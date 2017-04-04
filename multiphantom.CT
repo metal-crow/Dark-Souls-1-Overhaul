@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="24">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>10316</ID>
+      <Description>"Disable Framerate Warning Disconnection"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>// Credits to Jellybaby34
+[ENABLE]
+// This aob may not work due to multiple results
+aobscan(FrameRateWarnAOB,74 17 b9 * * * * e8 * * * * 8b)
+registersymbol(FrameRateWarnAOB)
+//code from here to '[DISABLE]' will be used to enable the cheat
+FrameRateWarnAOB:
+db C3
+
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+FrameRateWarnAOB:
+db 51
+unregistersymbol(FrameRateWarnAOB)
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>7</ID>
+      <Description>"fix malloc"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+"DARKSOULS.exe"+A63CA6:
+push 000000A0//(desired num of phantoms * 0x20)
+
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem)
+"DARKSOULS.exe"+A63CA6:
+push 00000080
+//Alt: db 68 80 00 00 00
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>8</ID>
+      <Description>"fix memset"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+"DARKSOULS.exe"+A63CBA:
+push 000000A0
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem)
+"DARKSOULS.exe"+A63CBA:
+push 00000080
+//Alt: db 68 80 00 00 00
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>9</ID>
+      <Description>"set number_of_char_slots_available"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+"DARKSOULS.exe"+A63CC1:
+mov [edi],00000005//number of character slots
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem)
+"DARKSOULS.exe"+A63CC1:
+mov [edi],00000004
+//Alt: db C7 07 04 00 00 00
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>19</ID>
+      <Description>"max_allowed_summons"</Description>
+      <LastState Value="5" RealAddress="0501912C"/>
+      <VariableType>4 Bytes</VariableType>
+      <Address>0137D82C</Address>
+      <Offsets>
+        <Offset>08c</Offset>
+      </Offsets>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>10317</ID>
+      <Description>"force show summon signs"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//one of these governs red signs, another white
+//(probably some other around governs dragon)
+"DARKSOULS.exe"+9B51B7:
+push 05 //max number of summons before signs dissapear
+
+"DARKSOULS.exe"+9B51EB:
+push 05 //max number of summons before signs dissapear
+
+[DISABLE]
+"DARKSOULS.exe"+9B51B7:
+push 03
+
+"DARKSOULS.exe"+9B51EB:
+push 02
+//Alt: db 6A 02 6A 02 57
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>22</ID>
+      <Description>"connected players count"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>12</ID>
+          <Description>"force total_num_connected_players to 1"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem: //this is allocated memory, you have read,write,execute access
+//set the summoned player counts back to 0/1
+mov     [edx+4], 0//num white
+mov     [edx+8], 0//number black
+mov     [edx+0C], 0//number dragon(i think)
+mov     [edx+10], 1//number total
+
+originalcode:
+pop edi
+pop esi
+pop ebp
+pop ebx
+pop ecx
+
+exit:
+jmp returnhere
+
+"DARKSOULS.exe"+AA1B0B:
+jmp newmem
+returnhere:
+
+
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem)
+"DARKSOULS.exe"+AA1B0B:
+pop edi
+pop esi
+pop ebp
+pop ebx
+pop ecx
+//Alt: db 5F 5E 5D 5B 59
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>0</ID>
+          <Description>"white"</Description>
+          <LastState Value="00000000" RealAddress="0CE33044"/>
+          <ShowAsHex>1</ShowAsHex>
+          <VariableType>4 Bytes</VariableType>
+          <Address>013784A0</Address>
+          <Offsets>
+            <Offset>4</Offset>
+            <Offset>bec</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1</ID>
+          <Description>"total"</Description>
+          <LastState Value="00000003" RealAddress="0CE33050"/>
+          <ShowAsHex>1</ShowAsHex>
+          <VariableType>4 Bytes</VariableType>
+          <Address>013784A0</Address>
+          <Offsets>
+            <Offset>10</Offset>
+            <Offset>bec</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>23</ID>
+      <Description>"connected players count alt"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>10</ID>
+          <Description>"force total_num_connected_players_secondary to 1"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem: //this is allocated memory, you have read,write,execute access
+mov [esi+14],1//sets a secondary total_num_connected_players variable to 1
+
+originalcode:
+//mov [esi+14],eax
+add esp,08
+
+exit:
+jmp returnhere
+
+"DARKSOULS.exe"+AA18F7:
+jmp newmem
+nop
+returnhere:
+
+
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem)
+"DARKSOULS.exe"+AA18F7:
+mov [esi+14],eax
+add esp,08
+//Alt: db 89 46 14 83 C4 08
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>4</ID>
+          <Description>"total again?"</Description>
+          <LastState Value="00000003" RealAddress="0CE33054"/>
+          <ShowAsHex>1</ShowAsHex>
+          <VariableType>4 Bytes</VariableType>
+          <Address>013784A0</Address>
+          <Offsets>
+            <Offset>14</Offset>
+            <Offset>bec</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>21</ID>
+      <Description>"connected players count alt (maybe models?)"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>16</ID>
+          <Description>"red_phant_b"</Description>
+          <LastState Value="2" RealAddress="050191D0"/>
+          <VariableType>4 Bytes</VariableType>
+          <Address>"DARKSOULS.exe"+00F7CE14</Address>
+          <Offsets>
+            <Offset>230</Offset>
+            <Offset>564</Offset>
+            <Offset>0</Offset>
+            <Offset>490</Offset>
+            <Offset>7F0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>17</ID>
+          <Description>"red_phant_a"</Description>
+          <LastState Value="2" RealAddress="0501914C"/>
+          <VariableType>4 Bytes</VariableType>
+          <Address>"DARKSOULS.exe"+00F7CE14</Address>
+          <Offsets>
+            <Offset>1AC</Offset>
+            <Offset>524</Offset>
+            <Offset>0</Offset>
+            <Offset>4D0</Offset>
+            <Offset>7F0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>18</ID>
+          <Description>"num_total_phants"</Description>
+          <LastState Value="3" RealAddress="06A28EA8"/>
+          <VariableType>4 Bytes</VariableType>
+          <Address>"DARKSOULS.exe"+00F7D644</Address>
+          <Offsets>
+            <Offset>178</Offset>
+            <Offset>290</Offset>
+            <Offset>254</Offset>
+            <Offset>CC</Offset>
+            <Offset>288</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>25</ID>
+      <Description>"tests"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>FrameRateWarnAOB</Name>
+      <Address> 00D7841E</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+</CheatTable>
