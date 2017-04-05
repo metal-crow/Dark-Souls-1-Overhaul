@@ -4,7 +4,7 @@
     <CheatEntry>
       <ID>10316</ID>
       <Description>"Disable Framerate Warning Disconnection"</Description>
-      <LastState/>
+      <LastState Activated="1"/>
       <VariableType>Auto Assembler Script</VariableType>
       <AssemblerScript>// Credits to Jellybaby34
 [ENABLE]
@@ -82,7 +82,7 @@ mov [edi],00000004
     <CheatEntry>
       <ID>19</ID>
       <Description>"max_allowed_summons"</Description>
-      <LastState Value="5" RealAddress="0501912C"/>
+      <LastState Value="5" RealAddress="0511E12C"/>
       <VariableType>4 Bytes</VariableType>
       <Address>0137D82C</Address>
       <Offsets>
@@ -103,13 +103,18 @@ push 05 //max number of summons before signs dissapear
 "DARKSOULS.exe"+9B51EB:
 push 05 //max number of summons before signs dissapear
 
+"DARKSOULS.exe"+9B11BE:
+cmp edx,05
+
 [DISABLE]
 "DARKSOULS.exe"+9B51B7:
 push 03
 
 "DARKSOULS.exe"+9B51EB:
 push 02
-//Alt: db 6A 02 6A 02 57
+
+"DARKSOULS.exe"+9B11BE:
+cmp edx,03
 </AssemblerScript>
     </CheatEntry>
     <CheatEntry>
@@ -168,20 +173,20 @@ pop ecx
         </CheatEntry>
         <CheatEntry>
           <ID>0</ID>
-          <Description>"white"</Description>
-          <LastState Value="00000000" RealAddress="0CE33044"/>
+          <Description>"black"</Description>
+          <LastState Value="00000003" RealAddress="0CF38048"/>
           <ShowAsHex>1</ShowAsHex>
           <VariableType>4 Bytes</VariableType>
           <Address>013784A0</Address>
           <Offsets>
-            <Offset>4</Offset>
+            <Offset>8</Offset>
             <Offset>bec</Offset>
           </Offsets>
         </CheatEntry>
         <CheatEntry>
           <ID>1</ID>
           <Description>"total"</Description>
-          <LastState Value="00000003" RealAddress="0CE33050"/>
+          <LastState Value="00000004" RealAddress="0CF38050"/>
           <ShowAsHex>1</ShowAsHex>
           <VariableType>4 Bytes</VariableType>
           <Address>013784A0</Address>
@@ -240,7 +245,7 @@ add esp,08
         <CheatEntry>
           <ID>4</ID>
           <Description>"total again?"</Description>
-          <LastState Value="00000003" RealAddress="0CE33054"/>
+          <LastState Value="00000005" RealAddress="0CF38054"/>
           <ShowAsHex>1</ShowAsHex>
           <VariableType>4 Bytes</VariableType>
           <Address>013784A0</Address>
@@ -260,7 +265,7 @@ add esp,08
         <CheatEntry>
           <ID>16</ID>
           <Description>"red_phant_b"</Description>
-          <LastState Value="2" RealAddress="050191D0"/>
+          <LastState Value="4" RealAddress="0511E1D0"/>
           <VariableType>4 Bytes</VariableType>
           <Address>"DARKSOULS.exe"+00F7CE14</Address>
           <Offsets>
@@ -274,7 +279,7 @@ add esp,08
         <CheatEntry>
           <ID>17</ID>
           <Description>"red_phant_a"</Description>
-          <LastState Value="2" RealAddress="0501914C"/>
+          <LastState Value="4" RealAddress="0511E14C"/>
           <VariableType>4 Bytes</VariableType>
           <Address>"DARKSOULS.exe"+00F7CE14</Address>
           <Offsets>
@@ -288,7 +293,7 @@ add esp,08
         <CheatEntry>
           <ID>18</ID>
           <Description>"num_total_phants"</Description>
-          <LastState Value="3" RealAddress="06A28EA8"/>
+          <LastState Value="4" RealAddress="06B2DF28"/>
           <VariableType>4 Bytes</VariableType>
           <Address>"DARKSOULS.exe"+00F7D644</Address>
           <Offsets>
