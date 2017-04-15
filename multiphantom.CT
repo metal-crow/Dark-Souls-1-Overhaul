@@ -141,6 +141,125 @@ cmp eax,[esi+00000168]
 </AssemblerScript>
     </CheatEntry>
     <CheatEntry>
+      <ID>10319</ID>
+      <Description>"info_about_summons.summon_chars_data setup"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//allocation of the summon_chars_data array put in the info_about_summons struct
+"DARKSOULS.exe"+806848:
+push 17D0 //16 + 1216*number of character slots
+
+//counter limit for initing all items in summon_chars_data array
+"DARKSOULS.exe"+8068A4:
+cmp esi,05
+"DARKSOULS.exe"+806ADE:
+cmp ebx,17C0//this is not index, but byte offset. So 1216*number of character slots
+
+//believe this is length of summon_chars_data array, stored in struct
+"DARKSOULS.exe"+8068A9:
+mov [ecx-04],00000005
+
+[DISABLE]
+"DARKSOULS.exe"+806848:
+push 00000E50
+
+"DARKSOULS.exe"+8068A4:
+cmp esi,03
+"DARKSOULS.exe"+806ADE:
+cmp ebx,0E40
+
+"DARKSOULS.exe"+8068A9:
+mov [ecx-04],00000003
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>10320</ID>
+      <Description>"info_about_summons.summon_char_types setup"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//size of summon_char_types array in info_about_summons struct
+"DARKSOULS.exe"+8068C3:
+push 05
+
+//init rest of the summon_char_types array to zero
+alloc(newmem,64)
+label(returnhere)
+newmem:
+mov [edx+02],bl
+mov [edx+03],bl
+mov [edx+04],bl
+call DARKSOULS.exe+1629C0
+jmp returnhere
+
+"DARKSOULS.exe"+8068DF:
+jmp newmem
+nop
+nop
+nop
+returnhere:
+
+//hardcoded limits for summon_char_types length
+"DARKSOULS.exe"+802CB7:
+cmp eax,05
+"DARKSOULS.exe"+802C80:
+cmp ecx,04
+"DARKSOULS.exe"+92E7A9:
+cmp ebx,04
+"DARKSOULS.exe"+92E6AF:
+cmp ebx,04
+"DARKSOULS.exe"+92FB73:
+cmp esi,04
+"DARKSOULS.exe"+92FDF1:
+cmp edi,04
+"DARKSOULS.exe"+930431:
+cmp eax,04
+"DARKSOULS.exe"+931C66:
+cmp esi,04
+"DARKSOULS.exe"+928135:
+cmp eax,04
+"DARKSOULS.exe"+92B19A:
+cmp edi,04
+"DARKSOULS.exe"+AE2B8A:
+cmp eax,04
+
+
+[DISABLE]
+"DARKSOULS.exe"+8068C3:
+push 03
+
+dealloc(newmem)
+"DARKSOULS.exe"+8068DF:
+mov [edx+02],bl
+call DARKSOULS.exe+1629C0
+//Alt: db 88 5A 02 E8 D9 C0 95 FF
+
+"DARKSOULS.exe"+802CB7:
+cmp eax,03
+"DARKSOULS.exe"+802C80:
+cmp ecx,02
+"DARKSOULS.exe"+92E7A9:
+cmp ebx,02
+"DARKSOULS.exe"+92E6AF:
+cmp ebx,02
+"DARKSOULS.exe"+92FB73:
+cmp esi,02
+"DARKSOULS.exe"+92FDF1:
+cmp edi,02
+"DARKSOULS.exe"+930431:
+cmp eax,02
+"DARKSOULS.exe"+931C66:
+cmp esi,02
+"DARKSOULS.exe"+928135:
+cmp eax,02
+"DARKSOULS.exe"+92B19A:
+cmp edi,02
+"DARKSOULS.exe"+AE2B8A:
+cmp eax,02
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
       <ID>22</ID>
       <Description>"connected players count"</Description>
       <LastState Value="" RealAddress="00000000"/>
@@ -329,11 +448,42 @@ add esp,08
       <LastState Value="" RealAddress="00000000"/>
       <GroupHeader>1</GroupHeader>
     </CheatEntry>
+    <CheatEntry>
+      <ID>10318</ID>
+      <Description>"force char i to 3 and move 31 into char type"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+alloc(newmem,2048)
+
+newmem: //this is allocated memory, you have read,write,execute access
+mov eax, 3 //set player num to 3
+
+mov ecx,["DARKSOULS.exe"+F78700]
+mov edx,[ecx+10]
+mov byte ptr [eax+edx],1F //move 31 into the would be player type location
+
+jmp "DARKSOULS.exe"+92A3EB //jump to player type check
+
+"DARKSOULS.exe"+92A3DD:
+jmp newmem
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem)
+"DARKSOULS.exe"+92A3DD:
+cmp eax,-01
+je DARKSOULS.exe+92A3F1
+//Alt: db 83 F8 FF 74 0F
+</AssemblerScript>
+    </CheatEntry>
   </CheatEntries>
   <UserdefinedSymbols>
     <SymbolEntry>
       <Name>FrameRateWarnAOB</Name>
-      <Address> 00D7847E</Address>
+      <Address> 00D7841E</Address>
     </SymbolEntry>
   </UserdefinedSymbols>
 </CheatTable>
