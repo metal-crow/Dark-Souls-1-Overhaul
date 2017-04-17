@@ -141,6 +141,26 @@ cmp eax,[esi+00000168]
 </AssemblerScript>
     </CheatEntry>
     <CheatEntry>
+      <ID>10321</ID>
+      <Description>"players_connected_counts.ptr_to_PlayerArray setup"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+"DARKSOULS.exe"+AA2554:
+cmp edx,05
+"DARKSOULS.exe"+AA2569:
+cmp ebx,05
+
+
+[DISABLE]
+"DARKSOULS.exe"+AA2554:
+cmp edx,04
+
+"DARKSOULS.exe"+AA2569:
+cmp ebx,04
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
       <ID>10319</ID>
       <Description>"info_about_summons.summon_chars_data setup"</Description>
       <LastState/>
@@ -160,6 +180,12 @@ cmp ebx,17C0//this is not index, but byte offset. So 1216*number of character sl
 "DARKSOULS.exe"+8068A9:
 mov [ecx-04],00000005
 
+//bounds checks
+"DARKSOULS.exe"+8037A7:
+cmp edx,05
+"DARKSOULS.exe"+8037BF:
+cmp ecx,17C0//1216*number of chars
+
 [DISABLE]
 "DARKSOULS.exe"+806848:
 push 00000E50
@@ -171,6 +197,11 @@ cmp ebx,0E40
 
 "DARKSOULS.exe"+8068A9:
 mov [ecx-04],00000003
+
+"DARKSOULS.exe"+8037A7:
+cmp edx,02
+"DARKSOULS.exe"+8037BF:
+cmp ecx,00000E40
 </AssemblerScript>
     </CheatEntry>
     <CheatEntry>
@@ -448,42 +479,11 @@ add esp,08
       <LastState Value="" RealAddress="00000000"/>
       <GroupHeader>1</GroupHeader>
     </CheatEntry>
-    <CheatEntry>
-      <ID>10318</ID>
-      <Description>"force char i to 3 and move 31 into char type"</Description>
-      <LastState/>
-      <VariableType>Auto Assembler Script</VariableType>
-      <AssemblerScript>[ENABLE]
-//code from here to '[DISABLE]' will be used to enable the cheat
-alloc(newmem,2048)
-
-newmem: //this is allocated memory, you have read,write,execute access
-mov eax, 3 //set player num to 3
-
-mov ecx,["DARKSOULS.exe"+F78700]
-mov edx,[ecx+10]
-mov byte ptr [eax+edx],1F //move 31 into the would be player type location
-
-jmp "DARKSOULS.exe"+92A3EB //jump to player type check
-
-"DARKSOULS.exe"+92A3DD:
-jmp newmem
- 
- 
-[DISABLE]
-//code from here till the end of the code will be used to disable the cheat
-dealloc(newmem)
-"DARKSOULS.exe"+92A3DD:
-cmp eax,-01
-je DARKSOULS.exe+92A3F1
-//Alt: db 83 F8 FF 74 0F
-</AssemblerScript>
-    </CheatEntry>
   </CheatEntries>
   <UserdefinedSymbols>
     <SymbolEntry>
       <Name>FrameRateWarnAOB</Name>
-      <Address> 00D7841E</Address>
+      <Address>00D7841E</Address>
     </SymbolEntry>
   </UserdefinedSymbols>
 </CheatTable>
