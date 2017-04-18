@@ -2,33 +2,70 @@
 <CheatTable CheatEngineTableVersion="24">
   <CheatEntries>
     <CheatEntry>
-      <ID>10316</ID>
-      <Description>"Disable Framerate Warning Disconnection"</Description>
-      <LastState/>
-      <VariableType>Auto Assembler Script</VariableType>
-      <AssemblerScript>// Credits to Jellybaby34
+      <ID>12376</ID>
+      <Description>"Activate on Attach"</Description>
+      <Options moActivateChildrenAsWell="1" moDeactivateChildrenAsWell="1"/>
+      <LastState Value="" Activated="1" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>10316</ID>
+          <Description>"Disable Framerate Warning Disconnection"</Description>
+          <LastState Activated="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>// Credits to Jellybaby34
 [ENABLE]
 // This aob may not work due to multiple results
 aobscan(FrameRateWarnAOB,74 17 b9 * * * * e8 * * * * 8b)
 registersymbol(FrameRateWarnAOB)
 //code from here to '[DISABLE]' will be used to enable the cheat
-FrameRateWarnAOB:
+FrameRateWarnAOB-1E:
 db C3
 
 
 [DISABLE]
 //code from here till the end of the code will be used to disable the cheat
-FrameRateWarnAOB:
+FrameRateWarnAOB-1E:
 db 51
 unregistersymbol(FrameRateWarnAOB)
 </AssemblerScript>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>7</ID>
-      <Description>"fix malloc"</Description>
-      <LastState/>
-      <VariableType>Auto Assembler Script</VariableType>
-      <AssemblerScript>[ENABLE]
+        </CheatEntry>
+        <CheatEntry>
+          <ID>12375</ID>
+          <Description>"Change Version Number"</Description>
+          <LastState Activated="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+
+// 2C is the version number of debug, 2E is current release
+DARKSOULS.exe+7E73FA:
+mov byte ptr [esp+1C],3C
+
+DARKSOULS.exe+7E719D:
+cmp byte ptr [eax],3C
+
+DARKSOULS.exe+7E7229:
+cmp byte ptr [eax],3C
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+DARKSOULS.exe+7E73FA:
+mov byte ptr [esp+1C],2E
+
+DARKSOULS.exe+7E719D:
+cmp byte ptr [eax],2E
+
+DARKSOULS.exe+7E7229:
+cmp byte ptr [eax],2E
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>7</ID>
+          <Description>"fix malloc"</Description>
+          <LastState Activated="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
 //code from here to '[DISABLE]' will be used to enable the cheat
 "DARKSOULS.exe"+A63CA6:
 push 000000A0//(desired num of phantoms * 0x20)
@@ -41,13 +78,13 @@ dealloc(newmem)
 push 00000080
 //Alt: db 68 80 00 00 00
 </AssemblerScript>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>8</ID>
-      <Description>"fix memset"</Description>
-      <LastState/>
-      <VariableType>Auto Assembler Script</VariableType>
-      <AssemblerScript>[ENABLE]
+        </CheatEntry>
+        <CheatEntry>
+          <ID>8</ID>
+          <Description>"fix memset"</Description>
+          <LastState Activated="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
 //code from here to '[DISABLE]' will be used to enable the cheat
 "DARKSOULS.exe"+A63CBA:
 push 000000A0
@@ -60,13 +97,13 @@ dealloc(newmem)
 push 00000080
 //Alt: db 68 80 00 00 00
 </AssemblerScript>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>9</ID>
-      <Description>"set number_of_char_slots_available"</Description>
-      <LastState/>
-      <VariableType>Auto Assembler Script</VariableType>
-      <AssemblerScript>[ENABLE]
+        </CheatEntry>
+        <CheatEntry>
+          <ID>9</ID>
+          <Description>"set number_of_char_slots_available"</Description>
+          <LastState Activated="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
 //code from here to '[DISABLE]' will be used to enable the cheat
 "DARKSOULS.exe"+A63CC1:
 mov [edi],00000005//number of character slots
@@ -78,22 +115,13 @@ dealloc(newmem)
 mov [edi],00000004
 //Alt: db C7 07 04 00 00 00
 </AssemblerScript>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>19</ID>
-      <Description>"max_allowed_summons"</Description>
-      <VariableType>4 Bytes</VariableType>
-      <Address>0137D82C</Address>
-      <Offsets>
-        <Offset>08c</Offset>
-      </Offsets>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>10317</ID>
-      <Description>"force show summon signs"</Description>
-      <LastState/>
-      <VariableType>Auto Assembler Script</VariableType>
-      <AssemblerScript>[ENABLE]
+        </CheatEntry>
+        <CheatEntry>
+          <ID>10317</ID>
+          <Description>"force show summon signs"</Description>
+          <LastState Activated="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
 //one of these governs red signs, another white
 //(probably some other around governs dragon)
 "DARKSOULS.exe"+9B51B7:
@@ -139,13 +167,13 @@ cmp dword ptr [eax+10],02
 "DARKSOULS.exe"+9B1271:
 cmp eax,[esi+00000168]
 </AssemblerScript>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>10321</ID>
-      <Description>"players_connected_counts.ptr_to_PlayerArray setup"</Description>
-      <LastState/>
-      <VariableType>Auto Assembler Script</VariableType>
-      <AssemblerScript>[ENABLE]
+        </CheatEntry>
+        <CheatEntry>
+          <ID>10321</ID>
+          <Description>"players_connected_counts.ptr_to_PlayerArray setup"</Description>
+          <LastState Activated="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
 "DARKSOULS.exe"+AA2554:
 cmp edx,05
 "DARKSOULS.exe"+AA2569:
@@ -159,13 +187,13 @@ cmp edx,04
 "DARKSOULS.exe"+AA2569:
 cmp ebx,04
 </AssemblerScript>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>10319</ID>
-      <Description>"info_about_summons.summon_chars_data setup"</Description>
-      <LastState/>
-      <VariableType>Auto Assembler Script</VariableType>
-      <AssemblerScript>[ENABLE]
+        </CheatEntry>
+        <CheatEntry>
+          <ID>10319</ID>
+          <Description>"info_about_summons.summon_chars_data setup"</Description>
+          <LastState Activated="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
 //allocation of the summon_chars_data array put in the info_about_summons struct
 "DARKSOULS.exe"+806848:
 push 17D0 //16 + 1216*number of character slots
@@ -203,13 +231,13 @@ cmp edx,02
 "DARKSOULS.exe"+8037BF:
 cmp ecx,00000E40
 </AssemblerScript>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>10320</ID>
-      <Description>"info_about_summons.summon_char_types setup"</Description>
-      <LastState/>
-      <VariableType>Auto Assembler Script</VariableType>
-      <AssemblerScript>[ENABLE]
+        </CheatEntry>
+        <CheatEntry>
+          <ID>10320</ID>
+          <Description>"info_about_summons.summon_char_types setup"</Description>
+          <LastState Activated="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
 //size of summon_char_types array in info_about_summons struct
 "DARKSOULS.exe"+8068C3:
 push 05
@@ -289,6 +317,18 @@ cmp edi,02
 "DARKSOULS.exe"+AE2B8A:
 cmp eax,02
 </AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>19</ID>
+      <Description>"max_allowed_summons"</Description>
+      <LastState Value="4" RealAddress="04EB24FC"/>
+      <VariableType>4 Bytes</VariableType>
+      <Address>0137D82C</Address>
+      <Offsets>
+        <Offset>08c</Offset>
+      </Offsets>
     </CheatEntry>
     <CheatEntry>
       <ID>22</ID>
@@ -347,6 +387,7 @@ pop ecx
         <CheatEntry>
           <ID>0</ID>
           <Description>"black"</Description>
+          <LastState Value="00000000" RealAddress="0CCCF0A8"/>
           <ShowAsHex>1</ShowAsHex>
           <VariableType>4 Bytes</VariableType>
           <Address>013784A0</Address>
@@ -358,6 +399,7 @@ pop ecx
         <CheatEntry>
           <ID>1</ID>
           <Description>"total"</Description>
+          <LastState Value="00000000" RealAddress="0CCCF0B0"/>
           <ShowAsHex>1</ShowAsHex>
           <VariableType>4 Bytes</VariableType>
           <Address>013784A0</Address>
@@ -416,6 +458,7 @@ add esp,08
         <CheatEntry>
           <ID>4</ID>
           <Description>"total again?"</Description>
+          <LastState Value="00000001" RealAddress="0CCCF0B4"/>
           <ShowAsHex>1</ShowAsHex>
           <VariableType>4 Bytes</VariableType>
           <Address>013784A0</Address>
@@ -483,7 +526,84 @@ add esp,08
   <UserdefinedSymbols>
     <SymbolEntry>
       <Name>FrameRateWarnAOB</Name>
-      <Address>00D7841E</Address>
+      <Address> 00D7841E</Address>
     </SymbolEntry>
   </UserdefinedSymbols>
+  <Comments>51 8B 40 04 85 C0 74 2F 8B 0D  
+</Comments>
+  <LuaScript>AddressList = getAddressList()
+
+errorOnLookupFailure(false)
+DefaultProccessName = "DARKSOULS.exe"
+strings_add(getAutoAttachList(), DefaultProccessName)
+
+-------------------------------------------------------------------------------
+
+function activateOnAttach()
+  local count = addresslist_getCount(AddressList)
+  for i=0,count-1 do
+    local record = addresslist_getMemoryRecord(AddressList, i)
+    if record.getDescription() == 'Activate on Attach' then
+       memoryrecord_freeze(record)
+       break
+    end
+  end
+end
+
+function getProcessNameFromProcessID(iProcessID)
+  if iProcessID &lt; 1 then return 0 end
+  local plist = createStringlist()
+  getProcesslist(plist)
+  for i=1, strings_getCount(plist)-1 do
+    local process = strings_getString(plist, i)
+    local offset = string.find(process,'-')
+    local pid = tonumber('0x'..string.sub(process,1,offset-1))
+    local pname = string.sub(process,offset+1)
+    if pid == iProcessID then return pname end
+  end
+  return 0
+end
+
+function getOpenedProcessName()
+  local process = getOpenedProcessID()
+  if process ~= 0 and getProcessIDFromProcessName(DefaultProccessName) == getOpenedProcessID() then
+    if checkOpenedProcess(DefaultProccessName) == true then return DefaultProccessName end
+    return 0
+  end
+  return getProcessNameFromProcessID(getOpenedProcessID())
+end
+
+function checkOpenedProcess(process)
+  if process == nil or process == 0 or process == false then
+    process = getOpenedProcessID()
+    if process ~= 0 and getProcessIDFromProcessName(DefaultProccessName) == process then
+      process = DefaultProccessName
+    end
+  end
+  if type(process) == "number" then process = getProcessNameFromProcessID(process) end
+  if process ~= nil and process ~= 0 then
+    if readInteger(process) then return true end
+  end
+  return false
+end
+
+function checkProccessAttached()
+  if DefaultProccessName == nil then return end
+  if checkOpenedProcess() == false then openProcess(DefaultProccessName) end
+end
+
+function onOpenProcess(processid)
+  activateOnAttach()
+  beep()
+end
+
+if AttachTimer ~= nil then
+  timer_setEnabled(AttachTimer, false); object_destroy(AttachTimer); AttachTimer = nil;
+end
+AttachTimer = createTimer(nil)
+timer_onTimer(AttachTimer, checkProccessAttached)
+timer_setInterval(AttachTimer,3000)
+timer_setEnabled(AttachTimer, true)
+
+</LuaScript>
 </CheatTable>
