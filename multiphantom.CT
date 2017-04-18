@@ -68,7 +68,7 @@ cmp byte ptr [eax],2E
           <AssemblerScript>[ENABLE]
 //code from here to '[DISABLE]' will be used to enable the cheat
 "DARKSOULS.exe"+A63CA6:
-push 000000A0//(desired num of phantoms * 0x20)
+push 00000120//(desired num of phantoms * 0x20)
 
  
 [DISABLE]
@@ -87,7 +87,7 @@ push 00000080
           <AssemblerScript>[ENABLE]
 //code from here to '[DISABLE]' will be used to enable the cheat
 "DARKSOULS.exe"+A63CBA:
-push 000000A0
+push 00000120
  
  
 [DISABLE]
@@ -106,7 +106,7 @@ push 00000080
           <AssemblerScript>[ENABLE]
 //code from here to '[DISABLE]' will be used to enable the cheat
 "DARKSOULS.exe"+A63CC1:
-mov [edi],00000005//number of character slots
+mov [edi],00000009//number of character slots
  
 [DISABLE]
 //code from here till the end of the code will be used to disable the cheat
@@ -125,24 +125,24 @@ mov [edi],00000004
 //one of these governs red signs, another white
 //(probably some other around governs dragon)
 "DARKSOULS.exe"+9B51B7:
-push 05 //max number of summons before signs dissapear
+push 09 //max number of summons before signs dissapear
 "DARKSOULS.exe"+9B51EB:
-push 05 //max number of summons before signs dissapear
+push 09 //max number of summons before signs dissapear
 
 //Check that sums up all phantoms
 "DARKSOULS.exe"+9B11BE:
-cmp edx,08
+cmp edx,3f //this is more than number of phantoms, but not sure by how much
 
 //not 100% on this one
 "DARKSOULS.exe"+92A47C:
-cmp dword ptr [eax+10],05
+cmp dword ptr [eax+10],09
 
 //I dunno
 alloc(newmem,64)
 label(returnhere)
 
 newmem:
-cmp eax,5
+cmp eax,9
 jmp returnhere
 
 "DARKSOULS.exe"+9B1271:
@@ -175,9 +175,9 @@ cmp eax,[esi+00000168]
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>[ENABLE]
 "DARKSOULS.exe"+AA2554:
-cmp edx,05
+cmp edx,09
 "DARKSOULS.exe"+AA2569:
-cmp ebx,05
+cmp ebx,09
 
 
 [DISABLE]
@@ -196,23 +196,23 @@ cmp ebx,04
           <AssemblerScript>[ENABLE]
 //allocation of the summon_chars_data array put in the info_about_summons struct
 "DARKSOULS.exe"+806848:
-push 17D0 //16 + 1216*number of character slots
+push 2AD0 //16 + 1216*number of character slots
 
 //counter limit for initing all items in summon_chars_data array
 "DARKSOULS.exe"+8068A4:
-cmp esi,05
+cmp esi,09
 "DARKSOULS.exe"+806ADE:
-cmp ebx,17C0//this is not index, but byte offset. So 1216*number of character slots
+cmp ebx,2AC0//this is not index, but byte offset. So 1216*number of character slots
 
 //believe this is length of summon_chars_data array, stored in struct
 "DARKSOULS.exe"+8068A9:
-mov [ecx-04],00000005
+mov [ecx-04],00000009
 
 //bounds checks
 "DARKSOULS.exe"+8037A7:
-cmp edx,05
+cmp edx,09
 "DARKSOULS.exe"+8037BF:
-cmp ecx,17C0//1216*number of chars
+cmp ecx,2AC0//1216*number of chars
 
 [DISABLE]
 "DARKSOULS.exe"+806848:
@@ -240,7 +240,7 @@ cmp ecx,00000E40
           <AssemblerScript>[ENABLE]
 //size of summon_char_types array in info_about_summons struct
 "DARKSOULS.exe"+8068C3:
-push 05
+push 09
 
 //init rest of the summon_char_types array to zero
 alloc(newmem,64)
@@ -249,6 +249,10 @@ newmem:
 mov [edx+02],bl
 mov [edx+03],bl
 mov [edx+04],bl
+mov [edx+05],bl
+mov [edx+06],bl
+mov [edx+07],bl
+mov [edx+08],bl
 call DARKSOULS.exe+1629C0
 jmp returnhere
 
@@ -259,29 +263,29 @@ nop
 nop
 returnhere:
 
-//hardcoded limits for summon_char_types length
+//hardcoded limits for summon_char_types length (some are &lt;=)
 "DARKSOULS.exe"+802CB7:
-cmp eax,05
+cmp eax,09
 "DARKSOULS.exe"+802C80:
-cmp ecx,04
+cmp ecx,08
 "DARKSOULS.exe"+92E7A9:
-cmp ebx,04
+cmp ebx,08
 "DARKSOULS.exe"+92E6AF:
-cmp ebx,04
+cmp ebx,08
 "DARKSOULS.exe"+92FB73:
-cmp esi,04
+cmp esi,08
 "DARKSOULS.exe"+92FDF1:
-cmp edi,04
+cmp edi,08
 "DARKSOULS.exe"+930431:
-cmp eax,04
+cmp eax,08
 "DARKSOULS.exe"+931C66:
-cmp esi,04
+cmp esi,08
 "DARKSOULS.exe"+928135:
-cmp eax,04
+cmp eax,08
 "DARKSOULS.exe"+92B19A:
-cmp edi,04
+cmp edi,08
 "DARKSOULS.exe"+AE2B8A:
-cmp eax,04
+cmp eax,08
 
 
 [DISABLE]
