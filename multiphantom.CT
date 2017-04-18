@@ -242,6 +242,9 @@ cmp ecx,00000E40
 "DARKSOULS.exe"+8068C3:
 push 09
 
+//write to a variable to alert us if inject was done in time
+globalalloc(sucessful_phantomfix,4)
+
 //init rest of the summon_char_types array to zero
 alloc(newmem,64)
 label(returnhere)
@@ -253,8 +256,12 @@ mov [edx+05],bl
 mov [edx+06],bl
 mov [edx+07],bl
 mov [edx+08],bl
+mov [sucessful_phantomfix], 1//success marker
 call DARKSOULS.exe+1629C0
 jmp returnhere
+
+sucessful_phantomfix:
+dd 0
 
 "DARKSOULS.exe"+8068DF:
 jmp newmem
@@ -291,6 +298,9 @@ cmp eax,08
 [DISABLE]
 "DARKSOULS.exe"+8068C3:
 push 03
+
+unregistersymbol(sucessful_phantomfix)
+dealloc(sucessful_phantomfix)
 
 dealloc(newmem)
 "DARKSOULS.exe"+8068DF:
@@ -333,6 +343,12 @@ cmp eax,02
       <Offsets>
         <Offset>08c</Offset>
       </Offsets>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>10322</ID>
+      <Description>"sucessful_phantomfix"</Description>
+      <VariableType>4 Bytes</VariableType>
+      <Address>sucessful_phantomfix</Address>
     </CheatEntry>
     <CheatEntry>
       <ID>22</ID>
@@ -531,6 +547,10 @@ add esp,08
     <SymbolEntry>
       <Name>FrameRateWarnAOB</Name>
       <Address> 00D7841E</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>sucessful_phantomfix</Name>
+      <Address>018F0020</Address>
     </SymbolEntry>
   </UserdefinedSymbols>
   <Comments>51 8B 40 04 85 C0 74 2F 8B 0D  
