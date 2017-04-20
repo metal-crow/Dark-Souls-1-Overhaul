@@ -1730,15 +1730,6 @@ function getProcessNameFromProcessID(iProcessID)
   return 0
 end
 
-function getOpenedProcessName()
-  local process = getOpenedProcessID()
-  if process ~= 0 and getProcessIDFromProcessName(DefaultProccessName) == getOpenedProcessID() then
-    if checkOpenedProcess(DefaultProccessName) == true then return DefaultProccessName end
-    return 0
-  end
-  return getProcessNameFromProcessID(getOpenedProcessID())
-end
-
 function checkOpenedProcess(process)
   if process == nil or process == 0 or process == false then
     process = getOpenedProcessID()
