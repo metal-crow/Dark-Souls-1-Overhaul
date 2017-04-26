@@ -1673,6 +1673,46 @@ cmp eax,02
         </CheatEntry>
       </CheatEntries>
     </CheatEntry>
+    <CheatEntry>
+      <ID>12426</ID>
+      <Description>"Other Scripts"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Value="" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>12425</ID>
+          <Description>"Red Eye Orb + Eye of Death (No Covenant Req.)"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+registersymbol(RedEyeOrb)
+registersymbol(EyeOfDeath)
+aobscan(RedEyeOrb,0b 00 00 00 52 00 00 00 00 00 00 00 00 00 00 00)
+RedEyeOrb+42:
+db ff
+RedEyeOrb+43:
+db ff
+aobscan(EyeOfDeath,10 00 00 00 57 00 00 00 00 00 00 00 00 00 00 00)
+EyeOfDeath+42:
+db ff
+EyeOfDeath+43:
+db ff
+[DISABLE]
+unregistersymbol(RedEyeOrb)
+unregistersymbol(EyeOfDeath)
+RedEyeOrb+42:
+db 10
+RedEyeOrb+43:
+db 00
+EyeOfDeath+42:
+db 40
+EyeOfDeath+43:
+db 00
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
   </CheatEntries>
   <UserdefinedSymbols>
     <SymbolEntry>
