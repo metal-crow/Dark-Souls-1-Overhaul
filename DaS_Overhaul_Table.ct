@@ -1565,6 +1565,11 @@ cmp edi,08
 "DARKSOULS.exe"+AE2B8A:
 cmp eax,08
 
+
+"DARKSOULS.exe"+322A00:
+push 09
+push 08
+
 [DISABLE]
 "DARKSOULS.exe"+A63CA6:
 push 00000080
@@ -1645,6 +1650,11 @@ cmp eax,02
 cmp edi,02
 "DARKSOULS.exe"+AE2B8A:
 cmp eax,02
+
+
+"DARKSOULS.exe"+322A00:
+push 05
+push 04
 </AssemblerScript>
         </CheatEntry>
       </CheatEntries>
