@@ -1,0 +1,2205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="24">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>89915</ID>
+      <Description>"Open"</Description>
+      <Options moHideChildren="1"/>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+globalalloc(selected_weapon,40)
+
+[DISABLE]
+dealloc(selected_weapon)
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>10322</ID>
+          <Description>"Select Weapon"</Description>
+          <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">D0 07 00 00 01 00 00 00 58 09 03 00:Dagger
+D0 07 00 00 02 00 00 00 58 09 03 00:Crystal Dagger
+D0 07 00 00 03 00 00 00 58 09 03 00:Lightning Dagger
+D0 07 00 00 04 00 00 00 58 09 03 00:Raw Dagger
+D0 07 00 00 05 00 00 00 58 09 03 00:Magic Dagger
+D0 07 00 00 06 00 00 00 58 09 03 00:Enchanted Dagger
+D0 07 00 00 07 00 00 00 58 09 03 00:Divine Dagger
+D0 07 00 00 08 00 00 00 58 09 03 00:Occult Dagger
+D0 07 00 00 09 00 00 00 58 09 03 00:Fire Dagger
+D0 07 00 00 A 00 00 00 58 09 03 00:Chaos Dagger
+D0 07 00 00 B 00 00 00 58 09 03 00:Parrying Dagger
+D0 07 00 00 C 00 00 00 58 09 03 00:Crystal Parrying Dagger
+D0 07 00 00 D 00 00 00 58 09 03 00:Lightning Parrying Dagger
+D0 07 00 00 E 00 00 00 58 09 03 00:Raw Parrying Dagger
+D0 07 00 00 F 00 00 00 58 09 03 00:Magic Parrying Dagger
+D0 07 00 00 10 00 00 00 58 09 03 00:Enchanted Parrying Dagger
+D0 07 00 00 11 00 00 00 58 09 03 00:Divine Parrying Dagger
+D0 07 00 00 12 00 00 00 58 09 03 00:Occult Parrying Dagger
+D0 07 00 00 13 00 00 00 58 09 03 00:Fire Parrying Dagger
+D0 07 00 00 14 00 00 00 58 09 03 00:Chaos Parrying Dagger
+D3 07 00 00 1F 00 00 00 58 09 03 00:Ghost Blade
+D1 07 00 00 15 00 00 00 58 09 03 00:Bandit's Knife
+D1 07 00 00 16 00 00 00 58 09 03 00:Crystal Knife
+D1 07 00 00 17 00 00 00 58 09 03 00:Lightning Knife
+D1 07 00 00 18 00 00 00 58 09 03 00:Raw Knife
+D1 07 00 00 19 00 00 00 58 09 03 00:Magic Knife
+D1 07 00 00 1A 00 00 00 58 09 03 00:Enchanted Knife
+D1 07 00 00 1B 00 00 00 58 09 03 00:Divine Knife
+D1 07 00 00 1C 00 00 00 58 09 03 00:Occult Knife
+D1 07 00 00 1D 00 00 00 58 09 03 00:Fire Knife
+D1 07 00 00 1E 00 00 00 58 09 03 00:Chaos Knife
+D2 07 00 00 29 00 00 00 58 09 03 00:Priscilla's Dagger
+FC 08 00 00 65 00 00 00 F8 8F 04 00:Shortsword
+FC 08 00 00 66 00 00 00 F8 8F 04 00:Crystal Shortsword
+FC 08 00 00 67 00 00 00 F8 8F 04 00:Lightning Shortsword
+FC 08 00 00 68 00 00 00 F8 8F 04 00:Raw Shortsword
+FC 08 00 00 69 00 00 00 F8 8F 04 00:Magic Shortsword
+FC 08 00 00 6A 00 00 00 F8 8F 04 00:Enchanted Shortsword
+FC 08 00 00 6B 00 00 00 F8 8F 04 00:Divine Shortsword
+FC 08 00 00 6C 00 00 00 F8 8F 04 00:Occult Shortsword
+FC 08 00 00 6D 00 00 00 F8 8F 04 00:Fire Shortsword
+FC 08 00 00 6E 00 00 00 F8 8F 04 00:Chaos Shortsword
+FC 08 00 00 6F 00 00 00 F8 8F 04 00:Longsword
+FC 08 00 00 70 00 00 00 F8 8F 04 00:Crystal Longsword
+FC 08 00 00 71 00 00 00 F8 8F 04 00:Lightning Longsword
+FC 08 00 00 72 00 00 00 F8 8F 04 00:Raw Longsword
+FC 08 00 00 73 00 00 00 F8 8F 04 00:Magic Longsword
+FC 08 00 00 74 00 00 00 F8 8F 04 00:Enchanted Longsword
+FC 08 00 00 75 00 00 00 F8 8F 04 00:Divine Longsword
+FC 08 00 00 76 00 00 00 F8 8F 04 00:Occult Longsword
+FC 08 00 00 77 00 00 00 F8 8F 04 00:Fire Longsword
+FC 08 00 00 78 00 00 00 F8 8F 04 00:Chaos Longsword
+FD 08 00 00 79 00 00 00 F8 8F 04 00:Broadsword
+FD 08 00 00 7A 00 00 00 F8 8F 04 00:Crystal Broadsword
+FD 08 00 00 7B 00 00 00 F8 8F 04 00:Lightning Broadsword
+FD 08 00 00 7C 00 00 00 F8 8F 04 00:Raw Broadsword
+FD 08 00 00 7D 00 00 00 F8 8F 04 00:Magic Broadsword
+FD 08 00 00 7E 00 00 00 F8 8F 04 00:Enchanted Broadsword
+FD 08 00 00 7F 00 00 00 F8 8F 04 00:Divine Broadsword
+FD 08 00 00 80 00 00 00 F8 8F 04 00:Occult Broadsword
+FD 08 00 00 81 00 00 00 F8 8F 04 00:Fire Broadsword
+FD 08 00 00 82 00 00 00 F8 8F 04 00:Chaos Broadsword
+FC 08 00 00 D3 00 00 00 F8 8F 04 00:Broken Straight Sword
+FC 08 00 00 D4 00 00 00 F8 8F 04 00:Crys. Broken Str. Sword
+FC 08 00 00 D5 00 00 00 F8 8F 04 00:Ltng. Broken Str. Sword
+FC 08 00 00 D6 00 00 00 F8 8F 04 00:Raw Broken Straight Sword
+FC 08 00 00 D7 00 00 00 F8 8F 04 00:Magic Broken Straight Sword
+FC 08 00 00 D8 00 00 00 F8 8F 04 00:Ench. Broken Str. Sword
+FC 08 00 00 D9 00 00 00 F8 8F 04 00:Div. Broken Str. Sword
+FC 08 00 00 DA 00 00 00 F8 8F 04 00:Occ. Broken Str. Sword
+FC 08 00 00 DB 00 00 00 F8 8F 04 00:Fire Broken Straight Sword
+FC 08 00 00 DC 00 00 00 F8 8F 04 00:Chaos Broken Straight Sword
+FE 08 00 00 83 00 00 00 F8 8F 04 00:Balder Side Sword
+FE 08 00 00 84 00 00 00 F8 8F 04 00:Crystal Balder Side Sword
+FE 08 00 00 85 00 00 00 F8 8F 04 00:Lightning Balder Side Sword
+FE 08 00 00 86 00 00 00 F8 8F 04 00:Raw Balder Side Sword
+FE 08 00 00 87 00 00 00 F8 8F 04 00:Magic Balder Side Sword
+FE 08 00 00 88 00 00 00 F8 8F 04 00:Enchanted Balder Side Sword
+FE 08 00 00 89 00 00 00 F8 8F 04 00:Divine Balder Side Sword
+FE 08 00 00 8A 00 00 00 F8 8F 04 00:Occult Balder Side Sword
+FE 08 00 00 8B 00 00 00 F8 8F 04 00:Fire Balder Side Sword
+FE 08 00 00 8C 00 00 00 F8 8F 04 00:Chaos Balder Side Sword
+FC 08 00 00 B5 00 00 00 F8 8F 04 00:Crystal Straight Sword
+FC 08 00 00 8D 00 00 00 F8 8F 04 00:Sunlight Straight Sword
+FC 08 00 00 8E 00 00 00 F8 8F 04 00:Crys. Sunlight Str. Sword
+FC 08 00 00 8F 00 00 00 F8 8F 04 00:Ltng. Sunlight Str. Sword
+FC 08 00 00 90 00 00 00 F8 8F 04 00:Raw Sunlight Straight Sword
+FC 08 00 00 91 00 00 00 F8 8F 04 00:Magic Sunlight Str. Sword
+FC 08 00 00 92 00 00 00 F8 8F 04 00:Ench. Sunlight Str. Sword
+FC 08 00 00 93 00 00 00 F8 8F 04 00:Div. Sunlight Str. Sword
+FC 08 00 00 94 00 00 00 F8 8F 04 00:Occ. Sunlight Str. Sword
+FC 08 00 00 95 00 00 00 F8 8F 04 00:Fire Sunlight Str. Sword
+FC 08 00 00 96 00 00 00 F8 8F 04 00:Chaos Sunlight Str. Sword
+FD 08 00 00 AB 00 00 00 F8 8F 04 00:Barbed Straight Sword
+FD 08 00 00 AC 00 00 00 F8 8F 04 00:Crys. Barbed Str. Sword
+FD 08 00 00 AD 00 00 00 F8 8F 04 00:Ltng. Barbed Str. Sword
+FD 08 00 00 AE 00 00 00 F8 8F 04 00:Raw Barbed Straight Sword
+FD 08 00 00 AF 00 00 00 F8 8F 04 00:Magic Barbed Straight Sword
+FD 08 00 00 B0 00 00 00 F8 8F 04 00:Ench. Barbed Str. Sword
+FD 08 00 00 B1 00 00 00 F8 8F 04 00:Div. Barbed Str. Sword
+FD 08 00 00 B2 00 00 00 F8 8F 04 00:Occ. Barbed Str. Sword
+FD 08 00 00 B3 00 00 00 F8 8F 04 00:Fire Barbed Straight Sword
+FD 08 00 00 B4 00 00 00 F8 8F 04 00:Chaos Barbed Straight Sword
+FF 08 00 00 BF 00 00 00 F8 8F 04 00:Silv. Knight Str. Sword
+FC 08 00 00 C0 00 00 00 F8 8F 04 00:Astora's Straight Sword
+00 09 00 00 A1 00 00 00 F8 8F 04 00:Darksword
+00 09 00 00 A2 00 00 00 F8 8F 04 00:Crystal Darksword
+00 09 00 00 A3 00 00 00 F8 8F 04 00:Lightning Darksword
+00 09 00 00 A4 00 00 00 F8 8F 04 00:Raw Darksword
+00 09 00 00 A5 00 00 00 F8 8F 04 00:Magic Darksword
+00 09 00 00 A6 00 00 00 F8 8F 04 00:Enchanted Darksword
+00 09 00 00 A7 00 00 00 F8 8F 04 00:Divine Darksword
+00 09 00 00 A8 00 00 00 F8 8F 04 00:Occult Darksword
+00 09 00 00 A9 00 00 00 F8 8F 04 00:Fire Darksword
+00 09 00 00 AA 00 00 00 F8 8F 04 00:Chaos Darksword
+01 09 00 00 CA 00 00 00 F8 8F 04 00:Drake Sword
+FD 08 00 00 DD 00 00 00 F8 8F 04 00:Straight Sword Hilt
+FD 08 00 00 DE 00 00 00 F8 8F 04 00:Crystal Straight Sword Hilt
+FD 08 00 00 DF 00 00 00 F8 8F 04 00:Ltng. Str. Sword Hilt
+FD 08 00 00 E0 00 00 00 F8 8F 04 00:Raw Straight Sword Hilt
+FD 08 00 00 E1 00 00 00 F8 8F 04 00:Magic Straight Sword Hilt
+FD 08 00 00 E2 00 00 00 F8 8F 04 00:Ench. Straight Sword Hilt
+FD 08 00 00 E3 00 00 00 F8 8F 04 00:Divine Straight Sword Hilt
+FD 08 00 00 E4 00 00 00 F8 8F 04 00:Occult Straight Sword Hilt
+FD 08 00 00 E5 00 00 00 F8 8F 04 00:Fire Straight Sword Hilt
+FD 08 00 00 E6 00 00 00 F8 8F 04 00:Chaos Straight Sword Hilt
+C4 09 00 00 2D 01 00 00 B0 12 06 00:Bastard Sword
+C4 09 00 00 2E 01 00 00 B0 12 06 00:Crystal Bastard Sword
+C4 09 00 00 2F 01 00 00 B0 12 06 00:Lightning Bastard Sword
+C4 09 00 00 30 01 00 00 B0 12 06 00:Raw Bastard Sword
+C4 09 00 00 31 01 00 00 B0 12 06 00:Magic Bastard Sword
+C4 09 00 00 32 01 00 00 B0 12 06 00:Enchanted Bastard Sword
+C4 09 00 00 33 01 00 00 B0 12 06 00:Divine Bastard Sword
+C4 09 00 00 34 01 00 00 B0 12 06 00:Occult Bastard Sword
+C4 09 00 00 35 01 00 00 B0 12 06 00:Fire Bastard Sword
+C4 09 00 00 36 01 00 00 B0 12 06 00:Chaos Bastard Sword
+C9 09 00 00 37 01 00 00 B0 12 06 00:Claymore
+C9 09 00 00 38 01 00 00 B0 12 06 00:Crystal Claymore
+C9 09 00 00 39 01 00 00 B0 12 06 00:Lightning Claymore
+C9 09 00 00 3A 01 00 00 B0 12 06 00:Raw Claymore
+C9 09 00 00 3B 01 00 00 B0 12 06 00:Magic Claymore
+C9 09 00 00 3C 01 00 00 B0 12 06 00:Enchanted Claymore
+C9 09 00 00 3D 01 00 00 B0 12 06 00:Divine Claymore
+C9 09 00 00 3E 01 00 00 B0 12 06 00:Occult Claymore
+C9 09 00 00 3F 01 00 00 B0 12 06 00:Fire Claymore
+C9 09 00 00 40 01 00 00 B0 12 06 00:Chaos Claymore
+C4 09 00 00 41 01 00 00 B0 12 06 00:Man-serpent Greatsword
+C4 09 00 00 42 01 00 00 B0 12 06 00:Crys. Man-srp. Greatsword
+C4 09 00 00 43 01 00 00 B0 12 06 00:Ltng. Man-srp. Greatsword
+C4 09 00 00 44 01 00 00 B0 12 06 00:Raw Man-serpent Greatsword
+C4 09 00 00 45 01 00 00 B0 12 06 00:Magic Man-srp. Greatsword
+C4 09 00 00 46 01 00 00 B0 12 06 00:Ench. Man-srp. Greatsword
+C4 09 00 00 47 01 00 00 B0 12 06 00:Div. Man-srp. Greatsword
+C4 09 00 00 48 01 00 00 B0 12 06 00:Occ. Man-srp. Greatsword
+C4 09 00 00 49 01 00 00 B0 12 06 00:Fire Man-serpent Greatsword
+C4 09 00 00 4A 01 00 00 B0 12 06 00:Chaos Man-srp. Greatsword
+C6 09 00 00 4B 01 00 00 B0 12 06 00:Flamberge
+C6 09 00 00 4C 01 00 00 B0 12 06 00:Crystal Flamberge
+C6 09 00 00 4D 01 00 00 B0 12 06 00:Lightning Flamberge
+C6 09 00 00 4E 01 00 00 B0 12 06 00:Raw Flamberge
+C6 09 00 00 4F 01 00 00 B0 12 06 00:Magic Flamberge
+C6 09 00 00 50 01 00 00 B0 12 06 00:Enchanted Flamberge
+C6 09 00 00 51 01 00 00 B0 12 06 00:Divine Flamberge
+C6 09 00 00 52 01 00 00 B0 12 06 00:Occult Flamberge
+C6 09 00 00 53 01 00 00 B0 12 06 00:Fire Flamberge
+C6 09 00 00 54 01 00 00 B0 12 06 00:Chaos Flamberge
+C4 09 00 00 55 01 00 00 B0 12 06 00:Crystal Greatsword
+C7 09 00 00 69 01 00 00 B0 12 06 00:Stone Greatsword
+CA 09 00 00 85 01 00 00 B0 12 06 00:Greatsword of Artorias
+CA 09 00 00 86 01 00 00 B0 12 06 00:Greatsword of Artorias
+C8 09 00 00 C3 01 00 00 B0 12 06 00:Moonlight Greatsword
+C5 09 00 00 5F 01 00 00 B0 12 06 00:Black Knight Sword
+CA 09 00 00 73 01 00 00 B0 12 06 00:Greatsword of Artorias
+CA 09 00 00 74 01 00 00 B0 12 06 00:Greatsword of Artorias
+CA 09 00 00 75 01 00 00 B0 12 06 00:Greatsword of Artorias
+CA 09 00 00 76 01 00 00 B0 12 06 00:Greatsword of Artorias
+CA 09 00 00 77 01 00 00 B0 12 06 00:Greatsword of Artorias
+CA 09 00 00 78 01 00 00 B0 12 06 00:Greatsword of Artorias
+CA 09 00 00 79 01 00 00 B0 12 06 00:Greatsword of Artorias
+CA 09 00 00 7A 01 00 00 B0 12 06 00:Greatsword of Artorias
+CA 09 00 00 7B 01 00 00 B0 12 06 00:Greatsword of Artorias
+CA 09 00 00 7C 01 00 00 B0 12 06 00:Greatsword of Artorias
+CA 09 00 00 7D 01 00 00 B0 12 06 00:Greatsword of Artorias
+CA 09 00 00 7E 01 00 00 B0 12 06 00:Greatsword of Artorias
+CA 09 00 00 7F 01 00 00 B0 12 06 00:Greatsword of Artorias
+CA 09 00 00 80 01 00 00 B0 12 06 00:Greatsword of Artorias
+CA 09 00 00 81 01 00 00 B0 12 06 00:Greatsword of Artorias
+CA 09 00 00 82 01 00 00 B0 12 06 00:Greatsword of Artorias
+CA 09 00 00 83 01 00 00 B0 12 06 00:Greatsword of Artorias
+CA 09 00 00 84 01 00 00 B0 12 06 00:Greatsword of Artorias
+CB 09 00 00 A5 01 00 00 B0 12 06 00:Great Lord Greatsword
+CB 09 00 00 A6 01 00 00 B0 12 06 00:Great Lord Greatsword
+CB 09 00 00 A7 01 00 00 B0 12 06 00:Great Lord Greatsword
+CB 09 00 00 A8 01 00 00 B0 12 06 00:Great Lord Greatsword
+CB 09 00 00 A9 01 00 00 B0 12 06 00:Great Lord Greatsword
+CB 09 00 00 AA 01 00 00 B0 12 06 00:Great Lord Greatsword
+CB 09 00 00 AB 01 00 00 B0 12 06 00:Great Lord Greatsword
+CB 09 00 00 AC 01 00 00 B0 12 06 00:Great Lord Greatsword
+CB 09 00 00 AD 01 00 00 B0 12 06 00:Great Lord Greatsword
+CB 09 00 00 AE 01 00 00 B0 12 06 00:Great Lord Greatsword
+CB 09 00 00 AF 01 00 00 B0 12 06 00:Great Lord Greatsword
+CB 09 00 00 B0 01 00 00 B0 12 06 00:Great Lord Greatsword
+CB 09 00 00 B1 01 00 00 B0 12 06 00:Great Lord Greatsword
+CB 09 00 00 B2 01 00 00 B0 12 06 00:Great Lord Greatsword
+CB 09 00 00 B3 01 00 00 B0 12 06 00:Great Lord Greatsword
+CB 09 00 00 B4 01 00 00 B0 12 06 00:Great Lord Greatsword
+CB 09 00 00 B5 01 00 00 B0 12 06 00:Great Lord Greatsword
+CB 09 00 00 B6 01 00 00 B0 12 06 00:Great Lord Greatsword
+28 A 00 00 FF 01 00 00 98 16 06 00:Zweihander
+28 A 00 00 00 02 00 00 98 16 06 00:Crystal Zweihander
+28 A 00 00 01 02 00 00 98 16 06 00:Lightning Zweihander
+28 A 00 00 02 02 00 00 98 16 06 00:Raw Zweihander
+28 A 00 00 03 02 00 00 98 16 06 00:Magic Zweihander
+28 A 00 00 04 02 00 00 98 16 06 00:Enchanted Zweihander
+28 A 00 00 05 02 00 00 98 16 06 00:Divine Zweihander
+28 A 00 00 06 02 00 00 98 16 06 00:Occult Zweihander
+28 A 00 00 07 02 00 00 98 16 06 00:Fire Zweihander
+28 A 00 00 08 02 00 00 98 16 06 00:Chaos Zweihander
+2A A 00 00 F5 01 00 00 98 16 06 00:Greatsword
+2A A 00 00 F6 01 00 00 98 16 06 00:Crystal Greatsword
+2A A 00 00 F7 01 00 00 98 16 06 00:Lightning Greatsword
+2A A 00 00 F8 01 00 00 98 16 06 00:Raw Greatsword
+2A A 00 00 F9 01 00 00 98 16 06 00:Magic Greatsword
+2A A 00 00 FA 01 00 00 98 16 06 00:Enchanted Greatsword
+2A A 00 00 FB 01 00 00 98 16 06 00:Divine Greatsword
+2A A 00 00 FC 01 00 00 98 16 06 00:Occult Greatsword
+2A A 00 00 FD 01 00 00 98 16 06 00:Fire Greatsword
+2A A 00 00 FE 01 00 00 98 16 06 00:Chaos Greatsword
+2B A 00 00 09 02 00 00 98 16 06 00:Demon Great Machete
+2B A 00 00 A 02 00 00 98 16 06 00:Crystal Demon Great Machete
+2B A 00 00 B 02 00 00 98 16 06 00:Ltng. Demon Great Machete
+2B A 00 00 C 02 00 00 98 16 06 00:Raw Demon Great Machete
+2B A 00 00 D 02 00 00 98 16 06 00:Magic Demon Great Machete
+2B A 00 00 E 02 00 00 98 16 06 00:Ench. Demon Great Machete
+2B A 00 00 F 02 00 00 98 16 06 00:Divine Demon Great Machete
+2B A 00 00 10 02 00 00 98 16 06 00:Occult Demon Great Machete
+2B A 00 00 11 02 00 00 98 16 06 00:Fire Demon Great Machete
+2B A 00 00 12 02 00 00 98 16 06 00:Chaos Demon Great Machete
+29 A 00 00 1D 02 00 00 98 16 06 00:Dragon Greatsword
+2C A 00 00 13 02 00 00 98 16 06 00:Black Knight Greatsword
+F0 A 00 00 59 02 00 00 50 99 07 00:Scimitar
+F0 A 00 00 5A 02 00 00 50 99 07 00:Crystal Scimitar
+F0 A 00 00 5B 02 00 00 50 99 07 00:Lightning Scimitar
+F0 A 00 00 5C 02 00 00 50 99 07 00:Raw Scimitar
+F0 A 00 00 5D 02 00 00 50 99 07 00:Magic Scimitar
+F0 A 00 00 5E 02 00 00 50 99 07 00:Enchanted Scimitar
+F0 A 00 00 5F 02 00 00 50 99 07 00:Divine Scimitar
+F0 A 00 00 60 02 00 00 50 99 07 00:Occult Scimitar
+F0 A 00 00 61 02 00 00 50 99 07 00:Fire Scimitar
+F0 A 00 00 62 02 00 00 50 99 07 00:Chaos Scimitar
+F0 A 00 00 63 02 00 00 50 99 07 00:Falchion
+F0 A 00 00 64 02 00 00 50 99 07 00:Crystal Falchion
+F0 A 00 00 65 02 00 00 50 99 07 00:Lightning Falchion
+F0 A 00 00 66 02 00 00 50 99 07 00:Raw Falchion
+F0 A 00 00 67 02 00 00 50 99 07 00:Magic Falchion
+F0 A 00 00 68 02 00 00 50 99 07 00:Enchanted Falchion
+F0 A 00 00 69 02 00 00 50 99 07 00:Divine Falchion
+F0 A 00 00 6A 02 00 00 50 99 07 00:Occult Falchion
+F0 A 00 00 6B 02 00 00 50 99 07 00:Fire Falchion
+F0 A 00 00 6C 02 00 00 50 99 07 00:Chaos Falchion
+F1 A 00 00 6D 02 00 00 50 99 07 00:Shotel
+F1 A 00 00 6E 02 00 00 50 99 07 00:Crystal Shotel
+F1 A 00 00 6F 02 00 00 50 99 07 00:Lightning Shotel
+F1 A 00 00 70 02 00 00 50 99 07 00:Raw Shotel
+F1 A 00 00 71 02 00 00 50 99 07 00:Magic Shotel
+F1 A 00 00 72 02 00 00 50 99 07 00:Enchanted Shotel
+F1 A 00 00 73 02 00 00 50 99 07 00:Divine Shotel
+F1 A 00 00 74 02 00 00 50 99 07 00:Occult Shotel
+F1 A 00 00 75 02 00 00 50 99 07 00:Fire Shotel
+F1 A 00 00 76 02 00 00 50 99 07 00:Chaos Shotel
+F2 A 00 00 81 02 00 00 50 99 07 00:Jagged Ghost Blade
+F3 A 00 00 77 02 00 00 50 99 07 00:Painting Guardian Sword
+F3 A 00 00 78 02 00 00 50 99 07 00:Crys. Ptg. Guardian Sword
+F3 A 00 00 79 02 00 00 50 99 07 00:Ltng. Ptg. Guardian Sword
+F3 A 00 00 7A 02 00 00 50 99 07 00:Raw Painting Guardian Sword
+F3 A 00 00 7B 02 00 00 50 99 07 00:Magic Ptg. Guardian Sword
+F3 A 00 00 7C 02 00 00 50 99 07 00:Ench. Ptg. Guardian Sword
+F3 A 00 00 7D 02 00 00 50 99 07 00:Div. Ptg. Guardian Sword
+F3 A 00 00 7E 02 00 00 50 99 07 00:Occ. Ptg. Guardian Sword
+F3 A 00 00 7F 02 00 00 50 99 07 00:Fire Ptg. Guardian Sword
+F3 A 00 00 80 02 00 00 50 99 07 00:Chaos Ptg. Guardian Sword
+F4 A 00 00 8B 02 00 00 50 99 07 00:Quelaag's Furysword
+F4 A 00 00 8C 02 00 00 50 99 07 00:Quelaag's Furysword
+F4 A 00 00 8D 02 00 00 50 99 07 00:Quelaag's Furysword
+F4 A 00 00 8E 02 00 00 50 99 07 00:Quelaag's Furysword
+F4 A 00 00 8F 02 00 00 50 99 07 00:Quelaag's Furysword
+F4 A 00 00 90 02 00 00 50 99 07 00:Quelaag's Furysword
+EC 13 00 00 C7 02 00 00 38 9D 07 00:Server
+EC 13 00 00 C8 02 00 00 38 9D 07 00:Crystal Server
+EC 13 00 00 C9 02 00 00 38 9D 07 00:Lightning Server
+EC 13 00 00 CA 02 00 00 38 9D 07 00:Raw Server
+EC 13 00 00 CB 02 00 00 38 9D 07 00:Magic Server
+EC 13 00 00 CC 02 00 00 38 9D 07 00:Enchanted Server
+EC 13 00 00 CD 02 00 00 38 9D 07 00:Divine Server
+EC 13 00 00 CE 02 00 00 38 9D 07 00:Occult Server
+EC 13 00 00 CF 02 00 00 38 9D 07 00:Fire Server
+EC 13 00 00 D0 02 00 00 38 9D 07 00:Chaos Server
+EC 13 00 00 BD 02 00 00 38 9D 07 00:Murakumo
+EC 13 00 00 BE 02 00 00 38 9D 07 00:Crystal Murakumo
+EC 13 00 00 BF 02 00 00 38 9D 07 00:Lightning Murakumo
+EC 13 00 00 C0 02 00 00 38 9D 07 00:Raw Murakumo
+EC 13 00 00 C1 02 00 00 38 9D 07 00:Magic Murakumo
+EC 13 00 00 C2 02 00 00 38 9D 07 00:Enchanted Murakumo
+EC 13 00 00 C3 02 00 00 38 9D 07 00:Divine Murakumo
+EC 13 00 00 C4 02 00 00 38 9D 07 00:Occult Murakumo
+EC 13 00 00 C5 02 00 00 38 9D 07 00:Fire Murakumo
+EC 13 00 00 C6 02 00 00 38 9D 07 00:Chaos Murakumo
+ED 13 00 00 D1 02 00 00 38 9D 07 00:Gravelord Sword
+54 B 00 00 21 03 00 00 D8 23 09 00:Uchigatana
+54 B 00 00 22 03 00 00 D8 23 09 00:Crystal Uchigatana
+54 B 00 00 23 03 00 00 D8 23 09 00:Lightning Uchigatana
+54 B 00 00 24 03 00 00 D8 23 09 00:Raw Uchigatana
+54 B 00 00 25 03 00 00 D8 23 09 00:Magic Uchigatana
+54 B 00 00 26 03 00 00 D8 23 09 00:Enchanted Uchigatana
+54 B 00 00 27 03 00 00 D8 23 09 00:Divine Uchigatana
+54 B 00 00 28 03 00 00 D8 23 09 00:Occult Uchigatana
+54 B 00 00 29 03 00 00 D8 23 09 00:Fire Uchigatana
+54 B 00 00 2A 03 00 00 D8 23 09 00:Chaos Uchigatana
+54 B 00 00 35 03 00 00 D8 23 09 00:Washing Pole
+54 B 00 00 36 03 00 00 D8 23 09 00:Crystal Washing Pole
+54 B 00 00 37 03 00 00 D8 23 09 00:Lightning Washing Pole
+54 B 00 00 38 03 00 00 D8 23 09 00:Raw Washing Pole
+54 B 00 00 39 03 00 00 D8 23 09 00:Magic Washing Pole
+54 B 00 00 3A 03 00 00 D8 23 09 00:Enchanted Washing Pole
+54 B 00 00 3B 03 00 00 D8 23 09 00:Divine Washing Pole
+54 B 00 00 3C 03 00 00 D8 23 09 00:Occult Washing Pole
+54 B 00 00 3D 03 00 00 D8 23 09 00:Fire Washing Pole
+54 B 00 00 3E 03 00 00 D8 23 09 00:Chaos Washing Pole
+55 B 00 00 2B 03 00 00 D8 23 09 00:Iaito
+55 B 00 00 2C 03 00 00 D8 23 09 00:Crystal Iaito
+55 B 00 00 2D 03 00 00 D8 23 09 00:Lightning Iaito
+55 B 00 00 2E 03 00 00 D8 23 09 00:Raw Iaito
+55 B 00 00 2F 03 00 00 D8 23 09 00:Magic Iaito
+55 B 00 00 30 03 00 00 D8 23 09 00:Enchanted Iaito
+55 B 00 00 31 03 00 00 D8 23 09 00:Divine Iaito
+55 B 00 00 32 03 00 00 D8 23 09 00:Occult Iaito
+55 B 00 00 33 03 00 00 D8 23 09 00:Fire Iaito
+55 B 00 00 34 03 00 00 D8 23 09 00:Chaos Iaito
+56 B 00 00 3F 03 00 00 D8 23 09 00:Chaos Blade
+56 B 00 00 40 03 00 00 D8 23 09 00:Chaos Blade
+56 B 00 00 41 03 00 00 D8 23 09 00:Chaos Blade
+8D A 00 00 85 03 00 00 78 AA A 00:Mail Breaker
+8D A 00 00 86 03 00 00 78 AA A 00:Crystal Mail Breaker
+8D A 00 00 87 03 00 00 78 AA A 00:Lightning Mail Breaker
+8D A 00 00 88 03 00 00 78 AA A 00:Raw Mail Breaker
+8D A 00 00 89 03 00 00 78 AA A 00:Magic Mail Breaker
+8D A 00 00 8A 03 00 00 78 AA A 00:Enchanted Mail Breaker
+8D A 00 00 8B 03 00 00 78 AA A 00:Divine Mail Breaker
+8D A 00 00 8C 03 00 00 78 AA A 00:Occult Mail Breaker
+8D A 00 00 8D 03 00 00 78 AA A 00:Fire Mail Breaker
+8D A 00 00 8E 03 00 00 78 AA A 00:Chaos Mail Breaker
+8C A 00 00 8F 03 00 00 78 AA A 00:Rapier
+8C A 00 00 90 03 00 00 78 AA A 00:Crystal Rapier
+8C A 00 00 91 03 00 00 78 AA A 00:Lightning Rapier
+8C A 00 00 92 03 00 00 78 AA A 00:Raw Rapier
+8C A 00 00 93 03 00 00 78 AA A 00:Magic Rapier
+8C A 00 00 94 03 00 00 78 AA A 00:Enchanted Rapier
+8C A 00 00 95 03 00 00 78 AA A 00:Divine Rapier
+8C A 00 00 96 03 00 00 78 AA A 00:Occult Rapier
+8C A 00 00 97 03 00 00 78 AA A 00:Fire Rapier
+8C A 00 00 98 03 00 00 78 AA A 00:Chaos Rapier
+8E A 00 00 99 03 00 00 78 AA A 00:Estoc
+8E A 00 00 9A 03 00 00 78 AA A 00:Crystal Estoc
+8E A 00 00 9B 03 00 00 78 AA A 00:Lightning Estoc
+8E A 00 00 9C 03 00 00 78 AA A 00:Raw Estoc
+8E A 00 00 9D 03 00 00 78 AA A 00:Magic Estoc
+8E A 00 00 9E 03 00 00 78 AA A 00:Enchanted Estoc
+8E A 00 00 9F 03 00 00 78 AA A 00:Divine Estoc
+8E A 00 00 A0 03 00 00 78 AA A 00:Occult Estoc
+8E A 00 00 A1 03 00 00 78 AA A 00:Fire Estoc
+8E A 00 00 A2 03 00 00 78 AA A 00:Chaos Estoc
+8F A 00 00 AD 03 00 00 78 AA A 00:Velka's Rapier
+90 A 00 00 A3 03 00 00 78 AA A 00:Ricard's Rapier
+90 A 00 00 A4 03 00 00 78 AA A 00:Crystal Ricard's Rapier
+90 A 00 00 A5 03 00 00 78 AA A 00:Lightning Ricard's Rapier
+90 A 00 00 A6 03 00 00 78 AA A 00:Raw Ricard's Rapier
+90 A 00 00 A7 03 00 00 78 AA A 00:Magic Ricard's Rapier
+90 A 00 00 A8 03 00 00 78 AA A 00:Enchanted Ricard's Rapier
+90 A 00 00 A9 03 00 00 78 AA A 00:Divine Ricard's Rapier
+90 A 00 00 AA 03 00 00 78 AA A 00:Occult Ricard's Rapier
+90 A 00 00 AB 03 00 00 78 AA A 00:Fire Ricard's Rapier
+90 A 00 00 AC 03 00 00 78 AA A 00:Chaos Ricard's Rapier
+B9 B 00 00 E9 03 00 00 30 2D C 00:Hand Axe
+B9 B 00 00 EA 03 00 00 30 2D C 00:Crystal Hand Axe
+B9 B 00 00 EB 03 00 00 30 2D C 00:Lightning Hand Axe
+B9 B 00 00 EC 03 00 00 30 2D C 00:Raw Hand Axe
+B9 B 00 00 ED 03 00 00 30 2D C 00:Magic Hand Axe
+B9 B 00 00 EE 03 00 00 30 2D C 00:Enchanted Hand Axe
+B9 B 00 00 EF 03 00 00 30 2D C 00:Divine Hand Axe
+B9 B 00 00 F0 03 00 00 30 2D C 00:Occult Hand Axe
+B9 B 00 00 F1 03 00 00 30 2D C 00:Fire Hand Axe
+B9 B 00 00 F2 03 00 00 30 2D C 00:Chaos Hand Axe
+B8 B 00 00 F3 03 00 00 30 2D C 00:Battle Axe
+B8 B 00 00 F4 03 00 00 30 2D C 00:Crystal Battle Axe
+B8 B 00 00 F5 03 00 00 30 2D C 00:Lightning Battle Axe
+B8 B 00 00 F6 03 00 00 30 2D C 00:Raw Battle Axe
+B8 B 00 00 F7 03 00 00 30 2D C 00:Magic Battle Axe
+B8 B 00 00 F8 03 00 00 30 2D C 00:Enchanted Battle Axe
+B8 B 00 00 F9 03 00 00 30 2D C 00:Divine Battle Axe
+B8 B 00 00 FA 03 00 00 30 2D C 00:Occult Battle Axe
+B8 B 00 00 FB 03 00 00 30 2D C 00:Fire Battle Axe
+B8 B 00 00 FC 03 00 00 30 2D C 00:Chaos Battle Axe
+B8 B 00 00 11 04 00 00 30 2D C 00:Crescent Axe
+BB B 00 00 FD 03 00 00 30 2D C 00:Butcher Knife
+BB B 00 00 FE 03 00 00 30 2D C 00:Crystal Butcher Knife
+BB B 00 00 FF 03 00 00 30 2D C 00:Lightning Butcher Knife
+BB B 00 00 00 04 00 00 30 2D C 00:Raw Butcher Knife
+BB B 00 00 01 04 00 00 30 2D C 00:Magic Butcher Knife
+BB B 00 00 02 04 00 00 30 2D C 00:Enchanted Butcher Knife
+BB B 00 00 03 04 00 00 30 2D C 00:Divine Butcher Knife
+BB B 00 00 04 04 00 00 30 2D C 00:Occult Butcher Knife
+BB B 00 00 05 04 00 00 30 2D C 00:Fire Butcher Knife
+BB B 00 00 06 04 00 00 30 2D C 00:Chaos Butcher Knife
+BA B 00 00 1B 04 00 00 30 2D C 00:Golem Axe
+BA B 00 00 1C 04 00 00 30 2D C 00:Golem Axe
+BA B 00 00 1D 04 00 00 30 2D C 00:Golem Axe
+BA B 00 00 1E 04 00 00 30 2D C 00:Golem Axe
+BA B 00 00 1F 04 00 00 30 2D C 00:Golem Axe
+BA B 00 00 20 04 00 00 30 2D C 00:Golem Axe
+BA B 00 00 21 04 00 00 30 2D C 00:Golem Axe
+BC B 00 00 07 04 00 00 30 2D C 00:Gargoyle Tail Axe
+BC B 00 00 08 04 00 00 30 2D C 00:Crystal Gargoyle Tail Axe
+BC B 00 00 09 04 00 00 30 2D C 00:Lightning Gargoyle Tail Axe
+BC B 00 00 A 04 00 00 30 2D C 00:Raw Gargoyle Tail Axe
+BC B 00 00 B 04 00 00 30 2D C 00:Magic Gargoyle Tail Axe
+BC B 00 00 C 04 00 00 30 2D C 00:Enchanted Gargoyle Tail Axe
+BC B 00 00 D 04 00 00 30 2D C 00:Divine Gargoyle Tail Axe
+BC B 00 00 E 04 00 00 30 2D C 00:Occult Gargoyle Tail Axe
+BC B 00 00 F 04 00 00 30 2D C 00:Fire Gargoyle Tail Axe
+BC B 00 00 10 04 00 00 30 2D C 00:Chaos Gargoyle Tail Axe
+80 C 00 00 4D 04 00 00 18 31 C 00:Greataxe
+80 C 00 00 4E 04 00 00 18 31 C 00:Crystal Greataxe
+80 C 00 00 4F 04 00 00 18 31 C 00:Lightning Greataxe
+80 C 00 00 50 04 00 00 18 31 C 00:Raw Greataxe
+80 C 00 00 51 04 00 00 18 31 C 00:Magic Greataxe
+80 C 00 00 52 04 00 00 18 31 C 00:Enchanted Greataxe
+80 C 00 00 53 04 00 00 18 31 C 00:Divine Greataxe
+80 C 00 00 54 04 00 00 18 31 C 00:Occult Greataxe
+80 C 00 00 55 04 00 00 18 31 C 00:Fire Greataxe
+80 C 00 00 56 04 00 00 18 31 C 00:Chaos Greataxe
+82 C 00 00 57 04 00 00 18 31 C 00:Demon's Greataxe
+82 C 00 00 58 04 00 00 18 31 C 00:Crystal Demon's Greataxe
+82 C 00 00 59 04 00 00 18 31 C 00:Lightning Demon's Greataxe
+82 C 00 00 5A 04 00 00 18 31 C 00:Raw Demon's Greataxe
+82 C 00 00 5B 04 00 00 18 31 C 00:Magic Demon's Greataxe
+82 C 00 00 5C 04 00 00 18 31 C 00:Enchanted Demon's Greataxe
+82 C 00 00 5D 04 00 00 18 31 C 00:Divine Demon's Greataxe
+82 C 00 00 5E 04 00 00 18 31 C 00:Occult Demon's Greataxe
+82 C 00 00 5F 04 00 00 18 31 C 00:Fire Demon's Greataxe
+82 C 00 00 60 04 00 00 18 31 C 00:Chaos Demon's Greataxe
+81 C 00 00 6B 04 00 00 18 31 C 00:Dragon King Greataxe
+83 C 00 00 62 04 00 00 18 31 C 00:Black Knight Greataxe
+E6 C 00 00 A7 04 00 00 D0 B3 D 00:Club
+E6 C 00 00 A8 04 00 00 D0 B3 D 00:Crystal Club
+E6 C 00 00 A9 04 00 00 D0 B3 D 00:Lightning Club
+E6 C 00 00 AA 04 00 00 D0 B3 D 00:Raw Club
+E6 C 00 00 AB 04 00 00 D0 B3 D 00:Magic Club
+E6 C 00 00 AC 04 00 00 D0 B3 D 00:Enchanted Club
+E6 C 00 00 AD 04 00 00 D0 B3 D 00:Divine Club
+E6 C 00 00 AE 04 00 00 D0 B3 D 00:Occult Club
+E6 C 00 00 AF 04 00 00 D0 B3 D 00:Fire Club
+E6 C 00 00 B0 04 00 00 D0 B3 D 00:Chaos Club
+E4 C 00 00 C5 04 00 00 D0 B3 D 00:Mace
+E4 C 00 00 C6 04 00 00 D0 B3 D 00:Crystal Mace
+E4 C 00 00 C7 04 00 00 D0 B3 D 00:Lightning Mace
+E4 C 00 00 C8 04 00 00 D0 B3 D 00:Raw Mace
+E4 C 00 00 C9 04 00 00 D0 B3 D 00:Magic Mace
+E4 C 00 00 CA 04 00 00 D0 B3 D 00:Enchanted Mace
+E4 C 00 00 CB 04 00 00 D0 B3 D 00:Divine Mace
+E4 C 00 00 CC 04 00 00 D0 B3 D 00:Occult Mace
+E4 C 00 00 CD 04 00 00 D0 B3 D 00:Fire Mace
+E4 C 00 00 CE 04 00 00 D0 B3 D 00:Chaos Mace
+E4 C 00 00 CF 04 00 00 D0 B3 D 00:Morning Star
+E4 C 00 00 D0 04 00 00 D0 B3 D 00:Crystal Morning Star
+E4 C 00 00 D1 04 00 00 D0 B3 D 00:Lightning Morning Star
+E4 C 00 00 D2 04 00 00 D0 B3 D 00:Raw Morning Star
+E4 C 00 00 D3 04 00 00 D0 B3 D 00:Magic Morning Star
+E4 C 00 00 D4 04 00 00 D0 B3 D 00:Enchanted Morning Star
+E4 C 00 00 D5 04 00 00 D0 B3 D 00:Divine Morning Star
+E4 C 00 00 D6 04 00 00 D0 B3 D 00:Occult Morning Star
+E4 C 00 00 D7 04 00 00 D0 B3 D 00:Fire Morning Star
+E4 C 00 00 D8 04 00 00 D0 B3 D 00:Chaos Morning Star
+E5 C 00 00 D9 04 00 00 D0 B3 D 00:Warpick
+E5 C 00 00 DA 04 00 00 D0 B3 D 00:Crystal Warpick
+E5 C 00 00 DB 04 00 00 D0 B3 D 00:Lightning Warpick
+E5 C 00 00 DC 04 00 00 D0 B3 D 00:Raw Warpick
+E5 C 00 00 DD 04 00 00 D0 B3 D 00:Magic Warpick
+E5 C 00 00 DE 04 00 00 D0 B3 D 00:Enchanted Warpick
+E5 C 00 00 DF 04 00 00 D0 B3 D 00:Divine Warpick
+E5 C 00 00 E0 04 00 00 D0 B3 D 00:Occult Warpick
+E5 C 00 00 E1 04 00 00 D0 B3 D 00:Fire Warpick
+E5 C 00 00 E2 04 00 00 D0 B3 D 00:Chaos Warpick
+E7 C 00 00 E3 04 00 00 D0 B3 D 00:Pickaxe
+E7 C 00 00 E4 04 00 00 D0 B3 D 00:Crystal Pickaxe
+E7 C 00 00 E5 04 00 00 D0 B3 D 00:Lightning Pickaxe
+E7 C 00 00 E6 04 00 00 D0 B3 D 00:Raw Pickaxe
+E7 C 00 00 E7 04 00 00 D0 B3 D 00:Magic Pickaxe
+E7 C 00 00 E8 04 00 00 D0 B3 D 00:Enchanted Pickaxe
+E7 C 00 00 E9 04 00 00 D0 B3 D 00:Divine Pickaxe
+E7 C 00 00 EA 04 00 00 D0 B3 D 00:Occult Pickaxe
+E7 C 00 00 EB 04 00 00 D0 B3 D 00:Fire Pickaxe
+E7 C 00 00 EC 04 00 00 D0 B3 D 00:Chaos Pickaxe
+E6 C 00 00 B1 04 00 00 D0 B3 D 00:Reinforced Club
+E6 C 00 00 B2 04 00 00 D0 B3 D 00:Crystal Reinforced Club
+E6 C 00 00 B3 04 00 00 D0 B3 D 00:Lightning Reinforced Club
+E6 C 00 00 B4 04 00 00 D0 B3 D 00:Raw Reinforced Club
+E6 C 00 00 B5 04 00 00 D0 B3 D 00:Magic Reinforced Club
+E6 C 00 00 B6 04 00 00 D0 B3 D 00:Enchanted Reinforced Club
+E6 C 00 00 B7 04 00 00 D0 B3 D 00:Divine Reinforced Club
+E6 C 00 00 B8 04 00 00 D0 B3 D 00:Occult Reinforced Club
+E6 C 00 00 B9 04 00 00 D0 B3 D 00:Fire Reinforced Club
+E6 C 00 00 BA 04 00 00 D0 B3 D 00:Chaos Reinforced Club
+E4 C 00 00 ED 04 00 00 D0 B3 D 00:Blacksmith Hammer
+E4 C 00 00 EE 04 00 00 D0 B3 D 00:Crystal Blacksmith Hammer
+E4 C 00 00 EF 04 00 00 D0 B3 D 00:Lightning Blacksmith Hammer
+E4 C 00 00 F0 04 00 00 D0 B3 D 00:Raw Blacksmith Hammer
+E4 C 00 00 F1 04 00 00 D0 B3 D 00:Magic Blacksmith Hammer
+E4 C 00 00 F2 04 00 00 D0 B3 D 00:Enchanted Blacksmith Hammer
+E4 C 00 00 F3 04 00 00 D0 B3 D 00:Divine Blacksmith Hammer
+E4 C 00 00 F4 04 00 00 D0 B3 D 00:Occult Blacksmith Hammer
+E4 C 00 00 F5 04 00 00 D0 B3 D 00:Fire Blacksmith Hammer
+E4 C 00 00 F6 04 00 00 D0 B3 D 00:Chaos Blacksmith Hammer
+E6 C 00 00 BB 04 00 00 D0 B3 D 00:Blacksmith Giant Hammer
+E4 C 00 00 F7 04 00 00 D0 B3 D 00:Hammer of Vamos
+AD D 00 00 1F 05 00 00 B8 B7 D 00:Great Club
+AD D 00 00 20 05 00 00 B8 B7 D 00:Crystal Great Club
+AD D 00 00 21 05 00 00 B8 B7 D 00:Lightning Great Club
+AD D 00 00 22 05 00 00 B8 B7 D 00:Raw Great Club
+AD D 00 00 23 05 00 00 B8 B7 D 00:Magic Great Club
+AD D 00 00 24 05 00 00 B8 B7 D 00:Enchanted Great Club
+AD D 00 00 25 05 00 00 B8 B7 D 00:Divine Great Club
+AD D 00 00 26 05 00 00 B8 B7 D 00:Occult Great Club
+AD D 00 00 27 05 00 00 B8 B7 D 00:Fire Great Club
+AD D 00 00 28 05 00 00 B8 B7 D 00:Chaos Great Club
+AC D 00 00 33 05 00 00 B8 B7 D 00:Grant
+AC D 00 00 29 05 00 00 B8 B7 D 00:Demon's Great Hammer
+AC D 00 00 2A 05 00 00 B8 B7 D 00:Crys. Demon's Great Hammer
+AC D 00 00 2B 05 00 00 B8 B7 D 00:Ltng. Demon's Gr. Hammer
+AC D 00 00 2C 05 00 00 B8 B7 D 00:Raw Demon's Great Hammer
+AC D 00 00 2D 05 00 00 B8 B7 D 00:Magic Demon's Gr. Hammer
+AC D 00 00 2E 05 00 00 B8 B7 D 00:Ench. Demon's Gr. Hammer
+AC D 00 00 2F 05 00 00 B8 B7 D 00:Div. Demon's Gr. Hammer
+AC D 00 00 30 05 00 00 B8 B7 D 00:Occ. Demon's Gr. Hammer
+AC D 00 00 31 05 00 00 B8 B7 D 00:Fire Demon's Great Hammer
+AC D 00 00 32 05 00 00 B8 B7 D 00:Chaos Demon's Great Hammer
+AC D 00 00 3D 05 00 00 B8 B7 D 00:Dragon Tooth
+AE D 00 00 15 05 00 00 B8 B7 D 00:Large Club
+AE D 00 00 16 05 00 00 B8 B7 D 00:Crystal Large Club
+AE D 00 00 17 05 00 00 B8 B7 D 00:Lightning Large Club
+AE D 00 00 18 05 00 00 B8 B7 D 00:Raw Large Club
+AE D 00 00 19 05 00 00 B8 B7 D 00:Magic Large Club
+AE D 00 00 1A 05 00 00 B8 B7 D 00:Enchanted Large Club
+AE D 00 00 1B 05 00 00 B8 B7 D 00:Divine Large Club
+AE D 00 00 1C 05 00 00 B8 B7 D 00:Occult Large Club
+AE D 00 00 1D 05 00 00 B8 B7 D 00:Fire Large Club
+AE D 00 00 1E 05 00 00 B8 B7 D 00:Chaos Large Club
+AF D 00 00 47 05 00 00 B8 B7 D 00:Smough's Hammer
+AF D 00 00 48 05 00 00 B8 B7 D 00:Smough's Hammer
+AF D 00 00 49 05 00 00 B8 B7 D 00:Smough's Hammer
+AF D 00 00 4A 05 00 00 B8 B7 D 00:Smough's Hammer
+AF D 00 00 4B 05 00 00 B8 B7 D 00:Smough's Hammer
+AF D 00 00 4C 05 00 00 B8 B7 D 00:Smough's Hammer
+AF D 00 00 4D 05 00 00 B8 B7 D 00:Smough's Hammer
+AF D 00 00 4E 05 00 00 B8 B7 D 00:Smough's Hammer
+AF D 00 00 4F 05 00 00 B8 B7 D 00:Smough's Hammer
+AF D 00 00 50 05 00 00 B8 B7 D 00:Smough's Hammer
+AF D 00 00 51 05 00 00 B8 B7 D 00:Smough's Hammer
+AF D 00 00 52 05 00 00 B8 B7 D 00:Smough's Hammer
+69 10 00 00 D6 06 00 00 58 3E F 00:Fists
+68 10 00 00 D7 06 00 00 58 3E F 00:Caestus
+68 10 00 00 D8 06 00 00 58 3E F 00:Crystal Caestus
+68 10 00 00 D9 06 00 00 58 3E F 00:Lightning Caestus
+68 10 00 00 DA 06 00 00 58 3E F 00:Raw Caestus
+68 10 00 00 DB 06 00 00 58 3E F 00:Magic Caestus
+68 10 00 00 DC 06 00 00 58 3E F 00:Enchanted Caestus
+68 10 00 00 DD 06 00 00 58 3E F 00:Divine Caestus
+68 10 00 00 DE 06 00 00 58 3E F 00:Occult Caestus
+68 10 00 00 DF 06 00 00 58 3E F 00:Fire Caestus
+68 10 00 00 E0 06 00 00 58 3E F 00:Chaos Caestus
+6A 10 00 00 E1 06 00 00 58 3E F 00:Claw
+6A 10 00 00 E2 06 00 00 58 3E F 00:Crystal Claw
+6A 10 00 00 E3 06 00 00 58 3E F 00:Lightning Claw
+6A 10 00 00 E4 06 00 00 58 3E F 00:Raw Claw
+6A 10 00 00 E5 06 00 00 58 3E F 00:Magic Claw
+6A 10 00 00 E6 06 00 00 58 3E F 00:Enchanted Claw
+6A 10 00 00 E7 06 00 00 58 3E F 00:Divine Claw
+6A 10 00 00 E8 06 00 00 58 3E F 00:Occult Claw
+6A 10 00 00 E9 06 00 00 58 3E F 00:Fire Claw
+6A 10 00 00 EA 06 00 00 58 3E F 00:Chaos Claw
+6C 10 00 00 EB 06 00 00 58 3E F 00:Dragon Bone Fist
+6C 10 00 00 EC 06 00 00 58 3E F 00:Dragon Bone Fist
+6B 10 00 00 F5 06 00 00 58 3E F 00:Dark Hand
+10 E 00 00 79 05 00 00 F8 C4 10 00:Spear
+10 E 00 00 7A 05 00 00 F8 C4 10 00:Crystal Spear
+10 E 00 00 7B 05 00 00 F8 C4 10 00:Lightning Spear
+10 E 00 00 7C 05 00 00 F8 C4 10 00:Raw Spear
+10 E 00 00 7D 05 00 00 F8 C4 10 00:Magic Spear
+10 E 00 00 7E 05 00 00 F8 C4 10 00:Enchanted Spear
+10 E 00 00 7F 05 00 00 F8 C4 10 00:Divine Spear
+10 E 00 00 80 05 00 00 F8 C4 10 00:Occult Spear
+10 E 00 00 81 05 00 00 F8 C4 10 00:Fire Spear
+10 E 00 00 82 05 00 00 F8 C4 10 00:Chaos Spear
+10 E 00 00 83 05 00 00 F8 C4 10 00:Winged Spear
+10 E 00 00 84 05 00 00 F8 C4 10 00:Crystal Winged Spear
+10 E 00 00 85 05 00 00 F8 C4 10 00:Lightning Winged Spear
+10 E 00 00 86 05 00 00 F8 C4 10 00:Raw Winged Spear
+10 E 00 00 87 05 00 00 F8 C4 10 00:Magic Winged Spear
+10 E 00 00 88 05 00 00 F8 C4 10 00:Enchanted Winged Spear
+10 E 00 00 89 05 00 00 F8 C4 10 00:Divine Winged Spear
+10 E 00 00 8A 05 00 00 F8 C4 10 00:Occult Winged Spear
+10 E 00 00 8B 05 00 00 F8 C4 10 00:Fire Winged Spear
+10 E 00 00 8C 05 00 00 F8 C4 10 00:Chaos Winged Spear
+14 E 00 00 8D 05 00 00 F8 C4 10 00:Partizan
+14 E 00 00 8E 05 00 00 F8 C4 10 00:Crystal Partizan
+14 E 00 00 8F 05 00 00 F8 C4 10 00:Lightning Partizan
+14 E 00 00 90 05 00 00 F8 C4 10 00:Raw Partizan
+14 E 00 00 91 05 00 00 F8 C4 10 00:Magic Partizan
+14 E 00 00 92 05 00 00 F8 C4 10 00:Enchanted Partizan
+14 E 00 00 93 05 00 00 F8 C4 10 00:Divine Partizan
+14 E 00 00 94 05 00 00 F8 C4 10 00:Occult Partizan
+14 E 00 00 95 05 00 00 F8 C4 10 00:Fire Partizan
+14 E 00 00 96 05 00 00 F8 C4 10 00:Chaos Partizan
+15 E 00 00 AC 05 00 00 F8 C4 10 00:Demon's Spear
+12 E 00 00 AB 05 00 00 F8 C4 10 00:Channeler's Trident
+16 E 00 00 B5 05 00 00 F8 C4 10 00:Silver Knight Spear
+11 E 00 00 A1 05 00 00 F8 C4 10 00:Pike
+11 E 00 00 A2 05 00 00 F8 C4 10 00:Crystal Pike
+11 E 00 00 A3 05 00 00 F8 C4 10 00:Lightning Pike
+11 E 00 00 A4 05 00 00 F8 C4 10 00:Raw Pike
+11 E 00 00 A5 05 00 00 F8 C4 10 00:Magic Pike
+11 E 00 00 A6 05 00 00 F8 C4 10 00:Enchanted Pike
+11 E 00 00 A7 05 00 00 F8 C4 10 00:Divine Pike
+11 E 00 00 A8 05 00 00 F8 C4 10 00:Occult Pike
+11 E 00 00 A9 05 00 00 F8 C4 10 00:Fire Pike
+11 E 00 00 AA 05 00 00 F8 C4 10 00:Chaos Pike
+13 E 00 00 CA 05 00 00 F8 C4 10 00:Dragonslayer Spear
+13 E 00 00 CB 05 00 00 F8 C4 10 00:Dragonslayer Spear
+13 E 00 00 CC 05 00 00 F8 C4 10 00:Dragonslayer Spear
+13 E 00 00 CE 05 00 00 F8 C4 10 00:Dragonslayer Spear
+13 E 00 00 CF 05 00 00 F8 C4 10 00:Dragonslayer Spear
+13 E 00 00 D0 05 00 00 F8 C4 10 00:Dragonslayer Spear
+13 E 00 00 D1 05 00 00 F8 C4 10 00:Dragonslayer Spear
+13 E 00 00 D2 05 00 00 F8 C4 10 00:Dragonslayer Spear
+13 E 00 00 D3 05 00 00 F8 C4 10 00:Dragonslayer Spear
+13 E 00 00 CD 05 00 00 F8 C4 10 00:Dragonslayer Spear
+10 E 00 00 BF 05 00 00 F8 C4 10 00:Moonlight Butterfly Horn
+10 E 00 00 C0 05 00 00 F8 C4 10 00:Moonlight Butterfly Horn
+10 E 00 00 C1 05 00 00 F8 C4 10 00:Moonlight Butterfly Horn
+10 E 00 00 C3 05 00 00 F8 C4 10 00:Moonlight Butterfly Horn
+10 E 00 00 C4 05 00 00 F8 C4 10 00:Moonlight Butterfly Horn
+10 E 00 00 C5 05 00 00 F8 C4 10 00:Moonlight Butterfly Horn
+10 E 00 00 C6 05 00 00 F8 C4 10 00:Moonlight Butterfly Horn
+10 E 00 00 C7 05 00 00 F8 C4 10 00:Moonlight Butterfly Horn
+10 E 00 00 C8 05 00 00 F8 C4 10 00:Moonlight Butterfly Horn
+10 E 00 00 C2 05 00 00 F8 C4 10 00:Moonlight Butterfly Horn
+D8 E 00 00 DD 05 00 00 98 4B 12 00:Halberd
+D8 E 00 00 DE 05 00 00 98 4B 12 00:Crystal Halberd
+D8 E 00 00 DF 05 00 00 98 4B 12 00:Lightning Halberd
+D8 E 00 00 E0 05 00 00 98 4B 12 00:Raw Halberd
+D8 E 00 00 E1 05 00 00 98 4B 12 00:Magic Halberd
+D8 E 00 00 E2 05 00 00 98 4B 12 00:Enchanted Halberd
+D8 E 00 00 E3 05 00 00 98 4B 12 00:Divine Halberd
+D8 E 00 00 E4 05 00 00 98 4B 12 00:Occult Halberd
+D8 E 00 00 E5 05 00 00 98 4B 12 00:Fire Halberd
+D8 E 00 00 E6 05 00 00 98 4B 12 00:Chaos Halberd
+DB E 00 00 05 06 00 00 98 4B 12 00:Giant's Halberd
+DC E 00 00 F 06 00 00 98 4B 12 00:Titanite Catch Pole
+D8 E 00 00 FB 05 00 00 98 4B 12 00:Gargoyle's Halberd
+D8 E 00 00 FC 05 00 00 98 4B 12 00:Crystal Gargoyle's Halberd
+D8 E 00 00 FD 05 00 00 98 4B 12 00:Ltng. Gargoyle's Halberd
+D8 E 00 00 FE 05 00 00 98 4B 12 00:Raw Gargoyle's Halberd
+D8 E 00 00 FF 05 00 00 98 4B 12 00:Magic Gargoyle's Halberd
+D8 E 00 00 00 06 00 00 98 4B 12 00:Ench. Gargoyle's Halberd
+D8 E 00 00 01 06 00 00 98 4B 12 00:Divine Gargoyle's Halberd
+D8 E 00 00 02 06 00 00 98 4B 12 00:Occult Gargoyle's Halberd
+D8 E 00 00 03 06 00 00 98 4B 12 00:Fire Gargoyle's Halberd
+D8 E 00 00 04 06 00 00 98 4B 12 00:Chaos Gargoyle's Halberd
+DD E 00 00 19 06 00 00 98 4B 12 00:Black Knight Halberd
+DA E 00 00 E7 05 00 00 98 4B 12 00:Lucerne
+DA E 00 00 E8 05 00 00 98 4B 12 00:Crystal Lucerne
+DA E 00 00 E9 05 00 00 98 4B 12 00:Lightning Lucerne
+DA E 00 00 EA 05 00 00 98 4B 12 00:Raw Lucerne
+DA E 00 00 EB 05 00 00 98 4B 12 00:Magic Lucerne
+DA E 00 00 EC 05 00 00 98 4B 12 00:Enchanted Lucerne
+DA E 00 00 ED 05 00 00 98 4B 12 00:Divine Lucerne
+DA E 00 00 EE 05 00 00 98 4B 12 00:Occult Lucerne
+DA E 00 00 EF 05 00 00 98 4B 12 00:Fire Lucerne
+DA E 00 00 F0 05 00 00 98 4B 12 00:Chaos Lucerne
+D9 E 00 00 F1 05 00 00 98 4B 12 00:Scythe
+D9 E 00 00 F2 05 00 00 98 4B 12 00:Crystal Scythe
+D9 E 00 00 F3 05 00 00 98 4B 12 00:Lightning Scythe
+D9 E 00 00 F4 05 00 00 98 4B 12 00:Raw Scythe
+D9 E 00 00 F5 05 00 00 98 4B 12 00:Magic Scythe
+D9 E 00 00 F6 05 00 00 98 4B 12 00:Enchanted Scythe
+D9 E 00 00 F7 05 00 00 98 4B 12 00:Divine Scythe
+D9 E 00 00 F8 05 00 00 98 4B 12 00:Occult Scythe
+D9 E 00 00 F9 05 00 00 98 4B 12 00:Fire Scythe
+D9 E 00 00 FA 05 00 00 98 4B 12 00:Chaos Scythe
+88 13 00 00 41 06 00 00 98 4B 12 00:Great Scythe
+88 13 00 00 42 06 00 00 98 4B 12 00:Crystal Great Scythe
+88 13 00 00 43 06 00 00 98 4B 12 00:Lightning Great Scythe
+88 13 00 00 44 06 00 00 98 4B 12 00:Raw Great Scythe
+88 13 00 00 45 06 00 00 98 4B 12 00:Magic Great Scythe
+88 13 00 00 46 06 00 00 98 4B 12 00:Enchanted Great Scythe
+88 13 00 00 47 06 00 00 98 4B 12 00:Divine Great Scythe
+88 13 00 00 48 06 00 00 98 4B 12 00:Occult Great Scythe
+88 13 00 00 49 06 00 00 98 4B 12 00:Fire Great Scythe
+88 13 00 00 4A 06 00 00 98 4B 12 00:Chaos Great Scythe
+88 13 00 00 4B 06 00 00 98 4B 12 00:Lifehunt Scythe
+88 13 00 00 4C 06 00 00 98 4B 12 00:Lifehunt Scythe
+88 13 00 00 4D 06 00 00 98 4B 12 00:Lifehunt Scythe
+88 13 00 00 4E 06 00 00 98 4B 12 00:Lifehunt Scythe
+88 13 00 00 4F 06 00 00 98 4B 12 00:Lifehunt Scythe
+88 13 00 00 50 06 00 00 98 4B 12 00:Lifehunt Scythe
+88 13 00 00 51 06 00 00 98 4B 12 00:Lifehunt Scythe
+88 13 00 00 52 06 00 00 98 4B 12 00:Lifehunt Scythe
+30 11 00 00 09 07 00 00 50 CE 13 00:Short Bow
+30 11 00 00 A 07 00 00 50 CE 13 00:Crystal Short Bow
+30 11 00 00 B 07 00 00 50 CE 13 00:Lightning Short Bow
+30 11 00 00 C 07 00 00 50 CE 13 00:Raw Short Bow
+30 11 00 00 D 07 00 00 50 CE 13 00:Magic Short Bow
+30 11 00 00 E 07 00 00 50 CE 13 00:Enchanted Short Bow
+30 11 00 00 F 07 00 00 50 CE 13 00:Divine Short Bow
+30 11 00 00 10 07 00 00 50 CE 13 00:Occult Short Bow
+30 11 00 00 11 07 00 00 50 CE 13 00:Fire Short Bow
+30 11 00 00 12 07 00 00 50 CE 13 00:Chaos Short Bow
+30 11 00 00 1D 07 00 00 50 CE 13 00:Longbow
+30 11 00 00 1E 07 00 00 50 CE 13 00:Crystal Longbow
+30 11 00 00 1F 07 00 00 50 CE 13 00:Lightning Longbow
+30 11 00 00 20 07 00 00 50 CE 13 00:Raw Longbow
+30 11 00 00 21 07 00 00 50 CE 13 00:Magic Longbow
+30 11 00 00 22 07 00 00 50 CE 13 00:Enchanted Longbow
+30 11 00 00 23 07 00 00 50 CE 13 00:Divine Longbow
+30 11 00 00 24 07 00 00 50 CE 13 00:Occult Longbow
+30 11 00 00 25 07 00 00 50 CE 13 00:Fire Longbow
+30 11 00 00 26 07 00 00 50 CE 13 00:Chaos Longbow
+30 11 00 00 27 07 00 00 50 CE 13 00:Black Bow of Pharis
+30 11 00 00 28 07 00 00 50 CE 13 00:Crystal Black Bow of Pharis
+30 11 00 00 29 07 00 00 50 CE 13 00:Ltng. Black Bow of Pharis
+30 11 00 00 2A 07 00 00 50 CE 13 00:Raw Black Bow of Pharis
+30 11 00 00 2B 07 00 00 50 CE 13 00:Magic Black Bow of Pharis
+30 11 00 00 2C 07 00 00 50 CE 13 00:Ench. Black Bow of Pharis
+30 11 00 00 2D 07 00 00 50 CE 13 00:Divine Black Bow of Pharis
+30 11 00 00 2E 07 00 00 50 CE 13 00:Occult Black Bow of Pharis
+30 11 00 00 2F 07 00 00 50 CE 13 00:Fire Black Bow of Pharis
+30 11 00 00 30 07 00 00 50 CE 13 00:Chaos Black Bow of Pharis
+30 11 00 00 31 07 00 00 50 CE 13 00:Dragonslayer Greatbow
+30 11 00 00 13 07 00 00 50 CE 13 00:Composite Bow
+30 11 00 00 14 07 00 00 50 CE 13 00:Crystal Composite Bow
+30 11 00 00 15 07 00 00 50 CE 13 00:Lightning Composite Bow
+30 11 00 00 16 07 00 00 50 CE 13 00:Raw Composite Bow
+30 11 00 00 17 07 00 00 50 CE 13 00:Magic Composite Bow
+30 11 00 00 18 07 00 00 50 CE 13 00:Enchanted Composite Bow
+30 11 00 00 19 07 00 00 50 CE 13 00:Divine Composite Bow
+30 11 00 00 1A 07 00 00 50 CE 13 00:Occult Composite Bow
+30 11 00 00 1B 07 00 00 50 CE 13 00:Fire Composite Bow
+30 11 00 00 1C 07 00 00 50 CE 13 00:Chaos Composite Bow
+30 11 00 00 3B 07 00 00 50 CE 13 00:Darkmoon Bow
+30 11 00 00 3C 07 00 00 50 CE 13 00:Darkmoon Bow
+30 11 00 00 3D 07 00 00 50 CE 13 00:Darkmoon Bow
+30 11 00 00 3E 07 00 00 50 CE 13 00:Darkmoon Bow
+F8 11 00 00 6D 07 00 00 38 D2 13 00:Light Crossbow
+F8 11 00 00 6E 07 00 00 38 D2 13 00:Crystal Light Crossbow
+F8 11 00 00 6F 07 00 00 38 D2 13 00:Lightning Light Crossbow
+F8 11 00 00 70 07 00 00 38 D2 13 00:Magic Light Crossbow
+F8 11 00 00 71 07 00 00 38 D2 13 00:Divine Light Crossbow
+F8 11 00 00 72 07 00 00 38 D2 13 00:Fire Light Crossbow
+F8 11 00 00 77 07 00 00 38 D2 13 00:Heavy Crossbow
+F8 11 00 00 78 07 00 00 38 D2 13 00:Crystal Heavy Crossbow
+F8 11 00 00 79 07 00 00 38 D2 13 00:Lightning Heavy Crossbow
+F8 11 00 00 7A 07 00 00 38 D2 13 00:Magic Heavy Crossbow
+F8 11 00 00 7B 07 00 00 38 D2 13 00:Divine Heavy Crossbow
+F8 11 00 00 7C 07 00 00 38 D2 13 00:Fire Heavy Crossbow
+F8 11 00 00 8B 07 00 00 38 D2 13 00:Avelyn
+F8 11 00 00 8C 07 00 00 38 D2 13 00:Crystal Avelyn
+F8 11 00 00 8D 07 00 00 38 D2 13 00:Lightning Avelyn
+F8 11 00 00 8E 07 00 00 38 D2 13 00:Magic Avelyn
+F8 11 00 00 8F 07 00 00 38 D2 13 00:Divine Avelyn
+F8 11 00 00 90 07 00 00 38 D2 13 00:Fire Avelyn
+F8 11 00 00 81 07 00 00 38 D2 13 00:Sniper Crossbow
+F8 11 00 00 82 07 00 00 38 D2 13 00:Crystal Sniper Crossbow
+F8 11 00 00 83 07 00 00 38 D2 13 00:Lightning Sniper Crossbow
+F8 11 00 00 84 07 00 00 38 D2 13 00:Magic Sniper Crossbow
+F8 11 00 00 85 07 00 00 38 D2 13 00:Divine Sniper Crossbow
+F8 11 00 00 86 07 00 00 38 D2 13 00:Fire Sniper Crossbow
+05 10 00 00 D1 07 00 00 08 51 15 00:Sorcerer's Catalyst
+05 10 00 00 D2 07 00 00 08 51 15 00:Beatrice's Catalyst
+06 10 00 00 D8 07 00 00 08 51 15 00:Tin Banishment Catalyst
+05 10 00 00 D3 07 00 00 08 51 15 00:Logan's Catalyst
+05 10 00 00 DB 07 00 00 08 51 15 00:Tin Darkmoon Catalyst
+05 10 00 00 DC 07 00 00 08 51 15 00:Tin Darkmoon Catalyst
+05 10 00 00 DD 07 00 00 08 51 15 00:Tin Darkmoon Catalyst
+05 10 00 00 DE 07 00 00 08 51 15 00:Tin Darkmoon Catalyst
+05 10 00 00 DF 07 00 00 08 51 15 00:Tin Darkmoon Catalyst
+05 10 00 00 D4 07 00 00 08 51 15 00:Oolacile Ivory Catalyst
+06 10 00 00 D9 07 00 00 08 51 15 00:Tin Crystallization Ctlyst.
+06 10 00 00 D6 07 00 00 08 51 15 00:Demon's Catalyst
+05 10 00 00 D7 07 00 00 08 51 15 00:Izalith Catalyst
+04 10 00 00 EF 07 00 00 F0 54 15 00:Pyromancy Flame
+04 10 00 00 F0 07 00 00 F0 54 15 00:Pyromancy Flame+1
+04 10 00 00 F1 07 00 00 F0 54 15 00:Pyromancy Flame+2
+04 10 00 00 F2 07 00 00 F0 54 15 00:Pyromancy Flame+3
+04 10 00 00 F3 07 00 00 F0 54 15 00:Pyromancy Flame+4
+04 10 00 00 F4 07 00 00 F0 54 15 00:Pyromancy Flame+5
+04 10 00 00 F5 07 00 00 F0 54 15 00:Pyromancy Flame+6
+04 10 00 00 F6 07 00 00 F0 54 15 00:Pyromancy Flame+7
+04 10 00 00 F7 07 00 00 F0 54 15 00:Pyromancy Flame+8
+04 10 00 00 F8 07 00 00 F0 54 15 00:Pyromancy Flame+9
+04 10 00 00 F9 07 00 00 F0 54 15 00:Pyromancy Flame+10
+04 10 00 00 FA 07 00 00 F0 54 15 00:Pyromancy Flame+11
+04 10 00 00 FB 07 00 00 F0 54 15 00:Pyromancy Flame+12
+04 10 00 00 FC 07 00 00 F0 54 15 00:Pyromancy Flame+13
+04 10 00 00 FD 07 00 00 F0 54 15 00:Pyromancy Flame+14
+04 10 00 00 FE 07 00 00 F0 54 15 00:Pyromancy Flame+15
+04 10 00 00 FF 07 00 00 F0 54 15 00:Pyromancy Flame
+04 10 00 00 00 08 00 00 F0 54 15 00:Pyromancy Flame+1
+04 10 00 00 01 08 00 00 F0 54 15 00:Pyromancy Flame+2
+04 10 00 00 02 08 00 00 F0 54 15 00:Pyromancy Flame+3
+04 10 00 00 03 08 00 00 F0 54 15 00:Pyromancy Flame+4
+04 10 00 00 04 08 00 00 F0 54 15 00:Pyromancy Flame+5
+04 10 00 00 05 08 00 00 D8 58 15 00:Talisman
+04 10 00 00 06 08 00 00 D8 58 15 00:Canvas Talisman
+04 10 00 00 07 08 00 00 D8 58 15 00:Thorolund Talisman
+04 10 00 00 08 08 00 00 D8 58 15 00:Ivory Talisman
+04 10 00 00 A 08 00 00 D8 58 15 00:Sunlight Talisman
+04 10 00 00 B 08 00 00 D8 58 15 00:Darkmoon Talisman
+04 10 00 00 C 08 00 00 D8 58 15 00:Velka's Talisman
+07 10 00 00 D 08 00 00 F0 54 15 00:Skull Lantern
+C0 12 00 00 FD 08 00 00 78 DF 16 00:East-West Shield
+C0 12 00 00 FE 08 00 00 78 DF 16 00:Crystal East-West Shield
+C0 12 00 00 FF 08 00 00 78 DF 16 00:Lightning East-West Shield
+C0 12 00 00 00 09 00 00 78 DF 16 00:Magic East-West Shield
+C0 12 00 00 01 09 00 00 78 DF 16 00:Divine East-West Shield
+C0 12 00 00 02 09 00 00 78 DF 16 00:Fire East-West Shield
+C0 12 00 00 07 09 00 00 78 DF 16 00:Wooden Shield
+C0 12 00 00 08 09 00 00 78 DF 16 00:Crystal Wooden Shield
+C0 12 00 00 09 09 00 00 78 DF 16 00:Lightning Wooden Shield
+C0 12 00 00 A 09 00 00 78 DF 16 00:Magic Wooden Shield
+C0 12 00 00 B 09 00 00 78 DF 16 00:Divine Wooden Shield
+C0 12 00 00 C 09 00 00 78 DF 16 00:Fire Wooden Shield
+C0 12 00 00 11 09 00 00 78 DF 16 00:Large Leather Shield
+C0 12 00 00 12 09 00 00 78 DF 16 00:Crys. Large Leather Shield
+C0 12 00 00 13 09 00 00 78 DF 16 00:Ltng. Large Leather Shield
+C0 12 00 00 14 09 00 00 78 DF 16 00:Magic Large Leather Shield
+C0 12 00 00 15 09 00 00 78 DF 16 00:Divine Large Leather Shield
+C0 12 00 00 16 09 00 00 78 DF 16 00:Fire Large Leather Shield
+C1 12 00 00 67 08 00 00 90 DB 16 00:Small Leather Shield
+C1 12 00 00 68 08 00 00 90 DB 16 00:Crys. Small Leather Shield
+C1 12 00 00 69 08 00 00 90 DB 16 00:Ltng. Small Leather Shield
+C1 12 00 00 6A 08 00 00 90 DB 16 00:Magic Small Leather Shield
+C1 12 00 00 6B 08 00 00 90 DB 16 00:Divine Small Leather Shield
+C1 12 00 00 6C 08 00 00 90 DB 16 00:Fire Small Leather Shield
+C1 12 00 00 85 08 00 00 90 DB 16 00:Target Shield
+C1 12 00 00 86 08 00 00 90 DB 16 00:Crystal Target Shield
+C1 12 00 00 87 08 00 00 90 DB 16 00:Lightning Target Shield
+C1 12 00 00 88 08 00 00 90 DB 16 00:Magic Target Shield
+C1 12 00 00 89 08 00 00 90 DB 16 00:Divine Target Shield
+C1 12 00 00 8A 08 00 00 90 DB 16 00:Fire Target Shield
+C1 12 00 00 7B 08 00 00 90 DB 16 00:Buckler
+C1 12 00 00 7C 08 00 00 90 DB 16 00:Crystal Buckler
+C1 12 00 00 7D 08 00 00 90 DB 16 00:Lightning Buckler
+C1 12 00 00 7E 08 00 00 90 DB 16 00:Magic Buckler
+C1 12 00 00 7F 08 00 00 90 DB 16 00:Divine Buckler
+C1 12 00 00 80 08 00 00 90 DB 16 00:Fire Buckler
+C1 12 00 00 55 08 00 00 90 DB 16 00:Cracked Round Shield
+C1 12 00 00 56 08 00 00 90 DB 16 00:Crys. Cracked Round Shield
+C1 12 00 00 57 08 00 00 90 DB 16 00:Ltng. Cracked Round Shield
+C1 12 00 00 58 08 00 00 90 DB 16 00:Magic Cracked Round Shield
+C1 12 00 00 59 08 00 00 90 DB 16 00:Divine Cracked Round Shield
+C1 12 00 00 5A 08 00 00 90 DB 16 00:Fire Cracked Round Shield
+C1 12 00 00 71 08 00 00 90 DB 16 00:Leather Shield
+C1 12 00 00 72 08 00 00 90 DB 16 00:Crystal Leather Shield
+C1 12 00 00 73 08 00 00 90 DB 16 00:Lightning Leather Shield
+C1 12 00 00 74 08 00 00 90 DB 16 00:Magic Leather Shield
+C1 12 00 00 75 08 00 00 90 DB 16 00:Divine Leather Shield
+C1 12 00 00 76 08 00 00 90 DB 16 00:Fire Leather Shield
+C1 12 00 00 5D 08 00 00 90 DB 16 00:Plank Shield
+C1 12 00 00 5E 08 00 00 90 DB 16 00:Crystal Plank Shield
+C1 12 00 00 5F 08 00 00 90 DB 16 00:Lightning Plank Shield
+C1 12 00 00 60 08 00 00 90 DB 16 00:Magic Plank Shield
+C1 12 00 00 61 08 00 00 90 DB 16 00:Divine Plank Shield
+C1 12 00 00 62 08 00 00 90 DB 16 00:Fire Plank Shield
+C1 12 00 00 3F 08 00 00 90 DB 16 00:Caduceus Round Shield
+C1 12 00 00 40 08 00 00 90 DB 16 00:Crys. Caduceus Round Shield
+C1 12 00 00 41 08 00 00 90 DB 16 00:Ltng. Caduceus Round Shield
+C1 12 00 00 42 08 00 00 90 DB 16 00:Magic Caduceus Round Shield
+C1 12 00 00 43 08 00 00 90 DB 16 00:Div. Caduceus Round Shield
+C1 12 00 00 44 08 00 00 90 DB 16 00:Fire Caduceus Round Shield
+C2 12 00 00 8F 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 90 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 91 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 92 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 93 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 94 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 95 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 96 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 97 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 98 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 99 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 9A 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 9B 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 9C 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 9D 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 9E 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 9F 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 A0 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 A1 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 A2 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 A3 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 A4 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 A5 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 A6 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 A7 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 A8 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 A9 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 AA 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 AB 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 AC 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 AD 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 AE 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 AF 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 B0 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 B1 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 B2 08 00 00 90 DB 16 00:Crystal Ring Shield
+C2 12 00 00 B3 08 00 00 90 DB 16 00:Crystal Ring Shield
+C0 12 00 00 1B 09 00 00 78 DF 16 00:Heater Shield
+C0 12 00 00 1C 09 00 00 78 DF 16 00:Crystal Heater Shield
+C0 12 00 00 1D 09 00 00 78 DF 16 00:Lightning Heater Shield
+C0 12 00 00 1E 09 00 00 78 DF 16 00:Magic Heater Shield
+C0 12 00 00 1F 09 00 00 78 DF 16 00:Divine Heater Shield
+C0 12 00 00 20 09 00 00 78 DF 16 00:Fire Heater Shield
+C0 12 00 00 43 09 00 00 78 DF 16 00:Knight Shield
+C0 12 00 00 44 09 00 00 78 DF 16 00:Crystal Knight Shield
+C0 12 00 00 45 09 00 00 78 DF 16 00:Lightning Knight Shield
+C0 12 00 00 46 09 00 00 78 DF 16 00:Magic Knight Shield
+C0 12 00 00 47 09 00 00 78 DF 16 00:Divine Knight Shield
+C0 12 00 00 48 09 00 00 78 DF 16 00:Fire Knight Shield
+C0 12 00 00 25 09 00 00 78 DF 16 00:Tower Kite Shield
+C0 12 00 00 26 09 00 00 78 DF 16 00:Crystal Tower Kite Shield
+C0 12 00 00 27 09 00 00 78 DF 16 00:Lightning Tower Kite Shield
+C0 12 00 00 28 09 00 00 78 DF 16 00:Magic Tower Kite Shield
+C0 12 00 00 29 09 00 00 78 DF 16 00:Divine Tower Kite Shield
+C0 12 00 00 2A 09 00 00 78 DF 16 00:Fire Tower Kite Shield
+C0 12 00 00 61 09 00 00 78 DF 16 00:Grass Crest Shield
+C0 12 00 00 62 09 00 00 78 DF 16 00:Crystal Grass Crest Shield
+C0 12 00 00 63 09 00 00 78 DF 16 00:Ltng. Grass Crest Shield
+C0 12 00 00 64 09 00 00 78 DF 16 00:Magic Grass Crest Shield
+C0 12 00 00 65 09 00 00 78 DF 16 00:Divine Grass Crest Shield
+C0 12 00 00 66 09 00 00 78 DF 16 00:Fire Grass Crest Shield
+C0 12 00 00 39 09 00 00 78 DF 16 00:Hollow Soldier Shield
+C0 12 00 00 3A 09 00 00 78 DF 16 00:Crys. Hollow Soldier Shield
+C0 12 00 00 3B 09 00 00 78 DF 16 00:Ltng. Hollow Soldier Shield
+C0 12 00 00 3C 09 00 00 78 DF 16 00:Magic Hollow Soldier Shield
+C0 12 00 00 3D 09 00 00 78 DF 16 00:Div. Hollow Soldier Shield
+C0 12 00 00 3E 09 00 00 78 DF 16 00:Fire Hollow Soldier Shield
+C0 12 00 00 4F 09 00 00 78 DF 16 00:Balder Shield
+C0 12 00 00 50 09 00 00 78 DF 16 00:Crystal Balder Shield
+C0 12 00 00 51 09 00 00 78 DF 16 00:Lightning Balder Shield
+C0 12 00 00 52 09 00 00 78 DF 16 00:Magic Balder Shield
+C0 12 00 00 53 09 00 00 78 DF 16 00:Divine Balder Shield
+C0 12 00 00 54 09 00 00 78 DF 16 00:Fire Balder Shield
+C0 12 00 00 A7 09 00 00 78 DF 16 00:Crest Shield
+C0 12 00 00 A8 09 00 00 78 DF 16 00:Dragon Crest Shield
+C1 12 00 00 35 08 00 00 90 DB 16 00:Warrior's Round Shield
+C1 12 00 00 36 08 00 00 90 DB 16 00:Crys. Warrior's Rd. Shield
+C1 12 00 00 37 08 00 00 90 DB 16 00:Ltng. Warrior's Rd. Shield
+C1 12 00 00 38 08 00 00 90 DB 16 00:Magic Warrior's Rd. Shield
+C1 12 00 00 39 08 00 00 90 DB 16 00:Div. Warrior's Round Shield
+C1 12 00 00 3A 08 00 00 90 DB 16 00:Fire Warrior's Round Shield
+C0 12 00 00 6D 09 00 00 78 DF 16 00:Iron Round Shield
+C0 12 00 00 6E 09 00 00 78 DF 16 00:Crystal Iron Round Shield
+C0 12 00 00 6F 09 00 00 78 DF 16 00:Lightning Iron Round Shield
+C0 12 00 00 70 09 00 00 78 DF 16 00:Magic Iron Round Shield
+C0 12 00 00 71 09 00 00 78 DF 16 00:Divine Iron Round Shield
+C0 12 00 00 72 09 00 00 78 DF 16 00:Fire Iron Round Shield
+C0 12 00 00 57 09 00 00 78 DF 16 00:Spider Shield
+C0 12 00 00 58 09 00 00 78 DF 16 00:Crystal Spider Shield
+C0 12 00 00 59 09 00 00 78 DF 16 00:Lightning Spider Shield
+C0 12 00 00 5A 09 00 00 78 DF 16 00:Magic Spider Shield
+C0 12 00 00 5B 09 00 00 78 DF 16 00:Divine Spider Shield
+C0 12 00 00 5C 09 00 00 78 DF 16 00:Fire Spider Shield
+C3 12 00 00 89 09 00 00 78 DF 16 00:Spiked Shield
+C3 12 00 00 8A 09 00 00 78 DF 16 00:Crystal Spiked Shield
+C3 12 00 00 8B 09 00 00 78 DF 16 00:Lightning Spiked Shield
+C3 12 00 00 8C 09 00 00 78 DF 16 00:Magic Spiked Shield
+C3 12 00 00 8D 09 00 00 78 DF 16 00:Divine Spiked Shield
+C3 12 00 00 8E 09 00 00 78 DF 16 00:Fire Spiked Shield
+C0 12 00 00 9D 09 00 00 78 DF 16 00:Crystal Shield
+C0 12 00 00 75 09 00 00 78 DF 16 00:Sunlight Shield
+C0 12 00 00 76 09 00 00 78 DF 16 00:Crystal Sunlight Shield
+C0 12 00 00 77 09 00 00 78 DF 16 00:Lightning Sunlight Shield
+C0 12 00 00 78 09 00 00 78 DF 16 00:Magic Sunlight Shield
+C0 12 00 00 79 09 00 00 78 DF 16 00:Divine Sunlight Shield
+C0 12 00 00 7A 09 00 00 78 DF 16 00:Fire Sunlight Shield
+C0 12 00 00 B1 09 00 00 78 DF 16 00:Silver Knight Shield
+C0 12 00 00 B2 09 00 00 78 DF 16 00:Black Knight Shield
+C3 12 00 00 7F 09 00 00 78 DF 16 00:Pierce Shield
+C3 12 00 00 80 09 00 00 78 DF 16 00:Crystal Pierce Shield
+C3 12 00 00 81 09 00 00 78 DF 16 00:Lightning Pierce Shield
+C3 12 00 00 82 09 00 00 78 DF 16 00:Magic Pierce Shield
+C3 12 00 00 83 09 00 00 78 DF 16 00:Divine Pierce Shield
+C3 12 00 00 84 09 00 00 78 DF 16 00:Fire Pierce Shield
+C1 12 00 00 4F 08 00 00 90 DB 16 00:Red and White Round Shield
+C1 12 00 00 50 08 00 00 90 DB 16 00:Crystal R&amp;W Round Shield
+C1 12 00 00 51 08 00 00 90 DB 16 00:Lightning R&amp;W Round Shield
+C1 12 00 00 52 08 00 00 90 DB 16 00:Magic R&amp;W Round Shield
+C1 12 00 00 53 08 00 00 90 DB 16 00:Divine R&amp;W Round Shield
+C1 12 00 00 54 08 00 00 90 DB 16 00:Fire R&amp;W Round Shield
+C0 12 00 00 2F 09 00 00 78 DF 16 00:Caduceus Kite Shield
+C0 12 00 00 30 09 00 00 78 DF 16 00:Crys. Caduceus Kite Shield
+C0 12 00 00 31 09 00 00 78 DF 16 00:Ltng. Caduceus Kite Shield
+C0 12 00 00 32 09 00 00 78 DF 16 00:Magic Caduceus Kite Shield
+C0 12 00 00 33 09 00 00 78 DF 16 00:Divine Caduceus Kite Shield
+C0 12 00 00 34 09 00 00 78 DF 16 00:Fire Caduceus Kite Shield
+C0 12 00 00 93 09 00 00 78 DF 16 00:Gargoyle's Shield
+C0 12 00 00 94 09 00 00 78 DF 16 00:Crystal Gargoyle's Shield
+C0 12 00 00 95 09 00 00 78 DF 16 00:Lightning Gargoyle's Shield
+C0 12 00 00 96 09 00 00 78 DF 16 00:Magic Gargoyle's Shield
+C0 12 00 00 97 09 00 00 78 DF 16 00:Divine Gargoyle's Shield
+C0 12 00 00 98 09 00 00 78 DF 16 00:Fire Gargoyle's Shield
+5D 12 00 00 29 A 00 00 18 66 18 00:Eagle Shield
+5D 12 00 00 2A A 00 00 18 66 18 00:Crystal Eagle Shield
+5D 12 00 00 2B A 00 00 18 66 18 00:Lightning Eagle Shield
+5D 12 00 00 2C A 00 00 18 66 18 00:Magic Eagle Shield
+5D 12 00 00 2D A 00 00 18 66 18 00:Divine Eagle Shield
+5D 12 00 00 2E A 00 00 18 66 18 00:Fire Eagle Shield
+5C 12 00 00 33 A 00 00 18 66 18 00:Tower Shield
+5C 12 00 00 34 A 00 00 18 66 18 00:Crystal Tower Shield
+5C 12 00 00 35 A 00 00 18 66 18 00:Lightning Tower Shield
+5C 12 00 00 36 A 00 00 18 66 18 00:Magic Tower Shield
+5C 12 00 00 37 A 00 00 18 66 18 00:Divine Tower Shield
+5C 12 00 00 38 A 00 00 18 66 18 00:Fire Tower Shield
+5C 12 00 00 3F A 00 00 18 66 18 00:Giant Shield
+5C 12 00 00 40 A 00 00 18 66 18 00:Crystal Giant Shield
+5C 12 00 00 41 A 00 00 18 66 18 00:Lightning Giant Shield
+5C 12 00 00 42 A 00 00 18 66 18 00:Magic Giant Shield
+5C 12 00 00 43 A 00 00 18 66 18 00:Divine Giant Shield
+5C 12 00 00 44 A 00 00 18 66 18 00:Fire Giant Shield
+5C 12 00 00 51 A 00 00 18 66 18 00:Stone Greatshield
+5C 12 00 00 5B A 00 00 18 66 18 00:Havel's Greatshield
+5E 12 00 00 47 A 00 00 18 66 18 00:Bonewheel Shield
+5E 12 00 00 48 A 00 00 18 66 18 00:Crystal Bonewheel Shield
+5E 12 00 00 49 A 00 00 18 66 18 00:Lightning Bonewheel Shield
+5E 12 00 00 4A A 00 00 18 66 18 00:Magic Bonewheel Shield
+5E 12 00 00 4B A 00 00 18 66 18 00:Divine Bonewheel Shield
+5E 12 00 00 4C A 00 00 18 66 18 00:Fire Bonewheel Shield
+5C 12 00 00 65 A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 66 A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 67 A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 68 A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 69 A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 6A A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 6B A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 6C A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 6D A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 6E A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 6F A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 70 A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 71 A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 72 A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 73 A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 74 A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 75 A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 76 A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 77 A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 78 A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 79 A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 7A A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 7B A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 7C A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 7D A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 7E A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 7F A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 80 A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 81 A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 82 A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 83 A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 84 A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 85 A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 86 A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 87 A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 88 A 00 00 18 66 18 00:Greatshield of Artorias
+5C 12 00 00 89 A 00 00 18 66 18 00:Greatshield of Artorias
+CC 10 00 00 A5 06 00 00 B8 EC 19 00:Whip
+CC 10 00 00 A6 06 00 00 B8 EC 19 00:Crystal Whip
+CC 10 00 00 A7 06 00 00 B8 EC 19 00:Lightning Whip
+CC 10 00 00 A8 06 00 00 B8 EC 19 00:Raw Whip
+CC 10 00 00 A9 06 00 00 B8 EC 19 00:Magic Whip
+CC 10 00 00 AA 06 00 00 B8 EC 19 00:Enchanted Whip
+CC 10 00 00 AB 06 00 00 B8 EC 19 00:Divine Whip
+CC 10 00 00 AC 06 00 00 B8 EC 19 00:Occult Whip
+CC 10 00 00 AD 06 00 00 B8 EC 19 00:Fire Whip
+CC 10 00 00 AE 06 00 00 B8 EC 19 00:Chaos Whip
+CC 10 00 00 AF 06 00 00 B8 EC 19 00:Notched Whip
+CC 10 00 00 B0 06 00 00 B8 EC 19 00:Crystal Notched Whip
+CC 10 00 00 B1 06 00 00 B8 EC 19 00:Lightning Notched Whip
+CC 10 00 00 B2 06 00 00 B8 EC 19 00:Raw Notched Whip
+CC 10 00 00 B3 06 00 00 B8 EC 19 00:Magic Notched Whip
+CC 10 00 00 B4 06 00 00 B8 EC 19 00:Enchanted Notched Whip
+CC 10 00 00 B5 06 00 00 B8 EC 19 00:Divine Notched Whip
+CC 10 00 00 B6 06 00 00 B8 EC 19 00:Occult Notched Whip
+CC 10 00 00 B7 06 00 00 B8 EC 19 00:Fire Notched Whip
+CC 10 00 00 B8 06 00 00 B8 EC 19 00:Chaos Notched Whip
+E8 03 00 00 8A 13 00 00 38 07 20 00:Standard Arrow
+E9 03 00 00 8B 13 00 00 38 07 20 00:Large Arrow
+EA 03 00 00 8C 13 00 00 38 07 20 00:Feather Arrow
+EB 03 00 00 8D 13 00 00 38 07 20 00:Fire Arrow
+EC 03 00 00 8E 13 00 00 38 07 20 00:Poison Arrow
+ED 03 00 00 8F 13 00 00 38 07 20 00:Moonlight Arrow
+EE 03 00 00 89 13 00 00 38 07 20 00:Wooden Arrow
+EF 03 00 00 90 13 00 00 38 07 20 00:Dragonslayer Arrow
+F0 03 00 00 91 13 00 00 38 07 20 00:Oya of [ DLC ] go (copied from translated name)
+E8 03 00 00 93 13 00 00 38 07 20 00:Arrow
+4C 04 00 00 BC 13 00 00 D8 8D 21 00:Standard Bolt
+4D 04 00 00 BD 13 00 00 D8 8D 21 00:Heavy Bolt
+4E 04 00 00 BE 13 00 00 D8 8D 21 00:Sniper Bolt
+4F 04 00 00 BB 13 00 00 D8 8D 21 00:Wood Bolt
+50 04 00 00 BF 13 00 00 D8 8D 21 00:Lightning Bolt
+4C 04 00 00 C0 13 00 00 D8 8D 21 00:Bolt
+C1 12 00 00 49 08 00 00 90 DB 16 00:Effigy Shield
+C1 12 00 00 4A 08 00 00 90 DB 16 00:Crystal Effigy Shield
+C1 12 00 00 4B 08 00 00 90 DB 16 00:Lightning Effigy Shield
+C1 12 00 00 4C 08 00 00 90 DB 16 00:Magic Effigy Shield
+C1 12 00 00 4D 08 00 00 90 DB 16 00:Divine Effigy Shield
+C1 12 00 00 4E 08 00 00 90 DB 16 00:Fire Effigy Shield
+C0 12 00 00 49 09 00 00 78 DF 16 00:Sanctus
+C0 12 00 00 4A 09 00 00 78 DF 16 00:Crystal Sanctus
+C0 12 00 00 4B 09 00 00 78 DF 16 00:Lightning Sanctus
+C0 12 00 00 4C 09 00 00 78 DF 16 00:Magic Sanctus
+C0 12 00 00 4D 09 00 00 78 DF 16 00:Divine Sanctus
+C0 12 00 00 4E 09 00 00 78 DF 16 00:Fire Sanctus
+C0 12 00 00 67 09 00 00 78 DF 16 00:Bloodshield
+C0 12 00 00 68 09 00 00 78 DF 16 00:Crystal Bloodshield
+C0 12 00 00 69 09 00 00 78 DF 16 00:Lightning Bloodshield
+C0 12 00 00 6A 09 00 00 78 DF 16 00:Magic Bloodshield
+C0 12 00 00 6B 09 00 00 78 DF 16 00:Divine Bloodshield
+C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
+5C 12 00 00 39 A 00 00 18 66 18 00:Black Iron Greatshield
+5C 12 00 00 3A A 00 00 18 66 18 00:Crys. Black Iron Grtshld.
+5C 12 00 00 3B A 00 00 18 66 18 00:Ltng. Black Iron Grtshld.
+5C 12 00 00 3C A 00 00 18 66 18 00:Mag. Black Iron Grtshld.
+5C 12 00 00 3D A 00 00 18 66 18 00:Div. Black Iron Greatshield
+5C 12 00 00 3E A 00 00 18 66 18 00:Fire Black Iron Greatshield
+</DropDownList>
+          <LastState RealAddress="1EDF0000"/>
+          <ShowAsHex>1</ShowAsHex>
+          <VariableType>String</VariableType>
+          <Length>35</Length>
+          <Unicode>0</Unicode>
+          <ZeroTerminate>1</ZeroTerminate>
+          <Address>selected_weapon</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>89788</ID>
+          <Description>"Weapon Base"</Description>
+          <LastState Value="2000" RealAddress="0544F6AC"/>
+          <VariableType>4 Bytes</VariableType>
+          <Address>0544F6AC</Address>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>89789</ID>
+              <Description>"behaviorVariationId"</Description>
+              <LastState Value="2000" RealAddress="0544F6AC"/>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+0</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89790</ID>
+              <Description>"sortId"</Description>
+              <LastState Value="2" RealAddress="0544F6B0"/>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+4</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89791</ID>
+              <Description>"wanderingEquipId"</Description>
+              <LastState Value="199000" RealAddress="0544F6B4"/>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+8</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89792</ID>
+              <Description>"weight"</Description>
+              <LastState Value="0.5" RealAddress="0544F6B8"/>
+              <VariableType>Float</VariableType>
+              <Address>+c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89793</ID>
+              <Description>"weaponWeightRate"</Description>
+              <LastState Value="0" RealAddress="0544F6BC"/>
+              <VariableType>Float</VariableType>
+              <Address>+10</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89794</ID>
+              <Description>"fixPrice"</Description>
+              <LastState Value="400" RealAddress="0544F6C0"/>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+14</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89795</ID>
+              <Description>"basicPrice"</Description>
+              <LastState Value="100" RealAddress="0544F6C4"/>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+18</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89796</ID>
+              <Description>"sellValue"</Description>
+              <LastState Value="1" RealAddress="0544F6C8"/>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+1c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89797</ID>
+              <Description>"correctStrength"</Description>
+              <LastState Value="13" RealAddress="0544F6CC"/>
+              <VariableType>Float</VariableType>
+              <Address>+20</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89798</ID>
+              <Description>"correctAgility"</Description>
+              <LastState Value="85" RealAddress="0544F6D0"/>
+              <VariableType>Float</VariableType>
+              <Address>+24</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89799</ID>
+              <Description>"correctMagic"</Description>
+              <LastState Value="0" RealAddress="0544F6D4"/>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+28</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89800</ID>
+              <Description>"correctFaith"</Description>
+              <LastState Value="0" RealAddress="0544F6D8"/>
+              <VariableType>Float</VariableType>
+              <Address>+2c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89801</ID>
+              <Description>"physGuardCutRate"</Description>
+              <LastState Value="45" RealAddress="0544F6DC"/>
+              <VariableType>Float</VariableType>
+              <Address>+30</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89802</ID>
+              <Description>"magGuardCutRate"</Description>
+              <LastState Value="10" RealAddress="0544F6E0"/>
+              <VariableType>Float</VariableType>
+              <Address>+34</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89803</ID>
+              <Description>"fireGuardCutRate"</Description>
+              <LastState Value="30" RealAddress="0544F6E4"/>
+              <VariableType>Float</VariableType>
+              <Address>+38</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89804</ID>
+              <Description>"thunGuardCutRate"</Description>
+              <LastState Value="30" RealAddress="0544F6E8"/>
+              <VariableType>Float</VariableType>
+              <Address>+3c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89805</ID>
+              <Description>"spEffectBehaviorId"</Description>
+              <LastState Value="-1" RealAddress="0544F6EC"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+40</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89806</ID>
+              <Description>"spEffectBehaviorId1"</Description>
+              <LastState Value="-1" RealAddress="0544F6F0"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+44</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89807</ID>
+              <Description>"spEffectBehaviorId2"</Description>
+              <LastState Value="-1" RealAddress="0544F6F4"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+48</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89808</ID>
+              <Description>"residentSpEffectId"</Description>
+              <LastState Value="-1" RealAddress="0544F6F8"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+4c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89809</ID>
+              <Description>"residentSpEffectId1"</Description>
+              <LastState Value="-1" RealAddress="0544F6FC"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+50</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89810</ID>
+              <Description>"residentSpEffectId2"</Description>
+              <LastState Value="-1" RealAddress="0544F700"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+54</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89811</ID>
+              <Description>"materialSetId"</Description>
+              <LastState Value="100" RealAddress="0544F704"/>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+58</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89812</ID>
+              <Description>"originEquipWep"</Description>
+              <LastState Value="100010" RealAddress="0544F708"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+5c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89813</ID>
+              <Description>"originEquipWep1"</Description>
+              <LastState Value="100010" RealAddress="0544F70C"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+60</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89814</ID>
+              <Description>"originEquipWep2"</Description>
+              <LastState Value="100010" RealAddress="0544F710"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+64</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89815</ID>
+              <Description>"originEquipWep3"</Description>
+              <LastState Value="100010" RealAddress="0544F714"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+68</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89816</ID>
+              <Description>"originEquipWep4"</Description>
+              <LastState Value="100010" RealAddress="0544F718"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+6c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89817</ID>
+              <Description>"originEquipWep5"</Description>
+              <LastState Value="100010" RealAddress="0544F71C"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+70</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89818</ID>
+              <Description>"originEquipWep6"</Description>
+              <LastState Value="-1" RealAddress="0544F720"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+74</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89819</ID>
+              <Description>"originEquipWep7"</Description>
+              <LastState Value="-1" RealAddress="0544F724"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+78</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89820</ID>
+              <Description>"originEquipWep8"</Description>
+              <LastState Value="-1" RealAddress="0544F728"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+7c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89821</ID>
+              <Description>"originEquipWep9"</Description>
+              <LastState Value="-1" RealAddress="0544F72C"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+80</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89822</ID>
+              <Description>"originEquipWep10"</Description>
+              <LastState Value="-1" RealAddress="0544F730"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+84</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89823</ID>
+              <Description>"originEquipWep11"</Description>
+              <LastState Value="-1" RealAddress="0544F734"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+88</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89824</ID>
+              <Description>"originEquipWep12"</Description>
+              <LastState Value="-1" RealAddress="0544F738"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+8c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89825</ID>
+              <Description>"originEquipWep13"</Description>
+              <LastState Value="-1" RealAddress="0544F73C"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+90</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89826</ID>
+              <Description>"originEquipWep14"</Description>
+              <LastState Value="-1" RealAddress="0544F740"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+94</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89827</ID>
+              <Description>"originEquipWep15"</Description>
+              <LastState Value="-1" RealAddress="0544F744"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+98</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89828</ID>
+              <Description>"antiDemonDamageRate"</Description>
+              <LastState Value="1" RealAddress="0544F748"/>
+              <VariableType>Float</VariableType>
+              <Address>+9c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89829</ID>
+              <Description>"antSaintDamageRate"</Description>
+              <LastState Value="1" RealAddress="0544F74C"/>
+              <VariableType>Float</VariableType>
+              <Address>+a0</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89830</ID>
+              <Description>"antWeakA_DamageRate"</Description>
+              <LastState Value="1" RealAddress="0544F750"/>
+              <VariableType>Float</VariableType>
+              <Address>+a4</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89831</ID>
+              <Description>"antWeakB_DamageRate"</Description>
+              <LastState Value="1" RealAddress="0544F754"/>
+              <VariableType>Float</VariableType>
+              <Address>+a8</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89832</ID>
+              <Description>"vagrantItemLotId"</Description>
+              <LastState Value="100700" RealAddress="0544F758"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+ac</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89833</ID>
+              <Description>"vagrantBonusEneDropItemLotId"</Description>
+              <LastState Value="100710" RealAddress="0544F75C"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+b0</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89834</ID>
+              <Description>"vagrantItemEneDropItemLotId"</Description>
+              <LastState Value="100720" RealAddress="0544F760"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+b4</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89835</ID>
+              <Description>"equipModelId"</Description>
+              <LastState Value="100" RealAddress="0544F764"/>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+b8</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89836</ID>
+              <Description>"iconId"</Description>
+              <LastState Value="1" RealAddress="0544F766"/>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+ba</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89837</ID>
+              <Description>"durability"</Description>
+              <LastState Value="20" RealAddress="0544F768"/>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+bc</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89838</ID>
+              <Description>"durabilityMax"</Description>
+              <LastState Value="20" RealAddress="0544F76A"/>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+be</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89839</ID>
+              <Description>"attackThrowEscape"</Description>
+              <LastState Value="1" RealAddress="0544F76C"/>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+c0</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89840</ID>
+              <Description>"parryDamageLife"</Description>
+              <LastState Value="10" RealAddress="0544F76E"/>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+c2</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89841</ID>
+              <Description>"attackBasePhysics"</Description>
+              <LastState Value="56" RealAddress="0544F770"/>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+c4</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89842</ID>
+              <Description>"attackBaseMagic"</Description>
+              <LastState Value="0" RealAddress="0544F772"/>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+c6</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89843</ID>
+              <Description>"attackBaseFire"</Description>
+              <LastState Value="0" RealAddress="0544F774"/>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+C8</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89844</ID>
+              <Description>"attackBaseThunder"</Description>
+              <LastState Value="0" RealAddress="0544F776"/>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+Ca</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89845</ID>
+              <Description>"attackBaseStamina"</Description>
+              <LastState Value="10" RealAddress="0544F778"/>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+cc</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89846</ID>
+              <Description>"saWeaponDamage"</Description>
+              <LastState Value="5" RealAddress="0544F77A"/>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+Ce</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89847</ID>
+              <Description>"saDurability"</Description>
+              <LastState Value="0" RealAddress="0544F77C"/>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+d0</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89848</ID>
+              <Description>"guardAngle"</Description>
+              <LastState Value="0" RealAddress="0544F77E"/>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+d2</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89849</ID>
+              <Description>"staminaGuardDef"</Description>
+              <LastState Value="26" RealAddress="0544F780"/>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+d4</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89850</ID>
+              <Description>"reinforceTypeId"</Description>
+              <LastState Value="100" RealAddress="0544F782"/>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+d6</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89851</ID>
+              <Description>"trophySGradeId"</Description>
+              <LastState Value="65535" RealAddress="0544F784"/>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+d8</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89852</ID>
+              <Description>"trophySeqId"</Description>
+              <LastState Value="17" RealAddress="0544F786"/>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+da</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89853</ID>
+              <Description>"throwAtkRate"</Description>
+              <LastState Value="31" RealAddress="0544F788"/>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+dc</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89854</ID>
+              <Description>"bowDistRate"</Description>
+              <LastState Value="65535" RealAddress="0544F78A"/>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+de</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89855</ID>
+              <Description>"equipModelCategory"</Description>
+              <LastState Value="7" RealAddress="0544F78C"/>
+              <VariableType>Byte</VariableType>
+              <Address>+e0</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89856</ID>
+              <Description>"equipModelGender"</Description>
+              <LastState Value="0" RealAddress="0544F78D"/>
+              <VariableType>Byte</VariableType>
+              <Address>+e1</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89857</ID>
+              <Description>"weaponCategory"</Description>
+              <LastState Value="0" RealAddress="0544F78E"/>
+              <VariableType>Byte</VariableType>
+              <Address>+e2</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89858</ID>
+              <Description>"wepmotionCategory"</Description>
+              <LastState Value="20" RealAddress="0544F78F"/>
+              <VariableType>Byte</VariableType>
+              <Address>+e3</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89859</ID>
+              <Description>"guardmotionCategory"</Description>
+              <LastState Value="2" RealAddress="0544F790"/>
+              <VariableType>Byte</VariableType>
+              <Address>+e4</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89860</ID>
+              <Description>"atkMaterial"</Description>
+              <LastState Value="0" RealAddress="0544F791"/>
+              <VariableType>Byte</VariableType>
+              <Address>+e5</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89861</ID>
+              <Description>"defMaterial"</Description>
+              <LastState Value="50" RealAddress="0544F792"/>
+              <VariableType>Byte</VariableType>
+              <Address>+e6</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89862</ID>
+              <Description>"defSfxMaterial"</Description>
+              <LastState Value="50" RealAddress="0544F793"/>
+              <VariableType>Byte</VariableType>
+              <Address>+e7</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89863</ID>
+              <Description>"correctType"</Description>
+              <LastState Value="0" RealAddress="0544F794"/>
+              <VariableType>Byte</VariableType>
+              <Address>+e8</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89864</ID>
+              <Description>"spAttribute"</Description>
+              <LastState Value="1" RealAddress="0544F795"/>
+              <VariableType>Byte</VariableType>
+              <Address>+e9</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89865</ID>
+              <Description>"spAtkcategory"</Description>
+              <LastState Value="0" RealAddress="0544F796"/>
+              <VariableType>Byte</VariableType>
+              <Address>+ea</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89866</ID>
+              <Description>"wepmotionOneHandId"</Description>
+              <LastState Value="0" RealAddress="0544F797"/>
+              <VariableType>Byte</VariableType>
+              <Address>+eb</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89867</ID>
+              <Description>"wepmotionBothHandId"</Description>
+              <LastState Value="10" RealAddress="0544F798"/>
+              <VariableType>Byte</VariableType>
+              <Address>+ec</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89868</ID>
+              <Description>"properStrength"</Description>
+              <LastState Value="5" RealAddress="0544F799"/>
+              <VariableType>Byte</VariableType>
+              <Address>+ed</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89869</ID>
+              <Description>"properAgility"</Description>
+              <LastState Value="8" RealAddress="0544F79A"/>
+              <VariableType>Byte</VariableType>
+              <Address>+ee</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89870</ID>
+              <Description>"properMagic"</Description>
+              <LastState Value="0" RealAddress="0544F79B"/>
+              <VariableType>Byte</VariableType>
+              <Address>+ef</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89871</ID>
+              <Description>"properFaith"</Description>
+              <LastState Value="0" RealAddress="0544F79C"/>
+              <VariableType>Byte</VariableType>
+              <Address>+f0</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89872</ID>
+              <Description>"overStrength"</Description>
+              <LastState Value="99" RealAddress="0544F79D"/>
+              <VariableType>Byte</VariableType>
+              <Address>+f1</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89873</ID>
+              <Description>"attackBaseParry"</Description>
+              <LastState Value="0" RealAddress="0544F79E"/>
+              <VariableType>Byte</VariableType>
+              <Address>+f2</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89874</ID>
+              <Description>"defenseBaseParry"</Description>
+              <LastState Value="0" RealAddress="0544F79F"/>
+              <VariableType>Byte</VariableType>
+              <Address>+f3</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89875</ID>
+              <Description>"guardBaseRepel"</Description>
+              <LastState Value="10" RealAddress="0544F7A0"/>
+              <VariableType>Byte</VariableType>
+              <Address>+f4</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89876</ID>
+              <Description>"attackBaseRepel"</Description>
+              <LastState Value="20" RealAddress="0544F7A1"/>
+              <VariableType>Byte</VariableType>
+              <Address>+f5</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89877</ID>
+              <Description>"guardCutCancelRate"</Description>
+              <LastState Value="0" RealAddress="0544F7A2"/>
+              <VariableType>Byte</VariableType>
+              <Address>+f6</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89878</ID>
+              <Description>"guardLevel"</Description>
+              <LastState Value="1" RealAddress="0544F7A3"/>
+              <VariableType>Byte</VariableType>
+              <Address>+f7</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89879</ID>
+              <Description>"slashGuardCutRate"</Description>
+              <LastState Value="0" RealAddress="0544F7A4"/>
+              <VariableType>Byte</VariableType>
+              <Address>+f8</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89880</ID>
+              <Description>"blowGuardCutRate"</Description>
+              <LastState Value="0" RealAddress="0544F7A5"/>
+              <VariableType>Byte</VariableType>
+              <Address>+f9</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89881</ID>
+              <Description>"thrustGuardCutRate"</Description>
+              <LastState Value="0" RealAddress="0544F7A6"/>
+              <VariableType>Byte</VariableType>
+              <Address>+fa</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89882</ID>
+              <Description>"poisonGuardResist"</Description>
+              <LastState Value="40" RealAddress="0544F7A7"/>
+              <VariableType>Byte</VariableType>
+              <Address>+fb</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89883</ID>
+              <Description>"diseaseGuardResist"</Description>
+              <LastState Value="40" RealAddress="0544F7A8"/>
+              <VariableType>Byte</VariableType>
+              <Address>+fc</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89884</ID>
+              <Description>"bloodGuardResist"</Description>
+              <LastState Value="40" RealAddress="0544F7A9"/>
+              <VariableType>Byte</VariableType>
+              <Address>+fd</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89885</ID>
+              <Description>"curseGuardResist"</Description>
+              <LastState Value="30" RealAddress="0544F7AA"/>
+              <VariableType>Byte</VariableType>
+              <Address>+fe</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89886</ID>
+              <Description>"isDurabilityDivergence"</Description>
+              <LastState Value="0" RealAddress="0544F7AB"/>
+              <VariableType>Byte</VariableType>
+              <Address>+ff</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89887</ID>
+              <Description>"rightHandEquipable?"</Description>
+              <LastState Value="1" RealAddress="0544F7AC"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>0</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+100</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89888</ID>
+              <Description>"leftHandEquipable"</Description>
+              <LastState Value="1" RealAddress="0544F7AC"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>1</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+100</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89889</ID>
+              <Description>"bothHandEquipable"</Description>
+              <LastState Value="1" RealAddress="0544F7AC"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>2</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+100</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89890</ID>
+              <Description>"arrowSlotEquipable"</Description>
+              <LastState Value="0" RealAddress="0544F7AC"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>3</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+100</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89891</ID>
+              <Description>"boltSlotEquipable"</Description>
+              <LastState Value="0" RealAddress="0544F7AC"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>4</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+100</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89892</ID>
+              <Description>"enableGuard"</Description>
+              <LastState Value="0" RealAddress="0544F7AC"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>5</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+100</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89893</ID>
+              <Description>"enableParry"</Description>
+              <LastState Value="1" RealAddress="0544F7AC"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>6</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+100</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89894</ID>
+              <Description>"enableMagic"</Description>
+              <LastState Value="0" RealAddress="0544F7AC"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>7</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+100</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89895</ID>
+              <Description>"enableSorcery?"</Description>
+              <LastState Value="0" RealAddress="0544F7AD"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>0</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+101</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89896</ID>
+              <Description>"enableMiracle"</Description>
+              <LastState Value="0" RealAddress="0544F7AD"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>1</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+101</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89897</ID>
+              <Description>"enableVowMagic"</Description>
+              <LastState Value="0" RealAddress="0544F7AD"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>2</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+101</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89898</ID>
+              <Description>"isNormalAttackType"</Description>
+              <LastState Value="0" RealAddress="0544F7AD"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>3</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+101</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89899</ID>
+              <Description>"isBlowAttackType"</Description>
+              <LastState Value="0" RealAddress="0544F7AD"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>4</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+101</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89900</ID>
+              <Description>"isSlashAttackType"</Description>
+              <LastState Value="1" RealAddress="0544F7AD"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>5</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+101</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89901</ID>
+              <Description>"isThrustAttackType"</Description>
+              <LastState Value="1" RealAddress="0544F7AD"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>6</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+101</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89902</ID>
+              <Description>"isEnhance (Can be buffed)"</Description>
+              <LastState Value="1" RealAddress="0544F7AD"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>7</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+101</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89903</ID>
+              <Description>"isLuckCorrect"</Description>
+              <LastState Value="0" RealAddress="0544F7AE"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>0</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+102</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89904</ID>
+              <Description>"isCustom"</Description>
+              <LastState Value="1" RealAddress="0544F7AE"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>1</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+102</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89905</ID>
+              <Description>"disableBaseChangeReset"</Description>
+              <LastState Value="1" RealAddress="0544F7AE"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>2</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+102</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89906</ID>
+              <Description>"disableRepair"</Description>
+              <LastState Value="1" RealAddress="0544F7AE"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>3</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+102</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89907</ID>
+              <Description>"isDarkHand"</Description>
+              <LastState Value="0" RealAddress="0544F7AE"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>4</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+102</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89908</ID>
+              <Description>"simpleModelForDlc"</Description>
+              <LastState Value="0" RealAddress="0544F7AE"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>5</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+102</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89909</ID>
+              <Description>"ubyte lanternWep"</Description>
+              <LastState Value="0" RealAddress="0544F7AE"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>6</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+102</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89910</ID>
+              <Description>"isVersusGhostWep"</Description>
+              <LastState Value="0" RealAddress="0544F7AE"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>7</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+102</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89911</ID>
+              <Description>"baseChangeCategory"</Description>
+              <LastState Value="1" RealAddress="0544F7AF"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>0</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+103</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89912</ID>
+              <Description>"isDragonSlayer"</Description>
+              <LastState Value="0" RealAddress="0544F7AF"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>1</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+103</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89913</ID>
+              <Description>"isDeposit"</Description>
+              <LastState Value="1" RealAddress="0544F7AF"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>2</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+103</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89914</ID>
+              <Description>"disableMultiDropShare"</Description>
+              <LastState Value="0" RealAddress="0544F7AF"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>3</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+103</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>selected_weapon</Name>
+      <Address>1EDF0000</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+  <LuaScript>AddressList = getAddressList()
+
+function SetWeaponBase()
+  --get aob for selected weapon dropdown
+  local selected_weapon = AddressList.getMemoryRecordByDescription('Select Weapon')
+  local weapon_aob = readString(selected_weapon.getCurrentAddress(),35, false)
+  if weapon_aob ~= nil then
+    --aob scan
+    local weapon_aob_results = AOBScan(weapon_aob)
+    if weapon_aob_results ~= nil and weapon_aob_results.getCount()==1 then
+      --set Weapon Base address to the 1st result of aob scan
+      AddressList.getMemoryRecordByDescription('Weapon Base').setAddress(weapon_aob_results[0])
+    end
+    if weapon_aob_results ~= nil then
+      weapon_aob_results.Destroy()
+    end
+  end
+end
+
+WeaponListener = createTimer(nil)
+timer_onTimer(WeaponListener, SetWeaponBase)
+timer_setInterval(WeaponListener,3000)
+timer_setEnabled(WeaponListener, true)
+</LuaScript>
+</CheatTable>
