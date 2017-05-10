@@ -5,15 +5,35 @@
       <ID>89915</ID>
       <Description>"Open"</Description>
       <Options moHideChildren="1"/>
-      <LastState/>
+      <LastState Activated="1"/>
       <VariableType>Auto Assembler Script</VariableType>
       <AssemblerScript>[ENABLE]
 globalalloc(selected_weapon,40)
+globalalloc(selected_weapon_var_name,40)
 
 [DISABLE]
+dealloc(selected_weapon_var_name)
 dealloc(selected_weapon)
 </AssemblerScript>
       <CheatEntries>
+        <CheatEntry>
+          <ID>89917</ID>
+          <Description>"Set the value to the weapon name, and check the box"</Description>
+          <LastState Value="" RealAddress="00000000"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>89916</ID>
+              <Description>"Generate CE Code"</Description>
+              <LastState Activated="1" RealAddress="0F510030"/>
+              <VariableType>String</VariableType>
+              <Length>40</Length>
+              <Unicode>0</Unicode>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>selected_weapon_var_name</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
         <CheatEntry>
           <ID>10322</ID>
           <Description>"Select Weapon"</Description>
@@ -1161,7 +1181,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
 5C 12 00 00 3D A 00 00 18 66 18 00:Div. Black Iron Greatshield
 5C 12 00 00 3E A 00 00 18 66 18 00:Fire Black Iron Greatshield
 </DropDownList>
-          <LastState RealAddress="1EDF0000"/>
+          <LastState RealAddress="0F510000"/>
           <ShowAsHex>1</ShowAsHex>
           <VariableType>String</VariableType>
           <Length>35</Length>
@@ -1172,126 +1192,126 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
         <CheatEntry>
           <ID>89788</ID>
           <Description>"Weapon Base"</Description>
-          <LastState Value="2000" RealAddress="0544F6AC"/>
+          <LastState Value="2000" RealAddress="04E2C6AC"/>
           <VariableType>4 Bytes</VariableType>
-          <Address>0544F6AC</Address>
+          <Address>04E2C6AC</Address>
           <CheatEntries>
             <CheatEntry>
               <ID>89789</ID>
               <Description>"behaviorVariationId"</Description>
-              <LastState Value="2000" RealAddress="0544F6AC"/>
+              <LastState Value="2000" RealAddress="04E2C6AC"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+0</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89790</ID>
               <Description>"sortId"</Description>
-              <LastState Value="2" RealAddress="0544F6B0"/>
+              <LastState Value="2" RealAddress="04E2C6B0"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+4</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89791</ID>
               <Description>"wanderingEquipId"</Description>
-              <LastState Value="199000" RealAddress="0544F6B4"/>
+              <LastState Value="199000" RealAddress="04E2C6B4"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+8</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89792</ID>
               <Description>"weight"</Description>
-              <LastState Value="0.5" RealAddress="0544F6B8"/>
+              <LastState Value="0.5" RealAddress="04E2C6B8"/>
               <VariableType>Float</VariableType>
               <Address>+c</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89793</ID>
               <Description>"weaponWeightRate"</Description>
-              <LastState Value="0" RealAddress="0544F6BC"/>
+              <LastState Value="0" RealAddress="04E2C6BC"/>
               <VariableType>Float</VariableType>
               <Address>+10</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89794</ID>
               <Description>"fixPrice"</Description>
-              <LastState Value="400" RealAddress="0544F6C0"/>
+              <LastState Value="400" RealAddress="04E2C6C0"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+14</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89795</ID>
               <Description>"basicPrice"</Description>
-              <LastState Value="100" RealAddress="0544F6C4"/>
+              <LastState Value="100" RealAddress="04E2C6C4"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+18</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89796</ID>
               <Description>"sellValue"</Description>
-              <LastState Value="1" RealAddress="0544F6C8"/>
+              <LastState Value="1" RealAddress="04E2C6C8"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+1c</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89797</ID>
               <Description>"correctStrength"</Description>
-              <LastState Value="13" RealAddress="0544F6CC"/>
+              <LastState Value="13" RealAddress="04E2C6CC"/>
               <VariableType>Float</VariableType>
               <Address>+20</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89798</ID>
               <Description>"correctAgility"</Description>
-              <LastState Value="85" RealAddress="0544F6D0"/>
+              <LastState Value="85" RealAddress="04E2C6D0"/>
               <VariableType>Float</VariableType>
               <Address>+24</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89799</ID>
               <Description>"correctMagic"</Description>
-              <LastState Value="0" RealAddress="0544F6D4"/>
+              <LastState Value="0" RealAddress="04E2C6D4"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+28</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89800</ID>
               <Description>"correctFaith"</Description>
-              <LastState Value="0" RealAddress="0544F6D8"/>
+              <LastState Value="0" RealAddress="04E2C6D8"/>
               <VariableType>Float</VariableType>
               <Address>+2c</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89801</ID>
               <Description>"physGuardCutRate"</Description>
-              <LastState Value="45" RealAddress="0544F6DC"/>
+              <LastState Value="45" RealAddress="04E2C6DC"/>
               <VariableType>Float</VariableType>
               <Address>+30</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89802</ID>
               <Description>"magGuardCutRate"</Description>
-              <LastState Value="10" RealAddress="0544F6E0"/>
+              <LastState Value="10" RealAddress="04E2C6E0"/>
               <VariableType>Float</VariableType>
               <Address>+34</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89803</ID>
               <Description>"fireGuardCutRate"</Description>
-              <LastState Value="30" RealAddress="0544F6E4"/>
+              <LastState Value="30" RealAddress="04E2C6E4"/>
               <VariableType>Float</VariableType>
               <Address>+38</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89804</ID>
               <Description>"thunGuardCutRate"</Description>
-              <LastState Value="30" RealAddress="0544F6E8"/>
+              <LastState Value="30" RealAddress="04E2C6E8"/>
               <VariableType>Float</VariableType>
               <Address>+3c</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89805</ID>
               <Description>"spEffectBehaviorId"</Description>
-              <LastState Value="-1" RealAddress="0544F6EC"/>
+              <LastState Value="-1" RealAddress="04E2C6EC"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+40</Address>
@@ -1299,7 +1319,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89806</ID>
               <Description>"spEffectBehaviorId1"</Description>
-              <LastState Value="-1" RealAddress="0544F6F0"/>
+              <LastState Value="-1" RealAddress="04E2C6F0"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+44</Address>
@@ -1307,7 +1327,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89807</ID>
               <Description>"spEffectBehaviorId2"</Description>
-              <LastState Value="-1" RealAddress="0544F6F4"/>
+              <LastState Value="-1" RealAddress="04E2C6F4"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+48</Address>
@@ -1315,7 +1335,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89808</ID>
               <Description>"residentSpEffectId"</Description>
-              <LastState Value="-1" RealAddress="0544F6F8"/>
+              <LastState Value="-1" RealAddress="04E2C6F8"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+4c</Address>
@@ -1323,7 +1343,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89809</ID>
               <Description>"residentSpEffectId1"</Description>
-              <LastState Value="-1" RealAddress="0544F6FC"/>
+              <LastState Value="-1" RealAddress="04E2C6FC"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+50</Address>
@@ -1331,7 +1351,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89810</ID>
               <Description>"residentSpEffectId2"</Description>
-              <LastState Value="-1" RealAddress="0544F700"/>
+              <LastState Value="-1" RealAddress="04E2C700"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+54</Address>
@@ -1339,14 +1359,14 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89811</ID>
               <Description>"materialSetId"</Description>
-              <LastState Value="100" RealAddress="0544F704"/>
+              <LastState Value="100" RealAddress="04E2C704"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+58</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89812</ID>
               <Description>"originEquipWep"</Description>
-              <LastState Value="100010" RealAddress="0544F708"/>
+              <LastState Value="100010" RealAddress="04E2C708"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+5c</Address>
@@ -1354,7 +1374,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89813</ID>
               <Description>"originEquipWep1"</Description>
-              <LastState Value="100010" RealAddress="0544F70C"/>
+              <LastState Value="100010" RealAddress="04E2C70C"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+60</Address>
@@ -1362,7 +1382,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89814</ID>
               <Description>"originEquipWep2"</Description>
-              <LastState Value="100010" RealAddress="0544F710"/>
+              <LastState Value="100010" RealAddress="04E2C710"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+64</Address>
@@ -1370,7 +1390,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89815</ID>
               <Description>"originEquipWep3"</Description>
-              <LastState Value="100010" RealAddress="0544F714"/>
+              <LastState Value="100010" RealAddress="04E2C714"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+68</Address>
@@ -1378,7 +1398,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89816</ID>
               <Description>"originEquipWep4"</Description>
-              <LastState Value="100010" RealAddress="0544F718"/>
+              <LastState Value="100010" RealAddress="04E2C718"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+6c</Address>
@@ -1386,7 +1406,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89817</ID>
               <Description>"originEquipWep5"</Description>
-              <LastState Value="100010" RealAddress="0544F71C"/>
+              <LastState Value="100010" RealAddress="04E2C71C"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+70</Address>
@@ -1394,7 +1414,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89818</ID>
               <Description>"originEquipWep6"</Description>
-              <LastState Value="-1" RealAddress="0544F720"/>
+              <LastState Value="-1" RealAddress="04E2C720"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+74</Address>
@@ -1402,7 +1422,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89819</ID>
               <Description>"originEquipWep7"</Description>
-              <LastState Value="-1" RealAddress="0544F724"/>
+              <LastState Value="-1" RealAddress="04E2C724"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+78</Address>
@@ -1410,7 +1430,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89820</ID>
               <Description>"originEquipWep8"</Description>
-              <LastState Value="-1" RealAddress="0544F728"/>
+              <LastState Value="-1" RealAddress="04E2C728"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+7c</Address>
@@ -1418,7 +1438,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89821</ID>
               <Description>"originEquipWep9"</Description>
-              <LastState Value="-1" RealAddress="0544F72C"/>
+              <LastState Value="-1" RealAddress="04E2C72C"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+80</Address>
@@ -1426,7 +1446,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89822</ID>
               <Description>"originEquipWep10"</Description>
-              <LastState Value="-1" RealAddress="0544F730"/>
+              <LastState Value="-1" RealAddress="04E2C730"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+84</Address>
@@ -1434,7 +1454,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89823</ID>
               <Description>"originEquipWep11"</Description>
-              <LastState Value="-1" RealAddress="0544F734"/>
+              <LastState Value="-1" RealAddress="04E2C734"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+88</Address>
@@ -1442,7 +1462,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89824</ID>
               <Description>"originEquipWep12"</Description>
-              <LastState Value="-1" RealAddress="0544F738"/>
+              <LastState Value="-1" RealAddress="04E2C738"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+8c</Address>
@@ -1450,7 +1470,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89825</ID>
               <Description>"originEquipWep13"</Description>
-              <LastState Value="-1" RealAddress="0544F73C"/>
+              <LastState Value="-1" RealAddress="04E2C73C"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+90</Address>
@@ -1458,7 +1478,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89826</ID>
               <Description>"originEquipWep14"</Description>
-              <LastState Value="-1" RealAddress="0544F740"/>
+              <LastState Value="-1" RealAddress="04E2C740"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+94</Address>
@@ -1466,7 +1486,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89827</ID>
               <Description>"originEquipWep15"</Description>
-              <LastState Value="-1" RealAddress="0544F744"/>
+              <LastState Value="-1" RealAddress="04E2C744"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+98</Address>
@@ -1474,35 +1494,35 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89828</ID>
               <Description>"antiDemonDamageRate"</Description>
-              <LastState Value="1" RealAddress="0544F748"/>
+              <LastState Value="1" RealAddress="04E2C748"/>
               <VariableType>Float</VariableType>
               <Address>+9c</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89829</ID>
               <Description>"antSaintDamageRate"</Description>
-              <LastState Value="1" RealAddress="0544F74C"/>
+              <LastState Value="1" RealAddress="04E2C74C"/>
               <VariableType>Float</VariableType>
               <Address>+a0</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89830</ID>
               <Description>"antWeakA_DamageRate"</Description>
-              <LastState Value="1" RealAddress="0544F750"/>
+              <LastState Value="1" RealAddress="04E2C750"/>
               <VariableType>Float</VariableType>
               <Address>+a4</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89831</ID>
               <Description>"antWeakB_DamageRate"</Description>
-              <LastState Value="1" RealAddress="0544F754"/>
+              <LastState Value="1" RealAddress="04E2C754"/>
               <VariableType>Float</VariableType>
               <Address>+a8</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89832</ID>
               <Description>"vagrantItemLotId"</Description>
-              <LastState Value="100700" RealAddress="0544F758"/>
+              <LastState Value="100700" RealAddress="04E2C758"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+ac</Address>
@@ -1510,7 +1530,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89833</ID>
               <Description>"vagrantBonusEneDropItemLotId"</Description>
-              <LastState Value="100710" RealAddress="0544F75C"/>
+              <LastState Value="100710" RealAddress="04E2C75C"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+b0</Address>
@@ -1518,7 +1538,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89834</ID>
               <Description>"vagrantItemEneDropItemLotId"</Description>
-              <LastState Value="100720" RealAddress="0544F760"/>
+              <LastState Value="100720" RealAddress="04E2C760"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+b4</Address>
@@ -1526,371 +1546,371 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89835</ID>
               <Description>"equipModelId"</Description>
-              <LastState Value="100" RealAddress="0544F764"/>
+              <LastState Value="100" RealAddress="04E2C764"/>
               <VariableType>2 Bytes</VariableType>
               <Address>+b8</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89836</ID>
               <Description>"iconId"</Description>
-              <LastState Value="1" RealAddress="0544F766"/>
+              <LastState Value="1" RealAddress="04E2C766"/>
               <VariableType>2 Bytes</VariableType>
               <Address>+ba</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89837</ID>
               <Description>"durability"</Description>
-              <LastState Value="20" RealAddress="0544F768"/>
+              <LastState Value="20" RealAddress="04E2C768"/>
               <VariableType>2 Bytes</VariableType>
               <Address>+bc</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89838</ID>
               <Description>"durabilityMax"</Description>
-              <LastState Value="20" RealAddress="0544F76A"/>
+              <LastState Value="20" RealAddress="04E2C76A"/>
               <VariableType>2 Bytes</VariableType>
               <Address>+be</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89839</ID>
               <Description>"attackThrowEscape"</Description>
-              <LastState Value="1" RealAddress="0544F76C"/>
+              <LastState Value="1" RealAddress="04E2C76C"/>
               <VariableType>2 Bytes</VariableType>
               <Address>+c0</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89840</ID>
               <Description>"parryDamageLife"</Description>
-              <LastState Value="10" RealAddress="0544F76E"/>
+              <LastState Value="10" RealAddress="04E2C76E"/>
               <VariableType>2 Bytes</VariableType>
               <Address>+c2</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89841</ID>
               <Description>"attackBasePhysics"</Description>
-              <LastState Value="56" RealAddress="0544F770"/>
+              <LastState Value="56" RealAddress="04E2C770"/>
               <VariableType>2 Bytes</VariableType>
               <Address>+c4</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89842</ID>
               <Description>"attackBaseMagic"</Description>
-              <LastState Value="0" RealAddress="0544F772"/>
+              <LastState Value="0" RealAddress="04E2C772"/>
               <VariableType>2 Bytes</VariableType>
               <Address>+c6</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89843</ID>
               <Description>"attackBaseFire"</Description>
-              <LastState Value="0" RealAddress="0544F774"/>
+              <LastState Value="0" RealAddress="04E2C774"/>
               <VariableType>2 Bytes</VariableType>
               <Address>+C8</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89844</ID>
               <Description>"attackBaseThunder"</Description>
-              <LastState Value="0" RealAddress="0544F776"/>
+              <LastState Value="0" RealAddress="04E2C776"/>
               <VariableType>2 Bytes</VariableType>
               <Address>+Ca</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89845</ID>
               <Description>"attackBaseStamina"</Description>
-              <LastState Value="10" RealAddress="0544F778"/>
+              <LastState Value="10" RealAddress="04E2C778"/>
               <VariableType>2 Bytes</VariableType>
               <Address>+cc</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89846</ID>
               <Description>"saWeaponDamage"</Description>
-              <LastState Value="5" RealAddress="0544F77A"/>
+              <LastState Value="5" RealAddress="04E2C77A"/>
               <VariableType>2 Bytes</VariableType>
               <Address>+Ce</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89847</ID>
               <Description>"saDurability"</Description>
-              <LastState Value="0" RealAddress="0544F77C"/>
+              <LastState Value="0" RealAddress="04E2C77C"/>
               <VariableType>2 Bytes</VariableType>
               <Address>+d0</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89848</ID>
               <Description>"guardAngle"</Description>
-              <LastState Value="0" RealAddress="0544F77E"/>
+              <LastState Value="0" RealAddress="04E2C77E"/>
               <VariableType>2 Bytes</VariableType>
               <Address>+d2</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89849</ID>
               <Description>"staminaGuardDef"</Description>
-              <LastState Value="26" RealAddress="0544F780"/>
+              <LastState Value="26" RealAddress="04E2C780"/>
               <VariableType>2 Bytes</VariableType>
               <Address>+d4</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89850</ID>
               <Description>"reinforceTypeId"</Description>
-              <LastState Value="100" RealAddress="0544F782"/>
+              <LastState Value="100" RealAddress="04E2C782"/>
               <VariableType>2 Bytes</VariableType>
               <Address>+d6</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89851</ID>
               <Description>"trophySGradeId"</Description>
-              <LastState Value="65535" RealAddress="0544F784"/>
+              <LastState Value="65535" RealAddress="04E2C784"/>
               <VariableType>2 Bytes</VariableType>
               <Address>+d8</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89852</ID>
               <Description>"trophySeqId"</Description>
-              <LastState Value="17" RealAddress="0544F786"/>
+              <LastState Value="17" RealAddress="04E2C786"/>
               <VariableType>2 Bytes</VariableType>
               <Address>+da</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89853</ID>
               <Description>"throwAtkRate"</Description>
-              <LastState Value="31" RealAddress="0544F788"/>
+              <LastState Value="31" RealAddress="04E2C788"/>
               <VariableType>2 Bytes</VariableType>
               <Address>+dc</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89854</ID>
               <Description>"bowDistRate"</Description>
-              <LastState Value="65535" RealAddress="0544F78A"/>
+              <LastState Value="65535" RealAddress="04E2C78A"/>
               <VariableType>2 Bytes</VariableType>
               <Address>+de</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89855</ID>
               <Description>"equipModelCategory"</Description>
-              <LastState Value="7" RealAddress="0544F78C"/>
+              <LastState Value="7" RealAddress="04E2C78C"/>
               <VariableType>Byte</VariableType>
               <Address>+e0</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89856</ID>
               <Description>"equipModelGender"</Description>
-              <LastState Value="0" RealAddress="0544F78D"/>
+              <LastState Value="0" RealAddress="04E2C78D"/>
               <VariableType>Byte</VariableType>
               <Address>+e1</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89857</ID>
               <Description>"weaponCategory"</Description>
-              <LastState Value="0" RealAddress="0544F78E"/>
+              <LastState Value="0" RealAddress="04E2C78E"/>
               <VariableType>Byte</VariableType>
               <Address>+e2</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89858</ID>
               <Description>"wepmotionCategory"</Description>
-              <LastState Value="20" RealAddress="0544F78F"/>
+              <LastState Value="20" RealAddress="04E2C78F"/>
               <VariableType>Byte</VariableType>
               <Address>+e3</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89859</ID>
               <Description>"guardmotionCategory"</Description>
-              <LastState Value="2" RealAddress="0544F790"/>
+              <LastState Value="2" RealAddress="04E2C790"/>
               <VariableType>Byte</VariableType>
               <Address>+e4</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89860</ID>
               <Description>"atkMaterial"</Description>
-              <LastState Value="0" RealAddress="0544F791"/>
+              <LastState Value="0" RealAddress="04E2C791"/>
               <VariableType>Byte</VariableType>
               <Address>+e5</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89861</ID>
               <Description>"defMaterial"</Description>
-              <LastState Value="50" RealAddress="0544F792"/>
+              <LastState Value="50" RealAddress="04E2C792"/>
               <VariableType>Byte</VariableType>
               <Address>+e6</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89862</ID>
               <Description>"defSfxMaterial"</Description>
-              <LastState Value="50" RealAddress="0544F793"/>
+              <LastState Value="50" RealAddress="04E2C793"/>
               <VariableType>Byte</VariableType>
               <Address>+e7</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89863</ID>
               <Description>"correctType"</Description>
-              <LastState Value="0" RealAddress="0544F794"/>
+              <LastState Value="0" RealAddress="04E2C794"/>
               <VariableType>Byte</VariableType>
               <Address>+e8</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89864</ID>
               <Description>"spAttribute"</Description>
-              <LastState Value="1" RealAddress="0544F795"/>
+              <LastState Value="1" RealAddress="04E2C795"/>
               <VariableType>Byte</VariableType>
               <Address>+e9</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89865</ID>
               <Description>"spAtkcategory"</Description>
-              <LastState Value="0" RealAddress="0544F796"/>
+              <LastState Value="0" RealAddress="04E2C796"/>
               <VariableType>Byte</VariableType>
               <Address>+ea</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89866</ID>
               <Description>"wepmotionOneHandId"</Description>
-              <LastState Value="0" RealAddress="0544F797"/>
+              <LastState Value="0" RealAddress="04E2C797"/>
               <VariableType>Byte</VariableType>
               <Address>+eb</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89867</ID>
               <Description>"wepmotionBothHandId"</Description>
-              <LastState Value="10" RealAddress="0544F798"/>
+              <LastState Value="10" RealAddress="04E2C798"/>
               <VariableType>Byte</VariableType>
               <Address>+ec</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89868</ID>
               <Description>"properStrength"</Description>
-              <LastState Value="5" RealAddress="0544F799"/>
+              <LastState Value="5" RealAddress="04E2C799"/>
               <VariableType>Byte</VariableType>
               <Address>+ed</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89869</ID>
               <Description>"properAgility"</Description>
-              <LastState Value="8" RealAddress="0544F79A"/>
+              <LastState Value="8" RealAddress="04E2C79A"/>
               <VariableType>Byte</VariableType>
               <Address>+ee</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89870</ID>
               <Description>"properMagic"</Description>
-              <LastState Value="0" RealAddress="0544F79B"/>
+              <LastState Value="0" RealAddress="04E2C79B"/>
               <VariableType>Byte</VariableType>
               <Address>+ef</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89871</ID>
               <Description>"properFaith"</Description>
-              <LastState Value="0" RealAddress="0544F79C"/>
+              <LastState Value="0" RealAddress="04E2C79C"/>
               <VariableType>Byte</VariableType>
               <Address>+f0</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89872</ID>
               <Description>"overStrength"</Description>
-              <LastState Value="99" RealAddress="0544F79D"/>
+              <LastState Value="99" RealAddress="04E2C79D"/>
               <VariableType>Byte</VariableType>
               <Address>+f1</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89873</ID>
               <Description>"attackBaseParry"</Description>
-              <LastState Value="0" RealAddress="0544F79E"/>
+              <LastState Value="0" RealAddress="04E2C79E"/>
               <VariableType>Byte</VariableType>
               <Address>+f2</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89874</ID>
               <Description>"defenseBaseParry"</Description>
-              <LastState Value="0" RealAddress="0544F79F"/>
+              <LastState Value="0" RealAddress="04E2C79F"/>
               <VariableType>Byte</VariableType>
               <Address>+f3</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89875</ID>
               <Description>"guardBaseRepel"</Description>
-              <LastState Value="10" RealAddress="0544F7A0"/>
+              <LastState Value="10" RealAddress="04E2C7A0"/>
               <VariableType>Byte</VariableType>
               <Address>+f4</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89876</ID>
               <Description>"attackBaseRepel"</Description>
-              <LastState Value="20" RealAddress="0544F7A1"/>
+              <LastState Value="20" RealAddress="04E2C7A1"/>
               <VariableType>Byte</VariableType>
               <Address>+f5</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89877</ID>
               <Description>"guardCutCancelRate"</Description>
-              <LastState Value="0" RealAddress="0544F7A2"/>
+              <LastState Value="0" RealAddress="04E2C7A2"/>
               <VariableType>Byte</VariableType>
               <Address>+f6</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89878</ID>
               <Description>"guardLevel"</Description>
-              <LastState Value="1" RealAddress="0544F7A3"/>
+              <LastState Value="1" RealAddress="04E2C7A3"/>
               <VariableType>Byte</VariableType>
               <Address>+f7</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89879</ID>
               <Description>"slashGuardCutRate"</Description>
-              <LastState Value="0" RealAddress="0544F7A4"/>
+              <LastState Value="0" RealAddress="04E2C7A4"/>
               <VariableType>Byte</VariableType>
               <Address>+f8</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89880</ID>
               <Description>"blowGuardCutRate"</Description>
-              <LastState Value="0" RealAddress="0544F7A5"/>
+              <LastState Value="0" RealAddress="04E2C7A5"/>
               <VariableType>Byte</VariableType>
               <Address>+f9</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89881</ID>
               <Description>"thrustGuardCutRate"</Description>
-              <LastState Value="0" RealAddress="0544F7A6"/>
+              <LastState Value="0" RealAddress="04E2C7A6"/>
               <VariableType>Byte</VariableType>
               <Address>+fa</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89882</ID>
               <Description>"poisonGuardResist"</Description>
-              <LastState Value="40" RealAddress="0544F7A7"/>
+              <LastState Value="40" RealAddress="04E2C7A7"/>
               <VariableType>Byte</VariableType>
               <Address>+fb</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89883</ID>
               <Description>"diseaseGuardResist"</Description>
-              <LastState Value="40" RealAddress="0544F7A8"/>
+              <LastState Value="40" RealAddress="04E2C7A8"/>
               <VariableType>Byte</VariableType>
               <Address>+fc</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89884</ID>
               <Description>"bloodGuardResist"</Description>
-              <LastState Value="40" RealAddress="0544F7A9"/>
+              <LastState Value="40" RealAddress="04E2C7A9"/>
               <VariableType>Byte</VariableType>
               <Address>+fd</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89885</ID>
               <Description>"curseGuardResist"</Description>
-              <LastState Value="30" RealAddress="0544F7AA"/>
+              <LastState Value="30" RealAddress="04E2C7AA"/>
               <VariableType>Byte</VariableType>
               <Address>+fe</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89886</ID>
               <Description>"isDurabilityDivergence"</Description>
-              <LastState Value="0" RealAddress="0544F7AB"/>
+              <LastState Value="0" RealAddress="04E2C7AB"/>
               <VariableType>Byte</VariableType>
               <Address>+ff</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>89887</ID>
               <Description>"rightHandEquipable?"</Description>
-              <LastState Value="1" RealAddress="0544F7AC"/>
+              <LastState Value="1" RealAddress="04E2C7AC"/>
               <VariableType>Binary</VariableType>
               <BitStart>0</BitStart>
               <BitLength>1</BitLength>
@@ -1900,7 +1920,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89888</ID>
               <Description>"leftHandEquipable"</Description>
-              <LastState Value="1" RealAddress="0544F7AC"/>
+              <LastState Value="1" RealAddress="04E2C7AC"/>
               <VariableType>Binary</VariableType>
               <BitStart>1</BitStart>
               <BitLength>1</BitLength>
@@ -1910,7 +1930,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89889</ID>
               <Description>"bothHandEquipable"</Description>
-              <LastState Value="1" RealAddress="0544F7AC"/>
+              <LastState Value="1" RealAddress="04E2C7AC"/>
               <VariableType>Binary</VariableType>
               <BitStart>2</BitStart>
               <BitLength>1</BitLength>
@@ -1920,7 +1940,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89890</ID>
               <Description>"arrowSlotEquipable"</Description>
-              <LastState Value="0" RealAddress="0544F7AC"/>
+              <LastState Value="0" RealAddress="04E2C7AC"/>
               <VariableType>Binary</VariableType>
               <BitStart>3</BitStart>
               <BitLength>1</BitLength>
@@ -1930,7 +1950,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89891</ID>
               <Description>"boltSlotEquipable"</Description>
-              <LastState Value="0" RealAddress="0544F7AC"/>
+              <LastState Value="0" RealAddress="04E2C7AC"/>
               <VariableType>Binary</VariableType>
               <BitStart>4</BitStart>
               <BitLength>1</BitLength>
@@ -1940,7 +1960,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89892</ID>
               <Description>"enableGuard"</Description>
-              <LastState Value="0" RealAddress="0544F7AC"/>
+              <LastState Value="0" RealAddress="04E2C7AC"/>
               <VariableType>Binary</VariableType>
               <BitStart>5</BitStart>
               <BitLength>1</BitLength>
@@ -1950,7 +1970,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89893</ID>
               <Description>"enableParry"</Description>
-              <LastState Value="1" RealAddress="0544F7AC"/>
+              <LastState Value="1" RealAddress="04E2C7AC"/>
               <VariableType>Binary</VariableType>
               <BitStart>6</BitStart>
               <BitLength>1</BitLength>
@@ -1960,7 +1980,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89894</ID>
               <Description>"enableMagic"</Description>
-              <LastState Value="0" RealAddress="0544F7AC"/>
+              <LastState Value="0" RealAddress="04E2C7AC"/>
               <VariableType>Binary</VariableType>
               <BitStart>7</BitStart>
               <BitLength>1</BitLength>
@@ -1970,7 +1990,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89895</ID>
               <Description>"enableSorcery?"</Description>
-              <LastState Value="0" RealAddress="0544F7AD"/>
+              <LastState Value="0" RealAddress="04E2C7AD"/>
               <VariableType>Binary</VariableType>
               <BitStart>0</BitStart>
               <BitLength>1</BitLength>
@@ -1980,7 +2000,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89896</ID>
               <Description>"enableMiracle"</Description>
-              <LastState Value="0" RealAddress="0544F7AD"/>
+              <LastState Value="0" RealAddress="04E2C7AD"/>
               <VariableType>Binary</VariableType>
               <BitStart>1</BitStart>
               <BitLength>1</BitLength>
@@ -1990,7 +2010,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89897</ID>
               <Description>"enableVowMagic"</Description>
-              <LastState Value="0" RealAddress="0544F7AD"/>
+              <LastState Value="0" RealAddress="04E2C7AD"/>
               <VariableType>Binary</VariableType>
               <BitStart>2</BitStart>
               <BitLength>1</BitLength>
@@ -2000,7 +2020,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89898</ID>
               <Description>"isNormalAttackType"</Description>
-              <LastState Value="0" RealAddress="0544F7AD"/>
+              <LastState Value="0" RealAddress="04E2C7AD"/>
               <VariableType>Binary</VariableType>
               <BitStart>3</BitStart>
               <BitLength>1</BitLength>
@@ -2010,7 +2030,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89899</ID>
               <Description>"isBlowAttackType"</Description>
-              <LastState Value="0" RealAddress="0544F7AD"/>
+              <LastState Value="0" RealAddress="04E2C7AD"/>
               <VariableType>Binary</VariableType>
               <BitStart>4</BitStart>
               <BitLength>1</BitLength>
@@ -2020,7 +2040,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89900</ID>
               <Description>"isSlashAttackType"</Description>
-              <LastState Value="1" RealAddress="0544F7AD"/>
+              <LastState Value="1" RealAddress="04E2C7AD"/>
               <VariableType>Binary</VariableType>
               <BitStart>5</BitStart>
               <BitLength>1</BitLength>
@@ -2030,7 +2050,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89901</ID>
               <Description>"isThrustAttackType"</Description>
-              <LastState Value="1" RealAddress="0544F7AD"/>
+              <LastState Value="1" RealAddress="04E2C7AD"/>
               <VariableType>Binary</VariableType>
               <BitStart>6</BitStart>
               <BitLength>1</BitLength>
@@ -2040,7 +2060,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89902</ID>
               <Description>"isEnhance (Can be buffed)"</Description>
-              <LastState Value="1" RealAddress="0544F7AD"/>
+              <LastState Value="1" RealAddress="04E2C7AD"/>
               <VariableType>Binary</VariableType>
               <BitStart>7</BitStart>
               <BitLength>1</BitLength>
@@ -2050,7 +2070,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89903</ID>
               <Description>"isLuckCorrect"</Description>
-              <LastState Value="0" RealAddress="0544F7AE"/>
+              <LastState Value="0" RealAddress="04E2C7AE"/>
               <VariableType>Binary</VariableType>
               <BitStart>0</BitStart>
               <BitLength>1</BitLength>
@@ -2060,7 +2080,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89904</ID>
               <Description>"isCustom"</Description>
-              <LastState Value="1" RealAddress="0544F7AE"/>
+              <LastState Value="1" RealAddress="04E2C7AE"/>
               <VariableType>Binary</VariableType>
               <BitStart>1</BitStart>
               <BitLength>1</BitLength>
@@ -2070,7 +2090,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89905</ID>
               <Description>"disableBaseChangeReset"</Description>
-              <LastState Value="1" RealAddress="0544F7AE"/>
+              <LastState Value="1" RealAddress="04E2C7AE"/>
               <VariableType>Binary</VariableType>
               <BitStart>2</BitStart>
               <BitLength>1</BitLength>
@@ -2080,7 +2100,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89906</ID>
               <Description>"disableRepair"</Description>
-              <LastState Value="1" RealAddress="0544F7AE"/>
+              <LastState Value="1" RealAddress="04E2C7AE"/>
               <VariableType>Binary</VariableType>
               <BitStart>3</BitStart>
               <BitLength>1</BitLength>
@@ -2090,7 +2110,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89907</ID>
               <Description>"isDarkHand"</Description>
-              <LastState Value="0" RealAddress="0544F7AE"/>
+              <LastState Value="0" RealAddress="04E2C7AE"/>
               <VariableType>Binary</VariableType>
               <BitStart>4</BitStart>
               <BitLength>1</BitLength>
@@ -2100,7 +2120,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89908</ID>
               <Description>"simpleModelForDlc"</Description>
-              <LastState Value="0" RealAddress="0544F7AE"/>
+              <LastState Value="0" RealAddress="04E2C7AE"/>
               <VariableType>Binary</VariableType>
               <BitStart>5</BitStart>
               <BitLength>1</BitLength>
@@ -2110,7 +2130,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89909</ID>
               <Description>"ubyte lanternWep"</Description>
-              <LastState Value="0" RealAddress="0544F7AE"/>
+              <LastState Value="0" RealAddress="04E2C7AE"/>
               <VariableType>Binary</VariableType>
               <BitStart>6</BitStart>
               <BitLength>1</BitLength>
@@ -2120,7 +2140,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89910</ID>
               <Description>"isVersusGhostWep"</Description>
-              <LastState Value="0" RealAddress="0544F7AE"/>
+              <LastState Value="0" RealAddress="04E2C7AE"/>
               <VariableType>Binary</VariableType>
               <BitStart>7</BitStart>
               <BitLength>1</BitLength>
@@ -2130,7 +2150,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89911</ID>
               <Description>"baseChangeCategory"</Description>
-              <LastState Value="1" RealAddress="0544F7AF"/>
+              <LastState Value="1" RealAddress="04E2C7AF"/>
               <VariableType>Binary</VariableType>
               <BitStart>0</BitStart>
               <BitLength>1</BitLength>
@@ -2140,7 +2160,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89912</ID>
               <Description>"isDragonSlayer"</Description>
-              <LastState Value="0" RealAddress="0544F7AF"/>
+              <LastState Value="0" RealAddress="04E2C7AF"/>
               <VariableType>Binary</VariableType>
               <BitStart>1</BitStart>
               <BitLength>1</BitLength>
@@ -2150,7 +2170,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89913</ID>
               <Description>"isDeposit"</Description>
-              <LastState Value="1" RealAddress="0544F7AF"/>
+              <LastState Value="1" RealAddress="04E2C7AF"/>
               <VariableType>Binary</VariableType>
               <BitStart>2</BitStart>
               <BitLength>1</BitLength>
@@ -2160,7 +2180,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
             <CheatEntry>
               <ID>89914</ID>
               <Description>"disableMultiDropShare"</Description>
-              <LastState Value="0" RealAddress="0544F7AF"/>
+              <LastState Value="0" RealAddress="04E2C7AF"/>
               <VariableType>Binary</VariableType>
               <BitStart>3</BitStart>
               <BitLength>1</BitLength>
@@ -2175,21 +2195,31 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
   <UserdefinedSymbols>
     <SymbolEntry>
       <Name>selected_weapon</Name>
-      <Address>1EDF0000</Address>
+      <Address>0F510000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>selected_weapon_var_name</Name>
+      <Address>0F510030</Address>
     </SymbolEntry>
   </UserdefinedSymbols>
   <LuaScript>AddressList = getAddressList()
+generate_code_entry = AddressList.getMemoryRecordByDescription('Generate CE Code')
+weapon_base_entry = AddressList.getMemoryRecordByDescription('Weapon Base')
 
+weapon_aob = ""
+weapon_name = "UNKNOWNNAME"
 function SetWeaponBase()
   --get aob for selected weapon dropdown
   local selected_weapon = AddressList.getMemoryRecordByDescription('Select Weapon')
-  local weapon_aob = readString(selected_weapon.getCurrentAddress(),35, false)
+  weapon_aob = readString(selected_weapon.getCurrentAddress(),35, false)
   if weapon_aob ~= nil then
     --aob scan
     local weapon_aob_results = AOBScan(weapon_aob)
     if weapon_aob_results ~= nil and weapon_aob_results.getCount()==1 then
       --set Weapon Base address to the 1st result of aob scan
-      AddressList.getMemoryRecordByDescription('Weapon Base').setAddress(weapon_aob_results[0])
+      weapon_base_entry.setAddress(weapon_aob_results[0])
+      --save the current (original) stats for the weapon
+      table_string_disable = GenerateStringForWeapon()
     end
     if weapon_aob_results ~= nil then
       weapon_aob_results.Destroy()
@@ -2201,5 +2231,58 @@ WeaponListener = createTimer(nil)
 timer_onTimer(WeaponListener, SetWeaponBase)
 timer_setInterval(WeaponListener,3000)
 timer_setEnabled(WeaponListener, true)
+
+
+
+table_string_disable = ""
+
+function GenerateStringForWeapon()
+  local table_string = ""
+
+  --iterate through all children of the weapon base (all variables in the struct)
+  for i=3,97 do
+    table_string = table_string .. weapon_name .. weapon_base_entry[i].Address .. ": db "
+
+    --handle the type cases
+    if weapon_base_entry[i].Type == vtDword or weapon_base_entry[i].Type == vtSingle then
+      local read_bytes = readBytes(weapon_base_entry[i].CurrentAddress, 4, true)
+      table_string = table_string .. string.format("%x %x %x %x //%s\n", read_bytes[1], read_bytes[2], read_bytes[3], read_bytes[4], weapon_base_entry[i].Description)
+    elseif weapon_base_entry[i].Type == vtWord then
+      local read_bytes = readBytes(weapon_base_entry[i].CurrentAddress, 2, true)
+      table_string = table_string .. string.format("%x %x //%s\n", read_bytes[1], read_bytes[2], weapon_base_entry[i].Description)
+    elseif weapon_base_entry[i].Type == vtByte then
+      local read_bytes = readBytes(weapon_base_entry[i].CurrentAddress, 1, true)
+      table_string = table_string .. string.format("%x //%s\n", read_bytes[1], weapon_base_entry[i].Description)
+    else
+      print("WARNING unknown type at i="..i)
+    end
+  end
+
+  --count the flags bytes as a single 4 byte chunk
+  table_string = table_string .. weapon_name .. weapon_base_entry[98].Address .. ": db "
+  local flag_bytes = readBytes(weapon_base_entry[98].CurrentAddress, 4, true)
+  table_string = table_string .. string.format("%x %x %x %x //flags\n", flag_bytes[1], flag_bytes[2], flag_bytes[3], flag_bytes[4])
+
+  return table_string
+end
+
+
+generate_code_entry.OnActivate = function(record, before, currentstate)
+  local table_string = "[ENABLE]\n"..
+                       "aobscan(" .. weapon_name .. "," .. weapon_aob .. ")\n" ..
+                       GenerateStringForWeapon() .. "\n" ..
+                       "[DISABLE]\n" ..
+                       table_string_disable ..
+                       "unregistersymbol(" .. weapon_name .. ")"
+
+  --get varable name for weapon and fix up
+  local variable_name = readString(generate_code_entry.getCurrentAddress(), 40, false)
+  variable_name = variable_name:gsub(" ","_"):lower()
+  --insert variable name into table
+  table_string = table_string:gsub(weapon_name,variable_name)
+
+  print(table_string)
+  return false
+end
 </LuaScript>
 </CheatTable>
