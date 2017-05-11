@@ -1467,9 +1467,11 @@ push 09 //max number of summons before signs dissapear
 "DARKSOULS.exe"+9B11BE:
 cmp edx,3f //this is more than number of phantoms, but not sure by how much
 
-//not 100% on this one
+//not 100% on these ones
 "DARKSOULS.exe"+92A47C:
 cmp dword ptr [eax+10],09
+"DARKSOULS.exe"+92A465:
+cmp dword ptr [eax+90],09
 
 //I dunno
 alloc(forceshowsigns_newmem,64)
@@ -1565,10 +1567,9 @@ cmp edi,08
 "DARKSOULS.exe"+AE2B8A:
 cmp eax,08
 
-
+//size to init an array of char pointers to
 "DARKSOULS.exe"+322A00:
 push 09
-push 08
 
 [DISABLE]
 "DARKSOULS.exe"+A63CA6:
@@ -1592,6 +1593,8 @@ cmp edx,03
 
 "DARKSOULS.exe"+92A47C:
 cmp dword ptr [eax+10],02
+"DARKSOULS.exe"+92A465:
+cmp dword ptr [eax+90],03
 
 "DARKSOULS.exe"+9B1271:
 cmp eax,[esi+00000168]
@@ -1651,10 +1654,8 @@ cmp edi,02
 "DARKSOULS.exe"+AE2B8A:
 cmp eax,02
 
-
 "DARKSOULS.exe"+322A00:
 push 05
-push 04
 </AssemblerScript>
         </CheatEntry>
       </CheatEntries>
@@ -1727,11 +1728,7 @@ db 00
   <UserdefinedSymbols>
     <SymbolEntry>
       <Name>sucessful_phantomfix</Name>
-      <Address>03410000</Address>
-    </SymbolEntry>
-    <SymbolEntry>
-      <Name>FrameRateWarnAOB</Name>
-      <Address>00D7841E</Address>
+      <Address>14960010</Address>
     </SymbolEntry>
   </UserdefinedSymbols>
   <LuaScript>AddressList = getAddressList()
