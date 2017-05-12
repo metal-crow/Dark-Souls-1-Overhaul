@@ -1571,6 +1571,29 @@ cmp eax,08
 "DARKSOULS.exe"+322A00:
 push 09
 
+//number of black signs visible
+//this aob is in memory for the defaults dark souls normally sets. Will not work with we change
+// - BlackSos.[First/Second/Third]LevelRange[Max/Min]
+aobscan(BlackSosNum,05 00 00 00 03 00 00 00 03 00 00 00 05 00 00 00 05 00 00 00 0A 00 00 00 0A 00 00 00)
+BlackSosNum:
+ db 08 00 00 00
+
+//something to do with number of allowed invaders? just adding to be safe
+//this aob is in memory for the defaults dark souls normally sets. Will not work with we change
+// - Invade.[First/Second/Third]LevelRange[Max/Min]
+aobscan(InvadeNum,05 00 00 00 FA FF FF FF 08 00 00 00 FC FF FF FF 0A 00 00 00 FE FF FF FF 0C 00 00 00)
+InvadeNum:
+ db 08 00 00 00
+
+//max connection tickets
+//Alt AOB: 05 00 00 00 00 00 90 41 00 00 10 42 00 00 A0 40 00 00 20 41 00 00 A0 41
+DARKSOULS.exe+EDE2CC:
+ db 08 00 00 00
+
+ //Lobby Access Max Count
+"DARKSOULS.exe"+7E9AD1:
+mov [esi+000000D4],00000008
+
 [DISABLE]
 "DARKSOULS.exe"+A63CA6:
 push 00000080
@@ -1656,6 +1679,18 @@ cmp eax,02
 
 "DARKSOULS.exe"+322A00:
 push 05
+
+BlackSosNum:
+ db 05 00 00 00
+
+InvadeNum:
+ db 05 00 00 00
+
+DARKSOULS.exe+EDE2CC:
+ db 05 00 00 00
+
+"DARKSOULS.exe"+7E9AD1:
+mov [esi+000000D4],00000005
 </AssemblerScript>
         </CheatEntry>
       </CheatEntries>
