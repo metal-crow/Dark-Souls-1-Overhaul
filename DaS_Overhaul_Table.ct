@@ -1392,7 +1392,7 @@ GreatScythe+EA:
         <CheatEntry>
           <ID>10316</ID>
           <Description>"Disable Framerate Warning Disconnection"</Description>
-          <LastState/>
+          <LastState Activated="1"/>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>// Credits to Jellybaby34
 [ENABLE]
@@ -1414,7 +1414,7 @@ unregistersymbol(FrameRateWarnAOB)
         <CheatEntry>
           <ID>12424</ID>
           <Description>"Change Version Number"</Description>
-          <LastState/>
+          <LastState Activated="1"/>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>[ENABLE]
 //code from here to '[DISABLE]' will be used to enable the cheat
@@ -1444,7 +1444,7 @@ cmp byte ptr [eax],2E
         <CheatEntry>
           <ID>12375</ID>
           <Description>"Multiphantom Patch"</Description>
-          <LastState/>
+          <LastState Activated="1"/>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>[ENABLE]
 "DARKSOULS.exe"+A63CA6:
@@ -1485,11 +1485,6 @@ jmp forceshowsigns_returnhere
 jmp forceshowsigns_newmem
 nop
 forceshowsigns_returnhere:
-
-"DARKSOULS.exe"+AA2554:
-cmp edx,09
-"DARKSOULS.exe"+AA2569:
-cmp ebx,09
 
 //allocation of the summon_chars_data array put in the info_about_summons struct
 "DARKSOULS.exe"+806848:
@@ -1594,6 +1589,277 @@ DARKSOULS.exe+EDE2CC:
 "DARKSOULS.exe"+7E9AD1:
 mov [esi+000000D4],00000008
 
+//in initing players_connected_array, number of chars to init
+"DARKSOULS.exe"+AA24AA:
+push 09
+
+//for mallocing players_connected_array: 24+20*(number of characters)+36
+"DARKSOULS.exe"+ABB55D:
+push 000000F0
+
+//in initing players_connected_array, offsets after newly updated number of chars to init
+alloc(players_connected_array_offsets,512)
+
+players_connected_array_offsets:
+mov [esi+D8],ebx
+mov [esi+000000EC],ebx
+or edi,-01
+push ecx
+mov [esi+DC],ebx
+mov [esi+E0],edi
+mov [esi+000000E4],edi
+mov [esi+000000E8],edi
+call DARKSOULS.exe+AA2320
+mov [esi+CC],edi
+mov [esi+D0],edi
+mov [esi+D4],edi
+
+jmp DARKSOULS.exe+AA24FF
+
+"DARKSOULS.exe"+AA24D2:
+jmp players_connected_array_offsets
+nop
+nop
+nop
+nop
+
+//the number of char slots iterated through the players_connected_array (functions that reference it)
+"DARKSOULS.exe"+AA1A86:
+mov [esp+10],00000009
+"DARKSOULS.exe"+AA2FDE:
+mov [esp+14],00000009
+"DARKSOULS.exe"+AA2554:
+cmp edx,09
+"DARKSOULS.exe"+AA2569:
+cmp ebx,09
+"DARKSOULS.exe"+C12C71:
+cmp esi,09
+"DARKSOULS.exe"+AA2932:
+mov [esp+14],00000009
+"DARKSOULS.exe"+AA2C8E:
+mov [esp+14],00000009
+"DARKSOULS.exe"+AA2A2C:
+cmp eax,09
+"DARKSOULS.exe"+AA2C06:
+cmp edi,09
+"DARKSOULS.exe"+AA2C18:
+cmp eax,09
+//^ but number of phantom slots
+"DARKSOULS.exe"+AA1788:
+cmp ecx,08
+"DARKSOULS.exe"+AA1798:
+mov ecx,00000008
+"DARKSOULS.exe"+AA2BFF:
+lea ebx,[edi+08]
+
+//where the variables after the inline character array in the players_connected_array
+//whose offsets have changed, are referenced
+//OFFSET+=num additional chars*0x20
+alloc(pca_off1,24)
+label(pca_off1_ret)
+pca_off1:
+  cmp [eax+E0],esi
+  setne al
+  jmp pca_off1_ret
+"DARKSOULS.exe"+A6615A:
+  jmp pca_off1
+  nop
+  pca_off1_ret:
+
+alloc(pca_off2,24)
+label(pca_off2_ret)
+pca_off2:
+  cmp dword ptr [eax+E0],-01
+  je DARKSOULS.exe+A5B939
+  jmp pca_off2_ret
+"DARKSOULS.exe"+A5B900:
+  jmp pca_off2
+  nop
+  pca_off2_ret:
+
+alloc(pca_off3,24)
+label(pca_off3_ret)
+pca_off3:
+  cmp dword ptr [eax+E0],-01
+  setne al
+  jmp pca_off3_ret
+"DARKSOULS.exe"+9C83DB:
+  jmp pca_off3
+  nop
+  nop
+  pca_off3_ret:
+
+alloc(pca_off4,24)
+label(pca_off4_ret)
+pca_off4:
+  cmp dword ptr [eax+E0],-01
+  jne DARKSOULS.exe+9C6BDB
+  jmp pca_off4_ret
+"DARKSOULS.exe"+9C6BBE:
+  jmp pca_off4
+  nop
+  pca_off4_ret:
+
+alloc(pca_off5,24)
+label(pca_off5_ret)
+pca_off5:
+  cmp dword ptr [edx+E0],-01
+  jne DARKSOULS.exe+92A453
+  jmp pca_off5_ret
+"DARKSOULS.exe"+92A44A:
+  jmp pca_off5
+  nop
+  pca_off5_ret:
+
+alloc(pca_off6,24)
+label(pca_off6_ret)
+pca_off6:
+  cmp dword ptr [eax+E0],-01
+  jne DARKSOULS.exe+9B5405
+  jmp pca_off6_ret
+"DARKSOULS.exe"+9B53FB:
+  jmp pca_off6
+  nop
+  pca_off6_ret:
+
+alloc(pca_off7,24)
+label(pca_off7_ret)
+pca_off7:
+  cmp dword ptr [ecx+E0],-01
+  mov byte ptr [esp+0E],00
+  jmp pca_off7_ret
+"DARKSOULS.exe"+93FEEE:
+  jmp pca_off7
+  nop
+  nop
+  nop
+  nop
+  pca_off7_ret:
+
+alloc(pca_off8,24)
+label(pca_off8_ret)
+pca_off8:
+  lea eax,[edx+CC]
+  push esi
+  xor bl,bl
+  jmp pca_off8_ret
+"DARKSOULS.exe"+AA1771:
+  jmp pca_off8
+  nop
+  pca_off8_ret:
+
+alloc(pca_off9,24)
+label(pca_off9_ret)
+pca_off9:
+  mov [edx+D8],00000000
+  jmp pca_off9_ret
+"DARKSOULS.exe"+AA1791:
+  jmp pca_off9
+  nop
+  nop
+  pca_off9_ret:
+
+alloc(pca_off10,24)
+label(pca_off10_ret)
+pca_off10:
+  inc [edx+D8]
+  add eax,04
+  jmp pca_off10_ret
+"DARKSOULS.exe"+AA17AD:
+  jmp pca_off10
+  nop
+  pca_off10_ret:
+
+alloc(pca_off11,24)
+label(pca_off11_ret)
+pca_off11:
+  mov edx,[ebx+D4]
+  mov [esp+24],ecx
+  jmp pca_off11_ret
+"DARKSOULS.exe"+AA29A9:
+  jmp pca_off11
+  nop
+  nop
+  pca_off11_ret:
+
+alloc(pca_off12,24)
+label(pca_off12_ret)
+pca_off12:
+  mov edi,[eax+E0]
+  cmp edi,-01
+  jmp pca_off12_ret
+"DARKSOULS.exe"+AA3141:
+  jmp pca_off12
+  nop
+  pca_off12_ret:
+
+alloc(pca_off13,24)
+label(pca_off13_ret)
+pca_off13:
+  mov edi,[eax+E0]
+  cmp edi,-01
+  jmp pca_off13_ret
+"DARKSOULS.exe"+AA3268:
+  jmp pca_off13
+  nop
+  pca_off13_ret:
+
+alloc(pca_off14,24)
+label(pca_off14_ret)
+pca_off14:
+  mov eax,[esi+D8]
+  jmp pca_off14_ret
+"DARKSOULS.exe"+AA18E2:
+  jmp pca_off14
+  pca_off14_ret:
+
+alloc(pca_off15,24)
+label(pca_off15_ret)
+pca_off15:
+  mov edx,[esi+DC]
+  cmp edx,01
+  jmp pca_off15_ret
+"DARKSOULS.exe"+AA18E7:
+  jmp pca_off15
+  nop
+  pca_off15_ret:
+
+alloc(pca_off16,24)
+label(pca_off16_ret)
+pca_off16:
+  cmp dword ptr [edi+DC],02
+  jne DARKSOULS.exe+AA27A9
+  jmp pca_off16_ret
+"DARKSOULS.exe"+AA2748:
+  jmp pca_off16
+  nop
+  pca_off16_ret:
+
+alloc(pca_off17,24)
+label(pca_off17_ret)
+pca_off17:
+  mov [edi+DC],00000003
+  jmp pca_off17_ret
+"DARKSOULS.exe"+AA27A1:
+  jmp pca_off17
+  nop
+  nop
+  pca_off17_ret:
+
+alloc(pca_off18,24)
+label(pca_off18_ret)
+pca_off18:
+  mov ecx,[edi+E0]
+  cmp ecx,-01
+  jmp pca_off18_ret
+"DARKSOULS.exe"+AA2740:
+  jmp pca_off18
+  nop
+  pca_off18_ret:
+
+"DARKSOULS.exe"+AA277A:
+  mov ecx,[edi+000000E4]
+
 [DISABLE]
 "DARKSOULS.exe"+A63CA6:
 push 00000080
@@ -1646,7 +1912,7 @@ cmp ecx,00000E40
 "DARKSOULS.exe"+8068C3:
 push 03
 
-unregistersymbol(sucessful_phantomfix)
+//unregistersymbol(sucessful_phantomfix)
 dealloc(sucessful_phantomfix)
 
 dealloc(summon_char_types_newmem)
@@ -1691,6 +1957,97 @@ DARKSOULS.exe+EDE2CC:
 
 "DARKSOULS.exe"+7E9AD1:
 mov [esi+000000D4],00000005
+
+"DARKSOULS.exe"+AA24AA:
+push 04
+
+"DARKSOULS.exe"+ABB55D:
+push 0000008C
+
+dealloc(players_connected_array_offsets)
+"DARKSOULS.exe"+AA24D2:
+mov [esi+74],ebx
+mov [esi+00000088],ebx
+
+"DARKSOULS.exe"+AA1A86:
+mov [esp+10],00000004
+"DARKSOULS.exe"+AA2FDE:
+mov [esp+14],00000004
+"DARKSOULS.exe"+C12C71:
+cmp esi,06
+"DARKSOULS.exe"+AA2932:
+mov [esp+14],00000004
+"DARKSOULS.exe"+AA2C8E:
+mov [esp+14],00000004
+"DARKSOULS.exe"+AA2A2C:
+cmp eax,04
+"DARKSOULS.exe"+AA2C06:
+cmp edi,04
+"DARKSOULS.exe"+AA2C18:
+cmp eax,04
+"DARKSOULS.exe"+AA1788:
+cmp ecx,03
+"DARKSOULS.exe"+AA1798:
+mov ecx,00000003
+"DARKSOULS.exe"+AA2BFF:
+lea ebx,[edi+02]
+
+dealloc(pca_off1)
+"DARKSOULS.exe"+A6615A:
+cmp [eax+7C],esi
+dealloc(pca_off2)
+"DARKSOULS.exe"+A5B900:
+cmp dword ptr [eax+7C],-01
+dealloc(pca_off3)
+"DARKSOULS.exe"+9C83DB:
+cmp dword ptr [eax+7C],-01
+dealloc(pca_off4)
+"DARKSOULS.exe"+9C6BBE:
+cmp dword ptr [eax+7C],-01
+dealloc(pca_off5)
+"DARKSOULS.exe"+92A44A:
+cmp dword ptr [edx+7C],-01
+dealloc(pca_off6)
+"DARKSOULS.exe"+9B53FB:
+cmp dword ptr [eax+7C],-01
+dealloc(pca_off7)
+"DARKSOULS.exe"+93FEEE:
+cmp dword ptr [ecx+7C],-01
+dealloc(pca_off8)
+"DARKSOULS.exe"+AA1771:
+lea eax,[edx+68]
+dealloc(pca_off9)
+"DARKSOULS.exe"+AA1791:
+mov [edx+74],00000000
+dealloc(pca_off10)
+"DARKSOULS.exe"+AA17AD:
+inc [edx+74]
+dealloc(pca_off11)
+"DARKSOULS.exe"+AA29A9:
+mov edx,[ebx+70]
+dealloc(pca_off12)
+"DARKSOULS.exe"+AA3141:
+mov edi,[eax+7C]
+dealloc(pca_off13)
+"DARKSOULS.exe"+AA3268:
+mov edi,[eax+7C]
+dealloc(pca_off14)
+"DARKSOULS.exe"+AA18E2:
+mov eax,[esi+74]
+dealloc(pca_off15)
+"DARKSOULS.exe"+AA18E7:
+mov edx,[esi+78]
+dealloc(pca_off16)
+"DARKSOULS.exe"+AA2748:
+cmp dword ptr [edi+78],02
+dealloc(pca_off17)
+"DARKSOULS.exe"+AA27A1:
+mov [edi+78],00000003
+dealloc(pca_off18)
+"DARKSOULS.exe"+AA2740:
+mov ecx,[edi+7C]
+"DARKSOULS.exe"+AA277A:
+mov ecx,[edi+00000080]
 </AssemblerScript>
         </CheatEntry>
       </CheatEntries>
@@ -1763,7 +2120,11 @@ db 00
   <UserdefinedSymbols>
     <SymbolEntry>
       <Name>sucessful_phantomfix</Name>
-      <Address>14960010</Address>
+      <Address>1DB80000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>FrameRateWarnAOB</Name>
+      <Address> 00D7841E</Address>
     </SymbolEntry>
   </UserdefinedSymbols>
   <LuaScript>AddressList = getAddressList()
