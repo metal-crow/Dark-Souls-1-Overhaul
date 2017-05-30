@@ -1392,7 +1392,7 @@ GreatScythe+EA:
         <CheatEntry>
           <ID>10316</ID>
           <Description>"Disable Framerate Warning Disconnection"</Description>
-          <LastState Activated="1"/>
+          <LastState/>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>// Credits to Jellybaby34
 [ENABLE]
@@ -1414,7 +1414,7 @@ unregistersymbol(FrameRateWarnAOB)
         <CheatEntry>
           <ID>12424</ID>
           <Description>"Change Version Number"</Description>
-          <LastState Activated="1"/>
+          <LastState/>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>[ENABLE]
 //code from here to '[DISABLE]' will be used to enable the cheat
@@ -1444,7 +1444,7 @@ cmp byte ptr [eax],2E
         <CheatEntry>
           <ID>12375</ID>
           <Description>"Multiphantom Patch"</Description>
-          <LastState Activated="1"/>
+          <LastState/>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>[ENABLE]
 "DARKSOULS.exe"+A63CA6:
@@ -1505,6 +1505,8 @@ mov [ecx-04],00000009
 cmp edx,09
 "DARKSOULS.exe"+8037BF:
 cmp ecx,2AC0//1216*number of chars
+"DARKSOULS.exe"+802CC0:
+cmp eax,09
 
 //size of summon_char_types array in info_about_summons struct
 "DARKSOULS.exe"+8068C3:
@@ -1908,6 +1910,8 @@ mov [ecx-04],00000003
 cmp edx,02
 "DARKSOULS.exe"+8037BF:
 cmp ecx,00000E40
+"DARKSOULS.exe"+802CC0:
+cmp eax,02
 
 "DARKSOULS.exe"+8068C3:
 push 03
@@ -2120,11 +2124,11 @@ db 00
   <UserdefinedSymbols>
     <SymbolEntry>
       <Name>sucessful_phantomfix</Name>
-      <Address>1DB80000</Address>
+      <Address>16330000</Address>
     </SymbolEntry>
     <SymbolEntry>
       <Name>FrameRateWarnAOB</Name>
-      <Address> 00D7841E</Address>
+      <Address>00D7841E</Address>
     </SymbolEntry>
   </UserdefinedSymbols>
   <LuaScript>AddressList = getAddressList()
