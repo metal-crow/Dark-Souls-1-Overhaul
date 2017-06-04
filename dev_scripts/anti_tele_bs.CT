@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="24">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>0</ID>
+      <Description>"anti_tele_bs"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+globalalloc(new_animationid,4)
+//**************
+//inject code into the function that sets the new animation id to a backstab
+alloc(save_newanimation_id,256)
+label(save_newanimation_id_returnhere)
+
+save_newanimation_id:
+  mov esi,[eax+28]
+  mov DWORD PTR [new_animationid], esi //save the animation id
+  xor ebp,ebp
+  jmp save_newanimation_id_returnhere
+
+"DARKSOULS.exe"+A06A49:
+  jmp save_newanimation_id
+save_newanimation_id_returnhere:
+
+//**************
+//in the function that moves the player: check if the movement is due to backstab, and its valid
+globalalloc(float_math_tmp,12)
+
+alloc(anti_telebs_check,256)
+label(anti_telebs_check_returnhere)
+label(anti_telebs_check_isbackstab)
+label(anti_telebs_check_isplayer)
+label(no_telebs_detected_pre)
+label(no_telebs_detected)
+
+anti_telebs_check:
+  //if in backstab animation
+  cmp DWORD PTR [new_animationid], 2328
+  je  anti_telebs_check_isbackstab
+  cmp DWORD PTR [new_animationid], 24CC
+  je  anti_telebs_check_isbackstab
+  jmp no_telebs_detected
+anti_telebs_check_isbackstab:
+  //if this is the player's position
+  push eax
+  push ebx
+  mov eax, [137D644]
+  mov eax, [eax+3C]
+  mov eax, [eax+28]
+  mov eax, [eax+1C]
+  mov ebx, [eax+10]
+  cmp [esi+10], ebx
+  jne no_telebs_detected_pre
+  mov ebx, [eax+18]
+  cmp [esi+18], ebx
+  jne no_telebs_detected_pre
+  pop ebx
+  pop eax
+anti_telebs_check_isplayer:
+  //if the distance to move is reasonable
+  //save xmm0[0] and xmm1[0]
+  movss DWORD PTR [float_math_tmp], xmm1
+  movss DWORD PTR [float_math_tmp+4], xmm0
+  //calculate distance we're moving
+  //old x is [esi+0x10], new x is in xmm1
+  subss xmm1, DWORD PTR [esi+0x10]//new x - old x
+  movss DWORD PTR [float_math_tmp+8], xmm1
+  and DWORD PTR [float_math_tmp+8], 0x7FFFFFFF //make result abs
+  movss xmm1, DWORD PTR [float_math_tmp+8]//xmm1 = abs(new_x-old_x)
+  mulss xmm1, xmm1//xmm1 = abs(new_x-old_x)^2
+  //old y is [esi+0x18], new y is in xmm0
+  subss xmm0, DWORD PTR [esi+0x18]
+  movss DWORD PTR [float_math_tmp+8], xmm0
+  and DWORD PTR [float_math_tmp+8], 0x7FFFFFFF
+  movss xmm0, DWORD PTR [float_math_tmp+8]
+  mulss xmm0, xmm0//xmm0 = abs(new_y-old_y)^2
+  //int(abs(new_x-old_x)^2+abs(new_y-old_y)^2)
+  addss xmm1, xmm0
+  push eax
+  cvttss2si eax, xmm1
+  mov DWORD PTR [float_math_tmp+8], eax
+  pop eax
+  //restore xmm0 and xmm1
+  movss xmm1, DWORD PTR [float_math_tmp]
+  movss xmm0, DWORD PTR [float_math_tmp+4]
+  //reset our global
+  mov DWORD PTR [new_animationid], 0
+  //int(abs(new_x-old_x)^2+abs(new_y-old_y)^2) &gt; 8^2
+  cmp DWORD PTR [float_math_tmp+8], 40
+  jge DARKSOULS.exe+ABDBE5//too great a distance. don't move
+  jmp no_telebs_detected
+  //else continue normally
+no_telebs_detected_pre:
+  pop ebx
+  pop eax
+no_telebs_detected:
+  movss [esp+08],xmm0
+  jmp anti_telebs_check_returnhere
+
+"DARKSOULS.exe"+ABDBB9:
+  jmp anti_telebs_check
+  nop
+anti_telebs_check_returnhere:
+
+
+[DISABLE]
+dealloc(new_animationid)
+dealloc(save_newanimation_id)
+"DARKSOULS.exe"+A06A49:
+mov esi,[eax+28]
+xor ebp,ebp
+//Alt: db 8B 70 28 33 ED
+
+dealloc(float_math_tmp)
+dealloc(anti_telebs_check)
+"DARKSOULS.exe"+ABDBB9:
+movss [esp+08],xmm0
+//Alt: db F3 0F 11 44 24 08
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>new_animationid</Name>
+      <Address>154A0000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>entered_codepath_for_changeuser_position</Name>
+      <Address>1E2A0010</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>float_math_tmp</Name>
+      <Address>154A0010</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+</CheatTable>
