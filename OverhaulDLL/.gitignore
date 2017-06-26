@@ -294,5 +294,8 @@ __pycache__/
 
 !SP_IO.pdb
 !SP_IOx64.pdb
+!SP_SysUtils.pdb
+!SP_AsmInjectx86.pdb
+!SP_AoBScan.pdb
 !D3DFont.pdb
 !SpD3D9OTextFeed.pdb
