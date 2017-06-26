@@ -9,8 +9,8 @@ void __stdcall initialize_plugin()
 
 	player_char_status = SpPointer(player_char_base, { 0xA28 }); // Player character status (loading, human, co-op, invader, hollow)
 
-	extern void apply_multiphantom_patch();
-	apply_multiphantom_patch();
+	extern void apply_multiphantom_secondary_patch();
+	apply_multiphantom_secondary_patch();
 }
 
 
@@ -66,6 +66,27 @@ int fix_bonfire_input()
 
 		return -1;
 	}
+}
+
+
+// Check if the multiphantom patch was applied correctly
+int check_multiphantom_patch_applied()
+{
+	extern uint32_t sucessful_phantomfix;
+	if (sucessful_phantomfix)
+	{
+		_PRINT_OVERLAY_("Multiphantom patch was applied successfully", 2000, true);
+		SP_beep(800, 100);
+		SP_beep(800, 100);
+	}
+	else
+	{
+		_PRINT_OVERLAY_("Multiphantom patch was not applied in time", 2000, true);
+		SP_beep(300, 100);
+		SP_beep(300, 100);
+	}
+
+	return 0;
 }
 
 

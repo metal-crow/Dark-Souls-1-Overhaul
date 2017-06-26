@@ -49,6 +49,7 @@ class SpD3D9Overlay;
 
 // Configuration setting key names
 #define _SP_DS1_MOD_HOTKEY_BONFIRE_INPUT_FIX_ "BonfireInputFix"
+#define _SP_DS1_MOD_HOTKEY_CHECK_MULTIPHANTOM_PATCH_ "CheckMultiphantomPatch"
 
 // Global variables & data:
 SpD3D9Device **device;
