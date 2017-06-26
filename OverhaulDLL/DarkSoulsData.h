@@ -35,6 +35,12 @@ extern SpD3D9Device **device; // ID3D9Device wrapper object with built-in overla
 extern bool *verbose_output_enabled;
 extern bool *audio_feedback_enabled;
 
+enum SP_DS1_GAME_VERSION_ENUM {
+	SP_DS1_VERSION_RELEASE = 0x2E,
+	SP_DS1_VERSION_DEBUG = 0x2C,
+	SP_DS1_VERSION_OVERHAUL = 0x3C
+};
+
 enum SP_DS1_PLAYER_STATUS_ENUM {
 	SP_DS1_PLAYER_STATUS_LOADING = -1,
 	SP_DS1_PLAYER_STATUS_HUMAN = 0,
@@ -58,6 +64,7 @@ SpPointer player_char_status; // Player character status (loading, human, co-op,
 
 //////////////////////// FUNCTION PROTOTYPES ////////////////////////
 void __stdcall initialize_plugin(); // Exported function
+void change_game_version_number(); // Changes the game version number to avoid compatibility issues with non-overhaul builds
 int fix_bonfire_input(); // Fixes input bug that causes players to be stuck at a bonfire
 
 void SP_beep(DWORD frequency, DWORD duration, bool wait);
