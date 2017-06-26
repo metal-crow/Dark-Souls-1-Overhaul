@@ -184,7 +184,7 @@ void apply_multiphantom_patch()
 	memcpy_s(write_address, 2, patch3, 2); // push 0x9
 
 
-
+	/*
 	// Number of black signs visible
 	// This aob is in memory for the defaults dark souls normally sets. Will not work with we change
 	//  - BlackSos.[First/Second/Third]LevelRange[Max/Min]
@@ -209,7 +209,7 @@ void apply_multiphantom_patch()
 	}
 	set_mem_protection(InvadeNum, 4, MEM_PROTECT_RWX);
 	*(uint32_t*)InvadeNum = 0x08000000;
-
+	*/
 
 	// Max connection tickets
 	// Alt AOB: 05 00 00 00 00 00 90 41 00 00 10 42 00 00 A0 40 00 00 20 41 00 00 A0 41
@@ -399,9 +399,34 @@ void apply_multiphantom_patch()
 	set_mem_protection(write_address, 16, MEM_PROTECT_RWX);
 	inject_jmp_5b((uint8_t*)write_address, &pca_off_ret18, 1, pca_off18);
 
-	//Beep(300, 100);
-	//Beep(300, 100);
+}
 
+void apply_multiphantom_secondary_patch()
+{
+	// Number of black signs visible
+	// This aob is in memory for the defaults dark souls normally sets. Will not work with we change
+	//  - BlackSos.[First/Second/Third]LevelRange[Max/Min]
+	void *BlackSosNum = aob_scan("05 00 00 00 03 00 00 00 03 00 00 00 05 00 00 00 05 00 00 00 0A 00 00 00 0A 00 00 00");
+	while (BlackSosNum == NULL)
+	{
+		Sleep(100);
+		BlackSosNum = aob_scan("05 00 00 00 03 00 00 00 03 00 00 00 05 00 00 00 05 00 00 00 0A 00 00 00 0A 00 00 00");
+	}
+	set_mem_protection(BlackSosNum, 4, MEM_PROTECT_RWX);
+	*(uint32_t*)BlackSosNum = 0x08000000;
+
+
+	// Something to do with number of allowed invaders? just adding to be safe
+	// This aob is in memory for the defaults dark souls normally sets. Will not work with we change
+	// - Invade.[First/Second/Third]LevelRange[Max/Min]
+	void *InvadeNum = aob_scan("05 00 00 00 FA FF FF FF 08 00 00 00 FC FF FF FF 0A 00 00 00 FE FF FF FF 0C 00 00 00");
+	while (InvadeNum == NULL)
+	{
+		Sleep(100);
+		InvadeNum = aob_scan("05 00 00 00 FA FF FF FF 08 00 00 00 FC FF FF FF 0A 00 00 00 FE FF FF FF 0C 00 00 00");
+	}
+	set_mem_protection(InvadeNum, 4, MEM_PROTECT_RWX);
+	*(uint32_t*)InvadeNum = 0x08000000;
 }
 
 

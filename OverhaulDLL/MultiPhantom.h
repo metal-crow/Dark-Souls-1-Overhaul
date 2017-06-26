@@ -25,6 +25,7 @@ uint32_t players_connected_array_offsets_returnhere;
 
 
 void apply_multiphantom_patch();
+void apply_multiphantom_secondary_patch();
 
 void __stdcall forceshowsigns_newmem();
 void __stdcall summon_char_types_newmem();

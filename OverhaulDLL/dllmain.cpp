@@ -16,8 +16,8 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 			extern void change_game_version_number();
 			change_game_version_number();
 
-			//extern void apply_multiphantom_patch();
-			//apply_multiphantom_patch();
+			extern void apply_multiphantom_patch();
+			apply_multiphantom_patch();
 			break;
 		case DLL_THREAD_ATTACH:
 			break;
@@ -51,6 +51,13 @@ void __stdcall load_keybinds(std::list<SP_KEY_FUNCTION> *new_keybinds, bool *aud
 		{
 			extern int fix_bonfire_input();
 			add_function_keybind(key, fix_bonfire_input, keybinds);
+		}
+		key = 0;
+
+		if (key = get_vk_hotkey(settings_file.c_str(), keybinds_section.c_str(), _SP_DS1_MOD_HOTKEY_CHECK_MULTIPHANTOM_PATCH_))
+		{
+			extern int check_multiphantom_patch_applied();
+			add_function_keybind(key, check_multiphantom_patch_applied, keybinds);
 		}
 		key = 0;
 	}
