@@ -1,0 +1,5 @@
+LIBRARY DS_Overhaul.dll
+EXPORTS
+	initialize_plugin @1
+	load_keybinds @2
+	set_device_wrapper @3
