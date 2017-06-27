@@ -56,8 +56,8 @@ void __stdcall load_keybinds(std::list<SP_KEY_FUNCTION> *new_keybinds, bool *aud
 
 		if (key = get_vk_hotkey(settings_file.c_str(), keybinds_section.c_str(), _SP_DS1_MOD_HOTKEY_CHECK_MULTIPHANTOM_PATCH_))
 		{
-			extern int check_multiphantom_patch_applied();
-			add_function_keybind(key, check_multiphantom_patch_applied, keybinds);
+			extern int print_debug_info();
+			add_function_keybind(key, print_debug_info, keybinds);
 		}
 		key = 0;
 	}

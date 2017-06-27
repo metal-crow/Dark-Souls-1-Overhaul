@@ -11,6 +11,9 @@
 // Applies the multiphantom patch, which increases the maximum number of simultaneous phantoms allowed in a session
 void apply_multiphantom_patch()
 {
+
+	max_allowed_summons_ptr = SpPointer((void *)0x0137D82C, { 0x08C });
+
 	// (Desired num of phantoms * 0x20)
 	uint8_t patch1[5] = { 0x68, 0x20, 0x01, 0x00, 0x00 }; // push 0x120
 	void *write_address = (uint8_t*)ds1_base + 0xA63CA6;
@@ -411,7 +414,7 @@ void apply_multiphantom_secondary_patch()
 	// Number of black signs visible
 	// This aob is in memory for the defaults dark souls normally sets. Will not work with we change
 	//  - BlackSos.[First/Second/Third]LevelRange[Max/Min]
-	void *BlackSosNum = aob_scan("05 00 00 00 03 00 00 00 03 00 00 00 05 00 00 00 05 00 00 00 0A 00 00 00 0A 00 00 00");
+	BlackSosNum = aob_scan("05 00 00 00 03 00 00 00 03 00 00 00 05 00 00 00 05 00 00 00 0A 00 00 00 0A 00 00 00");
 	while (BlackSosNum == NULL)
 	{
 		Sleep(100);
@@ -424,7 +427,7 @@ void apply_multiphantom_secondary_patch()
 	// Something to do with number of allowed invaders? just adding to be safe
 	// This aob is in memory for the defaults dark souls normally sets. Will not work with we change
 	// - Invade.[First/Second/Third]LevelRange[Max/Min]
-	void *InvadeNum = aob_scan("05 00 00 00 FA FF FF FF 08 00 00 00 FC FF FF FF 0A 00 00 00 FE FF FF FF 0C 00 00 00");
+	InvadeNum = aob_scan("05 00 00 00 FA FF FF FF 08 00 00 00 FC FF FF FF 0A 00 00 00 FE FF FF FF 0C 00 00 00");
 	while (InvadeNum == NULL)
 	{
 		Sleep(100);

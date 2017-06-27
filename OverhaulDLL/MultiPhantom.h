@@ -15,13 +15,15 @@ Sean Pesce	-	C++ conversion
 
 extern void *ds1_base;
 
-
+SpPointer max_allowed_summons_ptr;
 uint32_t forceshowsigns_returnhere;
 uint32_t sucessful_phantomfix;
 uint32_t summon_char_types_returnhere;
 uint32_t summon_char_types_callproc;
 uint32_t players_connected_array_offsets_callproc;
 uint32_t players_connected_array_offsets_returnhere;
+void *BlackSosNum;
+void *InvadeNum;
 
 
 void apply_multiphantom_patch();

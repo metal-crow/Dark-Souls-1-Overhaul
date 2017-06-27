@@ -56,6 +56,8 @@ enum SP_DS1_PLAYER_STATUS_ENUM {
 
 //////////////////////// GAME VARIABLES, POINTERS, & OTHER DATA ////////////////////////
 
+#define _MAX_SUMMONS_ 9
+
 void *ds1_base; // Base address of Dark Souls game process
 
 void *player_char_base; // Base address for player character data
@@ -67,7 +69,7 @@ void __stdcall initialize_plugin(); // Exported function
 void change_game_version_number(); // Changes the game version number to avoid compatibility issues with non-overhaul builds
 int fix_bonfire_input(); // Fixes input bug that causes players to be stuck at a bonfire
 
-int check_multiphantom_patch_applied();
+int print_debug_info();
 
 void SP_beep(DWORD frequency, DWORD duration, bool wait);
 void SP_beep(DWORD frequency, DWORD duration);
