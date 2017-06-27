@@ -6,6 +6,8 @@
 // Exported function
 void __stdcall initialize_plugin()
 {
+	_GET_TEXT_FEED_->set_title("Dark Souls Overhaul Mod --TEST BUILD--");
+
 	player_char_base = (void*)((unsigned int)ds1_base + 0xF7E204); // Obtain base address for player character data
 
 	player_char_status = SpPointer(player_char_base, { 0xA28 }); // Player character status (loading, human, co-op, invader, hollow)
