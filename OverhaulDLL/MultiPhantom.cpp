@@ -399,6 +399,11 @@ void apply_multiphantom_patch()
 	set_mem_protection(write_address, 16, MEM_PROTECT_RWX);
 	inject_jmp_5b((uint8_t*)write_address, &pca_off_ret18, 1, pca_off18);
 
+
+	uint8_t patch35[6] = { 0x8B, 0x8F, 0xE4, 0x00, 0x00, 0x00 }; // mov ecx, DWORD PTR [edi+0xe4]
+	write_address = (uint8_t*)ds1_base + 0xAA277A;
+	set_mem_protection(write_address, 6, MEM_PROTECT_RWX);
+	memcpy_s(write_address, 6, patch35, 6);
 }
 
 void apply_multiphantom_secondary_patch()
