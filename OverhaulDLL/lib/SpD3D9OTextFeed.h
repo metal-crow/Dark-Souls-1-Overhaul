@@ -117,19 +117,23 @@ public:
 	void SpD3D9OTextFeed::print(const char *message, unsigned long long duration, bool include_timestamp, SP_D3D9O_TEXT_COLOR_ENUM text_color); // Prints message with specified text color
 	void SpD3D9OTextFeed::set_bounds(RECT *window_boundaries); // Initializes screenspace boundaries for each text style
 	void SpD3D9OTextFeed::set_font_height(unsigned int new_text_height); // Set font height
+	void SpD3D9OTextFeed::set_title(const char *new_title); // Set info bar title message
 	void SpD3D9OTextFeed::clean_feed(); // Removes expired messages
 
 
 private:
 	unsigned int new_font_size = 0; // If non-zero, acts as a flag for update_text_height() to be called
-	DWORD current_rgb_cycle_vals[3] = { 0x00FF0000, 0x00000000, 0x00000000 }; // Current RGB values for color-cycling text
 	std::string info_string = ""; // String for info header line
+	std::string info_title = _SP_D3D9O_TF_DEFAULT_TITLE_; // Info header line title attribute
+	std::string new_info_title = ""; // If non-empty string, acts as flag for update_title() to be called
 	std::string feed_string[_SP_D3D9O_TEXT_COLOR_COUNT_]; // Array of strings to hold text (of each supported color) for text feed
 	std::string feed_string_full = "";	// String to hold the feed text as a single string (used for shadow/outline)
 	void SpD3D9OTextFeed::build_feed();
 	void SpD3D9OTextFeed::update_font_height(); // Update text to new font height
 	void SpD3D9OTextFeed::update_info_header(); // Updates info string attributes (date, time, FPS, etc)
+	void SpD3D9OTextFeed::update_title(); // Update title message in info string
 	#ifdef _SP_D3D9O_TF_USE_ID3DX_FONT_
+		DWORD current_rgb_cycle_vals[3] = { 0x00FF0000, 0x00000000, 0x00000000 }; // Current RGB values for color-cycling text
 		void SpD3D9OTextFeed::cycle_color(); // Cycles text to next color in RGB spectrum
 	#else
 		void SpD3D9OTextFeed::update_position(); // Updates text feed position based on boundaries and number of messages
