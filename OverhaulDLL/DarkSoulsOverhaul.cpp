@@ -1,6 +1,7 @@
 // Author: Sean Pesce
 
 #include "DarkSoulsData.h"
+#include <sstream> // std::stringstream 
 
 // Exported function
 void __stdcall initialize_plugin()
@@ -11,6 +12,15 @@ void __stdcall initialize_plugin()
 
 	extern void apply_multiphantom_secondary_patch();
 	apply_multiphantom_secondary_patch();
+
+	extern SpPointer max_allowed_summons_ptr;
+	set_mem_protection(max_allowed_summons_ptr.resolve(), 4, MEM_PROTECT_RWX);
+	while (*((void**)max_allowed_summons_ptr.base) == NULL)
+	{
+		// Wait for max summon data to load in
+		Sleep(100);
+	}
+	max_allowed_summons_ptr.write((uint32_t)_MAX_SUMMONS_);
 }
 
 
@@ -70,21 +80,52 @@ int fix_bonfire_input()
 
 
 // Check if the multiphantom patch was applied correctly
-int check_multiphantom_patch_applied()
+int print_debug_info()
 {
 	extern uint32_t sucessful_phantomfix;
 	if (sucessful_phantomfix)
 	{
-		_PRINT_OVERLAY_("Multiphantom patch was applied successfully", 2000, true);
+		_PRINT_OVERLAY_("Multiphantom patch was applied successfully", 20000, true);
 		SP_beep(800, 100);
 		SP_beep(800, 100);
 	}
 	else
 	{
-		_PRINT_OVERLAY_("Multiphantom patch was not applied in time", 2000, true);
+		_PRINT_OVERLAY_("Multiphantom patch was not applied in time", 20000, true);
 		SP_beep(300, 100);
 		SP_beep(300, 100);
 	}
+
+	std::string str = "BlackSosNum = aob_scan(05 00 00 00 03 00 00 00 03 00 00 00 05 00 00 00 05 00 00 00 0A 00 00 00 0A 00 00 00) = ";
+	extern void *BlackSosNum;
+	std::stringstream ss;
+	ss << static_cast<const void*>(BlackSosNum);
+	str.append(ss.str());
+	_PRINT_OVERLAY_(str.c_str(), 20000, true);
+
+	str.clear();
+	ss.str(std::string());
+	str = "InvadeNum = aob_scan(05 00 00 00 FA FF FF FF 08 00 00 00 FC FF FF FF 0A 00 00 00 FE FF FF FF 0C 00 00 00) = ";
+	extern void *InvadeNum;
+	ss << static_cast<const void*>(InvadeNum);
+	str.append(ss.str());
+	_PRINT_OVERLAY_(str.c_str(), 20000, true);
+	str.clear();
+	ss.str(std::string());
+
+	extern SpPointer max_allowed_summons_ptr;
+	str = "max_allowed_summons address: ";
+	ss << static_cast<const void*>(max_allowed_summons_ptr.resolve());
+	str.append(ss.str());
+	_PRINT_OVERLAY_(str.c_str(), 20000, true);
+	ss.str(std::string());
+	str.clear();
+	str = "max_allowed_summons value = ";
+	int val = 0;
+	max_allowed_summons_ptr.read(&val);
+	str.append(std::to_string(val));
+	_PRINT_OVERLAY_(str.c_str(), 20000, true);
+	str.clear();
 
 	return 0;
 }
