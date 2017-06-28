@@ -6,7 +6,8 @@
 // Exported function
 void __stdcall initialize_plugin()
 {
-	_GET_TEXT_FEED_->set_title("Dark Souls Overhaul Mod --TEST BUILD--");
+	_GET_TEXT_FEED_->set_title("Dark Souls Overhaul Mod");
+	_PRINT_OVERLAY_("-------------TEST BUILD-------------", 0, false, SP_D3D9O_TEXT_COLOR_ORANGE);
 
 	player_char_base = (void*)((unsigned int)ds1_base + 0xF7E204); // Obtain base address for player character data
 
@@ -128,6 +129,11 @@ int print_debug_info()
 	int val = 0;
 	max_allowed_summons_ptr.read(&val);
 	str.append(std::to_string(val));
+	_PRINT_OVERLAY_(str.c_str(), 20000, true);
+	str.clear();
+
+	extern uint32_t *max_allowed_summons32;
+	str.append("max_allowed_summons32 = ").append(std::to_string(*max_allowed_summons32));
 	_PRINT_OVERLAY_(str.c_str(), 20000, true);
 	str.clear();
 
