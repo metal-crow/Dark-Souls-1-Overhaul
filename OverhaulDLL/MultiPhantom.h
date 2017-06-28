@@ -18,7 +18,7 @@ Sean Pesce	-	C++ conversion
 extern void *ds1_base;
 
 uint8_t max_allowed_summons8 = _MAX_SUMMONS_;
-uint8_t max_allowed_summons32_arr[4] = { 0x0, 0x0, 0x0, max_allowed_summons8 }; // Use an array of 4 bytes to represent a DWORD for easy conversion between big/little endian
+uint8_t max_allowed_summons32_arr[4] = { max_allowed_summons8, 0x0, 0x0, 0x0 }; // Use an array of 4 bytes to represent a DWORD for easy conversion between big/little endian
 uint32_t *max_allowed_summons32 = (uint32_t*)max_allowed_summons32_arr;
 
 SpPointer max_allowed_summons_ptr;
