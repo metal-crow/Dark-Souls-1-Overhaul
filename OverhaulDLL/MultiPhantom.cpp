@@ -778,7 +778,7 @@ void apply_multiphantom_patch_dynamic()
 
 
 	// Check that sums up all phantoms
-	uint8_t patch4[3] = { 0x83, 0xFA, (max_allowed_summons8 * 7) }; // cmp edx,0x3F		// This is more than number of phantoms, but not sure by how much (num * 7 ?)
+	uint8_t patch4[3] = { 0x83, 0xFA, (uint8_t)(max_allowed_summons8 * 7) }; // cmp edx,0x3F		// This is more than number of phantoms, but not sure by how much (num * 7 ?)
 	write_address = (uint8_t*)ds1_base + 0x9B11BE;
 	set_mem_protection(write_address, 3, MEM_PROTECT_RWX);
 	memcpy_s(write_address, 3, patch4, 3);
@@ -875,12 +875,12 @@ void apply_multiphantom_patch_dynamic()
 	set_mem_protection(write_address, 3, MEM_PROTECT_RWX);
 	memcpy_s(write_address, 3, patch14, 3);
 
-	uint8_t patch15[3] = { 0x83, 0xF9, (max_allowed_summons8 - 1) }; // cmp ecx,0x08
+	uint8_t patch15[3] = { 0x83, 0xF9, (uint8_t)(max_allowed_summons8 - 1) }; // cmp ecx,0x08
 	write_address = (uint8_t*)ds1_base + 0x802C80;
 	set_mem_protection(write_address, 3, MEM_PROTECT_RWX);
 	memcpy_s(write_address, 3, patch15, 3);
 
-	uint8_t patch16[3] = { 0x83, 0xFB, (max_allowed_summons8 - 1) }; // cmp ebx,0x08
+	uint8_t patch16[3] = { 0x83, 0xFB, (uint8_t)(max_allowed_summons8 - 1) }; // cmp ebx,0x08
 	write_address = (uint8_t*)ds1_base + 0x92E7A9;
 	set_mem_protection(write_address, 3, MEM_PROTECT_RWX);
 	memcpy_s(write_address, 3, patch16, 3);
@@ -889,17 +889,17 @@ void apply_multiphantom_patch_dynamic()
 	set_mem_protection(write_address, 3, MEM_PROTECT_RWX);
 	memcpy_s(write_address, 3, patch16, 3);
 
-	uint8_t patch17[3] = { 0x83, 0xFE, (max_allowed_summons8 - 1) }; // cmp esi,0x08
+	uint8_t patch17[3] = { 0x83, 0xFE, (uint8_t)(max_allowed_summons8 - 1) }; // cmp esi,0x08
 	write_address = (uint8_t*)ds1_base + 0x92FB73;
 	set_mem_protection(write_address, 3, MEM_PROTECT_RWX);
 	memcpy_s(write_address, 3, patch17, 3);
 
-	uint8_t patch18[3] = { 0x83, 0xFF, (max_allowed_summons8 - 1) }; // cmp edi,0x08
+	uint8_t patch18[3] = { 0x83, 0xFF, (uint8_t)(max_allowed_summons8 - 1) }; // cmp edi,0x08
 	write_address = (uint8_t*)ds1_base + 0x92FDF1;
 	set_mem_protection(write_address, 3, MEM_PROTECT_RWX);
 	memcpy_s(write_address, 3, patch18, 3);
 
-	uint8_t patch19[3] = { 0x83, 0xF8, (max_allowed_summons8 - 1) }; // cmp eax,0x08
+	uint8_t patch19[3] = { 0x83, 0xF8, (uint8_t)(max_allowed_summons8 - 1) }; // cmp eax,0x08
 	write_address = (uint8_t*)ds1_base + 0x930431;
 	set_mem_protection(write_address, 3, MEM_PROTECT_RWX);
 	memcpy_s(write_address, 3, patch19, 3);
@@ -963,7 +963,7 @@ void apply_multiphantom_patch_dynamic()
 
 
 	// Lobby Access Max Count
-	uint8_t patch20[7] = { 0xC7, 0x86, 0xD4, 0x00, 0x00, 0x00, (max_allowed_summons8 - 1) }; // mov DWORD PTR [esi+0xd4],0x8
+	uint8_t patch20[7] = { 0xC7, 0x86, 0xD4, 0x00, 0x00, 0x00, (uint8_t)(max_allowed_summons8 - 1) }; // mov DWORD PTR [esi+0xd4],0x8
 	write_address = (uint8_t*)ds1_base + 0x7E9AD1;
 	set_mem_protection(write_address, 10, MEM_PROTECT_RWX);
 	memcpy_s(write_address, 7, patch20, 7);
@@ -1049,17 +1049,17 @@ void apply_multiphantom_patch_dynamic()
 	memcpy_s(write_address, 3, patch31, 3);
 
 	//^ but number of phantom slots
-	uint8_t patch32[3] = { 0x83, 0xF9, (max_allowed_summons8 - 1) }; // cmp ecx,0x08
+	uint8_t patch32[3] = { 0x83, 0xF9, (uint8_t)(max_allowed_summons8 - 1) }; // cmp ecx,0x08
 	write_address = (uint8_t*)ds1_base + 0xAA1788;
 	set_mem_protection(write_address, 3, MEM_PROTECT_RWX);
 	memcpy_s(write_address, 3, patch32, 3);
 
-	uint8_t patch33[5] = { 0xB9, (max_allowed_summons8 - 1), 0x00, 0x00, 0x00 }; // mov ecx,0x00000008
+	uint8_t patch33[5] = { 0xB9, (uint8_t)(max_allowed_summons8 - 1), 0x00, 0x00, 0x00 }; // mov ecx,0x00000008
 	write_address = (uint8_t*)ds1_base + 0xAA1798;
 	set_mem_protection(write_address, 5, MEM_PROTECT_RWX);
 	memcpy_s(write_address, 5, patch33, 5);
 
-	uint8_t patch34[3] = { 0x8D, 0x5F, (max_allowed_summons8 - 1) }; // lea ebx,[edi+0x08]
+	uint8_t patch34[3] = { 0x8D, 0x5F, (uint8_t)(max_allowed_summons8 - 1) }; // lea ebx,[edi+0x08]
 	write_address = (uint8_t*)ds1_base + 0xAA2BFF;
 	set_mem_protection(write_address, 3, MEM_PROTECT_RWX);
 	memcpy_s(write_address, 3, patch34, 3);
