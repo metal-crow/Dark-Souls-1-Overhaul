@@ -12,8 +12,14 @@ Sean Pesce	-	C++ conversion
 #include "SP_AsmInject_x86.hpp"
 #include "SP_AoB_Scan.hpp"
 
+#define _MAX_SUMMONS_ 9
+
 
 extern void *ds1_base;
+
+uint8_t max_allowed_summons8 = _MAX_SUMMONS_;
+uint8_t max_allowed_summons32_arr[4] = { 0x0, 0x0, 0x0, max_allowed_summons8 }; // Use an array of 4 bytes to represent a DWORD for easy conversion between big/little endian
+uint32_t *max_allowed_summons32 = (uint32_t*)max_allowed_summons32_arr;
 
 SpPointer max_allowed_summons_ptr;
 uint32_t forceshowsigns_returnhere;
