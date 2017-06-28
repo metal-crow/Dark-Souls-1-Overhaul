@@ -56,8 +56,6 @@ enum SP_DS1_PLAYER_STATUS_ENUM {
 
 //////////////////////// GAME VARIABLES, POINTERS, & OTHER DATA ////////////////////////
 
-#define _MAX_SUMMONS_ 9
-
 void *ds1_base; // Base address of Dark Souls game process
 
 void *player_char_base; // Base address for player character data

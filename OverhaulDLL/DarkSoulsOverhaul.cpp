@@ -22,7 +22,9 @@ void __stdcall initialize_plugin()
 		// Wait for max summon data to load in
 		Sleep(100);
 	}
-	max_allowed_summons_ptr.write((uint32_t)_MAX_SUMMONS_);
+	extern uint8_t max_allowed_summons8;
+	uint32_t max_summons = max_allowed_summons8;
+	max_allowed_summons_ptr.write(max_summons);
 }
 
 
