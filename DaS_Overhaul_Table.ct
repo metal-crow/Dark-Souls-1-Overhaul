@@ -1519,13 +1519,20 @@ globalalloc(sucessful_phantomfix,4)
 alloc(summon_char_types_newmem,64)
 label(summon_char_types_returnhere)
 summon_char_types_newmem:
-mov [edx+02],bl
-mov [edx+03],bl
-mov [edx+04],bl
-mov [edx+05],bl
-mov [edx+06],bl
-mov [edx+07],bl
-mov [edx+08],bl
+push eax
+push ebx  //copy of base ptr
+mov  eax, 2 //counter
+startloop:
+cmp  eax, 9 //MAXCHARACTERS
+je  endloop
+mov  ebx, edx
+add  ebx, eax
+mov  [ebx],bl
+inc  eax
+jmp  startloop
+endloop:
+pop  ebx
+pop  eax
 mov [sucessful_phantomfix], 1//success marker
 call DARKSOULS.exe+1629C0
 jmp summon_char_types_returnhere
