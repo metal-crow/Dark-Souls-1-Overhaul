@@ -442,18 +442,18 @@ void apply_multiphantom_secondary_patch()
 /*
 	summon_char_types_newmem:
 	push eax
-	push ebx  // Copy of base ptr
-	mov  eax, 2 // Counter
+	push ecx  //copy of base ptr
+	mov  eax, 2 //counter
 	startloop:
-	cmp  eax, 9 // MAXCHARACTERS
+	cmp  eax, 9 //MAXCHARACTERS
 	je  endloop
-	mov  ebx, edx
-	add  ebx, eax
-	mov  [ebx], bl
+	mov  ecx, edx
+	add  ecx, eax
+	mov  [ecx],bl
 	inc  eax
 	jmp  startloop
 	endloop:
-	pop  ebx
+	pop  ecx
 	pop  eax
 
 	mov[sucessful_phantomfix], 1	// Success marker
@@ -479,19 +479,19 @@ void __declspec(naked) __stdcall summon_char_types_newmem()
 		*/
 
 		push eax
-		push ebx  // Copy of base ptr
-		mov  eax, 2 // Counter
+		push ecx  //copy of base ptr
+		mov  eax, 2 //counter
 		startloop:
-		//cmp  eax, 9 // MAXCHARACTERS
+		//cmp  eax, 9 //MAXCHARACTERS
 		cmp  eax, max_allowed_summons32_final
 		je  endloop
-		mov  ebx, edx
-		add  ebx, eax
-		mov[ebx], bl
+		mov  ecx, edx
+		add  ecx, eax
+		mov[ecx], bl
 		inc  eax
 		jmp  startloop
 		endloop:
-		pop  ebx
+		pop  ecx
 		pop  eax
 
 		mov [sucessful_phantomfix], 1	// Success marker
