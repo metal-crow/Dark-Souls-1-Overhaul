@@ -16,8 +16,8 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 			extern void change_game_version_number();
 			change_game_version_number();
 
-			extern void apply_multiphantom_patch();
-			apply_multiphantom_patch();
+			extern void apply_multiphantom_patch_dynamic();
+			apply_multiphantom_patch_dynamic();
 			break;
 		case DLL_THREAD_ATTACH:
 			break;

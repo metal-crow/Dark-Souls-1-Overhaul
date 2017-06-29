@@ -13,8 +13,8 @@ void __stdcall initialize_plugin()
 
 	player_char_status = SpPointer(player_char_base, { 0xA28 }); // Player character status (loading, human, co-op, invader, hollow)
 
-	extern void apply_multiphantom_secondary_patch();
-	apply_multiphantom_secondary_patch();
+	extern void apply_multiphantom_secondary_patch_dynamic();
+	apply_multiphantom_secondary_patch_dynamic();
 
 	extern SpPointer max_allowed_summons_ptr;
 	set_mem_protection(max_allowed_summons_ptr.resolve(), 4, MEM_PROTECT_RWX);

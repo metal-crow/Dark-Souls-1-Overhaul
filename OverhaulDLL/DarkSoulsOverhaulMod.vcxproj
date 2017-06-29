@@ -192,6 +192,7 @@
   <ItemGroup>
     <ClInclude Include="DarkSoulsData.h" />
     <ClInclude Include="MultiPhantom.h" />
+    <ClInclude Include="PreprocessorArithmetic.h" />
     <ClInclude Include="SpD3D9Plugin.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

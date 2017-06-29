@@ -7,6 +7,7 @@
 */
 
 #include "MultiPhantom.h"
+#include "PreprocessorArithmetic.h"
 
 // Applies the multiphantom patch, which increases the maximum number of simultaneous phantoms allowed in a session
 void apply_multiphantom_patch()
@@ -438,48 +439,157 @@ void apply_multiphantom_secondary_patch()
 }
 
 
+/*
+	summon_char_types_newmem:
+	push eax
+	push ebx  // Copy of base ptr
+	mov  eax, 2 // Counter
+	startloop:
+	cmp  eax, 9 // MAXCHARACTERS
+	je  endloop
+	mov  ebx, edx
+	add  ebx, eax
+	mov  [ebx], bl
+	inc  eax
+	jmp  startloop
+	endloop:
+	pop  ebx
+	pop  eax
 
+	mov[sucessful_phantomfix], 1	// Success marker
+	call summon_char_types_callproc
+	jmp summon_char_types_returnhere
+*/
 void __declspec(naked) __stdcall summon_char_types_newmem()
 {
 	__asm
 	{
+		/*
+		// Old version:
 		mov [edx + 0x02], bl
 		mov [edx + 0x03], bl
 		mov [edx + 0x04], bl
 		mov [edx + 0x05], bl
 		mov [edx + 0x06], bl
 		mov [edx + 0x07], bl
-		mov [edx + 0x08], bl
+		mov [edx + 0x08], bl // Must write for each offset up until max_allowed_phantoms-1
 		mov[sucessful_phantomfix], 1	// Success marker
+		call summon_char_types_callproc
+		jmp summon_char_types_returnhere
+		*/
+
+		push eax
+		push ebx  // Copy of base ptr
+		mov  eax, 2 // Counter
+		startloop:
+		//cmp  eax, 9 // MAXCHARACTERS
+		cmp  eax, max_allowed_summons32_final
+		je  endloop
+		mov  ebx, edx
+		add  ebx, eax
+		mov[ebx], bl
+		inc  eax
+		jmp  startloop
+		endloop:
+		pop  ebx
+		pop  eax
+
+		mov [sucessful_phantomfix], 1	// Success marker
 		call summon_char_types_callproc
 		jmp summon_char_types_returnhere
 	}
 }
 
 
-
+// For all offsets, do 20*(number_of_characters - 4)+orignal_offset		(original found in DISABLE script)
 void __declspec(naked) __stdcall players_connected_array_offsets()
 {
 	__asm
 	{
-		mov [esi + 0xD8], ebx
-		mov [esi + 0x000000EC], ebx
+		// Disable:
+		// mov [esi + 0x74],ebx
+		// mov[esi + 0x00000088], ebx
+
+		// Full original code:
+		/*
+			mov     [esi+0x74], ebx
+			mov     [esi+0x88], ebx
+			or      edi, 0x0FFFFFFFF
+			push    ecx
+			mov     [esi+0x78], ebx
+			mov     [esi+0x7C], edi
+			mov     [esi+0x80], edi
+			mov     [esi+0x84], edi
+			call    sub_EA2320
+			mov     [esi+0x68], edi
+			mov     [esi+0x6C], edi
+			mov     [esi+0x70], edi
+		*/
+		push eax
+		mov eax, pca_offset_add
+		add eax, 0x74
+		add eax, esi
+		mov [eax], ebx
+
+		mov eax, pca_offset_add
+		add eax, 0x88
+		add eax, esi
+		mov [eax], ebx
+		pop eax
+
 		or edi, -0x01
 		push ecx
-		mov [esi + 0xDC], ebx
-		mov [esi + 0xE0], edi
-		mov [esi + 0x000000E4], edi
-		mov [esi + 0x000000E8], edi
+
+		push eax
+		mov eax, pca_offset_add
+		add eax, 0x78
+		add eax, esi
+		mov [eax], ebx
+
+		mov eax, pca_offset_add
+		add eax, 0x7C
+		add eax, esi
+		mov [eax], edi
+
+		mov eax, pca_offset_add
+		add eax, 0x80
+		add eax, esi
+		mov [eax], edi
+
+		mov eax, pca_offset_add
+		add eax, 0x84
+		add eax, esi
+		mov [eax], edi
+		pop eax
+
 		call players_connected_array_offsets_callproc
-		mov [esi + 0xCC], edi
-		mov [esi + 0xD0], edi
-		mov [esi + 0xD4], edi
+
+		push eax
+		mov eax, pca_offset_add
+		add eax, 0x68
+		add eax, esi
+		mov [eax], edi
+
+		mov eax, pca_offset_add
+		add eax, 0x6C
+		add eax, esi
+		mov [eax], edi
+
+		mov eax, pca_offset_add
+		add eax, 0x70
+		add eax, esi
+		mov [eax], edi
+		pop eax
+
 		jmp players_connected_array_offsets_returnhere
+		
+
 	}
 }
 
 
 
+// Unused in dynamic version
 void __declspec(naked) __stdcall forceshowsigns_newmem()
 {
 	__asm
@@ -491,21 +601,45 @@ void __declspec(naked) __stdcall forceshowsigns_newmem()
 
 
 
+// For all pca_off offsets, do 20*(number_of_characters - 4)+orignal_offset		(original found in DISABLE script)
+
 
 // Where the variables after the inline character array in the players_connected_array
 // whose offsets have changed, are referenced
 // OFFSET+=num additional chars*0x20
 void __declspec(naked) __stdcall pca_off1()
 {
+	// Disable:
+	/*
+		cmp [eax+0x7C], esi
+	*/
+
 	__asm
 	{
+		// For all pca_off offsets, do 20*(number_of_characters - 4)+orignal_offset		(original found in DISABLE script)
+		/*
+		Original:
+
 		cmp dword ptr [eax + 0xE0], esi
+		setne al
+		jmp pca_off_ret1
+		*/
+		push edx
+		mov edx, pca_offset_add
+		add edx, 0x7C
+		add edx, eax
+		cmp dword ptr[edx], esi
+		pop edx
 		setne al
 		jmp pca_off_ret1
 	}
 }
 void __declspec(naked) __stdcall pca_off2()
 {
+	// Disable:
+	/*
+		cmp dword ptr [eax+0x7C], -0x01
+	*/
 	__asm
 	{
 		/*
@@ -518,8 +652,27 @@ void __declspec(naked) __stdcall pca_off2()
 			Unfortunately inline ASM is extremely finnicky with the JE/JNE instructions
 
 		*/
+
+		/*
 		cmp dword ptr[eax + 0xE0], -0x01
 		je $+0x7
+		jmp pca_off_ret2
+		nop
+		nop
+		nop
+		nop
+		nop
+		nop
+		nop
+		jmp pca_off_jmp2
+		*/
+		push edx
+		mov edx, pca_offset_add
+		add edx, 0x7C
+		add edx, eax
+		cmp dword ptr[edx], -0x01
+		pop edx
+		je $ + 0x7
 		jmp pca_off_ret2
 		nop
 		nop
@@ -533,15 +686,28 @@ void __declspec(naked) __stdcall pca_off2()
 }
 void __declspec(naked) __stdcall pca_off3()
 {
+	// Disable:
+	/*
+		cmp dword ptr [eax+0x7C], -0x01
+	*/
 	__asm
 	{
-		cmp dword ptr [eax + 0xE0], -0x01
+		push edx
+		mov edx, pca_offset_add
+		add edx, 0x7C
+		add edx, eax
+		cmp dword ptr [edx], -0x01
+		pop edx
 		setne al
 		jmp pca_off_ret3
 	}
 }
 void __declspec(naked) __stdcall pca_off4()
 {
+	// Disable:
+	/*
+		cmp dword ptr [eax+0x7C], -0x01
+	*/
 	__asm
 	{
 		/*
@@ -552,7 +718,12 @@ void __declspec(naked) __stdcall pca_off4()
 			jmp pca_off_ret4
 
 		*/
-		cmp dword ptr[eax + 0xE0], -0x01
+		push edx
+		mov edx, pca_offset_add
+		add edx, 0x7C
+		add edx, eax
+		cmp dword ptr[edx], -0x01
+		pop edx
 		jne $+0x7
 		jmp pca_off_ret4
 		nop
@@ -568,6 +739,10 @@ void __declspec(naked) __stdcall pca_off4()
 }
 void __declspec(naked) __stdcall pca_off5()
 {
+	// Disable:
+	/*
+		cmp dword ptr [edx+0x7C], -0x01
+	*/
 	__asm
 	{
 		/*
@@ -578,7 +753,12 @@ void __declspec(naked) __stdcall pca_off5()
 			jmp pca_off_ret5
 
 		*/
-		cmp dword ptr[edx + 0xE0], -0x01
+		push eax
+		mov eax, pca_offset_add
+		add eax, 0x7C
+		add eax, edx
+		cmp dword ptr[eax], -0x01
+		pop eax
 		jne $+0x7
 		jmp pca_off_ret5
 		nop
@@ -593,6 +773,10 @@ void __declspec(naked) __stdcall pca_off5()
 }
 void __declspec(naked) __stdcall pca_off6()
 {
+	// Disable:
+	/*
+		cmp dword ptr [eax+0x7C], -0x01
+	*/
 	__asm
 	{
 		/*
@@ -603,7 +787,12 @@ void __declspec(naked) __stdcall pca_off6()
 			jmp pca_off_ret6
 
 		*/
-		cmp dword ptr[eax + 0xE0], -0x01
+		push edx
+		mov edx, pca_offset_add
+		add edx, 0x7C
+		add edx, eax
+		cmp dword ptr[edx], -0x01
+		pop edx
 		jne $+0x7
 		jmp pca_off_ret6
 		nop
@@ -618,18 +807,36 @@ void __declspec(naked) __stdcall pca_off6()
 }
 void __declspec(naked) __stdcall pca_off7()
 {
+	// Disable:
+	/*
+		cmp dword ptr [ecx+0x7C], -0x01
+	*/
 	__asm
 	{
-		cmp dword ptr [ecx + 0xE0], -0x01
+		push edx
+		mov edx, pca_offset_add
+		add edx, 0x7C
+		add edx, ecx
+		cmp dword ptr [edx], -0x01
+		pop edx
 		mov byte ptr [esp + 0x0E], 0x00
 		jmp pca_off_ret7
 	}
 }
 void __declspec(naked) __stdcall pca_off8()
 {
+	// Disable:
+	/*
+		lea eax, [edx+0x68]
+	*/
 	__asm
 	{
-		lea eax, [edx + 0xCC]
+		push ecx
+		mov ecx, pca_offset_add
+		add ecx, 0x68
+		add ecx, edx
+		lea eax, [ecx]
+		pop ecx
 		push esi
 		xor bl, bl
 		jmp pca_off_ret8
@@ -637,67 +844,134 @@ void __declspec(naked) __stdcall pca_off8()
 }
 void __declspec(naked) __stdcall pca_off9()
 {
+	// Disable:
+	/*
+		mov [edx+0x74], 0x00000000
+	*/
 	__asm
 	{
-		mov dword ptr [edx + 0xD8], 0x00000000
+		push ecx
+		mov ecx, pca_offset_add
+		add ecx, 0x74
+		add ecx, edx
+		mov dword ptr [ecx], 0x00000000
+		pop ecx
 		jmp pca_off_ret9
 	}
 }
 void __declspec(naked) __stdcall pca_off10()
 {
+	// Disable:
+	/*
+		inc [edx+0x74]
+	*/
 	__asm
 	{
-		inc [edx + 0xD8]
+		push ecx
+		mov ecx, pca_offset_add
+		add ecx, 0x74
+		add ecx, edx
+		inc [ecx]
+		pop ecx
 		add eax, 0x04
 		jmp pca_off_ret10
 	}
 }
 void __declspec(naked) __stdcall pca_off11()
 {
+	// Disable:
+	/*
+		mov edx, [ebx+0x70]
+	*/
 	__asm
 	{
-		mov edx, [ebx + 0xD4]
+		push ecx
+		mov ecx, pca_offset_add
+		add ecx, 0x70
+		add ecx, ebx
+		mov edx, [ecx]
+		pop ecx
 		mov dword ptr [esp + 0x24], ecx
 		jmp pca_off_ret11
 	}
 }
 void __declspec(naked) __stdcall pca_off12()
 {
+	// Disable:
+	/*
+		mov edi, [eax+0x7C]
+	*/
 	__asm
 	{
-		mov edi, [eax + 0xE0]
+		push ecx
+		mov ecx, pca_offset_add
+		add ecx, 0x7C
+		add ecx, eax
+		mov edi, [ecx]
+		pop ecx
 		cmp edi, -0x01
 		jmp pca_off_ret12
 	}
 }
 void __declspec(naked) __stdcall pca_off13()
 {
+	// Disable:
+	/*
+		mov edi, [eax+0x7C]
+	*/
 	__asm
 	{
-		mov edi, [eax + 0xE0]
+		push ecx
+		mov ecx, pca_offset_add
+		add ecx, 0x7C
+		add ecx, eax
+		mov edi, [ecx]
+		pop ecx
 		cmp edi, -0x01
 		jmp pca_off_ret13
 	}
 }
 void __declspec(naked) __stdcall pca_off14()
 {
+	// Disable:
+	/*
+		mov eax, [esi+0x74]
+	*/
 	__asm
 	{
-		mov eax, [esi + 0xD8]
+		push ecx
+		mov ecx, pca_offset_add
+		add ecx, 0x74
+		add ecx, esi
+		mov eax, [ecx]
+		pop ecx
 		jmp pca_off_ret14
 	}
 }
 void __declspec(naked) __stdcall pca_off15()
 {
+	// Disable:
+	/*
+		mov edx, [esi+0x78]
+	*/
 	__asm
 	{
-		mov edx, [esi + 0xDC]
+		push ecx
+		mov ecx, pca_offset_add
+		add ecx, 0x78
+		add ecx, esi
+		mov edx, [ecx]
+		pop ecx
 		cmp edx, 0x01
 		jmp pca_off_ret15
 	}
 }
 void __declspec(naked) __stdcall pca_off16()
 {
+	// Disable:
+	/*
+		cmp dword ptr [edi+0x78], 0x02
+	*/
 	__asm
 	{
 		/*
@@ -708,7 +982,12 @@ void __declspec(naked) __stdcall pca_off16()
 			jmp pca_off_ret16
 
 		*/
-		cmp dword ptr[edi + 0xDC], 0x02
+		push ecx
+		mov ecx, pca_offset_add
+		add ecx, 0x78
+		add ecx, edi
+		cmp dword ptr[ecx], 0x02
+		pop ecx
 		jne $+0x7
 		jmp pca_off_ret16
 		nop
@@ -723,17 +1002,35 @@ void __declspec(naked) __stdcall pca_off16()
 }
 void __declspec(naked) __stdcall pca_off17()
 {
+	// Disable:
+	/*
+		mov [edi+0x78], 0x00000003
+	*/
 	__asm
 	{
-		mov dword ptr [edi + 0xDC], 0x00000003
+		push ecx
+		mov ecx, pca_offset_add
+		add ecx, 0x78
+		add ecx, edi
+		mov dword ptr [ecx], 0x00000003
+		pop ecx
 		jmp pca_off_ret17
 	}
 }
 void __declspec(naked) __stdcall pca_off18()
 {
+	// Disable:
+	/*
+		mov ecx, [edi+0x7C]
+	*/
 	__asm
 	{
-		mov ecx, [edi + 0xE0]
+		push eax
+		mov eax, pca_offset_add
+		add eax, 0x7C
+		add eax, edi
+		mov ecx, [eax]
+		pop eax
 		cmp ecx, -0x01
 		jmp pca_off_ret18
 	}
@@ -798,9 +1095,11 @@ void apply_multiphantom_patch_dynamic()
 
 	// "I dunno"
 	// - Metal-Crow, 2017
+	uint8_t patch6_2[6] = { 0x83, 0xF8, max_allowed_summons8, 0x90, 0x90, 0x90 }; // cmp eax,0x9; nop; nop; nop
 	write_address = (uint8_t*)ds1_base + 0x9B1271;
 	set_mem_protection(write_address, 10, MEM_PROTECT_RWX);
-	inject_jmp_5b((uint8_t*)write_address, &forceshowsigns_returnhere, 1, forceshowsigns_newmem);
+	memcpy_s(write_address, 6, patch6_2, 6);
+	//inject_jmp_5b((uint8_t*)write_address, &forceshowsigns_returnhere, 1, forceshowsigns_newmem);
 
 
 	// Allocation of the summon_chars_data array put in the info_about_summons struct

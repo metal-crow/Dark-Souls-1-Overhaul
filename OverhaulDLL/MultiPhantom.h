@@ -21,6 +21,10 @@ uint8_t max_allowed_summons8 = _MAX_SUMMONS_;
 uint8_t max_allowed_summons32_arr[4] = { max_allowed_summons8, 0x0, 0x0, 0x0 }; // Use an array of 4 bytes to represent a DWORD for easy conversion between big/little endian
 uint32_t *max_allowed_summons32 = (uint32_t*)max_allowed_summons32_arr;
 
+uint32_t max_allowed_summons32_final = _MAX_SUMMONS_;
+
+uint32_t pca_offset_add = 20 * (_MAX_SUMMONS_ - 4);  // For all pca_off offsets, do 20*(number_of_characters - 4)+orignal_offset
+
 SpPointer max_allowed_summons_ptr;
 uint32_t forceshowsigns_returnhere;
 uint32_t sucessful_phantomfix;
