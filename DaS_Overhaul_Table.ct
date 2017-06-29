@@ -1392,7 +1392,7 @@ GreatScythe+EA:
         <CheatEntry>
           <ID>10316</ID>
           <Description>"Disable Framerate Warning Disconnection"</Description>
-          <LastState/>
+          <LastState Activated="1"/>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>// Credits to Jellybaby34
 [ENABLE]
@@ -1414,7 +1414,7 @@ unregistersymbol(FrameRateWarnAOB)
         <CheatEntry>
           <ID>12424</ID>
           <Description>"Change Version Number"</Description>
-          <LastState/>
+          <LastState Activated="1"/>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>[ENABLE]
 //code from here to '[DISABLE]' will be used to enable the cheat
@@ -1444,7 +1444,7 @@ cmp byte ptr [eax],2E
         <CheatEntry>
           <ID>12375</ID>
           <Description>"Multiphantom Patch"</Description>
-          <LastState/>
+          <LastState Activated="1"/>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>[ENABLE]
 "DARKSOULS.exe"+A63CA6:
@@ -1520,18 +1520,18 @@ alloc(summon_char_types_newmem,64)
 label(summon_char_types_returnhere)
 summon_char_types_newmem:
 push eax
-push ebx  //copy of base ptr
+push ecx  //copy of base ptr
 mov  eax, 2 //counter
 startloop:
 cmp  eax, 9 //MAXCHARACTERS
 je  endloop
-mov  ebx, edx
-add  ebx, eax
-mov  [ebx],bl
+mov  ecx, edx
+add  ecx, eax
+mov  [ecx],bl
 inc  eax
 jmp  startloop
 endloop:
-pop  ebx
+pop  ecx
 pop  eax
 mov [sucessful_phantomfix], 1//success marker
 call DARKSOULS.exe+1629C0
@@ -2073,12 +2073,14 @@ mov ecx,[edi+00000080]
         <CheatEntry>
           <ID>10322</ID>
           <Description>"sucessful_phantomfix"</Description>
+          <LastState Value="1" RealAddress="15AB0000"/>
           <VariableType>4 Bytes</VariableType>
           <Address>sucessful_phantomfix</Address>
         </CheatEntry>
         <CheatEntry>
           <ID>19</ID>
           <Description>"max_allowed_summons"</Description>
+          <LastState Value="9" RealAddress="058B9BBC"/>
           <VariableType>4 Bytes</VariableType>
           <Address>0137D82C</Address>
           <Offsets>
@@ -2131,11 +2133,11 @@ db 00
   <UserdefinedSymbols>
     <SymbolEntry>
       <Name>sucessful_phantomfix</Name>
-      <Address>16330000</Address>
+      <Address>15AB0000</Address>
     </SymbolEntry>
     <SymbolEntry>
       <Name>FrameRateWarnAOB</Name>
-      <Address>00D7841E</Address>
+      <Address> 00D7841E</Address>
     </SymbolEntry>
   </UserdefinedSymbols>
   <LuaScript>AddressList = getAddressList()
