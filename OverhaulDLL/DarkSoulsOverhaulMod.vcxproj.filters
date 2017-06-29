@@ -43,5 +43,8 @@
     <ClInclude Include="MultiPhantom.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PreprocessorArithmetic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
