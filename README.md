@@ -6,3 +6,7 @@ ToDo list:
 https://docs.google.com/spreadsheets/d/1rDaYKnxde3KE2giuGPERdN_a0voME_7c7dyN8MVYNp8
   
 Balance Changes and Suggestions: https://docs.google.com/document/d/1qlg4kQDUq45ufqmX8PreXchwibFwJJ3ZzK0khrHGNTY/  
+  
+Collaborative IDA database (using https://github.com/DGA-MI-SSI/YaCo):  
+https://github.com/metal-crow/Dark-Souls-IDA-db  
+Note: It is very important you Pack (Deflate) the ida database along with Collect Garbage when you close it, as failing to do so can easily massivly bloat the idb, leading to issues with github's large file handling.  
