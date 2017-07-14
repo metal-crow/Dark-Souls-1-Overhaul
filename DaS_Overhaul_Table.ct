@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<CheatTable CheatEngineTableVersion="24">
+<CheatTable CheatEngineTableVersion="26">
   <CheatEntries>
     <CheatEntry>
       <ID>12422</ID>
@@ -1392,7 +1392,7 @@ GreatScythe+EA:
         <CheatEntry>
           <ID>10316</ID>
           <Description>"Disable Framerate Warning Disconnection"</Description>
-          <LastState Activated="1"/>
+          <LastState/>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>// Credits to Jellybaby34
 [ENABLE]
@@ -1414,7 +1414,7 @@ unregistersymbol(FrameRateWarnAOB)
         <CheatEntry>
           <ID>12424</ID>
           <Description>"Change Version Number"</Description>
-          <LastState Activated="1"/>
+          <LastState/>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>[ENABLE]
 //code from here to '[DISABLE]' will be used to enable the cheat
@@ -1444,7 +1444,7 @@ cmp byte ptr [eax],2E
         <CheatEntry>
           <ID>12375</ID>
           <Description>"Multiphantom Patch"</Description>
-          <LastState Activated="1"/>
+          <LastState/>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>[ENABLE]
 "DARKSOULS.exe"+A63CA6:
@@ -1519,20 +1519,13 @@ globalalloc(sucessful_phantomfix,4)
 alloc(summon_char_types_newmem,64)
 label(summon_char_types_returnhere)
 summon_char_types_newmem:
-push eax
-push ecx  //copy of base ptr
-mov  eax, 2 //counter
-startloop:
-cmp  eax, 9 //MAXCHARACTERS
-je  endloop
-mov  ecx, edx
-add  ecx, eax
-mov  [ecx],bl
-inc  eax
-jmp  startloop
-endloop:
-pop  ecx
-pop  eax
+mov [edx+02],bl
+mov [edx+03],bl
+mov [edx+04],bl
+mov [edx+05],bl
+mov [edx+06],bl
+mov [edx+07],bl
+mov [edx+08],bl
 mov [sucessful_phantomfix], 1//success marker
 call DARKSOULS.exe+1629C0
 jmp summon_char_types_returnhere
@@ -2073,14 +2066,12 @@ mov ecx,[edi+00000080]
         <CheatEntry>
           <ID>10322</ID>
           <Description>"sucessful_phantomfix"</Description>
-          <LastState Value="1" RealAddress="15AB0000"/>
           <VariableType>4 Bytes</VariableType>
           <Address>sucessful_phantomfix</Address>
         </CheatEntry>
         <CheatEntry>
           <ID>19</ID>
           <Description>"max_allowed_summons"</Description>
-          <LastState Value="9" RealAddress="058B9BBC"/>
           <VariableType>4 Bytes</VariableType>
           <Address>0137D82C</Address>
           <Offsets>
@@ -2093,7 +2084,7 @@ mov ecx,[edi+00000080]
       <ID>12426</ID>
       <Description>"Other Scripts"</Description>
       <Options moHideChildren="1"/>
-      <LastState Value="" RealAddress="00000000"/>
+      <LastState Value="" Activated="1" RealAddress="00000000"/>
       <GroupHeader>1</GroupHeader>
       <CheatEntries>
         <CheatEntry>
@@ -2127,17 +2118,661 @@ EyeOfDeath+43:
 db 00
 </AssemblerScript>
         </CheatEntry>
+        <CheatEntry>
+          <ID>12427</ID>
+          <Description>"Custom Spells"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[enable]
+RegisterSymbol(FireballData)
+RegisterSymbol(FireballCast)
+RegisterSymbol(FireballProc)
+
+aobscan(FireballData,00 00 00 00 FF FF FF FF 1D 0C 70 17 00 00 00 00)
+FireballData+25:
+db 16
+
+aobscan(FireballCast,00 00 00 00 D9 4E 00 00 FF FF FF FF FF FF FF FF)
+FireballCast+4:
+db BC 02
+FireballCast+10:
+db 00 00 F0 42
+FireballCast+14:
+db 00 00 C8 42
+FireballCast+1C:
+db 00 00 00 00
+FireballCast+20:
+db 00 00 00 00
+FireballCast+28:
+db 00 00 80 3F
+FireballCast+34:
+db 00 00 80 3F
+FireballCast+38:
+db 00 00 80 3F
+FireballCast+64:
+db 11 27
+FireballCast+80:
+db 03
+FireballCast+82:
+db 00
+FireballCast+91:
+db 00
+FireballCast+9A:
+db 01
+
+aobscan(FireballProc,C8 32 00 00 3D 4F 00 00 FF FF FF FF FF FF FF FF)
+FireballProc+4:
+db D9 4E 00 00
+FireballProc+8:
+db 3D 4F 00 00
+FireballProc+10:
+db 00 00 90 40
+FireballProc+14:
+db 00 00 C8 42
+FireballProc+24:
+db 9A 99 19 3F
+FireballProc+28:
+db 00 00 80 40
+FireballProc+34:
+db 00 00 80 40
+FireballProc+38:
+db 00 00 80 40
+FireballProc+82:
+db 78
+FireballProc+91:
+db 0F
+
+RegisterSymbol(FirestormData)
+RegisterSymbol(FirestormCast)
+RegisterSymbol(FirestormLava)
+
+aobscan(FirestormData,00 00 00 00 FF FF FF FF 21 0C 40 1F 00 00 00 00)
+FirestormData+18:
+db 03
+FirestormData+25:
+db 0C
+
+aobscan(FirestormCast,00 00 00 00 FF FF FF FF FF FF FF FF FF FF FF FF 00 00 80 3F 00 00 00 00 CD CC CC 3D 00 00 00 00)
+FirestormCast+0:
+db E6 32
+FirestormCast+4:
+db 2A 4F 00 00
+FirestormCast+18:
+db 00 00 00 00
+//Maybe optional?
+//FirestormCast+28:
+//db 00 00 80 3F
+//FirestormCast+34:
+//db 00 00 80 3F
+//FirestormCast+38:
+//db 00 00 80 3F
+FirestormCast+44:
+db 00 00 40 40
+FirestormCast+4c:
+db 00 00 00 3F
+FirestormCast+58:
+db 00 00 00 40
+FirestormCast+80:
+db 01
+FirestormCast+9A:
+db 00
+//FirestormCast+9B:
+//db 14
+
+aobscan(FirestormLava,98 3A 00 00 DC 4E 00 00 FF FF FF FF FF FF FF FF)
+FirestormLava+0:
+db F0 32
+FirestormLava+4:
+db 8E 4F
+FirestormLava+10:
+db 00 00 00 40
+FirestormLava+28:
+db 00 00 40 3F
+FirestormLava+34:
+db 00 00 40 3F
+FirestormLava+38:
+db 00 00 40 3F
+FirestormLava+48:
+db 00 00 80 BF
+FirestormLava+58:
+db 00 00 00 40
+FirestormLava+80:
+db 0C
+FirestormLava+84:
+db B4
+FirestormLava+86:
+db 1E
+
+		  
+RegisterSymbol(FireOrbData)
+RegisterSymbol(FireOrbCast)
+RegisterSymbol(FireOrbHit)
+
+
+aobscan(FireOrbData,00 00 00 00 FF FF FF FF 1E 0C D4 17 00 00 00 00)
+FireOrbData+25:
+db 07
+
+
+aobscan(FireOrbCast,00 00 00 00 DA 4E 00 00 FF FF FF FF FF FF FF FF)
+
+FireOrbCast+4:
+db 0F 4F
+FireOrbCast+10:
+db 00 00 70 41
+FireOrbCast+14:
+db 00 00 80 3F
+FireOrbCast+1C:
+db 00 00 00 00
+FireOrbCast+20:
+db 00 00 00 00
+FireOrbCast+28:
+db CD CC 4C 3D
+FireOrbCast+34:
+db CD CC 4C 3D
+FireOrbCast+38:
+db CD CC 4C 3D
+FireOrbCast+44:
+db CD CC CC 3F
+FireOrbCast+82:
+db 00
+FireOrbCast+91:
+db 00
+FireOrbCast+9B:
+db 01
+
+
+aobscan(FireOrbHit,D2 32 00 00 3E 4F 00 00 FF FF FF FF FF FF FF FF)
+
+//FireOrbHit+48:
+//db 9A 99 99 3F
+
+RegisterSymbol(GreatFireballData)
+RegisterSymbol(GreatFireballCast)
+RegisterSymbol(GreatFireballHit)
+
+aobscan(GreatFireballData,00 00 00 00 FF FF FF FF 1F 0C 38 18 00 00 00 00)
+
+aobscan(GreatFireballCast,00 00 00 00 DB 4E 00 00 FF FF FF FF FF FF FF FF)
+
+GreatFireballCast+10:
+db 00 00 C8 42
+GreatFireballCast+14:
+db 00 00 C8 42
+GreatFireballCast+28:
+db 00 00 00 41
+GreatFireballCast+34:
+db 00 00 00 41
+GreatFireballCast+38:
+db 00 00 00 41
+GreatFireballCast+44:
+db 00 00 00 00
+GreatFireballCast+80:
+db 0C
+GreatFireballCast+82:
+db 14
+GreatFireballCast+88:
+db 07
+GreatFireballCast+90:
+db E2
+GreatFireballCast+91:
+db 00
+GreatFireballCast+92:
+db 01
+GreatFireballCast+9B:
+db 04
+
+aobscan(GreatFireballHit,DC 32 00 00 3F 4F 00 00 FF FF FF FF FF FF FF FF)
+GreatFireballHit+0:
+db 98 3A
+GreatFireballHit+4:
+db 40 4F
+GreatFireballHit+10:
+db 00 00 80 3F
+GreatFireballHit+44:
+db 00 00 80 3F
+GreatFireballHit+48:
+db 00 00 80 3F
+GreatFireballHit+4C:
+db 00 00 00 00
+GreatFireballHit+58:
+db 00 00 C0 3F
+GreatFireballHit+9B:
+db 05
+
+RegisterSymbol(LightningSpearData)
+RegisterSymbol(LightningSpearCast)
+RegisterSymbol(LightningSpearSparksOne)
+RegisterSymbol(LightningSpearSparksTwo)
+RegisterSymbol(LightningSpearSparksThree)
+RegisterSymbol(LightningSpearSparksFour)
+
+aobscan(LightningSpearData,00 00 00 00 FF FF FF FF E5 0C 28 23 00 00 00 00)
+
+LightningSpearData+18:
+db 06
+LightningSpearData+25:
+db 14
+
+
+aobscan(LightningSpearCast,80 3E 00 00 A3 4E 00 00 06 4F 00 00 FF FF FF FF)
+
+LightningSpearCast+0:
+db 00 00
+LightningSpearCast+4:
+db 00 00
+LightningSpearCast+8:
+db 00 00
+LightningSpearCast+10:
+db 00 00 00 00
+LightningSpearCast+28:
+db 00 00 00 00
+LightningSpearCast+34:
+db 00 00 00 00
+LightningSpearCast+38:
+db 00 00 00 00
+LightningSpearCast+82:
+db 00
+LightningSpearCast+91:
+db 00
+LightningSpearCast+99:
+db 00
+//LightningSpearCast+9B:
+//db 00
+
+aobscan(LightningSpearSparksOne,8A 3E 00 00 FF FF FF FF 07 4F 00 00 FF FF FF FF)
+LightningSpearSparksOne+99:
+db 00
+
+aobscan(LightningSpearSparksTwo,94 3E 00 00 FF FF FF FF 08 4F 00 00 FF FF FF FF)
+LightningSpearSparksTwo+99:
+db 00
+
+aobscan(LightningSpearSparksThree,9E 3E 00 00 FF FF FF FF 09 4F 00 00 FF FF FF FF)
+LightningSpearSparksThree+99:
+db 00
+
+aobscan(LightningSpearSparksFour,A8 3E 00 00 FF FF FF FF 0A 4F 00 00 FF FF FF FF)
+LightningSpearSparksFour+99:
+db 00
+
+RegisterSymbol(EmitForceData)
+RegisterSymbol(EmitForceCast)
+RegisterSymbol(EmitForceHit)
+
+aobscan(EmitForceData,00 00 00 00 FF FF FF FF 89 0C D8 27 00 00 00 00)
+
+EmitForceData+25:
+db 05
+
+aobscan(EmitForceCast,00 00 00 00 D1 4E 00 00 FF FF FF FF FF FF FF FF)
+
+EmitForceCast+0:
+db 10 27
+EmitForceCast+4:
+db 66 5A
+EmitForceCast+10:
+db 00 00 80 3F
+EmitForceCast+28:
+db 00 00 20 41
+EmitForceCast+34:
+db 00 00 20 41
+EmitForceCast+38:
+db 00 00 20 41
+EmitForceCast+44:
+db 00 00 00 3F
+EmitForceCast+48:
+db 00 00 80 BF
+EmitForceCast+4C:
+db 00 00 00 00
+EmitForceCast+92:
+db 01
+EmitForceCast+9B:
+db 01
+
+
+aobscan(EmitForceHit,4c 4A 00 00 35 4F 00 00 FF FF FF FF FF FF FF FF)
+
+EmitForceHit+0:
+db 10 27
+EmitForceHit+4:
+db 66 5A
+EmitForceHit+10:
+db 00 00 80 3F
+EmitForceHit+14:
+db 00 00 20 41
+EmitForceHit+28:
+db 00 00 20 41
+EmitForceHit+34:
+db 00 00 20 41
+EmitForceHit+38:
+db 00 00 20 41
+EmitForceHit+44:
+db 00 00 00 3F
+EmitForceHit+84:
+db B4
+EmitForceHit+9B:
+db 01
+
+
+
+[disable]
+
+
+FireballData+25:
+db 05
+
+FireballCast+4:
+db D9 4E
+FireballCast+10:
+db 00 00 00 3F
+FireballCast+14:
+db 00 00 20 41
+FireballCast+1C:
+db CD CC 1C 41
+FireballCast+20:
+db CD CC 1C 41
+FireballCast+28:
+db 00 00 70 41
+FireballCast+34:
+db 00 00 70 41
+FireballCast+38:
+db 00 00 70 41
+FireballCast+64:
+db 00 00
+FireballCast+80:
+db 01
+FireballCast+82:
+db 0A
+FireballCast+91:
+db 1E
+FireballCast+9A:
+db 00
+
+FireballProc+4:
+db 3D 4F 00 00
+FireballProc+8:
+db FF FF FF FF
+FireballProc+10:
+db 00 00 00 3F
+FireballProc+14:
+db 00 00 00 00
+FireballProc+24:
+db 00 00 00 00
+FireballProc+28:
+db 00 00 00 00
+FireballProc+34:
+db 00 00 00 00
+FireballProc+38:
+db 00 00 00 00
+FireballProc+82:
+db 00
+FireballProc+91:
+db 00
+
+UnregisterSymbol(FireballData)
+UnregisterSymbol(FireballCast)
+UnregisterSymbol(FireballProc)
+
+FirestormData+18:
+db 14
+FirestormData+25:
+db 0A
+
+FirestormCast+0:
+db 00 00
+FirestormCast+4:
+db FF FF FF FF
+FirestormCast+18:
+db CD CC CC 3D
+//Maybe optional?
+//FirestormCast+28:
+//db 00 00 00 00
+//FirestormCast+34:
+//db 00 00 00 00
+//FirestormCast+38:
+//db 00 00 00 00
+FirestormCast+44:
+db 00 00 00 3F
+FirestormCast+4c:
+db 00 00 00 00
+FirestormCast+58:
+db 00 00 C0 3F
+FirestormCast+80:
+db 02
+FirestormCast+9A:
+db 08
+//FirestormCast+9B:
+//db 04
+
+FirestormLava+0:
+db 98 3A
+FirestormLava+4:
+db DC 4E
+FirestormLava+10:
+db 00 00 80 3F
+FirestormLava+28:
+db 00 00 00 00
+FirestormLava+34:
+db 00 00 00 00
+FirestormLava+38:
+db 00 00 00 00
+FirestormLava+48:
+db 00 00 80 3F
+FirestormLava+58:
+db 00 00 C0 3F
+FirestormLava+80:
+db 01
+FirestormLava+84:
+db 00
+FirestormLava+86:
+db 00
+
+UnregisterSymbol(FirestormData)
+UnregisterSymbol(FirestormCast)
+UnregisterSymbol(FirestormLava)
+
+
+
+FireOrbData+25:
+db 05
+
+FireOrbCast+4:
+db DA 4E
+FireOrbCast+10:
+db 00 00 00 3F
+FireOrbCast+14:
+db 00 00 20 41
+FireOrbCast+1C:
+db CD CC 1C 41
+FireOrbCast+20:
+db CD CC 1C 41
+FireOrbCast+28:
+db 00 00 70 41
+FireOrbCast+34:
+db 00 00 70 41
+FireOrbCast+38:
+db 00 00 70 41
+FireOrbCast+44:
+db 00 00 80 3E
+FireOrbCast+82:
+db 0A
+FireOrbCast+91:
+db 1E
+FireOrbCast+9B:
+db 00
+
+
+//FireOrbHit+48:
+//db 9A 99 99 3F
+
+
+UnregisterSymbol(FireOrbData)
+UnregisterSymbol(FireOrbCast)
+UnregisterSymbol(FireOrbHit)
+
+GreatFireballCast+10:
+db 00 00 00 3F
+GreatFireballCast+14:
+db 00 00 20 41
+GreatFireballCast+28:
+db 00 00 70 41
+GreatFireballCast+34:
+db 00 00 70 41
+GreatFireballCast+38:
+db 00 00 70 41
+GreatFireballCast+44:
+db 00 00 80 3E
+GreatFireballCast+80:
+db 01
+GreatFireballCast+82:
+db 0A
+GreatFireballCast+88:
+db 00
+GreatFireballCast+90:
+db 00
+GreatFireballCast+91:
+db 1E
+GreatFireballCast+92:
+db 00
+GreatFireballCast+9B:
+db 05
+
+
+GreatFireballHit+0:
+db DC 32
+GreatFireballHit+4:
+db 3F 4F
+GreatFireballHit+10:
+db 00 00 00 3F
+GreatFireballHit+44:
+db CD CC 4C 3E
+GreatFireballHit+48:
+db 33 33 B3 3F
+GreatFireballHit+4C:
+db 00 00 00 3F
+GreatFireballHit+58:
+db 00 00 00 00
+GreatFireballHit+9B:
+db 01
+
+
+UnregisterSymbol(GreatFireballData)
+UnregisterSymbol(GreatFireballCast)
+UnregisterSymbol(GreatFireballHit)
+
+LightningSpearData+18:
+db 0A
+LightningSpearData+25:
+db 13
+
+
+LightningSpearCast+0:
+db 80 3E
+LightningSpearCast+4:
+db A3 4E
+LightningSpearCast+8:
+db 06 4E
+LightningSpearCast+10:
+db 66 66 66 3F
+LightningSpearCast+28:
+db 00 00 F0 41
+LightningSpearCast+34:
+db 00 00 F0 41
+LightningSpearCast+38:
+db 00 00 F0 41
+LightningSpearCast+82:
+db 0A
+LightningSpearCast+91:
+db 1E
+LightningSpearCast+99:
+db 02
+//LightningSpearCast+9B:
+//db 04
+
+LightningSpearSparksOne+99:
+db 02
+
+LightningSpearSparksTwo+99:
+db 02
+
+LightningSpearSparksThree+99:
+db 02
+
+LightningSpearSparksFour+99:
+db 01
+
+UnregisterSymbol(LightningSpearData)
+UnregisterSymbol(LightningSpearCast)
+UnregisterSymbol(LightningSpearSparksOne)
+UnregisterSymbol(LightningSpearSparksTwo)
+UnregisterSymbol(LightningSpearSparksThree)
+UnregisterSymbol(LightningSpearSparksFour)
+
+EmitForceData+25:
+db 12
+
+EmitForceCast+0:
+db 00 00
+EmitForceCast+4:
+db D1 4E
+EmitForceCast+10:
+db CD CC 0C 3F
+EmitForceCast+28:
+db 00 00 70 41
+EmitForceCast+34:
+db 00 00 70 41
+EmitForceCast+38:
+db 00 00 70 41
+EmitForceCast+44:
+db CD CC CC 3D
+EmitForceCast+48:
+db CD CC CC 3E
+EmitForceCast+4C:
+db 00 00 00 3F
+EmitForceCast+92:
+db 00
+EmitForceCast+9B:
+db 00
+
+EmitForceHit+0:
+db 4C 4A
+EmitForceHit+4:
+db 35 4F
+EmitForceHit+10:
+db 9A 99 99 3E
+EmitForceHit+14:
+db 00 00 00 00
+EmitForceHit+28:
+db 00 00 00 00
+EmitForceHit+34:
+db 00 00 00 00
+EmitForceHit+38:
+db 00 00 00 00
+EmitForceHit+44:
+db 00 00 C0 3F
+EmitForceHit+84:
+db 00
+EmitForceHit+9B:
+db 11
+
+UnregisterSymbol(EmitForceData)
+UnregisterSymbol(EmitForceCast)
+UnregisterSymbol(EmitForceHit)
+
+</AssemblerScript>
+        </CheatEntry>
       </CheatEntries>
     </CheatEntry>
   </CheatEntries>
   <UserdefinedSymbols>
     <SymbolEntry>
       <Name>sucessful_phantomfix</Name>
-      <Address>15AB0000</Address>
+      <Address>16330000</Address>
     </SymbolEntry>
     <SymbolEntry>
       <Name>FrameRateWarnAOB</Name>
-      <Address> 00D7841E</Address>
+      <Address>00D7841E</Address>
     </SymbolEntry>
   </UserdefinedSymbols>
   <LuaScript>AddressList = getAddressList()
