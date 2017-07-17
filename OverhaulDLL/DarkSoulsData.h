@@ -9,6 +9,7 @@
 
 // Other Header Files:
 #include "SP_SysUtils.hpp"
+#include "SP_AoB_Scan.hpp"
 
 class SpD3D9Device;
 class SpD3D9Overlay;
@@ -65,6 +66,7 @@ SpPointer player_char_status; // Player character status (loading, human, co-op,
 //////////////////////// FUNCTION PROTOTYPES ////////////////////////
 void __stdcall initialize_plugin(); // Exported function
 void change_game_version_number(); // Changes the game version number to avoid compatibility issues with non-overhaul builds
+void disable_framerate_warning_disconnection(); // Disables automatic game disconnection when low framerate is detected
 int fix_bonfire_input(); // Fixes input bug that causes players to be stuck at a bonfire
 
 int print_debug_info();
