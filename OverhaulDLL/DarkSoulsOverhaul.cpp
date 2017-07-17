@@ -1,4 +1,10 @@
-// Author: Sean Pesce
+/*
+	Authors:
+
+	Metal-Crow	-	Reverse engineering, CE, LUA, etc
+	Ashley		-	Reverse engineering, CE, LUA, etc
+	Sean Pesce	-	C++ conversion
+*/
 
 #include "DarkSoulsData.h"
 #include <sstream> // std::stringstream 
@@ -16,6 +22,7 @@ void __stdcall initialize_plugin()
 	extern void apply_multiphantom_secondary_patch_dynamic();
 	apply_multiphantom_secondary_patch_dynamic();
 
+	// Set maximum number of phantoms
 	extern SpPointer max_allowed_summons_ptr;
 	set_mem_protection(max_allowed_summons_ptr.resolve(), 4, MEM_PROTECT_RWX);
 	while (*((void**)max_allowed_summons_ptr.base) == NULL)
@@ -26,6 +33,9 @@ void __stdcall initialize_plugin()
 	extern uint8_t max_allowed_summons8;
 	uint32_t max_summons = max_allowed_summons8;
 	max_allowed_summons_ptr.write(max_summons);
+
+	// Disable "Framerate insufficient for online play" error
+	disable_framerate_warning_disconnection();
 }
 
 
@@ -48,6 +58,22 @@ void change_game_version_number()
 	write_address = (uint8_t*)ds1_base + 0x7E7229;
 	set_mem_protection(write_address, 3, MEM_PROTECT_RWX);
 	memcpy_s(write_address, 3, patch2, 3);
+}
+
+
+// Disables automatic game disconnection when low framerate is detected
+void disable_framerate_warning_disconnection()
+{
+	uint8_t *FrameRateWarn = NULL;
+	FrameRateWarn = (uint8_t*)aob_scan("74 17 B9 ?? ?? ?? ?? E8 ?? ?? ?? ?? 8B"); // Careful, this pattern returns 2 results
+
+	if (FrameRateWarn)
+	{
+		// AoB Scan was successful
+		set_mem_protection(FrameRateWarn, 1, MEM_PROTECT_RWX);
+		FrameRateWarn -= 0x1E;
+		*FrameRateWarn = 0xC3; // To disable this patch, set *FrameRateWarn = 0x51
+	}
 }
 
 
