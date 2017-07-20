@@ -7,10 +7,8 @@ The DLL is a plugin for [this Direct3D9 overlay](https://github.com/SeanPesce/Di
 * **Compiling:** To compile the project, you will need to install the **[June 2010 DirectX SDK](https://www.microsoft.com/en-us/download/details.aspx?id=6812)** (and add it to the include path if you install it to a non-default location).  Additionally, make sure to use the **[x86 Release build configuration](http://i.imgur.com/3FfTwYQ.png)** in Visual Studio, otherwise you'll probably run into linker errors.  
 
 * **Initialization:** One-time initialization code should be implemented in one of two functions:  
-
- * **`DllMain()`:** Found in **dllmain.cpp**, this is the earliest function where mod code will be executed. *Note:* make sure you add the code under the `DLL_PROCESS_ATTACH` case of the switch statement in this function. Code outside of this statement will likely be executed more than once.  
-
- * **`initialize_plugin()`:** Found in **DarkSoulsOverhaul.cpp**, this code is also run once when the DLL is loaded, but a bit later than `DllMain`. Unlike `DllMain`, this function is executed in a separate thread from the main game-loading thread, allowing the game to load simultaneously. For this reason, slow tasks and/or one-time AoB scans should probably be performed here, to ensure the data we're scanning for has been loaded into memory.  
+  * **`DllMain()`:** Found in **dllmain.cpp**, this is the earliest function where mod code will be executed. *Note:* make sure you add the code under the `DLL_PROCESS_ATTACH` case of the switch statement in this function. Code outside of this statement will likely be executed more than once.  
+  * **`initialize_plugin()`:** Found in **DarkSoulsOverhaul.cpp**, this code is also run once when the DLL is loaded, but a bit later than `DllMain`. Unlike `DllMain`, this function is executed in a separate thread from the main game-loading thread, allowing the game to load simultaneously. For this reason, slow tasks and/or one-time AoB scans should probably be performed here, to ensure the data we're scanning for has been loaded into memory.  
 
 * **Printing overlay messages:** Printing messages to the overlay is useful for real-time debugging and developer/end-user feedback. To print a message to the overlay, use the **`_PRINT_OVERLAY_()`** preprocessor macro. The signature of the related function can be found below. The arguments are as follows:    
   * `message` is the message to be printed.
