@@ -1,4 +1,9 @@
-// Author: Sean Pesce
+/*
+	Authors:
+	Metal-Crow	-	Reverse engineering, CE, LUA, etc
+	Ashley		-	Reverse engineering, CE, LUA, etc
+	Sean Pesce	-	C++ conversion
+*/
 
 #include "DarkSoulsData.h"
 #include <sstream> // std::stringstream 
@@ -9,14 +14,21 @@ void __stdcall initialize_plugin()
 	_GET_TEXT_FEED_->set_title("Dark Souls Overhaul Mod");
 	_PRINT_OVERLAY_("-------------TEST BUILD-------------", 0, false, SP_D3D9O_TEXT_COLOR_ORANGE);
 
+
 	// Obtain base address for player character data
 	player_char_base = (void*)((unsigned int)ds1_base + 0xF7E204);
+
+
 	// Player character status (loading, human, co-op, invader, hollow)
 	player_char_status = SpPointer(player_char_base, { 0xA28 });
 
+
+	// Apply remaining multi-phantom patches
 	extern void apply_multiphantom_secondary_patch_dynamic();
 	apply_multiphantom_secondary_patch_dynamic();
 
+
+	// Set maximum number of phantoms
 	extern SpPointer max_allowed_summons_ptr;
 	set_mem_protection(max_allowed_summons_ptr.resolve(), 4, MEM_PROTECT_RWX);
 	while (*((void**)max_allowed_summons_ptr.base) == NULL)
@@ -27,6 +39,9 @@ void __stdcall initialize_plugin()
 	extern uint8_t max_allowed_summons8;
 	uint32_t max_summons = max_allowed_summons8;
 	max_allowed_summons_ptr.write(max_summons);
+
+	// Disable "Framerate insufficient for online play" error
+	disable_framerate_warning_disconnection();
 }
 
 
@@ -52,23 +67,37 @@ void change_game_version_number()
 }
 
 
+// Disables automatic game disconnection when low framerate is detected
+void disable_framerate_warning_disconnection()
+{
+	uint8_t *FrameRateWarn = NULL;
+	FrameRateWarn = (uint8_t*)aob_scan("74 17 B9 ?? ?? ?? ?? E8 ?? ?? ?? ?? 8B"); // Careful, this pattern returns 2 results
+
+	if (FrameRateWarn)
+	{
+		// AoB Scan was successful
+		set_mem_protection(FrameRateWarn, 1, MEM_PROTECT_RWX);
+		FrameRateWarn -= 0x1E;
+		*FrameRateWarn = 0xC3; // To disable this patch, set *FrameRateWarn = 0x51
+	}
+}
+
+
 
 // Fixes input bug that causes players to be stuck at a bonfire
 int fix_bonfire_input()
 {
 	// Get current player status
-	int status; // = SP_DS1_PLAYER_STATUS_LOADING;
+	int status = SP_DS1_PLAYER_STATUS_LOADING;
 	player_char_status.read(&status);
 
-	// Check if player is hollow/human
-	if (status == SP_DS1_PLAYER_STATUS_HOLLOW || status == SP_DS1_PLAYER_STATUS_HUMAN)
+	if (status == SP_DS1_PLAYER_STATUS_HOLLOW || status == SP_DS1_PLAYER_STATUS_HUMAN) // Check if player is hollow/human
 	{
-		SpPointer bonfire_anim_fix = SpPointer((void*)0x12E29E8, { 0x0, 0xFC });
 		// Write zero to bonfire animation status address
-		bonfire_anim_fix.write((uint32_t)0);
+		SpPointer bonfire_anim_fix = SpPointer((void*)0x12E29E8, { 0x0, 0xFC });
+		bonfire_anim_fix.write((uint32_t)0); 
 
 		_PRINT_OVERLAY_(_SP_DS1_MOD_MSG_BONFIRE_INPUT_FIX_, 2000, true);
-
 		SP_beep(500, 200);
 
 		return 0;
@@ -77,18 +106,17 @@ int fix_bonfire_input()
 	{
 		// Player is not hollow/human, so can't be at a bonfire
 		_PRINT_OVERLAY_(_SP_DS1_MOD_MSG_CANT_BONFIRE_INPUT_FIX_, 2000, true);
-
 		SP_beep(300, 100);
 		SP_beep(300, 100);
-
 		return -1;
 	}
 }
 
 
-// Check if the multiphantom patch was applied correctly
+// Prints various debugging info (developer use only)
 int print_debug_info()
 {
+	// Check if the multiphantom patch was applied correctly
 	extern uint32_t sucessful_phantomfix;
 	if (sucessful_phantomfix)
 	{
