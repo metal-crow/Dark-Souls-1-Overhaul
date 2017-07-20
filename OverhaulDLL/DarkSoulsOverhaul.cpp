@@ -9,9 +9,10 @@ void __stdcall initialize_plugin()
 	_GET_TEXT_FEED_->set_title("Dark Souls Overhaul Mod");
 	_PRINT_OVERLAY_("-------------TEST BUILD-------------", 0, false, SP_D3D9O_TEXT_COLOR_ORANGE);
 
-	player_char_base = (void*)((unsigned int)ds1_base + 0xF7E204); // Obtain base address for player character data
-
-	player_char_status = SpPointer(player_char_base, { 0xA28 }); // Player character status (loading, human, co-op, invader, hollow)
+	// Obtain base address for player character data
+	player_char_base = (void*)((unsigned int)ds1_base + 0xF7E204);
+	// Player character status (loading, human, co-op, invader, hollow)
+	player_char_status = SpPointer(player_char_base, { 0xA28 });
 
 	extern void apply_multiphantom_secondary_patch_dynamic();
 	apply_multiphantom_secondary_patch_dynamic();
@@ -56,14 +57,15 @@ void change_game_version_number()
 int fix_bonfire_input()
 {
 	// Get current player status
-	int status = SP_DS1_PLAYER_STATUS_LOADING;
+	int status; // = SP_DS1_PLAYER_STATUS_LOADING;
 	player_char_status.read(&status);
 
-	if (status == SP_DS1_PLAYER_STATUS_HOLLOW || status == SP_DS1_PLAYER_STATUS_HUMAN) // Check if player is hollow/human
+	// Check if player is hollow/human
+	if (status == SP_DS1_PLAYER_STATUS_HOLLOW || status == SP_DS1_PLAYER_STATUS_HUMAN)
 	{
 		SpPointer bonfire_anim_fix = SpPointer((void*)0x12E29E8, { 0x0, 0xFC });
-
-		bonfire_anim_fix.write((uint32_t)0); // Write zero to bonfire animation status address
+		// Write zero to bonfire animation status address
+		bonfire_anim_fix.write((uint32_t)0);
 
 		_PRINT_OVERLAY_(_SP_DS1_MOD_MSG_BONFIRE_INPUT_FIX_, 2000, true);
 
