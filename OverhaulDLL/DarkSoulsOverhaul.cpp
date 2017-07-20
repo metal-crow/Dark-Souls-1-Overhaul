@@ -15,12 +15,19 @@ void __stdcall initialize_plugin()
 	_GET_TEXT_FEED_->set_title("Dark Souls Overhaul Mod");
 	_PRINT_OVERLAY_("-------------TEST BUILD-------------", 0, false, SP_D3D9O_TEXT_COLOR_ORANGE);
 
-	player_char_base = (void*)((unsigned int)ds1_base + 0xF7E204); // Obtain base address for player character data
 
-	player_char_status = SpPointer(player_char_base, { 0xA28 }); // Player character status (loading, human, co-op, invader, hollow)
+	// Obtain base address for player character data
+	player_char_base = (void*)((unsigned int)ds1_base + 0xF7E204);
 
+
+	// Player character status (loading, human, co-op, invader, hollow)
+	player_char_status = SpPointer(player_char_base, { 0xA28 });
+
+
+	// Apply remaining multi-phantom patches
 	extern void apply_multiphantom_secondary_patch_dynamic();
 	apply_multiphantom_secondary_patch_dynamic();
+
 
 	// Set maximum number of phantoms
 	extern SpPointer max_allowed_summons_ptr;
@@ -87,12 +94,11 @@ int fix_bonfire_input()
 
 	if (status == SP_DS1_PLAYER_STATUS_HOLLOW || status == SP_DS1_PLAYER_STATUS_HUMAN) // Check if player is hollow/human
 	{
+		// Write zero to bonfire animation status address
 		SpPointer bonfire_anim_fix = SpPointer((void*)0x12E29E8, { 0x0, 0xFC });
-
-		bonfire_anim_fix.write((uint32_t)0); // Write zero to bonfire animation status address
+		bonfire_anim_fix.write((uint32_t)0); 
 
 		_PRINT_OVERLAY_(_SP_DS1_MOD_MSG_BONFIRE_INPUT_FIX_, 2000, true);
-
 		SP_beep(500, 200);
 
 		return 0;
@@ -101,18 +107,17 @@ int fix_bonfire_input()
 	{
 		// Player is not hollow/human, so can't be at a bonfire
 		_PRINT_OVERLAY_(_SP_DS1_MOD_MSG_CANT_BONFIRE_INPUT_FIX_, 2000, true);
-
 		SP_beep(300, 100);
 		SP_beep(300, 100);
-
 		return -1;
 	}
 }
 
 
-// Check if the multiphantom patch was applied correctly
+// Prints various debugging info (developer use only)
 int print_debug_info()
 {
+	// Check if the multiphantom patch was applied correctly
 	extern uint32_t sucessful_phantomfix;
 	if (sucessful_phantomfix)
 	{
