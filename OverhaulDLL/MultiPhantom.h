@@ -36,8 +36,8 @@ void *BlackSosNum;
 void *InvadeNum;
 
 
-void apply_multiphantom_patch();
-void apply_multiphantom_secondary_patch();
+void apply_multiphantom_patch_dynamic();
+void apply_multiphantom_secondary_patch_dynamic();
 
 void __stdcall forceshowsigns_newmem();
 void __stdcall summon_char_types_newmem();
