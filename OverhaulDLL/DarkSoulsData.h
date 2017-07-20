@@ -69,7 +69,7 @@ void change_game_version_number(); // Changes the game version number to avoid c
 void disable_framerate_warning_disconnection(); // Disables automatic game disconnection when low framerate is detected
 int fix_bonfire_input(); // Fixes input bug that causes players to be stuck at a bonfire
 
-int print_debug_info();
+int print_debug_info(); // Prints various debugging info (developer use only)
 
-void SP_beep(DWORD frequency, DWORD duration, bool wait);
+void SP_beep(DWORD frequency, DWORD duration, bool wait); // Beeps at the specified frequency for a specified duration (in milliseconds) if audio feedback is enabled
 void SP_beep(DWORD frequency, DWORD duration);
