@@ -8,6 +8,26 @@
 #include "DarkSoulsData.h"
 #include <sstream> // std::stringstream 
 
+
+// Tasks to be run when the DLL is first loaded
+void on_process_attach(const char *settings_file)
+{
+	initialized_plugin = false;
+
+	// Obtain user preferences
+	show_node_count = ((int)GetPrivateProfileInt(_SP_DS1_MOD_SETTINGS_SECTION_PREFS_, _SP_DS1_MOD_PREF_SHOW_NODE_COUNT_, 1, settings_file) != 0);
+
+	// Obtain base address of Dark Souls game process
+	ds1_base = GetModuleHandle(NULL);
+
+	// Set new game version number
+	change_game_version_number();
+
+	// Apply initial multiphantom patches
+	extern void apply_multiphantom_patch_dynamic();
+	apply_multiphantom_patch_dynamic();
+}
+
 // Exported function
 void __stdcall initialize_plugin()
 {
@@ -42,6 +62,9 @@ void __stdcall initialize_plugin()
 
 	// Disable "Framerate insufficient for online play" error
 	disable_framerate_warning_disconnection();
+
+	//Sleep(10000);
+	initialized_plugin = true;
 }
 
 
@@ -109,6 +132,29 @@ int fix_bonfire_input()
 		SP_beep(300, 100);
 		SP_beep(300, 100);
 		return -1;
+	}
+}
+
+
+// Adds various elements to text feed info header (node count, etc)
+void __stdcall add_info_bar_element(std::string *info_string)
+{
+	// Get multiplayer node count
+	SpPointer p_node_count_check = SpPointer((uint8_t*)ds1_base + 0xF7F77C, { 0x2C, 0x778 });
+
+	if (initialized_plugin && *(void**)(p_node_count_check.resolve()) && show_node_count)
+	{
+		SpPointer p_node_count = SpPointer((uint8_t*)ds1_base + 0xF7F77C, { 0x2C, 0x778, 0x80 });
+		int node_count;
+		p_node_count.read(&node_count);
+
+		info_string->append("[Nodes: ");
+		info_string->append(std::to_string(node_count));
+		info_string->append("]  ");
+	}
+	else if (show_node_count)
+	{
+		info_string->append("[Nodes: --]  ");
 	}
 }
 

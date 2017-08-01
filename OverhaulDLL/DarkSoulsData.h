@@ -55,6 +55,13 @@ enum SP_DS1_PLAYER_STATUS_ENUM {
 #define _SP_DS1_MOD_MSG_CANT_BONFIRE_INPUT_FIX_ "Bonfire input fix was not applied; no character loaded"
 
 
+//////////////////////// USER PREFERENCE VARIABLES & DATA ////////////////////////
+#define _SP_DS1_MOD_SETTINGS_SECTION_PREFS_ "Preferences"
+#define _SP_DS1_MOD_PREF_SHOW_NODE_COUNT_ "DisplayNodeCount"
+
+bool show_node_count;
+bool initialized_plugin;
+
 //////////////////////// GAME VARIABLES, POINTERS, & OTHER DATA ////////////////////////
 
 void *ds1_base; // Base address of Dark Souls game process
@@ -64,7 +71,9 @@ SpPointer player_char_status; // Player character status (loading, human, co-op,
 
 
 //////////////////////// FUNCTION PROTOTYPES ////////////////////////
+void on_process_attach(const char *settings_file); // Executes tasks to be run when the DLL is first loaded
 void __stdcall initialize_plugin(); // Exported function
+void __stdcall add_info_bar_element(std::string *info_string); // Adds various elements to text feed info header (node count, etc)
 void change_game_version_number(); // Changes the game version number to avoid compatibility issues with non-overhaul builds
 void disable_framerate_warning_disconnection(); // Disables automatic game disconnection when low framerate is detected
 int fix_bonfire_input(); // Fixes input bug that causes players to be stuck at a bonfire

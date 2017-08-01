@@ -11,17 +11,8 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	{
 		case DLL_PROCESS_ATTACH:
 
-			// Obtain base address of Dark Souls game process
-			extern void* ds1_base;
-			ds1_base = GetModuleHandle(NULL);
-
-			// Set new game version number
-			extern void change_game_version_number();
-			change_game_version_number();
-
-			// Apply initial multiphantom patches
-			extern void apply_multiphantom_patch_dynamic();
-			apply_multiphantom_patch_dynamic();
+			extern void on_process_attach(const char *settings_file);
+			on_process_attach(_SETTINGS_FILE_);
 
 			break;
 		case DLL_THREAD_ATTACH:
