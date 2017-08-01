@@ -3,3 +3,4 @@ EXPORTS
 	initialize_plugin @1
 	load_keybinds @2
 	set_device_wrapper @3
+	add_info_bar_element @4
