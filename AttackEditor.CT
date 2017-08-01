@@ -1,0 +1,1740 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="24">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>90767</ID>
+      <Description>"AttackParamPC"</Description>
+      <LastState RealAddress="04B480DC"/>
+      <VariableType>String</VariableType>
+      <Length>32</Length>
+      <Unicode>0</Unicode>
+      <ZeroTerminate>1</ZeroTerminate>
+      <Address>BaseP</Address>
+      <Offsets>
+        <Offset>c</Offset>
+        <Offset>20</Offset>
+        <Offset>12c</Offset>
+      </Offsets>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>89915</ID>
+      <Description>"Open"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+globalalloc(selected_attack,4)
+globalalloc(selected_attack_var_name,100)
+
+aobscan(finditP,A1????????39A8400400000F)
+label(BaseP)
+registersymbol(BaseP)
+[finditP+1]:
+BaseP:
+
+[DISABLE]
+dealloc(selected_attack_var_name)
+dealloc(selected_attack)
+
+unregistersymbol(BaseP)
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>89917</ID>
+          <Description>"Set the value to the attack name, and check the box"</Description>
+          <LastState Value="" RealAddress="00000000"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>89916</ID>
+              <Description>"Generate CE Code"</Description>
+              <LastState RealAddress="22A80070"/>
+              <VariableType>String</VariableType>
+              <Length>100</Length>
+              <Unicode>0</Unicode>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>selected_attack_var_name</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>10322</ID>
+          <Description>"Select Attack and check the box"</Description>
+          <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">0:Dummy bullet
+1:[ DLC ] dummy bullet ( funnel for C )
+2:[ DLC ] dummy bullet ( funnel for C2 )
+3:[ DLC ] dummy bullet ( for those who follow )
+5:Use dummy attack to keep out bullet
+10:PC_ common _ egg attack
+40:Common attack [ ladder _ right punch ]
+41:Common attack [ ladder ] _ right kick
+42:Common attack [ ladder _ left punch ]
+43:Common attack [ ladder _ left kick ]
+44:Common attack and slide down the ladder _ [ ]
+101:[ System ] menu display magnification attack
+200:Common attack [ fall ] _ attack Armor
+201:Common attack [ landing ] _ attack Armor
+202:Common attack [ thud ] _ landing attack Armor
+203:Common attack [ fall ] _ landing attack Armor
+204:Common attack [ rolling ] _ attack Armor
+205:Common attack [ summons ] _ attack Armor
+206:Common attack his back [ fall ] _ attack Armor
+210:Common attack push [ before ] _ attack Armor
+211:Armor attack _ [ to blow off after a common attack
+212:Armor attack _ [ Futtobi before the common attack
+213:Common attack [ push ] _ after attack Armor
+220:Common attack armor attack _ [ throw ]
+221:Common attack armor attack _ [ throw ] strength
+222:Common attack armor attack _ [ slams Parry ]
+300:Common attack [ fall ]
+301:Common attack [ landing ]
+302:Common attack [ thud landing ]
+303:Common attack [ fall ] landing
+304:Common attack [ rolling ]
+305:Common attack [ summons ]
+306:Common attack his back [ fall ]
+310:Common attack push [ before ]
+311:[ I blown away to the common after attack
+312:[ The Futtobi before the common attack
+313:Common attack [ after ] push
+320:Common attack [ throw ]
+321:The [ throwing strength common attack
+322:Common attack slams [ Parry ]
+1050:Damage for throwing knives
+1051:Damage for throwing knives poison
+1052:Molotov cocktail for damage
+1053:Africa damage for throwing knives
+1054:Black Molotov cocktail for damage
+1100:Dragon roar [ effect ] blow
+2000:Arrow ordinary
+2001:Large arrow
+2002:Feather arrows
+2003:Flaming arrow
+2004:Arrow Kuroki
+2005:Gekkoya
+2006:Arrow of the tree
+2007:Oya of dragon hunting
+2008:Oya go-
+2050:Light bolt
+2051:Heavy bolt
+2052:Sniper bolt
+2053:Wood bolt
+2054:Lightning Bolt
+10000:A bullet EN
+10010:EN bullet A2
+10020:EN bullet B
+10030:EN bullet B2
+10050:EN bullet C
+10070:EN bullet C2
+10080:EN bullet D
+10090:EN bullet D2
+12000:Summon
+12001:Summons 1_ resonance LV1
+12002:Summons 1_ resonance LV2
+12003:Summons 1_ resonance LV3
+12010:Summon 2
+12011:Summons 2_ resonance LV1
+12012:Summons 2_ resonance LV2
+12013:Summons 2_ resonance LV3
+13000:Projection flame 1
+13010:Flame projection 2
+13020:Flame projection 3
+13030:Chaos _ Fireball
+13040:Chaos _ Fireball [ lava ]
+14000:Proximity flame 1
+14010:Proximity flame 2
+14020:Proximity flame 3
+15000:Fire Storm 1
+15010:Fire Storm 2
+15020:Chaos _ Firestorm
+15030:Chaos _ Firestorm [ lava ]
+16000:Thunder 1 [ parent ]
+16010:Thunder [ 1 child ]
+16020:Thunder 1 grandson ]
+16030:Thunder [ 1 ] great-grandson
+16040:Thunder [ 1 ] great-great-grandchild
+16050:Thunder [ 1 ] Raimago
+16100:Thunder 2 [ parent ]
+16110:Thunder 2 [ child ]
+16120:Thunder 2 grandchildren ]
+16130:Thunder 2 great-grandson ]
+16140:Thunder 2 great-great-grandchild ]
+16150:Thunder [ 2 ] Raimago
+16200:Lightning 3 [ parent ]
+16210:Lightning 3 [ child ]
+16220:Thunder 3 grandchildren ]
+16230:Thunder [ 3 ] great-grandson
+16240:Thunder [ 3 ] great-great-grandchild
+16250:Thunder [ 3 ] Raimago
+17000:Retributive justice
+18000:Dragon transformation _ attack
+18001:Dragon transformation _ attack _ resonance LV1
+18002:Dragon transformation _ attack _ resonance LV2
+18003:Dragon transformation _ attack _ resonance LV3
+19000:Force 1
+19010:Force 2
+19011:Force 2_ resonance LV1
+19012:Force 2_ resonance LV2
+19013:Force 2_ resonance LV3
+19014:Force 2_ resonance LV4
+19020:Force 3
+19021:Force 3_ resonance LV1
+19022:Force 3_ resonance LV2
+19023:Force 3_ resonance LV3
+19024:Force 3_ resonance LV4
+20000:Seoul drain 1
+20010:Seoul drain 2
+21000:Flame radiation
+22000:Whip of flame
+23000:Whip of chaos _ flame
+23010:Whip of flame chaos _ [ lava ]
+24000:Crystal beam
+25000:Balls of [ DLC ] darkness
+26000:Splash of [ DLC ] darkness
+27000:[ DLC ] those who follow
+28000:[ DLC ] black flames
+30000:Funnel
+30001:Genki ball attack Lv1
+30002:Genki ball attack Lv2
+30003:Genki ball attack Lv3
+30004:Machine gun
+30005:Through beam
+30006:Fire bolt
+30007:1_ thunder resonance LV2 [ parent ]
+30008:1_ thunder resonance LV2 [ child ]
+30009:1_ thunder resonance LV2 [ grandson ]
+30010:1_ thunder resonance LV2 [ great-grandson ]
+30011:1_ thunder resonance LV2 ] [ great-great-grandchild
+30012:1_ thunder resonance LV2 ] [ Raimago
+30013:1_ thunder resonance LV3 [ parent ]
+30014:1_ thunder resonance LV3 [ child ]
+30015:1_ thunder resonance LV3 [ grandson ]
+30016:1_ thunder resonance LV3 [ great-grandson ]
+30017:1_ thunder resonance LV3 ] [ great-great-grandchild
+30018:1_ thunder resonance LV3 ] [ Raimago
+30019:1_ thunder resonance LV4 [ parent ]
+30020:1_ thunder resonance LV4 [ child ]
+30021:1_ thunder resonance LV4 [ grandson ]
+30022:1_ thunder resonance LV4 [ great-grandson ]
+30023:1_ thunder resonance LV4 ] [ great-great-grandchild
+30024:1_ thunder resonance LV4 ] [ Raimago
+30025:1_ thunder resonance LV5 [ parent ]
+30026:1_ thunder resonance LV5 [ child ]
+30027:1_ thunder resonance LV5 [ grandson ]
+30028:1_ thunder resonance LV5 [ great-grandson ]
+30029:1_ thunder resonance LV5 ] [ great-great-grandchild
+30030:1_ thunder resonance LV5 ] [ Raimago
+2000000:Dagger _ one hand usually 1
+2000010:Dagger _ one hand usually 2
+2000020:Dagger _ one hand usually 3
+2000030:Dagger _ one hand jump 1
+2000040:_ One hand dagger fall loop
+2000050:_ One hand dagger fall landing
+2000100:Tame one hand dagger _ 1
+2000110:Tame one hand dagger _ 2
+2000200:Dagger _ both hands usually 1
+2000210:Dagger _ both hands usually 2
+2000220:Dagger _ both hands usually 3
+2000230:Dagger _ both hands jump 1
+2000240:Dagger _ both hands fall loop
+2000250:Dagger _ both hands fall landing
+2000300:Dagger _ both hands Tame 1
+2000310:Dagger _ both hands Tame 2
+2000400:Dagger _ left hand
+2000410:Dagger _ one hand a short distance
+2000420:Dagger _ both hands close range
+2000430:Dagger _ one hand guard
+2000440:Dagger _ both hands guard
+2000450:Dagger _ Parry
+2000490:Throw dagger _ fall
+2000500:_ Dagger behind
+2000505:Dagger _ strengthening behind
+2000510:Dagger _ Parry after
+2000515:Dagger _ strengthening Parry after
+2000516:Dagger _ strengthening Parry _ after the second stage
+2000520:_ One hand dagger dash
+2000530:Dagger _ both hands Dash
+2000540:Dagger _ one hand before
+2000580:Dagger _ both hands step before
+2000600:Dagger _ Paryigado
+2001100:[ 72 ] _ one hand dagger Tame 1
+2001110:[ 72 ] _ one hand dagger Tame 2
+2001300:[ 72 ] dagger _ both hands Tame 1
+2001310:[ 72 ] dagger _ both hands Tame 2
+2002100:[ 73 ]吸魂_ one hand Tame 1
+2002110:[ 73 ]吸魂_ one hand Tame 2
+2002300:[ 73 ]吸魂_ both hands Tame 1
+2002310:[ 73 ]吸魂_ both hands Tame 2
+2003100:Tame one hand knife _ one of [ 120 ] Evil Dead
+2003110:Tame one hand knife _ 2 [ 120 ] of the Dead
+2003300:Knife _ both hands Tame 1 of [ 120 ] Evil Dead
+2003310:Knife _ both hands Tame 2 of [ 120 ] Evil Dead
+2004100:Tame one hand dagger _ 1 [ 130 ] of Kiaran
+2004110:Tame one hand dagger _ 2 [ 130 ] Kiaran
+2004300:Dagger _ both hands Tame 1 of [ 130 ] Kiaran
+2004310:Dagger _ both hands Tame 2 of [ 130 ] Kiaran
+2300000:Straight sword _ one hand usually 1
+2300010:Straight sword _ one hand usually 2
+2300020:Straight sword _ one hand usually 3
+2300030:Straight sword _ one hand jump 1
+2300040:Straight sword _ one hand fall loop
+2300050:Straight sword _ one hand fall landing
+2300100:Straight sword _ one hand Tame 1
+2300110:Straight sword _ one hand Tame 2
+2300200:Straight sword _ both hands usually 1
+2300210:Straight sword _ both hands usually 2
+2300220:Straight sword _ both hands usually 3
+2300230:Straight sword _ both hands jump 1
+2300240:Straight sword _ both hands fall loop
+2300250:Straight sword _ both hands fall landing
+2300300:Straight sword _ both hands Tame 1
+2300310:Straight sword _ both hands Tame 2
+2300400:Straight left hand sword _
+2300410:Straight sword _ one hand a short distance
+2300420:Straight sword _ both hands close range
+2300430:Straight sword _ one hand guard
+2300440:_ Both hands straight sword guard
+2300450:Straight sword _ Parry
+2300490:Throw straight sword _ fall
+2300500:Straight sword _ behind
+2300505:Straight sword _ strengthening behind
+2300510:Straight sword _ Parry after
+2300515:Straight sword _ strengthening Parry after
+2300516:Straight sword _ strengthening Parry _ after the second stage
+2300520:Straight sword _ one hand dash
+2300530:Straight sword _ both hands Dash
+2300540:Straight sword _ one hand before
+2300580:Straight sword _ both hands step before
+2300600:Straight sword _ Paryigado
+2301000:[ 53 ] Broad _ one hand usually 1
+2301010:[ 53 ] Broad _ one hand usually 2
+2301020:[ 53 ] Broad _ one hand usually 3
+2301030:[ 53 ] Broad _ one hand jump 1
+2301040:[ 53 ] Broad _ dropping one hand loop
+2301050:[ 53 ] Broad _ dropping one hand landing
+2301100:[ 53 ] Broad _ one hand Tame 1
+2301110:[ 53 ] Broad _ one hand Tame 2
+2301200:[ 53 ] Broad _ both hands usually 1
+2301210:[ 53 ] Broad _ both hands usually 2
+2301220:[ 53 ] Broad _ both hands usually 3
+2301230:[ 53 ] _ both hands Broad Jump 1
+2301240:[ 53 ] Broad _ both hands fall loop
+2301250:[ 53 ] Broad _ both hands fall landing
+2301300:[ 53 ] Broad _ both hands Tame 1
+2301310:[ 53 ] Broad _ both hands Tame 2
+2301400:[ 53 ] Broad _ left hand
+2301490:[ 53 ] throw broad _ fall
+2301500:[ 53 ] Broad _ behind
+2301505:[ 53 ] Broad _ strengthening behind
+2301510:[ 53 ] Broad _ Parry after
+2301515:[ 53 ] Broad _ strengthening Parry after
+2301516:[ 53 ] Broad _ strengthening Parry _ after the second stage
+2301520:[ 53 ] Broad _ one hand dash
+2301530:[ 53 ] Broad _ both hands Dash
+2301540:[ 53 ] Broad _ one hand before
+2301580:[ 53 ] Broad _ both hands step before
+2302030:[ 54 ] thorn突直sword _ one hand jump 1
+2302100:[ 54 ] thorn突直sword _ one hand Tame 1
+2302110:[ 54 ] thorn突直sword _ one hand Tame 2
+2302230:[ 54 ] thorn突直sword _ both hands jump 1
+2302300:[ 54 ] thorn突直sword _ both hands Tame 1
+2302310:[ 54 ] thorn突直sword _ both hands Tame 2
+2302580:[ 54 ] thorn突直sword _ both hands step before
+2303100:Tame one hand sword _ 1 [ 55 ] of hero
+2303110:Tame one hand sword _ 2 [ 55 ] hero
+2303300:Ken _ both hands Tame 1 of [ 55 ] hero
+2303310:Ken _ both hands Tame 2 of [ 55 ] hero
+2304100:[ 57 ] Dark _ one hand Tame 1
+2304110:[ 57 ] Dark _ one hand Tame 2
+2304300:[ 57 ] Dark _ both hands Tame 1
+2304310:[ 57 ] Dark _ both hands Tame 2
+2305100:Tame one hand sword _ 1 [ 58 ] of old dragon
+2305110:Tame one hand sword _ 2 [ 58 ] old dragon
+2305300:Ken _ both hands Tame 1 of [ 58 ] old dragon
+2305310:Ken _ both hands Tame 2 of [ 58 ] old dragon
+2305320:Ken _ both hands Tame 1 / magic sword upon activation of [ 58 ] old dragon
+2305330:Ken _ both hands Tame 2 / magic sword upon activation of [ 58 ] old dragon
+2305580:Ken _ both hands step before the [ 58 ] old dragon
+2305800:_ Sword magic attack of [ 58 ] old dragon
+2500000:Large sword _ one hand usually 1
+2500010:Large sword _ one hand usually 2
+2500020:Large sword _ one hand usually 3
+2500030:Large sword _ one hand jump 1
+2500040:_ One hand sword fall loop
+2500050:_ One hand sword fall landing
+2500100:Large sword _ one hand Tame 1
+2500110:Large sword _ one hand Tame 2
+2500200:Large sword _ both hands usually 1
+2500210:Large sword _ both hands usually 2
+2500220:Large sword _ both hands usually 3
+2500230:Large sword _ both hands jump 1
+2500240:Large sword _ both hands fall loop
+2500250:Large sword _ both hands fall landing
+2500300:Large sword _ both hands Tame 1
+2500310:Large sword _ both hands Tame 2
+2500400:Large sword _ left hand
+2500410:Large sword _ one hand a short distance
+2500420:Large sword _ both hands close range
+2500430:Large sword _ one hand guard
+2500440:_ Both hands sword guard
+2500450:Large sword _ Parry
+2500490:Throw sword _ fall
+2500500:_ Large sword behind
+2500505:Large sword _ strengthening behind
+2500510:Large sword _ Parry after
+2500515:Large sword _ strengthening Parry after
+2500516:Large sword _ strengthening Parry _ after the second stage
+2500520:Large sword _ one hand dash
+2500530:Large sword _ both hands Dash
+2500540:Large sword _ one hand before
+2500580:Large sword _ both hands step before
+2500600:Large sword _ Paryigado
+2501100:Large sword _ one hand one of Tame [ 80 ] Black Knight
+2501110:Large sword _ one hand Tame 2 of [ 80 ] Black Knight
+2501300:Large sword _ both hands Tame 1 of 80 [ ] Black Knight
+2501310:Large sword _ both hands Tame 2 of [ 80 ] Black Knight
+2502000:Fran Berger _ one hand usually 1
+2502010:Fran Berger _ one hand usually 2
+2502020:Fran Berger _ one hand usually 3
+2502030:Fran Berger _ one hand jump 1
+2502040:Fran Berger _ one hand fall loop
+2502050:Fran Berger _ one hand fall landing
+2502100:Fran Berger _ one hand Tame 1
+2502110:Fran Berger _ one hand Tame 2
+2502200:Fran Berger _ both hands usually 1
+2502210:Fran Berger _ both hands usually 2
+2502220:Fran Berger _ both hands usually 3
+2502230:Fran Berger _ both hands jump 1
+2502240:Fran Berger _ both hands fall hand loop
+2502250:Fran Berger _ both hands hand fall landing
+2502300:Fran Berger _ both hands Tame 1
+2502310:Fran Berger _ both hands Tame 2
+2502400:Fran Berger _ left hand
+2502490:Throw Fran Berger _ fall
+2502500:Fran Berger _ behind
+2502505:Fran Berger _ strengthening behind
+2502510:Fran Berger _ Parry after
+2502515:Fran Berger _ strengthening Parry after
+2502516:Fran Berger _ strengthening Parry _ after the second stage
+2502520:Fran Berger _ one hand dash
+2502530:Fran Berger _ both hands Dash
+2502540:Fran Berger _ one hand before
+2502580:Fran Berger _ both hands step before
+2503100:Large sword _ one hand one of Tame [ 77 ] stone
+2503110:Large sword _ one hand Tame 2 of [ 77 ] stone
+2503800:_ Large sword magic attack of [ 77 ] stone
+2504100:[ 79 ] Moonlight _ one hand Tame 1
+2504110:[ 79 ] Moonlight _ one hand Tame 2
+2504120:[ 79 ] Moonlight _ one hand Tame 1 / magic sword upon activation
+2504130:[ 79 ] Moonlight _ one hand Tame 2 / magic sword upon activation
+2504300:[ 79 ] Moonlight _ both hands Tame 1
+2504310:[ 79 ] Moonlight _ both hands Tame 2
+2504320:[ 79 ] Moonlight _ both hands Tame 1 / magic sword upon activation
+2504330:[ 79 ] Moonlight _ both hands Tame 2 / magic sword upon activation
+2504800:[ 79 ] Moonlight _ _ one hand magic attack
+2504801:[ 79 ] Moonlight _ hands _ magic attack
+2505100:[ 74 ] Claymore _ one hand Tame 1
+2505110:[ 74 ] Claymore _ one hand Tame 2
+2505580:[ 74 ] Claymore _ both hands step before
+2506100:[ 78 ] Arutoriusu _ one hand Tame 1
+2506110:[ 78 ] Arutoriusu _ one hand Tame 2
+2506300:[ 78 ] Arutoriusu _ both hands Tame 1
+2506310:[ 78 ] Arutoriusu _ both hands Tame 2
+2507100:[ 97 ] King _ one hand Tame 1
+2507110:[ 97 ] King _ one hand Tame 2
+2507300:[ 97 ] King _ both hands Tame 1
+2507310:[ 97 ] King _ both hands Tame 2
+2508100:[ 131 ] Arutoriusu ( erosion ) _ one hand Tame 1
+2508110:[ 131 ] Arutoriusu ( erosion ) _ one hand Tame 2
+2508300:[ 131 ] Arutoriusu ( erosion ) _ both hands Tame 1
+2508310:[ 131 ] Arutoriusu ( erosion ) _ both hands Tame 2
+2509300:Large sword _ both hands Tame 1 [ 135 ] of the black dragon
+2509320:Large sword _ both hands Tame 1 / magic sword upon activation of [ 135 ] Black Dragon
+2509800:Large sword _ hands _ magic attack of [ 135 ] Black Dragon
+2600000:Oversized sword _ one hand usually 1
+2600001:Oversized sword _ 1_ one hand usually range
+2600010:Oversized sword _ one hand usually 2
+2600020:Oversized sword _ one hand usually 3
+2600030:Oversized sword _ one hand jump 1
+2600040:Oversized sword _ one hand fall loop
+2600050:Oversized sword _ one hand fall landing
+2600100:Oversized sword _ one hand Tame 1
+2600110:Oversized sword _ one hand Tame 2
+2600200:Oversized sword _ both hands usually 1
+2600210:Oversized sword _ both hands usually 2
+2600220:Oversized sword _ both hands usually 3
+2600230:Oversized sword _ both hands jump 1
+2600240:Oversized sword _ both hands fall loop
+2600250:Oversized sword _ both hands fall landing
+2600300:Oversized sword _ both hands Tame 1
+2600310:Oversized sword _ both hands Tame 2
+2600400:Oversized sword _ left hand
+2600410:Oversized sword _ one hand a short distance
+2600420:Oversized sword _ both hands close range
+2600430:Oversized sword _ one hand guard
+2600440:Oversized sword guard _ both hands
+2600450:Oversized sword _ Parry
+2600490:Throw oversized sword _ fall
+2600500:Extra large sword behind _
+2600501:Extra large sword behind _ _ two撃目
+2600505:Oversized sword _ strengthening behind
+2600506:Oversized sword _ strengthening behind _ two -stage
+2600510:Oversized sword _ Parry after
+2600511:Oversized sword _ _ Parry after two撃目
+2600515:Oversized sword _ strengthening Parry after
+2600516:Oversized sword _ strengthening Parry _ after the second stage
+2600517:Oversized sword _ strengthening Parry _ after the third stage
+2600520:Oversized sword _ one hand dash
+2600530:Oversized sword _ both hands Dash
+2600540:Oversized sword _ one hand before
+2600580:Oversized sword _ both hands step before
+2600600:Oversized sword _ Paryigado
+2601300:Large sword _ both hands Tame 1 [ 98 ] of old dragon
+2601310:Large sword _ both hands Tame 2 of [ 98 ] old dragon
+2601320:Large sword _ both hands Tame 1 / magic sword upon activation of [ 98 ] old dragon
+2601330:Large sword _ both hands Tame 2 / magic sword upon activation of [ 98 ] old dragon
+2601800:_ Large sword magic attack of [ 98 ] old dragon
+2602100:[ 95 ] Great Sword _ one hand Tame 1
+2602110:[ 95 ] Great Sword _ one hand Tame 2
+2602300:[ 95 ] Great Sword _ both hands Tame 1
+2602310:[ 95 ] Great Sword _ both hands Tame 2
+2603100:Hatchet _ one hand one of Tame [ 96 ] daemon
+2603110:Hatchet _ one hand Tame 2 of [ 96 ] daemon
+2603300:Hatchet _ both hands Tame 1 of [ 96 ] daemon
+2603310:Hatchet _ both hands Tame 2 of [ 96 ] daemon
+2604100:Oversized sword _ one hand Tame 1 of 128 ] Black Knight
+2604110:Oversized sword _ one hand Tame 2 of [ 128 ] Black Knight
+2604300:Oversized sword _ both hands Tame 1 of 128 ] Black Knight
+2604310:Oversized sword _ both hands Tame 2 of [ 128 ] Black Knight
+2700000:Thorn sword _ one hand usually 1
+2700010:Thorn sword _ one hand usually 2
+2700020:Thorn sword _ one hand usually 3
+2700030:Thorn sword _ one hand jump 1
+2700040:Thorn sword _ one hand fall loop
+2700050:Thorn sword _ one hand fall landing
+2700100:Thorn sword _ one hand Tame 1
+2700110:Thorn sword _ one hand Tame 2
+2700200:Thorn sword _ both hands usually 1
+2700210:Thorn sword _ both hands usually 2
+2700220:Thorn sword _ both hands usually 3
+2700230:Thorn sword _ both hands jump 1
+2700240:Thorn sword _ both hands fall loop
+2700250:Thorn sword _ both hands fall landing
+2700300:Thorn sword _ both hands Tame 1
+2700310:Thorn sword _ both hands Tame 2
+2700400:Thorn sword _ left hand
+2700410:Thorn sword _ one hand a short distance
+2700420:Thorn sword _ both hands close range
+2700430:Thorn sword _ one hand guard
+2700440:Thorn sword guard _ both hands
+2700450:Thorn sword _ Parry
+2700460:_ Thorn sword guard in attack
+2700490:Throw thorn sword _ fall
+2700500:Thorn sword _ behind
+2700505:Thorn sword _ strengthening behind
+2700510:Thorn sword _ Parry after
+2700515:Thorn sword _ strengthening Parry after
+2700516:Thorn sword _ strengthening Parry _ after the second stage
+2700520:Thorn sword _ one hand dash
+2700530:Thorn sword _ both hands Dash
+2700540:Thorn sword _ one hand before
+2700580:Thorn sword _ both hands step before
+2700600:Thorn sword _ Paryigado
+2701100:[ 119 ] mail Breaker _ one hand Tame 1
+2701110:[ 119 ] mail Breaker _ one hand Tame 2
+2701300:[ 119 ] mail Breaker _ both hands Tame 1
+2701310:[ 119 ] mail Breaker _ both hands Tame 2
+2702100:[ 113 ] estoc _ one hand Tame 1
+2702110:[ 113 ] estoc _ one hand Tame 2
+2702300:[ 113 ] estoc _ both hands Tame 1
+2702310:[ 113 ] estoc _ both hands Tame 2
+2703100:[ 114 ] Belka _ one hand Tame 1
+2703110:[ 114 ] Belka _ one hand Tame 2
+2703300:[ 114 ] Belka _ both hands Tame 1
+2703310:[ 114 ] Belka _ both hands Tame 2
+2704100:Thorn sword _ one hand Tame 1 of [ 115 ] aristocracy
+2704110:Thorn sword _ one hand Tame 2 of [ 115 ] aristocracy
+2704300:Thorn sword _ both hands Tame 1 of [ 115 ] aristocracy
+2704310:Thorn sword _ both hands Tame 2 of [ 115 ] aristocracy
+2800000:Song sword _ one hand usually 1
+2800010:Song sword _ one hand usually 2
+2800020:Song sword _ one hand usually 3
+2800030:Song sword _ one hand jump 1
+2800040:Song _ one hand sword fall loop
+2800050:Song _ one hand sword fall landing
+2800100:Song sword _ one hand Tame 1
+2800110:Song sword _ one hand Tame 2
+2800200:Song sword _ both hands usually 1
+2800210:Song sword _ both hands usually 2
+2800220:Song sword _ both hands usually 3
+2800230:Song sword _ both hands jump 1
+2800240:Song sword _ both hands fall loop
+2800250:Song sword _ both hands fall landing
+2800300:Song sword _ both hands Tame 1
+2800310:Song sword _ both hands Tame 2
+2800400:Song sword _ left hand
+2800410:Song sword _ one hand a short distance
+2800420:Song sword _ both hands close range
+2800430:Song _ one hand sword guard
+2800440:Song sword guard _ both hands
+2800450:Song sword _ Parry
+2800490:Throw song sword _ fall
+2800500:Song sword _ behind
+2800505:_ Strengthening songs sword behind
+2800510:Ken Parry song _ after
+2800515:_ Strengthening songs sword after Parry
+2800516:Song sword _ strengthening Parry _ after the second stage
+2800520:Song sword _ one hand dash
+2800530:Song sword _ both hands Dash
+2800540:Song sword _ one hand before
+2800580:Song sword _ both hands step before
+2800600:Song sword _ Paryigado
+2801100:[ 99 ] Shoretel IP Phone Systems _ one hand Tame 1
+2801110:[ 99 ] Shoretel IP Phone Systems _ one hand Tame 2
+2801300:[ 99 ] Shoretel IP Phone Systems _ both hands Tame 1
+2801310:[ 99 ] Shoretel IP Phone Systems _ both hands Tame 2
+2802100:Song sword _ one hand Tame one of the Dead [ 100 ]
+2802110:Song sword _ one hand Tame 2 [ 100 ] of the Dead
+2802300:Song sword _ both hands Tame 1 of [ 100 ] Evil Dead
+2802310:Song sword _ both hands Tame 2 of [ 100 ] Evil Dead
+2803100:[ 101 ] Eremia _ one hand Tame 1
+2803110:[ 101 ] Eremia _ one hand Tame 2
+2803300:[ 101 ] Eremia _ both hands Tame 1
+2803310:[ 101 ] Eremia _ both hands Tame 2
+2804100:[ 56 ] Krag _ one hand Tame 1
+2804110:[ 56 ] Krag _ one hand Tame 2
+2804300:[ 56 ] Krag _ both hands Tame 1
+2804310:[ 56 ] Krag _ both hands Tame 2
+2805100:Song sword _ one hand Tame 1 of 132 ] Kiaran
+2805110:Song sword _ one hand Tame 2 [ 132 ] of Kiaran
+2805300:Song sword _ both hands Tame 1 of [ 132 ] Kiaran
+2805310:Song sword _ both hands Tame 2 of [ 132 ] Kiaran
+2805311:Two -stage song sword hands Tame _ 2_ of [ 132 ] Kiaran
+2805400:Song sword _ _ usually the left hand of the [ 132 ] Kiaran
+2805401:The song left hand sword _ _ reservoir [ 132 ] Kiaran
+2900000:_ One hand sword usually 1
+2900010:_ One hand sword usually 2
+2900020:_ One hand sword usually 3
+2900030:_ One hand sword jump 1
+2900040:_ One hand sword fall loop
+2900050:_ One hand sword fall landing
+2900100:Tame one hand sword _ 1
+2900110:Tame one hand sword _ 2
+2900200:_ Sword hands usually 1
+2900210:_ Sword hands usually 2
+2900220:_ Sword hands usually 3
+2900230:_ Sword hands jump 1
+2900240:_ Sword hands fall loop
+2900250:_ Sword hands fall landing
+2900300:_ Sword hands Tame 1
+2900310:_ Sword hands Tame 2
+2900400:_ Left hand sword
+2900410:_ Sword one hand a short distance
+2900420:Sword _ both hands close range
+2900430:_ One hand sword guard
+2900440:_ Both hands sword guard
+2900450:Sword _ Parry
+2900490:Throw sword _ fall
+2900500:_ Sword behind
+2900505:_ Strengthening sword behind
+2900510:_ Parry sword after
+2900515:Sword _ strengthening Parry after
+2900516:Sword _ strengthening Parry _ after the second stage
+2900520:_ One hand sword dash
+2900530:_ Both hands sword dash
+2900540:_ One hand sword before
+2900580:_ Sword hands step before
+2900600:Sword _ Paryigado
+2901100:[ 89 ] Iaido sword _ one hand Tame 1
+2901110:[ 89 ] Iaido sword _ one hand Tame 2
+2901300:[ 89 ] Iaido sword _ both hands Tame 1
+2901310:[ 89 ] Iaido sword _ both hands Tame 2
+2902100:Tame one hand blade _ 1 [ 90 ] of chaos
+2902110:Tame one hand blade _ 2 [ 90 ] chaos
+2902300:Blade _ both hands Tame 1 of [ 90 ] chaos
+2902310:Blade _ both hands Tame 2 of [ 90 ] chaos
+3000000:Ax _ one hand usually 1
+3000010:Ax _ one hand usually 2
+3000020:Ax _ one hand usually 3
+3000030:Ax _ one hand jump 1
+3000040:_ One hand ax fall loop
+3000050:_ One hand ax fall landing
+3000100:Tame one hand ax _ 1
+3000110:Tame one hand ax _ 2
+3000200:Ax _ both hands usually 1
+3000210:Ax _ both hands usually 2
+3000220:Ax _ both hands usually 3
+3000230:Ax _ both hands jump 1
+3000240:Ax _ both hands fall loop
+3000250:Ax _ both hands fall landing
+3000300:Ax _ both hands Tame 1
+3000310:Ax _ both hands Tame 2
+3000400:_ Left hand ax
+3000410:Ax _ one hand a short distance
+3000420:Ax _ both hands close range
+3000430:Ax _ one hand guard
+3000440:Ax _ both hands guard
+3000450:Ax _ Parry
+3000490:Throw ax _ fall
+3000500:_ Ax behind
+3000501:_ Ax _ behind two撃目
+3000505:Ax _ strengthening behind
+3000506:_ Ax _ strengthening behind two -stage
+3000510:Ax _ Parry after
+3000511:_ Ax _ Parry after two撃目
+3000515:Ax _ strengthening Parry after
+3000516:_ Ax _ strengthening Parry after the second stage
+3000517:_ Ax _ strengthening Parry after the third stage
+3000520:One hand ax _ Dash
+3000530:Ax _ both hands Dash
+3000540:Ax _ one hand before
+3000580:Ax _ both hands step before
+3000600:Ax _ Paryigado
+3001000:[ 102 ] hand _ one hand usually 1
+3001010:[ 102 ] hand _ one hand usually 2
+3001020:[ 102 ] hand _ one hand usually 3
+3001100:[ 102 ] hand _ one hand Tame 1
+3001110:[ 102 ] hand _ one hand Tame 2
+3001200:[ 102 ] hand _ both hands usually 1
+3001210:[ 102 ] hand _ both hands usually 2
+3001220:[ 102 ] hand _ both hands usually 3
+3001300:[ 102 ] hand _ both hands Tame 1
+3001310:[ 102 ] hand _ both hands Tame 2
+3001400:[ 102 ] hand _ the left hand
+3002100:[ 104 ] Iron Axe _ one hand Tame 1
+3002110:[ 104 ] Iron Axe _ one hand Tame 2
+3002120:[ 104 ] Iron Axe _ one hand Tame 1 / magic sword upon activation
+3002130:[ 104 ] Iron Axe _ one hand Tame 2 / magic sword upon activation
+3002300:[ 104 ] Iron Axe _ both hands Tame 1
+3002301:[ 104 ] Iron Axe _ 1_ Tame both hands around
+3002310:[ 104 ] Iron Axe _ both hands Tame 2
+3002800:[ 104 ] Iron Axe _ _ one hand magic attack
+3003100:[ 103 ] cleaver _ one hand Tame 1
+3003110:[ 103 ] cleaver _ one hand Tame 2
+3003300:[ 103 ] cleaver _ both hands Tame 1
+3003310:[ 103 ] cleaver _ both hands Tame 2
+3004100:Ohno _ one hand Tame 1 of [ 125 ] Gargoyle
+3004110:Ohno _ one hand Tame 2 of [ 125 ] Gargoyle
+3004300:Ohno _ both hands Tame 1 of [ 125 ] Gargoyle
+3004310:Ohno _ both hands Tame 2 of [ 125 ] Gargoyle
+3200000:Broad ax _ one hand usually 1
+3200010:Broad ax _ one hand usually 2
+3200020:Broad ax _ one hand usually 3
+3200030:Broad ax _ one hand jump 1
+3200040:_ One hand broad ax fall loop
+3200050:_ One hand broad ax fall landing
+3200100:Tame one hand broad ax _ 1
+3200101:Tame one hand broad ax _ 1_ peripheral ( small)
+3200110:Tame one hand broad ax _ 2
+3200200:Broad ax _ both hands usually 1
+3200210:Broad ax _ both hands usually 2
+3200220:Broad ax _ both hands usually 3
+3200230:Broad ax _ both hands jump 1
+3200240:Broad ax _ both hands fall loop
+3200250:Broad ax _ both hands fall landing
+3200300:Broad ax _ both hands Tame 1_ center
+3200301:Broad ax _ 1_ Tame both hands around
+3200310:Broad ax _ both hands Tame 2
+3200400:Broad ax _ left hand
+3200410:Broad ax _ one hand a short distance
+3200420:Broad ax _ both hands close range
+3200430:Broad ax _ one hand guard
+3200440:Broad ax _ both hands guard
+3200450:Broad ax _ Parry
+3200490:Throw broad ax _ fall
+3200500:Broad ax _ behind
+3200501:Broad ax _ _ behind two撃目
+3200505:Broad ax _ strengthening behind
+3200506:Broad ax _ strengthening behind _ two -stage
+3200510:Broad ax _ Parry after
+3200511:Parry broad ax _ after _ two撃目
+3200515:Broad ax _ strengthening Parry after
+3200516:Broad ax _ strengthening Parry _ after the second stage
+3200517:Broad ax _ strengthening Parry _ after the third stage
+3200520:Broad ax _ one hand dash
+3200530:Broad ax _ both hands Dash
+3200540:Broad ax _ one hand before
+3200580:Broad ax _ both hands step before
+3200600:Broad ax _ Paryigado
+3201300:Large ax _ both hands Tame 1 of [ 106 ] Dragon King
+3201301:Large ax _ 1_ Tame both hands around the [ 106 ] Dragon King
+3201310:Large ax _ both hands Tame 2 of [ 106 ] Dragon King
+3201320:Large ax _ both hands Tame 1 / magic sword upon activation of [ 106 ] Dragon King
+3201330:Large ax _ both hands Tame 2 / magic sword upon activation of [ 106 ] Dragon King
+3201800:Large ax _ hands _ magic attack of [ 106 ] Dragon King
+3202100:Tame one hand broad ax _ 1 [ 105 ] daemon
+3202110:Tame one hand broad ax _ 2 of [ 105 ] daemon
+3202300:Broad ax _ both hands Tame 1 of [ 105 ] daemon
+3202310:Broad ax _ both hands Tame 2 of [ 105 ] daemon
+3203000:Large ax _ one hand usually one of [ 107 ] Black Knight
+3203010:Large ax _ one hand usually 2 of [ 107 ] Black Knight
+3203020:Large ax _ one hand usually 3 of [ 107 ] Black Knight
+3203100:Large ax _ one hand Tame 1 of [ 107 ] Black Knight
+3203110:Large ax _ one hand Tame 2 of [ 107 ] Black Knight
+3203200:Large ax _ both hands usually one of the [ 107 ] Black Knight
+3203210:Large ax _ both hands usually 2 of [ 107 ] Black Knight
+3203220:Large ax _ both hands usually 3 of [ 107 ] Black Knight
+3203300:Large ax _ both hands Tame 1 of [ 107 ] Black Knight
+3203310:Large ax _ both hands Tame 2 of [ 107 ] Black Knight
+3204100:Stone ax _ one hand Tame 1 of [ 133 ] clay figure
+3204110:Stone ax _ one hand Tame 2 of [ 133 ] clay figure
+3204300:Stone ax _ both hands Tame 1 of [ 133 ] clay figure
+3204310:Stone ax _ both hands Tame 2 of [ 133 ] clay figure
+3300000:Hammer _ one hand usually 1
+3300010:Hammer _ one hand usually 2
+3300020:Hammer _ one hand usually 3
+3300030:Hammer _ one hand jump 1
+3300040:_ One hand hammer fall loop
+3300050:_ One hand hammer fall landing
+3300100:Hammer _ one hand Tame 1
+3300110:Tame one hand hammer _ 2
+3300200:Hammer _ both hands usually 1
+3300210:Hammer _ both hands usually 2
+3300220:Hammer _ both hands usually 3
+3300230:_ Hammer hands jump 1
+3300240:_ Both hands falling hammer loop
+3300250:Hammer _ both hands fall landing
+3300300:_ Hammer hands Tame 1
+3300310:_ Hammer hands Tame 2
+3300400:_ Left hand hammer
+3300410:Hammer _ one hand a short distance
+3300420:Hammer _ both hands close range
+3300430:Hammer _ one hand guard
+3300440:_ Hammer hands guard
+3300450:Hammer _ Parry
+3300490:Hammer throw _ fall
+3300500:_ Hammer behind
+3300501:_ _ Hammer behind two撃目
+3300505:Hammer _ strengthening behind
+3300506:Hammer _ strengthening behind _ two -stage
+3300510:Hammer _ Parry after
+3300511:Parry hammer _ after _ two撃目
+3300515:Hammer _ strengthening Parry after
+3300516:Hammer _ strengthening Parry _ after the second stage
+3300517:Hammer _ strengthening Parry _ after the third stage
+3300520:Hammer _ one hand dash
+3300530:_ Hammer hands Dash
+3300540:Hammer _ one hand before
+3300580:_ Hammer hands step before
+3300600:Hammer _ Paryigado
+3301000:[ 60 ] War _ one hand usually pick one
+3301010:[ 60 ] War _ Pick one hand usually 2
+3301020:[ 60 ] War _ Pick one hand usually 3
+3301030:[ 60 ] War _ Pick one hand jump 1
+3301040:[ 60 ] War _ Pick one hand fall loop
+3301050:[ 60 ] War _ Pick one hand fall landing
+3301100:[ 60 ] War _ Pick one hand Tame 1
+3301110:[ 60 ] War _ Pick one hand Tame 2
+3301200:[ 60 ] War _ both hands usually pick one
+3301210:[ 60 ] War _ both hands usually pick two
+3301220:[ 60 ] War pick _ both hands usually 3
+3301230:[ 60 ] War pick _ both hands jump 1
+3301240:[ 60 ] War pick _ both hands fall loop
+3301250:[ 60 ] War pick _ both hands fall landing
+3301300:[ 60 ] War pick _ both hands Tame 1
+3301310:[ 60 ] War pick _ both hands Tame 2
+3301400:[ 60 ] War pick _ left hand
+3301490:[ 60 ] throw War pick _ fall
+3301500:[ 60 ] War pick _ behind
+3301501:[ 60 ] War pick _ _ behind two撃目
+3301505:[ 60 ] War pick _ strengthening behind
+3301506:[ 60 ] War pick _ strengthening behind _ two -stage
+3301510:[ 60 ] War pick _ Parry after
+3301511:[ 60 ] War pick _ Parry _ after two撃目
+3301515:[ 60 ] War pick _ strengthening Parry after
+3301516:[ 60 ] War pick _ strengthening Parry _ after the second stage
+3301517:[ 60 ] War pick _ strengthening Parry _ after the third stage
+3301520:[ 60 ] War _ Pick one hand dash
+3301530:[ 60 ] War pick _ both hands Dash
+3301540:[ 60 ] War _ Pick one hand before
+3301580:[ 60 ] War pick _ both hands step before
+3302000:[ ] Club _ one hand usually 1
+3302010:[ ] Club _ one hand usually 2
+3302020:[ ] Club _ one hand usually 3
+3302030:[ ] Club _ one hand jump 1
+3302040:[ ] Club _ one hand fall loop
+3302050:[ ] Club _ one hand fall landing
+3302100:[ ] Club _ one hand Tame 1
+3302110:[ ] Club _ one hand Tame 2
+3302200:[ ] Club _ both hands usually 1
+3302210:[ ] Club _ both hands usually 2
+3302220:[ ] Club _ both hands usually 3
+3302230:[ ] Club _ both hands jump 1
+3302240:[ ] Club _ both hands fall loop
+3302250:[ ] Club _ both hands fall landing
+3302300:[ ] Club _ both hands Tame 1
+3302310:[ ] Club _ both hands Tame 2
+3302400:[ _ ] Club left hand
+3302490:[ Throw ] Club _ fall
+3302500:[ _ ] Club behind
+3302501:[ ] _ Club _ behind two撃目
+3302505:[ ] Club _ strengthening behind
+3302506:[ ] _ Club _ strengthening behind two -stage
+3302510:[ _ ] Club after Parry
+3302511:[ ] _ Club _ Parry after two撃目
+3302515:[ ] Club _ strengthening Parry after
+3302516:[ ] _ Club _ strengthening Parry after the second stage
+3302517:[ ] _ Club _ strengthening Parry after the third stage
+3302520:[ ] Club _ one hand dash
+3302530:[ ] Club _ both hands Dash
+3302540:[ ] Club _ one hand before
+3302580:[ ] Club _ both hands step before
+3303000:[ 61 ] picks _ one hand usually 1
+3303010:[ 61 ] picks _ one hand usually 2
+3303020:[ 61 ] picks _ one hand usually 3
+3303030:[ 61 ] picks _ one hand jump 1
+3303040:[ 61 ] picks _ one hand fall loop
+3303050:[ 61 ] picks _ one hand fall landing
+3303100:[ 61 ] picks _ one hand Tame 1
+3303110:[ 61 ] picks _ one hand Tame 2
+3303200:[ 61 ] pickaxe _ both hands usually 1
+3303210:[ 61 ] pickaxe _ both hands usually 2
+3303220:[ 61 ] pickaxe _ both hands usually 3
+3303230:[ 61 ] pickaxe _ both hands jump 1
+3303240:[ 61 ] pickaxe _ both hands fall loop
+3303250:[ 61 ] pickaxe _ both hands fall landing
+3303300:[ 61 ] pickaxe _ both hands Tame 1
+3303310:[ 61 ] pickaxe _ both hands Tame 2
+3303400:[ 61 ] _ pickaxe left hand
+3303490:[ 61 ] throw pickaxe _ fall
+3303500:[ 61 ] _ pickaxe behind
+3303501:[ 61 ] pickaxe _ _ behind two撃目
+3303505:[ 61 ] pickaxe _ strengthening behind
+3303506:[ 61 ] pickaxe _ strengthening behind _ two -stage
+3303510:[ 61 ] _ pickaxe after Parry
+3303511:[ 61 ] Parry pickaxe _ after _ two撃目
+3303515:[ 61 ] pickaxe _ strengthening Parry after
+3303516:[ 61 ] pickaxe _ strengthening Parry _ after the second stage
+3303517:[ 61 ] pickaxe _ strengthening Parry _ after the third stage
+3303520:[ 61 ] picks _ one hand dash
+3303530:[ 61 ] pickaxe _ both hands Dash
+3303540:[ 61 ] picks _ one hand before
+3303580:[ 61 ] pickaxe _ both hands step before
+3500000:Otsuchi _ one hand usually 1
+3500010:Otsuchi _ one hand usually 2
+3500020:Otsuchi _ one hand usually 3
+3500030:Otsuchi _ one hand jump 1
+3500040:Otsuchi _ dropping one hand loop
+3500050:Otsuchi _ dropping one hand landing
+3500100:Otsuchi _ one hand Tame 1
+3500101:Otsuchi _ 1_ Tame one hand around ( small)
+3500110:Otsuchi _ one hand Tame 2
+3500200:Otsuchi _ both hands usually 1
+3500210:Otsuchi _ both hands usually 2
+3500220:Otsuchi _ both hands usually 3
+3500230:Otsuchi _ both hands jump 1
+3500240:Otsuchi _ both hands fall loop
+3500250:Otsuchi _ both hands fall landing
+3500300:Otsuchi _ both hands Tame 1_ center
+3500301:Otsuchi _ 1_ Tame both hands around
+3500310:Otsuchi _ both hands Tame 2
+3500400:_ Sledgehammer left hand
+3500410:Otsuchi _ one hand a short distance
+3500420:Otsuchi _ both hands close range
+3500430:Otsuchi _ one hand guard
+3500440:Otsuchi _ both hands guard
+3500450:Otsuchi _ Parry
+3500490:Throw sledgehammer _ fall
+3500500:Otsuchi _ behind
+3500501:Otsuchi _ _ behind two撃目
+3500505:Otsuchi _ strengthening behind
+3500506:Otsuchi _ strengthening behind _ two -stage
+3500510:Otsuchi _ Parry after
+3500511:Otsuchi _ Parry _ after two撃目
+3500515:Otsuchi _ strengthening Parry after
+3500516:Otsuchi _ strengthening Parry _ after the second stage
+3500517:Otsuchi _ strengthening Parry _ after the third stage
+3500520:Otsuchi _ one hand dash
+3500530:Otsuchi _ both hands Dash
+3500540:Otsuchi _ one hand before
+3500580:Otsuchi _ both hands step before
+3500600:Otsuchi _ Paryigado
+3500800:Otsuchi _ magic attack
+3501100:[ 69 ] Great club _ one hand Tame 1
+3501110:[ 69 ] Great club _ one hand Tame 2
+3501300:[ 69 ] Great club _ both hands Tame 1_ center
+3501310:[ 69 ] Great club _ both hands Tame 2
+3502100:[ 124 ]蛮兵_ one hand Tame 1
+3502110:[ 124 ]蛮兵_ one hand Tame 2
+3502300:[ 124 ] both hands Tame蛮兵_ 1_ center
+3502310:[ 124 ]蛮兵_ both hands Tame 2
+3503100:[ 70 ] Sumo _ one hand Tame 1
+3503101:[ 70 ] Sumo _ 1_ Tame one hand around ( small)
+3503110:[ 70 ] Sumo _ one hand Tame 2
+3503300:[ 70 ] Sumo _ both hands Tame 1_ center
+3503310:[ 70 ] Sumo _ both hands Tame 2
+3600000:Spear _ one hand usually 1
+3600010:Spear _ one hand usually 2
+3600020:Spear _ one hand usually 3
+3600030:Spear _ one hand jump 1
+3600040:Spear _ one hand fall loop
+3600050:Spear _ one hand fall landing
+3600100:Tame one hand spear _ 1
+3600110:Tame one hand spear _ 2
+3600200:Spear _ both hands usually 1
+3600210:Spear _ both hands usually 2
+3600220:Spear _ both hands usually 3
+3600230:Spear _ both hands jump 1
+3600240:Spear _ both hands fall loop
+3600250:Spear _ both hands fall landing
+3600300:Spear _ both hands Tame 1
+3600310:Spear _ both hands Tame 2
+3600400:_ Left hand spear
+3600410:Spear _ one hand a short distance
+3600420:Spear _ both hands close range
+3600430:Spear _ one hand guard
+3600440:Spear _ both hands guard
+3600450:Spear _ Parry
+3600460:Spear _ guard during attack
+3600490:Throw spears _ fall
+3600500:_ Spear behind
+3600505:Spear _ strengthening behind
+3600510:Spear _ Parry after
+3600515:Spear _ strengthening Parry after
+3600516:Spear _ strengthening Parry _ after the second stage
+3600520:_ One hand spear dash
+3600530:Spear _ both hands Dash
+3600540:Spear _ one hand before
+3600580:Spear _ both hands step before
+3600600:Spear _ Paryigado
+3601100:[ 67 ] Pike _ one hand Tame 1
+3601110:[ 67 ] Pike _ one hand Tame 2
+3601300:[ 67 ] Pike _ both hands Tame 1
+3601310:[ 67 ] Pike _ both hands Tame 2
+3601520:[ 67 ] Pike _ one hand dash
+3601521:[ 67 ] Pike _ one hand dash (Set )
+3601530:[ 67 ] Pike _ both hands Dash
+3601531:[ 67 ] Pike _ both hands dash (Set )
+3602100:[ 65 ] six eyes _ one hand Tame 1
+3602101:Two撃目[ 65 ] six eyes _ one hand Tame 1_
+3602110:[ 65 ] six eyes _ one hand Tame 2
+3603100:Tame one hand spear _ 1 [ 68 ] of dragon hunting
+3603110:Tame one hand spear _ 2 [ 68 ] dragon hunt
+3603120:Spear _ one hand Tame 1 / magic sword upon activation of [ 68 ] dragon hunt
+3603130:Tame one hand spear _ 2 / magic sword upon activation of [ 68 ] dragon hunt
+3603300:Spear _ both hands Tame 1 of [ 68 ] dragon hunt
+3603310:Spear _ both hands Tame 2 of [ 68 ] dragon hunt
+3604100:[ 63 ] partisans _ one hand Tame 1
+3604110:[ 63 ] partisans _ one hand Tame 2
+3604300:[ 63 ] partisans _ both hands Tame 1
+3604310:[ 63 ] partisans _ both hands Tame 2
+3605100:Spear _ one hand Tame 1 of 64 ] daemon
+3605110:Tame one hand spear _ 2 [ 64 ] daemon
+3605300:Spear _ both hands Tame 1 of [ 64 ] daemon
+3605310:Spear _ both hands Tame 2 of [ 64 ] daemon
+3606100:Tame one hand spear _ 1 of the 66 silver knight
+3606110:Tame one hand spear _ 2 [ 66 ] Silver Knight
+3606300:Spear _ both hands Tame 1 of [ 66 ] Silver Knight
+3606310:Spear _ both hands Tame 2 of [ 66 ] Silver Knight
+3607300:[ 134 ] Garden fork _ both hands Tame 1
+3607301:[ 134 ] Garden fork _ both hands Tame 2_ swing away
+3800000:Onoyari _ one hand usually 1
+3800010:Onoyari _ one hand usually 2
+3800020:Onoyari _ one hand usually 3
+3800030:Onoyari _ one hand jump 1
+3800040:Onoyari _ dropping one hand loop
+3800050:Onoyari _ dropping one hand landing
+3800100:Onoyari _ one hand Tame 1
+3800110:Onoyari _ one hand Tame 2
+3800200:Onoyari _ both hands usually 1
+3800210:Onoyari _ both hands usually 2
+3800220:Onoyari _ both hands usually 3
+3800230:Onoyari _ both hands jump 1
+3800240:Onoyari _ both hands fall loop
+3800250:Onoyari _ both hands fall landing
+3800300:Onoyari _ both hands Tame 1
+3800301:Two撃目Onoyari _ both hands Tame 1_
+3800310:Onoyari _ both hands Tame 2
+3800400:Onoyari _ left hand
+3800410:Onoyari _ one hand a short distance
+3800420:Onoyari _ both hands close range
+3800430:Onoyari _ one hand guard
+3800440:Onoyari _ both hands guard
+3800450:Onoyari _ Parry
+3800490:Throw Onoyari _ fall
+3800500:Onoyari _ behind
+3800505:Onoyari _ strengthening behind
+3800510:Onoyari _ Parry after
+3800515:Onoyari _ strengthening Parry after
+3800516:Onoyari _ strengthening Parry _ after the second stage
+3800520:Onoyari _ one hand dash
+3800530:Onoyari _ both hands Dash
+3800540:Onoyari _ one hand before
+3800580:Onoyari _ both hands step before
+3800600:Onoyari _ Paryigado
+3801000:[ Size ] ( slashing ) _ one hand usually 1
+3801010:[ Size ] ( slashing ) _ one hand usually 2
+3801020:[ Size ] ( slashing ) _ one hand usually 3
+3801030:[ Size ] ( slashing ) _ one hand jump 1
+3801040:[ Size ] ( slashing ) _ dropping one hand loop
+3801050:[ Size ] ( slashing ) _ dropping one hand landing
+3801100:[ Size ] ( slashing ) _ one hand Tame 1
+3801110:[ Size ] ( slashing ) _ one hand Tame 2
+3801200:[ Size ] ( slashing ) _ both hands usually 1
+3801210:[ Size ] ( slashing ) _ both hands usually 2
+3801220:[ Size ] ( slashing ) _ both hands usually 3
+3801230:[ Size ] ( slashing ) _ both hands jump 1
+3801240:[ Size ] ( slashing ) _ both hands fall loop
+3801250:[ Size ] ( slashing ) _ both hands fall landing
+3801300:[ Size ] ( slashing ) _ both hands Tame 1
+3801301:Two撃目( slashing ) _ both hands Tame 1_ [ ] size
+3801310:[ Size ] ( slashing ) _ both hands Tame 2
+3801400:[ Size ] ( slashing ) _ left hand
+3801490:[ Size ] Throw ( slashing ) _ fall
+3801500:[ Size ] ( slashing ) _ behind
+3801505:[ Size ] ( slashing ) _ strengthening behind
+3801510:[ Size ] ( slashing ) _ Parry after
+3801515:[ Size ] ( slashing ) _ strengthening Parry after
+3801516:[ Size ] ( slashing ) _ strengthening Parry _ after the second stage
+3801520:[ Size ] ( slashing ) _ one hand dash
+3801530:[ Size ] ( slashing ) _ both hands Dash
+3801540:[ Size ] ( slashing ) _ one hand before
+3801580:[ Size ] ( slashing ) _ both hands step before
+3802000:[ 109 ] Lucerne ( piercing ) _ one hand usually 1
+3802010:[ 109 ] Lucerne ( piercing ) _ one hand usually 2
+3802020:[ 109 ] Lucerne ( piercing ) _ one hand usually 3
+3802030:[ 109 ] Lucerne ( piercing ) _ one hand jump 1
+3802040:[ 109 ] Lucerne ( piercing ) _ dropping one hand loop
+3802050:[ 109 ] Lucerne ( piercing ) _ dropping one hand landing
+3802100:[ 109 ] Lucerne ( piercing ) _ one hand Tame 1
+3802110:[ 109 ] Lucerne ( piercing ) _ one hand Tame 2
+3802200:[ 109 ] Lucerne ( piercing ) _ both hands usually 1
+3802210:[ 109 ] Lucerne ( piercing ) _ both hands usually 2
+3802220:[ 109 ] Lucerne ( piercing ) _ both hands usually 3
+3802230:[ 109 ] Lucerne ( piercing ) _ both hands jump 1
+3802240:[ 109 ] Lucerne ( piercing ) _ both hands fall loop
+3802250:[ 109 ] Lucerne ( piercing ) _ both hands fall landing
+3802300:[ 109 ] Lucerne ( piercing ) _ both hands Tame 1
+3802301:Two撃目( piercing ) _ both hands Tame 1_ [ 109 ] Lucerne
+3802310:[ 109 ] Lucerne ( piercing ) _ both hands Tame 2
+3802400:[ 109 ] Lucerne ( piercing ) _ left hand
+3802490:[ 109 ] Lucerne Throw ( piercing ) _ fall
+3802500:[ 109 ] Lucerne ( piercing ) _ behind
+3802505:[ 109 ] Lucerne ( piercing ) _ strengthening behind
+3802510:[ 109 ] Lucerne ( piercing ) _ Parry after
+3802515:[ 109 ] Lucerne ( piercing ) _ strengthening Parry after
+3802516:[ 109 ] Lucerne ( piercing ) _ strengthening Parry _ after the second stage
+3802520:[ 109 ] Lucerne ( piercing ) _ one hand dash
+3802530:[ 109 ] Lucerne ( piercing ) _ both hands Dash
+3802540:[ 109 ] Lucerne ( piercing ) _ one hand before
+3802580:[ 109 ] Lucerne ( piercing ) _ both hands step before
+3803100:Halberd _ one hand Tame 1 of [ 110 ] giant
+3803110:Halberd _ one hand Tame 2 of [ 110 ] giant
+3803300:Halberd _ both hands Tame 1 of [ 110 ] giant
+3803310:Halberd _ both hands Tame 2 of [ 110 ] giant
+3804100:[ 111 ] dress _ one hand Tame 1
+3804110:[ 111 ] dress _ one hand Tame 2
+3804300:[ 111 ] dress _ both hands Tame 1
+3804310:[ 111 ] dress _ both hands Tame 2
+3805100:Onoyari _ one hand Tame 1 of [ 112 ] Black Knight
+3805110:Onoyari _ one hand Tame 2 of [ 112 ] Black Knight
+3805300:Onoyari _ both hands Tame 1 of [ 112 ] Black Knight
+3805310:Onoyari _ both hands Tame 2 of [ 112 ] Black Knight
+5000000:Sickle _ one hand usually 1
+5000010:Sickle _ one hand usually 2
+5000020:Sickle _ one hand usually 3
+5000030:Sickle _ one hand jump 1
+5000040:Sickle _ dropping one hand loop
+5000050:Sickle _ dropping one hand landing
+5000100:Sickle _ one hand Tame 1
+5000110:Sickle _ one hand Tame 2
+5000200:Sickle _ both hands usually 1
+5000210:Sickle _ both hands usually 2
+5000220:Sickle _ both hands usually 3
+5000230:Sickle _ both hands jump 1
+5000240:Sickle _ both hands fall loop
+5000250:Sickle _ both hands fall landing
+5000300:Sickle _ both hands Tame 1
+5000310:Sickle _ both hands Tame 2
+5000400:Sickle _ left hand
+5000410:Sickle _ one hand a short distance
+5000420:Sickle _ both hands close range
+5000430:Sickle _ one hand guard
+5000440:Sickle _ both hands guard
+5000450:Sickle _ Parry
+5000490:Throw sickle _ fall
+5000500:Sickle _ behind
+5000505:Sickle _ strengthening behind
+5000510:Sickle _ Parry after
+5000515:Sickle _ strengthening Parry after
+5000516:Sickle _ strengthening Parry _ after the second stage
+5000520:Sickle _ one hand dash
+5000530:Sickle _ both hands Dash
+5000540:Sickle _ one hand before
+5000580:Sickle _ both hands step before
+5000600:Sickle _ Paryigado
+4100100:Catalyst _ one hand Tame 1
+4100300:Catalyst _ both hands Tame 1
+4100400:Catalyst _ left hand
+4100430:Catalyst _ one hand guard
+4100440:Catalyst _ both hands guard
+4101100:Cane _ one hand Tame 1
+4101300:Cane _ both hands Tame 1
+4101400:Cane _ left hand
+4102100:[ 127 ] Yaritsue _ one hand Tame 1
+4102300:[ 127 ] Yaritsue _ both hands Tame 1
+4102400:[ 127 ] Yaritsue _ left hand
+4103100:[ 121 ] lantern _ one hand Tame 1
+4103300:[ 121 ] lantern _ both hands Tame 1
+4103400:[ 121 ] lantern _ left hand
+4103410:[ 121 ] lantern _ one hand a short distance
+4103420:[ 121 ] lantern _ both hands close range
+4104100:Main _ one hand Tame 1 [ 136 ] of abyss
+4104110:Main _ one hand Tame 2 of [ 136 ] abyss
+4104300:Main _ both hands Tame 1 of [ 136 ] abyss
+4104310:Main _ both hands Tame 2 of [ 136 ] abyss
+4104400:_ The left hand of the main [ 136 ] abyss
+4200000:_ Fist one hand usually 1
+4200010:_ Fist one hand usually 2
+4200020:_ Fist one hand usually 3
+4200030:_ Fist one hand jump 1
+4200040:Fist _ fall one hand loop
+4200050:One hand fist _ fall landing
+4200100:Tame one hand fist _ 1
+4200110:Tame one hand fist _ 2
+4200400:_ Left hand fist
+4200410:_ Fist one hand a short distance
+4200430:_ Fist one hand guard
+4200450:Fist _ Parry
+4200490:Throw fist _ fall
+4200500:_ Fist behind
+4200501:_ _ Fist behind two撃目
+4200505:Fist _ strengthening behind
+4200510:_ Fist after Parry
+4200511:Parry fist _ after _ two撃目
+4200515:Fist _ strengthening Parry after
+4200516:Fist _ strengthening Parry _ after the second stage
+4200517:Fist _ strengthening Parry _ after the third stage
+4200520:_ Fist one hand dash
+4200540:_ Fist one hand before
+4200600:Fist _ Paryigado
+4200700:_ Ladder right fist attack
+4200701:Fist _ ladder left hand attack
+4200702:_ Fist right foot ladder attack
+4200703:_ Fist left foot ladder attack
+4200900:[ 117 ] RyuKen _ one hand usually
+4200901:[ 117 ] RyuKen _ one hand large
+4200902:[ 117 ] RyuKen _ left hand
+4200903:[ 117 ] RyuKen _ one hand dash
+4200904:[ 117 ] RyuKen _ one hand
+4200905:[ 117 ] RyuKen _ one hand jump attack
+4200906:[ 117 ] RyuKen _ one hand falling attack
+4200907:[ 117 ] RyuKen _ attack _ dropping one hand around
+4202000:[ 86 ] claws _ one hand usually 1
+4202010:[ 86 ] claws _ one hand usually 2
+4202020:[ 86 ] claws _ one hand usually 3
+4202030:[ 86 ] claws _ one hand jump 1
+4202040:[ 86 ] claws _ one hand fall loop
+4202050:[ 86 ] claws _ one hand fall landing
+4202100:[ 86 ] claws _ one hand Tame 1
+4202110:[ 86 ] claws _ one hand Tame 2
+4202400:[ 86 ] claws left hand _
+4202490:[ 86 ] throw claws _ fall
+4202500:[ 86 ] talon _ behind
+4202501:[ 86 ] claws _ _ behind two撃目
+4202505:[ 86 ] claws _ strengthening behind
+4202510:[ 86 ] claws _ Parry after
+4202511:[ 86 ] claws _ Parry _ after two撃目
+4202515:[ 86 ] claws _ strengthening Parry after
+4202516:[ 86 ] claws _ strengthening Parry _ after the second stage
+4202517:[ 86 ] claws _ strengthening Parry _ after the third stage
+4202520:[ 86 ] claws _ one hand dash
+4202540:[ 86 ] claws _ one hand before
+4203100:[ 123 ] Dakuhan _ one hand Tame 1
+4203110:[ 123 ] Dakuhan _ one hand Tame 2
+4203120:[ 123 ] Dark Hand _ one hand Tame 1 / magic upon activation
+4203130:[ 123 ] Dark Hand _ one hand Tame 2 / magic upon activation
+4203400:[ 123 ] dark hand _ the left hand
+4203405:[ 123 ] Dark Hand _ left hand / magic upon activation
+4203430:[ 123 ] Dark Hand _ one hand guard
+4204100:[ 87 ] large keel _ one hand Tame 1
+4204110:[ 87 ] large keel _ one hand Tame 2
+4400000:Bow _ one hand usually
+4400100:Bow _ one hand Tame
+4400200:Bow _ both hands usually
+4400300:Bow _ both hands Tame
+4400400:_ Left hand bow
+4400410:Bow _ one hand a short distance
+4400420:Bow _ both hands close range
+4400430:Bow _ one hand guard
+4400440:Bow _ both hands guard
+4400450:Bow _ Parry
+4400500:Bow _ behind
+4400510:Bow _ Parry after
+4400520:Bow _ one hand dash
+4400530:Bow _ both hands Dash
+4400540:Bow _ one hand before
+4400580:Bow _ both hands step before
+4400600:Bow _ Paryigado
+4600000:Crossbow _ one hand usually
+4600100:Crossbow _ one hand Tame
+4600200:Crossbow _ both hands usually
+4600300:Crossbow _ both hands Tame
+4600400:Crossbow _ left hand
+4600410:Crossbow _ one hand a short distance
+4600420:Crossbow _ both hands close range
+4600430:Crossbow _ one hand guard
+4600440:Crossbow _ both hands guard
+4600450:Crossbow _ Parry
+4600500:Crossbow _ behind
+4600510:Crossbow _ Parry after
+4600520:Crossbow _ one hand dash
+4600530:Crossbow _ both hands Dash
+4600540:Crossbow _ one hand before
+4600580:Crossbow _ both hands step before
+4600600:Crossbow _ Paryigado
+4700000:Large shield _ one hand usually 1
+4700010:Large shield _ one hand usually 2
+4700020:Large shield _ one hand usually 3
+4700030:Large shield _ one hand jump 1
+4700040:Large shield _ dropping one hand loop
+4700050:Large shield _ dropping one hand landing
+4700100:Large shield _ one hand Tame 1
+4700110:Large shield _ one hand Tame 2
+4700200:Large shield _ both hands usually 1
+4700210:Large shield _ both hands usually 2
+4700220:Large shield _ both hands usually 3
+4700230:Large shield _ both hands jump 1
+4700240:Large shield _ both hands fall loop
+4700250:Large shield _ both hands fall landing
+4700300:Large shield _ both hands Tame 1
+4700310:Large shield _ both hands Tame 2
+4700400:Large shield _ left hand
+4700410:Large shield _ one hand a short distance
+4700420:Large shield _ both hands close range
+4700430:Large shield _ one hand guard
+4700440:Large shield _ both hands guard
+4700520:Large shield _ one hand dash
+4700521:Large shield _ one hand _ Dash Dash
+4700530:Large shield _ both hands Dash
+4700531:Large shield _ hands _ Dash Dash
+4700540:Large shield _ one hand before
+4700580:Large shield _ both hands step before
+4700600:Large shield _ Paryigado
+4700601:Large shield _ general-purpose range
+4702100:[ 126 ] wheel _ one hand Tame 1
+4702110:[ 126 ] wheel _ one hand Tame 2
+4702300:[ 126 ] wheel _ both hands Tame 1
+4702310:[ 126 ] wheel _ both hands Tame 2
+4702400:[ 126 ] left hand wheel _
+4800000:Shield _ one hand usually 1
+4800010:Shield _ one hand usually 2
+4800020:Shield _ one hand usually 3
+4800030:Shield _ one hand jump 1
+4800040:Shield _ dropping one hand loop
+4800050:Shield _ dropping one hand landing
+4800100:Shield _ one hand Tame 1
+4800110:Shield _ one hand Tame 2
+4800200:Shield _ both hands usually 1
+4800210:Shield _ both hands usually 2
+4800220:Shield _ both hands usually 3
+4800230:Shield _ both hands jump 1
+4800240:Shield _ both hands fall loop
+4800250:Shield _ both hands fall landing
+4800300:Shield _ both hands Tame 1
+4800301:Shield _ both hands Tame 1_ Dash
+4800310:Shield _ both hands Tame 2
+4800400:Shield _ left hand
+4800410:Shield _ one hand a short distance
+4800420:Shield _ both hands close range
+4800430:Shield _ one hand guard
+4800440:Shield _ both hands guard
+4800450:Shield _ Parry
+4800520:Shield _ one hand dash
+4800521:Shield _ one hand _ Dash Dash
+4800530:Shield _ both hands Dash
+4800531:Shield _ hands _ Dash Dash
+4800540:Shield _ one hand before
+4800580:Shield _ both hands step before
+4800600:Shield _ Paryigado
+4802100:Shield _ one hand Tame 1 of [ 92 ] crystal ring
+4802110:Shield _ one hand Tame 2 of [ 92 ] crystal ring
+4802120:Shield _ one hand Tame 1 / magic sword upon activation of [ 92 ] crystal ring
+4802130:Shield _ one hand Tame 2 / magic sword upon activation of [ 92 ] crystal ring
+4802300:Shield _ both hands Tame 1 of [ 92 ] crystal ring
+4802310:Shield _ both hands Tame 2 of [ 92 ] crystal ring
+4802320:Shield _ both hands Tame 1 / magic sword upon activation of [ 92 ] crystal ring
+4802330:Shield _ both hands Tame 2 / magic sword upon activation of [ 92 ] crystal ring
+4802400:Shield _ left hand [ 92 ] crystal ring
+4802405:Shield _ left hand / magic sword upon activation of [ 92 ] crystal ring
+4802800:Shield _ magic sword of [ 92 ] crystal ring
+4803000:[ 93 ] Spike _ one hand usually 1
+4803010:[ 93 ] Spike _ one hand usually 2
+4803020:[ 93 ] Spike _ one hand usually 3
+4803030:[ 93 ] Spike _ one hand jump 1
+4803040:[ 93 ] Spike _ one hand fall loop
+4803050:[ 93 ] Spike _ one hand fall landing
+4803100:[ 93 ] Spike _ one hand Tame 1
+4803110:[ 93 ] Spike _ one hand Tame 2
+4803200:[ 93 ] Spike _ both hands usually 1
+4803210:[ 93 ] Spike _ both hands usually 2
+4803220:[ 93 ] Spike _ both hands usually 3
+4803230:[ 93 ] Spike _ both hands jump 1
+4803240:[ 93 ] Spike _ both hands fall loop
+4803250:[ 93 ] Spike _ both hands fall landing
+4803300:[ 93 ] Spike _ both hands Tame 1
+4803301:[ 93 ] both hands Tame spike _ 1_ Dash
+4803310:[ 93 ] Spike _ both hands Tame 2
+4803400:[ 93 ] Spike _ left hand
+4803410:[ 93 ] Spike _ one hand a short distance
+4803420:[ 93 ] Spike _ both hands close range
+4803430:[ 93 ] spike _ one hand guard
+4803440:[ 93 ] _ both hands spike guard
+4803450:[ 93 ] Spike _ Parry
+4803520:[ 93 ] Spike _ one hand dash
+4803521:[ 93 ] Spike _ one hand _ Dash Dash
+4803530:[ 93 ] Spike _ both hands Dash
+4803531:[ 93 ] Spike _ hands _ Dash Dash
+4803540:[ 93 ] Spike _ one hand before
+4803580:[ 93 ] Spike _ both hands step before
+4803600:[ 93 ] Spike _ Paryigado
+5100000:Omagari sword _ one hand usually 1
+5100010:Omagari sword _ one hand usually 2
+5100020:Omagari sword _ one hand usually 3
+5100030:Omagari sword _ one hand jump 1
+5100040:Omagari sword _ dropping one hand loop
+5100050:Omagari sword _ dropping one hand landing
+5100100:Omagari sword _ one hand Tame 1
+5100110:Omagari sword _ one hand Tame 2
+5100200:Omagari sword _ both hands usually 1
+5100210:Omagari sword _ both hands usually 2
+5100220:Omagari sword _ both hands usually 3
+5100230:Omagari sword _ both hands jump 1
+5100240:Omagari sword _ both hands fall loop
+5100250:Omagari sword _ both hands fall landing
+5100300:Omagari sword _ both hands Tame 1
+5100310:Omagari sword _ both hands Tame 2
+5100400:Omagari sword _ left hand
+5100410:Omagari sword _ one hand a short distance
+5100420:Omagari sword _ both hands close range
+5100430:Omagari sword _ one hand guard
+5100440:Omagari _ both hands sword guard
+5100450:Omagari _ Ken Parry
+5100490:Throw Omagari sword _ fall
+5100500:Omagari sword _ behind
+5100501:Omagari sword _ _ behind two撃目
+5100505:Omagari sword _ strengthening behind
+5100506:Omagari sword _ strengthening behind _ two -stage
+5100510:Omagari _ Ken Parry after
+5100511:Omagari Ken Parry _ after _ two撃目
+5100515:Omagari sword _ strengthening Parry after
+5100516:Omagari sword _ strengthening Parry _ after the second stage
+5100517:Omagari sword _ strengthening Parry _ after the third stage
+5100520:Omagari sword _ one hand dash
+5100530:Omagari sword _ both hands Dash
+5100540:Omagari sword _ one hand before
+5100580:Omagari sword _ both hands step before
+5100600:Omagari sword _ Paryigado
+5101100:Song sword _ one hand Tame 1 of 116 ] Haka-o
+5101110:Song sword _ one hand Tame 2 [ 116 ] of Haka-o
+5101300:Song sword _ both hands Tame 1 of [ 116 ] Haka-o
+5101310:Song sword _ both hands Tame 2 of [ 116 ] Haka-o
+4300000:_ Whip hand usually 1
+4300010:Whip _ one hand usually 2
+4300020:Whip _ one hand usually 3
+4300030:_ Whip hand jump 1
+4300040:Whip _ one hand fall loop
+4300050:Whip _ one hand fall landing
+4300100:_ Whip hand Tame 1
+4300110:_ Whip hand Tame 2
+4300200:Whip _ both hands usually 1
+4300210:Whip _ both hands usually 2
+4300220:Whip _ both hands usually 3
+4300230:Whip _ both hands jump 1
+4300240:Whip _ both hands fall loop
+4300250:Whip _ both hands fall landing
+4300300:Whip _ both hands Tame 1
+4300310:Whip _ both hands Tame 2
+4300400:Whip _ left hand
+4300410:Whip _ one hand a short distance
+4300420:Whip _ both hands close range
+4300430:_ Whip hand guard
+4300440:Whip _ both hands guard
+4300450:Whip _ Parry
+4300520:Whip hand _ Dash
+4300530:Whip _ both hands Dash
+4300540:Whip _ one hand before
+4300580:Whip _ both hands step before
+4300600:Whip _ Paryigado
+</DropDownList>
+          <LastState Value="20000" RealAddress="22A80000"/>
+          <VariableType>4 Bytes</VariableType>
+          <Address>selected_attack</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>89788</ID>
+          <Description>"Attack Base"</Description>
+          <LastState Value="1045220557" RealAddress="04B4FF70"/>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4b4ff70</Address>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>89789</ID>
+              <Description>"hit0_Radius"</Description>
+              <LastState Value="0.200000003" RealAddress="04B4FF70"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+0</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90768</ID>
+              <Description>"hit1_Radius"</Description>
+              <LastState Value="0" RealAddress="04B4FF74"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+4</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90772</ID>
+              <Description>"hit2_Radius"</Description>
+              <LastState Value="0" RealAddress="04B4FF78"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+8</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90771</ID>
+              <Description>"hit3_Radius"</Description>
+              <LastState Value="0" RealAddress="04B4FF7C"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90770</ID>
+              <Description>"knockbackDist"</Description>
+              <LastState Value="0.6000000238" RealAddress="04B4FF80"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+10</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90769</ID>
+              <Description>"hitStopTime"</Description>
+              <LastState Value="0" RealAddress="04B4FF84"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+14</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90773</ID>
+              <Description>"spEffectId0"</Description>
+              <LastState Value="0" RealAddress="04B4FF88"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+18</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90777</ID>
+              <Description>"spEffectId1"</Description>
+              <LastState Value="0" RealAddress="04B4FF8C"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+1c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90776</ID>
+              <Description>"spEffectId2"</Description>
+              <LastState Value="0" RealAddress="04B4FF90"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+20</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90775</ID>
+              <Description>"spEffectId3"</Description>
+              <LastState Value="0" RealAddress="04B4FF94"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+24</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90774</ID>
+              <Description>"spEffectId4"</Description>
+              <LastState Value="0" RealAddress="04B4FF98"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+28</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90778</ID>
+              <Description>"hit0_DmyPoly1"</Description>
+              <LastState Value="120" RealAddress="04B4FF9C"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+2c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90785</ID>
+              <Description>"hit1_DmyPoly1"</Description>
+              <LastState Value="-1" RealAddress="04B4FFA0"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+30</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90784</ID>
+              <Description>"hit2_DmyPoly1"</Description>
+              <LastState Value="-1" RealAddress="04B4FFA4"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+34</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90783</ID>
+              <Description>"hit3_DmyPoly1"</Description>
+              <LastState Value="-1" RealAddress="04B4FFA8"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+38</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90782</ID>
+              <Description>"hit0_DmyPoly2"</Description>
+              <LastState Value="0" RealAddress="04B4FFAC"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+3c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90781</ID>
+              <Description>"hit1_DmyPoly2"</Description>
+              <LastState Value="100" RealAddress="04B4FFB0"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+40</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90780</ID>
+              <Description>"hit2_DmyPoly2"</Description>
+              <LastState Value="100" RealAddress="04B4FFB4"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+44</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90779</ID>
+              <Description>"hit3_DmyPoly2"</Description>
+              <LastState Value="0" RealAddress="04B4FFB8"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+48</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>selected_weapon</Name>
+      <Address>1BE90000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>selected_weapon_var_name</Name>
+      <Address>1BE90030</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>selected_attack</Name>
+      <Address>22A80000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>selected_attack_var_name</Name>
+      <Address>22A80070</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseP</Name>
+      <Address>013785B4</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+  <LuaScript>AddressList = getAddressList()
+attack_base_entry = AddressList.getMemoryRecordByDescription('Attack Base')
+
+AddressList.getMemoryRecordByDescription('Open').OnActivate = function(record, before, currentstate)
+  attack_param_pc_indicies_addr = AddressList.getMemoryRecordByDescription('AttackParamPC').getCurrentAddress()+0x24
+  return true
+end
+
+attack_aob = ""
+attack_name = "UNKNOWNNAME"
+
+--on attack selection, get address from aob, and save default atribs
+selected_attack = AddressList.getMemoryRecordByDescription('Select Attack and check the box')
+selected_attack.OnActivate = function(record, before, currentstate)
+  --get id from selected attack dropdown
+  weapon_id = readInteger(selected_attack.getCurrentAddress())
+  if weapon_id ~= nil then
+    --find in PARAM index array
+    for id_i=0,1396 do
+      if readInteger(attack_param_pc_indicies_addr+id_i*12) == weapon_id then
+        attack_paramentry_offset = readInteger(attack_param_pc_indicies_addr+id_i*12+4)
+        break
+      end
+    end
+    --use offset to get entry
+    attack_paramentry_address = attack_param_pc_indicies_addr+attack_paramentry_offset-0x30
+    --set Attack Base address
+    attack_base_entry.setAddress(string.format("%x",attack_paramentry_address))
+    --save the current (original) stats for the attack
+    --table_string_disable = GenerateStringForAttack()
+  end
+
+  return false
+end
+
+
+
+table_string_disable = ""
+
+function GenerateStringForAttack()
+  local table_string = ""
+
+  --iterate through all children of the attack base (all variables in the struct)
+  for i=3,97 do
+    table_string = table_string .. weapon_name .. weapon_base_entry[i].Address .. ": db "
+
+    --handle the type cases
+    if weapon_base_entry[i].Type == vtDword or weapon_base_entry[i].Type == vtSingle then
+      local read_bytes = readBytes(weapon_base_entry[i].CurrentAddress, 4, true)
+      table_string = table_string .. string.format("%x %x %x %x //%s\n", read_bytes[1], read_bytes[2], read_bytes[3], read_bytes[4], weapon_base_entry[i].Description)
+    elseif weapon_base_entry[i].Type == vtWord then
+      local read_bytes = readBytes(weapon_base_entry[i].CurrentAddress, 2, true)
+      table_string = table_string .. string.format("%x %x //%s\n", read_bytes[1], read_bytes[2], weapon_base_entry[i].Description)
+    elseif weapon_base_entry[i].Type == vtByte then
+      local read_bytes = readBytes(weapon_base_entry[i].CurrentAddress, 1, true)
+      table_string = table_string .. string.format("%x //%s\n", read_bytes[1], weapon_base_entry[i].Description)
+    else
+      print("WARNING unknown type at i="..i)
+    end
+  end
+
+  --count the flags bytes as a single 4 byte chunk
+  table_string = table_string .. weapon_name .. weapon_base_entry[98].Address .. ": db "
+  local flag_bytes = readBytes(weapon_base_entry[98].CurrentAddress, 4, true)
+  table_string = table_string .. string.format("%x %x %x %x //flags\n", flag_bytes[1], flag_bytes[2], flag_bytes[3], flag_bytes[4])
+
+  return table_string
+end
+
+
+--after attack weapon atribs, user triggers the generation of the CE script generation for the changes
+generate_code_entry = AddressList.getMemoryRecordByDescription('Generate CE Code')
+generate_code_entry.OnActivate = function(record, before, currentstate)
+  local table_string = "[ENABLE]\n"..
+                       "aobscan(" .. weapon_name .. "," .. weapon_aob .. ")\n" ..
+                       GenerateStringForWeapon() .. "\n" ..
+                       "[DISABLE]\n" ..
+                       table_string_disable ..
+                       "unregistersymbol(" .. weapon_name .. ")"
+
+  --get varable name for weapon and fix up
+  local variable_name = readString(generate_code_entry.getCurrentAddress(), 40, false)
+  variable_name = variable_name:gsub(" ","_"):lower()
+  --insert variable name into table
+  table_string = table_string:gsub(weapon_name,variable_name)
+
+  print(table_string)
+  return false
+end
+</LuaScript>
+</CheatTable>
