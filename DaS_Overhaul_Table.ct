@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<CheatTable CheatEngineTableVersion="26">
+<CheatTable CheatEngineTableVersion="24">
   <CheatEntries>
     <CheatEntry>
       <ID>12422</ID>
@@ -7,6 +7,12 @@
       <LastState/>
       <VariableType>Auto Assembler Script</VariableType>
       <AssemblerScript>[ENABLE]
+aobscan(finditP,A1????????39A8400400000F)
+label(ATK_PARAM_BASE_P)
+registersymbol(ATK_PARAM_BASE_P)
+[finditP+1]:
+ATK_PARAM_BASE_P:
+
 aobscan(GhostBlade,d3 07 00 00 1f 00 00 00 58 09 03 00 )
 GhostBlade+40:
  db 64 14 00 00 
@@ -2078,13 +2084,27 @@ mov ecx,[edi+00000080]
             <Offset>08c</Offset>
           </Offsets>
         </CheatEntry>
+        <CheatEntry>
+          <ID>90767</ID>
+          <Description>"ATK_PARAM_PC_BASE"</Description>
+          <VariableType>String</VariableType>
+          <Length>32</Length>
+          <Unicode>0</Unicode>
+          <ZeroTerminate>1</ZeroTerminate>
+          <Address>ATK_PARAM_BASE_P</Address>
+          <Offsets>
+            <Offset>c</Offset>
+            <Offset>20</Offset>
+            <Offset>12c</Offset>
+          </Offsets>
+        </CheatEntry>
       </CheatEntries>
     </CheatEntry>
     <CheatEntry>
       <ID>12426</ID>
       <Description>"Other Scripts"</Description>
       <Options moHideChildren="1"/>
-      <LastState Value="" Activated="1" RealAddress="00000000"/>
+      <LastState Value="" RealAddress="00000000"/>
       <GroupHeader>1</GroupHeader>
       <CheatEntries>
         <CheatEntry>
