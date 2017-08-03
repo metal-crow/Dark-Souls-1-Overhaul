@@ -2054,7 +2054,7 @@ function GenerateStringForAttack()
 
   --iterate through all children of the attack base (all variables in the struct)
   for i=0,61 do
-    table_string = table_string .. "ATK_PARAM_PC_BASE+" .. attack_name .. attack_base_entry[i].Address .. ": db "
+    table_string = table_string .. "ATK_PARAM_ST_BASE+" .. attack_name .. attack_base_entry[i].Address .. ": db "
 
     --handle the type cases
     if attack_base_entry[i].Type == vtDword or attack_base_entry[i].Type == vtSingle then
@@ -2072,7 +2072,7 @@ function GenerateStringForAttack()
   end
 
   --count the flags bytes as a single 1 byte chunk
-  table_string = table_string .. "ATK_PARAM_PC_BASE+" .. attack_name .. attack_base_entry[62].Address .. ": db "
+  table_string = table_string .. "ATK_PARAM_ST_BASE+" .. attack_name .. attack_base_entry[62].Address .. ": db "
   local flag_bytes = readBytes(attack_base_entry[62].CurrentAddress, 1, true)
   table_string = table_string .. string.format("%x //flags\n", flag_bytes[1])
 
@@ -2084,11 +2084,10 @@ end
 generate_code_entry = AddressList.getMemoryRecordByDescription('Generate CE Code')
 generate_code_entry.OnActivate = function(record, before, currentstate)
   local table_string = "[ENABLE]\n"..
-                       "registersymbol(" .. attack_name .. "," .. attack_paramentry_offset_hex .. ")\n" ..
+                       "define(" .. attack_name .. "," .. attack_paramentry_offset_hex .. ")\n" ..
                        GenerateStringForAttack() .. "\n" ..
                        "[DISABLE]\n" ..
-                       table_string_disable ..
-                       "unregistersymbol(" .. attack_name .. ")"
+                       table_string_disable
 
   --get varable name for attack and fix up
   local variable_name = readString(generate_code_entry.getCurrentAddress(), 100, false)
