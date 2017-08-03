@@ -19,7 +19,7 @@ ATK_PARAM_BASE_P:
 
 {$lua}
 AddressList = getAddressList()
-attack_param_pcbase_addr = AddressList.getMemoryRecordByDescription('ATK_PARAM_PC_BASE').getCurrentAddress()
+attack_param_pcbase_addr = AddressList.getMemoryRecordByDescription('ATK_PARAM_ST_BASE').getCurrentAddress()
 return "define(ATK_PARAM_ST_BASE, "..string.format("%x",attack_param_pcbase_addr)..")"
 {$asm}
 //end ATK_PARAM_ST_BASE
