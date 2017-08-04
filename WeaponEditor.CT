@@ -2110,7 +2110,7 @@ function GenerateStringForWeapon()
 
   --iterate through all children of the weapon base (all variables in the struct)
   for i=3,97 do
-    table_string = table_string .. weapon_name .. weapon_base_entry[i].Address .. ": db "
+    table_string = table_string .. weapon_name .. weapon_base_entry[i].Address .. ":\n db "
 
     --handle the type cases
     if weapon_base_entry[i].Type == vtDword or weapon_base_entry[i].Type == vtSingle then
@@ -2128,7 +2128,7 @@ function GenerateStringForWeapon()
   end
 
   --count the flags bytes as a single 4 byte chunk
-  table_string = table_string .. weapon_name .. weapon_base_entry[98].Address .. ": db "
+  table_string = table_string .. weapon_name .. weapon_base_entry[98].Address .. ":\n db "
   local flag_bytes = readBytes(weapon_base_entry[98].CurrentAddress, 4, true)
   table_string = table_string .. string.format("%x %x %x %x //flags\n", flag_bytes[1], flag_bytes[2], flag_bytes[3], flag_bytes[4])
 
