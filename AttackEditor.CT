@@ -1462,7 +1462,7 @@ unregistersymbol(BaseP)
           <ID>89788</ID>
           <Description>"Attack Base"</Description>
           <VariableType>4 Bytes</VariableType>
-          <Address>4a3a4e0</Address>
+          <Address>4ba7d00</Address>
           <CheatEntries>
             <CheatEntry>
               <ID>89789</ID>
@@ -2001,11 +2001,11 @@ unregistersymbol(BaseP)
     </SymbolEntry>
     <SymbolEntry>
       <Name>selected_attack</Name>
-      <Address>1C0A0000</Address>
+      <Address>0FFF0000</Address>
     </SymbolEntry>
     <SymbolEntry>
       <Name>selected_attack_var_name</Name>
-      <Address>1C0A0010</Address>
+      <Address>0FFF0010</Address>
     </SymbolEntry>
   </UserdefinedSymbols>
   <LuaScript>AddressList = getAddressList()
@@ -2054,7 +2054,8 @@ function GenerateStringForAttack()
 
   --iterate through all children of the attack base (all variables in the struct)
   for i=0,61 do
-    table_string = table_string .. "ATK_PARAM_ST_BASE+" .. attack_name .. attack_base_entry[i].Address .. ": db "
+    table_string = table_string .. "define(" .. attack_name .. "," .. string.format("%x",attack_paramentry_offset_hex+tonumber(string.sub(attack_base_entry[i].Address,2),16)) .. ")\n"
+    table_string = table_string .. "[ATK_PARAM_ST_BASE]+" .. attack_name  .. ":\n db "
 
     --handle the type cases
     if attack_base_entry[i].Type == vtDword or attack_base_entry[i].Type == vtSingle then
@@ -2072,7 +2073,8 @@ function GenerateStringForAttack()
   end
 
   --count the flags bytes as a single 1 byte chunk
-  table_string = table_string .. "ATK_PARAM_ST_BASE+" .. attack_name .. attack_base_entry[62].Address .. ": db "
+  table_string = table_string .. "define(" .. attack_name .. "," .. string.format("%x",attack_paramentry_offset_hex+tonumber(string.sub(attack_base_entry[62].Address,2),16)) .. ")\n"
+  table_string = table_string .. "[ATK_PARAM_ST_BASE]+" .. attack_name .. ":\n db "
   local flag_bytes = readBytes(attack_base_entry[62].CurrentAddress, 1, true)
   table_string = table_string .. string.format("%x //flags\n", flag_bytes[1])
 
@@ -2084,7 +2086,6 @@ end
 generate_code_entry = AddressList.getMemoryRecordByDescription('Generate CE Code')
 generate_code_entry.OnActivate = function(record, before, currentstate)
   local table_string = "[ENABLE]\n"..
-                       "define(" .. attack_name .. "," .. attack_paramentry_offset_hex .. ")\n" ..
                        GenerateStringForAttack() .. "\n" ..
                        "[DISABLE]\n" ..
                        table_string_disable

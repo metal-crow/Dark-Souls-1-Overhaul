@@ -7,23 +7,6 @@
       <LastState/>
       <VariableType>Auto Assembler Script</VariableType>
       <AssemblerScript>[ENABLE]
-//the entire point of below is to get the current address of the ATK_PARAM_ST_BASE
-//it can be represented simply as
-//finditP = aobscan(A1????????39A8400400000F)
-//ATK_PARAM_ST_BASE = [[[finditP+1]+12c]+20]+c
-aobscan(finditP,A1????????39A8400400000F)
-label(ATK_PARAM_BASE_P)
-registersymbol(ATK_PARAM_BASE_P)
-[finditP+1]:
-ATK_PARAM_BASE_P:
-
-{$lua}
-AddressList = getAddressList()
-attack_param_pcbase_addr = AddressList.getMemoryRecordByDescription('ATK_PARAM_ST_BASE').getCurrentAddress()
-return "define(ATK_PARAM_ST_BASE, "..string.format("%x",attack_param_pcbase_addr)..")"
-{$asm}
-//end ATK_PARAM_ST_BASE
-
 aobscan(GhostBlade,d3 07 00 00 1f 00 00 00 58 09 03 00 )
 GhostBlade+40:
  db 64 14 00 00 
@@ -1408,6 +1391,34 @@ GreatScythe+EA:
       <CheatEntries>
         <CheatEntry>
           <ID>10316</ID>
+          <Description>"ATK_PARAM_ST Address Load"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//the entire point of below is to get the current address of the ATK_PARAM_ST_BASE
+//it can be represented simply as
+//finditP = aobscan(A1????????39A8400400000F)
+//ATK_PARAM_ST_BASE = [[[finditP+1]+12c]+20]+c
+aobscan(finditP,A1????????39A8400400000F)
+label(ATK_PARAM_BASE_P)
+registersymbol(ATK_PARAM_BASE_P)
+[finditP+1]:
+ATK_PARAM_BASE_P:
+
+globalalloc(ATK_PARAM_ST_BASE, 4)
+{$lua}
+AddressList = getAddressList()
+attack_param_pcbase_addr = AddressList.getMemoryRecordByDescription('ATK_PARAM_ST_BASE').getCurrentAddress()
+return "ATK_PARAM_ST_BASE:\n dd "..string.format("%x",attack_param_pcbase_addr)
+{$asm}
+//end ATK_PARAM_ST_BASE
+
+[DISABLE]
+unregistersymbol(ATK_PARAM_BASE_P)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>90768</ID>
           <Description>"Disable Framerate Warning Disconnection"</Description>
           <LastState/>
           <VariableType>Auto Assembler Script</VariableType>
