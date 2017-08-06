@@ -3,1382 +3,1451 @@
   <CheatEntries>
     <CheatEntry>
       <ID>12422</ID>
-      <Description>"DaS Overhaul Alpha 3"</Description>
+      <Description>"DaS Overhaul Alpha 4"</Description>
       <LastState/>
       <VariableType>Auto Assembler Script</VariableType>
       <AssemblerScript>[ENABLE]
 aobscan(GhostBlade,d3 07 00 00 1f 00 00 00 58 09 03 00 )
 GhostBlade+40:
- db 64 14 00 00 
+ db 64 14 00 00
 aobscan(Broadsword,fd 08 00 00 79 00 00 00 f8 8f 04 00 )
 Broadsword+20:
- db 00 00 c0 42 
+ db 00 00 c0 42
 Broadsword+24:
- db 00 00 20 41 
+ db 00 00 20 41
 Broadsword+C4:
- db 5f 00 
+ db 5f 00
 Broadsword+D4:
- db 0d 00 
+ db 0d 00
 aobscan(BalderSideSword,fe 08 00 00 83 00 00 00 f8 8f 04 00 )
 BalderSideSword+4C:
- db d4 08 00 00 
+ db d4 08 00 00
 BalderSideSword+D4:
- db 0d 00 
+ db 0d 00
 aobscan(SilvKnightStrSword,ff 08 00 00 bf 00 00 00 f8 8f 04 00 )
 SilvKnightStrSword+20:
- db 00 00 00 00 
+ db 00 00 00 00
 SilvKnightStrSword+24:
- db 00 00 00 00 
+ db 00 00 00 00
 SilvKnightStrSword+2C:
- db 00 00 02 43 
+ db 00 00 02 43
 SilvKnightStrSword+4C:
- db 62 0c 00 00 
+ db 62 0c 00 00
 SilvKnightStrSword+C4:
- db 00 00 
+ db 00 00
 SilvKnightStrSword+CA:
- db 64 00 
+ db 64 00
 SilvKnightStrSword+D4:
- db 0a 00 
+ db 0a 00
 aobscan(AstorasStraightSword,fc 08 00 00 c0 00 00 00 f8 8f 04 00 )
 AstorasStraightSword+20:
- db 00 00 40 41 
+ db 00 00 40 41
 AstorasStraightSword+24:
- db 00 00 40 41 
+ db 00 00 40 41
 AstorasStraightSword+2C:
- db 00 00 48 43 
+ db 00 00 48 43
 AstorasStraightSword+C6:
- db 69 00 
+ db 69 00
 AstorasStraightSword+D4:
- db 0c 00 
+ db 0c 00
 aobscan(BastardSword,c4 09 00 00 2d 01 00 00 b0 12 06 00 )
 BastardSword+20:
- db 00 00 c0 42 
+ db 00 00 c0 42
 BastardSword+24:
- db 00 00 20 41 
+ db 00 00 20 41
 BastardSword+D4:
- db 10 00 
+ db 10 00
 BastardSword+EA:
- db 4a 
+ db 4a
 aobscan(Flamberge,c6 09 00 00 4b 01 00 00 b0 12 06 00 )
 Flamberge+20:
- db 00 00 00 00 
+ db 00 00 00 00
 Flamberge+24:
- db 00 00 be 42 
+ db 00 00 be 42
 Flamberge+40:
- db 14 19 00 00 
+ db 14 19 00 00
 Flamberge+44:
- db 00 00 00 00 
+ db 00 00 00 00
 Flamberge+D4:
- db 10 00 
+ db 10 00
+aobscan(CrystalGreatsword,c4 09 00 00 55 01 00 00 b0 12 06 00 )
+CrystalGreatsword+20:
+ db 00 00 02 43
+CrystalGreatsword+24:
+ db 00 00 70 41
+CrystalGreatsword+28:
+ db 00 00 02 43
+CrystalGreatsword+B8:
+ db 11 01
+CrystalGreatsword+BA:
+ db a5 00
+CrystalGreatsword+C4:
+ db a0 00
+CrystalGreatsword+C6:
+ db a0 00
+CrystalGreatsword+EA:
+ db 4b
+CrystalGreatsword+EF:
+ db 20
 aobscan(GreatswordofArtorias,ca 09 00 00 85 01 00 00 b0 12 06 00 )
 GreatswordofArtorias+C:
- db 00 00 00 41 
+ db 00 00 00 41
 GreatswordofArtorias+20:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias+24:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias+28:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias+2C:
- db 00 00 43 43 
+ db 00 00 43 43
 GreatswordofArtorias+4C:
- db b2 0b 00 00 
+ db b2 0b 00 00
 GreatswordofArtorias+50:
- db 19 00 00 00 
+ db 19 00 00 00
 GreatswordofArtorias+C4:
- db 00 00 
+ db 00 00
 GreatswordofArtorias+C6:
- db 7d 00 
+ db 7d 00
 GreatswordofArtorias+D4:
- db 12 00 
+ db 12 00
 GreatswordofArtorias+ED:
- db 10 
+ db 10
 GreatswordofArtorias+EE:
- db 00 
+ db 00
 GreatswordofArtorias+EF:
- db 00 
+ db 00
 aobscan(GreatswordofArtorias2,ca 09 00 00 86 01 00 00 b0 12 06 00 )
 GreatswordofArtorias2+C:
- db 00 00 00 41 
+ db 00 00 00 41
 GreatswordofArtorias2+20:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias2+24:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias2+28:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias2+2C:
- db 00 00 43 43 
+ db 00 00 43 43
 GreatswordofArtorias2+4C:
- db b2 0b 00 00 
+ db b2 0b 00 00
 GreatswordofArtorias2+50:
- db 19 00 00 00 
+ db 19 00 00 00
 GreatswordofArtorias2+C4:
- db 00 00 
+ db 00 00
 GreatswordofArtorias2+C6:
- db 7d 00 
+ db 7d 00
 GreatswordofArtorias2+D4:
- db 12 00 
+ db 12 00
 GreatswordofArtorias2+ED:
- db 10 
+ db 10
 GreatswordofArtorias2+EE:
- db 00 
+ db 00
 GreatswordofArtorias2+EF:
- db 00 
+ db 00
 aobscan(BlackKnightSword,c5 09 00 00 5f 01 00 00 b0 12 06 00 )
 BlackKnightSword+C:
- db 00 00 a0 40 
+ db 00 00 a0 40
 BlackKnightSword+20:
- db 00 00 00 00 
+ db 00 00 00 00
 BlackKnightSword+24:
- db 00 00 00 00 
+ db 00 00 00 00
 BlackKnightSword+C4:
- db 2c 01 
+ db 2c 01
 BlackKnightSword+D4:
- db 10 00 
+ db 10 00
 BlackKnightSword+EA:
- db 00 
+ db 00
 BlackKnightSword+EE:
- db 0a 
+ db 0a
 aobscan(GreatswordofArtorias3,ca 09 00 00 73 01 00 00 b0 12 06 00 )
 GreatswordofArtorias3+C:
- db 00 00 00 41 
+ db 00 00 00 41
 GreatswordofArtorias3+20:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias3+24:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias3+28:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias3+2C:
- db 00 00 43 43 
+ db 00 00 43 43
 GreatswordofArtorias3+4C:
- db b2 0b 00 00 
+ db b2 0b 00 00
 GreatswordofArtorias3+50:
- db 19 00 00 00 
+ db 19 00 00 00
 GreatswordofArtorias3+C4:
- db 00 00 
+ db 00 00
 GreatswordofArtorias3+C6:
- db 7d 00 
+ db 7d 00
 GreatswordofArtorias3+D4:
- db 12 00 
+ db 12 00
 GreatswordofArtorias3+ED:
- db 10 
+ db 10
 GreatswordofArtorias3+EE:
- db 00 
+ db 00
 GreatswordofArtorias3+EF:
- db 00 
+ db 00
 aobscan(GreatswordofArtorias4,ca 09 00 00 74 01 00 00 b0 12 06 00 )
 GreatswordofArtorias4+C:
- db 00 00 00 41 
+ db 00 00 00 41
 GreatswordofArtorias4+20:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias4+24:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias4+28:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias4+2C:
- db 00 00 43 43 
+ db 00 00 43 43
 GreatswordofArtorias4+4C:
- db b2 0b 00 00 
+ db b2 0b 00 00
 GreatswordofArtorias4+50:
- db 19 00 00 00 
+ db 19 00 00 00
 GreatswordofArtorias4+C4:
- db 00 00 
+ db 00 00
 GreatswordofArtorias4+C6:
- db 7d 00 
+ db 7d 00
 GreatswordofArtorias4+D4:
- db 12 00 
+ db 12 00
 GreatswordofArtorias4+ED:
- db 10 
+ db 10
 GreatswordofArtorias4+EE:
- db 00 
+ db 00
 GreatswordofArtorias4+EF:
- db 00 
+ db 00
 aobscan(GreatswordofArtorias5,ca 09 00 00 75 01 00 00 b0 12 06 00 )
 GreatswordofArtorias5+C:
- db 00 00 00 41 
+ db 00 00 00 41
 GreatswordofArtorias5+20:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias5+24:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias5+28:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias5+2C:
- db 00 00 43 43 
+ db 00 00 43 43
 GreatswordofArtorias5+4C:
- db b2 0b 00 00 
+ db b2 0b 00 00
 GreatswordofArtorias5+50:
- db 19 00 00 00 
+ db 19 00 00 00
 GreatswordofArtorias5+C4:
- db 00 00 
+ db 00 00
 GreatswordofArtorias5+C6:
- db 7d 00 
+ db 7d 00
 GreatswordofArtorias5+D4:
- db 12 00 
+ db 12 00
 GreatswordofArtorias5+ED:
- db 10 
+ db 10
 GreatswordofArtorias5+EE:
- db 00 
+ db 00
 GreatswordofArtorias5+EF:
- db 00 
+ db 00
 aobscan(GreatswordofArtorias6,ca 09 00 00 76 01 00 00 b0 12 06 00 )
 GreatswordofArtorias6+C:
- db 00 00 00 41 
+ db 00 00 00 41
 GreatswordofArtorias6+20:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias6+24:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias6+28:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias6+2C:
- db 00 00 43 43 
+ db 00 00 43 43
 GreatswordofArtorias6+4C:
- db b2 0b 00 00 
+ db b2 0b 00 00
 GreatswordofArtorias6+50:
- db 19 00 00 00 
+ db 19 00 00 00
 GreatswordofArtorias6+C4:
- db 00 00 
+ db 00 00
 GreatswordofArtorias6+C6:
- db 7d 00 
+ db 7d 00
 GreatswordofArtorias6+D4:
- db 12 00 
+ db 12 00
 GreatswordofArtorias6+ED:
- db 10 
+ db 10
 GreatswordofArtorias6+EE:
- db 00 
+ db 00
 GreatswordofArtorias6+EF:
- db 00 
+ db 00
 aobscan(GreatswordofArtorias7,ca 09 00 00 77 01 00 00 b0 12 06 00 )
 GreatswordofArtorias7+C:
- db 00 00 00 41 
+ db 00 00 00 41
 GreatswordofArtorias7+20:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias7+24:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias7+28:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias7+2C:
- db 00 00 43 43 
+ db 00 00 43 43
 GreatswordofArtorias7+4C:
- db b2 0b 00 00 
+ db b2 0b 00 00
 GreatswordofArtorias7+50:
- db 19 00 00 00 
+ db 19 00 00 00
 GreatswordofArtorias7+C4:
- db 00 00 
+ db 00 00
 GreatswordofArtorias7+C6:
- db 7d 00 
+ db 7d 00
 GreatswordofArtorias7+D4:
- db 12 00 
+ db 12 00
 GreatswordofArtorias7+ED:
- db 10 
+ db 10
 GreatswordofArtorias7+EE:
- db 00 
+ db 00
 GreatswordofArtorias7+EF:
- db 00 
+ db 00
 aobscan(GreatswordofArtorias8,ca 09 00 00 78 01 00 00 b0 12 06 00 )
 GreatswordofArtorias8+C:
- db 00 00 00 41 
+ db 00 00 00 41
 GreatswordofArtorias8+20:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias8+24:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias8+28:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias8+2C:
- db 00 00 43 43 
+ db 00 00 43 43
 GreatswordofArtorias8+4C:
- db b2 0b 00 00 
+ db b2 0b 00 00
 GreatswordofArtorias8+50:
- db 19 00 00 00 
+ db 19 00 00 00
 GreatswordofArtorias8+C4:
- db 00 00 
+ db 00 00
 GreatswordofArtorias8+C6:
- db 7d 00 
+ db 7d 00
 GreatswordofArtorias8+D4:
- db 12 00 
+ db 12 00
 GreatswordofArtorias8+ED:
- db 10 
+ db 10
 GreatswordofArtorias8+EE:
- db 00 
+ db 00
 GreatswordofArtorias8+EF:
- db 00 
+ db 00
 aobscan(GreatswordofArtorias9,ca 09 00 00 79 01 00 00 b0 12 06 00 )
 GreatswordofArtorias9+C:
- db 00 00 00 41 
+ db 00 00 00 41
 GreatswordofArtorias9+20:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias9+24:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias9+28:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias9+2C:
- db 00 00 43 43 
+ db 00 00 43 43
 GreatswordofArtorias9+4C:
- db b2 0b 00 00 
+ db b2 0b 00 00
 GreatswordofArtorias9+50:
- db 19 00 00 00 
+ db 19 00 00 00
 GreatswordofArtorias9+C4:
- db 00 00 
+ db 00 00
 GreatswordofArtorias9+C6:
- db 7d 00 
+ db 7d 00
 GreatswordofArtorias9+D4:
- db 12 00 
+ db 12 00
 GreatswordofArtorias9+ED:
- db 10 
+ db 10
 GreatswordofArtorias9+EE:
- db 00 
+ db 00
 GreatswordofArtorias9+EF:
- db 00 
+ db 00
 aobscan(GreatswordofArtorias10,ca 09 00 00 7a 01 00 00 b0 12 06 00 )
 GreatswordofArtorias10+C:
- db 00 00 00 41 
+ db 00 00 00 41
 GreatswordofArtorias10+20:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias10+24:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias10+28:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias10+2C:
- db 00 00 43 43 
+ db 00 00 43 43
 GreatswordofArtorias10+4C:
- db b2 0b 00 00 
+ db b2 0b 00 00
 GreatswordofArtorias10+50:
- db 19 00 00 00 
+ db 19 00 00 00
 GreatswordofArtorias10+C4:
- db 00 00 
+ db 00 00
 GreatswordofArtorias10+C6:
- db 7d 00 
+ db 7d 00
 GreatswordofArtorias10+D4:
- db 12 00 
+ db 12 00
 GreatswordofArtorias10+ED:
- db 10 
+ db 10
 GreatswordofArtorias10+EE:
- db 00 
+ db 00
 GreatswordofArtorias10+EF:
- db 00 
+ db 00
 aobscan(GreatswordofArtorias11,ca 09 00 00 7b 01 00 00 b0 12 06 00 )
 GreatswordofArtorias11+C:
- db 00 00 00 41 
+ db 00 00 00 41
 GreatswordofArtorias11+20:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias11+24:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias11+28:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias11+2C:
- db 00 00 43 43 
+ db 00 00 43 43
 GreatswordofArtorias11+4C:
- db b2 0b 00 00 
+ db b2 0b 00 00
 GreatswordofArtorias11+50:
- db 19 00 00 00 
+ db 19 00 00 00
 GreatswordofArtorias11+C4:
- db 00 00 
+ db 00 00
 GreatswordofArtorias11+C6:
- db 7d 00 
+ db 7d 00
 GreatswordofArtorias11+D4:
- db 12 00 
+ db 12 00
 GreatswordofArtorias11+ED:
- db 10 
+ db 10
 GreatswordofArtorias11+EE:
- db 00 
+ db 00
 GreatswordofArtorias11+EF:
- db 00 
+ db 00
 aobscan(GreatswordofArtorias12,ca 09 00 00 7c 01 00 00 b0 12 06 00 )
 GreatswordofArtorias12+C:
- db 00 00 00 41 
+ db 00 00 00 41
 GreatswordofArtorias12+20:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias12+24:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias12+28:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias12+2C:
- db 00 00 43 43 
+ db 00 00 43 43
 GreatswordofArtorias12+4C:
- db b2 0b 00 00 
+ db b2 0b 00 00
 GreatswordofArtorias12+50:
- db 19 00 00 00 
+ db 19 00 00 00
 GreatswordofArtorias12+C4:
- db 00 00 
+ db 00 00
 GreatswordofArtorias12+C6:
- db 7d 00 
+ db 7d 00
 GreatswordofArtorias12+D4:
- db 12 00 
+ db 12 00
 GreatswordofArtorias12+ED:
- db 10 
+ db 10
 GreatswordofArtorias12+EE:
- db 00 
+ db 00
 GreatswordofArtorias12+EF:
- db 00 
+ db 00
 aobscan(GreatswordofArtorias13,ca 09 00 00 7d 01 00 00 b0 12 06 00 )
 GreatswordofArtorias13+C:
- db 00 00 00 41 
+ db 00 00 00 41
 GreatswordofArtorias13+20:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias13+24:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias13+28:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias13+2C:
- db 00 00 43 43 
+ db 00 00 43 43
 GreatswordofArtorias13+4C:
- db b2 0b 00 00 
+ db b2 0b 00 00
 GreatswordofArtorias13+50:
- db 19 00 00 00 
+ db 19 00 00 00
 GreatswordofArtorias13+C4:
- db 00 00 
+ db 00 00
 GreatswordofArtorias13+C6:
- db 7d 00 
+ db 7d 00
 GreatswordofArtorias13+D4:
- db 12 00 
+ db 12 00
 GreatswordofArtorias13+ED:
- db 10 
+ db 10
 GreatswordofArtorias13+EE:
- db 00 
+ db 00
 GreatswordofArtorias13+EF:
- db 00 
+ db 00
 aobscan(GreatswordofArtorias14,ca 09 00 00 7e 01 00 00 b0 12 06 00 )
 GreatswordofArtorias14+C:
- db 00 00 00 41 
+ db 00 00 00 41
 GreatswordofArtorias14+20:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias14+24:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias14+28:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias14+2C:
- db 00 00 43 43 
+ db 00 00 43 43
 GreatswordofArtorias14+4C:
- db b2 0b 00 00 
+ db b2 0b 00 00
 GreatswordofArtorias14+50:
- db 19 00 00 00 
+ db 19 00 00 00
 GreatswordofArtorias14+C4:
- db 00 00 
+ db 00 00
 GreatswordofArtorias14+C6:
- db 7d 00 
+ db 7d 00
 GreatswordofArtorias14+D4:
- db 12 00 
+ db 12 00
 GreatswordofArtorias14+ED:
- db 10 
+ db 10
 GreatswordofArtorias14+EE:
- db 00 
+ db 00
 GreatswordofArtorias14+EF:
- db 00 
+ db 00
 aobscan(GreatswordofArtorias15,ca 09 00 00 7f 01 00 00 b0 12 06 00 )
 GreatswordofArtorias15+C:
- db 00 00 00 41 
+ db 00 00 00 41
 GreatswordofArtorias15+20:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias15+24:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias15+28:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias15+2C:
- db 00 00 43 43 
+ db 00 00 43 43
 GreatswordofArtorias15+4C:
- db b2 0b 00 00 
+ db b2 0b 00 00
 GreatswordofArtorias15+50:
- db 19 00 00 00 
+ db 19 00 00 00
 GreatswordofArtorias15+C4:
- db 00 00 
+ db 00 00
 GreatswordofArtorias15+C6:
- db 7d 00 
+ db 7d 00
 GreatswordofArtorias15+D4:
- db 12 00 
+ db 12 00
 GreatswordofArtorias15+ED:
- db 10 
+ db 10
 GreatswordofArtorias15+EE:
- db 00 
+ db 00
 GreatswordofArtorias15+EF:
- db 00 
+ db 00
 aobscan(GreatswordofArtorias16,ca 09 00 00 80 01 00 00 b0 12 06 00 )
 GreatswordofArtorias16+C:
- db 00 00 00 41 
+ db 00 00 00 41
 GreatswordofArtorias16+20:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias16+24:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias16+28:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias16+2C:
- db 00 00 43 43 
+ db 00 00 43 43
 GreatswordofArtorias16+4C:
- db b2 0b 00 00 
+ db b2 0b 00 00
 GreatswordofArtorias16+50:
- db 19 00 00 00 
+ db 19 00 00 00
 GreatswordofArtorias16+C4:
- db 00 00 
+ db 00 00
 GreatswordofArtorias16+C6:
- db 7d 00 
+ db 7d 00
 GreatswordofArtorias16+D4:
- db 12 00 
+ db 12 00
 GreatswordofArtorias16+ED:
- db 10 
+ db 10
 GreatswordofArtorias16+EE:
- db 00 
+ db 00
 GreatswordofArtorias16+EF:
- db 00 
+ db 00
 aobscan(GreatswordofArtorias17,ca 09 00 00 81 01 00 00 b0 12 06 00 )
 GreatswordofArtorias17+C:
- db 00 00 00 41 
+ db 00 00 00 41
 GreatswordofArtorias17+20:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias17+24:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias17+28:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias17+2C:
- db 00 00 43 43 
+ db 00 00 43 43
 GreatswordofArtorias17+4C:
- db b2 0b 00 00 
+ db b2 0b 00 00
 GreatswordofArtorias17+50:
- db 19 00 00 00 
+ db 19 00 00 00
 GreatswordofArtorias17+C4:
- db 00 00 
+ db 00 00
 GreatswordofArtorias17+C6:
- db 7d 00 
+ db 7d 00
 GreatswordofArtorias17+D4:
- db 12 00 
+ db 12 00
 GreatswordofArtorias17+ED:
- db 10 
+ db 10
 GreatswordofArtorias17+EE:
- db 00 
+ db 00
 GreatswordofArtorias17+EF:
- db 00 
+ db 00
 aobscan(GreatswordofArtorias18,ca 09 00 00 82 01 00 00 b0 12 06 00 )
 GreatswordofArtorias18+C:
- db 00 00 00 41 
+ db 00 00 00 41
 GreatswordofArtorias18+20:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias18+24:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias18+28:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias18+2C:
- db 00 00 43 43 
+ db 00 00 43 43
 GreatswordofArtorias18+4C:
- db b2 0b 00 00 
+ db b2 0b 00 00
 GreatswordofArtorias18+50:
- db 19 00 00 00 
+ db 19 00 00 00
 GreatswordofArtorias18+C4:
- db 00 00 
+ db 00 00
 GreatswordofArtorias18+C6:
- db 7d 00 
+ db 7d 00
 GreatswordofArtorias18+D4:
- db 12 00 
+ db 12 00
 GreatswordofArtorias18+ED:
- db 10 
+ db 10
 GreatswordofArtorias18+EE:
- db 00 
+ db 00
 GreatswordofArtorias18+EF:
- db 00 
+ db 00
 aobscan(GreatswordofArtorias19,ca 09 00 00 83 01 00 00 b0 12 06 00 )
 GreatswordofArtorias19+C:
- db 00 00 00 41 
+ db 00 00 00 41
 GreatswordofArtorias19+20:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias19+24:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias19+28:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias19+2C:
- db 00 00 43 43 
+ db 00 00 43 43
 GreatswordofArtorias19+4C:
- db b2 0b 00 00 
+ db b2 0b 00 00
 GreatswordofArtorias19+50:
- db 19 00 00 00 
+ db 19 00 00 00
 GreatswordofArtorias19+C4:
- db 00 00 
+ db 00 00
 GreatswordofArtorias19+C6:
- db 7d 00 
+ db 7d 00
 GreatswordofArtorias19+D4:
- db 12 00 
+ db 12 00
 GreatswordofArtorias19+ED:
- db 10 
+ db 10
 GreatswordofArtorias19+EE:
- db 00 
+ db 00
 GreatswordofArtorias19+EF:
- db 00 
+ db 00
 aobscan(GreatswordofArtorias20,ca 09 00 00 84 01 00 00 b0 12 06 00 )
 GreatswordofArtorias20+C:
- db 00 00 00 41 
+ db 00 00 00 41
 GreatswordofArtorias20+20:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias20+24:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias20+28:
- db 00 00 00 00 
+ db 00 00 00 00
 GreatswordofArtorias20+2C:
- db 00 00 43 43 
+ db 00 00 43 43
 GreatswordofArtorias20+4C:
- db b2 0b 00 00 
+ db b2 0b 00 00
 GreatswordofArtorias20+50:
- db 19 00 00 00 
+ db 19 00 00 00
 GreatswordofArtorias20+C4:
- db 00 00 
+ db 00 00
 GreatswordofArtorias20+C6:
- db 7d 00 
+ db 7d 00
 GreatswordofArtorias20+D4:
- db 12 00 
+ db 12 00
 GreatswordofArtorias20+ED:
- db 10 
+ db 10
 GreatswordofArtorias20+EE:
- db 00 
+ db 00
 GreatswordofArtorias20+EF:
- db 00 
+ db 00
 aobscan(GreatLordGreatsword,cb 09 00 00 a5 01 00 00 b0 12 06 00 )
 GreatLordGreatsword+20:
- db 00 00 80 41 
+ db 00 00 80 41
 GreatLordGreatsword+24:
- db 00 00 90 41 
+ db 00 00 90 41
 GreatLordGreatsword+4C:
- db 58 0c 00 00 
+ db 58 0c 00 00
 GreatLordGreatsword+C4:
- db 04 01 
+ db 04 01
 GreatLordGreatsword+D4:
- db 10 00 
+ db 10 00
 GreatLordGreatsword+EA:
- db 00 
+ db 00
 aobscan(GreatLordGreatsword2,cb 09 00 00 a6 01 00 00 b0 12 06 00 )
 GreatLordGreatsword2+20:
- db 00 00 80 41 
+ db 00 00 80 41
 GreatLordGreatsword2+24:
- db 00 00 90 41 
+ db 00 00 90 41
 GreatLordGreatsword2+4C:
- db 58 0c 00 00 
+ db 58 0c 00 00
 GreatLordGreatsword2+C4:
- db 04 01 
+ db 04 01
 GreatLordGreatsword2+D4:
- db 10 00 
+ db 10 00
 GreatLordGreatsword2+EA:
- db 00 
+ db 00
 aobscan(GreatLordGreatsword3,cb 09 00 00 a7 01 00 00 b0 12 06 00 )
 GreatLordGreatsword3+20:
- db 00 00 80 41 
+ db 00 00 80 41
 GreatLordGreatsword3+24:
- db 00 00 90 41 
+ db 00 00 90 41
 GreatLordGreatsword3+4C:
- db 58 0c 00 00 
+ db 58 0c 00 00
 GreatLordGreatsword3+C4:
- db 04 01 
+ db 04 01
 GreatLordGreatsword3+D4:
- db 10 00 
+ db 10 00
 GreatLordGreatsword3+EA:
- db 00 
+ db 00
 aobscan(GreatLordGreatsword4,cb 09 00 00 a8 01 00 00 b0 12 06 00 )
 GreatLordGreatsword4+20:
- db 00 00 80 41 
+ db 00 00 80 41
 GreatLordGreatsword4+24:
- db 00 00 90 41 
+ db 00 00 90 41
 GreatLordGreatsword4+4C:
- db 58 0c 00 00 
+ db 58 0c 00 00
 GreatLordGreatsword4+C4:
- db 04 01 
+ db 04 01
 GreatLordGreatsword4+D4:
- db 10 00 
+ db 10 00
 GreatLordGreatsword4+EA:
- db 00 
+ db 00
 aobscan(GreatLordGreatsword5,cb 09 00 00 a9 01 00 00 b0 12 06 00 )
 GreatLordGreatsword5+20:
- db 00 00 80 41 
+ db 00 00 80 41
 GreatLordGreatsword5+24:
- db 00 00 90 41 
+ db 00 00 90 41
 GreatLordGreatsword5+4C:
- db 58 0c 00 00 
+ db 58 0c 00 00
 GreatLordGreatsword5+C4:
- db 04 01 
+ db 04 01
 GreatLordGreatsword5+D4:
- db 10 00 
+ db 10 00
 GreatLordGreatsword5+EA:
- db 00 
+ db 00
 aobscan(GreatLordGreatsword6,cb 09 00 00 aa 01 00 00 b0 12 06 00 )
 GreatLordGreatsword6+20:
- db 00 00 80 41 
+ db 00 00 80 41
 GreatLordGreatsword6+24:
- db 00 00 90 41 
+ db 00 00 90 41
 GreatLordGreatsword6+4C:
- db 58 0c 00 00 
+ db 58 0c 00 00
 GreatLordGreatsword6+C4:
- db 04 01 
+ db 04 01
 GreatLordGreatsword6+D4:
- db 10 00 
+ db 10 00
 GreatLordGreatsword6+EA:
- db 00 
+ db 00
 aobscan(GreatLordGreatsword7,cb 09 00 00 ab 01 00 00 b0 12 06 00 )
 GreatLordGreatsword7+20:
- db 00 00 80 41 
+ db 00 00 80 41
 GreatLordGreatsword7+24:
- db 00 00 90 41 
+ db 00 00 90 41
 GreatLordGreatsword7+4C:
- db 58 0c 00 00 
+ db 58 0c 00 00
 GreatLordGreatsword7+C4:
- db 04 01 
+ db 04 01
 GreatLordGreatsword7+D4:
- db 10 00 
+ db 10 00
 GreatLordGreatsword7+EA:
- db 00 
+ db 00
 aobscan(GreatLordGreatsword8,cb 09 00 00 ac 01 00 00 b0 12 06 00 )
 GreatLordGreatsword8+20:
- db 00 00 80 41 
+ db 00 00 80 41
 GreatLordGreatsword8+24:
- db 00 00 90 41 
+ db 00 00 90 41
 GreatLordGreatsword8+4C:
- db 58 0c 00 00 
+ db 58 0c 00 00
 GreatLordGreatsword8+C4:
- db 04 01 
+ db 04 01
 GreatLordGreatsword8+D4:
- db 10 00 
+ db 10 00
 GreatLordGreatsword8+EA:
- db 00 
+ db 00
 aobscan(GreatLordGreatsword9,cb 09 00 00 ad 01 00 00 b0 12 06 00 )
 GreatLordGreatsword9+20:
- db 00 00 80 41 
+ db 00 00 80 41
 GreatLordGreatsword9+24:
- db 00 00 90 41 
+ db 00 00 90 41
 GreatLordGreatsword9+4C:
- db 58 0c 00 00 
+ db 58 0c 00 00
 GreatLordGreatsword9+C4:
- db 04 01 
+ db 04 01
 GreatLordGreatsword9+D4:
- db 10 00 
+ db 10 00
 GreatLordGreatsword9+EA:
- db 00 
+ db 00
 aobscan(GreatLordGreatsword10,cb 09 00 00 ae 01 00 00 b0 12 06 00 )
 GreatLordGreatsword10+20:
- db 00 00 80 41 
+ db 00 00 80 41
 GreatLordGreatsword10+24:
- db 00 00 90 41 
+ db 00 00 90 41
 GreatLordGreatsword10+4C:
- db 58 0c 00 00 
+ db 58 0c 00 00
 GreatLordGreatsword10+C4:
- db 04 01 
+ db 04 01
 GreatLordGreatsword10+D4:
- db 10 00 
+ db 10 00
 GreatLordGreatsword10+EA:
- db 00 
+ db 00
 aobscan(GreatLordGreatsword11,cb 09 00 00 af 01 00 00 b0 12 06 00 )
 GreatLordGreatsword11+20:
- db 00 00 80 41 
+ db 00 00 80 41
 GreatLordGreatsword11+24:
- db 00 00 90 41 
+ db 00 00 90 41
 GreatLordGreatsword11+4C:
- db 58 0c 00 00 
+ db 58 0c 00 00
 GreatLordGreatsword11+C4:
- db 04 01 
+ db 04 01
 GreatLordGreatsword11+D4:
- db 10 00 
+ db 10 00
 GreatLordGreatsword11+EA:
- db 00 
+ db 00
 aobscan(GreatLordGreatsword12,cb 09 00 00 b0 01 00 00 b0 12 06 00 )
 GreatLordGreatsword12+20:
- db 00 00 80 41 
+ db 00 00 80 41
 GreatLordGreatsword12+24:
- db 00 00 90 41 
+ db 00 00 90 41
 GreatLordGreatsword12+4C:
- db 58 0c 00 00 
+ db 58 0c 00 00
 GreatLordGreatsword12+C4:
- db 04 01 
+ db 04 01
 GreatLordGreatsword12+D4:
- db 10 00 
+ db 10 00
 GreatLordGreatsword12+EA:
- db 00 
+ db 00
 aobscan(GreatLordGreatsword13,cb 09 00 00 b1 01 00 00 b0 12 06 00 )
 GreatLordGreatsword13+20:
- db 00 00 80 41 
+ db 00 00 80 41
 GreatLordGreatsword13+24:
- db 00 00 90 41 
+ db 00 00 90 41
 GreatLordGreatsword13+4C:
- db 58 0c 00 00 
+ db 58 0c 00 00
 GreatLordGreatsword13+C4:
- db 04 01 
+ db 04 01
 GreatLordGreatsword13+D4:
- db 10 00 
+ db 10 00
 GreatLordGreatsword13+EA:
- db 00 
+ db 00
 aobscan(GreatLordGreatsword14,cb 09 00 00 b2 01 00 00 b0 12 06 00 )
 GreatLordGreatsword14+20:
- db 00 00 80 41 
+ db 00 00 80 41
 GreatLordGreatsword14+24:
- db 00 00 90 41 
+ db 00 00 90 41
 GreatLordGreatsword14+4C:
- db 58 0c 00 00 
+ db 58 0c 00 00
 GreatLordGreatsword14+C4:
- db 04 01 
+ db 04 01
 GreatLordGreatsword14+D4:
- db 10 00 
+ db 10 00
 GreatLordGreatsword14+EA:
- db 00 
+ db 00
 aobscan(GreatLordGreatsword15,cb 09 00 00 b3 01 00 00 b0 12 06 00 )
 GreatLordGreatsword15+20:
- db 00 00 80 41 
+ db 00 00 80 41
 GreatLordGreatsword15+24:
- db 00 00 90 41 
+ db 00 00 90 41
 GreatLordGreatsword15+4C:
- db 58 0c 00 00 
+ db 58 0c 00 00
 GreatLordGreatsword15+C4:
- db 04 01 
+ db 04 01
 GreatLordGreatsword15+D4:
- db 10 00 
+ db 10 00
 GreatLordGreatsword15+EA:
- db 00 
+ db 00
 aobscan(GreatLordGreatsword16,cb 09 00 00 b4 01 00 00 b0 12 06 00 )
 GreatLordGreatsword16+20:
- db 00 00 80 41 
+ db 00 00 80 41
 GreatLordGreatsword16+24:
- db 00 00 90 41 
+ db 00 00 90 41
 GreatLordGreatsword16+4C:
- db 58 0c 00 00 
+ db 58 0c 00 00
 GreatLordGreatsword16+C4:
- db 04 01 
+ db 04 01
 GreatLordGreatsword16+D4:
- db 10 00 
+ db 10 00
 GreatLordGreatsword16+EA:
- db 00 
+ db 00
 aobscan(GreatLordGreatsword17,cb 09 00 00 b5 01 00 00 b0 12 06 00 )
 GreatLordGreatsword17+20:
- db 00 00 80 41 
+ db 00 00 80 41
 GreatLordGreatsword17+24:
- db 00 00 90 41 
+ db 00 00 90 41
 GreatLordGreatsword17+4C:
- db 58 0c 00 00 
+ db 58 0c 00 00
 GreatLordGreatsword17+C4:
- db 04 01 
+ db 04 01
 GreatLordGreatsword17+D4:
- db 10 00 
+ db 10 00
 GreatLordGreatsword17+EA:
- db 00 
+ db 00
 aobscan(GreatLordGreatsword18,cb 09 00 00 b6 01 00 00 b0 12 06 00 )
 GreatLordGreatsword18+20:
- db 00 00 80 41 
+ db 00 00 80 41
 GreatLordGreatsword18+24:
- db 00 00 90 41 
+ db 00 00 90 41
 GreatLordGreatsword18+4C:
- db 58 0c 00 00 
+ db 58 0c 00 00
 GreatLordGreatsword18+C4:
- db 04 01 
+ db 04 01
 GreatLordGreatsword18+D4:
- db 10 00 
+ db 10 00
 GreatLordGreatsword18+EA:
- db 00 
+ db 00
 aobscan(Zweihander,28 0a 00 00 ff 01 00 00 98 16 06 00 )
 Zweihander+20:
- db 00 00 aa 42 
+ db 00 00 aa 42
 Zweihander+24:
- db 00 00 3c 42 
+ db 00 00 3c 42
 Zweihander+D4:
- db 14 00 
+ db 14 00
+aobscan(CrystalGreatsword2,2a 0a 00 00 f6 01 00 00 98 16 06 00 )
+CrystalGreatsword2+20:
+ db 00 00 02 43
+CrystalGreatsword2+24:
+ db 00 00 70 41
+CrystalGreatsword2+28:
+ db 00 00 02 43
+CrystalGreatsword2+B8:
+ db 11 01
+CrystalGreatsword2+BA:
+ db a5 00
+CrystalGreatsword2+C4:
+ db a0 00
+CrystalGreatsword2+C6:
+ db a0 00
+CrystalGreatsword2+EA:
+ db 4b
+CrystalGreatsword2+EF:
+ db 20
 aobscan(DemonGreatMachete,2b 0a 00 00 09 02 00 00 98 16 06 00 )
 DemonGreatMachete+C:
- db 00 00 50 41 
+ db 00 00 50 41
 DemonGreatMachete+20:
- db 00 00 ba 42 
+ db 00 00 ba 42
 DemonGreatMachete+D4:
- db 13 00 
+ db 13 00
 DemonGreatMachete+ED:
- db 1e 
+ db 1e
 aobscan(BlackKnightGreatsword,2c 0a 00 00 13 02 00 00 98 16 06 00 )
 BlackKnightGreatsword+20:
- db 00 00 c8 41 
+ db 00 00 c8 41
 BlackKnightGreatsword+C4:
- db 86 01 
+ db 86 01
 BlackKnightGreatsword+D4:
- db 14 00 
+ db 14 00
 BlackKnightGreatsword+EE:
- db 00 
+ db 00
 aobscan(Scimitar,f0 0a 00 00 59 02 00 00 50 99 07 00 )
 Scimitar+24:
- db 00 00 dc 42 
+ db 00 00 dc 42
 Scimitar+C4:
- db 5a 00 
+ db 5a 00
 Scimitar+CE:
- db 0a 00 
+ db 0a 00
 Scimitar+D4:
- db 0c 00 
+ db 0c 00
 Scimitar+EA:
- db 65 
+ db 65
 aobscan(Falchion,f0 0a 00 00 63 02 00 00 50 99 07 00 )
 Falchion+C4:
- db 5c 00 
+ db 5c 00
 Falchion+D4:
- db 0c 00 
+ db 0c 00
 aobscan(Shotel,f1 0a 00 00 6d 02 00 00 50 99 07 00 )
 Shotel+C4:
- db 58 00 
+ db 58 00
 Shotel+CE:
- db 0a 00 
+ db 0a 00
 Shotel+D4:
- db 0c 00 
+ db 0c 00
 aobscan(QuelaagsFurysword,f4 0a 00 00 8b 02 00 00 50 99 07 00 )
 QuelaagsFurysword+C:
- db 00 00 80 40 
+ db 00 00 80 40
 QuelaagsFurysword+24:
- db 00 00 48 42 
+ db 00 00 48 42
 QuelaagsFurysword+C8:
- db 96 00 
+ db 96 00
 QuelaagsFurysword+D4:
- db 0a 00 
+ db 0a 00
 QuelaagsFurysword+EE:
- db 16 
+ db 16
 aobscan(QuelaagsFurysword2,f4 0a 00 00 8c 02 00 00 50 99 07 00 )
 QuelaagsFurysword2+C:
- db 00 00 80 40 
+ db 00 00 80 40
 QuelaagsFurysword2+24:
- db 00 00 48 42 
+ db 00 00 48 42
 QuelaagsFurysword2+C8:
- db 96 00 
+ db 96 00
 QuelaagsFurysword2+D4:
- db 0a 00 
+ db 0a 00
 QuelaagsFurysword2+EE:
- db 16 
+ db 16
 aobscan(QuelaagsFurysword3,f4 0a 00 00 8d 02 00 00 50 99 07 00 )
 QuelaagsFurysword3+C:
- db 00 00 80 40 
+ db 00 00 80 40
 QuelaagsFurysword3+24:
- db 00 00 48 42 
+ db 00 00 48 42
 QuelaagsFurysword3+C8:
- db 96 00 
+ db 96 00
 QuelaagsFurysword3+D4:
- db 0a 00 
+ db 0a 00
 QuelaagsFurysword3+EE:
- db 16 
+ db 16
 aobscan(QuelaagsFurysword4,f4 0a 00 00 8e 02 00 00 50 99 07 00 )
 QuelaagsFurysword4+C:
- db 00 00 80 40 
+ db 00 00 80 40
 QuelaagsFurysword4+24:
- db 00 00 48 42 
+ db 00 00 48 42
 QuelaagsFurysword4+C8:
- db 96 00 
+ db 96 00
 QuelaagsFurysword4+D4:
- db 0a 00 
+ db 0a 00
 QuelaagsFurysword4+EE:
- db 16 
+ db 16
 aobscan(QuelaagsFurysword5,f4 0a 00 00 8f 02 00 00 50 99 07 00 )
 QuelaagsFurysword5+C:
- db 00 00 80 40 
+ db 00 00 80 40
 QuelaagsFurysword5+24:
- db 00 00 48 42 
+ db 00 00 48 42
 QuelaagsFurysword5+C8:
- db 96 00 
+ db 96 00
 QuelaagsFurysword5+D4:
- db 0a 00 
+ db 0a 00
 QuelaagsFurysword5+EE:
- db 16 
+ db 16
 aobscan(QuelaagsFurysword6,f4 0a 00 00 90 02 00 00 50 99 07 00 )
 QuelaagsFurysword6+C:
- db 00 00 80 40 
+ db 00 00 80 40
 QuelaagsFurysword6+24:
- db 00 00 48 42 
+ db 00 00 48 42
 QuelaagsFurysword6+C8:
- db 96 00 
+ db 96 00
 QuelaagsFurysword6+D4:
- db 0a 00 
+ db 0a 00
 QuelaagsFurysword6+EE:
- db 16 
+ db 16
 aobscan(Server,ec 13 00 00 c7 02 00 00 38 9d 07 00 )
 Server+24:
- db 00 00 a4 42 
+ db 00 00 a4 42
 Server+44:
- db 4a 1a 00 00 
+ db 4a 1a 00 00
 Server+4C:
- db 54 1a 00 00 
+ db 54 1a 00 00
 Server+50:
- db 3a 02 00 00 
+ db 3a 02 00 00
 Server+54:
- db b2 0b 00 00 
+ db b2 0b 00 00
 Server+D4:
- db 09 00 
+ db 09 00
 Server+F0:
- db 14 
+ db 14
 aobscan(Murakumo,ec 13 00 00 bd 02 00 00 38 9d 07 00 )
 Murakumo+C:
- db 00 00 60 41 
+ db 00 00 60 41
 Murakumo+D4:
- db 08 00 
+ db 08 00
 Murakumo+ED:
- db 22 
+ db 22
 aobscan(GravelordSword,ed 13 00 00 d1 02 00 00 38 9d 07 00 )
 GravelordSword+20:
- db 00 00 a0 42 
+ db 00 00 a0 42
 GravelordSword+24:
- db 00 00 a0 42 
+ db 00 00 a0 42
 GravelordSword+44:
- db 30 0c 00 00 
+ db 30 0c 00 00
 GravelordSword+48:
- db e6 19 00 00 
+ db e6 19 00 00
 GravelordSword+4C:
- db 76 0c 00 00 
+ db 76 0c 00 00
 GravelordSword+C4:
- db 8f 00 
+ db 8f 00
 GravelordSword+D4:
- db 0a 00 
+ db 0a 00
 aobscan(WashingPole,54 0b 00 00 35 03 00 00 d8 23 09 00 )
 WashingPole+20:
- db 00 00 48 42 
+ db 00 00 48 42
 WashingPole+D4:
- db 0c 00 
+ db 0c 00
 aobscan(Iaito,55 0b 00 00 2b 03 00 00 d8 23 09 00 )
 Iaito+24:
- db 00 00 00 00 
+ db 00 00 00 00
 Iaito+28:
- db 00 00 16 43 
+ db 00 00 16 43
 Iaito+40:
- db be 0f 00 00 
+ db be 0f 00 00
 Iaito+4C:
- db 58 0c 00 00 
+ db 58 0c 00 00
 Iaito+C4:
- db 00 00 
+ db 00 00
 Iaito+C8:
- db 78 00 
+ db 78 00
 Iaito+D4:
- db 0c 00 
+ db 0c 00
 Iaito+EE:
- db 0e 
+ db 0e
 Iaito+EF:
- db 14 
+ db 14
 aobscan(ChaosBlade,56 0b 00 00 3f 03 00 00 d8 23 09 00 )
 ChaosBlade+24:
- db 00 00 a0 42 
+ db 00 00 a0 42
 ChaosBlade+4C:
- db 30 1b 00 00 
+ db 30 1b 00 00
 ChaosBlade+D4:
- db 0a 00 
+ db 0a 00
 aobscan(ChaosBlade2,56 0b 00 00 40 03 00 00 d8 23 09 00 )
 ChaosBlade2+24:
- db 00 00 a0 42 
+ db 00 00 a0 42
 ChaosBlade2+4C:
- db 30 1b 00 00 
+ db 30 1b 00 00
 ChaosBlade2+D4:
- db 0a 00 
+ db 0a 00
 aobscan(ChaosBlade3,56 0b 00 00 41 03 00 00 d8 23 09 00 )
 ChaosBlade3+24:
- db 00 00 a0 42 
+ db 00 00 a0 42
 ChaosBlade3+4C:
- db 30 1b 00 00 
+ db 30 1b 00 00
 ChaosBlade3+D4:
- db 0a 00 
+ db 0a 00
 aobscan(VelkasRapier,8f 0a 00 00 ad 03 00 00 78 aa 0a 00 )
 VelkasRapier+20:
- db 00 00 00 00 
+ db 00 00 00 00
 VelkasRapier+24:
- db 00 00 00 00 
+ db 00 00 00 00
 VelkasRapier+28:
- db 00 00 dc 42 
+ db 00 00 dc 42
 VelkasRapier+C6:
- db 78 00 
+ db 78 00
 aobscan(BattleAxe,b8 0b 00 00 f3 03 00 00 30 2d 0c 00 )
 BattleAxe+20:
- db 00 00 c8 42 
+ db 00 00 c8 42
 BattleAxe+24:
- db 00 00 00 00 
+ db 00 00 00 00
 BattleAxe+D4:
- db 0c 00 
+ db 0c 00
 aobscan(BlackKnightGreataxe,83 0c 00 00 62 04 00 00 18 31 0c 00 )
 BlackKnightGreataxe+C4:
- db 06 01 
+ db 06 01
 BlackKnightGreataxe+D4:
- db 12 00 
+ db 12 00
 aobscan(Pickaxe,e7 0c 00 00 e3 04 00 00 d0 b3 0d 00 )
 Pickaxe+CE:
- db 0a 00 
+ db 0a 00
 Pickaxe+D4:
- db 11 00 
+ db 11 00
 Pickaxe+E3:
- db 1e 
+ db 1e
 Pickaxe+EA:
- db 66 
+ db 66
 aobscan(ReinforcedClub,e6 0c 00 00 b1 04 00 00 d0 b3 0d 00 )
 ReinforcedClub+20:
- db 00 00 ae 42 
+ db 00 00 ae 42
 ReinforcedClub+40:
- db 14 19 00 00 
+ db 14 19 00 00
 ReinforcedClub+44:
- db 01 19 00 00 
+ db 01 19 00 00
 ReinforcedClub+D4:
- db 10 00 
+ db 10 00
 aobscan(GreatClub,ad 0d 00 00 1f 05 00 00 b8 b7 0d 00 )
 GreatClub+20:
- db 00 00 96 42 
+ db 00 00 96 42
 GreatClub+D4:
- db 0c 00 
+ db 0c 00
 GreatClub+ED:
- db 20 
+ db 20
 aobscan(DragonTooth,ac 0d 00 00 3d 05 00 00 b8 b7 0d 00 )
 DragonTooth+D4:
- db 16 00 
+ db 16 00
 DragonTooth+E3:
- db 19 
+ db 19
 DragonTooth+EA:
- db 33 
+ db 33
 aobscan(LargeClub,ae 0d 00 00 15 05 00 00 b8 b7 0d 00 )
 LargeClub+20:
- db 00 00 b4 42 
+ db 00 00 b4 42
 LargeClub+44:
- db 26 0c 00 00 
+ db 26 0c 00 00
 LargeClub+48:
- db 30 0c 00 00 
+ db 30 0c 00 00
 LargeClub+D4:
- db 0e 00 
+ db 0e 00
 aobscan(Partizan,14 0e 00 00 8d 05 00 00 f8 c4 10 00 )
 Partizan+EA:
- db 35 
+ db 35
 aobscan(DemonsSpear,15 0e 00 00 ac 05 00 00 f8 c4 10 00 )
 DemonsSpear+C:
- db 00 00 c0 40 
+ db 00 00 c0 40
 DemonsSpear+20:
- db 00 00 18 42 
+ db 00 00 18 42
 DemonsSpear+24:
- db 00 00 18 42 
+ db 00 00 18 42
 DemonsSpear+CA:
- db 6e 00 
+ db 6e 00
 DemonsSpear+D4:
- db 07 00 
+ db 07 00
 aobscan(SilverKnightSpear,16 0e 00 00 b5 05 00 00 f8 c4 10 00 )
 SilverKnightSpear+24:
- db 00 00 18 42 
+ db 00 00 18 42
 SilverKnightSpear+D4:
- db 08 00 
+ db 08 00
 SilverKnightSpear+ED:
- db 14 
+ db 14
 aobscan(Pike,11 0e 00 00 a1 05 00 00 f8 c4 10 00 )
 Pike+24:
- db 00 00 30 42 
+ db 00 00 30 42
 Pike+D4:
- db 0a 00 
+ db 0a 00
 aobscan(DragonslayerSpear,13 0e 00 00 ca 05 00 00 f8 c4 10 00 )
 DragonslayerSpear+20:
- db 00 00 00 00 
+ db 00 00 00 00
 DragonslayerSpear+24:
- db 00 00 00 00 
+ db 00 00 00 00
 DragonslayerSpear+2C:
- db 00 00 5a 43 
+ db 00 00 5a 43
 DragonslayerSpear+C4:
- db 00 00 
+ db 00 00
 DragonslayerSpear+CA:
- db 50 00 
+ db 50 00
 DragonslayerSpear+D4:
- db 0b 00 
+ db 0b 00
 DragonslayerSpear+EA:
- db 00 
+ db 00
 DragonslayerSpear+ED:
- db 14 
+ db 14
 DragonslayerSpear+EE:
- db 0c 
+ db 0c
 DragonslayerSpear+F0:
- db 14 
+ db 14
 aobscan(DragonslayerSpear2,13 0e 00 00 cb 05 00 00 f8 c4 10 00 )
 DragonslayerSpear2+20:
- db 00 00 00 00 
+ db 00 00 00 00
 DragonslayerSpear2+24:
- db 00 00 00 00 
+ db 00 00 00 00
 DragonslayerSpear2+2C:
- db 00 00 5a 43 
+ db 00 00 5a 43
 DragonslayerSpear2+C4:
- db 00 00 
+ db 00 00
 DragonslayerSpear2+CA:
- db 50 00 
+ db 50 00
 DragonslayerSpear2+D4:
- db 0b 00 
+ db 0b 00
 DragonslayerSpear2+EA:
- db 00 
+ db 00
 DragonslayerSpear2+ED:
- db 14 
+ db 14
 DragonslayerSpear2+EE:
- db 0c 
+ db 0c
 DragonslayerSpear2+F0:
- db 14 
+ db 14
 aobscan(DragonslayerSpear3,13 0e 00 00 cc 05 00 00 f8 c4 10 00 )
 DragonslayerSpear3+20:
- db 00 00 00 00 
+ db 00 00 00 00
 DragonslayerSpear3+24:
- db 00 00 00 00 
+ db 00 00 00 00
 DragonslayerSpear3+2C:
- db 00 00 5a 43 
+ db 00 00 5a 43
 DragonslayerSpear3+C4:
- db 00 00 
+ db 00 00
 DragonslayerSpear3+CA:
- db 50 00 
+ db 50 00
 DragonslayerSpear3+D4:
- db 0b 00 
+ db 0b 00
 DragonslayerSpear3+EA:
- db 00 
+ db 00
 DragonslayerSpear3+ED:
- db 14 
+ db 14
 DragonslayerSpear3+EE:
- db 0c 
+ db 0c
 DragonslayerSpear3+F0:
- db 14 
+ db 14
 aobscan(DragonslayerSpear4,13 0e 00 00 ce 05 00 00 f8 c4 10 00 )
 DragonslayerSpear4+20:
- db 00 00 00 00 
+ db 00 00 00 00
 DragonslayerSpear4+24:
- db 00 00 00 00 
+ db 00 00 00 00
 DragonslayerSpear4+2C:
- db 00 00 5a 43 
+ db 00 00 5a 43
 DragonslayerSpear4+C4:
- db 00 00 
+ db 00 00
 DragonslayerSpear4+CA:
- db 50 00 
+ db 50 00
 DragonslayerSpear4+D4:
- db 0b 00 
+ db 0b 00
 DragonslayerSpear4+EA:
- db 00 
+ db 00
 DragonslayerSpear4+ED:
- db 14 
+ db 14
 DragonslayerSpear4+EE:
- db 0c 
+ db 0c
 DragonslayerSpear4+F0:
- db 14 
+ db 14
 aobscan(DragonslayerSpear5,13 0e 00 00 cf 05 00 00 f8 c4 10 00 )
 DragonslayerSpear5+20:
- db 00 00 00 00 
+ db 00 00 00 00
 DragonslayerSpear5+24:
- db 00 00 00 00 
+ db 00 00 00 00
 DragonslayerSpear5+2C:
- db 00 00 5a 43 
+ db 00 00 5a 43
 DragonslayerSpear5+C4:
- db 00 00 
+ db 00 00
 DragonslayerSpear5+CA:
- db 50 00 
+ db 50 00
 DragonslayerSpear5+D4:
- db 0b 00 
+ db 0b 00
 DragonslayerSpear5+EA:
- db 00 
+ db 00
 DragonslayerSpear5+ED:
- db 14 
+ db 14
 DragonslayerSpear5+EE:
- db 0c 
+ db 0c
 DragonslayerSpear5+F0:
- db 14 
+ db 14
 aobscan(DragonslayerSpear6,13 0e 00 00 d0 05 00 00 f8 c4 10 00 )
 DragonslayerSpear6+20:
- db 00 00 00 00 
+ db 00 00 00 00
 DragonslayerSpear6+24:
- db 00 00 00 00 
+ db 00 00 00 00
 DragonslayerSpear6+2C:
- db 00 00 5a 43 
+ db 00 00 5a 43
 DragonslayerSpear6+C4:
- db 00 00 
+ db 00 00
 DragonslayerSpear6+CA:
- db 50 00 
+ db 50 00
 DragonslayerSpear6+D4:
- db 0b 00 
+ db 0b 00
 DragonslayerSpear6+EA:
- db 00 
+ db 00
 DragonslayerSpear6+ED:
- db 14 
+ db 14
 DragonslayerSpear6+EE:
- db 0c 
+ db 0c
 DragonslayerSpear6+F0:
- db 14 
+ db 14
 aobscan(DragonslayerSpear7,13 0e 00 00 d1 05 00 00 f8 c4 10 00 )
 DragonslayerSpear7+20:
- db 00 00 00 00 
+ db 00 00 00 00
 DragonslayerSpear7+24:
- db 00 00 00 00 
+ db 00 00 00 00
 DragonslayerSpear7+2C:
- db 00 00 5a 43 
+ db 00 00 5a 43
 DragonslayerSpear7+C4:
- db 00 00 
+ db 00 00
 DragonslayerSpear7+CA:
- db 50 00 
+ db 50 00
 DragonslayerSpear7+D4:
- db 0b 00 
+ db 0b 00
 DragonslayerSpear7+EA:
- db 00 
+ db 00
 DragonslayerSpear7+ED:
- db 14 
+ db 14
 DragonslayerSpear7+EE:
- db 0c 
+ db 0c
 DragonslayerSpear7+F0:
- db 14 
+ db 14
 aobscan(DragonslayerSpear8,13 0e 00 00 d2 05 00 00 f8 c4 10 00 )
 DragonslayerSpear8+20:
- db 00 00 00 00 
+ db 00 00 00 00
 DragonslayerSpear8+24:
- db 00 00 00 00 
+ db 00 00 00 00
 DragonslayerSpear8+2C:
- db 00 00 5a 43 
+ db 00 00 5a 43
 DragonslayerSpear8+C4:
- db 00 00 
+ db 00 00
 DragonslayerSpear8+CA:
- db 50 00 
+ db 50 00
 DragonslayerSpear8+D4:
- db 0b 00 
+ db 0b 00
 DragonslayerSpear8+EA:
- db 00 
+ db 00
 DragonslayerSpear8+ED:
- db 14 
+ db 14
 DragonslayerSpear8+EE:
- db 0c 
+ db 0c
 DragonslayerSpear8+F0:
- db 14 
+ db 14
 aobscan(DragonslayerSpear9,13 0e 00 00 d3 05 00 00 f8 c4 10 00 )
 DragonslayerSpear9+20:
- db 00 00 00 00 
+ db 00 00 00 00
 DragonslayerSpear9+24:
- db 00 00 00 00 
+ db 00 00 00 00
 DragonslayerSpear9+2C:
- db 00 00 5a 43 
+ db 00 00 5a 43
 DragonslayerSpear9+C4:
- db 00 00 
+ db 00 00
 DragonslayerSpear9+CA:
- db 50 00 
+ db 50 00
 DragonslayerSpear9+D4:
- db 0b 00 
+ db 0b 00
 DragonslayerSpear9+EA:
- db 00 
+ db 00
 DragonslayerSpear9+ED:
- db 14 
+ db 14
 DragonslayerSpear9+EE:
- db 0c 
+ db 0c
 DragonslayerSpear9+F0:
- db 14 
+ db 14
 aobscan(DragonslayerSpear10,13 0e 00 00 cd 05 00 00 f8 c4 10 00 )
 DragonslayerSpear10+20:
- db 00 00 00 00 
+ db 00 00 00 00
 DragonslayerSpear10+24:
- db 00 00 00 00 
+ db 00 00 00 00
 DragonslayerSpear10+2C:
- db 00 00 5a 43 
+ db 00 00 5a 43
 DragonslayerSpear10+C4:
- db 00 00 
+ db 00 00
 DragonslayerSpear10+CA:
- db 50 00 
+ db 50 00
 DragonslayerSpear10+D4:
- db 0b 00 
+ db 0b 00
 DragonslayerSpear10+EA:
- db 00 
+ db 00
 DragonslayerSpear10+ED:
- db 14 
+ db 14
 DragonslayerSpear10+EE:
- db 0c 
+ db 0c
 DragonslayerSpear10+F0:
- db 14 
+ db 14
 aobscan(GiantsHalberd,db 0e 00 00 05 06 00 00 98 4b 12 00 )
 GiantsHalberd+C:
- db 00 00 40 41 
+ db 00 00 40 41
 GiantsHalberd+20:
- db 00 00 8c 42 
+ db 00 00 8c 42
 GiantsHalberd+24:
- db 00 00 8c 42 
+ db 00 00 8c 42
 GiantsHalberd+CA:
- db c8 00 
+ db c8 00
 GiantsHalberd+CE:
- db 1e 00 
+ db 1e 00
 GiantsHalberd+D4:
- db 10 00 
+ db 10 00
 GiantsHalberd+EA:
- db 6c 
+ db 6c
 GiantsHalberd+ED:
- db 1e 
+ db 1e
 GiantsHalberd+EE:
- db 20 
+ db 20
 aobscan(GreatScythe,88 13 00 00 41 06 00 00 98 4b 12 00 )
 GreatScythe+C4:
- db 54 00 
+ db 54 00
 GreatScythe+D4:
- db 0e 00 
+ db 0e 00
 GreatScythe+EA:
- db 63 
+ db 63
+aobscan(CrestShield,c0 12 00 00 a7 09 00 00 78 df 16 00 )
+CrestShield+30:
+ db 00 00 82 42
+CrestShield+38:
+ db 00 00 f0 41
+CrestShield+3C:
+ db 00 00 a0 41
+CrestShield+D4:
+ db 19 00
+aobscan(SilverKnightShield,c0 12 00 00 b1 09 00 00 78 df 16 00 )
+SilverKnightShield+30:
+ db 00 00 8c 42
+SilverKnightShield+34:
+ db 00 00 a0 41
+SilverKnightShield+38:
+ db 00 00 a0 c1
+SilverKnightShield+3C:
+ db 00 00 b4 42
+SilverKnightShield+D4:
+ db 1e 00
+aobscan(BlackKnightShield,c0 12 00 00 b2 09 00 00 78 df 16 00 )
+BlackKnightShield+30:
+ db 00 00 8c 42
+BlackKnightShield+34:
+ db 00 00 a0 c1
+BlackKnightShield+38:
+ db 00 00 b4 42
+BlackKnightShield+3C:
+ db 00 00 20 41
+BlackKnightShield+D4:
+ db 1e 00
 [Disable]
 </AssemblerScript>
     </CheatEntry>
