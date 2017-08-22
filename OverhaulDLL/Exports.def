@@ -1,6 +1,9 @@
 LIBRARY DS_Overhaul.dll
 EXPORTS
 	initialize_plugin @1
-	load_keybinds @2
-	set_device_wrapper @3
-	add_info_bar_element @4
+	main_loop @2
+	draw_overlay @3
+	get_raw_input_data @4
+	disable_player_input @5
+	present @6
+	end_scene @7
