@@ -292,6 +292,7 @@ __pycache__/
 *.xsd.cs
 #################################################################################
 
+!lib\DirectX\Lib\x86
 !SP_IO.pdb
 !SP_IOx64.pdb
 !SP_SysUtils.pdb
@@ -299,3 +300,5 @@ __pycache__/
 !SP_AoBScan.pdb
 !D3DFont.pdb
 !SpD3D9OTextFeed.pdb
+!d3d9_sp_overlay.pdb
+!SpPointer.pdb
