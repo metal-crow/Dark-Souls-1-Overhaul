@@ -1,21 +1,24 @@
 /*
-Authors:
-
-Metal-Crow	-	Reverse engineering, CE, LUA, etc
-Sean Pesce	-	C++ conversion
+	DARK SOULS OVERHAUL
+	
+	Contributors to this file:
+		Sean Pesce	-	C++
 
 */
 
 #pragma once
 
-#include "SP_SysUtils.hpp"
-#include "SP_AsmInject_x86.hpp"
-#include "SP_AoB_Scan.hpp"
+#ifndef _DS1_OVERHAUL_PHANTOM_LIMIT_H_
+	#define _DS1_OVERHAUL_PHANTOM_LIMIT_H_
 
+
+#include "SpPointer.h"
+
+
+// Maximum number of phantoms allowed in the player's world
 #define _MAX_SUMMONS_ 9
 
 
-extern void *ds1_base;
 
 uint8_t max_allowed_summons8 = _MAX_SUMMONS_;
 uint8_t max_allowed_summons32_arr[4] = { max_allowed_summons8, 0x0, 0x0, 0x0 }; // Use an array of 4 bytes to represent a DWORD for easy conversion between big/little endian
@@ -36,8 +39,6 @@ void *BlackSosNum;
 void *InvadeNum;
 
 
-void apply_multiphantom_patch_dynamic();
-void apply_multiphantom_secondary_patch_dynamic();
 
 void __stdcall forceshowsigns_newmem();
 void __stdcall summon_char_types_newmem();
@@ -86,3 +87,4 @@ void __stdcall pca_off17();
 uint32_t pca_off_ret18;
 void __stdcall pca_off18();
 
+#endif // _DS1_OVERHAUL_PHANTOM_LIMIT_H_
