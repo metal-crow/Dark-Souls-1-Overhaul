@@ -117,6 +117,9 @@ class CD3DFont {
 		CD3DFont( const char* strFontName, DWORD dwHeight, DWORD dwFlags = 0L );
 		~CD3DFont();
 
+		// Accessors
+		float CD3DFont::GetFontHeight(); // Added by Sean Pesce; returns font height
+
 		// Begin/End batch drawing
 		HRESULT BeginDrawing( void );
 		HRESULT EndDrawing( void );
