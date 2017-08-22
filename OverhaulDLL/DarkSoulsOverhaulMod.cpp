@@ -65,7 +65,7 @@ void on_process_detach()
 __declspec(dllexport) void __stdcall initialize_plugin()
 {
 	// Set overlay info strings
-	set_text_feed_title("Dark Souls Overhaul Mod");
+	set_text_feed_title("[Dark Souls Overhaul Mod]");
 	print("-------------TEST BUILD-------------", 0, false, SP_D3D9O_TEXT_COLOR_ORANGE);
 
 
