@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="26">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>6</ID>
+      <Description>"Ring Helper"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[enable]
+globalalloc(selected_ring,40)
+globalalloc(selected_ring_var_name,40)
+
+[DISABLE]
+dealloc(selected_ring_var_name)
+dealloc(selected_ring)
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>7</ID>
+          <Description>"Select a Ring and check the box"</Description>
+          <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">D0 07 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Havel's Ring
+DA 07 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Red Tearstone Ring
+10 09 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Darkmoon Blade Covenant Ring
+1A 09 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Cat Covenant Ring
+DD 07 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Chloranthy Ring
+E4 07 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Flame Stoneplate Ring
+E5 07 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Thunder Stoneplate Ring
+E6 07 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Spell Stoneplate Ring
+E8 07 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Speckled Stoneplate Ring
+EE 07 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Bloodbite Ring
+EF 07 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Poisonbite Ring
+24 09 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Tiny Being's Ring
+F2 07 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Cursebite Ring
+F8 07 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:White Seance Ring
+02 08 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Bellowing Dragoncrest Ring
+0C 08 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Dusk Crown Ring
+24 00 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Hornet Ring
+20 08 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Hawk Ring
+E7 07 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Ring of Steel Protection
+34 08 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Covetous Gold Serpent Ring
+35 08 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Covetous Silver Serpent Ring
+3E 08 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Slubering Dragoncrest Ring
+3F 08 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Ring of Fog
+48 08 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Rusted Iron Ring
+52 08 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Ring of Sacrifice
+53 08 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Rare Ring of Sacrifice
+49 08 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Dark Wood Grain Ring
+5C 08 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Ring of the Sun Princess
+8E 08 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Old Witch's Ring
+98 08 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Covenant of Artorias
+A2 08 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Orange Charred Ring
+B6 08 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Lingering Dragoncrest Ring
+C0 08 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Ring of the Evil Eye
+CA 08 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Ring of Favor and Protection
+D4 08 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Leo Ring
+DE 08 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:East Wood Grain Ring
+2A 08 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Wolf Ring
+F2 08 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Blue Tearstone Ring
+FC 08 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Ring of the Sun's Firstborn
+06 09 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Darkmoon Seance Ring
+2E 09 00 00 FF FF FF FF 00 00 00 00 00 00 00 00:Calamity Ring
+</DropDownList>
+          <LastState RealAddress="15170000"/>
+          <VariableType>String</VariableType>
+          <Length>40</Length>
+          <Unicode>0</Unicode>
+          <CodePage>0</CodePage>
+          <ZeroTerminate>1</ZeroTerminate>
+          <Address>selected_ring</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>8</ID>
+          <Description>"Ring Base"</Description>
+          <LastState Value="2000" RealAddress="053EAE4C"/>
+          <VariableType>4 Bytes</VariableType>
+          <Address>053eae4c</Address>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>9</ID>
+              <Description>"refId"</Description>
+              <LastState Value="2000" RealAddress="053EAE4C"/>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+0</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>10</ID>
+              <Description>"sfxVariationId"</Description>
+              <LastState Value="-1" RealAddress="053EAE50"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+4</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>11</ID>
+              <Description>"weight"</Description>
+              <LastState Value="0" RealAddress="053EAE54"/>
+              <VariableType>Float</VariableType>
+              <Address>+8</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>12</ID>
+              <Description>"behaviorId"</Description>
+              <LastState Value="0" RealAddress="053EAE58"/>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+C</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>13</ID>
+              <Description>"basicPrice"</Description>
+              <LastState Value="0" RealAddress="053EAE5C"/>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+10</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>14</ID>
+              <Description>"sellValue"</Description>
+              <LastState Value="1000" RealAddress="053EAE60"/>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+14</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>15</ID>
+              <Description>"sortId"</Description>
+              <LastState Value="3" RealAddress="053EAE64"/>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+18</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>16</ID>
+              <Description>"qwcId"</Description>
+              <LastState Value="0" RealAddress="053EAE68"/>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+1C</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>17</ID>
+              <Description>"equipModelId"</Description>
+              <LastState Value="0" RealAddress="053EAE6C"/>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+20</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>18</ID>
+              <Description>"iconId"</Description>
+              <LastState Value="4000" RealAddress="053EAE6E"/>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+22</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>19</ID>
+              <Description>"shopLv"</Description>
+              <LastState Value="-1" RealAddress="053EAE70"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+24</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>20</ID>
+              <Description>"trophySGradeId"</Description>
+              <LastState Value="-1" RealAddress="053EAE72"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+26</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>21</ID>
+              <Description>"trophySeqId"</Description>
+              <LastState Value="-1" RealAddress="053EAE74"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+28</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>22</ID>
+              <Description>"equipModelCategory"</Description>
+              <LastState Value="0" RealAddress="053EAE76"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>+2A</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>23</ID>
+              <Description>"equipModelGender"</Description>
+              <LastState Value="0" RealAddress="053EAE77"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>+2B</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24</ID>
+              <Description>"accessoryCategory"</Description>
+              <LastState Value="0" RealAddress="053EAE78"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>+2C</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>25</ID>
+              <Description>"refCategory"</Description>
+              <LastState Value="2" RealAddress="053EAE79"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>+2D</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26</ID>
+              <Description>"spEffectCategory"</Description>
+              <LastState Value="0" RealAddress="053EAE7A"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>+2E</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>28</ID>
+              <Description>"vagrantItemLotId"</Description>
+              <LastState Value="101400" RealAddress="053EAE7C"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+30</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>27</ID>
+              <Description>"vagrantBonusEneDropItemLotId"</Description>
+              <LastState Value="101410" RealAddress="053EAE80"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+34</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>29</ID>
+              <Description>"vagrantItemEneDropItemLotId"</Description>
+              <LastState Value="101420" RealAddress="053EAE84"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+38</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>30</ID>
+              <Description>"isDeposit"</Description>
+              <LastState Value="1" RealAddress="053EAE88"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Binary</VariableType>
+              <BitStart>0</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+3C</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>31</ID>
+              <Description>"isEquipOutBreak"</Description>
+              <LastState Value="0" RealAddress="053EAE88"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Binary</VariableType>
+              <BitStart>1</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+3C</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>32</ID>
+              <Description>"disableMultiDropShare"</Description>
+              <LastState Value="0" RealAddress="053EAE88"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Binary</VariableType>
+              <BitStart>2</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+3C</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>selected_ring</Name>
+      <Address>15170000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>selected_ring_var_name</Name>
+      <Address>15170030</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+  <LuaScript>AddressList = getAddressList()
+ring_base_entry = AddressList.getMemoryRecordByDescription('Ring Base')
+
+ring_aob = ""
+ring_name = "UNKNOWNNAME"
+
+--on ring selection, get address from aob, and save default atribs
+selected_ring = AddressList.getMemoryRecordByDescription('Select a Ring and check the box')
+selected_ring.OnActivate = function(record, before, currentstate)
+  --get aob for selected ring dropdown
+  ring_aob = readString(selected_ring.getCurrentAddress(),35, false)
+  if ring_aob ~= nil then
+    --aob scan
+    local ring_aob_results = AOBScan(ring_aob)
+    if ring_aob_results ~= nil and ring_aob_results.getCount()==1 then
+      --set Ring Base address to the 1st result of aob scan
+      ring_base_entry.setAddress(ring_aob_results[0])
+      --save the current (original) stats for the ring
+      table_string_disable = GenerateStringForRing()
+    end
+    if ring_aob_results ~= nil then
+      ring_aob_results.Destroy()
+    end
+  end
+
+  return false
+end
+--I stole all this shit from metal-crow so thanks to him for bein a cool dude :^)
+
+</LuaScript>
+</CheatTable>
