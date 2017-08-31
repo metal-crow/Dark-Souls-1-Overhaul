@@ -26,6 +26,7 @@
 	#define GetAsyncKeyboardState get_async_keyboard_state
 	#define _SP_KEY_DOWN_ 2147483648
 	#define _SP_KEY_TOGGLED_ 1
+	#define VK_TO_WMKD_SC(key) (((LONG)MapVirtualKey(key, MAPVK_VK_TO_VSC)) << 16)		// Translates a Virtual-key code into the second parameter of a WM_KEYDOWN keyboard message containing only the corresponding scan code
 #endif // _WIN32
 
 #define _SP_MAX_PP_KEY_LENGTH_ 128			// Maximum length for private profile keys
