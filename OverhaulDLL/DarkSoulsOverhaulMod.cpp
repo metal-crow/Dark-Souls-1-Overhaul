@@ -16,9 +16,6 @@
 */
 DWORD WINAPI on_process_attach(LPVOID lpParam)
 {
-	// Load user preferences from settings file
-	ModData::get_user_prefs();
-
 	// Obtain base address of Dark Souls game process
 	GameData::ds1_base = GetModuleHandle(NULL);
 
@@ -66,8 +63,10 @@ __declspec(dllexport) void __stdcall initialize_plugin()
 {
 	// Set overlay info strings
 	set_text_feed_title("[Dark Souls Overhaul Mod]");
-	print("-------------TEST BUILD-------------", 0, false, SP_D3D9O_TEXT_COLOR_ORANGE);
+	print("-------------DARK SOULS OVERHAUL TEST BUILD-------------", 0, false, SP_D3D9O_TEXT_COLOR_ORANGE);
 
+	// Load user preferences from settings file
+	ModData::get_user_prefs();
 
 	// Register console commands
 	ModData::register_console_commands();
@@ -84,7 +83,7 @@ __declspec(dllexport) void __stdcall initialize_plugin()
 
 	
 	
-	ModData::initialized = true; // Should be the last statement of this function
+	ModData::initialized = true; // Should be the last statement in this function
 }
 
 
@@ -118,8 +117,11 @@ __declspec(dllexport) void __stdcall draw_overlay(std::string *text_feed_info_he
 	*/
 	
 
-	// Show node count in text feed info header
-	GameData::get_node_count(text_feed_info_header);
+	if (ModData::show_node_count)
+	{
+		// Show node count in text feed info header
+		GameData::get_node_count(text_feed_info_header);
+	}
 
 }
 
@@ -163,28 +165,173 @@ __declspec(dllexport) void __stdcall end_scene()
 
 /*
 	Called every time GetRawInputData() is called with a non-null pData argument.
+
+	Use this function to read player input, if needed.
 		
 		Microsoft documentation for GetRawInputData:
 		https://msdn.microsoft.com/en-us/library/windows/desktop/ms645596(v=vs.85).aspx
 
+	@return		True if the given input message should be cancelled before being sent to
+				the game, thereby disabling game input. Otherwise, returns false.
 */
-__declspec(dllexport) void __stdcall get_raw_input_data(RAWINPUT *pData, PUINT pcbSize)
+__declspec(dllexport) bool __stdcall get_raw_input_data(RAWINPUT *pData, PUINT pcbSize)
 {
-	// Use this function to read player input, if needed
+	// Mouse cursor position
+	static POINT cursor_position; // Static variable; saved between calls
+
+	// Determine input device type
+	switch (pData->header.dwType)
+	{
+		case RIM_TYPEMOUSE:
+
+			// Handle mouse input
+
+			// Mouse button press
+			switch (pData->data.mouse.usButtonFlags)
+			{
+				case RI_MOUSE_LEFT_BUTTON_DOWN:
+
+					break;
+
+				case RI_MOUSE_LEFT_BUTTON_UP:
+					
+					break;
+
+				case RI_MOUSE_RIGHT_BUTTON_DOWN:
+					
+					break;
+
+				case RI_MOUSE_RIGHT_BUTTON_UP:
+					
+					break;
+
+				case RI_MOUSE_MIDDLE_BUTTON_DOWN:
+					
+					break;
+
+				case RI_MOUSE_MIDDLE_BUTTON_UP:
+					
+					break;
+
+				case RI_MOUSE_WHEEL:
+					if (pData->data.mouse.usButtonData == 120)
+					{
+						// Scrolling up
+					}
+					else if (pData->data.mouse.usButtonData == 65416)
+					{
+						// Scrolling down
+					}
+					break;
+
+				// Additional mouse buttons
+				case RI_MOUSE_BUTTON_4_DOWN:
+				case RI_MOUSE_BUTTON_4_UP:
+				case RI_MOUSE_BUTTON_5_DOWN:
+				case RI_MOUSE_BUTTON_5_UP:
+					break;
+			} // switch (pData->data.mouse.usButtonFlags)
+
+			// Mouse movement
+			switch (pData->data.mouse.usFlags & MOUSE_MOVE_ABSOLUTE)
+			{
+				case MOUSE_MOVE_ABSOLUTE:
+					// Mouse movement data is based on absolute position
+					cursor_position.x = pData->data.mouse.lLastX;
+					cursor_position.y = pData->data.mouse.lLastY;
+					break;
+				case MOUSE_MOVE_RELATIVE:
+					// Mouse movement data is relative (based on last known position)
+					cursor_position.x += pData->data.mouse.lLastX;
+					cursor_position.y += pData->data.mouse.lLastY;
+
+					// Keep cursor on-screen
+					RECT window_rect;
+					if (!GetClientRect(_game_window, &window_rect))
+					{
+						// Handle error
+						break;
+					}
+					if (cursor_position.x < 0) // Too far left
+					{
+						cursor_position.x = 0;
+					}
+					else if (cursor_position.x > window_rect.right) // Too far right
+					{
+						cursor_position.x = window_rect.right;
+					}
+					if (cursor_position.y < 0) // Too far up
+					{
+						cursor_position.y = 0;
+					}
+					else if (cursor_position.y > window_rect.bottom) // Too far down
+					{
+						cursor_position.x = window_rect.bottom;
+					}
+					break;
+			}
+
+			break; // case RIM_TYPEMOUSE
 
 
-}
+		case RIM_TYPEKEYBOARD:
+
+			// Handle keyboard input
+
+			// Determine type of keyboard input
+			switch (pData->data.keyboard.Message)
+			{
+				case WM_KEYDOWN: // A nonsystem key is a key that is pressed when the ALT key is not pressed
+					
+					// Determine which key was pressed
+					switch (pData->data.keyboard.VKey)
+					{
+						// Handle key press
+
+						default:
+							break;
+					}
 
 
+				case WM_SYSKEYDOWN: // A system key is a key that is pressed when the ALT key is also down
+					
+					// Determine which syskey was pressed
+					switch (pData->data.keyboard.VKey)
+					{
+						// Handle key press (when ALT is down)
+
+						default:
+							break;
+					}
+					break; // case  WM_KEYDOWN || WM_SYSKEYDOWN
+
+				case WM_KEYUP:
+
+					// Determine which key was released
+					switch (pData->data.keyboard.VKey)
+					{
+						// Handle key release (key is no longer being pressed)
+
+						default:
+							break;
+					}
+					break; // case WM_KEYUP
+
+			} // switch (pData->data.keyboard.Message)
+			break; // case RIM_TYPEKEYBOARD
 
 
-/*
-	Called every time GetRawInputData() is called with a non-null pData argument.
-	If return value is true, in-game keyboard input is disabled.
-*/
-__declspec(dllexport) bool __stdcall disable_player_input()
-{
+		case RIM_TYPEHID:
+
+			// Handle input from some other type of hardware input device
+
+			break; // case RIM_TYPEHID
 
 
+	} // switch (pData->header.dwType)
+
+
+	// False = don't disable game input
 	return false;
 }
+

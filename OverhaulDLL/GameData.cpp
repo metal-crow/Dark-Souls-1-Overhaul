@@ -88,12 +88,6 @@ void GameData::disable_low_fps_disconnect()
 // Fixes input bug that causes players to be stuck at a bonfire (usually after turning human)
 int GameData::fix_bonfire_input()
 {
-	if (!ModData::initialized)
-	{
-		// If mod is not yet initialized, do nothing
-		return -1;
-	}
-
 	// Get current player status
 	int status = DS1_PLAYER_STATUS_LOADING;
 	player_char_status.read(&status);
@@ -106,6 +100,7 @@ int GameData::fix_bonfire_input()
 
 		print(_DS1_MOD_MSG_BONFIRE_INPUT_FIX_);
 
+		Sleep(200); // Sleep to avoid keypress being detected multiple times
 		return 0;
 	}
 	else
@@ -113,6 +108,7 @@ int GameData::fix_bonfire_input()
 		// Player is not hollow/human, so can't be at a bonfire
 		print(_DS1_MOD_MSG_CANT_BONFIRE_INPUT_FIX_);
 		
+		Sleep(200); // Sleep to avoid keypress being detected multiple times
 		return -1;
 	}
 }

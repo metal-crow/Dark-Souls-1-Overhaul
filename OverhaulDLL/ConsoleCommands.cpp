@@ -20,16 +20,19 @@
 
 
 // Applies the Bonfire input fix
-void cc_bonfire_input_fix(std::vector<std::string> args, std::string *output)
+int cc_bonfire_input_fix(std::vector<std::string> args, std::string *output)
 {
 	GameData::fix_bonfire_input();
+	return CONSOLE_COMMAND_SUCCESS;
 }
 
 
 
 // Enables/disables multiplayer node count element of overlay text feed
-void cc_text_feed_node_count(std::vector<std::string> args, std::string *output)
+int cc_text_feed_node_count(std::vector<std::string> args, std::string *output)
 {
+	int return_val = CONSOLE_COMMAND_SUCCESS;
+
 	if (args.size() > 0)
 	{
 		switch (parse_toggle_arg(args.at(0).c_str()))
@@ -42,6 +45,7 @@ void cc_text_feed_node_count(std::vector<std::string> args, std::string *output)
 				break;
 			default:
 				output->append("ERROR: Assigned value must be either 1 or 0 (1 = enabled, 0 = disabled)\n");
+				return_val = ERROR_INVALID_PARAMETER;
 				break;
 		}
 	}
@@ -49,12 +53,14 @@ void cc_text_feed_node_count(std::vector<std::string> args, std::string *output)
 	// If no argument is specified, simply print the status
 	if (ModData::show_node_count)
 	{
-		output->append("Text feed info bar multiplayer node count = enabled");
+		output->append("Display multiplayer node count = enabled");
 	}
 	else
 	{
-		output->append("Text feed info bar multiplayer node count = disabled");
+		output->append("Display multiplayer node count = disabled");
 	}
+
+	return return_val;
 }
 
 
