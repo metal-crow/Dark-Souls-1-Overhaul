@@ -15,8 +15,22 @@
 #include <vector>
 
 
-// Macro to obtain the IDirect3DDevice9 for rendering new elements
+
+////////////////////////////////////////////////////
+///////////////////// CONSTANTS ////////////////////
+////////////////////////////////////////////////////
+
+// Value that a console command should return if no errors occurred
+#define CONSOLE_COMMAND_SUCCESS ERROR_SUCCESS
+
+// Value returned by the console itself if an unknown command is executed
+#define CONSOLE_COMMAND_NOT_FOUND_ERROR (-1)
+
+// Obtain the IDirect3DDevice9 for rendering new elements
 #define _d3d9_dev get_d3d9_device()
+
+// Obtain the main game window handle
+#define _game_window get_game_window()
 
 
 // Enumerated message color values for use in the optional text_color parameter when calling print()
@@ -133,7 +147,7 @@ __declspec(dllimport) unsigned int register_hotkey_function(unsigned int vk_hotk
 								ERROR_SXS_XML_E_BADCHARINSTRING	If the command parameter contains invalid characters (such as whitespace characters)
 								ERROR_DUP_NAME					If a command already exists with the same name as the command parameter
 */
-__declspec(dllimport) int register_console_command(const char *command, void(*function)(std::vector<std::string>, std::string *), const char *help_message);
+__declspec(dllimport) int register_console_command(const char *command, int(*function)(std::vector<std::string>, std::string *), const char *help_message);
 
 
 
@@ -161,13 +175,42 @@ __declspec(dllimport) int register_console_alias(const char *new_alias, const ch
 	Executes a command string as if it were entered from the console input.
 
 	@param command				The command to be parsed and executed by the console.
+	@param return_code			[Optional parameter] Buffer to store the return code of the executed command. If NULL, the return code is discarded. If the specified command
+								doesn't exist, return_code is set to CONSOLE_COMMAND_NOT_FOUND_ERROR.
 	@param output				[Optional parameter] The output stream where console command output will be printed. If NULL, output is sent to the console's default output stream.
 
-	@return						0 if successful, otherwise returns one of the following error codes:
+	@return						CONSOLE_COMMAND_SUCCESS if successful, otherwise returns one of the following error codes:
 								ERROR_INVALID_ADDRESS			If the command argument is NULL
 								PEERDIST_ERROR_NOT_INITIALIZED	If the IDirect3D9Device, overlay, and/or console aren't initialized yet
+								CONSOLE_COMMAND_NOT_FOUND_ERROR If the specified command does not match an existing console command
 */
-__declspec(dllimport) int execute_console_command(const char *command, std::string *output = NULL);
+__declspec(dllimport) int execute_console_command(const char *command, int *return_code = NULL, std::string *output = NULL);
+
+
+
+
+/*
+	Checks if the in-game console is open.
+
+	@return						True if the in-game console is currently open; otherwise returns false.
+
+	@error						If the DirectX9 device or overlay is not yet initialized, last error code is set to ERROR_INVALID_ADDRESS
+*/
+__declspec(dllimport) bool console_open();
+
+
+
+
+/*
+	Obtains a handle to the main game window.
+
+	NOTE: Recommended to use the _game_window preprocessor macro every time the game window handle needs to be obtained.
+
+	@return						Game's primary window handle if successful; otherwise returns NULL.
+
+	@error						If the DirectX9 device or overlay is not yet initialized, last error code is set to ERROR_INVALID_ADDRESS
+*/
+__declspec(dllimport) HWND get_game_window();
 
 
 

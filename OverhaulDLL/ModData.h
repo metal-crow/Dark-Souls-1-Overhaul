@@ -15,11 +15,13 @@
 
 
 //////////////////////// USER PREFERENCE CONSTANTS ////////////////////////
-#define _DS1_MOD_SETTINGS_FILE_ "d3d9_Mod.ini"
-#define _DS1_MOD_SETTINGS_SECTION_PREFS_ "Preferences"
-#define _DS1_MOD_SETTINGS_SECTION_KEYBINDS_ "Keybinds"
-#define _DS1_MOD_PREF_SHOW_NODE_COUNT_ "DisplayNodeCount"
-#define _DS1_MOD_HOTKEY_BONFIRE_INPUT_FIX_ "BonfireInputFix"
+#define _DS1_OVERHAUL_SETTINGS_FILE_ ".\\d3d9_Mod.ini"
+#define _DS1_OVERHAUL_PREFS_SECTION_ "Dark Souls Overhaul Settings"
+#define _DS1_OVERHAUL_KEYBINDS_SECTION_ "Dark Souls Overhaul Keybinds"
+#define _DS1_OVERHAUL_PREF_SHOW_NODE_COUNT_ "DisplayNodeCount"
+#define _DS1_OVERHAUL_HOTKEY_BONFIRE_INPUT_FIX_ "BonfireInputFix"
+
+#define _DS1_OVERHAUL_SETTINGS_STRING_BUFF_LEN_ 256		// Length of the string buffer used when obtaining user preference-related string data
 
 
 
