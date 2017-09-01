@@ -8,6 +8,10 @@
 
 #include "DllMain.h"
 
+#define _SP_DEFINE_VK_NAME_STRINGS_		// Must be defined to use Virtual-key code name strings from SP_IO_Strings.hpp (opt-in by default because it increases filesize by a few KB)
+
+#include "SP_IO_Strings.hpp"
+
 
 
 /*
@@ -24,8 +28,8 @@ bool ModData::show_node_count = true;
 
 
 
-// Get user-defined settings preferences and keybinds from the settings file
-void ModData::get_user_prefs()
+// Get user-defined settings preferences from the settings file
+void ModData::get_user_preferences()
 {
 	// Buffer for string-related tasks
 	char buffer[_DS1_OVERHAUL_SETTINGS_STRING_BUFF_LEN_];
@@ -49,8 +53,16 @@ void ModData::get_user_prefs()
 
 
 
+	print_console("");
+}
+
+
+
+// Get user-defined keybinds from the settings file
+void ModData::get_user_keybinds()
+{
 	// Begin loading keybinds
-	print_console("\n[Overhaul Mod] Loading keybinds...");
+	print_console("[Overhaul Mod] Loading keybinds...");
 
 
 	// Variable that holds each keybind when read from settings file
@@ -58,26 +70,20 @@ void ModData::get_user_prefs()
 
 	
 	// Bonfire input fix keybind
-	if ((key = (uint8_t)get_vk_hotkey(_DS1_OVERHAUL_SETTINGS_FILE_, _DS1_OVERHAUL_KEYBINDS_SECTION_, _DS1_OVERHAUL_HOTKEY_BONFIRE_INPUT_FIX_)) // Obtain user's preferred key
-		&& register_hotkey_function(key, GameData::fix_bonfire_input))	// Register the keybind
+	if ( (key = (uint8_t)get_vk_hotkey(_DS1_OVERHAUL_SETTINGS_FILE_, _DS1_OVERHAUL_KEYBINDS_SECTION_, _DS1_OVERHAUL_HOTKEY_BONFIRE_INPUT_FIX_)) // Obtain user's preferred key
+		&& register_hotkey_function(key, GameData::fix_bonfire_input) )	// Register the keybind
 	{
 		// Successfully loaded and registered keybind; now print feedback to console
-		GetKeyNameText(VK_TO_WMKD_SC(key), buffer, _DS1_OVERHAUL_SETTINGS_STRING_BUFF_LEN_);  // Get the key name as a string
-		std::string out_str = "    Registered " _DS1_OVERHAUL_HOTKEY_BONFIRE_INPUT_FIX_ " keybind: ";
+		std::string output = "    Registered " _DS1_OVERHAUL_HOTKEY_BONFIRE_INPUT_FIX_ " keybind: ";
+		output.append(VK_NAME[key]).append(" (0x");   // Get the key name as a string
+		if (key < 0x10)
+			output += '0';
 		std::stringstream hex_stream;
-		hex_stream << std::hex << (int)key;
-		if (buffer[0] != '\0')
-		{
-			// Print key name and virtual key code
-			print_console(out_str.append(buffer).append(" (0x").append(hex_stream.str()).append(")").c_str());
-		}
-		else
-		{
-			// Couldn't determine key name; print only virtual key code
-			print_console(out_str.append("0x").append(hex_stream.str()).c_str());
-		}
+		hex_stream << std::hex << (int)key; // Convert Virtual-key code to hex string
+		output.append(hex_stream.str());
+		output += ')';
+		print_console(output.c_str());
 	}
-	buffer[0] = '\0';
 	key = 0;
 
 

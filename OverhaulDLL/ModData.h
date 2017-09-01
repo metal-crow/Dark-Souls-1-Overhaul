@@ -44,8 +44,11 @@ public:
 	// Registers all commands in ConsoleCommands.cpp for use with the in-game console
 	static void register_console_commands();
 
-	// Get user-defined settings preferences and keybinds from the settings file
-	static void get_user_prefs();
+	// Get user-defined settings preferences from the settings file
+	static void get_user_preferences();
+
+	// Get user-defined keybinds from the settings file
+	static void get_user_keybinds();
 
 	
 };
