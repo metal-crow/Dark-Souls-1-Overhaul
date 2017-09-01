@@ -23,12 +23,13 @@
 	Console command names (used to call the commands) and help messages (displayed when using the
 	built-in "help" command on another command).
 
-	Console Help Messages are prefixed with "chm"; Console Command Names are prefixed with "ccn".
+	Console Help Messages are prefixed with "chm"; Console Command Names are prefixed with "ccn",
+	and Console Command Aliases are prefixed with "cca".
 */
 
 
-#define ccn_bonfire_input_fix "fix_bonfire_input"
-const char *chm_bonfire_input_fix = ccn_bonfire_input_fix"\n"
+#define ccn_fix_bonfire_input "fix_bonfire_input"
+const char *chm_fix_bonfire_input = ccn_fix_bonfire_input"\n"
 									"    Allows player to regain control of their character if they encounter the bonfire input glitch,\n"
 									"    which is a bug that can cause the player to be stuck at the bonfire (usually after restoring\n"
 									"    humanity with the framerate unlocked).";
@@ -38,6 +39,7 @@ const char *chm_bonfire_input_fix = ccn_bonfire_input_fix"\n"
 #define ccn_text_feed_node_count "text_feed_node_count"
 const char *chm_text_feed_node_count = ccn_text_feed_node_count"\n"
 									"    Enables/disables the multiplayer node count element of the overlay text feed info bar (1 = enabled, 0 = disabled).";
+#define cca_node_count "node_count"
 
 
 

@@ -67,26 +67,76 @@ void GameData::set_game_version(uint8_t version_number)
 }
 
 
-// Disables automatic game disconnection when low framerate is detected
-void GameData::disable_low_fps_disconnect()
+// Checks if the player is stuck at the bonfire, and if so, automatically applies the bonfire input fix
+void GameData::check_bonfire_input_bug()
 {
-	print_console("[Overhaul Mod] Disabling low FPS disconnect...");
+	// Check that the mod is fully loaded
+	if (!ModData::initialized)
+		return;
 
-	uint8_t *fps_warn = NULL;
-	fps_warn = (uint8_t*)aob_scan("74 17 B9 ?? ?? ?? ?? E8 ?? ?? ?? ?? 8B"); // Careful, this pattern returns 2 results
+	/*
+		If glitch conditions do not exist, this variable is set to 0.
+		When bonfire input glitch is detected and first_detected is 0, the time is logged in first_detected.
 
-	if (fps_warn)
+		If the glitch is detected, and the time in first_detected is more than 1 second ago, the bonfire input fix is applied.
+	*/
+	static DWORD first_detected; // (Static variable persists between function calls)
+
+	// Get current player status
+	int status = DS1_PLAYER_STATUS_LOADING;
+	player_char_status.read(&status);
+
+	// Check for bonfire input glitch conditions
+	if (status == DS1_PLAYER_STATUS_HOLLOW || status == DS1_PLAYER_STATUS_HUMAN) // Check if player is hollow/human
 	{
-		// AoB Scan was successful
-		set_mem_protection(fps_warn, 1, MEM_PROTECT_RWX);
-		fps_warn -= 0x1E;
-		*fps_warn = 0xC3; // To disable this patch, set *fps_warn = 0x51
+		// Nested if-statements are necessary to avoid crashes related to resolving multi-level pointers
+
+		// Get pointer to current character animation
+		SpPointer bonfire_anim_fix = SpPointer((void*)0x12E29E8, { 0x0, 0xFC });
+
+		// Read current character animation
+		uint32_t current_anim;
+		bonfire_anim_fix.read(&current_anim);
+
+		// Get pointer to bonfire menu flag
+		SpPointer bonfire_menu_flag = SpPointer((void*)((uint32_t)ds1_base + 0xF786D0), { 0x40 });
+
+		// Read bonfire menu flag
+		uint8_t bonfire_menu_is_open;
+		bonfire_menu_flag.read(&bonfire_menu_is_open);
+
+		// Check bonfire input fix conditions
+		if ( (current_anim == 7701 || current_anim == 7711 || current_anim == 7721) // 3 different bonfire resting animation IDs
+			&& !bonfire_menu_is_open)
+		{
+			// Bonfire input glitch conditions currently exist
+
+			if (first_detected == 0)
+			{
+				// First detection; log time
+				first_detected = GetTickCount();
+				return;
+			}
+			else if ((GetTickCount() - first_detected) >= 1000)
+			{
+				// Too much time has elapsed; bonfire input glitch is definitely present
+				fix_bonfire_input();
+				print_console(_DS1_MOD_MSG_BONFIRE_INPUT_FIX_AUTOMATIC_);
+			}
+			else
+			{
+				// Not enough time has elapsed; return and check again later
+				return;
+			}
+		}
 	}
+
+	first_detected = 0;
 }
 
 
-// Fixes input bug that causes players to be stuck at a bonfire (usually after turning human)
-int GameData::fix_bonfire_input()
+// Fixes input bug that causes players to be stuck at a bonfire (usually after turning human with framerate unlocked)
+int GameData::fix_bonfire_input(bool print_to_text_feed, bool print_to_console)
 {
 	// Get current player status
 	int status = DS1_PLAYER_STATUS_LOADING;
@@ -94,23 +144,48 @@ int GameData::fix_bonfire_input()
 
 	if (status == DS1_PLAYER_STATUS_HOLLOW || status == DS1_PLAYER_STATUS_HUMAN) // Check if player is hollow/human
 	{
-		// Write zero to bonfire animation status address
+		// Get pointer to current character animation
 		SpPointer bonfire_anim_fix = SpPointer((void*)0x12E29E8, { 0x0, 0xFC });
-		bonfire_anim_fix.write((uint32_t)0);
 
-		print(_DS1_MOD_MSG_BONFIRE_INPUT_FIX_);
+		// Read current character animation
+		uint32_t current_anim;
+		bonfire_anim_fix.read(&current_anim);
 
-		Sleep(200); // Sleep to avoid keypress being detected multiple times
-		return 0;
+		// Check that player is currently sitting at a bonfire
+		if (current_anim == 7701 || current_anim == 7711 || current_anim == 7721) // 3 different bonfire resting animation IDs
+		{
+			// Write zero to bonfire animation status address
+			bonfire_anim_fix.write((uint32_t)0);
+
+			if (print_to_text_feed)
+				print(_DS1_MOD_MSG_BONFIRE_INPUT_FIX_SUCCESS_);
+
+			if (print_to_console)
+				print_console(_DS1_MOD_MSG_BONFIRE_INPUT_FIX_SUCCESS_);
+
+			return ERROR_SUCCESS;
+		}
+		else
+		{
+			// Player is not at a bonfire
+			if (print_to_text_feed)
+				print(_DS1_MOD_MSG_BONFIRE_INPUT_FIX_NOT_AT_BONFIRE_FAIL_);
+
+			if (print_to_console)
+				print_console(_DS1_MOD_MSG_BONFIRE_INPUT_FIX_NOT_AT_BONFIRE_FAIL_);
+		}
 	}
 	else
 	{
 		// Player is not hollow/human, so can't be at a bonfire
-		print(_DS1_MOD_MSG_CANT_BONFIRE_INPUT_FIX_);
-		
-		Sleep(200); // Sleep to avoid keypress being detected multiple times
-		return -1;
+		if (print_to_text_feed)
+			print(_DS1_MOD_MSG_BONFIRE_INPUT_FIX_NO_CHAR_FAIL_);
+
+		if (print_to_console)
+			print_console(_DS1_MOD_MSG_BONFIRE_INPUT_FIX_NO_CHAR_FAIL_);
 	}
+
+	return ERROR_BAD_ENVIRONMENT;
 }
 
 
@@ -144,5 +219,30 @@ int GameData::get_node_count(std::string *text_feed_info_header)
 			text_feed_info_header->append("[Nodes: --]  ");
 		}
 		return -1;
+	}
+}
+
+
+
+
+/////////////////////////////////////////
+//////////////// PATCHES ////////////////
+/////////////////////////////////////////
+
+
+// Disables automatic game disconnection when low framerate is detected
+void GameData::disable_low_fps_disconnect()
+{
+	print_console("[Overhaul Mod] Disabling low FPS disconnect...");
+
+	uint8_t *fps_warn = NULL;
+	fps_warn = (uint8_t*)aob_scan("74 17 B9 ?? ?? ?? ?? E8 ?? ?? ?? ?? 8B"); // Careful, this pattern returns 2 results
+
+	if (fps_warn)
+	{
+		// AoB Scan was successful
+		set_mem_protection(fps_warn, 1, MEM_PROTECT_RWX);
+		fps_warn -= 0x1E;
+		*fps_warn = 0xC3; // To disable this patch, set *fps_warn = 0x51
 	}
 }

@@ -20,10 +20,10 @@
 
 
 // Applies the Bonfire input fix
-int cc_bonfire_input_fix(std::vector<std::string> args, std::string *output)
+int cc_fix_bonfire_input(std::vector<std::string> args, std::string *output)
 {
-	GameData::fix_bonfire_input();
-	return CONSOLE_COMMAND_SUCCESS;
+	// Apply fix and print message to console (and not to text feed)
+	return GameData::fix_bonfire_input(false, true);
 }
 
 
@@ -72,6 +72,7 @@ int cc_text_feed_node_count(std::vector<std::string> args, std::string *output)
 */
 void ModData::register_console_commands()
 {
-	register_console_command(ccn_bonfire_input_fix, cc_bonfire_input_fix, chm_bonfire_input_fix);
+	register_console_command(ccn_fix_bonfire_input, cc_fix_bonfire_input, chm_fix_bonfire_input);
 	register_console_command(ccn_text_feed_node_count, cc_text_feed_node_count, chm_text_feed_node_count);
+	register_console_alias(cca_node_count, ccn_text_feed_node_count);
 }

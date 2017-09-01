@@ -97,6 +97,8 @@ __declspec(dllexport) void __stdcall main_loop()
 	// Use this function for code that must be called rerpeatedly, such as checking flags or waiting for values to change
 
 
+	// Check if the player is stuck at the bonfire, and if so, automatically apply the bonfire input fix
+	GameData::check_bonfire_input_bug();
 }
 
 
