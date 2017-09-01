@@ -64,27 +64,12 @@ void ModData::get_user_keybinds()
 	// Begin loading keybinds
 	print_console("[Overhaul Mod] Loading keybinds...");
 
-
-	// Variable that holds each keybind when read from settings file
-	uint8_t key = 0;
-
 	
 	// Bonfire input fix keybind
-	if ( (key = (uint8_t)get_vk_hotkey(_DS1_OVERHAUL_SETTINGS_FILE_, _DS1_OVERHAUL_KEYBINDS_SECTION_, _DS1_OVERHAUL_HOTKEY_BONFIRE_INPUT_FIX_)) // Obtain user's preferred key
-		&& register_hotkey_function(key, GameData::fix_bonfire_input) )	// Register the keybind
-	{
-		// Successfully loaded and registered keybind; now print feedback to console
-		std::string output = "    Registered " _DS1_OVERHAUL_HOTKEY_BONFIRE_INPUT_FIX_ " keybind: ";
-		output.append(VK_NAME[key]).append(" (0x");   // Get the key name as a string
-		if (key < 0x10)
-			output += '0';
-		std::stringstream hex_stream;
-		hex_stream << std::hex << (int)key; // Convert Virtual-key code to hex string
-		output.append(hex_stream.str());
-		output += ')';
-		print_console(output.c_str());
-	}
-	key = 0;
+	get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_BONFIRE_INPUT_FIX_, kf_fix_bonfire_input);
+
+	// Toggle multiplayer node count in text feed info header
+	get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_NODE_COUNT_, kf_toggle_node_count);
 
 
 
@@ -95,4 +80,28 @@ void ModData::get_user_keybinds()
 	print_console("");
 }
 
+
+
+// Helper function for get_user_keybinds() that loads the specified keybind from the config file and binds it to the specified function
+void ModData::get_single_user_keybind(const char *keybind_name, int(*function)())
+{
+	// Variable that holds the Virtual-key code of the keybind when read from settings file
+	uint8_t key;
+
+	// Bonfire input fix keybind
+	if ( (key = (uint8_t)get_vk_hotkey(_DS1_OVERHAUL_SETTINGS_FILE_, _DS1_OVERHAUL_KEYBINDS_SECTION_, keybind_name)) // Obtain user's preferred key
+		&& register_hotkey_function(key, function) )	// Register the keybind
+	{
+		// Successfully loaded and registered keybind; now print feedback to console
+		std::string output = std::string("    Registered ").append(keybind_name).append(" keybind: ");
+		output.append(VK_NAME[key]).append(" (0x");   // Get the key name as a string
+		if (key < 0x10)
+			output += '0';
+		std::stringstream hex_stream;
+		hex_stream << std::hex << (int)key; // Convert Virtual-key code to hex string
+		output.append(hex_stream.str());
+		output += ')';
+		print_console(output.c_str());
+	}
+}
 

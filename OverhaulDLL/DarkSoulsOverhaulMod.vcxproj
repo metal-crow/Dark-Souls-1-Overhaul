@@ -163,6 +163,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="ConsoleCommands.h" />
+    <ClInclude Include="KeybindFunctions.h" />
     <ClInclude Include="ModData.h" />
     <ClInclude Include="DllMain.h" />
     <ClInclude Include="GameData.h" />
@@ -187,6 +188,7 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="GameData.cpp" />
+    <ClCompile Include="KeybindFunctions.cpp" />
     <ClCompile Include="ModData.cpp" />
     <ClCompile Include="PhantomLimit.cpp" />
   </ItemGroup>

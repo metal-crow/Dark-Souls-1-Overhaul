@@ -196,7 +196,7 @@ __declspec(dllimport) int execute_console_command(const char *command, int *retu
 
 	@error						If the DirectX9 device or overlay is not yet initialized, last error code is set to ERROR_INVALID_ADDRESS
 */
-__declspec(dllimport) bool console_open();
+__declspec(dllimport) bool console_is_open();
 
 
 

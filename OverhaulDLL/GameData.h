@@ -54,9 +54,12 @@ public:
 
 	// Changes the game version number to avoid compatibility issues with different game builds
 	static void set_game_version(uint8_t version_number);
-	
-	// Fixes input bug that causes players to be stuck at a bonfire (usually when turning human)
-	static int fix_bonfire_input();
+
+	// Checks if the player is stuck at the bonfire, and if so, automatically applies the bonfire input fix
+	static void check_bonfire_input_bug();
+
+	// Fixes input bug that causes players to be stuck at a bonfire (usually after turning human with framerate unlocked)
+	static int fix_bonfire_input(bool print_to_text_feed = false, bool print_to_console = false);
 
 	// Adds current multiplayer node count to the text feed info string and returns node count as an int.
 	//		If argument is NULL, simply returns node count (or -1 if player is not online)

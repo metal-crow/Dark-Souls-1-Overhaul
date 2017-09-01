@@ -34,6 +34,7 @@
 // Game data/Overhaul mod data headers:
 #include "GameData.h"
 #include "ModData.h"
+#include "KeybindFunctions.h"
 
 
 
