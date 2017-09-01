@@ -65,8 +65,9 @@ __declspec(dllexport) void __stdcall initialize_plugin()
 	set_text_feed_title("[Dark Souls Overhaul Mod]");
 	print("-------------DARK SOULS OVERHAUL TEST BUILD-------------", 0, false, SP_D3D9O_TEXT_COLOR_ORANGE);
 
-	// Load user preferences from settings file
-	ModData::get_user_prefs();
+	// Load user preferences & keybinds from settings file
+	ModData::get_user_preferences();
+	ModData::get_user_keybinds();
 
 	// Register console commands
 	ModData::register_console_commands();
