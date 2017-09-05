@@ -47,6 +47,10 @@ public:
 	// Signifies whether the mod has finished executing the inititalize_plugin() function
 	static bool initialized;
 
+
+	// Cheats on/off. If cheats are enabled, saving and multiplayer are disabled until the game is restarted
+	static bool cheats;
+
 	// Determines whether node count is displayed on the overlay text feed info header
 	static bool show_node_count;
 

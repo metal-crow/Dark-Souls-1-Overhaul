@@ -45,6 +45,9 @@ public:
 
 	// Player character status (loading, human, co-op, invader, hollow)
 	static SpPointer player_char_status;
+
+	// Game saving on/off
+	static SpPointer saves_enabled;
 	
 
 
@@ -72,7 +75,7 @@ public:
 	/////////////////////////////////////////
 
 	// Disables automatic game disconnection when low framerate is detected
-	static void disable_low_fps_disconnect();
+	static void low_fps_disconnect_enabled(bool enable);
 
 	// Two-part patch to increase the multiplayer phantom limit:
 	static void increase_phantom_limit1(); // Called from on_process_attach()

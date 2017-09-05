@@ -1,3 +1,5 @@
+; Author: Sean Pesce
+
 LIBRARY DS_Overhaul.dll
 EXPORTS
 	initialize_plugin @1
