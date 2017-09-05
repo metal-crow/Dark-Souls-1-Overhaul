@@ -79,7 +79,7 @@ __declspec(dllexport) void __stdcall initialize_plugin()
 	GameData::increase_phantom_limit2();
 
 	// Disable "Framerate insufficient for online play" error
-	GameData::disable_low_fps_disconnect();
+	GameData::low_fps_disconnect_enabled(false);
 
 
 	
@@ -97,8 +97,22 @@ __declspec(dllexport) void __stdcall main_loop()
 	// Use this function for code that must be called rerpeatedly, such as checking flags or waiting for values to change
 
 
-	// Check if the player is stuck at the bonfire, and if so, automatically apply the bonfire input fix
-	GameData::check_bonfire_input_bug();
+	if (ModData::initialized)
+	{
+
+		// If cheats are enabled, make sure saveing and multiplayer are disabled
+		if (ModData::cheats)
+		{
+			if (*(bool*)GameData::saves_enabled.resolve())
+				// Cheats are on, but saving is enabled; disable saving
+				GameData::saves_enabled.write(false);
+			// @TODO: Check that multiplayer is disabled
+		}
+
+
+		// Check if the player is stuck at the bonfire, and if so, automatically apply the bonfire input fix
+		GameData::check_bonfire_input_bug();
+	}
 }
 
 
@@ -334,7 +348,7 @@ __declspec(dllexport) bool __stdcall get_raw_input_data(RAWINPUT *pData, PUINT p
 	} // switch (pData->header.dwType)
 
 
-	// False = don't disable game input
+	// False = don't disable game input (allow this input to reach the game)
 	return false;
 }
 

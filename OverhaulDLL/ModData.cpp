@@ -22,6 +22,9 @@
 // Signifies whether the mod has finished executing the inititalize_plugin() function
 bool ModData::initialized = false;
 
+// Cheats on/off. If cheats are enabled, saving and multiplayer are disabled until the game is restarted
+bool ModData::cheats = false;
+
 // Determines whether node count is displayed on the overlay text feed info header
 bool ModData::show_node_count = true;
 

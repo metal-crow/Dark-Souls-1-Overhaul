@@ -37,9 +37,15 @@ const char *chm_fix_bonfire_input = ccn_fix_bonfire_input"\n"
 
 
 #define ccn_text_feed_node_count "text_feed_node_count"
-const char *chm_text_feed_node_count = ccn_text_feed_node_count"\n"
+const char *chm_text_feed_node_count = ccn_text_feed_node_count" [enable/disable]\n"
 									"    Enables/disables the multiplayer node count element of the overlay text feed info bar (1 = enabled, 0 = disabled).";
 #define cca_node_count "node_count"
+
+
+#define ccn_cheats "cheats"
+const char *chm_cheats = ccn_cheats" [enable/disable]\n"
+									"    Enables cheats, unlocking additional console commands (1 = enable). If cheats are enabled, saving and multiplayer"
+									"    are disabled until the game is restarted.";
 
 
 
@@ -160,7 +166,7 @@ bool string_is_zero(const char *c_str)
 		return false;
 	}
 
-	for (int i = 0; i < str.length(); i++)
+	for (int i = 0; i < (int)str.length(); i++)
 	{
 		if (i != 1 && str.c_str()[i] != '0')
 		{
@@ -253,7 +259,7 @@ void args_to_string(std::vector<std::string> args, std::string *str)
 		{
 			// Argument contains whitespace/quotes, so must be a string argument
 			int last_match = 0;
-			while ((last_match < arg.length()) && (last_match = arg.find_first_of("'", last_match)) != std::string::npos)
+			while ((last_match < (int)arg.length()) && (last_match = arg.find_first_of("'", last_match)) != std::string::npos)
 			{
 				arg.insert(last_match, "\\");
 				last_match += 2; // +1 for new '\\' char, +1 to move past the '\'' char

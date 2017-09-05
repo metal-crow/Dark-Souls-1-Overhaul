@@ -5,7 +5,7 @@
 		Ashley						-	Reverse engineering, Low FPS Disconnect patch
 		jellybaby34					-	Game version number patch
 		Metal-Crow					-	Reverse engineering, Phantom Limit patch
-		Youri "NullBy7e" de Mooij	-	Bonfire Input Fix
+		Youri "NullBy7e" de Mooij	-	Original Bonfire Input Fix
 		Sean Pesce					-	C++
 	
 */
@@ -27,6 +27,9 @@ void *GameData::player_char_base = NULL;
 // Player character status (loading, human, co-op, invader, hollow)
 SpPointer GameData::player_char_status;
 
+// Game saving on/off
+SpPointer GameData::saves_enabled;
+
 
 
 
@@ -42,7 +45,8 @@ void GameData::init_pointers()
 	// Player character status (loading, human, co-op, invader, hollow)
 	GameData::player_char_status = SpPointer(GameData::player_char_base, { 0xA28 });
 
-
+	// Game saving on/off
+	GameData::saves_enabled = SpPointer((void*)0x13784A0, { 0xB40 });
 }
 
 
@@ -231,7 +235,7 @@ int GameData::get_node_count(std::string *text_feed_info_header)
 
 
 // Disables automatic game disconnection when low framerate is detected
-void GameData::disable_low_fps_disconnect()
+void GameData::low_fps_disconnect_enabled(bool enable)
 {
 	print_console("[Overhaul Mod] Disabling low FPS disconnect...");
 
@@ -243,6 +247,10 @@ void GameData::disable_low_fps_disconnect()
 		// AoB Scan was successful
 		set_mem_protection(fps_warn, 1, MEM_PROTECT_RWX);
 		fps_warn -= 0x1E;
-		*fps_warn = 0xC3; // To disable this patch, set *fps_warn = 0x51
+		
+		if (enable)
+			*fps_warn = 0x51; // Enable low FPS disconnect
+		else
+			*fps_warn = 0xC3; // Disable low FPS disconnect
 	}
 }
