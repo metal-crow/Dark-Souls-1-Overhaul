@@ -99,6 +99,8 @@ __declspec(dllexport) void __stdcall main_loop()
 
 	if (ModData::initialized)
 	{
+		// Update multiplayer node count
+		GameData::node_count = GameData::get_node_count();
 
 		// If cheats are enabled, make sure saveing and multiplayer are disabled
 		if (ModData::cheats)
@@ -137,7 +139,10 @@ __declspec(dllexport) void __stdcall draw_overlay(std::string *text_feed_info_he
 	if (ModData::show_node_count)
 	{
 		// Show node count in text feed info header
-		GameData::get_node_count(text_feed_info_header);
+		if(GameData::node_count > -1)
+			text_feed_info_header->append("[Nodes: ").append(std::to_string(GameData::node_count)).append("]  ");
+		else
+			text_feed_info_header->append("[Nodes: --]  ");
 	}
 
 }

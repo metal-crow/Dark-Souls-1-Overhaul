@@ -30,6 +30,9 @@ SpPointer GameData::player_char_status;
 // Game saving on/off
 SpPointer GameData::saves_enabled;
 
+// Multiplayer node count
+int GameData::node_count = -1;
+
 
 
 
@@ -88,7 +91,13 @@ void GameData::check_bonfire_input_bug()
 
 	// Get current player status
 	int status = DS1_PLAYER_STATUS_LOADING;
-	player_char_status.read(&status);
+	if (player_char_status.read(&status) != ERROR_SUCCESS)
+	{
+		// Error reading memory location
+		first_detected = 0;
+		return;
+	}
+
 
 	// Check for bonfire input glitch conditions
 	if (status == DS1_PLAYER_STATUS_HOLLOW || status == DS1_PLAYER_STATUS_HUMAN) // Check if player is hollow/human
@@ -100,18 +109,91 @@ void GameData::check_bonfire_input_bug()
 
 		// Read current character animation
 		uint32_t current_anim;
-		bonfire_anim_fix.read(&current_anim);
+		if (bonfire_anim_fix.read(&current_anim) != ERROR_SUCCESS)
+		{
+			// Error reading memory location
+			first_detected = 0;
+			return;
+		}
 
-		// Get pointer to bonfire menu flag
-		SpPointer bonfire_menu_flag = SpPointer((void*)((uint32_t)ds1_base + 0xF786D0), { 0x40 });
 
 		// Read bonfire menu flag
+		SpPointer bonfire_menu_flag = SpPointer((void*)((uint32_t)GetModuleHandle(NULL) + 0xF786D0), { 0x40 });
 		uint8_t bonfire_menu_is_open;
-		bonfire_menu_flag.read(&bonfire_menu_is_open);
+		if (bonfire_menu_flag.read(&bonfire_menu_is_open) != ERROR_SUCCESS)
+		{
+			first_detected = 0;
+			return;
+		}
+
+		// Read repair menu flag
+		SpPointer repair_menu_flag = SpPointer((void*)((uint32_t)GetModuleHandle(NULL) + 0xF786D0), { 0x4C });
+		uint8_t repair_menu_is_open;
+		if (repair_menu_flag.read(&repair_menu_is_open) != ERROR_SUCCESS)
+		{
+			first_detected = 0;
+			return;
+		}
+
+		// Read level up menu flag
+		SpPointer level_menu_flag = SpPointer((void*)((uint32_t)GetModuleHandle(NULL) + 0xF786D0), { 0x78 });
+		uint8_t level_menu_is_open;
+		if (level_menu_flag.read(&level_menu_is_open) != ERROR_SUCCESS)
+		{
+			first_detected = 0;
+			return;
+		}
+
+		// Read bottomless box menu flag
+		SpPointer bottomless_menu_flag = SpPointer((void*)((uint32_t)GetModuleHandle(NULL) + 0xF786D0), { 0x84 });
+		uint8_t bottomless_menu_is_open;
+		if (bottomless_menu_flag.read(&bottomless_menu_is_open) != ERROR_SUCCESS)
+		{
+			first_detected = 0;
+			return;
+		}
+
+		// Read attune magic menu flag
+		SpPointer attune_menu_flag = SpPointer((void*)((uint32_t)GetModuleHandle(NULL) + 0xF786D0), { 0x80 });
+		uint8_t attune_menu_is_open;
+		if (attune_menu_flag.read(&attune_menu_is_open) != ERROR_SUCCESS)
+		{
+			first_detected = 0;
+			return;
+		}
+
+		// Read reinforce weapon/armor menu flag
+		SpPointer reinforce_menu_flag = SpPointer((void*)((uint32_t)GetModuleHandle(NULL) + 0xF786D0), { 0x50 });
+		uint8_t reinforce_menu_is_open;
+		if (reinforce_menu_flag.read(&reinforce_menu_is_open) != ERROR_SUCCESS)
+		{
+			first_detected = 0;
+			return;
+		}
+
+		// Read warp menu flag
+		SpPointer warp_menu_flag = SpPointer((void*)((uint32_t)GetModuleHandle(NULL) + 0xF786D0), { 0xAC });
+		uint8_t warp_menu_is_open;
+		if (warp_menu_flag.read(&warp_menu_is_open) != ERROR_SUCCESS)
+		{
+			first_detected = 0;
+			return;
+		}
+
+		// Read "reverse hollowing?"/"can't kindle"/"can't reverse hollowing"/"insufficient attunement slots" dialog flag
+		SpPointer dialog_menu_flag = SpPointer((void*)((uint32_t)GetModuleHandle(NULL) + 0xF786D0), { 0x60 });
+		uint8_t dialog_menu_is_open;
+		if (dialog_menu_flag.read(&dialog_menu_is_open) != ERROR_SUCCESS)
+		{
+			first_detected = 0;
+			return;
+		}
+
 
 		// Check bonfire input fix conditions
 		if ( (current_anim == 7701 || current_anim == 7711 || current_anim == 7721) // 3 different bonfire resting animation IDs
-			&& !bonfire_menu_is_open)
+			&& !bonfire_menu_is_open && !repair_menu_is_open && !bottomless_menu_is_open && !reinforce_menu_is_open
+			&& !level_menu_is_open && !attune_menu_is_open && !dialog_menu_is_open && !warp_menu_is_open) // Make sure no bonfire menus are open
 		{
 			// Bonfire input glitch conditions currently exist
 
@@ -144,7 +226,17 @@ int GameData::fix_bonfire_input(bool print_to_text_feed, bool print_to_console)
 {
 	// Get current player status
 	int status = DS1_PLAYER_STATUS_LOADING;
-	player_char_status.read(&status);
+	if (player_char_status.read(&status) != ERROR_SUCCESS)
+	{
+		// Error reading memory location
+		if (print_to_text_feed)
+			print(_DS1_MOD_MSG_BONFIRE_INPUT_FIX_NO_INIT_FAIL_);
+
+		if (print_to_console)
+			print_console(_DS1_MOD_MSG_BONFIRE_INPUT_FIX_NO_INIT_FAIL_);
+		return ERROR_INVALID_ADDRESS;
+	}
+
 
 	if (status == DS1_PLAYER_STATUS_HOLLOW || status == DS1_PLAYER_STATUS_HUMAN) // Check if player is hollow/human
 	{
@@ -193,37 +285,15 @@ int GameData::fix_bonfire_input(bool print_to_text_feed, bool print_to_console)
 }
 
 
-// Adds current multiplayer node count to the text feed info string and returns node count as an int.
-//		If argument is NULL, simply returns node count (or -1 if player is not online)
-int GameData::get_node_count(std::string *text_feed_info_header)
+// Returns multiplayer node count as an int (or -1 if player is not online)
+int GameData::get_node_count()
 {
-	// First check that the node count pointer can be resolved
-	SpPointer node_count_ptr_check = SpPointer((uint8_t*)GameData::ds1_base + 0xF7F77C, { 0x2C, 0x778 });
+	SpPointer node_count_ptr = SpPointer((uint8_t*)ds1_base + 0xF7F77C, { 0x2C, 0x778, 0x80 });
 
-	if (ModData::initialized && *(void**)(node_count_ptr_check.resolve()))
-	{
-		// Get node count
-		SpPointer node_count_ptr = SpPointer((uint8_t*)ds1_base + 0xF7F77C, { 0x2C, 0x778, 0x80 });
-		int node_count;
-		node_count_ptr.read(&node_count);
-
-		if (text_feed_info_header != NULL && ModData::show_node_count)
-		{
-			text_feed_info_header->append("[Nodes: ");
-			text_feed_info_header->append(std::to_string(node_count));
-			text_feed_info_header->append("]  ");
-		}
-		return node_count;
-	}
-	else
-	{
-		// Node count pointer could not be resolved; game is still loading or player is offline
-		if (text_feed_info_header != NULL && ModData::show_node_count)
-		{
-			text_feed_info_header->append("[Nodes: --]  ");
-		}
-		return -1;
-	}
+	// Get node count
+	int nodes = -1;
+	node_count_ptr.read(&nodes);
+	return nodes;
 }
 
 

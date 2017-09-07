@@ -35,6 +35,7 @@
 
 //////////////////////////// OVERLAY MESSAGES ////////////////////////////
 #define _DS1_MOD_MSG_BONFIRE_INPUT_FIX_SUCCESS_ "SUCCESS: Bonfire input fix applied"
+#define _DS1_MOD_MSG_BONFIRE_INPUT_FIX_NO_INIT_FAIL_ "FAILED: Bonfire input fix was not applied (error reading memory)"
 #define _DS1_MOD_MSG_BONFIRE_INPUT_FIX_NO_CHAR_FAIL_ "FAILED: Bonfire input fix was not applied (no character loaded)"
 #define _DS1_MOD_MSG_BONFIRE_INPUT_FIX_NOT_AT_BONFIRE_FAIL_ "FAILED: Bonfire input fix was not applied (character is not sitting at a bonfire)"
 #define _DS1_MOD_MSG_BONFIRE_INPUT_FIX_AUTOMATIC_ "WARNING: Bonfire input glitch detected; applying input fix"
