@@ -460,6 +460,9 @@ void GameData::increase_phantom_limit2()
 
 
 	// Set maximum number of phantoms
+	while (max_allowed_summons_ptr.resolve() == NULL)
+		Sleep(100); // Wait until pointer can be resolved
+
 	set_mem_protection(max_allowed_summons_ptr.resolve(), 4, MEM_PROTECT_RWX);
 	while (*((void**)max_allowed_summons_ptr.base) == NULL)
 	{

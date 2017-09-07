@@ -48,6 +48,9 @@ public:
 
 	// Game saving on/off
 	static SpPointer saves_enabled;
+
+	// Multiplayer node count
+	static int node_count;
 	
 
 
@@ -64,9 +67,8 @@ public:
 	// Fixes input bug that causes players to be stuck at a bonfire (usually after turning human with framerate unlocked)
 	static int fix_bonfire_input(bool print_to_text_feed = false, bool print_to_console = false);
 
-	// Adds current multiplayer node count to the text feed info string and returns node count as an int.
-	//		If argument is NULL, simply returns node count (or -1 if player is not online)
-	static int get_node_count(std::string *text_feed_info_header = NULL);
+	// Returns multiplayer node count as an int (or -1 if player is not online)
+	static int get_node_count();
 
 
 
