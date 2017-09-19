@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable>
+  <CheatEntries>
+    <CheatEntry>
+      <ID>91724</ID>
+      <Description>"These control both the temporary HP and temporary Stamina"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>91725</ID>
+      <Description>"The bars are controlled via a float value from 0 to 1, empty to full"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>91726</ID>
+      <Description>"A timer sitting at 0 will count up 0.03 (per tick?) all the way to 0.99, after which the temporary bar will begin to drop"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>91727</ID>
+      <Description>"These 3 scripts just nop a few lines of code controlling the float value and timer value"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>91728</ID>
+      <Description>" "</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>91723</ID>
+      <Description>"Stops bar from dropping (timer keeps going)"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>//DARKSOULS.exe+888CED - F3 0F11 48 3C         - movss [eax+3C],xmm1
+
+[ENABLE]
+DARKSOULS.exe+888CED:
+nop
+nop
+nop
+nop
+nop
+
+[DISABLE]
+DARKSOULS.exe+888CED:
+movss [eax+3C],xmm1
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>91721</ID>
+      <Description>"Stops timers from counting"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>//DARKSOULS.exe+88900F - F3 0F11 46 54         - movss [esi+54],xmm0
+
+[ENABLE]
+DARKSOULS.exe+88900F:
+nop
+nop
+nop
+nop
+nop
+
+[DISABLE]
+DARKSOULS.exe+88900F:
+movss [esi+54],xmm0
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>91720</ID>
+      <Description>"Bar will always drop, ignoring the timer (lots of similar code near this does the same thing)"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>//DARKSOULS.exe+889006 - F3 0F10 4E 5C         - movss xmm1,[esi+5C]
+
+[ENABLE]
+DARKSOULS.exe+889006:
+nop
+nop
+nop
+nop
+nop
+
+[DISABLE]
+DARKSOULS.exe+889006:
+movss xmm1,[esi+5C]
+
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+</CheatTable>
