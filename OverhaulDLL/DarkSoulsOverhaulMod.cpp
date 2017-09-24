@@ -19,6 +19,9 @@ DWORD WINAPI on_process_attach(LPVOID lpParam)
 	// Obtain base address of Dark Souls game process
 	GameData::ds1_base = GetModuleHandle(NULL);
 
+	// Apply increase memory limit patch
+	GameData::increase_memory_limit();
+
 	// Change game version number
 	GameData::set_game_version(DS1_VERSION_OVERHAUL);
 

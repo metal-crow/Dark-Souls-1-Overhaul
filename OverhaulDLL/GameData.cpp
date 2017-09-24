@@ -324,3 +324,20 @@ void GameData::low_fps_disconnect_enabled(bool enable)
 			*fps_warn = 0xC3; // Disable low FPS disconnect
 	}
 }
+
+// Increase available pool of memory Dark Souls allocates itself
+void GameData::increase_memory_limit()
+{
+	print_console("[Overhaul Mod] Increasing available memory...");
+
+	uint8_t patch[5] = { 0x68, 0x00, 0x00, 0xDA, 0x00 }; // push 0x0DA0000. The constant can be increased as desired, and represents dark souls total memory pool
+
+	void *write_address = (uint8_t*)GameData::ds1_base + 0xB8B7E5;
+	apply_byte_patch(write_address, patch, 5);
+
+	write_address = (uint8_t*)GameData::ds1_base + 0x9E20;
+	apply_byte_patch(write_address, patch, 5);
+
+	write_address = (uint8_t*)GameData::ds1_base + 0x9E41;
+	apply_byte_patch(write_address, patch, 5);
+}
