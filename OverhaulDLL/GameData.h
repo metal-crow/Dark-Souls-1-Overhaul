@@ -79,6 +79,9 @@ public:
 	// Disables automatic game disconnection when low framerate is detected
 	static void low_fps_disconnect_enabled(bool enable);
 
+	// Increase available pool of memory Dark Souls allocates itself
+	static void increase_memory_limit();
+
 	// Two-part patch to increase the multiplayer phantom limit:
 	static void increase_phantom_limit1(); // Called from on_process_attach()
 	static void increase_phantom_limit2(); // Called from initialize_plugin()
