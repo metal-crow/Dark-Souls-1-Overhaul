@@ -135,7 +135,10 @@ __declspec(dllexport) void __stdcall draw_overlay(std::string *text_feed_info_he
 		Allows drawing of additional overlay elements and live text feed info header elements.
 		An appropriate stateblock for overlay drawing is applied before this function is called.
 		
-		NOTE: Use the _d3d9_dev macro to obtain the game's IDirect3DDevice9 for drawing new elements
+		NOTE: Use the _d3d9_dev macro to obtain the game's IDirect3DDevice9 for drawing new elements.
+
+		WARNING: This function is called from inside the DirectX9 Device Present() function. Keep
+		code in this function as optimized as possible to avoid lowering FPS.
 	*/
 	
 
@@ -162,7 +165,12 @@ __declspec(dllexport) void __stdcall draw_overlay(std::string *text_feed_info_he
 */
 __declspec(dllexport) void __stdcall present(const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA *pDirtyRegion, DWORD dwFlags)
 {
-	// NOTE: Use the _d3d9_dev macro to obtain the game's IDirect3DDevice9 for drawing new elements
+	/*
+		NOTE: Use the _d3d9_dev macro to obtain the game's IDirect3DDevice9 for drawing new elements.
+
+		WARNING: This function is called from inside the DirectX9 Device Present() function. Keep
+		code in this function as optimized as possible to avoid lowering FPS.
+	*/
 
 
 }
@@ -180,7 +188,12 @@ __declspec(dllexport) void __stdcall present(const RECT *pSourceRect, const RECT
 */
 __declspec(dllexport) void __stdcall end_scene()
 {
-	// NOTE: Use the _d3d9_dev macro to obtain the game's IDirect3DDevice9 for drawing new elements
+	/*
+		NOTE: Use the _d3d9_dev macro to obtain the game's IDirect3DDevice9 for drawing new elements.
+
+		WARNING: This function is called from inside the DirectX9 Device EndScene() function. Keep
+		code in this function as optimized as possible to avoid lowering FPS.
+	*/
 
 
 }
