@@ -22,11 +22,14 @@ DWORD WINAPI on_process_attach(LPVOID lpParam)
 	// Apply increase memory limit patch
 	GameData::increase_memory_limit();
 
-	// Change game version number
-	GameData::set_game_version(DS1_VERSION_OVERHAUL);
+	// Use overhaul bdt files
+	GameData::change_loaded_bdt_files();
 
 	// Apply first part of phantom limit patch
 	GameData::increase_phantom_limit1();
+
+	// Change game version number
+	GameData::set_game_version(DS1_VERSION_OVERHAUL);
 
 	return 0;
 }
