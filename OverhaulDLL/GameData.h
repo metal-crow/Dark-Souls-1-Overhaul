@@ -83,6 +83,9 @@ public:
 	// Increase available pool of memory Dark Souls allocates itself
 	static void increase_memory_limit();
 
+	// Dynamically change what bdt files are loaded by Dark Souls. From vanilla to overhaul versions
+	static void change_loaded_bdt_files();
+
 	// Two-part patch to increase the multiplayer phantom limit:
 	static void increase_phantom_limit1(); // Called from on_process_attach()
 	static void increase_phantom_limit2(); // Called from initialize_plugin()

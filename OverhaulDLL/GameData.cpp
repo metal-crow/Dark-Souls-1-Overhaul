@@ -341,3 +341,25 @@ void GameData::increase_memory_limit()
 	write_address = (uint8_t*)GameData::ds1_base + 0x9E41;
 	apply_byte_patch(write_address, patch, 5);
 }
+
+// Dynamically change what bdt files are loaded by Dark Souls. From vanilla to overhaul versions
+void GameData::change_loaded_bdt_files()
+{
+	wchar_t archive_name[] = L"ovhaul"; //dvdbnd -> ovhaul
+	void *dvd0_bdt = (uint8_t*)GameData::ds1_base + 0xD63AF6;
+	apply_byte_patch(dvd0_bdt, archive_name, 12);
+	void *dvd0_bhd = (uint8_t*)GameData::ds1_base + 0xD63B22;
+	apply_byte_patch(dvd0_bhd, archive_name, 12);
+	void *dvd1_bdt = (uint8_t*)GameData::ds1_base + 0xD63B5E;
+	apply_byte_patch(dvd1_bdt, archive_name, 12);
+	void *dvd1_bhd = (uint8_t*)GameData::ds1_base + 0xD63B8A;
+	apply_byte_patch(dvd1_bhd, archive_name, 12);
+	void *dvd2_bdt = (uint8_t*)GameData::ds1_base + 0xD63BC6;
+	apply_byte_patch(dvd2_bdt, archive_name, 12);
+	void *dvd2_bhd = (uint8_t*)GameData::ds1_base + 0xD63BF2;
+	apply_byte_patch(dvd2_bhd, archive_name, 12);
+	void *dvd3_bdt = (uint8_t*)GameData::ds1_base + 0xD63C2E;
+	apply_byte_patch(dvd3_bdt, archive_name, 12);
+	void *dvd3_bhd = (uint8_t*)GameData::ds1_base + 0xD63C5A;
+	apply_byte_patch(dvd3_bhd, archive_name, 12);
+}
