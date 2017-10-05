@@ -431,6 +431,8 @@ void GameData::increase_phantom_limit1()
 // Finishes applying the phantom limit patch (This late patch needs to be applied later in the game loading sequence)
 void GameData::increase_phantom_limit2()
 {
+	print_console("[Overhaul Mod] Increasing multiplayer phantom limit...");
+
 	uint32_t temp_ind_off = (uint32_t)(max_allowed_summons8 - 1) << 6;
 
 	// Number of black signs visible
