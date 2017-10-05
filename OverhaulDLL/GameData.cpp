@@ -4,7 +4,7 @@
 	Contributors to this file:
 		Ashley						-	Reverse engineering, Low FPS Disconnect patch
 		jellybaby34					-	Game version number patch
-		Metal-Crow					-	Reverse engineering, Phantom Limit patch
+		Metal-Crow					-	Reverse engineering, Phantom Limit patch, C++
 		Youri "NullBy7e" de Mooij	-	Original Bonfire Input Fix
 		Sean Pesce					-	C++
 	
