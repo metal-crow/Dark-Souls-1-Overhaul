@@ -3,6 +3,7 @@
 	
 	Contributors to this file:
 		Sean Pesce	-	C++
+		Metal-Crow	-	C++
 	
 */
 
