@@ -287,11 +287,22 @@ int GameData::fix_bonfire_input(bool print_to_text_feed, bool print_to_console)
 	else
 	{
 		// Player is not hollow/human, so can't be at a bonfire
-		if (print_to_text_feed)
-			print(_DS1_MOD_MSG_BONFIRE_INPUT_FIX_NO_CHAR_FAIL_);
+		if (status == DS1_PLAYER_STATUS_LOADING)
+		{
+			if (print_to_text_feed)
+				print(_DS1_MOD_MSG_BONFIRE_INPUT_FIX_NO_CHAR_FAIL_);
 
-		if (print_to_console)
-			print_console(_DS1_MOD_MSG_BONFIRE_INPUT_FIX_NO_CHAR_FAIL_);
+			if (print_to_console)
+				print_console(_DS1_MOD_MSG_BONFIRE_INPUT_FIX_NO_CHAR_FAIL_);
+		}
+		else
+		{
+			if (print_to_text_feed)
+				print(_DS1_MOD_MSG_BONFIRE_INPUT_FIX_NOT_AT_BONFIRE_FAIL_);
+
+			if (print_to_console)
+				print_console(_DS1_MOD_MSG_BONFIRE_INPUT_FIX_NOT_AT_BONFIRE_FAIL_);
+		}
 	}
 
 	return ERROR_BAD_ENVIRONMENT;
