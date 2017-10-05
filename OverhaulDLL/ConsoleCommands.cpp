@@ -3,6 +3,7 @@
 	
 	Contributors to this file:
 		Sean Pesce	-	C++, DirectX9 overlay
+		Wulf2k		-	Multiplayer network data addresses
 
 
 	This file defines custom console commands that will
@@ -76,6 +77,92 @@ int cc_fix_bonfire_input(std::vector<std::string> args, std::string *output)
 }
 
 
+// Prints information on every player in the user's multiplayer node network
+int cc_network_status(std::vector<std::string> args, std::string *output)
+{
+	if (GameData::node_count < 0)
+	{
+		output->append("Multiplayer network is unavailable.");
+	}
+	else if (GameData::node_count == 0)
+	{
+		output->append("No players in multiplayer network.");
+	}
+	else
+	{
+		output->append("\n");
+		std::string header = "     Steam64 ID         |    Steam64 ID (Hex)   |   Ping    ";
+		output->append(header);
+		output->append("\n");
+		for (int i = 0; i < (int)header.length(); i++)
+		{
+			output->append("-");
+		}
+		output->append("\n");
+		SpPointer connection_list = SpPointer((uint8_t*)GameData::ds1_base + 0xF62D24, { 0x54 } );
+		SpPointer entry = SpPointer(NULL);
+		for (int i = 0; i < GameData::node_count && connection_list.resolve() != entry.resolve(); i++)
+		{
+			if (i == 0)
+				entry = SpPointer(connection_list.resolve(), { 0x0 });
+
+			SpPointer status_ptr = SpPointer(entry.resolve(), { 0x8, 0x8 });
+			SpPointer steam_id_ptr = SpPointer(entry.resolve(), { 0x8, 0x170 });
+			SpPointer ping_ptr = SpPointer(entry.resolve(), { 0x8, 0x178 });
+
+			int status;
+			status_ptr.read(&status);
+			if (status > 2)
+			{
+				output->append("  ");
+
+				// Get Steam64 ID as decimal string
+				unsigned long long steam64_id_val;
+				steam_id_ptr.read(&steam64_id_val);
+				std::string steam64_id = std::to_string(steam64_id_val);
+				for (int j = 0, len = steam64_id.length(); j < (22 - len); j++) // 20 = largest possible length of a Steam64 ID string
+					steam64_id += ' ';
+				output->append(steam64_id);
+				output->append("|    ");
+
+
+				// Get Steam64 ID as hex string
+				uint8_t steam_id_bytes[8];
+				memcpy_s(steam_id_bytes, 8, steam_id_ptr.resolve(), 8);
+				for (int j = 0; j < 8; j++)
+				{
+					uint8_t b = steam_id_bytes[7 - j];
+					std::stringstream hex_stream;
+					hex_stream << std::hex << (int)b; // Convert Virtual-key code to hex string
+					if (b < 16)
+						output->append("0");
+					output->append(hex_stream.str());
+				}
+				output->append("   |   ");
+
+
+				// Get ping
+				int ping;
+				ping_ptr.read(&ping);
+				if (ping > 999)
+					ping = 999;
+				output->append(std::to_string(ping));
+				if (ping < 10)
+					output->append("  ");
+				else if (ping < 100)
+					output->append(" ");
+				output->append("\n");
+			}
+
+			// Get next connection
+			entry = SpPointer(entry.resolve(), { 0x0 });
+		}
+	}
+
+	return CONSOLE_COMMAND_SUCCESS;
+}
+
+
 
 // Enables/disables multiplayer node count element of overlay text feed
 int cc_text_feed_node_count(std::vector<std::string> args, std::string *output)
@@ -96,6 +183,17 @@ int cc_text_feed_node_count(std::vector<std::string> args, std::string *output)
 				output->append("ERROR: Assigned value must be either 1 or 0 (1 = enabled, 0 = disabled)\n");
 				return_val = ERROR_INVALID_PARAMETER;
 				break;
+		}
+	}
+	else
+	{
+		if (GameData::node_count < 0)
+		{
+			output->append("Multiplayer network is unavailable.\n");
+		}
+		else
+		{
+			output->append("Current node count: ").append(std::to_string(GameData::node_count)).append("\n");
 		}
 	}
 
@@ -125,4 +223,5 @@ void ModData::register_console_commands()
 	register_console_command(ccn_text_feed_node_count, cc_text_feed_node_count, chm_text_feed_node_count);
 	register_console_alias(cca_node_count, ccn_text_feed_node_count);
 	register_console_command(ccn_cheats, cc_cheats, chm_cheats);
+	register_console_command(ccn_network_status, cc_network_status, chm_network_status);
 }
