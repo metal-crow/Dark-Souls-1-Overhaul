@@ -23,7 +23,9 @@ DWORD WINAPI on_process_attach(LPVOID lpParam)
 	GameData::increase_memory_limit();
 
 	// Use overhaul bdt files
-	GameData::change_loaded_bdt_files();
+	std::wstring custom_archive_file;
+	ModData::get_custom_archive_file(&custom_archive_file);
+	GameData::change_loaded_bdt_files((wchar_t *)custom_archive_file.c_str());  // "dvdbnd" -> "ovhaul"
 
 	// Apply first part of phantom limit patch
 	GameData::increase_phantom_limit1();
@@ -70,6 +72,10 @@ __declspec(dllexport) void __stdcall initialize_plugin()
 	// Set overlay info strings
 	set_text_feed_title("[Dark Souls Overhaul Mod]");
 	print("-------------DARK SOULS OVERHAUL TEST BUILD-------------", 0, false, SP_D3D9O_TEXT_COLOR_ORANGE);
+
+	// Print startup messages
+	for (std::string msg : ModData::startup_messages)
+		print_console(msg.c_str());
 
 	// Load user preferences & keybinds from settings file
 	ModData::get_user_preferences();

@@ -11,7 +11,20 @@
 */
 
 #include "DllMain.h"
+#include <clocale>
 
+
+/*
+	Initialize constants:
+*/
+// Default filename prefix for game archive files
+const wchar_t *DEFAULT_ARCHIVE_FILE_PREFIX = L"dvdbnd";
+
+// Default file types for game archive files (wide char)
+const wchar_t *ARCHIVE_FILE_TYPE_W[2] = { L".bdt", L".bhd5" };
+
+// Default file types for game archive files (char)
+const char *ARCHIVE_FILE_TYPE[2] = { ".bdt", ".bhd5" };
 
 
 /*
@@ -57,8 +70,8 @@ void GameData::init_pointers()
 void GameData::set_game_version(uint8_t version_number)
 {
 	std::stringstream hex_stream;
-	hex_stream << std::hex << version_number;
-	print_console(std::string("[Overhaul Mod] Setting game version number = 0x").append(hex_stream.str()).append("...").c_str());
+	hex_stream << std::hex << (int)version_number;
+	ModData::startup_messages.push_back(std::string("[Overhaul Mod] Setting game version number to 0x").append(hex_stream.str()).append("..."));
 
 	uint8_t patch1[5] = { 0xC6, 0x44, 0x24, 0x1C, version_number }; // mov byte ptr [esp+0x1C],0x3C
 	uint8_t patch2[3] = { 0x80, 0x38, version_number }; // cmp byte ptr [eax],0x3C
@@ -307,8 +320,6 @@ int GameData::get_node_count()
 // Disables automatic game disconnection when low framerate is detected
 void GameData::low_fps_disconnect_enabled(bool enable)
 {
-	print_console("[Overhaul Mod] Disabling low FPS disconnect...");
-
 	uint8_t *fps_warn = NULL;
 	fps_warn = (uint8_t*)aob_scan("74 17 B9 ?? ?? ?? ?? E8 ?? ?? ?? ?? 8B"); // Careful, this pattern returns 2 results
 
@@ -319,16 +330,23 @@ void GameData::low_fps_disconnect_enabled(bool enable)
 		fps_warn -= 0x1E;
 		
 		if (enable)
+		{
+			print_console("[Overhaul Mod] Enabling low FPS disconnect...");
 			*fps_warn = 0x51; // Enable low FPS disconnect
+		}
 		else
+		{
+			print_console("[Overhaul Mod] Disabling low FPS disconnect...");
 			*fps_warn = 0xC3; // Disable low FPS disconnect
+		}
+			
 	}
 }
 
 // Increase available pool of memory Dark Souls allocates itself
 void GameData::increase_memory_limit()
 {
-	print_console("[Overhaul Mod] Increasing available memory...");
+	ModData::startup_messages.push_back("[Overhaul Mod] Increasing available memory...");
 
 	uint8_t patch[5] = { 0x68, 0x00, 0x00, 0xDA, 0x00 }; // push 0x0DA0000. The constant can be increased as desired, and represents dark souls total memory pool
 
@@ -342,10 +360,61 @@ void GameData::increase_memory_limit()
 	apply_byte_patch(write_address, patch, 5);
 }
 
-// Dynamically change what bdt files are loaded by Dark Souls. From vanilla to overhaul versions
-void GameData::change_loaded_bdt_files()
+// Set the .bdt files to be loaded by the game (WARNING: archive_name parameter must be exactly 6 characters)
+void GameData::change_loaded_bdt_files(wchar_t *archive_name)
 {
-	wchar_t archive_name[] = L"ovhaul"; //dvdbnd -> ovhaul
+	ModData::startup_messages.push_back(std::string("[Overhaul Mod] Checking for custom game files..."));
+
+	// Check that the custom archive name prefix is the correct length
+	size_t custom_name_len = 0;
+	if (archive_name == NULL || ((custom_name_len = wcslen(archive_name)) != ARCHIVE_FILE_PREFIX_LENGTH))
+	{
+		ModData::startup_messages.push_back(std::string("[Overhaul Mod] ERROR: Custom archive name prefix was invalid length (").append(std::to_string(custom_name_len)).append("). Using default archive files instead."));
+		return;
+	}
+
+	// Get char* strings for printing console messages
+	char archive_name_ch[_MAX_PATH];
+	archive_name_ch[0] = '\0';
+	std::setlocale(LC_ALL, "en_US.utf8");
+	size_t chars_converted;
+	errno_t conversion_return;
+	if ((conversion_return = wcstombs_s(&chars_converted, archive_name_ch, _MAX_PATH, archive_name, _TRUNCATE)))
+	{
+		// Error converting from wide char to char
+		ModData::startup_messages.push_back(std::string("[Overhaul Mod] ERROR: Unable to parse custom archive file name (Error code ").append(std::to_string(conversion_return)).append("). Using default archive files instead."));
+		return;
+	}
+
+
+
+	// Check that custom game archive files exist
+	for (int i = 0; i < ARCHIVE_FILE_PAIR_COUNT; i++)
+	{
+		std::ifstream check_file(std::wstring(archive_name).append(std::to_wstring(i)).append(ARCHIVE_FILE_TYPE_W[0]).c_str());
+		if (!check_file.good())
+		{
+			// Custom .bdt file doesn't exist
+			ModData::startup_messages.push_back(std::string("[Overhaul Mod] ERROR: The file \"").append(archive_name_ch).append(std::to_string(i)).append(ARCHIVE_FILE_TYPE[0]).append("\" could not be found. Using default archive files instead."));
+			return;
+		}
+		else
+			ModData::startup_messages.push_back(std::string("    Found ").append(archive_name_ch).append(std::to_string(i)).append(ARCHIVE_FILE_TYPE[0]));
+		check_file.close();
+		std::ifstream check_file2(std::wstring(archive_name).append(std::to_wstring(i)).append(ARCHIVE_FILE_TYPE_W[1]).c_str());
+		if (!check_file2.good())
+		{
+			// Custom .bhd5 file doesn't exist
+			ModData::startup_messages.push_back(std::string("[Overhaul Mod] ERROR: The file \"").append(archive_name_ch).append(std::to_string(i)).append(ARCHIVE_FILE_TYPE[1]).append("\" could not be found. Using default archive files."));
+			return;
+		}
+		else
+			ModData::startup_messages.push_back(std::string("    Found ").append(archive_name_ch).append(std::to_string(i)).append(ARCHIVE_FILE_TYPE[1]));
+		check_file2.close();
+	}
+	
+	
+	ModData::startup_messages.push_back(std::string("[Overhaul Mod] SUCCESS: Custom game archive files will be loaded (\"").append(archive_name_ch).append("\")."));
 	void *dvd0_bdt = (uint8_t*)GameData::ds1_base + 0xD63AF6;
 	apply_byte_patch(dvd0_bdt, archive_name, 12);
 	void *dvd0_bhd = (uint8_t*)GameData::ds1_base + 0xD63B22;

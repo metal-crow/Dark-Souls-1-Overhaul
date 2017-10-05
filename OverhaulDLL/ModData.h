@@ -20,6 +20,7 @@
 #define _DS1_OVERHAUL_KEYBINDS_SECTION_ "Dark Souls Overhaul Keybinds"
 // Settings:
 #define _DS1_OVERHAUL_PREF_SHOW_NODE_COUNT_ "DisplayNodeCount"
+#define _DS1_OVERHAUL_PREF_CUSTOM_GAME_ARCHIVE_ "CustomArchiveFiles"
 // Keybinds:
 #define _DS1_OVERHAUL_HOTKEY_BONFIRE_INPUT_FIX_ "BonfireInputFix"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_NODE_COUNT_ "ToggleNodeCount"
@@ -48,6 +49,9 @@ public:
 	// Signifies whether the mod has finished executing the inititalize_plugin() function
 	static bool initialized;
 
+	// Console messages from events that took place before the in-game console was loaded
+	static std::vector<std::string> startup_messages;
+
 
 	// Cheats on/off. If cheats are enabled, saving and multiplayer are disabled until the game is restarted
 	static bool cheats;
@@ -67,6 +71,9 @@ public:
 
 	// Helper function for get_user_keybinds() that loads the specified keybind from the config file and binds it to the specified function
 	static void get_single_user_keybind(const char *keybind_name, int(*function)());
+
+	// Get custom game archive file name prefix from the settings file
+	static void get_custom_archive_file(std::wstring *custom_archive_file_prefix);
 	
 };
 
