@@ -48,8 +48,8 @@ const char *chm_cheats = ccn_cheats" [enable/disable]\n"
 									"    are disabled until the game is restarted.";
 
 
-#define ccn_network_status "network_status"
-const char *chm_network_status = ccn_network_status" \n"
+#define ccn_multiplayer_network "multiplayer_network"
+const char *chm_multiplayer_network = ccn_multiplayer_network" \n"
 									"    Prints various multiplayer network information (Steam ID, ping, etc.) for each player in the current node network.";
 
 

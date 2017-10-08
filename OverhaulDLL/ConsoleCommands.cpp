@@ -78,7 +78,7 @@ int cc_fix_bonfire_input(std::vector<std::string> args, std::string *output)
 
 
 // Prints information on every player in the user's multiplayer node network
-int cc_network_status(std::vector<std::string> args, std::string *output)
+int cc_multiplayer_network(std::vector<std::string> args, std::string *output)
 {
 	if (GameData::node_count < 0)
 	{
@@ -223,5 +223,5 @@ void ModData::register_console_commands()
 	register_console_command(ccn_text_feed_node_count, cc_text_feed_node_count, chm_text_feed_node_count);
 	register_console_alias(cca_node_count, ccn_text_feed_node_count);
 	register_console_command(ccn_cheats, cc_cheats, chm_cheats);
-	register_console_command(ccn_network_status, cc_network_status, chm_network_status);
+	register_console_command(ccn_multiplayer_network, cc_multiplayer_network, chm_multiplayer_network);
 }
