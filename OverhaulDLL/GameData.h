@@ -73,6 +73,9 @@ public:
 	// Initializes pointers that depend on the game's base address
 	static void init_pointers();
 
+	// Obtains the current game version number
+	static uint8_t get_game_version();
+
 	// Changes the game version number to avoid compatibility issues with different game builds
 	static void set_game_version(uint8_t version_number);
 
