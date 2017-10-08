@@ -20,14 +20,20 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	switch (ul_reason_for_call)
 	{
 		case DLL_PROCESS_ATTACH:
-			// Create a new thread to run code without halting the library-loading thread
+			// Obtain base address of Dark Souls game process
+			GameData::ds1_base = GetModuleHandle(NULL);
+
+			// Create a new thread to run code without halting the library-loading thread:
 			plugin_thread_handle = CreateThread(
 				NULL,				// Default security attributes
 				0,					// Use default stack size
-				on_process_attach,	// Thread function name
+				on_process_attach_async, // Thread function name
 				NULL,				// Argument to thread function
 				0,					// Use default creation flags
 				&plugin_thread_id);	// Returns the thread identifier
+
+			// Run important startup code that must be executed before the game loads:
+			on_process_attach();
 			break;
 		case DLL_THREAD_ATTACH:
 			break;

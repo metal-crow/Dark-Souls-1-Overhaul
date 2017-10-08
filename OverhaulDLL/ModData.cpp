@@ -26,12 +26,42 @@ bool ModData::initialized = false;
 // Console messages from events that took place before the in-game console was loaded
 std::vector<std::string> ModData::startup_messages;
 
+// List of supported game versions
+std::vector<uint8_t> ModData::supported_game_versions = { DS1_VERSION_RELEASE };
+
+// Determines whether to start in legacy mode (only applies fixes, no gameplay changes)
+bool ModData::legacy_mode = false;
+
 // Cheats on/off. If cheats are enabled, saving and multiplayer are disabled until the game is restarted
 bool ModData::cheats = false;
 
 // Determines whether node count is displayed on the overlay text feed info header
 bool ModData::show_node_count = true;
 
+// Custom game archive files to load instead of the vanilla game files
+std::wstring ModData::custom_game_archives;
+
+
+
+// Get user-defined startup preferences from the settings file
+void ModData::get_startup_preferences()
+{
+
+	// Begin loading startup preferences
+	ModData::startup_messages.push_back("[Overhaul Mod] Loading startup preferences...");
+
+	// Check if legacy mode is enabled
+	ModData::legacy_mode = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_LEGACY_MODE_, (int)ModData::legacy_mode, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+	if (ModData::legacy_mode)
+		ModData::startup_messages.push_back("    Legacy mode enabled. Gameplay changes will not be applied.");
+
+	// Check for custom game archive files
+	ModData::get_custom_archive_files();
+
+	// @TODO Load additional startup preferences here
+
+
+}
 
 
 
@@ -47,12 +77,12 @@ void ModData::get_user_preferences()
 	print_console("[Overhaul Mod] Loading user preferences...");
 
 	// Display multiplayer node count in text feed info header
-	ModData::show_node_count = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_SHOW_NODE_COUNT_, 1, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
-	strcpy_s(buffer, _DS1_OVERHAUL_SETTINGS_STRING_BUFF_LEN_, "    Display multiplayer node count = ");
+	ModData::show_node_count = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_SHOW_NODE_COUNT_, (int)ModData::show_node_count, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+	std::string msg = "    Display multiplayer node count = ";
 	if (ModData::show_node_count)
-		print_console(std::string(buffer).append("enabled").c_str());
+		print_console(msg.append("enabled").c_str());
 	else
-		print_console(std::string(buffer).append("disabled").c_str());
+		print_console(msg.append("disabled").c_str());
 
 
 
@@ -113,7 +143,7 @@ void ModData::get_single_user_keybind(const char *keybind_name, int(*function)()
 
 
 // Get custom game archive file name prefix from the settings file
-void ModData::get_custom_archive_file(std::wstring *custom_archive_file_prefix)
+void ModData::get_custom_archive_files()
 {
 	char custom_archive_prefix_buff[ARCHIVE_FILE_PREFIX_LENGTH + 1];
 	custom_archive_prefix_buff[ARCHIVE_FILE_PREFIX_LENGTH] = '\0';
@@ -132,10 +162,12 @@ void ModData::get_custom_archive_file(std::wstring *custom_archive_file_prefix)
 	errno_t return_error = 0;
 	if (return_error = mbstowcs_s(&chars_converted, custom_archive_prefix_buff_w, ARCHIVE_FILE_PREFIX_LENGTH + 1, custom_archive_prefix_buff, _TRUNCATE)) {
 		// Conversion error
-		*custom_archive_file_prefix = L"";
+		ModData::custom_game_archives = L"";
 		return;
 	}
 	
-	*custom_archive_file_prefix = std::wstring(custom_archive_prefix_buff_w);
+	ModData::startup_messages.push_back(std::string("    Found custom game file definition: \"").append(custom_archive_prefix_buff).append("\""));
+
+	ModData::custom_game_archives = std::wstring(custom_archive_prefix_buff_w);
 }
 

@@ -18,9 +18,11 @@
 #define _DS1_OVERHAUL_SETTINGS_FILE_ ".\\d3d9_Mod.ini"
 #define _DS1_OVERHAUL_PREFS_SECTION_ "Dark Souls Overhaul Settings"
 #define _DS1_OVERHAUL_KEYBINDS_SECTION_ "Dark Souls Overhaul Keybinds"
+// Startup preferences:
+#define _DS1_OVERHAUL_PREF_LEGACY_MODE_ "LegacyMode"
+#define _DS1_OVERHAUL_PREF_CUSTOM_GAME_ARCHIVE_ "CustomArchiveFiles"
 // Settings:
 #define _DS1_OVERHAUL_PREF_SHOW_NODE_COUNT_ "DisplayNodeCount"
-#define _DS1_OVERHAUL_PREF_CUSTOM_GAME_ARCHIVE_ "CustomArchiveFiles"
 // Keybinds:
 #define _DS1_OVERHAUL_HOTKEY_BONFIRE_INPUT_FIX_ "BonfireInputFix"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_NODE_COUNT_ "ToggleNodeCount"
@@ -42,6 +44,7 @@
 #define _DS1_MOD_MSG_BONFIRE_INPUT_FIX_AUTOMATIC_ "WARNING: Bonfire input glitch detected; applying input fix"
 
 
+
 class ModData
 {
 public:
@@ -52,6 +55,11 @@ public:
 	// Console messages from events that took place before the in-game console was loaded
 	static std::vector<std::string> startup_messages;
 
+	// List of supported game versions
+	static std::vector<uint8_t> supported_game_versions;
+
+	// Determines whether to start in legacy mode (only applies fixes, no gameplay changes)
+	static bool legacy_mode;
 
 	// Cheats on/off. If cheats are enabled, saving and multiplayer are disabled until the game is restarted
 	static bool cheats;
@@ -59,11 +67,17 @@ public:
 	// Determines whether node count is displayed on the overlay text feed info header
 	static bool show_node_count;
 
+	// Custom game archive files to load instead of the vanilla game files
+	static std::wstring custom_game_archives;
+
 
 	// Registers all commands in ConsoleCommands.cpp for use with the in-game console
 	static void register_console_commands();
 
-	// Get all user-defined settings preferences from the settings file
+	// Get user-defined startup preferences from the settings file
+	static void get_startup_preferences();
+
+	// Get user-defined settings preferences from the settings file
 	static void get_user_preferences();
 
 	// Get all user-defined keybinds from the settings file
@@ -73,7 +87,7 @@ public:
 	static void get_single_user_keybind(const char *keybind_name, int(*function)());
 
 	// Get custom game archive file name prefix from the settings file
-	static void get_custom_archive_file(std::wstring *custom_archive_file_prefix);
+	static void get_custom_archive_files();
 	
 };
 

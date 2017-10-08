@@ -38,13 +38,19 @@
 
 
 
-// Macro for applying byte-array patches
+//////////////////////////// MACROS ////////////////////////////
+
+// Apply byte-array patch
 #define apply_byte_patch(dest_addr, patch, len) { set_mem_protection(dest_addr,len,MEM_PROTECT_RWX); memcpy_s(dest_addr,len,patch,len); }
+
+// Check if current game version number exists in the list of supported versions
+#define game_version_is_supported (std::find(ModData::supported_game_versions.begin(), ModData::supported_game_versions.end(), GameData::get_game_version()) != ModData::supported_game_versions.end())
 
 
 
 // Functions called from DllMain()
-DWORD WINAPI on_process_attach(LPVOID lpParam);
+void on_process_attach();
+DWORD WINAPI on_process_attach_async(LPVOID lpParam);
 void on_process_detach();
 
 

@@ -10,29 +10,55 @@
 #include "DllMain.h"
 
 
-
 /*
 	Called from DllMain when the plugin DLL is first loaded into memory (PROCESS_ATTACH case).
-	This function runs in a separate thread from DllMain.
+	NOTE: This function runs in the same thread as DllMain, so code implemented here will halt
+	game loading. Code in this function should be limited to tasks that absolutely MUST be
+	executed before the game loads. For less delicate startup tasks, use on_process_attach_async()
+	or initialize_plugin().
 */
-DWORD WINAPI on_process_attach(LPVOID lpParam)
+void on_process_attach()
 {
-	// Obtain base address of Dark Souls game process
-	GameData::ds1_base = GetModuleHandle(NULL);
 
-	// Apply increase memory limit patch
+	// Load startup preferences from settings file
+	ModData::get_startup_preferences(); // @TODO: If legacy mode is enabled, disable gameplay changes
+
+	// Check if game version is supported
+	if (!game_version_is_supported)
+	{
+		// @TODO: Handle wrong game version: Show dialog box and continue loading without applying mod
+
+		// Placeholder handling of wrong game version:
+		ModData::startup_messages.push_back("WARNING: Unsupported game version detected.");
+		MessageBox(NULL, std::string("Invalid game version detected. Change to supported game version, or disable the Dark Souls Overhaul Mod.").c_str(), "ERROR: Dark Souls Overhaul Mod - Wrong game version", NULL);
+		
+		exit(0);
+	}
+
+	// Change game version number
+	GameData::set_game_version(DS1_VERSION_OVERHAUL);
+
+	// Apply increased memory limit patch
 	GameData::increase_memory_limit();
 
 	// Use overhaul bdt files
-	std::wstring custom_archive_file;
-	ModData::get_custom_archive_file(&custom_archive_file);
-	GameData::change_loaded_bdt_files((wchar_t *)custom_archive_file.c_str());  // "dvdbnd" -> "ovhaul"
+	GameData::change_loaded_bdt_files((wchar_t *)ModData::custom_game_archives.c_str());  // "dvdbnd" -> "ovhaul"
 
 	// Apply first part of phantom limit patch
 	GameData::increase_phantom_limit1();
 
-	// Change game version number
-	GameData::set_game_version(DS1_VERSION_OVERHAUL);
+}
+
+
+
+/*
+	Called from DllMain when the plugin DLL is first loaded into memory (PROCESS_ATTACH case).
+	This function runs in a separate thread from DllMain, so code implemented here does NOT
+	pause game loading. Code that must be executed before the game loads should be implemented
+	in on_process_attach() instead of this function.
+*/
+DWORD WINAPI on_process_attach_async(LPVOID lpParam)
+{
 
 	return 0;
 }

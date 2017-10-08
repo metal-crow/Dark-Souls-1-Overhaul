@@ -66,12 +66,23 @@ void GameData::init_pointers()
 }
 
 
+// Obtains the current game version number
+uint8_t GameData::get_game_version()
+{
+	return *((uint8_t*)GameData::ds1_base + 0x7E719F);
+}
+
+
 // Changes the game version number to avoid compatibility issues with different game builds
 void GameData::set_game_version(uint8_t version_number)
 {
 	std::stringstream hex_stream;
 	hex_stream << std::hex << (int)version_number;
-	ModData::startup_messages.push_back(std::string("[Overhaul Mod] Setting game version number to 0x").append(hex_stream.str()).append("..."));
+	std::string new_version_str = hex_stream.str();
+	hex_stream.str(""); // Clear string stream
+	hex_stream << std::hex << (int)GameData::get_game_version();
+
+	ModData::startup_messages.push_back(std::string("[Overhaul Mod] Changing game version number from 0x").append(hex_stream.str()).append(" to 0x").append(new_version_str).append("..."));
 
 	uint8_t patch1[5] = { 0xC6, 0x44, 0x24, 0x1C, version_number }; // mov byte ptr [esp+0x1C],0x3C
 	uint8_t patch2[3] = { 0x80, 0x38, version_number }; // cmp byte ptr [eax],0x3C
@@ -374,11 +385,16 @@ void GameData::increase_memory_limit()
 // Set the .bdt files to be loaded by the game (WARNING: archive_name parameter must be exactly 6 characters)
 void GameData::change_loaded_bdt_files(wchar_t *archive_name)
 {
-	ModData::startup_messages.push_back(std::string("[Overhaul Mod] Checking for custom game files..."));
+	if (archive_name == NULL || (int)std::wstring(archive_name).length() == 0)
+	{
+		return;
+	}
+
+	ModData::startup_messages.push_back(std::string("[Overhaul Mod] Checking if custom game files exist..."));
 
 	// Check that the custom archive name prefix is the correct length
 	size_t custom_name_len = 0;
-	if (archive_name == NULL || ((custom_name_len = wcslen(archive_name)) != ARCHIVE_FILE_PREFIX_LENGTH))
+	if ((custom_name_len = (int)std::wstring(archive_name).length()) != ARCHIVE_FILE_PREFIX_LENGTH)
 	{
 		ModData::startup_messages.push_back(std::string("[Overhaul Mod] ERROR: Custom archive name prefix was invalid length (").append(std::to_string(custom_name_len)).append("). Using default archive files instead."));
 		return;
