@@ -23,9 +23,13 @@
 #define _DS1_OVERHAUL_PREF_CUSTOM_GAME_ARCHIVE_ "CustomArchiveFiles"
 // Settings:
 #define _DS1_OVERHAUL_PREF_SHOW_NODE_COUNT_ "DisplayNodeCount"
+#define _DS1_OVERHAUL_PREF_DIM_LAVA_ "DimLava"
+#define _DS1_OVERHAUL_PREF_DISABLE_ARMOR_SFX_ "DisableArmorSounds"
 // Keybinds:
 #define _DS1_OVERHAUL_HOTKEY_BONFIRE_INPUT_FIX_ "BonfireInputFix"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_NODE_COUNT_ "ToggleNodeCount"
+#define _DS1_OVERHAUL_HOTKEY_TOGGLE_DIM_LAVA_ "ToggleLavaBrightness"
+#define _DS1_OVERHAUL_HOTKEY_TOGGLE_ARMOR_SFX_ "ToggleArmorSounds"
 
 #define _DS1_OVERHAUL_SETTINGS_STRING_BUFF_LEN_ 256		// Length of the string buffer used when obtaining user preference-related string data
 
@@ -45,12 +49,15 @@
 
 
 
-class ModData
+class Mod
 {
 public:
 
-	// Signifies whether the mod has finished executing the inititalize_plugin() function
+	// Set to true after inititalize_plugin() has executed
 	static bool initialized;
+
+	// Set to true after deferred_tasks() has executed (or this boolean can be set to true to cancel unfinished deferred tasks)
+	static bool deferred_tasks_complete;
 
 	// Console messages from events that took place before the in-game console was loaded
 	static std::vector<std::string> startup_messages;
@@ -67,12 +74,19 @@ public:
 	// Determines whether node count is displayed on the overlay text feed info header
 	static bool show_node_count;
 
+	// User preference setting; determines whether the brightness of lava visual effects should be lowered
+	static bool dim_lava_pref;
+
+	// User preference setting; determines whether armor sound effects will be disabled
+	static bool disable_armor_sfx_pref;
+
 	// Custom game archive files to load instead of the vanilla game files
 	static std::wstring custom_game_archives;
 
 
 	// Registers all commands in ConsoleCommands.cpp for use with the in-game console
 	static void register_console_commands();
+
 
 	// Get user-defined startup preferences from the settings file
 	static void get_startup_preferences();
@@ -89,6 +103,15 @@ public:
 	// Get custom game archive file name prefix from the settings file
 	static void get_custom_archive_files();
 	
+
+
+	#ifdef _DS1_OVERHAUL_MOD_DBG_
+		
+		// Registers all commands in ConsoleCommandsDebug.cpp for use with the in-game console
+		static void register_console_commands_debug();
+
+	#endif // _DS1_OVERHAUL_MOD_DBG_
+
 };
 
 

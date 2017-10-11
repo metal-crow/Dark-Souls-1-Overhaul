@@ -2,16 +2,19 @@
 	DARK SOULS OVERHAUL
 	
 	Contributors to this file:
-		Ashley						-	Reverse engineering, Low FPS Disconnect patch
-		jellybaby34					-	Game version number patch
+		Ashley						-	Reverse engineering, Low FPS Disconnect patch technique
+		jellybaby34					-	Game version number patch technique
 		Metal-Crow					-	Reverse engineering, Phantom Limit patch, C++
-		Youri "NullBy7e" de Mooij	-	Original Bonfire Input Fix
-		Sean Pesce					-	C++
+		Sean Pesce					-	C++, automataed Bonfire Input Fix (FPSFix+)
+		Youri "NullBy7e" de Mooij	-	Original Bonfire Input Fix technique (FPSFix)
+		Zullie The Witch			-	Toggle armor sounds, Dim Lava Effects (C++ conversions by Sean)
 	
 */
 
 #include "DllMain.h"
+#include "GameParamData.h"
 #include <clocale>
+
 
 
 /*
@@ -32,77 +35,105 @@ const char *ARCHIVE_FILE_TYPE[2] = { ".bdt", ".bhd5" };
 */
 
 // Base address of Dark Souls game process
-void *GameData::ds1_base = NULL;
+void *Game::ds1_base = NULL;
 
 // Base address for player character data
-void *GameData::player_char_base = NULL;
+void *Game::player_char_base = NULL;
 
 // Player character status (loading, human, co-op, invader, hollow)
-SpPointer GameData::player_char_status;
+SpPointer Game::player_char_status;
+
+// Flag to determine if any characters have been loaded since the game was launched (useful if player had a character loaded but returned to main menu)
+bool Game::characters_loaded = false;
+
+// Address of lava brightness effect (used for dimming lava)
+uint8_t *Game::lava_luminosity = NULL;
 
 // Game saving on/off
-SpPointer GameData::saves_enabled;
+SpPointer Game::saves_enabled;
 
 // Multiplayer node count
-int GameData::node_count = -1;
+int Game::node_count = -1;
 
 
 
 
 
 // Initializes pointers that depend on the game's base address
-void GameData::init_pointers()
+void Game::init_pointers()
 {
 	print_console(std::string("[Overhaul Mod] Initializing pointers...").c_str());
 
 	// Obtain base address for player character data
-	GameData::player_char_base = (void*)((unsigned int)GameData::ds1_base + 0xF7E204);
+	Game::player_char_base = (void*)((unsigned int)Game::ds1_base + 0xF7E204);
 
 	// Player character status (loading, human, co-op, invader, hollow)
-	GameData::player_char_status = SpPointer(GameData::player_char_base, { 0xA28 });
+	Game::player_char_status = SpPointer(Game::player_char_base, { 0xA28 });
 
 	// Game saving on/off
-	GameData::saves_enabled = SpPointer((void*)0x13784A0, { 0xB40 });
+	Game::saves_enabled = SpPointer((void*)0x13784A0, { 0xB40 });
+	
+}
+
+
+// Performs tasks that were deferred until a character was loaded
+void Game::on_first_character_loaded()
+{
+	Game::characters_loaded = true;
+
+	// Obtain lava effect address
+	if (Game::lava_luminosity == NULL)
+		Game::lava_luminosity = (uint8_t*)aob_scan("66 66 26 40 00 00 80 3F 00 00 80 3F 00 00 80 3F 00 00 80 3F 00 00 80 40");
+
+	if (Mod::dim_lava_pref)
+		Game::enable_dim_lava(true);
+
+	// Get params def files
+	Game::protector_params.init(true);
+
+	// Disable armor sounds if it was specified in the config file
+	if (Mod::disable_armor_sfx_pref)
+		Game::enable_armor_sfx(false);
 }
 
 
 // Obtains the current game version number
-uint8_t GameData::get_game_version()
+uint8_t Game::get_game_version()
 {
-	return *((uint8_t*)GameData::ds1_base + 0x7E719F);
+	return *((uint8_t*)Game::ds1_base + 0x7E719F);
 }
 
 
 // Changes the game version number to avoid compatibility issues with different game builds
-void GameData::set_game_version(uint8_t version_number)
+void Game::set_game_version(uint8_t version_number)
 {
 	std::stringstream hex_stream;
 	hex_stream << std::hex << (int)version_number;
 	std::string new_version_str = hex_stream.str();
 	hex_stream.str(""); // Clear string stream
-	hex_stream << std::hex << (int)GameData::get_game_version();
+	hex_stream << std::hex << (int)Game::get_game_version();
 
-	ModData::startup_messages.push_back(std::string("[Overhaul Mod] Changing game version number from 0x").append(hex_stream.str()).append(" to 0x").append(new_version_str).append("..."));
+	Mod::startup_messages.push_back(std::string("[Overhaul Mod] Changing game version number from 0x").append(hex_stream.str()).append(" to 0x").append(new_version_str).append("..."));
 
 	uint8_t patch1[5] = { 0xC6, 0x44, 0x24, 0x1C, version_number }; // mov byte ptr [esp+0x1C],0x3C
 	uint8_t patch2[3] = { 0x80, 0x38, version_number }; // cmp byte ptr [eax],0x3C
 
-	void *write_address = (uint8_t*)GameData::ds1_base + 0x7E73FA;
+	void *write_address = (uint8_t*)Game::ds1_base + 0x7E73FA;
 	apply_byte_patch(write_address, patch1, 5);
 
-	write_address = (uint8_t*)GameData::ds1_base + 0x7E719D;
+	write_address = (uint8_t*)Game::ds1_base + 0x7E719D;
 	apply_byte_patch(write_address, patch2, 3);
 
-	write_address = (uint8_t*)GameData::ds1_base + 0x7E7229;
+	write_address = (uint8_t*)Game::ds1_base + 0x7E7229;
 	apply_byte_patch(write_address, patch2, 3);
 }
 
 
 // Checks if the player is stuck at the bonfire, and if so, automatically applies the bonfire input fix
-void GameData::check_bonfire_input_bug()
+void Game::check_bonfire_input_bug()
 {
 	// Check that the mod is fully loaded
-	if (!ModData::initialized)
+	if (!Mod::initialized)
 		return;
 
 	/*
@@ -246,7 +277,7 @@ void GameData::check_bonfire_input_bug()
 
 
 // Fixes input bug that causes players to be stuck at a bonfire (usually after turning human with framerate unlocked)
-int GameData::fix_bonfire_input(bool print_to_text_feed, bool print_to_console)
+int Game::fix_bonfire_input(bool print_to_text_feed, bool print_to_console)
 {
 	// Get current player status
 	int status = DS1_PLAYER_STATUS_LOADING;
@@ -320,8 +351,110 @@ int GameData::fix_bonfire_input(bool print_to_text_feed, bool print_to_console)
 }
 
 
+// Check if dim lava mod is currently active
+bool Game::dim_lava_enabled()
+{
+	if (Game::lava_luminosity == NULL)
+		Game::lava_luminosity = (uint8_t*)aob_scan("66 66 26 40 00 00 80 3F 00 00 80 3F 00 00 80 3F 00 00 80 3F 00 00 80 40");
+
+	if (Game::lava_luminosity == NULL)
+	{
+		// Unable to find lava brightness effects in memory
+		set_error(ERROR_FILE_NOT_FOUND);
+		return false;
+	}
+
+	uint8_t check_lava[4] = { 0x66, 0x66, 0x26, 0x40 };
+	for (int i = 0; i < 4; i++)
+		if (check_lava[i] != Game::lava_luminosity[i])
+			return true;
+
+	return false;
+}
+
+// Dim lava effects or restore default lava visuals
+void Game::enable_dim_lava(bool dim)
+{
+	if (dim != Game::dim_lava_enabled() && Game::lava_luminosity != NULL)
+	{
+		uint8_t patch_bytes[4];
+
+		if (dim)
+		{
+			// Dim lava effects
+			patch_bytes[0] = 0xD6, patch_bytes[1] = 0xCC, patch_bytes[2] = 0x4C, patch_bytes[3] = 0x3E;
+			apply_byte_patch(Game::lava_luminosity, patch_bytes, 4);
+
+			patch_bytes[0] = 0x00, patch_bytes[0] = 0x00, patch_bytes[0] = 0x80, patch_bytes[0] = 0x3F;
+			apply_byte_patch(Game::lava_luminosity + 0xAE0, patch_bytes, 4);
+			apply_byte_patch(Game::lava_luminosity + 0x1050, patch_bytes, 4);
+		}
+		else
+		{
+			// Restore default lava effects
+			patch_bytes[0] = 0x66, patch_bytes[1] = 0x66, patch_bytes[2] = 0x26, patch_bytes[3] = 0x40;
+			apply_byte_patch(Game::lava_luminosity, patch_bytes, 4);
+
+			patch_bytes[0] = 0x00, patch_bytes[0] = 0x00, patch_bytes[0] = 0x30, patch_bytes[0] = 0x40;
+			apply_byte_patch(Game::lava_luminosity + 0xAE0, patch_bytes, 4);
+
+			patch_bytes[0] = 0x00, patch_bytes[0] = 0x00, patch_bytes[0] = 0x80, patch_bytes[0] = 0x40;
+			apply_byte_patch(Game::lava_luminosity + 0x1050, patch_bytes, 4);
+		}
+	}
+	else if(Game::lava_luminosity == NULL)
+		set_error(ERROR_FILE_NOT_FOUND);
+}
+
+
+// Checks if armor sound effects are enabled
+bool Game::armor_sfx_enabled()
+{
+	Game::protector_params.init(true);
+
+	ProtectorParam *first_param = (ProtectorParam*)Game::protector_params.data();
+
+	return (first_param->defenseMaterial == 59 && first_param->defenseMaterial_Weak == 29);
+}
+
+
+// Toggles armor sound effecs
+void Game::enable_armor_sfx(bool enable)
+{
+	Game::protector_params.init(true);
+
+
+	// Static variable persists between function calls
+	static std::vector<std::vector<uint8_t>> default_armor_sfx_values;
+
+	// Check if default armor sound effects have been stored yet
+	bool backup_defaults = default_armor_sfx_values.empty();
+
+
+	for (int i = 0; i < (int)protector_params.param_count; i++)
+	{
+		// First time, store default armor sound effects
+		if (backup_defaults)
+			default_armor_sfx_values.push_back({ 
+						((ProtectorParam*)Game::protector_params.data())[i].defenseMaterial,
+						((ProtectorParam*)Game::protector_params.data())[i].defenseMaterial_Weak });
+			
+		if (enable)
+		{
+			((ProtectorParam*)Game::protector_params.data())[i].defenseMaterial = default_armor_sfx_values.at(i).at(0);
+			((ProtectorParam*)Game::protector_params.data())[i].defenseMaterial_Weak = default_armor_sfx_values.at(i).at(1);
+		}
+		else
+		{
+			((ProtectorParam*)Game::protector_params.data())[i].defenseMaterial = 0;
+			((ProtectorParam*)Game::protector_params.data())[i].defenseMaterial_Weak = 0;
+		}
+	}
+}
+
+
 // Returns multiplayer node count as an int (or -1 if player is not online)
-int GameData::get_node_count()
+int Game::get_node_count()
 {
 	SpPointer node_count_ptr = SpPointer((uint8_t*)ds1_base + 0xF7F77C, { 0x2C, 0x778, 0x80 });
 
@@ -340,10 +473,10 @@ int GameData::get_node_count()
 
 
 // Disables automatic game disconnection when low framerate is detected
-void GameData::low_fps_disconnect_enabled(bool enable)
+void Game::enable_low_fps_disconnect(bool enable)
 {
 	uint8_t *fps_warn = NULL;
-	fps_warn = (uint8_t*)aob_scan("74 17 B9 ?? ?? ?? ?? E8 ?? ?? ?? ?? 8B"); // Careful, this pattern returns 2 results
+	fps_warn = (uint8_t*)aob_scan("74 17 B9 ?? ?? ?? ?? E8 ?? ?? ?? ?? 8B"); // WARNING: this pattern returns 2 results
 
 	if (fps_warn)
 	{
@@ -366,37 +499,37 @@ void GameData::low_fps_disconnect_enabled(bool enable)
 }
 
 // Increase available pool of memory Dark Souls allocates itself
-void GameData::increase_memory_limit()
+void Game::increase_memory_limit()
 {
-	ModData::startup_messages.push_back("[Overhaul Mod] Increasing available memory...");
+	Mod::startup_messages.push_back("[Overhaul Mod] Increasing available memory...");
 
 	uint8_t patch[5] = { 0x68, 0x00, 0x00, 0xDA, 0x00 }; // push 0x0DA0000. The constant can be increased as desired, and represents dark souls total memory pool
 
-	void *write_address = (uint8_t*)GameData::ds1_base + 0xB8B7E5;
+	void *write_address = (uint8_t*)Game::ds1_base + 0xB8B7E5;
 	apply_byte_patch(write_address, patch, 5);
 
-	write_address = (uint8_t*)GameData::ds1_base + 0x9E20;
+	write_address = (uint8_t*)Game::ds1_base + 0x9E20;
 	apply_byte_patch(write_address, patch, 5);
 
-	write_address = (uint8_t*)GameData::ds1_base + 0x9E41;
+	write_address = (uint8_t*)Game::ds1_base + 0x9E41;
 	apply_byte_patch(write_address, patch, 5);
 }
 
 // Set the .bdt files to be loaded by the game (WARNING: archive_name parameter must be exactly 6 characters)
-void GameData::change_loaded_bdt_files(wchar_t *archive_name)
+void Game::change_loaded_bdt_files(wchar_t *archive_name)
 {
 	if (archive_name == NULL || (int)std::wstring(archive_name).length() == 0)
 	{
 		return;
 	}
 
-	ModData::startup_messages.push_back(std::string("[Overhaul Mod] Checking if custom game files exist..."));
+	Mod::startup_messages.push_back(std::string("[Overhaul Mod] Checking if custom game files exist..."));
 
 	// Check that the custom archive name prefix is the correct length
 	size_t custom_name_len = 0;
 	if ((custom_name_len = (int)std::wstring(archive_name).length()) != ARCHIVE_FILE_PREFIX_LENGTH)
 	{
-		ModData::startup_messages.push_back(std::string("[Overhaul Mod] ERROR: Custom archive name prefix was invalid length (").append(std::to_string(custom_name_len)).append("). Using default archive files instead."));
+		Mod::startup_messages.push_back(std::string("[Overhaul Mod] ERROR: Custom archive name prefix was invalid length (").append(std::to_string(custom_name_len)).append("). Using default archive files instead."));
 		return;
 	}
 
@@ -409,7 +542,7 @@ void GameData::change_loaded_bdt_files(wchar_t *archive_name)
 	if ((conversion_return = wcstombs_s(&chars_converted, archive_name_ch, _MAX_PATH, archive_name, _TRUNCATE)))
 	{
 		// Error converting from wide char to char
-		ModData::startup_messages.push_back(std::string("[Overhaul Mod] ERROR: Unable to parse custom archive file name (Error code ").append(std::to_string(conversion_return)).append("). Using default archive files instead."));
+		Mod::startup_messages.push_back(std::string("[Overhaul Mod] ERROR: Unable to parse custom archive file name (Error code ").append(std::to_string(conversion_return)).append("). Using default archive files instead."));
 		return;
 	}
 
@@ -422,40 +555,40 @@ void GameData::change_loaded_bdt_files(wchar_t *archive_name)
 		if (!check_file.good())
 		{
 			// Custom .bdt file doesn't exist
-			ModData::startup_messages.push_back(std::string("[Overhaul Mod] ERROR: The file \"").append(archive_name_ch).append(std::to_string(i)).append(ARCHIVE_FILE_TYPE[0]).append("\" could not be found. Using default archive files instead."));
+			Mod::startup_messages.push_back(std::string("[Overhaul Mod] ERROR: The file \"").append(archive_name_ch).append(std::to_string(i)).append(ARCHIVE_FILE_TYPE[0]).append("\" could not be found. Using default archive files instead."));
 			return;
 		}
 		else
-			ModData::startup_messages.push_back(std::string("    Found ").append(archive_name_ch).append(std::to_string(i)).append(ARCHIVE_FILE_TYPE[0]));
+			Mod::startup_messages.push_back(std::string("    Found ").append(archive_name_ch).append(std::to_string(i)).append(ARCHIVE_FILE_TYPE[0]));
 		check_file.close();
 		std::ifstream check_file2(std::wstring(archive_name).append(std::to_wstring(i)).append(ARCHIVE_FILE_TYPE_W[1]).c_str());
 		if (!check_file2.good())
 		{
 			// Custom .bhd5 file doesn't exist
-			ModData::startup_messages.push_back(std::string("[Overhaul Mod] ERROR: The file \"").append(archive_name_ch).append(std::to_string(i)).append(ARCHIVE_FILE_TYPE[1]).append("\" could not be found. Using default archive files."));
+			Mod::startup_messages.push_back(std::string("[Overhaul Mod] ERROR: The file \"").append(archive_name_ch).append(std::to_string(i)).append(ARCHIVE_FILE_TYPE[1]).append("\" could not be found. Using default archive files."));
 			return;
 		}
 		else
-			ModData::startup_messages.push_back(std::string("    Found ").append(archive_name_ch).append(std::to_string(i)).append(ARCHIVE_FILE_TYPE[1]));
+			Mod::startup_messages.push_back(std::string("    Found ").append(archive_name_ch).append(std::to_string(i)).append(ARCHIVE_FILE_TYPE[1]));
 		check_file2.close();
 	}
 	
 	
-	ModData::startup_messages.push_back(std::string("[Overhaul Mod] SUCCESS: Custom game archive files will be loaded (\"").append(archive_name_ch).append("\")."));
-	void *dvd0_bdt = (uint8_t*)GameData::ds1_base + 0xD63AF6;
+	Mod::startup_messages.push_back(std::string("[Overhaul Mod] SUCCESS: Custom game archive files will be loaded (\"").append(archive_name_ch).append("\")."));
+	void *dvd0_bdt = (uint8_t*)Game::ds1_base + 0xD63AF6;
 	apply_byte_patch(dvd0_bdt, archive_name, 12);
-	void *dvd0_bhd = (uint8_t*)GameData::ds1_base + 0xD63B22;
+	void *dvd0_bhd = (uint8_t*)Game::ds1_base + 0xD63B22;
 	apply_byte_patch(dvd0_bhd, archive_name, 12);
-	void *dvd1_bdt = (uint8_t*)GameData::ds1_base + 0xD63B5E;
+	void *dvd1_bdt = (uint8_t*)Game::ds1_base + 0xD63B5E;
 	apply_byte_patch(dvd1_bdt, archive_name, 12);
-	void *dvd1_bhd = (uint8_t*)GameData::ds1_base + 0xD63B8A;
+	void *dvd1_bhd = (uint8_t*)Game::ds1_base + 0xD63B8A;
 	apply_byte_patch(dvd1_bhd, archive_name, 12);
-	void *dvd2_bdt = (uint8_t*)GameData::ds1_base + 0xD63BC6;
+	void *dvd2_bdt = (uint8_t*)Game::ds1_base + 0xD63BC6;
 	apply_byte_patch(dvd2_bdt, archive_name, 12);
-	void *dvd2_bhd = (uint8_t*)GameData::ds1_base + 0xD63BF2;
+	void *dvd2_bhd = (uint8_t*)Game::ds1_base + 0xD63BF2;
 	apply_byte_patch(dvd2_bhd, archive_name, 12);
-	void *dvd3_bdt = (uint8_t*)GameData::ds1_base + 0xD63C2E;
+	void *dvd3_bdt = (uint8_t*)Game::ds1_base + 0xD63C2E;
 	apply_byte_patch(dvd3_bdt, archive_name, 12);
-	void *dvd3_bhd = (uint8_t*)GameData::ds1_base + 0xD63C5A;
+	void *dvd3_bhd = (uint8_t*)Game::ds1_base + 0xD63C5A;
 	apply_byte_patch(dvd3_bhd, archive_name, 12);
 }

@@ -31,6 +31,12 @@ int kf_fix_bonfire_input();
 // Toggles node count element of overlay text feed
 int kf_toggle_node_count();
 
+// Toggles dimmed lava visual effects
+int kf_toggle_dim_lava();
+
+// Toggles armor sound effects
+int kf_toggle_armor_sfx();
+
 
 
 #endif // _DS1_OVERHAUL_KEYBIND_FUNCTIONS_H_

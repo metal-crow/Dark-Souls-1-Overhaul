@@ -21,7 +21,7 @@ void on_process_attach()
 {
 
 	// Load startup preferences from settings file
-	ModData::get_startup_preferences(); // @TODO: If legacy mode is enabled, disable gameplay changes
+	Mod::get_startup_preferences(); // @TODO: If legacy mode is enabled, disable gameplay changes
 
 	// Check if game version is supported
 	if (!game_version_is_supported)
@@ -29,23 +29,23 @@ void on_process_attach()
 		// @TODO: Handle wrong game version: Show dialog box and continue loading without applying mod
 
 		// Placeholder handling of wrong game version:
-		ModData::startup_messages.push_back("WARNING: Unsupported game version detected.");
+		Mod::startup_messages.push_back("WARNING: Unsupported game version detected.");
 		MessageBox(NULL, std::string("Invalid game version detected. Change to supported game version, or disable the Dark Souls Overhaul Mod.").c_str(), "ERROR: Dark Souls Overhaul Mod - Wrong game version", NULL);
 		
 		exit(0);
 	}
 
 	// Change game version number
-	GameData::set_game_version(DS1_VERSION_OVERHAUL);
+	Game::set_game_version(DS1_VERSION_OVERHAUL);
 
 	// Apply increased memory limit patch
-	GameData::increase_memory_limit();
+	Game::increase_memory_limit();
 
 	// Use overhaul bdt files
-	GameData::change_loaded_bdt_files((wchar_t *)ModData::custom_game_archives.c_str());  // "dvdbnd" -> "ovhaul"
+	Game::change_loaded_bdt_files((wchar_t *)Mod::custom_game_archives.c_str());  // "dvdbnd" -> "ovhaul"
 
 	// Apply first part of phantom limit patch
-	GameData::increase_phantom_limit1();
+	Game::increase_phantom_limit1();
 
 }
 
@@ -69,6 +69,9 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
 void on_process_detach()
 {
 	// Exit tasks should be performed here
+
+	// Cancel any unfinished tasks
+	Mod::deferred_tasks_complete = false;
 
 }
 
@@ -101,29 +104,32 @@ __declspec(dllexport) void __stdcall initialize_plugin()
 	print("-------------DARK SOULS OVERHAUL TEST BUILD-------------", 0, false, SP_D3D9O_TEXT_COLOR_ORANGE);
 
 	// Print startup messages
-	for (std::string msg : ModData::startup_messages)
+	for (std::string msg : Mod::startup_messages)
 		print_console(msg.c_str());
 
 	// Load user preferences & keybinds from settings file
-	ModData::get_user_preferences();
-	ModData::get_user_keybinds();
+	Mod::get_user_preferences();
+	Mod::get_user_keybinds();
 
 	// Register console commands
-	ModData::register_console_commands();
+	Mod::register_console_commands();
 
 	// Initialize pointers
-	GameData::init_pointers();
+	Game::init_pointers();
 
 	// Apply secondary phantom limit patch
-	GameData::increase_phantom_limit2();
+	Game::increase_phantom_limit2();
 
 	// Disable "Framerate insufficient for online play" error
-	GameData::low_fps_disconnect_enabled(false);
+	Game::enable_low_fps_disconnect(false);
 
+	// Start thread for deferred tasks
+	if(!CreateThread(NULL, 0, deferred_tasks, NULL, 0, NULL))
+		// Error creating new thread
 
 	
 	
-	ModData::initialized = true; // Should be the last statement in this function
+	Mod::initialized = true; // Should be the last statement in this function
 }
 
 
@@ -136,24 +142,59 @@ __declspec(dllexport) void __stdcall main_loop()
 	// Use this function for code that must be called rerpeatedly, such as checking flags or waiting for values to change
 
 
-	if (ModData::initialized)
+	if (Mod::initialized)
 	{
 		// Update multiplayer node count
-		GameData::node_count = GameData::get_node_count();
+		Game::node_count = Game::get_node_count();
 
 		// If cheats are enabled, make sure saveing and multiplayer are disabled
-		if (ModData::cheats)
+		if (Mod::cheats)
 		{
-			if (*(bool*)GameData::saves_enabled.resolve())
+			if (*(bool*)Game::saves_enabled.resolve())
 				// Cheats are on, but saving is enabled; disable saving
-				GameData::saves_enabled.write(false);
-			// @TODO: Check that multiplayer is disabled
+				Game::saves_enabled.write(false);
+			
+			// @TODO: Check that multiplayer is disabled (first figure out how to disable it)
 		}
 
 
 		// Check if the player is stuck at the bonfire, and if so, automatically apply the bonfire input fix
-		GameData::check_bonfire_input_bug();
+		Game::check_bonfire_input_bug();
 	}
+}
+
+
+
+/*
+	Called from initialize_plugin() after the DLL is loaded and initialized. This function is for
+	tasks  that can only be  executed AFTER certain events have  occurred, but don't need to be
+	executed BEFORE any specific time or event.
+*/
+DWORD WINAPI deferred_tasks(LPVOID lpParam)
+{
+	// Sleep time (in milliseconds) between loop iterations
+	int wait_time = 500;
+
+	// Wait for event: first character loaded in this instance of the game
+	int char_status = DS1_PLAYER_STATUS_LOADING;
+	while ((!Mod::deferred_tasks_complete) && char_status == DS1_PLAYER_STATUS_LOADING)
+	{
+		Game::player_char_status.read(&char_status);
+		Sleep(wait_time);
+	}
+
+	// Perform tasks that rely on a character being loaded
+	Game::on_first_character_loaded();
+
+	
+
+	////////// Implement additional wait conditions here //////////
+
+
+
+	// Finished deferred tasks
+	Mod::deferred_tasks_complete = true;
+	return 0;
 }
 
 
@@ -178,11 +219,11 @@ __declspec(dllexport) void __stdcall draw_overlay(std::string *text_feed_info_he
 	*/
 	
 
-	if (ModData::show_node_count)
+	if (Mod::show_node_count)
 	{
 		// Show node count in text feed info header
-		if(GameData::node_count > -1)
-			text_feed_info_header->append("[Nodes: ").append(std::to_string(GameData::node_count)).append("]  ");
+		if(Game::node_count > -1)
+			text_feed_info_header->append("[Nodes: ").append(std::to_string(Game::node_count)).append("]  ");
 		else
 			text_feed_info_header->append("[Nodes: --]  ");
 	}

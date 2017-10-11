@@ -21,7 +21,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	{
 		case DLL_PROCESS_ATTACH:
 			// Obtain base address of Dark Souls game process
-			GameData::ds1_base = GetModuleHandle(NULL);
+			Game::ds1_base = GetModuleHandle(NULL);
 
 			// Create a new thread to run code without halting the library-loading thread:
 			plugin_thread_handle = CreateThread(
