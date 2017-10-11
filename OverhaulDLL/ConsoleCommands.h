@@ -28,6 +28,25 @@
 */
 
 
+// Error message displayed when an invalid argument is passed to a command that only accepts a boolean argument
+const std::string ERROR_INVALID_BOOL_ARGUMENT = "ERROR: Assigned value must be either 1 or 0 (1 = enabled, 0 = disabled)";
+
+
+
+#define ccn_developer_debug "dev_debug"
+const char *chm_developer_debug = ccn_developer_debug" \n    For developer use.";
+
+
+#define ccn_dim_lava "dim_lava"
+const char *chm_dim_lava = ccn_dim_lava" [boolean]\n     Enables/disables dimmed visual effects for lava (1 = enabled, 0 = disabled).";
+#define cca_lava_brightness_fix "lava_brightness_fix"
+
+
+#define ccn_armor_sfx "armor_sfx"
+const char *chm_armor_sfx = ccn_armor_sfx" [boolean]\n     Enables/disables armor sound effects (1 = enabled, 0 = disabled).";
+#define cca_armor_sounds "armor_sounds"
+
+
 #define ccn_fix_bonfire_input "fix_bonfire_input"
 const char *chm_fix_bonfire_input = ccn_fix_bonfire_input"\n"
 									"    Allows player to regain control of their character if they encounter the bonfire input glitch,\n"
@@ -37,13 +56,13 @@ const char *chm_fix_bonfire_input = ccn_fix_bonfire_input"\n"
 
 
 #define ccn_text_feed_node_count "text_feed_node_count"
-const char *chm_text_feed_node_count = ccn_text_feed_node_count" [enable/disable]\n"
+const char *chm_text_feed_node_count = ccn_text_feed_node_count" [boolean]\n"
 									"    Enables/disables the multiplayer node count element of the overlay text feed info bar (1 = enabled, 0 = disabled).";
 #define cca_node_count "node_count"
 
 
 #define ccn_cheats "cheats"
-const char *chm_cheats = ccn_cheats" [enable/disable]\n"
+const char *chm_cheats = ccn_cheats" [boolean]\n"
 									"    Enables cheats, unlocking additional console commands (1 = enable). If cheats are enabled, saving and multiplayer"
 									"    are disabled until the game is restarted.";
 
@@ -101,6 +120,21 @@ void error_code_to_string(DWORD last_error, std::string *message)
 
 	// Free buffer memory
 	LocalFree(msg_buff);
+}
+
+
+// Returns a string representing a boolean value
+void bool_to_string(bool boolean, std::string *str)
+{
+	if (str == NULL)
+		return;
+
+	str->clear();
+
+	if (boolean)
+		str->append("true");
+	else
+		str->append("false");
 }
 
 

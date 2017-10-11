@@ -3,7 +3,7 @@
 	
 	Contributors to this file:
 		Sean Pesce	-	C++, DirectX9 overlay
-		Wulf2k		-	Multiplayer network data addresses
+		Wulf2k		-	Reverse engineering (multiplayer network data)
 
 
 	This file defines custom console commands that will
@@ -30,25 +30,25 @@ int cc_cheats(std::vector<std::string> args, std::string *output)
 		switch (parse_toggle_arg(args.at(0).c_str()))
 		{
 			case 0:
-				if (ModData::cheats)
+				if (Mod::cheats)
 					output->append("Restart the game to disable cheats and re-enable saving and multiplayer.");
 				else
 					output->append("Cheats = disabled");
 				break;
 			case 1:
-				if (!ModData::cheats)
+				if (!Mod::cheats)
 				{
-					GameData::saves_enabled.write(false);
+					Game::saves_enabled.write(false);
 					// @TODO: Disable multiplayer
 					print("WARNING: Cheats enabled. Saving and multiplayer functions disabled. Restart game to disable cheats", 0, false, SP_D3D9O_TEXT_COLOR_RED);
 				}
 				else
 					output->append("Cheats = enabled. Saving and multiplayer functions have been disabled. Restart the game to disable cheats.");
-				ModData::cheats = true;
+				Mod::cheats = true;
 				break;
 			default:
-				output->append("ERROR: Assigned value must be either 1 or 0 (1 = enabled, 0 = disabled)\n");
-				if (ModData::cheats)
+				output->append(ERROR_INVALID_BOOL_ARGUMENT + "\n");
+				if (Mod::cheats)
 					output->append("Cheats = enabled. Saving and multiplayer functions have been disabled. Restart the game to disable cheats.");
 				else
 					output->append("Cheats = disabled");
@@ -58,7 +58,7 @@ int cc_cheats(std::vector<std::string> args, std::string *output)
 	}
 	else
 	{
-		if (ModData::cheats)
+		if (Mod::cheats)
 			output->append("Cheats = enabled. Saving and multiplayer functions have been disabled. Restart the game to disable cheats.");
 		else
 			output->append("Cheats = disabled");
@@ -69,22 +69,90 @@ int cc_cheats(std::vector<std::string> args, std::string *output)
 
 
 
+// Enables/disables dim lava effects
+int cc_dim_lava(std::vector<std::string> args, std::string *output)
+{
+	int ret_val = CONSOLE_COMMAND_SUCCESS;
+	if (args.size() > 0)
+	{
+		switch (parse_toggle_arg(args.at(0).c_str()))
+		{
+			case 0:
+				Game::enable_dim_lava(false);
+				break;
+			case 1:
+				Game::enable_dim_lava(true);
+				break;
+			default:
+				output->append(ERROR_INVALID_BOOL_ARGUMENT + "\n");
+				ret_val = ERROR_INVALID_PARAMETER;
+				break;
+		}
+	}
+
+	if (Game::dim_lava_enabled())
+	{
+		output->append("Dim lava = enabled");
+	}
+	else
+	{
+		output->append("Dim lava = disabled");
+	}
+	return ret_val;
+}
+
+
+
+// Enables/disables armor sound effects
+int cc_armor_sfx(std::vector<std::string> args, std::string *output)
+{
+	int ret_val = CONSOLE_COMMAND_SUCCESS;
+	if (args.size() > 0)
+	{
+		switch (parse_toggle_arg(args.at(0).c_str()))
+		{
+			case 0:
+				Game::enable_armor_sfx(false);
+				break;
+			case 1:
+				Game::enable_armor_sfx(true);
+				break;
+			default:
+				output->append(ERROR_INVALID_BOOL_ARGUMENT + "\n");
+				ret_val = ERROR_INVALID_PARAMETER;
+				break;
+		}
+	}
+
+	if (Game::armor_sfx_enabled())
+	{
+		output->append("Armor sfx = enabled");
+	}
+	else
+	{
+		output->append("Armor sfx = disabled");
+	}
+	return ret_val;
+}
+
+
+
 // Applies the Bonfire input fix
 int cc_fix_bonfire_input(std::vector<std::string> args, std::string *output)
 {
 	// Apply fix and print message to console (and not to text feed)
-	return GameData::fix_bonfire_input(false, true);
+	return Game::fix_bonfire_input(false, true);
 }
 
 
 // Prints information on every player in the user's multiplayer node network
 int cc_multiplayer_network(std::vector<std::string> args, std::string *output)
 {
-	if (GameData::node_count < 0)
+	if (Game::node_count < 0)
 	{
 		output->append("Multiplayer network is unavailable.");
 	}
-	else if (GameData::node_count == 0)
+	else if (Game::node_count == 0)
 	{
 		output->append("No players in multiplayer network.");
 	}
@@ -99,9 +167,9 @@ int cc_multiplayer_network(std::vector<std::string> args, std::string *output)
 			output->append("-");
 		}
 		output->append("\n");
-		SpPointer connection_list = SpPointer((uint8_t*)GameData::ds1_base + 0xF62D24, { 0x54 } );
+		SpPointer connection_list = SpPointer((uint8_t*)Game::ds1_base + 0xF62D24, { 0x54 } );
 		SpPointer entry = SpPointer(NULL);
-		for (int i = 0; i < GameData::node_count && connection_list.resolve() != entry.resolve(); i++)
+		for (int i = 0; i < Game::node_count && connection_list.resolve() != entry.resolve(); i++)
 		{
 			if (i == 0)
 				entry = SpPointer(connection_list.resolve(), { 0x0 });
@@ -163,7 +231,6 @@ int cc_multiplayer_network(std::vector<std::string> args, std::string *output)
 }
 
 
-
 // Enables/disables multiplayer node count element of overlay text feed
 int cc_text_feed_node_count(std::vector<std::string> args, std::string *output)
 {
@@ -174,10 +241,10 @@ int cc_text_feed_node_count(std::vector<std::string> args, std::string *output)
 		switch (parse_toggle_arg(args.at(0).c_str()))
 		{
 			case 0:
-				ModData::show_node_count = false;
+				Mod::show_node_count = false;
 				break;
 			case 1:
-				ModData::show_node_count = true;
+				Mod::show_node_count = true;
 				break;
 			default:
 				output->append("ERROR: Assigned value must be either 1 or 0 (1 = enabled, 0 = disabled)\n");
@@ -187,18 +254,18 @@ int cc_text_feed_node_count(std::vector<std::string> args, std::string *output)
 	}
 	else
 	{
-		if (GameData::node_count < 0)
+		if (Game::node_count < 0)
 		{
 			output->append("Multiplayer network is unavailable.\n");
 		}
 		else
 		{
-			output->append("Current node count: ").append(std::to_string(GameData::node_count)).append("\n");
+			output->append("Current node count: ").append(std::to_string(Game::node_count)).append("\n");
 		}
 	}
 
 	// If no argument is specified, simply print the status
-	if (ModData::show_node_count)
+	if (Mod::show_node_count)
 	{
 		output->append("Display multiplayer node count = enabled");
 	}
@@ -211,17 +278,49 @@ int cc_text_feed_node_count(std::vector<std::string> args, std::string *output)
 }
 
 
+/*
+						/////////////////////////////
+						///// FOR DEVELOPER USE /////
+						/////////////////////////////
+
+	Placeholder console command for devs to test/debug various data at runtime.
+
+	NOTE:
+	 Code implemented here is for developer use only; changes to this function
+	 should NOT be pushed to the repository.
+
+*/
+int cc_developer_debug(std::vector<std::string> args, std::string *output)
+{
+
+	return CONSOLE_COMMAND_SUCCESS;
+}
+
+
 
 
 /*
 	Called once at startup; registers all the above commands
 	for use with the in-game console.
 */
-void ModData::register_console_commands()
+void Mod::register_console_commands()
 {
+	register_console_command(ccn_developer_debug, cc_developer_debug, chm_developer_debug);
+	register_console_command(ccn_armor_sfx, cc_armor_sfx, chm_armor_sfx);
+	register_console_alias(cca_armor_sounds, ccn_armor_sfx);
+	register_console_command(ccn_dim_lava, cc_dim_lava, chm_dim_lava);
+	register_console_alias(cca_lava_brightness_fix, ccn_dim_lava);
 	register_console_command(ccn_fix_bonfire_input, cc_fix_bonfire_input, chm_fix_bonfire_input);
 	register_console_command(ccn_text_feed_node_count, cc_text_feed_node_count, chm_text_feed_node_count);
 	register_console_alias(cca_node_count, ccn_text_feed_node_count);
 	register_console_command(ccn_cheats, cc_cheats, chm_cheats);
 	register_console_command(ccn_multiplayer_network, cc_multiplayer_network, chm_multiplayer_network);
+
+
+
+	#ifdef _DS1_OVERHAUL_MOD_DBG_
+
+	Mod::register_console_commands_debug();
+
+	#endif // _DS1_OVERHAUL_MOD_DBG_
 }

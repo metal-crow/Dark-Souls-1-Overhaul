@@ -12,6 +12,7 @@
 	#define _DS1_OVERHAUL_GAME_DATA_H_
 
 
+
 #include "SpPointer.h"
 
 // Default number of game archive file pairs
@@ -49,9 +50,16 @@ enum DS1_PLAYER_STATUS_ENUM {
 
 
 
-class GameData
+class Game
 {
 public:
+
+	// Game data structure type definitions:
+	#include "GameParamDefs.h"
+
+					////////////////////////////////////////
+					////////////// GAME DATA ///////////////
+					////////////////////////////////////////
 
 	// Base address of Dark Souls game process
 	static void *ds1_base;
@@ -62,6 +70,12 @@ public:
 	// Player character status (loading, human, co-op, invader, hollow)
 	static SpPointer player_char_status;
 
+	// Flag to determine if any characters have been loaded since the game was launched (useful if player had a character loaded but returned to main menu)
+	static bool characters_loaded;
+
+	// Address of lava brightness effect (used for dimming lava)
+	static uint8_t *lava_luminosity;
+
 	// Game saving on/off
 	static SpPointer saves_enabled;
 
@@ -70,8 +84,15 @@ public:
 
 
 
+					/////////////////////////////////////////
+					/////////////// FUNCTIONS ///////////////
+					/////////////////////////////////////////
+
 	// Initializes pointers that depend on the game's base address
 	static void init_pointers();
+
+	// Runs tasks that were deferred until a character was loaded
+	static void on_first_character_loaded();
 
 	// Obtains the current game version number
 	static uint8_t get_game_version();
@@ -85,27 +106,49 @@ public:
 	// Fixes input bug that causes players to be stuck at a bonfire (usually after turning human with framerate unlocked)
 	static int fix_bonfire_input(bool print_to_text_feed = false, bool print_to_console = false);
 
+	// Check if dim lava mod is currently active
+	static bool dim_lava_enabled();
+
+	// Dim lava effects or restore default lava visuals
+	static void enable_dim_lava(bool dim);
+
 	// Returns multiplayer node count as an int (or -1 if player is not online)
 	static int get_node_count();
 
+	// Checks if armor sound effects are enabled
+	static bool armor_sfx_enabled();
+
+	// Toggles armor sound effecs
+	static void enable_armor_sfx(bool enable);
+
+	// Enables/Disables automatic game disconnection when low framerate is detected
+	static void enable_low_fps_disconnect(bool enable);
 
 
-	/////////////////////////////////////////
-	//////////////// PATCHES ////////////////
-	/////////////////////////////////////////
 
-	// Disables automatic game disconnection when low framerate is detected
-	static void low_fps_disconnect_enabled(bool enable);
+					/////////////////////////////////////////
+					//////////////// PATCHES ////////////////
+					/////////////////////////////////////////
 
 	// Increase available pool of memory Dark Souls allocates itself
 	static void increase_memory_limit();
 
-	// Set the .bdt files to be loaded by the game (WARNING: archive_name parameter must be exactly 6 characters)
+	// Set the .bdt files to be loaded by the game (NOTE: archive_name parameter must be exactly 6 characters)
 	static void change_loaded_bdt_files(wchar_t *archive_name);
 
 	// Two-part patch to increase the multiplayer phantom limit:
 	static void increase_phantom_limit1(); // Called from on_process_attach()
 	static void increase_phantom_limit2(); // Called from initialize_plugin()
+
+
+
+	#ifdef _DS1_OVERHAUL_MOD_DBG_
+		
+		// Additional debug build definitions
+		#include "GameParamDefsDebug.h"
+
+	#endif // _DS1_OVERHAUL_MOD_DBG_
+
 };
 
 

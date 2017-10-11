@@ -36,6 +36,9 @@
     <ClCompile Include="KeybindFunctions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Debug\ConsoleCommandsDebug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lib\PluginImports.h">
@@ -53,10 +56,22 @@
     <ClInclude Include="DllMain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="KeybindFunctions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameParamData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameParamDefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Debug\ConsoleCommandsDebug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="ConsoleCommands.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="KeybindFunctions.h">
+    <ClInclude Include="include\Debug\GameParamDefsDebug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
