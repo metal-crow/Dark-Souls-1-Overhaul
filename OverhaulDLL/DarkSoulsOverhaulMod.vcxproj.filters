@@ -18,25 +18,25 @@
     <ClCompile Include="DarkSoulsOverhaulMod.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PhantomLimit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ConsoleCommands.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GameData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ModData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="DllMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="KeybindFunctions.cpp">
+    <ClCompile Include="src\Debug\ConsoleCommandsDebug.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Debug\ConsoleCommandsDebug.cpp">
+    <ClCompile Include="src\GameData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ModData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PhantomLimit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Plugin\ConsoleCommands.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Plugin\KeybindFunctions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -44,34 +44,37 @@
     <ClInclude Include="lib\PluginImports.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PhantomLimit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GameData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ModData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DllMain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="KeybindFunctions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GameParamData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GameParamDefs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Debug\ConsoleCommandsDebug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ConsoleCommands.h">
+    <ClInclude Include="include\Debug\GameParamDefsDebug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Debug\GameParamDefsDebug.h">
+    <ClInclude Include="include\ParamDef\ArmorParamDef.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ParamDef\BaseParamDef.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ParamDef.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DllMain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ModData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PhantomLimit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Plugin\ConsoleCommands.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Plugin\KeybindFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

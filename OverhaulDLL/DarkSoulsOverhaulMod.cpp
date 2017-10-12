@@ -30,7 +30,8 @@ void on_process_attach()
 
 		// Placeholder handling of wrong game version:
 		Mod::startup_messages.push_back("WARNING: Unsupported game version detected.");
-		MessageBox(NULL, std::string("Invalid game version detected. Change to supported game version, or disable the Dark Souls Overhaul Mod.").c_str(), "ERROR: Dark Souls Overhaul Mod - Wrong game version", NULL);
+		MessageBox(NULL, std::string("Invalid game version detected. Change to supported game version, or disable the Dark Souls Overhaul Mod.").c_str(),
+									 "ERROR: Dark Souls Overhaul Mod - Wrong game version", NULL);
 		
 		exit(0);
 	}

@@ -22,19 +22,21 @@
 // Windows Header Files:
 #include <Windows.h>
 
-// SP library headers:
+// Sean's SP library headers:
 #include "SP_AoB_Scan.hpp"
 #include "SP_AsmInject_x86.hpp"
 #include "SP_IO.hpp"
 #include "SP_SysUtils.hpp"
+#include "SpDetours.h"
 
 // Data imported from DirectX9 overlay:
 #include "PluginImports.h"
 
 // Game data/Overhaul mod data headers:
-#include "GameData.h"
 #include "ModData.h"
-#include "KeybindFunctions.h"
+#include "GameData.h"
+#include "ParamDef.h"
+#include "Plugin/KeybindFunctions.h"
 
 
 
