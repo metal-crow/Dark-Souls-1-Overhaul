@@ -11,7 +11,7 @@
 */
 
 #include "DllMain.h"
-#include "ConsoleCommands.h"
+#include "Plugin/ConsoleCommands.h"
 
 
 ///////////////////////////////////////////////////////////
@@ -276,6 +276,7 @@ int cc_text_feed_node_count(std::vector<std::string> args, std::string *output)
 
 	return return_val;
 }
+
 
 
 /*

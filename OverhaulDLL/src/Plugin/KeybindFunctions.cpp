@@ -12,7 +12,6 @@
 #include "DllMain.h"
 
 
-
 // Fixes input bug that causes players to be stuck at a bonfire (usually after turning human with framerate unlocked)
 int kf_fix_bonfire_input()
 {
@@ -54,7 +53,7 @@ int kf_toggle_dim_lava()
 // Toggles armor sound effects
 int kf_toggle_armor_sfx()
 {
-	if (Game::protector_params.base == NULL)
+	if (ParamDef::Armor().base == NULL)
 	{
 		if (!Game::characters_loaded)
 			print_console("ERROR: Unable to toggle armor sounds (try loading a character first)");

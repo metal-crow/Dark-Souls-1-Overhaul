@@ -130,7 +130,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <PreprocessorDefinitions>WIN32;_DS1_OVERHAUL_MOD_DBG_;_WINDOWS;_USRDLL;DARKSOULSOVERHAULMOD_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>lib;lib\SP;lib\DirectX\Include;lib\D3DFont;include;include\Debug;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files\Microsoft DirectX SDK (June 2010)\Include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>lib;lib\SP;lib\DirectX\Include;lib\D3DFont;include;lib\Detours;include\Debug;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files\Microsoft DirectX SDK (June 2010)\Include;</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <MinimalRebuild>false</MinimalRebuild>
@@ -149,7 +149,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>lib;lib\SP;lib\DirectX\Lib\x86_;lib\D3DFont;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>d3d9_sp_overlay.lib;SpPointer.lib;SP_IO.lib;SP_AoBScan.lib;SP_AsmInjectx86.lib;SP_SysUtils.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9_sp_overlay.lib;SpPointer.lib;SP_IO.lib;SP_AoBScan.lib;SP_AsmInjectx86.lib;SP_SysUtils.lib;lib\Detours\Detours.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>Exports.def</ModuleDefinitionFile>
       <LinkTimeCodeGeneration>UseFastLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
@@ -179,7 +179,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;DARKSOULSOVERHAULMOD_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>lib;lib\SP;lib\DirectX\Include;lib\D3DFont;include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files\Microsoft DirectX SDK (June 2010)\Include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>lib;lib\SP;lib\DirectX\Include;lib\D3DFont;include;lib\Detours;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files\Microsoft DirectX SDK (June 2010)\Include;</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -188,7 +188,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>lib;lib\SP;lib\DirectX\Lib\x86_;lib\D3DFont;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>d3d9_sp_overlay.lib;SpPointer.lib;SP_IO.lib;SP_AoBScan.lib;SP_AsmInjectx86.lib;SP_SysUtils.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9_sp_overlay.lib;SpPointer.lib;SP_IO.lib;SP_AoBScan.lib;SP_AsmInjectx86.lib;SP_SysUtils.lib;lib\Detours\Detours.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>Exports.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
@@ -210,7 +210,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>lib;lib\SP;lib\DirectX\Lib\x86_;lib\D3DFont;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>d3d9_sp_overlay.lib;SpPointer.lib;SP_IO.lib;SP_AoBScan.lib;SP_AsmInjectx86.lib;SP_SysUtils.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9_sp_overlay.lib;SpPointer.lib;SP_IO.lib;SP_AoBScan.lib;SP_AsmInjectx86.lib;SP_SysUtils.lib;lib\Detours\Detours.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>Exports.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
@@ -255,20 +255,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="ConsoleCommands.h" />
-    <ClInclude Include="GameParamData.h" />
-    <ClInclude Include="GameParamDefs.h" />
     <ClInclude Include="include\Debug\ConsoleCommandsDebug.h" />
     <ClInclude Include="include\Debug\GameParamDefsDebug.h" />
-    <ClInclude Include="KeybindFunctions.h" />
-    <ClInclude Include="ModData.h" />
-    <ClInclude Include="DllMain.h" />
-    <ClInclude Include="GameData.h" />
+    <ClInclude Include="include\DllMain.h" />
+    <ClInclude Include="include\GameData.h" />
+    <ClInclude Include="include\ModData.h" />
+    <ClInclude Include="include\ParamDef.h" />
+    <ClInclude Include="include\ParamDef\ArmorParamDef.h" />
+    <ClInclude Include="include\ParamDef\BaseParamDef.h" />
+    <ClInclude Include="include\PhantomLimit.h" />
+    <ClInclude Include="include\Plugin\ConsoleCommands.h" />
+    <ClInclude Include="include\Plugin\KeybindFunctions.h" />
     <ClInclude Include="lib\PluginImports.h" />
-    <ClInclude Include="PhantomLimit.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ConsoleCommands.cpp" />
     <ClCompile Include="DarkSoulsOverhaulMod.cpp" />
     <ClCompile Include="DllMain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
@@ -290,11 +290,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Build|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="GameData.cpp" />
-    <ClCompile Include="KeybindFunctions.cpp" />
-    <ClCompile Include="ModData.cpp" />
-    <ClCompile Include="PhantomLimit.cpp" />
     <ClCompile Include="src\Debug\ConsoleCommandsDebug.cpp" />
+    <ClCompile Include="src\GameData.cpp" />
+    <ClCompile Include="src\ModData.cpp" />
+    <ClCompile Include="src\PhantomLimit.cpp" />
+    <ClCompile Include="src\Plugin\ConsoleCommands.cpp" />
+    <ClCompile Include="src\Plugin\KeybindFunctions.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Exports.def" />

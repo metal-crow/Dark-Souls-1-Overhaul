@@ -54,9 +54,6 @@ class Game
 {
 public:
 
-	// Game data structure type definitions:
-	#include "GameParamDefs.h"
-
 					////////////////////////////////////////
 					////////////// GAME DATA ///////////////
 					////////////////////////////////////////
@@ -139,15 +136,6 @@ public:
 	// Two-part patch to increase the multiplayer phantom limit:
 	static void increase_phantom_limit1(); // Called from on_process_attach()
 	static void increase_phantom_limit2(); // Called from initialize_plugin()
-
-
-
-	#ifdef _DS1_OVERHAUL_MOD_DBG_
-		
-		// Additional debug build definitions
-		#include "GameParamDefsDebug.h"
-
-	#endif // _DS1_OVERHAUL_MOD_DBG_
 
 };
 

@@ -12,7 +12,7 @@
 */
 
 #include "DllMain.h"
-#include "GameParamData.h"
+
 #include <clocale>
 
 
@@ -89,7 +89,7 @@ void Game::on_first_character_loaded()
 		Game::enable_dim_lava(true);
 
 	// Get params def files
-	Game::protector_params.init(true);
+	ParamDef::Armor().init(true);
 
 	// Disable armor sounds if it was specified in the config file
 	if (Mod::disable_armor_sfx_pref)
@@ -114,7 +114,7 @@ void Game::set_game_version(uint8_t version_number)
 	hex_stream << std::hex << (int)Game::get_game_version();
 
 	Mod::startup_messages.push_back(std::string("[Overhaul Mod] Changing game version number from 0x").append(hex_stream.str()).append(" to 0x").append(new_version_str).append("..."));
-
+	Mod::startup_messages.push_back(std::string("Size of protect struct: ").append(std::to_string(sizeof(ArmorParam))) + "    Size of default parameter: " + std::to_string(sizeof(struct Parameter)));
 	uint8_t patch1[5] = { 0xC6, 0x44, 0x24, 0x1C, version_number }; // mov byte ptr [esp+0x1C],0x3C
 	uint8_t patch2[3] = { 0x80, 0x38, version_number }; // cmp byte ptr [eax],0x3C
 
@@ -410,9 +410,9 @@ void Game::enable_dim_lava(bool dim)
 // Checks if armor sound effects are enabled
 bool Game::armor_sfx_enabled()
 {
-	Game::protector_params.init(true);
+	ParamDef::Armor().init(true);
 
-	ProtectorParam *first_param = (ProtectorParam*)Game::protector_params.data();
+	ArmorParam *first_param = ParamDef::Armor().data();
 
 	return (first_param->defenseMaterial == 59 && first_param->defenseMaterial_Weak == 29);
 }
@@ -421,7 +421,7 @@ bool Game::armor_sfx_enabled()
 // Toggles armor sound effecs
 void Game::enable_armor_sfx(bool enable)
 {
-	Game::protector_params.init(true);
+	ParamDef::Armor().init(true);
 
 
 	// Static variable persists between function calls
@@ -431,23 +431,23 @@ void Game::enable_armor_sfx(bool enable)
 	bool backup_defaults = default_armor_sfx_values.empty();
 
 
-	for (int i = 0; i < (int)protector_params.param_count; i++)
+	for (int i = 0; i < (int)ParamDef::Armor().param_count; i++)
 	{
 		// First time, store default armor sound effects
 		if (backup_defaults)
 			default_armor_sfx_values.push_back({ 
-						((ProtectorParam*)Game::protector_params.data())[i].defenseMaterial,
-						((ProtectorParam*)Game::protector_params.data())[i].defenseMaterial_Weak });
+						ParamDef::Armor().get(i)->defenseMaterial,
+						ParamDef::Armor().get(i)->defenseMaterial_Weak });
 			
 		if (enable)
 		{
-			((ProtectorParam*)Game::protector_params.data())[i].defenseMaterial = default_armor_sfx_values.at(i).at(0);
-			((ProtectorParam*)Game::protector_params.data())[i].defenseMaterial_Weak = default_armor_sfx_values.at(i).at(1);
+			ParamDef::Armor().get(i)->defenseMaterial = default_armor_sfx_values.at(i).at(0);
+			ParamDef::Armor().get(i)->defenseMaterial_Weak = default_armor_sfx_values.at(i).at(1);
 		}
 		else
 		{
-			((ProtectorParam*)Game::protector_params.data())[i].defenseMaterial = 0;
-			((ProtectorParam*)Game::protector_params.data())[i].defenseMaterial_Weak = 0;
+			ParamDef::Armor().get(i)->defenseMaterial = 0;
+			ParamDef::Armor().get(i)->defenseMaterial_Weak = 0;
 		}
 	}
 }
@@ -514,6 +514,8 @@ void Game::increase_memory_limit()
 	write_address = (uint8_t*)Game::ds1_base + 0x9E41;
 	apply_byte_patch(write_address, patch, 5);
 }
+
+
 
 // Set the .bdt files to be loaded by the game (WARNING: archive_name parameter must be exactly 6 characters)
 void Game::change_loaded_bdt_files(wchar_t *archive_name)
