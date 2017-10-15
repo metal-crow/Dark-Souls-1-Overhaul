@@ -26,6 +26,10 @@ int kf_fix_bonfire_input()
 int kf_toggle_node_count()
 {
 	Mod::show_node_count = !Mod::show_node_count;
+	if (Mod::show_node_count)
+		print_console("Displaying multiplayer node count");
+	else
+		print_console("Hiding multiplayer node count");
 	Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
 	return ERROR_SUCCESS;
 }
@@ -45,6 +49,10 @@ int kf_toggle_dim_lava()
 	}
 	Game::enable_dim_lava(!Game::dim_lava_enabled());
 	Mod::dim_lava_pref = Game::dim_lava_enabled();
+	if (Game::dim_lava_enabled())
+		print_console("Lowered brightness of lava effects");
+	else
+		print_console("Restored default lava effects");
 	Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
 	return ERROR_SUCCESS;
 }
@@ -64,6 +72,10 @@ int kf_toggle_armor_sfx()
 	}
 	Game::enable_armor_sfx(!Game::armor_sfx_enabled());
 	Mod::disable_armor_sfx_pref = !Game::armor_sfx_enabled();
+	if (Game::armor_sfx_enabled())
+		print_console("Enabled armor sounds");
+	else
+		print_console("Disabled armor sounds");
 	Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
 	return ERROR_SUCCESS;
 }
