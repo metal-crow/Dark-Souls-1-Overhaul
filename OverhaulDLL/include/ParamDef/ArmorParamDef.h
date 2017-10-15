@@ -2,13 +2,15 @@
 	DARK SOULS OVERHAUL
 
 	Contributors to this file:
-	Sean Pesce	-	C++
+		Sean Pesce	-	C++
 
 
 	ParamDef/ArmorParamDef.h
 
 	
 	EquipParamProtector
+
+	Equipment (Armor) Parameters from EquipParamProtector.paramdef
 
 
 	References:
@@ -30,7 +32,7 @@
 
 
 // EquipParamProtector data structure (Armor parameters)
-typedef struct ArmorParam : public Parameter { // Armor
+typedef struct ArmorParameter : public Param { // Armor
 	int32_t  sortId = -1;
 	uint32_t wanderingEquipId = 950000; // "Replacement equipment ID for the wandering ghost."
 	int32_t  vagrantItemLotId = -1; // "-1: no beigrant 0: no drawing 1: ~ lottery"
@@ -45,7 +47,7 @@ typedef struct ArmorParam : public Parameter { // Armor
 	int32_t  residentSpEffectId2 = -1;
 	int32_t  residentSpEffectId3 = -1;
 	int32_t  materialSetId = -1; // "Material parameter ID required to strengthen weapons"
-	float    partsDamageRate = 1.0; // "Site damage rate"
+	float    partsDamageRate = 1.0f; // "Site damage rate"
 	float    corectSARecover; // "Correct Super Armor Recover" (Note: "Correct" is spelled wrong) / "Super armor recovery time correction value"
 	// Key for Origin Equip Pro values:
 	// 0="Enhancement source armor ID", 1="Uses reinforcement armor ID 1", 2="Uses reinforcement armor ID 2", 3="Uses reinforcement armor ID 3",
@@ -55,12 +57,12 @@ typedef struct ArmorParam : public Parameter { // Armor
 	int32_t  originEquipPro[16] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 	float    faceScaleM_ScaleX;     // Male
 	float    faceScaleM_ScaleZ;     // Male
-	float    faceScaleM_MaxX = 1.0; // Male
-	float    faceScaleM_MaxZ = 1.0; // Male
+	float    faceScaleM_MaxX = 1.0f; // Male
+	float    faceScaleM_MaxZ = 1.0f; // Male
 	float    faceScaleF_ScaleX;     // Female
 	float    faceScaleF_ScaleZ;     // Female
-	float    faceScaleF_MaxX = 1.0; // Female
-	float    faceScaleF_MaxZ = 1.0; // Female
+	float    faceScaleF_MaxX = 1.0f; // Female
+	float    faceScaleF_MaxZ = 1.0f; // Female
 	int32_t  qwcId = -1; // "QWC parameter ID"
 	uint16_t equipModelId = 1;
 	uint16_t iconIdM; // "Male menu icon ID"
@@ -129,68 +131,34 @@ typedef struct ArmorParam : public Parameter { // Armor
 	int16_t  oldSortId =  -1; // "Old sort ID (-1 = not collected)"
 	uint8_t  pad_1[6] = { 0, 0, 0, 0, 0, 0 }; // Unused padding bits
 
-} ProtectorParam;
+} ArmorParam;
 
 
 
-
+// Armor parameter definitions file
 class ArmorParamDef : public BaseParamDef {
 
 
 public:
 	static ArmorParamDef& get_instance()
 	{
-		static ArmorParamDef instance; // Guaranteed to be destroyed.
-							  // Instantiated on first use.
+		static ArmorParamDef instance; // Guaranteed to be destroyed
 		return instance;
-	}
-
-	void *base = NULL;
-	size_t param_count = 324;
-	const int32_t data_start_offset = 0x30;
-	const size_t param_size = sizeof(ArmorParam);
-	const char *scan_pattern = "80 48 28 00 60 31 01 00 9B 45 01 00 68 4C 28 00 48 32 01 00 AA 45 01 00 50 50 28 00 30 33 01 00";
-
-
-	void *ArmorParamDef::init(bool print_result = false, bool re_init = false)
-	{
-		if (base != NULL && !re_init)
-			return base;
-
-		if (print_result)
-			print_console(std::string("Searching for param defs file...").c_str());
-
-		base = aob_scan(scan_pattern);
-
-		if (base != NULL && print_result)
-		{
-			std::stringstream hex_stream;
-			hex_stream << std::hex << (int)base;
-			print_console(std::string("    Located param defs file (start: 0x").append(hex_stream.str()).append(")").c_str());
-		}
-		else if (print_result)
-		{
-			print_console(std::string("    Failed to locate parameter data.").c_str());
-		}
-
-		return base;
 	}
 	
 	ArmorParam *data()
 	{
-		return (ArmorParam*)(base == NULL ? NULL : (((int8_t*)base) + data_start_offset));
+		return (ArmorParam*)BaseParamDef::data();
 	}
 
 	ArmorParam *get(int index)
 	{
-		if (index < 0 || (size_t)index >= param_count || data() == NULL)
-			return NULL;
-		return (ArmorParam*)(((int8_t*)data()) + (param_size * index));
+		return (ArmorParam*)BaseParamDef::get(index);
 	}
 
 
 	// Returns pointer to the parameter struct with the given sortId, or NULL if no match was found
-	ArmorParam *ArmorParamDef::get_by_sort_id(int32_t sort_id)
+	ArmorParam *get_by_sort_id(int32_t sort_id)
 	{
 		if(!data())
 			for(int i = 0; i < (int)param_count; i++)
@@ -198,10 +166,13 @@ public:
 					return get(i);
 		return NULL;
 	}
-
 	
 private:
-	ArmorParamDef() {}
+	//ArmorParamDef() : base_ptr(&base) {}
+	ArmorParamDef()
+		: BaseParamDef(NULL, 0x30, 324, sizeof(ArmorParam), "80 48 28 00 60 31 01 00 9B 45 01 00 68 4C 28 00 48 32 01 00 AA 45 01 00 50 50 28 00 30 33 01 00", "Armor")
+	{
+	}
 	
 public:
 	ArmorParamDef(ArmorParamDef const&) = delete;

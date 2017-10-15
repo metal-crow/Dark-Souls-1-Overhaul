@@ -90,6 +90,7 @@ void Game::on_first_character_loaded()
 
 	// Get params def files
 	ParamDef::Armor().init(true);
+	ParamDef::CamLock().init(true);
 
 	// Disable armor sounds if it was specified in the config file
 	if (Mod::disable_armor_sfx_pref)

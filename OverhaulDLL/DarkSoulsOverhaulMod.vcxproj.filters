@@ -77,6 +77,9 @@
     <ClInclude Include="include\Plugin\KeybindFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\ParamDef\LockCamParamDef.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Exports.def">
