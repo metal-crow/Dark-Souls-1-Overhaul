@@ -170,7 +170,10 @@ public:
 private:
 	//ArmorParamDef() : base_ptr(&base) {}
 	ArmorParamDef()
-		: BaseParamDef(NULL, 0x30, 324, sizeof(ArmorParam), "80 48 28 00 60 31 01 00 9B 45 01 00 68 4C 28 00 48 32 01 00 AA 45 01 00 50 50 28 00 30 33 01 00", "Armor")
+		: BaseParamDef(NULL, 0x30, 324, sizeof(ArmorParam),
+			"80 48 28 00 60 31 01 00 9B 45 01 00 68 4C 28 00 "
+			"48 32 01 00 AA 45 01 00 50 50 28 00 30 33 01 00",
+			"EquipParamProtector", "Armor")
 	{
 	}
 	

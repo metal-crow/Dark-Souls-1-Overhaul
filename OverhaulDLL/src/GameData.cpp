@@ -46,6 +46,9 @@ SpPointer Game::player_char_status;
 // Flag to determine if any characters have been loaded since the game was launched (useful if player had a character loaded but returned to main menu)
 bool Game::characters_loaded = false;
 
+// File extension for param def files
+const char *BaseParamDef::extension = ".paramdef";
+
 // Address of lava brightness effect (used for dimming lava)
 uint8_t *Game::lava_luminosity = NULL;
 
@@ -62,7 +65,7 @@ int Game::node_count = -1;
 // Initializes pointers that depend on the game's base address
 void Game::init_pointers()
 {
-	print_console(std::string("[Overhaul Mod] Initializing pointers...").c_str());
+	print_console(std::string(Mod::output_prefix + "Initializing pointers...").c_str());
 
 	// Obtain base address for player character data
 	Game::player_char_base = (void*)((unsigned int)Game::ds1_base + 0xF7E204);
@@ -114,8 +117,7 @@ void Game::set_game_version(uint8_t version_number)
 	hex_stream.str(""); // Clear string stream
 	hex_stream << std::hex << (int)Game::get_game_version();
 
-	Mod::startup_messages.push_back(std::string("[Overhaul Mod] Changing game version number from 0x").append(hex_stream.str()).append(" to 0x").append(new_version_str).append("..."));
-	Mod::startup_messages.push_back(std::string("Size of protect struct: ").append(std::to_string(sizeof(ArmorParam))) + "    Size of default parameter: " + std::to_string(sizeof(struct Parameter)));
+	Mod::startup_messages.push_back(std::string(Mod::output_prefix + "Changing game version number from 0x").append(hex_stream.str()).append(" to 0x").append(new_version_str).append("..."));
 	uint8_t patch1[5] = { 0xC6, 0x44, 0x24, 0x1C, version_number }; // mov byte ptr [esp+0x1C],0x3C
 	uint8_t patch2[3] = { 0x80, 0x38, version_number }; // cmp byte ptr [eax],0x3C
 
@@ -487,12 +489,12 @@ void Game::enable_low_fps_disconnect(bool enable)
 		
 		if (enable)
 		{
-			print_console("[Overhaul Mod] Enabling low FPS disconnect...");
+			print_console(Mod::output_prefix + "Enabling low FPS disconnect...");
 			*fps_warn = 0x51; // Enable low FPS disconnect
 		}
 		else
 		{
-			print_console("[Overhaul Mod] Disabling low FPS disconnect...");
+			print_console(Mod::output_prefix + "Disabling low FPS disconnect...");
 			*fps_warn = 0xC3; // Disable low FPS disconnect
 		}
 			
@@ -502,7 +504,7 @@ void Game::enable_low_fps_disconnect(bool enable)
 // Increase available pool of memory Dark Souls allocates itself
 void Game::increase_memory_limit()
 {
-	Mod::startup_messages.push_back("[Overhaul Mod] Increasing available memory...");
+	Mod::startup_messages.push_back(Mod::output_prefix + "Increasing available memory...");
 
 	uint8_t patch[5] = { 0x68, 0x00, 0x00, 0xDA, 0x00 }; // push 0x0DA0000. The constant can be increased as desired, and represents dark souls total memory pool
 
@@ -526,13 +528,13 @@ void Game::change_loaded_bdt_files(wchar_t *archive_name)
 		return;
 	}
 
-	Mod::startup_messages.push_back(std::string("[Overhaul Mod] Checking if custom game files exist..."));
+	Mod::startup_messages.push_back(std::string(Mod::output_prefix + "Checking if custom game files exist..."));
 
 	// Check that the custom archive name prefix is the correct length
 	size_t custom_name_len = 0;
 	if ((custom_name_len = (int)std::wstring(archive_name).length()) != ARCHIVE_FILE_PREFIX_LENGTH)
 	{
-		Mod::startup_messages.push_back(std::string("[Overhaul Mod] ERROR: Custom archive name prefix was invalid length (").append(std::to_string(custom_name_len)).append("). Using default archive files instead."));
+		Mod::startup_messages.push_back(std::string(Mod::output_prefix + "ERROR: Custom archive name prefix was invalid length (").append(std::to_string(custom_name_len)).append("). Using default archive files instead."));
 		return;
 	}
 
@@ -545,7 +547,7 @@ void Game::change_loaded_bdt_files(wchar_t *archive_name)
 	if ((conversion_return = wcstombs_s(&chars_converted, archive_name_ch, _MAX_PATH, archive_name, _TRUNCATE)))
 	{
 		// Error converting from wide char to char
-		Mod::startup_messages.push_back(std::string("[Overhaul Mod] ERROR: Unable to parse custom archive file name (Error code ").append(std::to_string(conversion_return)).append("). Using default archive files instead."));
+		Mod::startup_messages.push_back(std::string(Mod::output_prefix + "ERROR: Unable to parse custom archive file name (Error code ").append(std::to_string(conversion_return)).append("). Using default archive files instead."));
 		return;
 	}
 
@@ -558,7 +560,7 @@ void Game::change_loaded_bdt_files(wchar_t *archive_name)
 		if (!check_file.good())
 		{
 			// Custom .bdt file doesn't exist
-			Mod::startup_messages.push_back(std::string("[Overhaul Mod] ERROR: The file \"").append(archive_name_ch).append(std::to_string(i)).append(ARCHIVE_FILE_TYPE[0]).append("\" could not be found. Using default archive files instead."));
+			Mod::startup_messages.push_back(std::string(Mod::output_prefix + "ERROR: The file \"").append(archive_name_ch).append(std::to_string(i)).append(ARCHIVE_FILE_TYPE[0]).append("\" could not be found. Using default archive files instead."));
 			return;
 		}
 		else
@@ -568,7 +570,7 @@ void Game::change_loaded_bdt_files(wchar_t *archive_name)
 		if (!check_file2.good())
 		{
 			// Custom .bhd5 file doesn't exist
-			Mod::startup_messages.push_back(std::string("[Overhaul Mod] ERROR: The file \"").append(archive_name_ch).append(std::to_string(i)).append(ARCHIVE_FILE_TYPE[1]).append("\" could not be found. Using default archive files."));
+			Mod::startup_messages.push_back(std::string(Mod::output_prefix + "ERROR: The file \"").append(archive_name_ch).append(std::to_string(i)).append(ARCHIVE_FILE_TYPE[1]).append("\" could not be found. Using default archive files."));
 			return;
 		}
 		else
@@ -577,7 +579,7 @@ void Game::change_loaded_bdt_files(wchar_t *archive_name)
 	}
 	
 	
-	Mod::startup_messages.push_back(std::string("[Overhaul Mod] SUCCESS: Custom game archive files will be loaded (\"").append(archive_name_ch).append("\")."));
+	Mod::startup_messages.push_back(std::string(Mod::output_prefix + "SUCCESS: Custom game archive files will be loaded (\"").append(archive_name_ch).append("\")."));
 	void *dvd0_bdt = (uint8_t*)Game::ds1_base + 0xD63AF6;
 	apply_byte_patch(dvd0_bdt, archive_name, 12);
 	void *dvd0_bhd = (uint8_t*)Game::ds1_base + 0xD63B22;

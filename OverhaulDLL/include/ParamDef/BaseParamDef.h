@@ -47,13 +47,18 @@ public:
 	// Unique array of bytes that can be used to find the param file
 	std::string scan_pattern; // @TODO: Find a more efficient technique for obtaining base addresses
 
-	// Name of the param def file (used when printing feedback to overlay)
+	// Title of the param def file (used when printing feedback to overlay)
 	std::string title;
+
+	// File name of the param def file (without the .paramdef file extension)
+	std::string file;
 	
+	// File extension for param def files
+	static const char *extension;
 
 protected:
-	BaseParamDef(void *base_init = NULL, int32_t data_start_offset_init = 0, size_t param_count_init = 0, size_t param_size_init = sizeof(Param), const char *scan_pattern_init = "", const char *title_init = "INVALID")
-		: base(base_init), data_start_offset(data_start_offset_init), param_count(param_count_init), param_size(param_size_init), scan_pattern(scan_pattern_init), title(title_init)
+	BaseParamDef(void *base_init = NULL, int32_t data_start_offset_init = 0, size_t param_count_init = 0, size_t param_size_init = sizeof(Param), const char *scan_pattern_init = "", const char *file_init = "", const char *title_init = "")
+		: base(base_init), data_start_offset(data_start_offset_init), param_count(param_count_init), param_size(param_size_init), scan_pattern(scan_pattern_init), file(file_init), title(title_init)
 	{
 	}
 
@@ -70,7 +75,7 @@ protected:
 			return (*start);
 
 		if (print_result)
-			print_console((std::string("Searching for param def file: ") + this->title).c_str());
+			print_console((std::string("Searching for param def file: ") + this->file + this->extension).c_str());
 
 		(*start) = aob_scan(aob);
 

@@ -20,6 +20,9 @@
 */
 
 
+// Used in console messages to inform users that a message is being printed by the Overhaul mod
+const std::string Mod::output_prefix = "[Overhaul Mod] ";
+
 // Set to true after inititalize_plugin() has executed
 bool Mod::initialized = false;
 
@@ -57,7 +60,7 @@ void Mod::get_startup_preferences()
 {
 
 	// Begin loading startup preferences
-	Mod::startup_messages.push_back("[Overhaul Mod] Loading startup preferences...");
+	Mod::startup_messages.push_back(Mod::output_prefix + "Loading startup preferences...");
 
 	// Check if legacy mode is enabled
 	Mod::legacy_mode = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_LEGACY_MODE_, (int)Mod::legacy_mode, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
@@ -86,7 +89,7 @@ void Mod::get_user_preferences()
 
 
 	// Begin loading setting preferences
-	print_console("[Overhaul Mod] Loading user preferences...");
+	print_console(Mod::output_prefix + "Loading user preferences...");
 
 	// Display multiplayer node count in text feed info header
 	Mod::show_node_count = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_SHOW_NODE_COUNT_, (int)Mod::show_node_count, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
@@ -122,7 +125,7 @@ void Mod::get_user_preferences()
 void Mod::get_user_keybinds()
 {
 	// Begin loading keybinds
-	print_console("[Overhaul Mod] Loading keybinds...");
+	print_console(Mod::output_prefix + "Loading keybinds...");
 
 	
 	// Bonfire input fix keybind

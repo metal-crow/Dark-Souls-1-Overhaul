@@ -61,7 +61,7 @@ public:
 	
 private:
 	NewParamDef()
-		: BaseParamDef(/* @TODO: base, data_start_offset, param_count, sizeof(NewParam), scan_pattern, title */)
+		: BaseParamDef(/* @TODO: base, data_start_offset, param_count, sizeof(NewParam), scan_pattern, file, title */)
 	{
 	}
 	
