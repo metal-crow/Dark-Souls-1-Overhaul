@@ -263,6 +263,7 @@
     <ClInclude Include="include\ParamDef.h" />
     <ClInclude Include="include\ParamDef\ArmorParamDef.h" />
     <ClInclude Include="include\ParamDef\BaseParamDef.h" />
+    <ClInclude Include="include\ParamDef\LockCamParamDef.h" />
     <ClInclude Include="include\PhantomLimit.h" />
     <ClInclude Include="include\Plugin\ConsoleCommands.h" />
     <ClInclude Include="include\Plugin\KeybindFunctions.h" />

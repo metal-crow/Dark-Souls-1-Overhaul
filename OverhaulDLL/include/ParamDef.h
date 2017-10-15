@@ -2,7 +2,7 @@
 	DARK SOULS OVERHAUL
 
 	Contributors to this file:
-	Sean Pesce	-	C++
+		Sean Pesce	-	C++
 
 
 	ParamDef.h
@@ -20,16 +20,20 @@
 
 
 #include "ParamDef/ArmorParamDef.h"
+#include "ParamDef/LockCamParamDef.h"
+
 
 
 namespace ParamDef {
 
 
-	static ArmorParamDef& Protector() { return ArmorParamDef::get_instance(); }
+	// Armor parameters
 	static ArmorParamDef& Armor() { return ArmorParamDef::get_instance(); }
+	//static ArmorParamDef& Protector() { return ArmorParamDef::get_instance(); } // Just another name for armor params
+	//static ArmorParamDef& EquipProtector() { return ArmorParamDef::get_instance(); } // Just another name for Armor params
 
-
-
+	// Camera lock paramters
+	static LockCamParamDef& CamLock() { return LockCamParamDef::get_instance(); }
 
 
 }
