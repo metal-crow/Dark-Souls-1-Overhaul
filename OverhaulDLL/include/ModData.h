@@ -53,6 +53,9 @@ class Mod
 {
 public:
 
+	// Used in console messages to inform users that a message is being printed by the Overhaul mod
+	static const std::string output_prefix;
+
 	// Set to true after inititalize_plugin() has executed
 	static bool initialized;
 

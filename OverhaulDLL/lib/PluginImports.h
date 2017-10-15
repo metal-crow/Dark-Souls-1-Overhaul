@@ -90,7 +90,7 @@ __declspec(dllimport) IDirect3DDevice9 *get_d3d9_device();
 	@return						True if successful; false otherwise (generally fails if overlay hasn't been initialized yet)
 */
 __declspec(dllimport) bool print(const char *message, unsigned long long duration = 2000, bool include_timestamp = true, SP_D3D9O_TEXT_COLOR_ENUM text_color = SP_D3D9O_TEXT_COLOR_WHITE);
-
+__declspec(dllimport) bool print(std::string &message, unsigned long long duration = 2000, bool include_timestamp = true, SP_D3D9O_TEXT_COLOR_ENUM text_color = SP_D3D9O_TEXT_COLOR_WHITE);
 
 
 
@@ -102,6 +102,7 @@ __declspec(dllimport) bool print(const char *message, unsigned long long duratio
 	@return						True if successful; false otherwise (generally fails if overlay hasn't been initialized yet)
 */
 __declspec(dllimport) bool print_console(const char *message);
+__declspec(dllimport) bool print_console(std::string &message);
 
 
 
