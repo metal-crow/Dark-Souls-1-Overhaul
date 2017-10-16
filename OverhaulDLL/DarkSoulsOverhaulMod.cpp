@@ -42,8 +42,10 @@ void on_process_attach()
 	// Apply increased memory limit patch
 	Game::increase_memory_limit();
 
-	// Use overhaul bdt files
-	Game::change_loaded_bdt_files((wchar_t *)Mod::custom_game_archives.c_str());  // "dvdbnd" -> "ovhaul"
+	// Load non-default game files
+	Game::load_custom_bdt_files((wchar_t *)Mod::custom_game_archives.c_str());  // "dvdbnd" -> "ovhaul"
+	Game::load_custom_save_file((wchar_t *)Mod::custom_save_file.c_str());
+	Game::load_custom_game_config_file((wchar_t *)Mod::custom_config_file.c_str());
 
 	// Apply first part of phantom limit patch
 	Game::increase_phantom_limit1();

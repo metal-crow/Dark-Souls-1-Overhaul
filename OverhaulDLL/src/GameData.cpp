@@ -12,22 +12,25 @@
 */
 
 #include "DllMain.h"
-
-#include <clocale>
-
+#include "Shlobj.h"
+#include "SP_IO.hpp"
 
 
 /*
 	Initialize constants:
 */
-// Default filename prefix for game archive files
-const wchar_t *DEFAULT_ARCHIVE_FILE_PREFIX = L"dvdbnd";
 
 // Default file types for game archive files (wide char)
 const wchar_t *ARCHIVE_FILE_TYPE_W[2] = { L".bdt", L".bhd5" };
 
 // Default file types for game archive files (char)
 const char *ARCHIVE_FILE_TYPE[2] = { ".bdt", ".bhd5" };
+
+// Default filename prefix and suffix for game save file
+const wchar_t *DEFAULT_SAVE_FILE_SUFFIX = L"0005.sl2";
+
+// Default filename for game config file
+const wchar_t *DEFAULT_GAME_CONFIG_FILE = L"DarkSouls.ini";
 
 
 /*
@@ -519,16 +522,15 @@ void Game::increase_memory_limit()
 }
 
 
-
 // Set the .bdt files to be loaded by the game (WARNING: archive_name parameter must be exactly 6 characters)
-void Game::change_loaded_bdt_files(wchar_t *archive_name)
+void Game::load_custom_bdt_files(wchar_t *archive_name)
 {
 	if (archive_name == NULL || (int)std::wstring(archive_name).length() == 0)
 	{
 		return;
 	}
 
-	Mod::startup_messages.push_back(std::string(Mod::output_prefix + "Checking if custom game files exist..."));
+	Mod::startup_messages.push_back(std::string(Mod::output_prefix + "Checking if custom game archive files exist..."));
 
 	// Check that the custom archive name prefix is the correct length
 	size_t custom_name_len = 0;
@@ -539,18 +541,14 @@ void Game::change_loaded_bdt_files(wchar_t *archive_name)
 	}
 
 	// Get char* strings for printing console messages
-	char archive_name_ch[_MAX_PATH];
-	archive_name_ch[0] = '\0';
-	std::setlocale(LC_ALL, "en_US.utf8");
-	size_t chars_converted;
 	errno_t conversion_return;
-	if ((conversion_return = wcstombs_s(&chars_converted, archive_name_ch, _MAX_PATH, archive_name, _TRUNCATE)))
+	std::string archive_name_ch = "";
+	if(conversion_return = string_wide_to_mb(archive_name, archive_name_ch))
 	{
 		// Error converting from wide char to char
 		Mod::startup_messages.push_back(std::string(Mod::output_prefix + "ERROR: Unable to parse custom archive file name (Error code ").append(std::to_string(conversion_return)).append("). Using default archive files instead."));
 		return;
 	}
-
 
 
 	// Check that custom game archive files exist
@@ -561,6 +559,7 @@ void Game::change_loaded_bdt_files(wchar_t *archive_name)
 		{
 			// Custom .bdt file doesn't exist
 			Mod::startup_messages.push_back(std::string(Mod::output_prefix + "ERROR: The file \"").append(archive_name_ch).append(std::to_string(i)).append(ARCHIVE_FILE_TYPE[0]).append("\" could not be found. Using default archive files instead."));
+			check_file.close();
 			return;
 		}
 		else
@@ -571,6 +570,7 @@ void Game::change_loaded_bdt_files(wchar_t *archive_name)
 		{
 			// Custom .bhd5 file doesn't exist
 			Mod::startup_messages.push_back(std::string(Mod::output_prefix + "ERROR: The file \"").append(archive_name_ch).append(std::to_string(i)).append(ARCHIVE_FILE_TYPE[1]).append("\" could not be found. Using default archive files."));
+			check_file2.close();
 			return;
 		}
 		else
@@ -596,4 +596,135 @@ void Game::change_loaded_bdt_files(wchar_t *archive_name)
 	apply_byte_patch(dvd3_bdt, archive_name, 12);
 	void *dvd3_bhd = (uint8_t*)Game::ds1_base + 0xD63C5A;
 	apply_byte_patch(dvd3_bhd, archive_name, 12);
+}
+
+
+// Set the *.0005.sl2 file that will be loaded by the game (WARNING: filename_prefix parameter must be exactly 5 characters)
+void Game::load_custom_save_file(wchar_t *filename_prefix)
+{
+	if (filename_prefix == NULL || (int)std::wstring(filename_prefix).length() == 0)
+	{
+		return;
+	}
+
+	Mod::startup_messages.push_back(std::string(Mod::output_prefix + "Checking if custom save file exists..."));
+
+	// Check that the custom filename prefix is the correct length
+	size_t custom_name_len = 0;
+	if ((custom_name_len = (int)std::wstring(filename_prefix).length()) != SAVE_FILE_PREFIX_LENGTH)
+	{
+		Mod::startup_messages.push_back(std::string(Mod::output_prefix + "ERROR: Custom game save file name prefix was invalid length (").append(std::to_string(custom_name_len)).append("). Using default save file instead."));
+		return;
+	}
+
+	// Get char* strings for printing console messages
+	errno_t conversion_return;
+	std::string file_prefix_ch = "";
+	std::string file_suffix_ch = "";
+	if ((conversion_return = string_wide_to_mb(filename_prefix, file_prefix_ch)) || (conversion_return = string_wide_to_mb((wchar_t*)DEFAULT_SAVE_FILE_SUFFIX, file_suffix_ch)))
+	{
+		// Error converting from wide char to char
+		Mod::startup_messages.push_back(std::string(Mod::output_prefix + "ERROR: Unable to parse custom save file name (Error code ").append(std::to_string(conversion_return)).append("). Using default save file instead."));
+		return;
+	}
+
+	// Check that custom save file exists
+	bool found_file = false; // If true, the Documents folder couldn't be found
+	char docs_path[MAX_PATH];
+	docs_path[MAX_PATH - 1] = '\0';
+	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, docs_path)))
+	{
+		std::ifstream check_file(((std::string(docs_path) + "\\NBGI\\DarkSouls\\" + file_prefix_ch + file_suffix_ch).c_str()));
+		found_file = check_file.good();
+		check_file.close();
+	}
+	
+	// If file wasn't in user Documents, try the shared Documents folder
+	//if (!found_file && SUCCEEDED(SHGetFolderPath(NULL, CSIDL_COMMON_DOCUMENTS, NULL, SHGFP_TYPE_CURRENT, docs_path)))
+	//{
+	//	std::ifstream check_file(((std::string(docs_path) + "\\NBGI\\DarkSouls\\" + file_prefix_ch + file_suffix_ch).c_str()));
+	//	found_file = check_file.good();
+	//	check_file.close();
+	//}
+
+
+	if (!found_file)
+	{
+		// Custom save file doesn't exist
+		Mod::startup_messages.push_back(std::string(Mod::output_prefix + "ERROR: The file \"").append(file_prefix_ch).append(file_suffix_ch).append("\" could not be found. Using default save file instead."));
+		return;
+	}
+	else
+		Mod::startup_messages.push_back(std::string("    Found ").append(file_prefix_ch).append(file_suffix_ch));
+
+
+	Mod::startup_messages.push_back(std::string(Mod::output_prefix + "SUCCESS: Custom save file will be loaded (\"").append(file_prefix_ch).append(file_suffix_ch).append("\")."));
+	void *save_file = (uint8_t*)Game::ds1_base + 0xD6A460;
+	apply_byte_patch(save_file, filename_prefix, 10);
+}
+
+
+// Set the config file that will be loaded by the game (WARNING: filename parameter must be exactly 13 characters)
+void Game::load_custom_game_config_file(wchar_t *filename)
+{
+	if (filename == NULL || (int)std::wstring(filename).length() == 0)
+	{
+		return;
+	}
+
+	Mod::startup_messages.push_back(std::string(Mod::output_prefix + "Checking if custom game config file exists..."));
+
+	// Check that the custom filename is the correct length
+	size_t custom_name_len = 0;
+	if ((custom_name_len = (int)std::wstring(filename).length()) != GAME_CONFIG_FILE_NAME_LENGTH)
+	{
+		Mod::startup_messages.push_back(std::string(Mod::output_prefix + "ERROR: Custom game config file name was invalid length (").append(std::to_string(custom_name_len)).append("). Using default config file instead."));
+		return;
+	}
+
+	// Get char* strings for printing console messages
+	errno_t conversion_return;
+	std::string filename_ch = "";
+	if (conversion_return = string_wide_to_mb(filename, filename_ch))
+	{
+		// Error converting from wide char to char
+		Mod::startup_messages.push_back(std::string(Mod::output_prefix + "ERROR: Unable to parse custom config file name (Error code ").append(std::to_string(conversion_return)).append("). Using default config file instead."));
+		return;
+	}
+
+	// Check that custom config file exists
+	bool found_file = false; // If true, the AppData folder couldn't be found
+	char appdata_path[MAX_PATH];
+	appdata_path[MAX_PATH - 1] = '\0';
+	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, SHGFP_TYPE_CURRENT, appdata_path)))
+	{
+		appdata_path[std::string(appdata_path).find_last_of('\\')] = '\0';
+		std::ifstream check_file(((std::string(appdata_path) + "\\Local\\NBGI\\DarkSouls\\" + filename_ch).c_str()));
+		found_file = check_file.good();
+		check_file.close();
+	}
+	
+	// If file wasn't in user AppData, try the shared AppData folder
+	//if (!found_file && SUCCEEDED(SHGetFolderPath(NULL, CSIDL_COMMON_APPDATA, NULL, SHGFP_TYPE_CURRENT, docs_path)))
+	//{
+	//	appdata_path[std::string(appdata_path).find_last_of('\\')] = '\0';
+	//	std::ifstream check_file(((std::string(appdata_path) + "\\Local\\NBGI\\DarkSouls\\" + filename_ch).c_str()));
+	//	found_file = check_file.good();
+	//	check_file.close();
+	//}
+
+
+	if (!found_file)
+	{
+		// Custom config file doesn't exist
+		Mod::startup_messages.push_back(std::string(Mod::output_prefix + "ERROR: The file \"").append(filename_ch).append("\" could not be found. Using default config file instead."));
+		return;
+	}
+	else
+		Mod::startup_messages.push_back(std::string("    Found ").append(filename_ch));
+
+
+	Mod::startup_messages.push_back(std::string(Mod::output_prefix + "SUCCESS: Custom game config file will be loaded (\"").append(filename_ch).append("\")."));
+	void *cfg_file = (uint8_t*)Game::ds1_base + 0xD6C7AC;
+	apply_byte_patch(cfg_file, filename, 26);
 }

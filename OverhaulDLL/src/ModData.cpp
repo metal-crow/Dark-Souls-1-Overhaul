@@ -10,8 +10,9 @@
 
 #define _SP_DEFINE_VK_NAME_STRINGS_		// Must be defined to use Virtual-key code name strings from SP_IO_Strings.hpp (opt-in by default because it increases filesize by a few KB)
 
+#include "SP_IO.hpp"
 #include "SP_IO_Strings.hpp"
-#include <clocale>
+//#include <clocale>
 
 
 
@@ -53,6 +54,12 @@ bool Mod::disable_armor_sfx_pref = false;
 // Custom game archive files to load instead of the vanilla game files
 std::wstring Mod::custom_game_archives;
 
+// Custom character save file to load instead of the vanilla file
+std::wstring Mod::custom_save_file;
+
+// Custom game configuration file to load instead of the vanilla file
+std::wstring Mod::custom_config_file;
+
 
 
 // Get user-defined startup preferences from the settings file
@@ -67,8 +74,8 @@ void Mod::get_startup_preferences()
 	if (Mod::legacy_mode)
 		Mod::startup_messages.push_back("    Legacy mode enabled. Gameplay changes will not be applied.");
 
-	// Check for custom game archive files
-	Mod::get_custom_archive_files();
+	// Check for custom game files
+	Mod::get_custom_game_files();
 
 	// @TODO Load additional startup preferences here
 
@@ -175,9 +182,10 @@ void Mod::get_single_user_keybind(const char *keybind_name, int(*function)())
 
 
 
-// Get custom game archive file name prefix from the settings file
-void Mod::get_custom_archive_files()
+// Get custom game files from the settings file
+void Mod::get_custom_game_files()
 {
+	// Custom game archive file name prefix
 	char custom_archive_prefix_buff[ARCHIVE_FILE_PREFIX_LENGTH + 1];
 	custom_archive_prefix_buff[ARCHIVE_FILE_PREFIX_LENGTH] = '\0';
 	GetPrivateProfileString(_DS1_OVERHAUL_PREFS_SECTION_,
@@ -188,19 +196,54 @@ void Mod::get_custom_archive_files()
 							_DS1_OVERHAUL_SETTINGS_FILE_);
 
 	// Convert string to wide chars
-	wchar_t custom_archive_prefix_buff_w[ARCHIVE_FILE_PREFIX_LENGTH + 1];
-	custom_archive_prefix_buff_w[ARCHIVE_FILE_PREFIX_LENGTH] = L'\0';
-	std::setlocale(LC_ALL, "en_US.utf8");
-	size_t chars_converted;
 	errno_t return_error = 0;
-	if (return_error = mbstowcs_s(&chars_converted, custom_archive_prefix_buff_w, ARCHIVE_FILE_PREFIX_LENGTH + 1, custom_archive_prefix_buff, _TRUNCATE)) {
+	if (return_error = string_mb_to_wide(custom_archive_prefix_buff, Mod::custom_game_archives)) {
 		// Conversion error
 		Mod::custom_game_archives = L"";
-		return;
 	}
+	else if (std::string(custom_archive_prefix_buff).length() > 0)
+		Mod::startup_messages.push_back(std::string("    Found custom game archive file definition: \"").append(custom_archive_prefix_buff).append("\""));
 	
-	Mod::startup_messages.push_back(std::string("    Found custom game file definition: \"").append(custom_archive_prefix_buff).append("\""));
 
-	Mod::custom_game_archives = std::wstring(custom_archive_prefix_buff_w);
+
+	// Custom game save file name prefix
+	char custom_save_prefix_buff[SAVE_FILE_PREFIX_LENGTH + 1];
+	custom_save_prefix_buff[SAVE_FILE_PREFIX_LENGTH] = '\0';
+	GetPrivateProfileString(_DS1_OVERHAUL_PREFS_SECTION_,
+							_DS1_OVERHAUL_PREF_CUSTOM_SAVE_FILE_,
+							NULL,
+							custom_save_prefix_buff,
+							SAVE_FILE_PREFIX_LENGTH + 1,
+							_DS1_OVERHAUL_SETTINGS_FILE_);
+
+	// Convert string to wide chars
+	return_error = 0;
+	std::string custom_save_suffix = "";
+	if ((return_error = string_mb_to_wide(custom_save_prefix_buff, Mod::custom_save_file)) || (return_error = string_wide_to_mb((wchar_t*)DEFAULT_SAVE_FILE_SUFFIX, custom_save_suffix))) {
+		// Conversion error
+		Mod::custom_save_file = L"";
+	}
+	else if(std::string(custom_save_prefix_buff).length() > 0)
+		Mod::startup_messages.push_back(std::string("    Found custom game save file definition: \"").append(custom_save_prefix_buff).append(custom_save_suffix).append("\""));
+
+
+	// Custom game config file
+	char custom_game_cfg_buff[GAME_CONFIG_FILE_NAME_LENGTH + 1];
+	custom_game_cfg_buff[GAME_CONFIG_FILE_NAME_LENGTH] = '\0';
+	GetPrivateProfileString(_DS1_OVERHAUL_PREFS_SECTION_,
+							_DS1_OVERHAUL_PREF_CUSTOM_GAME_CFG_FILE_,
+							NULL,
+							custom_game_cfg_buff,
+							GAME_CONFIG_FILE_NAME_LENGTH + 1,
+							_DS1_OVERHAUL_SETTINGS_FILE_);
+
+	// Convert string to wide chars
+	return_error = 0;
+	if (return_error = string_mb_to_wide(custom_game_cfg_buff, Mod::custom_config_file)) {
+		// Conversion error
+		Mod::custom_config_file = L"";
+	}
+	else if (std::string(custom_game_cfg_buff).length() > 0)
+		Mod::startup_messages.push_back(std::string("    Found custom game config file definition: \"").append(custom_game_cfg_buff).append("\""));
 }
 
