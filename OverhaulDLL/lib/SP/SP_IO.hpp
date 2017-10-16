@@ -311,6 +311,37 @@ int append_current_date_string(std::string *date_string, bool surround_with_brac
 
 
 
+/**
+	string_wide_to_mb(wchar_t*, std::string&, bool);
+
+	Converts a wide character string (UTF-16) to a multibyte string (char* string).
+
+	@param in_string	Wide character string to be converted
+	@param out_string	Multibyte string where the converted string will be stored.
+	@param append		If true, the converted string is appended to the end of out_string.
+						Otherwise, out_string is erased and set to the converted string.
+
+	@return 0 on success, otherwise returns a relevant error code
+*/
+int string_wide_to_mb(wchar_t *in_string, std::string &out_string, bool append = false);
+
+
+/**
+	string_mb_to_wide(char*, std::wstring&, bool);
+
+	Converts a multibyte string (char* string) to a wide character string (UTF-16).
+
+	@param in_string	Multibyte string to be converted
+	@param out_string	Wide character string where the converted string will be stored.
+	@param append		If true, the converted string is appended to the end of out_string.
+						Otherwise, out_string is erased and set to the converted string.
+
+	@return 0 on success, otherwise returns a relevant error code
+*/
+int string_mb_to_wide(char *in_string, std::wstring &out_string, bool append = false);
+
+
+
 /////////////////////// Keyboard I/O ///////////////////////
 
 

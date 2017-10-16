@@ -18,17 +18,22 @@
 // Default number of game archive file pairs
 #define ARCHIVE_FILE_PAIR_COUNT 4
 
-// Exact length of game archive file name prefix (when using a custom archive file name prefix, the string length must be EXACTLY this many characters)
+// Exact length of game file names or file name prefixes (when using custom files, the custom file names must be the same length as the real files)
 #define ARCHIVE_FILE_PREFIX_LENGTH 6
-
-// Default filename prefix for game archive files
-extern const wchar_t *DEFAULT_ARCHIVE_FILE_PREFIX;
+#define SAVE_FILE_PREFIX_LENGTH 5
+#define GAME_CONFIG_FILE_NAME_LENGTH 13
 
 // Default file types for game archive files (wide char)
 extern const wchar_t *ARCHIVE_FILE_TYPE_W[2];
 
 // Default file types for game archive files (char)
 extern const char *ARCHIVE_FILE_TYPE[2];
+
+// Default filename suffix for game save file
+extern const wchar_t *DEFAULT_SAVE_FILE_SUFFIX;
+
+// Default filename for game config file
+extern const wchar_t *DEFAULT_GAME_CONFIG_FILE;
 
 
 
@@ -131,7 +136,13 @@ public:
 	static void increase_memory_limit();
 
 	// Set the .bdt files to be loaded by the game (NOTE: archive_name parameter must be exactly 6 characters)
-	static void change_loaded_bdt_files(wchar_t *archive_name);
+	static void load_custom_bdt_files(wchar_t *archive_name);
+
+	// Set the *.0005.sl2 file that will be loaded by the game (WARNING: filename_prefix parameter must be exactly 5 characters)
+	static void load_custom_save_file(wchar_t *filename_prefix);
+
+	// Set the config file that will be loaded by the game (WARNING: filename parameter must be exactly 13 characters)
+	static void load_custom_game_config_file(wchar_t *filename);
 
 	// Two-part patch to increase the multiplayer phantom limit:
 	static void increase_phantom_limit1(); // Called from on_process_attach()

@@ -21,6 +21,8 @@
 // Startup preferences:
 #define _DS1_OVERHAUL_PREF_LEGACY_MODE_ "LegacyMode"
 #define _DS1_OVERHAUL_PREF_CUSTOM_GAME_ARCHIVE_ "CustomArchiveFiles"
+#define _DS1_OVERHAUL_PREF_CUSTOM_SAVE_FILE_ "CustomSaveFile"
+#define _DS1_OVERHAUL_PREF_CUSTOM_GAME_CFG_FILE_ "CustomGameConfigFile"
 // Settings:
 #define _DS1_OVERHAUL_PREF_SHOW_NODE_COUNT_ "DisplayNodeCount"
 #define _DS1_OVERHAUL_PREF_DIM_LAVA_ "DimLava"
@@ -86,6 +88,12 @@ public:
 	// Custom game archive files to load instead of the vanilla game files
 	static std::wstring custom_game_archives;
 
+	// Custom character save file to load instead of the vanilla file
+	static std::wstring custom_save_file;
+
+	// Custom game configuration file to load instead of the vanilla file
+	static std::wstring custom_config_file;
+
 
 	// Registers all commands in ConsoleCommands.cpp for use with the in-game console
 	static void register_console_commands();
@@ -103,8 +111,8 @@ public:
 	// Helper function for get_user_keybinds() that loads the specified keybind from the config file and binds it to the specified function
 	static void get_single_user_keybind(const char *keybind_name, int(*function)());
 
-	// Get custom game archive file name prefix from the settings file
-	static void get_custom_archive_files();
+	// Get custom game files from the settings file
+	static void get_custom_game_files();
 	
 
 
