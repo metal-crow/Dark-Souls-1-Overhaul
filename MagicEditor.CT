@@ -4,7 +4,6 @@
     <CheatEntry>
       <ID>90767</ID>
       <Description>"MagicParam"</Description>
-      <LastState RealAddress="04B0507C"/>
       <VariableType>String</VariableType>
       <Length>32</Length>
       <Unicode>0</Unicode>
@@ -49,7 +48,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>89916</ID>
               <Description>"Generate CE Code"</Description>
-              <LastState RealAddress="1CD70010"/>
               <VariableType>String</VariableType>
               <Length>100</Length>
               <Unicode>0</Unicode>
@@ -204,21 +202,18 @@ unregistersymbol(BaseP)
 15900:Sword of the sun
 15910:Sword of moonlight
 </DropDownList>
-          <LastState Value="4010" RealAddress="1CD70000"/>
           <VariableType>4 Bytes</VariableType>
           <Address>selected_attack</Address>
         </CheatEntry>
         <CheatEntry>
           <ID>89788</ID>
           <Description>"Magic Base"</Description>
-          <LastState Value="0" RealAddress="04B05CAC"/>
           <VariableType>4 Bytes</VariableType>
           <Address>4b05cac</Address>
           <CheatEntries>
             <CheatEntry>
               <ID>82808</ID>
               <Description>"Yes/No Dialog Box"</Description>
-              <LastState Value="0" RealAddress="04B05CAC"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>Byte</VariableType>
               <Address>+0</Address>
@@ -226,7 +221,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82792</ID>
               <Description>"Limit Cancel SpEffect ID"</Description>
-              <LastState Value="-1" RealAddress="04B05CB0"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+4</Address>
@@ -234,7 +228,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82802</ID>
               <Description>"Sort ID"</Description>
-              <LastState Value="3102" RealAddress="04B05CB4"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+8</Address>
@@ -242,7 +235,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82781</ID>
               <Description>"Reference ID"</Description>
-              <LastState Value="6100" RealAddress="04B05CB6"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+A</Address>
@@ -250,7 +242,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82782</ID>
               <Description>"FP Cost"</Description>
-              <LastState Value="0" RealAddress="04B05CB8"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+C</Address>
@@ -258,7 +249,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82784</ID>
               <Description>"Stamina Cost"</Description>
-              <LastState Value="0" RealAddress="04B05CBA"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+E</Address>
@@ -266,7 +256,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82795</ID>
               <Description>"Icon ID"</Description>
-              <LastState Value="3021" RealAddress="04B05CBC"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+10</Address>
@@ -274,7 +263,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82796</ID>
               <Description>"Behavior ID"</Description>
-              <LastState Value="0" RealAddress="04B05CBE"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+12</Address>
@@ -282,7 +270,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82803</ID>
               <Description>"Material Item ID"</Description>
-              <LastState Value="-1" RealAddress="04B05CC0"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+14</Address>
@@ -290,7 +277,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82812</ID>
               <Description>"Replace Magic ID"</Description>
-              <LastState Value="-1" RealAddress="04B05CC2"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+16</Address>
@@ -298,7 +284,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82783</ID>
               <Description>"Number of Casts"</Description>
-              <LastState Value="6" RealAddress="04B05CC4"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+18</Address>
@@ -306,119 +291,102 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82785</ID>
               <Description>"Humanity"</Description>
-              <LastState Value="0" RealAddress="04B05CC6"/>
               <VariableType>Byte</VariableType>
               <Address>+1A</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>82779</ID>
               <Description>"Over Dexterity"</Description>
-              <LastState Value="99" RealAddress="04B05CC7"/>
               <VariableType>Byte</VariableType>
               <Address>+1B</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>82786</ID>
               <Description>"SFX Variation"</Description>
-              <LastState Value="86" RealAddress="04B05CC8"/>
               <VariableType>Byte</VariableType>
               <Address>+1C</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>82797</ID>
               <Description>"Slots Used"</Description>
-              <LastState Value="1" RealAddress="04B05CC9"/>
               <VariableType>Byte</VariableType>
               <Address>+1D</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>82798</ID>
               <Description>"Required INT"</Description>
-              <LastState Value="0" RealAddress="04B05CCA"/>
               <VariableType>Byte</VariableType>
               <Address>+1E</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>82799</ID>
               <Description>"Required FAI"</Description>
-              <LastState Value="0" RealAddress="04B05CCB"/>
               <VariableType>Byte</VariableType>
               <Address>+1F</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>82789</ID>
               <Description>"Dexterity Minimum Cast Speed Scaling"</Description>
-              <LastState Value="20" RealAddress="04B05CCC"/>
               <VariableType>Byte</VariableType>
               <Address>+20</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>82790</ID>
               <Description>"Dexterity Maximum Cast Speed Scaling"</Description>
-              <LastState Value="45" RealAddress="04B05CCD"/>
               <VariableType>Byte</VariableType>
               <Address>+21</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>82778</ID>
               <Description>"EzState Behavior Type"</Description>
-              <LastState Value="2" RealAddress="04B05CCE"/>
               <VariableType>Byte</VariableType>
               <Address>+22</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>82780</ID>
               <Description>"Reference Category"</Description>
-              <LastState Value="1" RealAddress="04B05CCF"/>
               <VariableType>Byte</VariableType>
               <Address>+23</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>82787</ID>
               <Description>"SpEffect Category"</Description>
-              <LastState Value="3" RealAddress="04B05CD0"/>
               <VariableType>Byte</VariableType>
               <Address>+24</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>82788</ID>
               <Description>"Reference Type"</Description>
-              <LastState Value="5" RealAddress="04B05CD1"/>
               <VariableType>Byte</VariableType>
               <Address>+25</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>82809</ID>
               <Description>"Menu Type"</Description>
-              <LastState Value="0" RealAddress="04B05CD2"/>
               <VariableType>Byte</VariableType>
               <Address>+26</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>82811</ID>
               <Description>"Has SpEffect Type"</Description>
-              <LastState Value="0" RealAddress="04B05CD3"/>
               <VariableType>Byte</VariableType>
               <Address>+27</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>82813</ID>
               <Description>"Replace Category"</Description>
-              <LastState Value="0" RealAddress="04B05CD4"/>
               <VariableType>Byte</VariableType>
               <Address>+28</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>82791</ID>
               <Description>"Use Limit Category"</Description>
-              <LastState Value="0" RealAddress="04B05CD5"/>
               <VariableType>Byte</VariableType>
               <Address>+29</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>82815</ID>
               <Description>"Vow Type 0"</Description>
-              <LastState Value="1" RealAddress="04B05CD6"/>
               <VariableType>Binary</VariableType>
               <BitStart>0</BitStart>
               <BitLength>1</BitLength>
@@ -428,7 +396,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82816</ID>
               <Description>"Vow Type 1"</Description>
-              <LastState Value="1" RealAddress="04B05CD6"/>
               <VariableType>Binary</VariableType>
               <BitStart>1</BitStart>
               <BitLength>1</BitLength>
@@ -438,7 +405,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82817</ID>
               <Description>"Vow Type 2"</Description>
-              <LastState Value="1" RealAddress="04B05CD6"/>
               <VariableType>Binary</VariableType>
               <BitStart>2</BitStart>
               <BitLength>1</BitLength>
@@ -448,7 +414,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82818</ID>
               <Description>"Vow Type 3"</Description>
-              <LastState Value="1" RealAddress="04B05CD6"/>
               <VariableType>Binary</VariableType>
               <BitStart>3</BitStart>
               <BitLength>1</BitLength>
@@ -458,7 +423,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82819</ID>
               <Description>"Vow Type 4"</Description>
-              <LastState Value="1" RealAddress="04B05CD6"/>
               <VariableType>Binary</VariableType>
               <BitStart>4</BitStart>
               <BitLength>1</BitLength>
@@ -468,7 +432,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82820</ID>
               <Description>"Vow Type 5"</Description>
-              <LastState Value="1" RealAddress="04B05CD6"/>
               <VariableType>Binary</VariableType>
               <BitStart>5</BitStart>
               <BitLength>1</BitLength>
@@ -478,7 +441,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82821</ID>
               <Description>"Vow Type 6"</Description>
-              <LastState Value="1" RealAddress="04B05CD6"/>
               <VariableType>Binary</VariableType>
               <BitStart>6</BitStart>
               <BitLength>1</BitLength>
@@ -488,7 +450,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82822</ID>
               <Description>"Vow Type 7"</Description>
-              <LastState Value="1" RealAddress="04B05CD6"/>
               <VariableType>Binary</VariableType>
               <BitStart>7</BitStart>
               <BitLength>1</BitLength>
@@ -498,7 +459,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82793</ID>
               <Description>"Enable Multi"</Description>
-              <LastState Value="1" RealAddress="04B05CD7"/>
               <VariableType>Binary</VariableType>
               <BitStart>0</BitStart>
               <BitLength>1</BitLength>
@@ -508,7 +468,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82794</ID>
               <Description>"Enable Mult Only"</Description>
-              <LastState Value="0" RealAddress="04B05CD7"/>
               <VariableType>Binary</VariableType>
               <BitStart>1</BitStart>
               <BitLength>1</BitLength>
@@ -518,7 +477,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82800</ID>
               <Description>"Is Weapon Enchant"</Description>
-              <LastState Value="0" RealAddress="04B05CD7"/>
               <VariableType>Binary</VariableType>
               <BitStart>2</BitStart>
               <BitLength>1</BitLength>
@@ -528,7 +486,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82801</ID>
               <Description>"Is Shield Enchant"</Description>
-              <LastState Value="0" RealAddress="04B05CD7"/>
               <VariableType>Binary</VariableType>
               <BitStart>3</BitStart>
               <BitLength>1</BitLength>
@@ -538,7 +495,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82804</ID>
               <Description>"Enable Human"</Description>
-              <LastState Value="1" RealAddress="04B05CD7"/>
               <VariableType>Binary</VariableType>
               <BitStart>4</BitStart>
               <BitLength>1</BitLength>
@@ -548,7 +504,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82805</ID>
               <Description>"Enable Dragon Phantom"</Description>
-              <LastState Value="1" RealAddress="04B05CD7"/>
               <VariableType>Binary</VariableType>
               <BitStart>5</BitStart>
               <BitLength>1</BitLength>
@@ -558,7 +513,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82806</ID>
               <Description>"Enable White Phantom"</Description>
-              <LastState Value="1" RealAddress="04B05CD7"/>
               <VariableType>Binary</VariableType>
               <BitStart>6</BitStart>
               <BitLength>1</BitLength>
@@ -568,7 +522,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82807</ID>
               <Description>"Enable Black Phantom"</Description>
-              <LastState Value="1" RealAddress="04B05CD7"/>
               <VariableType>Binary</VariableType>
               <BitStart>7</BitStart>
               <BitLength>1</BitLength>
@@ -578,7 +531,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82810</ID>
               <Description>"Disable Offline"</Description>
-              <LastState Value="0" RealAddress="04B05CD8"/>
               <VariableType>Binary</VariableType>
               <BitStart>0</BitStart>
               <BitLength>1</BitLength>
@@ -588,7 +540,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82814</ID>
               <Description>"Uses Miracle Resonance"</Description>
-              <LastState Value="0" RealAddress="04B05CD8"/>
               <VariableType>Binary</VariableType>
               <BitStart>1</BitStart>
               <BitLength>1</BitLength>
@@ -598,7 +549,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82823</ID>
               <Description>"Vow Type 8"</Description>
-              <LastState Value="1" RealAddress="04B05CD9"/>
               <VariableType>Binary</VariableType>
               <BitStart>0</BitStart>
               <BitLength>1</BitLength>
@@ -608,7 +558,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82824</ID>
               <Description>"Vow Type 9"</Description>
-              <LastState Value="1" RealAddress="04B05CD9"/>
               <VariableType>Binary</VariableType>
               <BitStart>1</BitStart>
               <BitLength>1</BitLength>
@@ -618,7 +567,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82825</ID>
               <Description>"Vow Type 10"</Description>
-              <LastState Value="1" RealAddress="04B05CD9"/>
               <VariableType>Binary</VariableType>
               <BitStart>2</BitStart>
               <BitLength>1</BitLength>
@@ -628,7 +576,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82826</ID>
               <Description>"Vow Type 11"</Description>
-              <LastState Value="1" RealAddress="04B05CD9"/>
               <VariableType>Binary</VariableType>
               <BitStart>3</BitStart>
               <BitLength>1</BitLength>
@@ -638,7 +585,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82827</ID>
               <Description>"Vow Type 12"</Description>
-              <LastState Value="1" RealAddress="04B05CD9"/>
               <VariableType>Binary</VariableType>
               <BitStart>4</BitStart>
               <BitLength>1</BitLength>
@@ -648,7 +594,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82828</ID>
               <Description>"Vow Type 13"</Description>
-              <LastState Value="1" RealAddress="04B05CD9"/>
               <VariableType>Binary</VariableType>
               <BitStart>5</BitStart>
               <BitLength>1</BitLength>
@@ -658,7 +603,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82829</ID>
               <Description>"Vow Type 14"</Description>
-              <LastState Value="1" RealAddress="04B05CD9"/>
               <VariableType>Binary</VariableType>
               <BitStart>6</BitStart>
               <BitLength>1</BitLength>
@@ -668,7 +612,6 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>82830</ID>
               <Description>"Vow Type 15"</Description>
-              <LastState Value="1" RealAddress="04B05CD9"/>
               <VariableType>Binary</VariableType>
               <BitStart>7</BitStart>
               <BitLength>1</BitLength>
@@ -959,7 +902,7 @@ function GenerateStringForAttack()
   --count the flags bytes as a single 3 byte chunk
   table_string = table_string .. "writeBytes(magic_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[27].Address,2),16)) .. ","
   local flag_bytes = readBytes(attack_base_entry[27].CurrentAddress, 3, true)
-  table_string = table_string .. string.format("%d) --flags\n", flag_bytes[1], flag_bytes[2], flag_bytes[3])
+  table_string = table_string .. string.format("%d, %d, %d) --flags\n", flag_bytes[1], flag_bytes[2], flag_bytes[3])
 
   table_string = table_string .. "{$asm}\n"
 
