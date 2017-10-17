@@ -1,0 +1,731 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="26">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>90767</ID>
+      <Description>"MoveParam"</Description>
+      <LastState RealAddress="04BA23CC"/>
+      <VariableType>String</VariableType>
+      <Length>32</Length>
+      <Unicode>0</Unicode>
+      <CodePage>0</CodePage>
+      <ZeroTerminate>1</ZeroTerminate>
+      <Address>BaseP</Address>
+      <Offsets>
+        <Offset>c</Offset>
+        <Offset>20</Offset>
+        <Offset>2dc</Offset>
+      </Offsets>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>89915</ID>
+      <Description>"Open"</Description>
+      <Options moHideChildren="1"/>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+globalalloc(selected_attack,4)
+globalalloc(selected_attack_var_name,100)
+
+aobscan(finditP,A1????????39A8400400000F)
+label(BaseP)
+registersymbol(BaseP)
+[finditP+1]:
+BaseP:
+
+[DISABLE]
+dealloc(selected_attack_var_name)
+dealloc(selected_attack)
+
+unregistersymbol(BaseP)
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>89917</ID>
+          <Description>"Set the value to the move name, and check the box"</Description>
+          <LastState Value="" RealAddress="00000000"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>89916</ID>
+              <Description>"Generate CE Code"</Description>
+              <LastState RealAddress="1C370010"/>
+              <VariableType>String</VariableType>
+              <Length>100</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>selected_attack_var_name</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>10322</ID>
+          <Description>"Select Move and check the box"</Description>
+          <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">0:Lightweight
+1:Lightweight +
+5:Medium amount
+6:Medium amount +
+10:Weight
+15:Weight over
+16:Ultra-light
+20:Mimicry _ lightweight
+21:Mimicry _ lightweight +
+25:Mimicry _ medium amount
+26:Mimicry _ medium amount +
+30:Mimicry _ weight
+35:Mimicry _ overweight
+36:Mimicry _ ultralight
+40:Underwater lightweight _ (Shenzhen)
+41:Underwater lightweight _ ( depth ) +
+45:Water medium amount _ (Shenzhen)
+46:Water medium amount _ ( depth ) +
+50:Water weight _ (Shenzhen)
+55:Water over weight _ (Shenzhen)
+56:Underwater super lightweight _ (Shenzhen)
+60:_ Lightweight body of iron
+61:_ Lightweight body of iron +
+65:Medium body _ the amount of iron
+66:Body _ medium amount of iron +
+70:_ Body weight of iron
+75:_ Body weight over the iron
+76:_ Ultra-light body of iron
+1001:Player weight
+1002:Player excessive weight
+1003:Player dying
+1004:Player Chi-numa ( excess weight )
+1005:Player Doku-numa ( movement speed reduction )
+1006:Player weight super move
+1010:Players usually _ mimicry
+1011:Player weight _ mimicry
+1012:Player excessive weight _ mimicry
+1013:Player ultra weight movement _ mimicry
+1020:Players usually _ water by (Shenzhen)
+1021:Player weight _ water by (Shenzhen)
+1022:Player excessive weight _ water by (Shenzhen)
+1023:Player ultra weight water move _ (Shenzhen)
+100:Enemy basic combat
+101:Birds standard
+102:Guard
+103:Dog
+104:Dragon daemon
+105:Enemy basic non- combat
+106:Scale miners combat
+107:Scale miners non- combat ( bag )
+108:Scale miners non- combat ( Pickle )
+109:Nozokikomi large spider
+110:Gargoyle test
+111:Dragon daemon ( tunnel )
+112:Beast for storm
+113:Beast of a storm ( child Ei ) Stocking waiting
+114:Scale miners non- combat ( bare hands )
+115:Octopus head combat
+116:Gargoyle air ( for 3050 )
+117:Gargoyle ground ( for 3050 )
+118:Use disappear Kageon'na _
+119:Blood tick only
+120:Parry aim
+121:( Version without running / turning Anime) [ DLC ] enemies basic combat
+900:PG for four-legged type
+</DropDownList>
+          <LastState Value="10" RealAddress="1C370000"/>
+          <VariableType>4 Bytes</VariableType>
+          <Address>selected_attack</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>89788</ID>
+          <Description>"Move Base"</Description>
+          <LastState RealAddress="04BA293C"/>
+          <VariableType>String</VariableType>
+          <Length>0</Length>
+          <Unicode>0</Unicode>
+          <CodePage>0</CodePage>
+          <ZeroTerminate>1</ZeroTerminate>
+          <Address>4ba293c</Address>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>91146</ID>
+              <Description>"stayId"</Description>
+              <LastState Value="9900" RealAddress="04BA293C"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+0</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91147</ID>
+              <Description>"walkF"</Description>
+              <LastState Value="9100" RealAddress="04BA2940"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+4</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91148</ID>
+              <Description>"walkB"</Description>
+              <LastState Value="9101" RealAddress="04BA2944"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+8</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91149</ID>
+              <Description>"walkL"</Description>
+              <LastState Value="9102" RealAddress="04BA2948"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91150</ID>
+              <Description>"walkR"</Description>
+              <LastState Value="9103" RealAddress="04BA294C"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+10</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91151</ID>
+              <Description>"dashF"</Description>
+              <LastState Value="9200" RealAddress="04BA2950"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+14</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91152</ID>
+              <Description>"dashB"</Description>
+              <LastState Value="9201" RealAddress="04BA2954"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+18</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91153</ID>
+              <Description>"dashL"</Description>
+              <LastState Value="9202" RealAddress="04BA2958"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+1C</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91154</ID>
+              <Description>"dashR"</Description>
+              <LastState Value="9203" RealAddress="04BA295C"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+20</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91155</ID>
+              <Description>"superDash"</Description>
+              <LastState Value="510" RealAddress="04BA2960"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+24</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91156</ID>
+              <Description>"escapeF (roll animation)"</Description>
+              <LastState Value="20" RealAddress="04BA2964"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+28</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91157</ID>
+              <Description>"escapeB"</Description>
+              <LastState Value="701" RealAddress="04BA2968"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+2c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91158</ID>
+              <Description>"escapeL"</Description>
+              <LastState Value="702" RealAddress="04BA296C"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+30</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91159</ID>
+              <Description>"escapeR"</Description>
+              <LastState Value="703" RealAddress="04BA2970"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+34</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91160</ID>
+              <Description>"turnL"</Description>
+              <LastState Value="602" RealAddress="04BA2974"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+38</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91161</ID>
+              <Description>"turnR"</Description>
+              <LastState Value="603" RealAddress="04BA2978"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+3c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91162</ID>
+              <Description>"largeTurnR"</Description>
+              <LastState Value="604" RealAddress="04BA297C"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+40</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91163</ID>
+              <Description>"largeTurnR"</Description>
+              <LastState Value="605" RealAddress="04BA2980"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+44</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91164</ID>
+              <Description>"stepMove"</Description>
+              <LastState Value="-1" RealAddress="04BA2984"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+48</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91165</ID>
+              <Description>"flyStay"</Description>
+              <LastState Value="-1" RealAddress="04BA2988"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+4c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91166</ID>
+              <Description>"flyWalkF"</Description>
+              <LastState Value="-1" RealAddress="04BA298C"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+50</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91167</ID>
+              <Description>"flyWalkFL"</Description>
+              <LastState Value="-1" RealAddress="04BA2990"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+54</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91168</ID>
+              <Description>"flyWalkFR"</Description>
+              <LastState Value="-1" RealAddress="04BA2994"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+58</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91169</ID>
+              <Description>"flyWalkFL2"</Description>
+              <LastState Value="-1" RealAddress="04BA2998"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+5c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91170</ID>
+              <Description>"flyWalkFR2"</Description>
+              <LastState Value="-1" RealAddress="04BA299C"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+60</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91171</ID>
+              <Description>"flyDashF"</Description>
+              <LastState Value="-1" RealAddress="04BA29A0"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+64</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91172</ID>
+              <Description>"flyDashFL"</Description>
+              <LastState Value="-1" RealAddress="04BA29A4"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+68</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91173</ID>
+              <Description>"flyDashFR"</Description>
+              <LastState Value="-1" RealAddress="04BA29A8"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+6c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91174</ID>
+              <Description>"flyDashFL2"</Description>
+              <LastState Value="-1" RealAddress="04BA29AC"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+70</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91175</ID>
+              <Description>"flyDashFR2"</Description>
+              <LastState Value="-1" RealAddress="04BA29B0"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+74</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91176</ID>
+              <Description>"dashEscapeF"</Description>
+              <LastState Value="-1" RealAddress="04BA29B4"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+78</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91177</ID>
+              <Description>"dashEscapeB"</Description>
+              <LastState Value="-1" RealAddress="04BA29B8"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+7c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91178</ID>
+              <Description>"dashEscapeL"</Description>
+              <LastState Value="-1" RealAddress="04BA29BC"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+80</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91179</ID>
+              <Description>"dashEscapeR"</Description>
+              <LastState Value="-1" RealAddress="04BA29C0"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+84</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91180</ID>
+              <Description>"analogMoveParamId"</Description>
+              <LastState Value="-1" RealAddress="04BA29C4"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+88</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>TestCode</Name>
+      <Address>0040F578</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseF</Name>
+      <Address>0137A620</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>mypointer</Name>
+      <Address>0CB20188</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>newmem2</Name>
+      <Address>18EF0000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>newmem1</Name>
+      <Address>18B80020</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>newmem9</Name>
+      <Address>19400000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>AttackAddr</Name>
+      <Address>19400000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>addressG</Name>
+      <Address>18B80000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>GoodsStructure</Name>
+      <Address>05ABD570</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>addressE</Name>
+      <Address>18B80000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>address</Name>
+      <Address>18B80020</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>EscapeAddressToUse</Name>
+      <Address>18EF0000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Effect</Name>
+      <Address>00DBE5C0</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Goods</Name>
+      <Address>004F6097</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Bullet</Name>
+      <Address>01006196</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Attack</Name>
+      <Address>00E485DD</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>World</Name>
+      <Address>00D38CF3</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Move0</Name>
+      <Address>00FCAD71</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Move</Name>
+      <Address>00FCAD76</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>ChrIni</Name>
+      <Address>00D1F982</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Anim</Name>
+      <Address>007403B0</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>lastdroppeditem</Name>
+      <Address>00DC4AAA</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL</Name>
+      <Address>013784D2</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL2</Name>
+      <Address>013784D3</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL3</Name>
+      <Address>013784E9</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL4</Name>
+      <Address>013784EA</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL5</Name>
+      <Address>013784EB</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL6</Name>
+      <Address>013784EC</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL7</Name>
+      <Address>013784ED</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL8</Name>
+      <Address>013784EE</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL9</Name>
+      <Address>013784E4</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL0</Name>
+      <Address>013784E5</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL11</Name>
+      <Address>013784E6</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL12</Name>
+      <Address>01376EE7</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL13</Name>
+      <Address>013784E7</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL14</Name>
+      <Address>013784E8</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>GameFlagData</Name>
+      <Address>1532001D</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>GameFlagAOB</Name>
+      <Address>00D38C43</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseA</Name>
+      <Address>012E29E8</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseB</Name>
+      <Address>01378700</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseC</Name>
+      <Address>013784A0</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseD</Name>
+      <Address>0137855C</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseE</Name>
+      <Address>0137E204</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseX</Name>
+      <Address>0137D644</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseZ</Name>
+      <Address>0137D648</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseL</Name>
+      <Address>0137D6C8</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>NewKnockBackMode</Name>
+      <Address>0137D648</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>selected_weapon</Name>
+      <Address>1BE90000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>selected_weapon_var_name</Name>
+      <Address>1BE90030</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>selected_attack</Name>
+      <Address>1C370000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>selected_attack_var_name</Name>
+      <Address>1C370010</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+  <LuaScript>AddressList = getAddressList()
+attack_base_entry = AddressList.getMemoryRecordByDescription('Move Base')
+
+AddressList.getMemoryRecordByDescription('Open').OnActivate = function(record, before, currentstate)
+  attack_param_pc_indicies_addr = AddressList.getMemoryRecordByDescription('MoveParam').getCurrentAddress()+0x24
+  return true
+end
+
+attack_paramentry_offset_hex = 0
+attack_name = "UNKNOWNNAME"
+
+--on attack selection, get address from aob, and save default atribs
+selected_attack = AddressList.getMemoryRecordByDescription('Select Move and check the box')
+selected_attack.OnActivate = function(record, before, currentstate)
+  --get id from selected attack dropdown
+  weapon_id = readInteger(selected_attack.getCurrentAddress())
+  if weapon_id ~= nil then
+    --find in PARAM index array
+    for id_i=0,64 do
+      if readInteger(attack_param_pc_indicies_addr+id_i*12) == weapon_id then
+        attack_paramentry_offset = readInteger(attack_param_pc_indicies_addr+id_i*12+4)-0x30
+        break
+      end
+    end
+    --use offset to get entry
+    attack_paramentry_address = attack_param_pc_indicies_addr+attack_paramentry_offset
+    --set Attack Base address
+    attack_base_entry.setAddress(string.format("%x",attack_paramentry_address))
+    --save attack paramentry offset for use in CE
+    attack_paramentry_offset_hex = string.format("%x",attack_paramentry_offset)
+    --save the current (original) stats for the attack
+    table_string_disable = GenerateStringForAttack()
+  end
+
+  return false
+end
+
+
+
+table_string_disable = ""
+
+function GenerateStringForAttack()
+  local table_string = "{$lua}\n" .. "AddressList = getAddressList()\n" .. "move_param_pcbase_addr = AddressList.getMemoryRecordByDescription('MoveParam').getCurrentAddress()+0x24\n"
+
+  --iterate through all children of the attack base (all variables in the struct)
+  --genreate lua because its really the only way for code that required dynamic param bases
+  for i=0,34 do
+
+    --handle the type cases
+    if attack_base_entry[i].Type == vtSingle then
+      local read_bytes = readFloat(attack_base_entry[i].CurrentAddress)
+      table_string = table_string .. "writeFloat(move_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[i].Address,2),16)) .. ","
+      table_string = table_string .. string.format("%f) --%s\n", read_bytes, attack_base_entry[i].Description)
+    elseif attack_base_entry[i].Type == vtDword then
+      local read_bytes = readInteger(attack_base_entry[i].CurrentAddress)
+      table_string = table_string .. "writeInteger(move_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[i].Address,2),16)) .. ","
+      table_string = table_string .. string.format("%d) --%s\n", read_bytes, attack_base_entry[i].Description)
+    elseif attack_base_entry[i].Type == vtWord then
+      local read_bytes = readSmallInteger(attack_base_entry[i].CurrentAddress)
+      table_string = table_string .. "writeSmallInteger(move_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[i].Address,2),16)) .. ","
+      table_string = table_string .. string.format("%d) --%s\n", read_bytes, attack_base_entry[i].Description)
+    elseif attack_base_entry[i].Type == vtByte then
+      local read_bytes = readBytes(attack_base_entry[i].CurrentAddress, 1, true)
+      table_string = table_string .. "writeBytes(move_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[i].Address,2),16)) .. ","
+      table_string = table_string .. string.format("%d) --%s\n", read_bytes[1], attack_base_entry[i].Description)
+    else
+      print("WARNING unknown type at i="..i)
+    end
+  end
+
+  table_string = table_string .. "{$asm}\n"
+
+  return table_string
+end
+
+
+--after attack weapon atribs, user triggers the generation of the CE script generation for the changes
+generate_code_entry = AddressList.getMemoryRecordByDescription('Generate CE Code')
+generate_code_entry.OnActivate = function(record, before, currentstate)
+  local table_string = "[ENABLE]\n"..
+                       GenerateStringForAttack() .. "\n" ..
+                       "[DISABLE]\n" ..
+                       table_string_disable
+
+  --get varable name for attack and fix up
+  local variable_name = readString(generate_code_entry.getCurrentAddress(), 100, false)
+  variable_name = variable_name:gsub(" ","_"):lower()
+  --insert variable name into table
+  table_string = table_string:gsub(attack_name,variable_name)
+
+  print(table_string)
+  return false
+end
+</LuaScript>
+</CheatTable>
