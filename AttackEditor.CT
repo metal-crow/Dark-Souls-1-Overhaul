@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<CheatTable CheatEngineTableVersion="24">
+<CheatTable CheatEngineTableVersion="26">
   <CheatEntries>
     <CheatEntry>
       <ID>90767</ID>
       <Description>"AttackParamPC"</Description>
+      <LastState RealAddress="04A69B6C"/>
       <VariableType>String</VariableType>
       <Length>32</Length>
       <Unicode>0</Unicode>
+      <CodePage>0</CodePage>
       <ZeroTerminate>1</ZeroTerminate>
       <Address>BaseP</Address>
       <Offsets>
@@ -47,9 +49,11 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>89916</ID>
               <Description>"Generate CE Code"</Description>
+              <LastState RealAddress="1CD60010"/>
               <VariableType>String</VariableType>
               <Length>100</Length>
               <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
               <ZeroTerminate>1</ZeroTerminate>
               <Address>selected_attack_var_name</Address>
             </CheatEntry>
@@ -1455,18 +1459,25 @@ unregistersymbol(BaseP)
 4300580:Whip _ both hands step before
 4300600:Whip _ Paryigado
 </DropDownList>
+          <LastState Value="313" RealAddress="1CD60000"/>
           <VariableType>4 Bytes</VariableType>
           <Address>selected_attack</Address>
         </CheatEntry>
         <CheatEntry>
           <ID>89788</ID>
           <Description>"Attack Base"</Description>
-          <VariableType>4 Bytes</VariableType>
-          <Address>4ba7d00</Address>
+          <LastState RealAddress="04A6EF00"/>
+          <VariableType>String</VariableType>
+          <Length>0</Length>
+          <Unicode>0</Unicode>
+          <CodePage>0</CodePage>
+          <ZeroTerminate>1</ZeroTerminate>
+          <Address>4a6ef00</Address>
           <CheatEntries>
             <CheatEntry>
               <ID>89789</ID>
               <Description>"hit0_Radius"</Description>
+              <LastState Value="0" RealAddress="04A6EF00"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>Float</VariableType>
               <Address>+0</Address>
@@ -1474,6 +1485,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90768</ID>
               <Description>"hit1_Radius"</Description>
+              <LastState Value="0" RealAddress="04A6EF04"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>Float</VariableType>
               <Address>+4</Address>
@@ -1481,6 +1493,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90772</ID>
               <Description>"hit2_Radius"</Description>
+              <LastState Value="0" RealAddress="04A6EF08"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>Float</VariableType>
               <Address>+8</Address>
@@ -1488,6 +1501,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90771</ID>
               <Description>"hit3_Radius"</Description>
+              <LastState Value="0" RealAddress="04A6EF0C"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>Float</VariableType>
               <Address>+c</Address>
@@ -1495,6 +1509,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90770</ID>
               <Description>"knockbackDist"</Description>
+              <LastState Value="0.6999999881" RealAddress="04A6EF10"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>Float</VariableType>
               <Address>+10</Address>
@@ -1502,6 +1517,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90769</ID>
               <Description>"hitStopTime"</Description>
+              <LastState Value="0" RealAddress="04A6EF14"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>Float</VariableType>
               <Address>+14</Address>
@@ -1509,6 +1525,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90773</ID>
               <Description>"spEffectId0"</Description>
+              <LastState Value="0" RealAddress="04A6EF18"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+18</Address>
@@ -1516,6 +1533,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90777</ID>
               <Description>"spEffectId1"</Description>
+              <LastState Value="0" RealAddress="04A6EF1C"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+1c</Address>
@@ -1523,6 +1541,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90776</ID>
               <Description>"spEffectId2"</Description>
+              <LastState Value="0" RealAddress="04A6EF20"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+20</Address>
@@ -1530,6 +1549,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90775</ID>
               <Description>"spEffectId3"</Description>
+              <LastState Value="0" RealAddress="04A6EF24"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+24</Address>
@@ -1537,6 +1557,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90774</ID>
               <Description>"spEffectId4"</Description>
+              <LastState Value="0" RealAddress="04A6EF28"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+28</Address>
@@ -1544,6 +1565,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90778</ID>
               <Description>"hit0_DmyPoly1"</Description>
+              <LastState Value="-1" RealAddress="04A6EF2C"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+2c</Address>
@@ -1551,6 +1573,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90785</ID>
               <Description>"hit1_DmyPoly1"</Description>
+              <LastState Value="-1" RealAddress="04A6EF2E"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+2e</Address>
@@ -1558,6 +1581,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90784</ID>
               <Description>"hit2_DmyPoly1"</Description>
+              <LastState Value="-1" RealAddress="04A6EF30"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+30</Address>
@@ -1565,6 +1589,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90783</ID>
               <Description>"hit3_DmyPoly1"</Description>
+              <LastState Value="-1" RealAddress="04A6EF32"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+32</Address>
@@ -1572,6 +1597,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90782</ID>
               <Description>"hit0_DmyPoly2"</Description>
+              <LastState Value="-1" RealAddress="04A6EF34"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+34</Address>
@@ -1579,6 +1605,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90781</ID>
               <Description>"hit1_DmyPoly2"</Description>
+              <LastState Value="-1" RealAddress="04A6EF36"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+36</Address>
@@ -1586,6 +1613,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90780</ID>
               <Description>"hit2_DmyPoly2"</Description>
+              <LastState Value="-1" RealAddress="04A6EF38"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+38</Address>
@@ -1593,6 +1621,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90779</ID>
               <Description>"hit3_DmyPoly2"</Description>
+              <LastState Value="-1" RealAddress="04A6EF3A"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+3a</Address>
@@ -1600,6 +1629,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90804</ID>
               <Description>"blowingCorrection"</Description>
+              <LastState Value="0" RealAddress="04A6EF3C"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+3c</Address>
@@ -1607,6 +1637,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90803</ID>
               <Description>"atkPhysCorrection"</Description>
+              <LastState Value="100" RealAddress="04A6EF3E"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+3e</Address>
@@ -1614,6 +1645,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90802</ID>
               <Description>"atkMagCorrection"</Description>
+              <LastState Value="100" RealAddress="04A6EF40"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+40</Address>
@@ -1621,6 +1653,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90801</ID>
               <Description>"atkFireCorrection"</Description>
+              <LastState Value="100" RealAddress="04A6EF42"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+42</Address>
@@ -1628,6 +1661,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90800</ID>
               <Description>"atkThunCorrection"</Description>
+              <LastState Value="100" RealAddress="04A6EF44"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+44</Address>
@@ -1635,6 +1669,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90799</ID>
               <Description>"atkStamCorrection"</Description>
+              <LastState Value="100" RealAddress="04A6EF46"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+46</Address>
@@ -1642,6 +1677,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90798</ID>
               <Description>"guardAtkRateCorrection"</Description>
+              <LastState Value="9900" RealAddress="04A6EF48"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+48</Address>
@@ -1649,6 +1685,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90797</ID>
               <Description>"guardBreakCorrection"</Description>
+              <LastState Value="0" RealAddress="04A6EF4A"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+4a</Address>
@@ -1656,6 +1693,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90796</ID>
               <Description>"atkThrowEscapeCorrection"</Description>
+              <LastState Value="0" RealAddress="04A6EF4C"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+4c</Address>
@@ -1663,6 +1701,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90795</ID>
               <Description>"atkSuperArmorCorrection"</Description>
+              <LastState Value="0" RealAddress="04A6EF4E"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+4e</Address>
@@ -1670,6 +1709,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90829</ID>
               <Description>"atkPhys"</Description>
+              <LastState Value="0" RealAddress="04A6EF50"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+50</Address>
@@ -1677,6 +1717,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90828</ID>
               <Description>"atkMag"</Description>
+              <LastState Value="0" RealAddress="04A6EF52"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+52</Address>
@@ -1684,6 +1725,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90827</ID>
               <Description>"atkFire"</Description>
+              <LastState Value="0" RealAddress="04A6EF54"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+54</Address>
@@ -1691,6 +1733,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90826</ID>
               <Description>"atkThun"</Description>
+              <LastState Value="0" RealAddress="04A6EF56"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+56</Address>
@@ -1698,6 +1741,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90830</ID>
               <Description>"atkStam"</Description>
+              <LastState Value="0" RealAddress="04A6EF58"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+58</Address>
@@ -1705,6 +1749,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90805</ID>
               <Description>"guardAtkRate"</Description>
+              <LastState Value="100" RealAddress="04A6EF5A"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+5a</Address>
@@ -1712,6 +1757,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90834</ID>
               <Description>"guardBreakRate"</Description>
+              <LastState Value="0" RealAddress="04A6EF5C"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+5c</Address>
@@ -1719,6 +1765,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90833</ID>
               <Description>"atkSuperArmor"</Description>
+              <LastState Value="45" RealAddress="04A6EF5E"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+5e</Address>
@@ -1726,6 +1773,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90832</ID>
               <Description>"atkThrowEscape"</Description>
+              <LastState Value="0" RealAddress="04A6EF60"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+60</Address>
@@ -1733,6 +1781,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90831</ID>
               <Description>"atkObj"</Description>
+              <LastState Value="1" RealAddress="04A6EF62"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+62</Address>
@@ -1740,6 +1789,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90808</ID>
               <Description>"guardStaminaCutRate"</Description>
+              <LastState Value="0" RealAddress="04A6EF64"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+64</Address>
@@ -1747,6 +1797,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90807</ID>
               <Description>"guardRate"</Description>
+              <LastState Value="0" RealAddress="04A6EF66"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+66</Address>
@@ -1754,6 +1805,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90806</ID>
               <Description>"throwTypeId"</Description>
+              <LastState Value="0" RealAddress="04A6EF68"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+68</Address>
@@ -1761,6 +1813,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90809</ID>
               <Description>"hit0_hitType"</Description>
+              <LastState Value="0" RealAddress="04A6EF6A"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Byte</VariableType>
               <Address>+6a</Address>
@@ -1768,6 +1821,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90825</ID>
               <Description>"hit1_hitType"</Description>
+              <LastState Value="0" RealAddress="04A6EF6B"/>
               <ShowAsSigned>0</ShowAsSigned>
               <Color>000000</Color>
               <VariableType>Byte</VariableType>
@@ -1776,6 +1830,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90824</ID>
               <Description>"hit2_hitType"</Description>
+              <LastState Value="0" RealAddress="04A6EF6C"/>
               <ShowAsSigned>0</ShowAsSigned>
               <Color>000000</Color>
               <VariableType>Byte</VariableType>
@@ -1784,6 +1839,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90823</ID>
               <Description>"hit3_hitType"</Description>
+              <LastState Value="0" RealAddress="04A6EF6D"/>
               <ShowAsSigned>0</ShowAsSigned>
               <Color>000000</Color>
               <VariableType>Byte</VariableType>
@@ -1792,6 +1848,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90822</ID>
               <Description>"hti0_Priority"</Description>
+              <LastState Value="0" RealAddress="04A6EF6E"/>
               <ShowAsSigned>0</ShowAsSigned>
               <Color>000000</Color>
               <VariableType>Byte</VariableType>
@@ -1800,6 +1857,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90821</ID>
               <Description>"hti1_Priority"</Description>
+              <LastState Value="0" RealAddress="04A6EF6F"/>
               <ShowAsSigned>0</ShowAsSigned>
               <Color>000000</Color>
               <VariableType>Byte</VariableType>
@@ -1808,6 +1866,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90820</ID>
               <Description>"hti2_Priority"</Description>
+              <LastState Value="0" RealAddress="04A6EF70"/>
               <ShowAsSigned>0</ShowAsSigned>
               <Color>000000</Color>
               <VariableType>Byte</VariableType>
@@ -1816,6 +1875,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90819</ID>
               <Description>"hti3_Priority"</Description>
+              <LastState Value="0" RealAddress="04A6EF71"/>
               <ShowAsSigned>0</ShowAsSigned>
               <Color>000000</Color>
               <VariableType>Byte</VariableType>
@@ -1824,6 +1884,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90818</ID>
               <Description>"dmgLevel"</Description>
+              <LastState Value="5" RealAddress="04A6EF72"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Byte</VariableType>
               <Address>+72</Address>
@@ -1831,6 +1892,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90817</ID>
               <Description>"mapHitType"</Description>
+              <LastState Value="0" RealAddress="04A6EF73"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Byte</VariableType>
               <Address>+73</Address>
@@ -1838,6 +1900,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90816</ID>
               <Description>"guardCutCancelRate"</Description>
+              <LastState Value="0" RealAddress="04A6EF74"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>Byte</VariableType>
               <Address>+74</Address>
@@ -1845,6 +1908,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90815</ID>
               <Description>"atkAttribute"</Description>
+              <LastState Value="4" RealAddress="04A6EF75"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Byte</VariableType>
               <Address>+75</Address>
@@ -1852,6 +1916,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90814</ID>
               <Description>"spAttribute"</Description>
+              <LastState Value="1" RealAddress="04A6EF76"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Byte</VariableType>
               <Address>+76</Address>
@@ -1859,6 +1924,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90813</ID>
               <Description>"atkType"</Description>
+              <LastState Value="0" RealAddress="04A6EF77"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Byte</VariableType>
               <Address>+77</Address>
@@ -1866,6 +1932,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90812</ID>
               <Description>"atkMaterial"</Description>
+              <LastState Value="6" RealAddress="04A6EF78"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Byte</VariableType>
               <Address>+78</Address>
@@ -1873,6 +1940,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90811</ID>
               <Description>"atkSize"</Description>
+              <LastState Value="0" RealAddress="04A6EF79"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Byte</VariableType>
               <Address>+79</Address>
@@ -1880,6 +1948,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90810</ID>
               <Description>"defMaterial"</Description>
+              <LastState Value="0" RealAddress="04A6EF7A"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Byte</VariableType>
               <Address>+7a</Address>
@@ -1887,6 +1956,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90835</ID>
               <Description>"defSfxMaterial"</Description>
+              <LastState Value="0" RealAddress="04A6EF7B"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Byte</VariableType>
               <Address>+7b</Address>
@@ -1894,6 +1964,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90837</ID>
               <Description>"hitSourceType"</Description>
+              <LastState Value="1" RealAddress="04A6EF7C"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Byte</VariableType>
               <Address>+7c</Address>
@@ -1901,6 +1972,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90836</ID>
               <Description>"throwFlag"</Description>
+              <LastState Value="0" RealAddress="04A6EF7D"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Byte</VariableType>
               <Address>+7d</Address>
@@ -1908,6 +1980,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90838</ID>
               <Description>"disableGuard"</Description>
+              <LastState Value="0" RealAddress="04A6EF7E"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Binary</VariableType>
               <BitStart>0</BitStart>
@@ -1918,6 +1991,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90839</ID>
               <Description>"disableStaminaAttack"</Description>
+              <LastState Value="0" RealAddress="04A6EF7E"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Binary</VariableType>
               <BitStart>1</BitStart>
@@ -1928,6 +2002,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90845</ID>
               <Description>"disableHitSpEffect"</Description>
+              <LastState Value="0" RealAddress="04A6EF7E"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Binary</VariableType>
               <BitStart>2</BitStart>
@@ -1938,6 +2013,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90844</ID>
               <Description>"IgnoreNotifyMissSwingForAI"</Description>
+              <LastState Value="1" RealAddress="04A6EF7E"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Binary</VariableType>
               <BitStart>3</BitStart>
@@ -1948,6 +2024,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90843</ID>
               <Description>"repeatHitSfx"</Description>
+              <LastState Value="0" RealAddress="04A6EF7E"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Binary</VariableType>
               <BitStart>4</BitStart>
@@ -1958,6 +2035,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90842</ID>
               <Description>"isArrowAtk"</Description>
+              <LastState Value="0" RealAddress="04A6EF7E"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Binary</VariableType>
               <BitStart>5</BitStart>
@@ -1968,6 +2046,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90841</ID>
               <Description>"isGhostAtk"</Description>
+              <LastState Value="0" RealAddress="04A6EF7E"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Binary</VariableType>
               <BitStart>6</BitStart>
@@ -1978,6 +2057,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90840</ID>
               <Description>"isDisableNoDamage"</Description>
+              <LastState Value="0" RealAddress="04A6EF7E"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Binary</VariableType>
               <BitStart>7</BitStart>
@@ -1992,6 +2072,194 @@ unregistersymbol(BaseP)
   </CheatEntries>
   <UserdefinedSymbols>
     <SymbolEntry>
+      <Name>TestCode</Name>
+      <Address>0040F578</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseF</Name>
+      <Address>0137A620</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>mypointer</Name>
+      <Address>0CB20188</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>newmem2</Name>
+      <Address>18EF0000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>newmem1</Name>
+      <Address>18B80020</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>newmem9</Name>
+      <Address>19400000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>AttackAddr</Name>
+      <Address>19400000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>addressG</Name>
+      <Address>18B80000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>GoodsStructure</Name>
+      <Address>05ABD570</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>addressE</Name>
+      <Address>18B80000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>address</Name>
+      <Address>18B80020</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>EscapeAddressToUse</Name>
+      <Address>18EF0000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Effect</Name>
+      <Address>00DBE5C0</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Goods</Name>
+      <Address>004F6097</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Bullet</Name>
+      <Address>01006196</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Attack</Name>
+      <Address>00E485DD</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>World</Name>
+      <Address>00D38CF3</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Move0</Name>
+      <Address>00FCAD71</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Move</Name>
+      <Address>00FCAD76</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>ChrIni</Name>
+      <Address>00D1F982</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Anim</Name>
+      <Address>007403B0</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>lastdroppeditem</Name>
+      <Address>00DC4AAA</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL</Name>
+      <Address>013784D2</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL2</Name>
+      <Address>013784D3</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL3</Name>
+      <Address>013784E9</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL4</Name>
+      <Address>013784EA</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL5</Name>
+      <Address>013784EB</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL6</Name>
+      <Address>013784EC</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL7</Name>
+      <Address>013784ED</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL8</Name>
+      <Address>013784EE</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL9</Name>
+      <Address>013784E4</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL0</Name>
+      <Address>013784E5</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL11</Name>
+      <Address>013784E6</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL12</Name>
+      <Address>01376EE7</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL13</Name>
+      <Address>013784E7</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL14</Name>
+      <Address>013784E8</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>GameFlagData</Name>
+      <Address>1532001D</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>GameFlagAOB</Name>
+      <Address>00D38C43</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseA</Name>
+      <Address>012E29E8</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseB</Name>
+      <Address>01378700</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseC</Name>
+      <Address>013784A0</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseD</Name>
+      <Address>0137855C</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseE</Name>
+      <Address>0137E204</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseX</Name>
+      <Address>0137D644</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseZ</Name>
+      <Address>0137D648</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseL</Name>
+      <Address>0137D6C8</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>NewKnockBackMode</Name>
+      <Address>0137D648</Address>
+    </SymbolEntry>
+    <SymbolEntry>
       <Name>selected_weapon</Name>
       <Address>1BE90000</Address>
     </SymbolEntry>
@@ -2001,11 +2269,11 @@ unregistersymbol(BaseP)
     </SymbolEntry>
     <SymbolEntry>
       <Name>selected_attack</Name>
-      <Address>0FFF0000</Address>
+      <Address>1CD60000</Address>
     </SymbolEntry>
     <SymbolEntry>
       <Name>selected_attack_var_name</Name>
-      <Address>0FFF0010</Address>
+      <Address>1CD60010</Address>
     </SymbolEntry>
   </UserdefinedSymbols>
   <LuaScript>AddressList = getAddressList()
@@ -2050,33 +2318,40 @@ end
 table_string_disable = ""
 
 function GenerateStringForAttack()
-  local table_string = ""
+  local table_string = "{$lua}\n" .. "AddressList = getAddressList()\n" .. "attack_param_pcbase_addr = AddressList.getMemoryRecordByDescription('AttackParamPC').getCurrentAddress()+0x24\n"
 
   --iterate through all children of the attack base (all variables in the struct)
+  --genreate lua because its really the only way for code that required dynamic param bases
   for i=0,61 do
-    table_string = table_string .. "define(" .. attack_name .. "," .. string.format("%x",attack_paramentry_offset_hex+tonumber(string.sub(attack_base_entry[i].Address,2),16)) .. ")\n"
-    table_string = table_string .. "[ATK_PARAM_ST_BASE]+" .. attack_name  .. ":\n db "
 
     --handle the type cases
-    if attack_base_entry[i].Type == vtDword or attack_base_entry[i].Type == vtSingle then
-      local read_bytes = readBytes(attack_base_entry[i].CurrentAddress, 4, true)
-      table_string = table_string .. string.format("%x %x %x %x //%s\n", read_bytes[1], read_bytes[2], read_bytes[3], read_bytes[4], attack_base_entry[i].Description)
+    if attack_base_entry[i].Type == vtSingle then
+      local read_bytes = readFloat(attack_base_entry[i].CurrentAddress)
+      table_string = table_string .. "writeFloat(attack_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[i].Address,2),16)) .. ","
+      table_string = table_string .. string.format("%f) --%s\n", read_bytes, attack_base_entry[i].Description)
+    elseif attack_base_entry[i].Type == vtDword then
+      local read_bytes = readInteger(attack_base_entry[i].CurrentAddress)
+      table_string = table_string .. "writeInteger(attack_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[i].Address,2),16)) .. ","
+      table_string = table_string .. string.format("%d) --%s\n", read_bytes, attack_base_entry[i].Description)
     elseif attack_base_entry[i].Type == vtWord then
-      local read_bytes = readBytes(attack_base_entry[i].CurrentAddress, 2, true)
-      table_string = table_string .. string.format("%x %x //%s\n", read_bytes[1], read_bytes[2], attack_base_entry[i].Description)
+      local read_bytes = readSmallInteger(attack_base_entry[i].CurrentAddress)
+      table_string = table_string .. "writeSmallInteger(attack_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[i].Address,2),16)) .. ","
+      table_string = table_string .. string.format("%d) --%s\n", read_bytes, attack_base_entry[i].Description)
     elseif attack_base_entry[i].Type == vtByte then
       local read_bytes = readBytes(attack_base_entry[i].CurrentAddress, 1, true)
-      table_string = table_string .. string.format("%x //%s\n", read_bytes[1], attack_base_entry[i].Description)
+      table_string = table_string .. "writeBytes(attack_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[i].Address,2),16)) .. ","
+      table_string = table_string .. string.format("%d) --%s\n", read_bytes[1], attack_base_entry[i].Description)
     else
       print("WARNING unknown type at i="..i)
     end
   end
 
   --count the flags bytes as a single 1 byte chunk
-  table_string = table_string .. "define(" .. attack_name .. "," .. string.format("%x",attack_paramentry_offset_hex+tonumber(string.sub(attack_base_entry[62].Address,2),16)) .. ")\n"
-  table_string = table_string .. "[ATK_PARAM_ST_BASE]+" .. attack_name .. ":\n db "
+  table_string = table_string .. "writeBytes(attack_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[62].Address,2),16)) .. ","
   local flag_bytes = readBytes(attack_base_entry[62].CurrentAddress, 1, true)
-  table_string = table_string .. string.format("%x //flags\n", flag_bytes[1])
+  table_string = table_string .. string.format("%d) --flags\n", flag_bytes[1])
+
+  table_string = table_string .. "{$asm}\n"
 
   return table_string
 end

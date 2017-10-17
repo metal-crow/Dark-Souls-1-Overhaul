@@ -1,0 +1,988 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="26">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>90767</ID>
+      <Description>"MagicParam"</Description>
+      <LastState RealAddress="04B0507C"/>
+      <VariableType>String</VariableType>
+      <Length>32</Length>
+      <Unicode>0</Unicode>
+      <CodePage>0</CodePage>
+      <ZeroTerminate>1</ZeroTerminate>
+      <Address>BaseP</Address>
+      <Offsets>
+        <Offset>c</Offset>
+        <Offset>20</Offset>
+        <Offset>204</Offset>
+      </Offsets>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>89915</ID>
+      <Description>"Open"</Description>
+      <Options moHideChildren="1"/>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+globalalloc(selected_attack,4)
+globalalloc(selected_attack_var_name,100)
+
+aobscan(finditP,A1????????39A8400400000F)
+label(BaseP)
+registersymbol(BaseP)
+[finditP+1]:
+BaseP:
+
+[DISABLE]
+dealloc(selected_attack_var_name)
+dealloc(selected_attack)
+
+unregistersymbol(BaseP)
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>89917</ID>
+          <Description>"Set the value to the magic name, and check the box"</Description>
+          <LastState Value="" RealAddress="00000000"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>89916</ID>
+              <Description>"Generate CE Code"</Description>
+              <LastState RealAddress="1CD70010"/>
+              <VariableType>String</VariableType>
+              <Length>100</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>selected_attack_var_name</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>10322</ID>
+          <Description>"Select Magic and check the box"</Description>
+          <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">3000:Arrow of Seoul
+3010:Arrow of strong Seoul
+3020:Futoshiya of Seoul
+3030:Futoshiya of strong Seoul
+3040:Mass of Seoul to be tracked
+3050:Crystalline mass of Seoul to be tracked
+3060:Spear of Seoul
+3070:Crystal spear of Seoul
+3100:Magic weapon enhancement 1
+3110:Magic weapon enhancement 2
+3120:Magic weapon enhancement 3
+3300:Strengthening shield 1
+3310:Strengthening shield 2
+3400:Invisible Weapon
+3410:Invisible body
+3500:Light
+3510:Silence
+3520:Sound
+3530:Repair
+3540:Falling control
+3550:Mimicry
+3600:Dispelled
+3610:Healing
+3700:Crystal beam
+3710:Balls of [ DLC ] darkness
+3720:Splash of [ DLC ] darkness
+3730:Fog of darkness [ DLC ]
+3740:[ DLC ] those who follow
+4000:Fireball
+4010:Fireball 2
+4020:Fireball 3
+4030:Fire Storm
+4040:Fire Storm 2
+4050:Flame radiation
+4060:Whip of flame
+4100:Proximity flame 1
+4110:Proximity flame 2
+4200:Fog of poison
+4210:Mist of deadly poison
+4220:Fog of acid
+4300:Body of iron
+4310:Veil of water
+4360:Fascination
+4400:The power of madness
+4500:Chaos _ Fireball
+4510:Chaos _ Firestorm
+4520:Whip of flame chaos
+4530:[ DLC ] black flames
+5000:Recovery 1
+5010:Recover for two
+5020:Recovery 3
+5030:4 recovery
+5040:Regenerating
+5050:Great regen
+5100:Summon
+5110:Summon 2
+5200:Cut once revival
+5210:Return
+5300:Force 1
+5310:Force 2
+5320:Force 3
+5400:Hint
+5500:Thunder 1
+5510:Thunder 2
+5520:Lightning 3
+5600:Magic protection 1
+5610:Magic protection 2
+5700:Retributive justice
+5710:Retributive justice
+5800:Gravity
+5810:Anti- magic area
+5900:Sword of the sun
+5910:Sword of moonlight
+13000:Arrow of Seoul
+13010:Arrow of strong Seoul
+13020:Futoshiya of Seoul
+13030:Futoshiya of strong Seoul
+13040:Mass of Seoul to be tracked
+13050:Crystalline mass of Seoul to be tracked
+13060:Spear of Seoul
+13070:Crystal spear of Seoul
+13100:Magic weapon enhancement 1
+13110:Magic weapon enhancement 2
+13120:Magic weapon enhancement 3
+13300:Strengthening shield 1
+13310:Strengthening shield 2
+13400:Invisible Weapon
+13410:Invisible body
+13500:Light
+13510:Silence
+13520:Sound
+13530:Repair
+13540:Falling control
+13550:Mimicry
+13600:Dispelled
+13610:Healing
+13700:Crystal beam
+14000:Fireball
+14010:Fireball 2
+14020:Fireball 3
+14030:Fire Storm
+14040:Fire Storm 2
+14050:Flame radiation
+14060:Whip of flame
+14100:Proximity flame 1
+14110:Proximity flame 2
+14200:Fog of poison
+14210:Mist of deadly poison
+14220:Fog of acid
+14300:Body of iron
+14310:Veil of water
+14360:Fascination
+14400:The power of madness
+14500:Chaos _ Fireball
+14510:Chaos _ Firestorm
+14520:Whip of flame chaos
+15000:Recovery 1
+15010:Recover for two
+15020:Recovery 3
+15030:4 recovery
+15040:Regenerating
+15050:Great regen
+15100:Summon
+15110:Summon 2
+15200:Cut once revival
+15210:Return
+15300:Force 1
+15310:Force 2
+15320:Force 3
+15400:Hint
+15500:Thunder 1
+15510:Thunder 2
+15520:Lightning 3
+15600:Magic protection 1
+15610:Magic protection 2
+15700:Retributive justice
+15710:Retributive justice
+15800:Gravity
+15810:Anti- magic area
+15900:Sword of the sun
+15910:Sword of moonlight
+</DropDownList>
+          <LastState Value="4010" RealAddress="1CD70000"/>
+          <VariableType>4 Bytes</VariableType>
+          <Address>selected_attack</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>89788</ID>
+          <Description>"Magic Base"</Description>
+          <LastState Value="0" RealAddress="04B05CAC"/>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4b05cac</Address>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>82808</ID>
+              <Description>"Yes/No Dialog Box"</Description>
+              <LastState Value="0" RealAddress="04B05CAC"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>+0</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82792</ID>
+              <Description>"Limit Cancel SpEffect ID"</Description>
+              <LastState Value="-1" RealAddress="04B05CB0"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+4</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82802</ID>
+              <Description>"Sort ID"</Description>
+              <LastState Value="3102" RealAddress="04B05CB4"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+8</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82781</ID>
+              <Description>"Reference ID"</Description>
+              <LastState Value="6100" RealAddress="04B05CB6"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+A</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82782</ID>
+              <Description>"FP Cost"</Description>
+              <LastState Value="0" RealAddress="04B05CB8"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+C</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82784</ID>
+              <Description>"Stamina Cost"</Description>
+              <LastState Value="0" RealAddress="04B05CBA"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+E</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82795</ID>
+              <Description>"Icon ID"</Description>
+              <LastState Value="3021" RealAddress="04B05CBC"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+10</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82796</ID>
+              <Description>"Behavior ID"</Description>
+              <LastState Value="0" RealAddress="04B05CBE"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+12</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82803</ID>
+              <Description>"Material Item ID"</Description>
+              <LastState Value="-1" RealAddress="04B05CC0"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+14</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82812</ID>
+              <Description>"Replace Magic ID"</Description>
+              <LastState Value="-1" RealAddress="04B05CC2"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+16</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82783</ID>
+              <Description>"Number of Casts"</Description>
+              <LastState Value="6" RealAddress="04B05CC4"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+18</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82785</ID>
+              <Description>"Humanity"</Description>
+              <LastState Value="0" RealAddress="04B05CC6"/>
+              <VariableType>Byte</VariableType>
+              <Address>+1A</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82779</ID>
+              <Description>"Over Dexterity"</Description>
+              <LastState Value="99" RealAddress="04B05CC7"/>
+              <VariableType>Byte</VariableType>
+              <Address>+1B</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82786</ID>
+              <Description>"SFX Variation"</Description>
+              <LastState Value="86" RealAddress="04B05CC8"/>
+              <VariableType>Byte</VariableType>
+              <Address>+1C</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82797</ID>
+              <Description>"Slots Used"</Description>
+              <LastState Value="1" RealAddress="04B05CC9"/>
+              <VariableType>Byte</VariableType>
+              <Address>+1D</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82798</ID>
+              <Description>"Required INT"</Description>
+              <LastState Value="0" RealAddress="04B05CCA"/>
+              <VariableType>Byte</VariableType>
+              <Address>+1E</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82799</ID>
+              <Description>"Required FAI"</Description>
+              <LastState Value="0" RealAddress="04B05CCB"/>
+              <VariableType>Byte</VariableType>
+              <Address>+1F</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82789</ID>
+              <Description>"Dexterity Minimum Cast Speed Scaling"</Description>
+              <LastState Value="20" RealAddress="04B05CCC"/>
+              <VariableType>Byte</VariableType>
+              <Address>+20</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82790</ID>
+              <Description>"Dexterity Maximum Cast Speed Scaling"</Description>
+              <LastState Value="45" RealAddress="04B05CCD"/>
+              <VariableType>Byte</VariableType>
+              <Address>+21</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82778</ID>
+              <Description>"EzState Behavior Type"</Description>
+              <LastState Value="2" RealAddress="04B05CCE"/>
+              <VariableType>Byte</VariableType>
+              <Address>+22</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82780</ID>
+              <Description>"Reference Category"</Description>
+              <LastState Value="1" RealAddress="04B05CCF"/>
+              <VariableType>Byte</VariableType>
+              <Address>+23</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82787</ID>
+              <Description>"SpEffect Category"</Description>
+              <LastState Value="3" RealAddress="04B05CD0"/>
+              <VariableType>Byte</VariableType>
+              <Address>+24</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82788</ID>
+              <Description>"Reference Type"</Description>
+              <LastState Value="5" RealAddress="04B05CD1"/>
+              <VariableType>Byte</VariableType>
+              <Address>+25</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82809</ID>
+              <Description>"Menu Type"</Description>
+              <LastState Value="0" RealAddress="04B05CD2"/>
+              <VariableType>Byte</VariableType>
+              <Address>+26</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82811</ID>
+              <Description>"Has SpEffect Type"</Description>
+              <LastState Value="0" RealAddress="04B05CD3"/>
+              <VariableType>Byte</VariableType>
+              <Address>+27</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82813</ID>
+              <Description>"Replace Category"</Description>
+              <LastState Value="0" RealAddress="04B05CD4"/>
+              <VariableType>Byte</VariableType>
+              <Address>+28</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82791</ID>
+              <Description>"Use Limit Category"</Description>
+              <LastState Value="0" RealAddress="04B05CD5"/>
+              <VariableType>Byte</VariableType>
+              <Address>+29</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82815</ID>
+              <Description>"Vow Type 0"</Description>
+              <LastState Value="1" RealAddress="04B05CD6"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>0</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2A</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82816</ID>
+              <Description>"Vow Type 1"</Description>
+              <LastState Value="1" RealAddress="04B05CD6"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>1</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2A</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82817</ID>
+              <Description>"Vow Type 2"</Description>
+              <LastState Value="1" RealAddress="04B05CD6"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>2</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2A</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82818</ID>
+              <Description>"Vow Type 3"</Description>
+              <LastState Value="1" RealAddress="04B05CD6"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>3</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2A</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82819</ID>
+              <Description>"Vow Type 4"</Description>
+              <LastState Value="1" RealAddress="04B05CD6"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>4</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2A</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82820</ID>
+              <Description>"Vow Type 5"</Description>
+              <LastState Value="1" RealAddress="04B05CD6"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>5</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2A</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82821</ID>
+              <Description>"Vow Type 6"</Description>
+              <LastState Value="1" RealAddress="04B05CD6"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>6</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2A</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82822</ID>
+              <Description>"Vow Type 7"</Description>
+              <LastState Value="1" RealAddress="04B05CD6"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>7</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2A</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82793</ID>
+              <Description>"Enable Multi"</Description>
+              <LastState Value="1" RealAddress="04B05CD7"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>0</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2B</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82794</ID>
+              <Description>"Enable Mult Only"</Description>
+              <LastState Value="0" RealAddress="04B05CD7"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>1</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2B</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82800</ID>
+              <Description>"Is Weapon Enchant"</Description>
+              <LastState Value="0" RealAddress="04B05CD7"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>2</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2B</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82801</ID>
+              <Description>"Is Shield Enchant"</Description>
+              <LastState Value="0" RealAddress="04B05CD7"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>3</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2B</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82804</ID>
+              <Description>"Enable Human"</Description>
+              <LastState Value="1" RealAddress="04B05CD7"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>4</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2B</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82805</ID>
+              <Description>"Enable Dragon Phantom"</Description>
+              <LastState Value="1" RealAddress="04B05CD7"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>5</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2B</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82806</ID>
+              <Description>"Enable White Phantom"</Description>
+              <LastState Value="1" RealAddress="04B05CD7"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>6</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2B</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82807</ID>
+              <Description>"Enable Black Phantom"</Description>
+              <LastState Value="1" RealAddress="04B05CD7"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>7</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2B</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82810</ID>
+              <Description>"Disable Offline"</Description>
+              <LastState Value="0" RealAddress="04B05CD8"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>0</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2C</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82814</ID>
+              <Description>"Uses Miracle Resonance"</Description>
+              <LastState Value="0" RealAddress="04B05CD8"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>1</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2C</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82823</ID>
+              <Description>"Vow Type 8"</Description>
+              <LastState Value="1" RealAddress="04B05CD9"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>0</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2D</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82824</ID>
+              <Description>"Vow Type 9"</Description>
+              <LastState Value="1" RealAddress="04B05CD9"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>1</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2D</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82825</ID>
+              <Description>"Vow Type 10"</Description>
+              <LastState Value="1" RealAddress="04B05CD9"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>2</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2D</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82826</ID>
+              <Description>"Vow Type 11"</Description>
+              <LastState Value="1" RealAddress="04B05CD9"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>3</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2D</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82827</ID>
+              <Description>"Vow Type 12"</Description>
+              <LastState Value="1" RealAddress="04B05CD9"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>4</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2D</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82828</ID>
+              <Description>"Vow Type 13"</Description>
+              <LastState Value="1" RealAddress="04B05CD9"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>5</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2D</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82829</ID>
+              <Description>"Vow Type 14"</Description>
+              <LastState Value="1" RealAddress="04B05CD9"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>6</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2D</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82830</ID>
+              <Description>"Vow Type 15"</Description>
+              <LastState Value="1" RealAddress="04B05CD9"/>
+              <VariableType>Binary</VariableType>
+              <BitStart>7</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2D</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>TestCode</Name>
+      <Address>0040F578</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseF</Name>
+      <Address>0137A620</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>mypointer</Name>
+      <Address>0CB20188</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>newmem2</Name>
+      <Address>18EF0000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>newmem1</Name>
+      <Address>18B80020</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>newmem9</Name>
+      <Address>19400000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>AttackAddr</Name>
+      <Address>19400000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>addressG</Name>
+      <Address>18B80000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>GoodsStructure</Name>
+      <Address>05ABD570</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>addressE</Name>
+      <Address>18B80000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>address</Name>
+      <Address>18B80020</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>EscapeAddressToUse</Name>
+      <Address>18EF0000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Effect</Name>
+      <Address>00DBE5C0</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Goods</Name>
+      <Address>004F6097</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Bullet</Name>
+      <Address>01006196</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Attack</Name>
+      <Address>00E485DD</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>World</Name>
+      <Address>00D38CF3</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Move0</Name>
+      <Address>00FCAD71</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Move</Name>
+      <Address>00FCAD76</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>ChrIni</Name>
+      <Address>00D1F982</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Anim</Name>
+      <Address>007403B0</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>lastdroppeditem</Name>
+      <Address>00DC4AAA</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL</Name>
+      <Address>013784D2</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL2</Name>
+      <Address>013784D3</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL3</Name>
+      <Address>013784E9</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL4</Name>
+      <Address>013784EA</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL5</Name>
+      <Address>013784EB</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL6</Name>
+      <Address>013784EC</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL7</Name>
+      <Address>013784ED</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL8</Name>
+      <Address>013784EE</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL9</Name>
+      <Address>013784E4</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL0</Name>
+      <Address>013784E5</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL11</Name>
+      <Address>013784E6</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL12</Name>
+      <Address>01376EE7</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL13</Name>
+      <Address>013784E7</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL14</Name>
+      <Address>013784E8</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>GameFlagData</Name>
+      <Address>1532001D</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>GameFlagAOB</Name>
+      <Address>00D38C43</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseA</Name>
+      <Address>012E29E8</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseB</Name>
+      <Address>01378700</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseC</Name>
+      <Address>013784A0</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseD</Name>
+      <Address>0137855C</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseE</Name>
+      <Address>0137E204</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseX</Name>
+      <Address>0137D644</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseZ</Name>
+      <Address>0137D648</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseL</Name>
+      <Address>0137D6C8</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>NewKnockBackMode</Name>
+      <Address>0137D648</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>selected_weapon</Name>
+      <Address>1BE90000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>selected_weapon_var_name</Name>
+      <Address>1BE90030</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>selected_attack</Name>
+      <Address>1CD70000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>selected_attack_var_name</Name>
+      <Address>1CD70010</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+  <LuaScript>AddressList = getAddressList()
+attack_base_entry = AddressList.getMemoryRecordByDescription('Magic Base')
+
+AddressList.getMemoryRecordByDescription('Open').OnActivate = function(record, before, currentstate)
+  attack_param_pc_indicies_addr = AddressList.getMemoryRecordByDescription('MagicParam').getCurrentAddress()+0x24
+  return true
+end
+
+attack_paramentry_offset_hex = 0
+attack_name = "UNKNOWNNAME"
+
+--on attack selection, get address from aob, and save default atribs
+selected_attack = AddressList.getMemoryRecordByDescription('Select Magic and check the box')
+selected_attack.OnActivate = function(record, before, currentstate)
+  --get id from selected attack dropdown
+  weapon_id = readInteger(selected_attack.getCurrentAddress())
+  if weapon_id ~= nil then
+    --find in PARAM index array
+    for id_i=0,141 do
+      if readInteger(attack_param_pc_indicies_addr+id_i*12) == weapon_id then
+        attack_paramentry_offset = readInteger(attack_param_pc_indicies_addr+id_i*12+4)-0x30
+        break
+      end
+    end
+    --use offset to get entry
+    attack_paramentry_address = attack_param_pc_indicies_addr+attack_paramentry_offset
+    --set Attack Base address
+    attack_base_entry.setAddress(string.format("%x",attack_paramentry_address))
+    --save attack paramentry offset for use in CE
+    attack_paramentry_offset_hex = string.format("%x",attack_paramentry_offset)
+    --save the current (original) stats for the attack
+    table_string_disable = GenerateStringForAttack()
+  end
+
+  return false
+end
+
+
+
+table_string_disable = ""
+
+function GenerateStringForAttack()
+  local table_string = "{$lua}\n" .. "AddressList = getAddressList()\n" .. "magic_param_pcbase_addr = AddressList.getMemoryRecordByDescription('MagicParam').getCurrentAddress()+0x24\n"
+
+  --iterate through all children of the attack base (all variables in the struct)
+  --genreate lua because its really the only way for code that required dynamic param bases
+  for i=0,26 do
+
+    --handle the type cases
+    if attack_base_entry[i].Type == vtSingle then
+      local read_bytes = readFloat(attack_base_entry[i].CurrentAddress)
+      table_string = table_string .. "writeFloat(magic_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[i].Address,2),16)) .. ","
+      table_string = table_string .. string.format("%f) --%s\n", read_bytes, attack_base_entry[i].Description)
+    elseif attack_base_entry[i].Type == vtDword then
+      local read_bytes = readInteger(attack_base_entry[i].CurrentAddress)
+      table_string = table_string .. "writeInteger(magic_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[i].Address,2),16)) .. ","
+      table_string = table_string .. string.format("%d) --%s\n", read_bytes, attack_base_entry[i].Description)
+    elseif attack_base_entry[i].Type == vtWord then
+      local read_bytes = readSmallInteger(attack_base_entry[i].CurrentAddress)
+      table_string = table_string .. "writeSmallInteger(magic_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[i].Address,2),16)) .. ","
+      table_string = table_string .. string.format("%d) --%s\n", read_bytes, attack_base_entry[i].Description)
+    elseif attack_base_entry[i].Type == vtByte then
+      local read_bytes = readBytes(attack_base_entry[i].CurrentAddress, 1, true)
+      table_string = table_string .. "writeBytes(magic_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[i].Address,2),16)) .. ","
+      table_string = table_string .. string.format("%d) --%s\n", read_bytes[1], attack_base_entry[i].Description)
+    else
+      print("WARNING unknown type at i="..i)
+    end
+  end
+
+  --count the flags bytes as a single 3 byte chunk
+  table_string = table_string .. "writeBytes(magic_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[27].Address,2),16)) .. ","
+  local flag_bytes = readBytes(attack_base_entry[27].CurrentAddress, 3, true)
+  table_string = table_string .. string.format("%d) --flags\n", flag_bytes[1], flag_bytes[2], flag_bytes[3])
+
+  table_string = table_string .. "{$asm}\n"
+
+  return table_string
+end
+
+
+--after attack weapon atribs, user triggers the generation of the CE script generation for the changes
+generate_code_entry = AddressList.getMemoryRecordByDescription('Generate CE Code')
+generate_code_entry.OnActivate = function(record, before, currentstate)
+  local table_string = "[ENABLE]\n"..
+                       GenerateStringForAttack() .. "\n" ..
+                       "[DISABLE]\n" ..
+                       table_string_disable
+
+  --get varable name for attack and fix up
+  local variable_name = readString(generate_code_entry.getCurrentAddress(), 100, false)
+  variable_name = variable_name:gsub(" ","_"):lower()
+  --insert variable name into table
+  table_string = table_string:gsub(attack_name,variable_name)
+
+  print(table_string)
+  return false
+end
+</LuaScript>
+</CheatTable>
