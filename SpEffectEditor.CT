@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<CheatTable CheatEngineTableVersion="24">
+<CheatTable CheatEngineTableVersion="26">
   <CheatEntries>
     <CheatEntry>
       <ID>90767</ID>
-      <Description>"SpEffectParamPC"</Description>
-      <LastState RealAddress="04A917CC"/>
+      <Description>"SpEffectParam"</Description>
+      <LastState RealAddress="04B4425C"/>
       <VariableType>String</VariableType>
       <Length>32</Length>
       <Unicode>0</Unicode>
+      <CodePage>0</CodePage>
       <ZeroTerminate>1</ZeroTerminate>
       <Address>BaseP</Address>
       <Offsets>
@@ -20,7 +21,7 @@
       <ID>89915</ID>
       <Description>"Open"</Description>
       <Options moHideChildren="1"/>
-      <LastState/>
+      <LastState Activated="1"/>
       <VariableType>Auto Assembler Script</VariableType>
       <AssemblerScript>[ENABLE]
 globalalloc(selected_attack,4)
@@ -41,17 +42,18 @@ unregistersymbol(BaseP)
       <CheatEntries>
         <CheatEntry>
           <ID>89917</ID>
-          <Description>"Set the value to the attack name, and check the box"</Description>
+          <Description>"Set the value to the effect name, and check the box"</Description>
           <LastState Value="" RealAddress="00000000"/>
           <GroupHeader>1</GroupHeader>
           <CheatEntries>
             <CheatEntry>
               <ID>89916</ID>
               <Description>"Generate CE Code"</Description>
-              <LastState RealAddress="1BD60090"/>
+              <LastState RealAddress="131F0010"/>
               <VariableType>String</VariableType>
               <Length>100</Length>
               <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
               <ZeroTerminate>1</ZeroTerminate>
               <Address>selected_attack_var_name</Address>
             </CheatEntry>
@@ -59,870 +61,874 @@ unregistersymbol(BaseP)
         </CheatEntry>
         <CheatEntry>
           <ID>10322</ID>
-          <Description>"Select Effect and check the box"</Description>
+          <Description>"Select effect and check the box"</Description>
           <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">0:Test
-1:Pledge_effect_test
+1:Pledge effect test
 2:test_enchantweapon
 3:test_cure
-4:[_System_]_SOSsign
+4:[ System ] SOSsign
 5:test_cureitem
-6:[_System_]_kickout
-7:[_System_]_leaveSession
-8:Parameter_change_of_[_system_]_ghost_when
-9:Parameter_change_of_the_system_when_the_black
-10:[_System_]_Black_Soulsign
-11:[_System_]_Black_ForceJoinSoulsign
-12:[_System_]_bloodSign
-13:[_System_]_Seoul_Steel_[_multi_]
-14:[_System_]_blue_sign_visualization
-15:Entry_into_the_[_system_]_NPC
-16:[_System_]_nitrate_intrusion_Sign_handouts
-17:[_System_]_l_arena_exit
-20:[_System_]_valuation_effects
-21:[_System_]_point_light_source_equipment
+6:[ System ] kickout
+7:[ System ] leaveSession
+8:Parameter change of [ system ] ghost when
+9:Parameter change of the system when the black
+10:[ System ] Black_Soulsign
+11:[ System ] Black_ForceJoinSoulsign
+12:[ System ] bloodSign
+13:[ System ] Seoul Steel [ multi ]
+14:[ System ] blue sign visualization
+15:Entry into the [ system ] NPC
+16:[ System ] nitrate intrusion Sign handouts
+17:[ System ] l arena exit
+20:[ System ] valuation effects
+21:[ System ] point light source equipment
 22:test_change_wep0
 23:test_change_wep1
-24:[_System_]_relief_request
-25:[_System_]_revival_production_for_effect
-26:The_intrusion_to_the_system_]_bounty
-27:I_spread_the_scale_of_the_[_system_]_dragon
-28:I_want_to_level_0_[_systems_]_multi_intrusion_time_limit
-30:Parry_to_be_deformed_state_(conditions_throw_)
-31:Counter_damage_[_piercing_]
-32:Player_falling_to_(conditions_throw_)
+24:[ System ] relief request
+25:[ System ] revival production for effect
+26:The intrusion to the system ] bounty
+27:I spread the scale of the [ system ] dragon
+28:I want to level 0 [ systems ] multi intrusion time limit
+30:Parry to be deformed state (conditions throw )
+31:Counter damage [ piercing ]
+32:Player falling to (conditions throw )
 33:Mineralization
 34:Crystallization
-35:Invalid_state_throw
-36:Throw_ring_and_equipment_(conditions_throw_)
-37:Throw_Seoul_drain_state_(conditions_throw_)
-38:Damage_throw_up_effect_strengthening
-39:Invalid_state___Saddle_anti-_throw_[_DLC_]
-40:No_resonance
-41:Resonance_Lv1
-42:Resonance_Lv2
-43:Resonance_Lv3
-44:Resonance_Lv4
-50:Nature_of_magic_(_+3_slot_version)
-52:PG_test_:_detection
-53:PG_test_:_Waiting_cooperation
-54:PG_test_:_cooperation
-55:PG_test_:_Submit_cooperation
-57:PG_test_:_gravity_invalid
-59:Cooperation_Lv1
-60:Cooperation_Lv2
-61:Cooperation_Lv3
-62:Cooperation_wait_release
-63:Evil_eye_Lv1
-64:Evil_Eye_Lv2
-65:Evil_Eye_(_for_user_)
-71:Curse_effect__LV1
-72:Curse_effect__LV2
-73:Curse_effect__LV3
-74:Curse_effect__LV4
-80:Curse_effect_[_strengthening_]_Tairei
-100:Bonfire_recovery_effect_1
-101:Bonfire_recovery_effect_2
-102:Bonfire_recovery_Effect_3
-103:Bonfire_recovery_effect_4
-104:Bonfire_recovery_effect_5
-105:Bonfire_recovery_effect_6
-106:Bonfire_recovery_effect_7
-107:Bonfire_recovery_effect_8
-108:Bonfire_recovery_effect_9
-109:Bonfire_recovery_effect_10
-110:Risupon_recovery_effect_1
-111:Risupon_recovery_effect_2
-112:Risupon_recovery_Effect_3
-113:Risupon_recovery_effect_4
-114:Risupon_recovery_effect_5
-115:Risupon_recovery_effect_6
-116:Risupon_recovery_effect_7
-117:Risupon_recovery_effect_8
-118:Risupon_recovery_effect_9
-119:Risupon_recovery_effect_10
-201:[_]_QWC_area__NPC__+1
-202:[_QWC_area__NPC__+2_]
-203:[_]_QWC_area__NPC__+3
-206:[_]_QWC_area__NPC_-1
-207:[_]_QWC_area__NPC_-2
-208:[_]_QWC_area__NPC_-3
-211:[_]_QWC_area___black___+1
-212:[_]_QWC_area___black___+2
-221:[_]_QWC_area___white___+1
-222:[_]_QWC_area___white___+2
-231:QWC_]_[_gray_area_____+1
-232:QWC_]_[_gray_area_____+2
-236:QWC_]_[_gray_area_____-1
-237:QWC_]_[_gray_area_____-2
-311:[_]_QWC_player___black___+1
-312:[_]_QWC_player___black___+2
-321:[_]_QWC_player___white___+1
-322:[_]_QWC_player___white___+2
-331:[_]_QWC_player___gray___+1
-332:[_]_QWC_player___gray___+2
-336:[_]_QWC_player___Gray___-1
-337:[_]_QWC_player___Gray___-2
+35:Invalid state throw
+36:Throw ring and equipment (conditions throw )
+37:Throw Seoul drain state (conditions throw )
+38:Damage throw up effect strengthening
+39:Invalid state _ Saddle anti- throw [ DLC ]
+40:No resonance
+41:Resonance Lv1
+42:Resonance Lv2
+43:Resonance Lv3
+44:Resonance Lv4
+50:Nature of magic ( +3 slot version)
+52:PG test : detection
+53:PG test : Waiting cooperation
+54:PG test : cooperation
+55:PG test : Submit cooperation
+57:PG test : gravity invalid
+59:Cooperation Lv1
+60:Cooperation Lv2
+61:Cooperation Lv3
+62:Cooperation wait release
+63:Evil eye Lv1
+64:Evil Eye Lv2
+65:Evil Eye ( for user )
+71:Curse effect _LV1
+72:Curse effect _LV2
+73:Curse effect _LV3
+74:Curse effect _LV4
+80:Curse effect [ strengthening ] Tairei
+100:Bonfire recovery effect 1
+101:Bonfire recovery effect 2
+102:Bonfire recovery Effect 3
+103:Bonfire recovery effect 4
+104:Bonfire recovery effect 5
+105:Bonfire recovery effect 6
+106:Bonfire recovery effect 7
+107:Bonfire recovery effect 8
+108:Bonfire recovery effect 9
+109:Bonfire recovery effect 10
+110:Risupon recovery effect 1
+111:Risupon recovery effect 2
+112:Risupon recovery Effect 3
+113:Risupon recovery effect 4
+114:Risupon recovery effect 5
+115:Risupon recovery effect 6
+116:Risupon recovery effect 7
+117:Risupon recovery effect 8
+118:Risupon recovery effect 9
+119:Risupon recovery effect 10
+201:[ ] QWC area _NPC_ +1
+202:[ QWC area _NPC_ +2 ]
+203:[ ] QWC area _NPC_ +3
+206:[ ] QWC area _NPC_-1
+207:[ ] QWC area _NPC_-2
+208:[ ] QWC area _NPC_-3
+211:[ ] QWC area _ black _ +1
+212:[ ] QWC area _ black _ +2
+221:[ ] QWC area _ white _ +1
+222:[ ] QWC area _ white _ +2
+231:QWC ] [ gray area _ _ +1
+232:QWC ] [ gray area _ _ +2
+236:QWC ] [ gray area _ _ -1
+237:QWC ] [ gray area _ _ -2
+311:[ ] QWC player _ black _ +1
+312:[ ] QWC player _ black _ +2
+321:[ ] QWC player _ white _ +1
+322:[ ] QWC player _ white _ +2
+331:[ ] QWC player _ gray _ +1
+332:[ ] QWC player _ gray _ +2
+336:[ ] QWC player _ Gray _ -1
+337:[ ] QWC player _ Gray _ -2
 500:Gravity
-510:Gravity_(_for_user_)
-520:Auditory_hallucination
-530:Hidden_figure
+510:Gravity ( for user )
+520:Auditory hallucination
+530:Hidden figure
 540:Silence
-550:Tip_blood_character
-560:When_revival_dead
+550:Tip blood character
+560:When revival dead
 570:Rijenereito
-571:Rijenereito___resonance_LV1
-572:Rijenereito___resonance_LV2
-573:Rijenereito___resonance_LV3
-574:Rijenereito___resonance_LV4
-580:Feedback_[_triggered_]_wait
-581:Feedback_[_triggered_]
-600:Anti-_Magic
-610:Anti-_Magic_(_user_use)_[_effect_]
-611:(_For_user_)_Anti_Magic_[_effect_]
+571:Rijenereito _ resonance LV1
+572:Rijenereito _ resonance LV2
+573:Rijenereito _ resonance LV3
+574:Rijenereito _ resonance LV4
+580:Feedback [ triggered ] wait
+581:Feedback [ triggered ]
+600:Anti- Magic
+610:Anti- Magic ( user use) [ effect ]
+611:( For user ) Anti Magic [ effect ]
 620:Light
 630:Fascination
-640:Falling_control
-1000:Magic_weapon_enhancement_1
-1010:Magic_weapon_enhancement_2
-1020:Magic_weapon_enhancement_3
-1040:Strengthening_shield_1
-1050:Strengthening_shield_2
-1060:Invisible_Weapon
-1070:Sword_of_the_sun
-1080:Sword_of_the_month
-1081:_LV1_Sword_of_the_month
-1082:_LV2_Sword_of_the_month
-1083:_LV3_Sword_of_the_month
-1090:The_power_of_madness
-1120:Veil_of_water
-1130:Body_of_iron_[_repelling_damage_reduction_effect_]
-1140:Body_of_iron_[_move_Donashi_effect_]
-1150:Body_of_iron_[_damage_animation_effect_change_]
-1160:Magic_protection_1
-1170:Magic_protection_2
-1200:Poison_cloud_of_poison_for
-1210:Highly_toxic_cloud_of_death_for
-1220:Corrosion_of_corrosion_for_cloud
-1230:Deadly_poison_of_fog_for_darkness
-1300:Universal_treatment_[_state_]_recovery
-1301:Universal_treatment_-resistant_bleeding_[_recovery_]
-1302:Universal_treatment_[_poison_-resistant_recovery_]
-1303:Universal_treatment_[_deadly_poison_resistant_recovery_]
-1320:Poison_treatment_[_state_]_recovery
-1321:Poison_treatment_-resistant_[_recovery_]
-1330:Arms_and_Armor_Repair
+640:Falling control
+1000:Magic weapon enhancement 1
+1010:Magic weapon enhancement 2
+1020:Magic weapon enhancement 3
+1040:Strengthening shield 1
+1050:Strengthening shield 2
+1060:Invisible Weapon
+1070:Sword of the sun
+1080:Sword of the month
+1081:_LV1 Sword of the month
+1082:_LV2 Sword of the month
+1083:_LV3 Sword of the month
+1090:The power of madness
+1120:Veil of water
+1130:Body of iron [ repelling damage reduction effect ]
+1140:Body of iron [ move Donashi effect ]
+1150:Body of iron [ damage animation effect change ]
+1160:Magic protection 1
+1170:Magic protection 2
+1200:Poison cloud of poison for
+1210:Highly toxic cloud of death for
+1220:Corrosion of corrosion for cloud
+1230:Deadly poison of fog for darkness
+1300:Universal treatment [ state ] recovery
+1301:Universal treatment -resistant bleeding [ recovery ]
+1302:Universal treatment [ poison -resistant recovery ]
+1303:Universal treatment [ deadly poison resistant recovery ]
+1320:Poison treatment [ state ] recovery
+1321:Poison treatment -resistant [ recovery ]
+1330:Arms and Armor Repair
 1340:Dispelled
-1400:HP_recovery_1
-1401:HP_recovery_1__resonance_LV1
-1402:HP_recovery_1__resonance_LV2
-1403:HP_recovery_1__resonance_LV3
-1404:HP_recovery_1__resonance_LV4
-1410:HP_recovery_2
-1411:HP_recovery_2__resonance_LV1
-1412:HP_recovery_2__resonance_LV2
-1413:HP_recovery_2__resonance_LV3
-1414:HP_recovery_2__resonance_LV4
-1420:HP_recovery_3
-1421:HP_recovery_3__resonance_LV1
-1422:HP_recovery_3__resonance_LV2
-1423:HP_recovery_3__resonance_LV3
-1424:HP_recovery_3__resonance_LV4
-1430:HP_recovery_4
-1431:HP_recovery_4__resonance_LV1
-1432:HP_recovery_4__resonance_LV2
-1433:HP_recovery_4__resonance_LV3
-1434:HP_recovery_4__resonance_LV4
+1400:HP recovery 1
+1401:HP recovery 1_ resonance LV1
+1402:HP recovery 1_ resonance LV2
+1403:HP recovery 1_ resonance LV3
+1404:HP recovery 1_ resonance LV4
+1410:HP recovery 2
+1411:HP recovery 2_ resonance LV1
+1412:HP recovery 2_ resonance LV2
+1413:HP recovery 2_ resonance LV3
+1414:HP recovery 2_ resonance LV4
+1420:HP recovery 3
+1421:HP recovery 3_ resonance LV1
+1422:HP recovery 3_ resonance LV2
+1423:HP recovery 3_ resonance LV3
+1424:HP recovery 3_ resonance LV4
+1430:HP recovery 4
+1431:HP recovery 4_ resonance LV1
+1432:HP recovery 4_ resonance LV2
+1433:HP recovery 4_ resonance LV3
+1434:HP recovery 4_ resonance LV4
 1500:Mimicry
-1510:Mimicry_[_move_Donashi_effect_]
-1520:Dragon_variation_1
-1530:Change_dragon_2
-1600:Seoul_drain_1_[_AI_]
-1610:Seoul_drain_1_[_PC_]
-1620:Seoul_drain_2_[_AI_]
-1630:Seoul_drain_2_[_PC_]
-1700:White_relief_detection_magic
-1710:Black_magic_relief_detection
-1720:Item_detection_magic
-1800:Chickens_come_home_to_roost___counting
-1810:Chickens_come_home_to_roost___explosion_generation
-1980:Others__HP_recovery_recovery
-1981:Ghost_camouflage
-1983:Black_ghost_dispel
-1984:Black_ghosting
+1510:Mimicry [ move Donashi effect ]
+1520:Dragon variation 1
+1530:Change dragon 2
+1600:Seoul drain 1 [ AI ]
+1610:Seoul drain 1 [ PC ]
+1620:Seoul drain 2 [ AI ]
+1630:Seoul drain 2 [ PC ]
+1700:White relief detection magic
+1710:Black magic relief detection
+1720:Item detection magic
+1800:Chickens come home to roost _ counting
+1810:Chickens come home to roost _ explosion generation
+1980:Others _HP recovery recovery
+1981:Ghost camouflage
+1983:Black ghost dispel
+1984:Black ghosting
 1985:Resuscitation
-1986:HP_recovery_1__resonance_LV1
-1987:HP_recovery_2__resonance_LV2
-1988:HP_recovery_3__resonance_LV3
-1989:HP_recovery_4__resonance_LV4
-1990:Others_recovery___abnormal_state_recovery
-2000:Equipment_weight_up
-2010:Pinch_attack_power_up
-2013:Stamina_recovery_up
-2020:Flame_-resistant
-2021:Thunder_Res_Up
-2022:Magic_-resistant_up
-2023:Physical_resistance
-2024:All_Resistances_up_1
-2030:Bleeding_-resistant
-2031:Poison_Resistance
-2034:Curse_resistant_up
-2040:Magic_slot_up
-2050:Magic_power_up
-2060:MP_overemphasis
-2080:Master_of_the_bow
-2090:SA_up
-2100:Dropped_up
-2101:Get_up_Seoul
-2110:Sound_cancellation
-2111:Stone_roller_hat
+1986:HP recovery 1_ resonance LV1
+1987:HP recovery 2_ resonance LV2
+1988:HP recovery 3_ resonance LV3
+1989:HP recovery 4_ resonance LV4
+1990:Others recovery _ abnormal state recovery
+2000:Equipment weight up
+2010:Pinch attack power up
+2013:Stamina recovery up
+2020:Flame -resistant
+2021:Thunder Res Up
+2022:Magic -resistant up
+2023:Physical resistance
+2024:All Resistances up 1
+2030:Bleeding -resistant
+2031:Poison Resistance
+2034:Curse resistant up
+2040:Magic slot up
+2050:Magic power up
+2060:MP overemphasis
+2080:Master of the bow
+2090:SA up
+2100:Dropped up
+2101:Get up Seoul
+2110:Sound cancellation
+2111:Stone roller hat
 2120:Tsuyoshiashi
 2121:Acrobatics
 2130:Resurrection
-2131:Resurrection_from_curse
+2131:Resurrection from curse
 2140:Resonance
-2190:Word_of_chaos
-2200:Darkness_walk
-2210:Lava_walk
-2230:Auxiliary_magic_extension
-2240:HP_drain
-2241:HP_drain
-2250:Curse_of_the_strong
-2260:Strengthening_counter
-2270:Cherish_weapons
-2290:Pinch_Def.
-2300:Miracle_power_up
-2310:Magic_slot_up_B
-2320:Ring_Kuratsuki_God
-2330:Ring_of_bandits
-2340:HP_slight_increase
-2350:Ring_of_Black_Dragon
+2190:Word of chaos
+2200:Darkness walk
+2210:Lava walk
+2230:Auxiliary magic extension
+2240:HP drain
+2241:HP drain
+2250:Curse of the strong
+2260:Strengthening counter
+2270:Cherish weapons
+2290:Pinch Def.
+2300:Miracle power up
+2310:Magic slot up B
+2320:Ring Kuratsuki God
+2330:Ring of bandits
+2340:HP slight increase
+2350:Ring of Black Dragon
 2976:Scapegoat
-2977:Power_up_both_hands
-2978:Spirit_body_hidden
-2979:Retributive_justice
-2980:Loading_weight_up
-2981:Pinch_Def.
-2982:Nature_of_the_miracle
-2983:White_hope
-2984:Black_hope
-2985:Sincere_prayer
-2986:Magic_insensitive
-2987:Landing_of_cat
-2988:You_take_care
-2989:Strength_ghost
-2990:Weak_"ghost_camouflage_"
+2977:Power up both hands
+2978:Spirit body hidden
+2979:Retributive justice
+2980:Loading weight up
+2981:Pinch Def.
+2982:Nature of the miracle
+2983:White hope
+2984:Black hope
+2985:Sincere prayer
+2986:Magic insensitive
+2987:Landing of cat
+2988:You take care
+2989:Strength ghost
+2990:Weak "ghost camouflage "
 2991:Pheromone
 2992:Greed
 2993:Karateka
-2994:HP_regen
-2995:MP_regen
-2996:Plague_-resistant
-2997:All_Resistances_up_2
-2998:Equipment_destruction_ignored
-3000:HP_recovery_grass
-3020:Est_[_HP_]_LV1
-3021:Est_[_HP_]_LV2
-3022:Est_[_HP_]_LV3
-3023:Est_[_HP_]_LV4
-3024:Est_[_HP_]_LV5
-3025:Est_[_HP_]_LV6
-3026:Est_[_HP_]_LV7
-3027:Est_[_HP_]_LV8
-3030:Est_[_HP_]_LV1__ally_client
-3031:Est_[_HP_]_LV2__ally_client
-3032:Est_[_HP_]_LV3__ally_client
-3033:Est_[_HP_]_LV4__ally_client
-3034:Est_[_HP_]_LV5__ally_client
-3035:Est_[_HP_]_LV6__ally_client
-3036:Est_[_HP_]_LV7__ally_client
-3037:Est_[_HP_]_LV8__ally_client
-3040:Stamina_grass
-3041:Fragments_of_[_DLC_]_king_oyster_mushrooms
-3050:Bleeding_treatment_[_state_]_recovery
-3051:Bleeding_treatment_-resistant_[_recovery_]
-3060:Poison_treatment_[_state_]_recovery
-3061:Poison_treatment_-resistant_[_recovery_]
-3070:Deadly_poison_treatment_[_state_]_recovery
-3071:Deadly_poison_treatment_-resistant_[_recovery_]
-3080:Universal_treatment_[_state_]_recovery
-3090:Curse_treatment
-3091:Egg_treatment
-3100:Weapon_repair
-3110:Throw_poison_poison_knife_[_effect_]
-3120:[_I_highly_toxic_to_the_other_party_]_shit_dumpling
-3121:Shit_dumpling_[_myself_damage_]
-3130:A_Matatabi
-3140:Matatabi_B
-3150:Est_disabled_mimic_[_sleep_]
-3151:Est_Est_disable_[_disabled_]
-3160:Flame_weapon_enhancement
-3170:Thunder_weapon_enhancement
-3180:Tairei_weapon_enhancement
-3190:[_I_]_applied_to_the_weapon_weapon_poisoning
-3191:[_I_want_to_poison_the_opponent_when_attacking_weapon_poisoning_]
-3210:Excitement_incense
-3220:Feedback_stone
-3221:A_feedback_stone
-3222:Feedback_stone_B
-3223:Feedback_stone_C
-3224:Feedback_stone_D
-3225:Feedback_stone_E
-3226:Dark_Ring
-3230:Resurrection_Resurrection_Stone_[_effect_]
-3231:Humanity_recovery
+2994:HP regen
+2995:MP regen
+2996:Plague -resistant
+2997:All Resistances up 2
+2998:Equipment destruction ignored
+3000:HP recovery grass
+3020:Est [ HP ] LV1
+3021:Est [ HP ] LV2
+3022:Est [ HP ] LV3
+3023:Est [ HP ] LV4
+3024:Est [ HP ] LV5
+3025:Est [ HP ] LV6
+3026:Est [ HP ] LV7
+3027:Est [ HP ] LV8
+3030:Est [ HP ] LV1_ ally client
+3031:Est [ HP ] LV2_ ally client
+3032:Est [ HP ] LV3_ ally client
+3033:Est [ HP ] LV4_ ally client
+3034:Est [ HP ] LV5_ ally client
+3035:Est [ HP ] LV6_ ally client
+3036:Est [ HP ] LV7_ ally client
+3037:Est [ HP ] LV8_ ally client
+3040:Stamina grass
+3041:Fragments of [ DLC ] king oyster mushrooms
+3050:Bleeding treatment [ state ] recovery
+3051:Bleeding treatment -resistant [ recovery ]
+3060:Poison treatment [ state ] recovery
+3061:Poison treatment -resistant [ recovery ]
+3070:Deadly poison treatment [ state ] recovery
+3071:Deadly poison treatment -resistant [ recovery ]
+3080:Universal treatment [ state ] recovery
+3090:Curse treatment
+3091:Egg treatment
+3100:Weapon repair
+3110:Throw poison poison knife [ effect ]
+3120:[ I highly toxic to the other party ] shit dumpling
+3121:Shit dumpling [ myself damage ]
+3130:A Matatabi
+3140:Matatabi B
+3150:Est disabled mimic [ sleep ]
+3151:Est Est disable [ disabled ]
+3160:Flame weapon enhancement
+3170:Thunder weapon enhancement
+3180:Tairei weapon enhancement
+3190:[ I ] applied to the weapon weapon poisoning
+3191:[ I want to poison the opponent when attacking weapon poisoning ]
+3210:Excitement incense
+3220:Feedback stone
+3221:A feedback stone
+3222:Feedback stone B
+3223:Feedback stone C
+3224:Feedback stone D
+3225:Feedback stone E
+3226:Dark Ring
+3230:Resurrection Resurrection Stone [ effect ]
+3231:Humanity recovery
 3240:Telescope
-3250:Pledge_destroyed
-3270:Seoul_1
-3271:Seoul_2
-3272:Soul_3
-3273:Seoul_4
-3274:Seoul_5
-3275:Seoul_6
-3276:Seoul_7
-3277:Seoul_8
-3278:Seoul_9
-3279:Seoul_10
-3290:Vagrant_humanity_1
-3291:Vagrant_human_nature_2
-3292:Vagrant_Soul_3
-3293:Vagrant_Soul_4
-3294:Vagrant_Seoul_5
-3295:Vagrant_Soul_6
-3296:Vagrant_Soul_7
-3297:Vagrant_Seoul_8
-3298:Vagrant_Seoul_9
-3299:Vagrant_Seoul_10
-3300:Vagrant_Seoul_11
-3310:Seoul_Krag_daughter_of_chaos
-3311:Seoul_Knight_Arutoriusu
-3312:Soul_of_the_Great_Gwynn
-3313:Seoul_Golem
-3314:Seoul_Knight_Rodoriku
-3315:Seoul_moonlight_butterfly
-3316:Seoul_'s_execution_of_sumo
-3317:Seoul_of_half_dragon_Priscilla
-3318:Soul_of_the_sun_shade_of_Gwynn_Dorin
-3319:Seoul_[_DLC_]_gold_chimeric
-3320:Seoul_[_DLC_]_Arutoriusu
-3321:Seoul_Lord's_[_DLC_]_abyss
-3330:Humanity_recovery
-3950:A_Potion
-3951:Potion_C
-3952:Potion_D
-3953:MP_Potion_B
-3954:Dispelled_item_[_curse_resistance_value_recovery_]
-3955:Pine_resin_which_burns_well
-3956:Stone_of_light
-3957:Phalanx_DS
-3958:DS_shield_of_the_king
-3959:DS_sword_of_the_king
-3960:Lendl_DS
-3961:Judge_DS
-3962:DS_warrior_of_storm
-3963:DS_beast_of_storm
-3964:God_DS
-3965:Chimeric_DS
-3966:Weng_DS_of_Kikoromo
-3967:Leech_daemon_DS
-3968:Flies_Colossus_DS
-3969:Libra_DS
-3970:Weaver_DS
-3971:Flame_giant_DS
-3972:Dragon_daemon_DS
-3973:Heroine_DS
-3974:Deb_daemon_DS
-3975:HiRyuko_DS
-3976:Hiryuoya_DS
-3977:DS_spirit_of_ore
-3978:Baddoendo_DS
-3979:Infinite_gate
-4000:Sustained_damage_floor_tunnel_[_1_]_lava
-4001:Sustained_damage_floor_[_Hill_Swamp_]
-4002:Sustained_damage_floor_[_poison_]_for_Donashi
-4003:Sustained_damage_blood_swamp_floor_[_for_]_Donashi
-4004:Sustained_damage_[_thread_]
-4005:[_Okina_Kikoromo_doping_PC_black_ghost
-4006:Head_SFX_PC_black_ghost_[_Okina_Kikoromo_]
-4011:Sustained_damage_floor_after____[_Hill_Swamp_]
-4012:Sustained_damage_floor_after____[_poison_]
-4013:Sustained_damage_floor_after____[_]_Chi-numa
-4014:Rumbling_shell_doping
-4015:Gunpowder_barrel_doping
-4016:Sustained_damage_floor_tunnel_[_2_]_lava
-4017:Sustained_damage_floor_tunnel_boss_[_lava_]
-4020:Sustained_damage_floor_[_poison___interval_adjustment___Kage-machi_]
-4021:Sustained_damage_floor_[_poison_effect___body___Kage-machi_]
-4030:[_Disabled_by_lava___waste_Metropolitan___ring_sustained_damage_floor
-4031:Sustained_damage_floor_lava_[___waste_Metropolitan_ring___also_through_]
-4100:Foot_is_slow_in_deep_water
-4130:I'm_hiding_in_the_coffin
-4140:Has_entered_the_territory_of_Kurana
-4150:Inner_door_key_to_general-purpose
-4160:Falling_enemy_for_control
-4161:White_cat_for_falling_control
-4170:Invalid_state_throw_pledge_special_standby
-4500:Bandits_territory_of_forest
-4501:Ohahaototo_territory
-4510:Arena_one-to-one_[_small_]_territory
-4511:Arena_2_vs_2_[_small_]_territory
-4512:Arena_Battle_Royal_[_small_]_territory
-4513:Arena_one-to-one_[_small_]_summons_hope_A
-4514:Arena_one-to-one_[_small_]_summons_hope_B
-4515:Arena_2_vs_2_[_small_]_summons_hope_A1
-4516:Arena_2_vs_2_[_small_]_summons_would_like_A2
-4517:Arena_2_vs_2_[_small_]_summons_would_like_B1
-4518:Arena_2_vs_2_[_small_]_summons_would_like_B2
-4519:Arena_Battle_Royal_[_small_]_summons_hope_A
-4520:Arena_Battle_Royal_[_small_]_summons_hope_B
-4521:Arena_Battle_Royal_[_small_]_summons_hope_C
-4522:Arena_Battle_Royal_[_small_]_summons_hope_D
-4523:Arena_one-to-one_[_large_]_territory
-4524:Arena_2_vs_2_[_large_]_territory
-4525:Arena_Battle_Royal_[_large_]_territory
-4526:Arena_one-to-one_[_large_]_summons_hope_A
-4527:Arena_one-to-one_[_large_]_summons_hope_B
-4528:Arena_2_vs_2_[_large_]_summons_hope_A1
-4529:Arena_2_vs_2_[_large_]_summons_would_like_A2
-4530:Arena_2_vs_2_[_large_]_summons_would_like_B1
-4531:Arena_2_vs_2_[_large_]_summons_would_like_B2
-4532:Arena_Battle_Royal_[_large_]_summons_hope_A
-4533:Arena_Battle_Royal_[_large_]_summons_hope_B
-4534:Arena_Battle_Royal_[_large_]_summons_hope_C
-4535:Arena_Battle_Royal_[_large_]_summons_hope_D
-4600:Dispelled_events
-4601:Dispelled_events
-4610:Competition_venue_specified_item_disabled
-4611:Arena_stadium_arena_death
-4612:Competition_venue_provisional_first_place_for_SFX
-4613:Competition_venue_NoDead
-4614:1_of_SFX_competition_venue_for_the_same_rate
-4615:1_of_the_provisional_competition_venue_(_10_straight_wins_)_SFX_for
-4616:1_of_the_provisional_competition_venue_(_30_straight_wins_)_SFX_for
-4617:1_of_the_provisional_competition_venue_(_50_straight_wins_)_SFX_for
-4618:1_of_the_provisional_competition_venue_(_100_straight_wins_)_SFX_for
-5000:Sleep_paralysis
-5001:First_stage_Phantom_Flame
-5002:The_second_stage_flame_Phantom
-5003:Third_stage_Phantom_Flame
-5004:Stage_4_Phantom_Flame
-5005:Thread_covered
-5006:Fly_racketeering
-5007:First_stage_Force_ghost
-5008:The_second_stage_Force_ghost
-5009:Third_stage_Force_ghost
-5010:Gold_orchid_strengthening
-5011:Doping_sticking_Phalanx_Chibi
-5012:Doping_sticking_Chibi_more_Phalanx
-5013:Chimeric_strengthening
-5014:Leech_covered
-5015:Weng_summoned_Black_NPC_strengthening
-5016:Corruption_people___poison_attack
-5017:Slave_soldiers___flame_dagger_(_Ojo_1)
-5018:I_use_the_general_soldier_recovery_items
-5019:I_use_the_knight_recovery_items
-5020:Deadly_poison_rats___deadly_poison_attack
-5021:Blood_mite___blood_poisoning
-5022:Black_Takoatama___Seoul_Steel
-5023:Centipede___corrosive_attack
-5024:Bleeding_attack_(_weak_resistance_and_effect_a_little_less_than_)
-5025:Bleeding_attack_(_strong_resistance_and_effect_a_little_over_)
-5026:__Slug_poison_mucus
-5027:Die_casting___blood_poisoning___normal_time
-5028:Die_casting___blood_poisoning___satiety_when
-5029:Corruption_people___poison_cloud_for
-5030:Corruption_people___deadly_poison_attack
-5031:Lendl_King_dedicated_Seoul_Steel
-5032:God_magic_square___sleep_paralysis
-5033:NPC_excessive_weight_doping
-5034:And_no_damage_to_the_flame
-5035:Disable_relic_of_Seoul
-5036:NPC_doping_(_3.0_times_damage_)
-5037:NPC_doping_(_defense_1.5_times_)
-5038:NPC_doping_(_defense_2.0_times_)
-5039:(_Resistant_to_fire_)_NPC_doping
-5040:NPC_doping_(_double_damage_)
-5041:NPC_doping_(_0.5_times_damage_)
-5042:Doran_reverse_doping
-5043:Seoul_Steel_invalid
-5044:Leech_daemon_recovery
-5045:3_doping_level_Ro-jo_+5_to_+1
-5046:3_doping_level_Ro-jo_+0_to_-5
-5047:3_doping_level_Ro-jo_-6_to_-10
-5048:3_doping_level_-11_to_Ro-jo
-5049:NPC_doping_(MP_overcompensation_)
-5050:HP100%_~_leech_daemon_recovery
-5051:HP70%_~_leech_daemon_recovery
-5052:HP40%_~_leech_daemon_recovery
-5053:Poison_invalid
-5054:Bleeding_invalid
-5055:Plague_invalid
-5056:Poison_and_bleeding_invalid
-5057:Poison_and_plague_invalid
-5058:Bleeding_&amp;_plague_invalid
-5059:Poison_and_bleeding_&amp;_plague_invalid
-5060:Ryoshu___poison_attack
-5061:Slave_soldiers___flame_dagger_(_Ojo_2_)
-5062:1,_2_Lendl_Prince_Ojo_(_defense_2.0_times_)
-5063:Ojo_3_Lendl_Prince_(_defense_2.0_times_)
-5064:2,_3,_4_Viau_Ojo_(_defense_2.5_times_)
-5065:3_Ro-jo_old_man_NPC_reinforcing
-5066:Doping_sticking_Phalanx_-_Chibi
-5067:Shield_one_step_left_foot_of_the_king
-5068:Shield_two-step_left_foot_of_the_king
-5069:Shield_three_stages_left_foot_of_the_king
-5070:Shield_one_step_right_foot_of_the_king
-5071:Two-step_right_foot_shield_of_the_king
-5072:3_shield_stage_right_foot_of_the_king
-5073:Judge_stomach_bleeding
-5074:NPC_stamina_attack_power_magnification_level_1
-5075:NPC_stamina_attack_power_magnification_level_2
-5076:NPC_stamina_attack_power_magnification_level_3
-5077:NPC_stamina_attack_power_magnification_level_4
-5078:NPC_stamina_attack_power_magnification_level_5
-5079:NPC_stamina_attack_power_magnification_level_6
-5080:NPC_stamina_attack_power_magnification_level_7
-5081:NPC_stamina_attack_power_magnification_level_8
-5082:NPC_stamina_attack_power_magnification_level_9
-5083:Libra_recovery
-5084:Doran_reinforcing
-5100:DS2_Gassmann_resident
-5101:I_use_the_DS2_proto_knight___items
-5102:DS2_proto_jailer___recovery_magic
-5103:DS2_proto_evil_eye_(_master_)
-5104:I_use_the_general_soldier_recovery_items
-5105:Frog_ray_motion_change
-5110:Tree_climbing_lizard_motion_change_(_default_)
-5111:Tree_climbing_lizard_motion_change_(_climbing_)
-5120:Become_wandering_daemon_normal_logic
-5130:Those_motion_change_that_continues_to_sore_(_arm_release_)
-5131:Those_motion_change_to_keep_sore_(_cliff_)
-5132:First_stage_those_firepower_to_keep_sore
-5133:The_second_stage_what_firepower_to_keep_sore
-5140:Wheel_skeleton_state_change_(_animation_offset_0)
-5141:Wheel_skeleton_state_change_(_animation_offset_10000)
-5142:[_The_only_fly_Tsu_large_and_blow_the_wheel_skeleton_damage_animation_change
-5150:Fire_damage_disabled
-5151:Bleeding_damage_reduction_(_provisional_)
-5152:Lava_walk_(_enemy_)
-5160:Small_damage_always
-5161:[_Disable_all_]_0.1_Second_Edition_resident_damage_animation_change
-5162:0.1_Second_Edition_you_find_that_you're_getting_small_damage
-5163:0.1_Second_Edition_when_the_SA_,_not_only_out_to_medium_Damage
-5170:Damage_anime_change_of_giant_slave_down_[_only_]_large
-5171:Wang_resident_damage_anime_change_of_firewood_[_The_SA_is_released,_I_will_in_a_small_or_less]
-5180:Small_damage_always_saint_gray
-5210:Pori_incubation_period
-5211:Pori_state
-5212:Tamagoatama_standby
+3250:Pledge destroyed
+3270:Seoul 1
+3271:Seoul 2
+3272:Soul 3
+3273:Seoul 4
+3274:Seoul 5
+3275:Seoul 6
+3276:Seoul 7
+3277:Seoul 8
+3278:Seoul 9
+3279:Seoul 10
+3290:Vagrant humanity 1
+3291:Vagrant human nature 2
+3292:Vagrant Soul 3
+3293:Vagrant Soul 4
+3294:Vagrant Seoul 5
+3295:Vagrant Soul 6
+3296:Vagrant Soul 7
+3297:Vagrant Seoul 8
+3298:Vagrant Seoul 9
+3299:Vagrant Seoul 10
+3300:Vagrant Seoul 11
+3310:Seoul Krag daughter of chaos
+3311:Seoul Knight Arutoriusu
+3312:Soul of the Great Gwynn
+3313:Seoul Golem
+3314:Seoul Knight Rodoriku
+3315:Seoul moonlight butterfly
+3316:Seoul 's execution of sumo
+3317:Seoul of half dragon Priscilla
+3318:Soul of the sun shade of Gwynn Dorin
+3319:Seoul [ DLC ] gold chimeric
+3320:Seoul [ DLC ] Arutoriusu
+3321:Seoul Lord's [ DLC ] abyss
+3330:Humanity recovery
+3950:A Potion
+3951:Potion C
+3952:Potion D
+3953:MP Potion B
+3954:Dispelled item [ curse resistance value recovery ]
+3955:Pine resin which burns well
+3956:Stone of light
+3957:Phalanx DS
+3958:DS shield of the king
+3959:DS sword of the king
+3960:Lendl DS
+3961:Judge DS
+3962:DS warrior of storm
+3963:DS beast of storm
+3964:God DS
+3965:Chimeric DS
+3966:Weng DS of Kikoromo
+3967:Leech daemon DS
+3968:Flies Colossus DS
+3969:Libra DS
+3970:Weaver DS
+3971:Flame giant DS
+3972:Dragon daemon DS
+3973:Heroine DS
+3974:Deb daemon DS
+3975:HiRyuko DS
+3976:Hiryuoya DS
+3977:DS spirit of ore
+3978:Baddoendo DS
+3979:Infinite gate
+4000:Sustained damage floor tunnel [ 1 ] lava
+4001:Sustained damage floor [ Hill Swamp ]
+4002:Sustained damage floor [ poison ] for Donashi
+4003:Sustained damage blood swamp floor [ for ] Donashi
+4004:Sustained damage [ thread ]
+4005:[ Okina Kikoromo doping PC black ghost
+4006:Head SFX PC black ghost [ Okina Kikoromo ]
+4011:Sustained damage floor after __ [ Hill Swamp ]
+4012:Sustained damage floor after __ [ poison ]
+4013:Sustained damage floor after __ [ ] Chi-numa
+4014:Rumbling shell doping
+4015:Gunpowder barrel doping
+4016:Sustained damage floor tunnel [ 2 ] lava
+4017:Sustained damage floor tunnel boss [ lava ]
+4020:Sustained damage floor [ poison _ interval adjustment _ Kage-machi ]
+4021:Sustained damage floor [ poison effect _ body _ Kage-machi ]
+4030:[ Disabled by lava _ waste Metropolitan _ ring sustained damage floor
+4031:Sustained damage floor lava [ _ waste Metropolitan ring _ also through ]
+4100:Foot is slow in deep water
+4130:I'm hiding in the coffin
+4140:Has entered the territory of Kurana
+4150:Inner door key to general-purpose
+4160:Falling enemy for control
+4161:White cat for falling control
+4170:Invalid state throw pledge special standby
+4500:Bandits territory of forest
+4501:Ohahaototo territory
+4510:Arena one-to-one [ small ] territory
+4511:Arena 2 vs 2 [ small ] territory
+4512:Arena Battle Royal [ small ] territory
+4513:Arena one-to-one [ small ] summons hope A
+4514:Arena one-to-one [ small ] summons hope B
+4515:Arena 2 vs 2 [ small ] summons hope A1
+4516:Arena 2 vs 2 [ small ] summons would like A2
+4517:Arena 2 vs 2 [ small ] summons would like B1
+4518:Arena 2 vs 2 [ small ] summons would like B2
+4519:Arena Battle Royal [ small ] summons hope A
+4520:Arena Battle Royal [ small ] summons hope B
+4521:Arena Battle Royal [ small ] summons hope C
+4522:Arena Battle Royal [ small ] summons hope D
+4523:Arena one-to-one [ large ] territory
+4524:Arena 2 vs 2 [ large ] territory
+4525:Arena Battle Royal [ large ] territory
+4526:Arena one-to-one [ large ] summons hope A
+4527:Arena one-to-one [ large ] summons hope B
+4528:Arena 2 vs 2 [ large ] summons hope A1
+4529:Arena 2 vs 2 [ large ] summons would like A2
+4530:Arena 2 vs 2 [ large ] summons would like B1
+4531:Arena 2 vs 2 [ large ] summons would like B2
+4532:Arena Battle Royal [ large ] summons hope A
+4533:Arena Battle Royal [ large ] summons hope B
+4534:Arena Battle Royal [ large ] summons hope C
+4535:Arena Battle Royal [ large ] summons hope D
+4600:Dispelled events
+4601:Dispelled events
+4610:Competition venue specified item disabled
+4611:Arena stadium arena death
+4612:Competition venue provisional first place for SFX
+4613:Competition venue NoDead
+4614:1 of SFX competition venue for the same rate
+4615:1 of the provisional competition venue ( 10 straight wins ) SFX for
+4616:1 of the provisional competition venue ( 30 straight wins ) SFX for
+4617:1 of the provisional competition venue ( 50 straight wins ) SFX for
+4618:1 of the provisional competition venue ( 100 straight wins ) SFX for
+5000:Sleep paralysis
+5001:First stage Phantom Flame
+5002:The second stage flame Phantom
+5003:Third stage Phantom Flame
+5004:Stage 4 Phantom Flame
+5005:Thread covered
+5006:Fly racketeering
+5007:First stage Force ghost
+5008:The second stage Force ghost
+5009:Third stage Force ghost
+5010:Gold orchid strengthening
+5011:Doping sticking Phalanx Chibi
+5012:Doping sticking Chibi more Phalanx
+5013:Chimeric strengthening
+5014:Leech covered
+5015:Weng summoned Black NPC strengthening
+5016:Corruption people _ poison attack
+5017:Slave soldiers _ flame dagger ( Ojo 1)
+5018:I use the general soldier recovery items
+5019:I use the knight recovery items
+5020:Deadly poison rats _ deadly poison attack
+5021:Blood mite _ blood poisoning
+5022:Black Takoatama _ Seoul Steel
+5023:Centipede _ corrosive attack
+5024:Bleeding attack ( weak resistance and effect a little less than )
+5025:Bleeding attack ( strong resistance and effect a little over )
+5026:_ Slug poison mucus
+5027:Die casting _ blood poisoning _ normal time
+5028:Die casting _ blood poisoning _ satiety when
+5029:Corruption people _ poison cloud for
+5030:Corruption people _ deadly poison attack
+5031:Lendl King dedicated Seoul Steel
+5032:God magic square _ sleep paralysis
+5033:NPC excessive weight doping
+5034:And no damage to the flame
+5035:Disable relic of Seoul
+5036:NPC doping ( 3.0 times damage )
+5037:NPC doping ( defense 1.5 times )
+5038:NPC doping ( defense 2.0 times )
+5039:( Resistant to fire ) NPC doping
+5040:NPC doping ( double damage )
+5041:NPC doping ( 0.5 times damage )
+5042:Doran reverse doping
+5043:Seoul Steel invalid
+5044:Leech daemon recovery
+5045:3 doping level Ro-jo +5 to +1
+5046:3 doping level Ro-jo +0 to -5
+5047:3 doping level Ro-jo -6 to -10
+5048:3 doping level -11 to Ro-jo
+5049:NPC doping (MP overcompensation )
+5050:HP100% ~ leech daemon recovery
+5051:HP70% ~ leech daemon recovery
+5052:HP40% ~ leech daemon recovery
+5053:Poison invalid
+5054:Bleeding invalid
+5055:Plague invalid
+5056:Poison and bleeding invalid
+5057:Poison and plague invalid
+5058:Bleeding &amp; plague invalid
+5059:Poison and bleeding &amp; plague invalid
+5060:Ryoshu _ poison attack
+5061:Slave soldiers _ flame dagger ( Ojo 2 )
+5062:1, 2 Lendl Prince Ojo ( defense 2.0 times )
+5063:Ojo 3 Lendl Prince ( defense 2.0 times )
+5064:2, 3, 4 Viau Ojo ( defense 2.5 times )
+5065:3 Ro-jo old man NPC reinforcing
+5066:Doping sticking Phalanx - Chibi
+5067:Shield one step left foot of the king
+5068:Shield two-step left foot of the king
+5069:Shield three stages left foot of the king
+5070:Shield one step right foot of the king
+5071:Two-step right foot shield of the king
+5072:3 shield stage right foot of the king
+5073:Judge stomach bleeding
+5074:NPC stamina attack power magnification level 1
+5075:NPC stamina attack power magnification level 2
+5076:NPC stamina attack power magnification level 3
+5077:NPC stamina attack power magnification level 4
+5078:NPC stamina attack power magnification level 5
+5079:NPC stamina attack power magnification level 6
+5080:NPC stamina attack power magnification level 7
+5081:NPC stamina attack power magnification level 8
+5082:NPC stamina attack power magnification level 9
+5083:Libra recovery
+5084:Doran reinforcing
+5100:DS2 Gassmann resident
+5101:I use the DS2 proto knight _ items
+5102:DS2 proto jailer _ recovery magic
+5103:DS2 proto evil eye ( master )
+5104:I use the general soldier recovery items
+5105:Frog ray motion change
+5110:Tree climbing lizard motion change ( default )
+5111:Tree climbing lizard motion change ( climbing )
+5120:Become wandering daemon normal logic
+5130:Those motion change that continues to sore ( arm release )
+5131:Those motion change to keep sore ( cliff )
+5132:First stage those firepower to keep sore
+5133:The second stage what firepower to keep sore
+5140:Wheel skeleton state change ( animation offset 0)
+5141:Wheel skeleton state change ( animation offset 10000)
+5142:[ The only fly Tsu large and blow the wheel skeleton damage animation change
+5150:Fire damage disabled
+5151:Bleeding damage reduction ( provisional )
+5152:Lava walk ( enemy )
+5160:Small damage always
+5161:[ Disable all ] 0.1 Second Edition resident damage animation change
+5162:0.1 Second Edition you find that you're getting small damage
+5163:0.1 Second Edition when the SA , not only out to medium Damage
+5170:Damage anime change of giant slave down [ only ] large
+5171:Wang resident damage anime change of firewood [ The SA is released, I will in a small or less]
+5180:Small damage always saint gray
+5210:Pori incubation period
+5211:Pori state
+5212:Tamagoatama standby
 5213:Tamagoatama
-5214:Tamagoatama___second_stage
-5220:Basilisk_stone_effect_(_breath_)
-5221:Basilisk_stone_effect_(_bullet_)
-5222:Basilisk_stone_effect_(_smoke_)
-5230:Jelly_covered
-5231:Immortal_person_(_Bagworm_)_dedicated_poison_blowguns
-5232:Warrior_figurine_gravity
-5233:Dark_Wraith吸魂effect
-5234:Corrosive_attack_,_single-shot
-5235:Corrosive_attack_,_Gero
-5236:Corrosive_attack_toe_-up_Continuous
-5250:Poison_damage_1
-5251:2_poison_damage
-5252:Poison_damage_3
-5253:4_poison_damage
-5254:5_poison_damage
-5255:Poison_damage_6
-5260:Deadly_poison_damage_1
-5261:Deadly_poison_damage_2
-5262:Deadly_poison_damage_3
-5263:Deadly_poison_damage_4
-5264:Deadly_poison_damage_5
-5265:Deadly_poison_damage_6
-5269:Deadly_poison_damage_10
-5270:Bleeding_damage_1
-5271:Bleeding_damage_2
-5272:Bleeding_damage_3
-5273:Bleeding_damage_4
-5274:Bleeding_damage_5
-5275:Bleeding_damage_6
-5279:Bleeding_damage_major_bleeding
-5280:Petrification_curse_damage_1
-5281:Petrification_curse_damage_2
-5282:Petrification_curse_damage_3
-5283:Petrification_curse_damage_4
-5284:Petrification_curse_damage_5
-5290:Crystal_curse_damage_1
-5291:Crystal_curse_damage_2
-5292:Crystal_curse_damage_3
-5293:Crystal_curse_damage_4
-5294:Crystal_curse_damage_5
-5295:Sheath_for_the_landing_crystal_curse_damage
-5296:Sheath_for_self-centered_explosion_curse_for_crystal_damage
-5300:Steady_damage_animation_change_【All_invalid】
-5301:[_Disable_press_-_launch_-_come_very_small_,_small_,_medium,_large_and叩Resident_damage_animation_change
-5302:The_[_invalid_and_minimal_,_small_,_medium,_large_and_press_Resident_damage_animation_change
-5303:The_[_invalid_and_minimal_,_small_,_medium,_and_press_Resident_damage_animation_change
-5304:The_[_disabled_to_small_and_very_small_-_press_Resident_damage_animation_change
-5305:The_[_disabled_and_minimum_-_press_Resident_damage_animation_change
-5306:Resident_damage_anime_change_→_press_[_small_]
-5307:Resident_damage_anime_change_[_small_]_→_minimum
-5308:Resident_damage_anime_medium_change_[_or_more]
-5309:Resident_damage_anime_change_[_medium_or_more_,_and_there_is_press_]
-5320:Resident_damage_anime_change_[_only_]_large
-5321:Resident_damage_anime_change_[_only_medium-and_large_-叩care_]
-5322:[_No_]_Futtobi_resident_damage_animation_change
-5323:[_There_is_no_slam_-_Futtobi_Resident_damage_animation_change
-5324:Resident_damage_anime_change_[_only_minimal_,_small_,_medium,_and_large_]
-5325:[_There_is_no_push_-_Futtobi_Resident_damage_animation_change
-5326:Resident_damage_anime_change_[_only_]_small_and_medium
-5327:Resident_damage_anime_change_[_only_small_,_medium,_and_large_]
-5328:Resident_damage_anime_change_[_small_,_medium,_large_and叩Yellow_Sea_]
-5329:Resident_damage_anime_only_a_small_change_[_]
-5330:[_The_only_fly_Tsu_small_,_large_-_blown_Resident_damage_animation_change
-5331:Resident_damage_anime_change_crystal_lizard_[_use]
-5332:Resident_damage_anime_change_[_medium_large_following_treatment_]
-5333:Resident_damage_anime_change_[_only_]_medium
-5334:[_The_only_fly_Tsu_medium-_blown_Resident_damage_animation_change
-5335:[_Ll_jump_only_medium_and_large_-_blowing_]_[_DLC_]_resident_damage_animation_change
-5336:The_only_fly_[_Tsu_small_,_medium_and_large_and_Obuki_]_[_DLC_]_resident_damage_animation_change
-5337:[_Large_handles_,_slammed_Futtobi_]_[_DLC_]_resident_damage_animation_change
-5360:SA_at_the_time_of_damage_Anime_[_change_]_without_all_anime
-5361:SA_Anime_damage_during_only_a_small_change_[_]
-5362:SA_at_the_time_of_damage_anime_change_[_only_]_medium
-5363:[_Medium_and_small_]_SA_when_damage_animation_change
-5364:SA_at_the_time_of_damage_anime_change_[_Disable_large_and_small_only_]
-5400:Weapon_change_animation_ID_offset_0
-5401:Weapon_change_animation_offset_ID_10000
-5402:Weapon_change_animation_offset_ID_20000
-5403:Weapon_change_animation_offset_ID_30000
-5410:Prince_Izari_motion_graphics_change_(_default_)
-5411:Prince_Izari_motion_graphics_change_(upward_)
-5412:Prince_Izari_motion_graphics_change_(upward_cliff_)
-5413:Prince_Izari_motion_graphics_change_(_downward_)
-5420:Mimic_the_normal_state
-5421:Mimic_mimicry_state
-5422:Mimic_mimicry_sleep_state
-5423:Mimic_the_normal_sleep_state
-5424:State_began_mimic_normal_sleep
-5430:1_cutting_state_Mizuumi-juukubi
-5431:2_disconnected_Mizuumi-juukubi
-5432:3_cutting_state_Mizuumi-juukubi
-5433:4_cutting_state_Mizuumi-juukubi
-5434:5_cutting_state_Mizuumi-juukubi
-5435:6_cutting_state_Mizuumi-juukubi
-5436:7_cutting_state_Mizuumi-juukubi
-5440:Seath;_automatic_HP_recovery
-5441:Hakuryu_sheath_invincible_SFX_display_1
-5442:Hakuryu_sheath_invincible_SFX_display_2
-5443:Hakuryu_sheath_invincible_SFX_display_3
-5444:Mayfly_dragon_HP_recovery
-5445:NPC_for_infinite_MP
-5446:Early_NPC_for_stamina_recovery
-5447:Hellkite_HP_recovery
-5450:Resurrection_from_the_skeleton_suspended_animation
-5451:Skeleton_immortality_state
-5452:Skeleton_suspended_animation
-5460:Enemies_Est_[_HP_]
-5466:Enemies_and_large_miracle_recovery
-5470:Ally_strengthening_magic_(_for_yourself_)
-5471:Ally_strengthening_magic_(_for_fellow_)
-5480:Anime_defense_force_adjustment_thrown
-5490:Two_bodies_first_half_for_HP_Gargoyle
-5491:Heavy_knight_in_Est_SA_reduction
-5492:Tutorial_NPC_dying
-5493:Contact_Falling_-service_control_of_Rotoreku
-5494:50_times_NPC_poison_resistant
-5495:Quite_strong_in_NPC_flame
-5496:Quite_strong_to_fire_and_magic_NPC
-5500:Prefer_ephemera_dragon_host
-5510:[_DLC_]_c4100__Arutoriusu___self-reinforcement
-5511:SA_adjustment_of_DLC_]_c4100__Arutoriusu___self-reinforcement_in
-5520:[_DLC_]_c3471_Fri_chimera_poison_damage
-5521:I_was_hit_by_flapping_[_DLC_]_c3471_gold_chimeric
-5522:During_wince_[_DLC_]_c3471_gold_chimeric
-5530:[_DLC_]_c4090__sniper_A__bleeding
-5540:[_DLC_]_c4172__humanity_(_large_)___outer_edge_damage
-5541:[_DLC_]_c4171__humanity_(medium_)___outer_edge_damage
-5542:[_DLC_]_c4170__humanity_(_small)___outer_edge_damage
-5550:Less_likely_to_go_for_[_DLC_]_c4520__shift__
-5560:[_DLC_]_c4160__abyss_people_magician___Dokukumo
-5561:[_DLC_]_c4160__abyss_magician_'s_wand__
-5570:Go_short_life_of_poison_eye_[_DLC_]_c4110_of_hawk
-5571:Go_plague_short_life_of_eye_[_DLC_]_c4110_of_hawk
-5580:[_DLC_]_c4150_abyss_human_eyes_light_animation_offset
-5581:[_DLC_]_c4150_abyss_human_eyes_light_doping
-5582:[_DLC_]_c4160_abyss_magician_'s_eyes_light_doping
-5590:Effect_throw_[_DLC_]_c4510__Black_Dragon___evil_eye
-6000:[_65_]_first_[_six_]_Baikiruto
-6010:Large_shield_of_[_94_]_[_rock_repelling_damage_reduction_effect_]
-6011:Large_shield_of_[_94_]_[_rock_damage_animation_effect_change_]
-6200:Stamina_recovery_down___head___Level_1
-6201:Stamina_recovery_down___head___level_2
-6202:Stamina_recovery_down___head___Level_3
-6203:Stamina_recovery_down___head___Level_4
-6210:Stamina_recovery_down___body___Level_1
-6211:Stamina_recovery_down___body___level_2
-6212:Stamina_recovery_down___body___Level_3
-6213:Stamina_recovery_down___body___Level_4
-6220:Stamina_recovery_arm___down___Level_1
-6221:Stamina_recovery_arm___down___level_2
-6222:Stamina_recovery_arm___down___Level_3
-6223:Stamina_recovery_arm___down___Level_4
-6230:Stamina_recovery_down_leg_____Level_1
-6231:Stamina_recovery_down_leg_____level_2
-6232:Stamina_recovery_down_leg_____Level_3
-6233:Stamina_recovery_down_leg_____Level_4
-6300:Super_Armor
-6310:Weapon_head
-6320:Arms_body
-6330:Weapon_arm
-6340:Arms_legs
-6400:Bleeding__1
-6401:Bleeding__2
-6402:Bleeding__3
-6403:Bleeding__4
-6404:Bleeding__5
-6405:Bleeding__6
-6410:Ultra_bleeding__1
-6420:Sickle__1_ultra_bleeding___Death
-6500:Poison__1
-6501:Poison__2
-6502:Poison__3
-6503:Poison__4
-6504:Poison__5
-6505:Poison__6
-6600:Deadly_poison__1
-6601:Deadly_poison__2
-6602:Deadly_poison__3
-6603:Deadly_poison__4
-6604:Deadly_poison__5
-6605:Deadly_poison__6
-6610:Song_of_the_sword_[_DLC_]_[_bleeding_]_Kiaran
-6620:Dagger_of_[_DLC_]_[_Kiaran_deadly_poison_]
-6621:SA_-up_of_[_DLC_]_Kiaran
-6630:Whip_[_DLC_]_chimera_[_poison_]
-6700:[_117_]_[_RyuKen_attack_during_correction_effect_]
-6702:[_117_]_[_RyuKen_breath_when_stamina_reduction_]
-6710:[_117_]_[_RyuKen_Baikiruto_]
-6711:[_117_]_[_RyuKen_Baikiruto_]__LV1
-6712:[_117_]_[_RyuKen_Baikiruto_]__LV2
-6713:[_117_]_[_RyuKen_Baikiruto_]__LV3
-6720:[_Sword_]_Omagari___HP_drain_attack_hit
-6730:[_70_]_Sumo_/_HP_drain___attack_hit
-6740:[_HP_]_Sanctus_Rijenereito
-6750:Bleeding_and_poison_shield_[_of_blood_]_,_deadly_poison_,_curse_resistance_up
-6760:[_]_Poison_dart_poison_effect
-6800:Bishop's_staff_/_magic_use_half_the_number_of_[_127_]_crystal
-6810:Ken_/_Physical_Def_up_of_[_58_]_old_dragon
-6820:[_79_]_Moon_Light_/_Magic_Def.
-6830:Sword_/_Physical_Def_up_of_[_98_]_old_dragon
-6840:Ohno_/_bleeding_and_poison_-resistant_up_of_[_125_]_Gargoyle
-6850:Large_ax_/_Physical_Def_up_of_[_106_]_Dragon_King
-6860:[_Fang_]_Dairyu_/_Physical_Def_up
-6870:[_87_]_large_keel_/_Physical_Def_up
-6880:/_Bleeding_and_poison_-resistant_up_[_gargoyle_halberd_(_small)
-6890:Stamina_recovery_up_[_shield_]_Kusamon
-6900:Up_a_little_weight_equipment_[_mask_of_Father's
-6910:I_increase_slightly_mask_[_Mother's_HP
-6920:Up_a_little_stamina_recovery_[_mask_of_child_]
-6930:Sharpness_of_magic_[_head_collar_of_Dusk_]
-6940:I_strengthen_[_crown_of_the_sun_shade_]_of_all_the_magic
-6950:[_Heliozoan_]_Light
-6960:Item_discovery_rate_up_in_Seoul_and_absorption_[_stigma_of_greedy_person_]
-6961:Reverse_regen_[_stigma_of_greedy_person_]
-6970:Self-inflicted_damage_of_chaos_[_blade_]
-6980:Their_ultra-_bleeding_[_sickle_of_the_Grim_Reaper_]
-6990:[_Meat_]_switch_knife___HP_drain_attack_hit
-7001:Level_1
-7002:Level_2
-7003:Level_3
-7004:Level_4
-7005:Level_5
-7006:Level_6
-7007:Level_7
-7008:Level_8
-7009:Level_9
-7010:Level_10
-7011:Level_11
-7012:Level_12
-7013:Level_13
-7014:Level_14
-7015:Level_15
-7100:Black_Soul_(2x_HP,_1.8x_attack,_1.2x_defense)
-7401:Round_-up_power_level___1
-7402:Round_-up_power___level_2
-7403:Round_-up_power_level_3__
-7404:Round_-up_power___Level_4
-7405:Round_-up_power_level___5
-7406:Round_-up_power_level___6
-7407:Round_-up_power_level___7
-7408:Round_-up_power_level___8
-7409:Round_-up_power_level___9
-7410:Round_-up_power_level___10
-7411:Round_-up_power_level___11
-7412:Round_-up_power_level___12
-7413:Round_-up_power_level___13
-7414:Round_-up_power_level___14
-7415:Round_-up_power_level___15
-7500:One_multi-_doping___white
-7501:Two_multi-_doping___white
-7510:One_person_only__c4100_[_DLC_]_SA_multi-_doping___white
-7511:Two_people_dedicated___c4100_[_DLC_]_SA_multi-_doping___white
-7600:(_0.5_times_the_actual_damage_)_NPC_doping
-7601:(_1.5_times_the_actual_damage_)_NPC_doping
-7602:(_2_times_the_actual_damage_)_NPC_doping
-7610:NPC_doping_(_defense_1.5_times_)
-7611:NPC_doping_(_defense_2.0_times_)
-7650:(_Aunt_of_swamp_)_NPC_doping
-7651:NPC_doping_(_)
-7700:NPC_cooperation_multi-_doping
-7800:[_DLC_]_NPC_HP_doping
-7801:[_DLC_]_NPC__stamina_recovery_doping
-8000:Wandering_doping_test_(_middle)
-8001:Wandering_doping_test_(_strong)
-71100:Disable_all
-71110:Immortality_system_invalid
-71111:Enable_all
-80000:Disable_all
-80011:Relic_&amp;吸魂invalid
-80101:Relic_and_fascinated_invalid
-80111:Relic_invalid
-81001:吸魂&amp;_fascinated_invalid
+5214:Tamagoatama _ second stage
+5220:Basilisk stone effect ( breath )
+5221:Basilisk stone effect ( bullet )
+5222:Basilisk stone effect ( smoke )
+5230:Jelly covered
+5231:Immortal person ( Bagworm ) dedicated poison blowguns
+5232:Warrior figurine gravity
+5233:Dark Wraith吸魂effect
+5234:Corrosive attack , single-shot
+5235:Corrosive attack , Gero
+5236:Corrosive attack toe -up Continuous
+5250:Poison damage 1
+5251:2 poison damage
+5252:Poison damage 3
+5253:4 poison damage
+5254:5 poison damage
+5255:Poison damage 6
+5260:Deadly poison damage 1
+5261:Deadly poison damage 2
+5262:Deadly poison damage 3
+5263:Deadly poison damage 4
+5264:Deadly poison damage 5
+5265:Deadly poison damage 6
+5269:Deadly poison damage 10
+5270:Bleeding damage 1
+5271:Bleeding damage 2
+5272:Bleeding damage 3
+5273:Bleeding damage 4
+5274:Bleeding damage 5
+5275:Bleeding damage 6
+5279:Bleeding damage major bleeding
+5280:Petrification curse damage 1
+5281:Petrification curse damage 2
+5282:Petrification curse damage 3
+5283:Petrification curse damage 4
+5284:Petrification curse damage 5
+5290:Crystal curse damage 1
+5291:Crystal curse damage 2
+5292:Crystal curse damage 3
+5293:Crystal curse damage 4
+5294:Crystal curse damage 5
+5295:Sheath for the landing crystal curse damage
+5296:Sheath for self-centered explosion curse for crystal damage
+5300:Steady damage animation change 【All invalid】
+5301:[ Disable press - launch - come very small , small , medium, large and叩Resident damage animation change
+5302:The [ invalid and minimal , small , medium, large and press Resident damage animation change
+5303:The [ invalid and minimal , small , medium, and press Resident damage animation change
+5304:The [ disabled to small and very small - press Resident damage animation change
+5305:The [ disabled and minimum - press Resident damage animation change
+5306:Resident damage anime change → press [ small ]
+5307:Resident damage anime change [ small ] → minimum
+5308:Resident damage anime medium change [ or more]
+5309:Resident damage anime change [ medium or more , and there is press ]
+5320:Resident damage anime change [ only ] large
+5321:Resident damage anime change [ only medium-and large -叩care ]
+5322:[ No ] Futtobi resident damage animation change
+5323:[ There is no slam - Futtobi Resident damage animation change
+5324:Resident damage anime change [ only minimal , small , medium, and large ]
+5325:[ There is no push - Futtobi Resident damage animation change
+5326:Resident damage anime change [ only ] small and medium
+5327:Resident damage anime change [ only small , medium, and large ]
+5328:Resident damage anime change [ small , medium, large and叩Yellow Sea ]
+5329:Resident damage anime only a small change [ ]
+5330:[ The only fly Tsu small , large - blown Resident damage animation change
+5331:Resident damage anime change crystal lizard [ use]
+5332:Resident damage anime change [ medium large following treatment ]
+5333:Resident damage anime change [ only ] medium
+5334:[ The only fly Tsu medium- blown Resident damage animation change
+5335:[ Ll jump only medium and large - blowing ] [ DLC ] resident damage animation change
+5336:The only fly [ Tsu small , medium and large and Obuki ] [ DLC ] resident damage animation change
+5337:[ Large handles , slammed Futtobi ] [ DLC ] resident damage animation change
+5360:SA at the time of damage Anime [ change ] without all anime
+5361:SA Anime damage during only a small change [ ]
+5362:SA at the time of damage anime change [ only ] medium
+5363:[ Medium and small ] SA when damage animation change
+5364:SA at the time of damage anime change [ Disable large and small only ]
+5400:Weapon change animation ID offset 0
+5401:Weapon change animation offset ID 10000
+5402:Weapon change animation offset ID 20000
+5403:Weapon change animation offset ID 30000
+5410:Prince Izari motion graphics change ( default )
+5411:Prince Izari motion graphics change (upward )
+5412:Prince Izari motion graphics change (upward cliff )
+5413:Prince Izari motion graphics change ( downward )
+5420:Mimic the normal state
+5421:Mimic mimicry state
+5422:Mimic mimicry sleep state
+5423:Mimic the normal sleep state
+5424:State began mimic normal sleep
+5430:1 cutting state Mizuumi-juukubi
+5431:2 disconnected Mizuumi-juukubi
+5432:3 cutting state Mizuumi-juukubi
+5433:4 cutting state Mizuumi-juukubi
+5434:5 cutting state Mizuumi-juukubi
+5435:6 cutting state Mizuumi-juukubi
+5436:7 cutting state Mizuumi-juukubi
+5440:Seath; automatic HP recovery
+5441:Hakuryu sheath invincible SFX display 1
+5442:Hakuryu sheath invincible SFX display 2
+5443:Hakuryu sheath invincible SFX display 3
+5444:Mayfly dragon HP recovery
+5445:NPC for infinite MP
+5446:Early NPC for stamina recovery
+5447:Hellkite HP recovery
+5450:Resurrection from the skeleton suspended animation
+5451:Skeleton immortality state
+5452:Skeleton suspended animation
+5460:Enemies Est [ HP ]
+5466:Enemies and large miracle recovery
+5470:Ally strengthening magic ( for yourself )
+5471:Ally strengthening magic ( for fellow )
+5480:Anime defense force adjustment thrown
+5490:Two bodies first half for HP Gargoyle
+5491:Heavy knight in Est SA reduction
+5492:Tutorial NPC dying
+5493:Contact Falling -service control of Rotoreku
+5494:50 times NPC poison resistant
+5495:Quite strong in NPC flame
+5496:Quite strong to fire and magic NPC
+5500:Prefer ephemera dragon host
+5510:[ DLC ] c4100_ Arutoriusu _ self-reinforcement
+5511:SA adjustment of DLC ] c4100_ Arutoriusu _ self-reinforcement in
+5520:[ DLC ] c3471 Fri chimera poison damage
+5521:I was hit by flapping [ DLC ] c3471 gold chimeric
+5522:During wince [ DLC ] c3471 gold chimeric
+5530:[ DLC ] c4090_ sniper A_ bleeding
+5540:[ DLC ] c4172_ humanity ( large ) _ outer edge damage
+5541:[ DLC ] c4171_ humanity (medium ) _ outer edge damage
+5542:[ DLC ] c4170_ humanity ( small) _ outer edge damage
+5550:Less likely to go for [ DLC ] c4520_ shift _
+5560:[ DLC ] c4160_ abyss people magician _ Dokukumo
+5561:[ DLC ] c4160_ abyss magician 's wand _
+5570:Go short life of poison eye [ DLC ] c4110 of hawk
+5571:Go plague short life of eye [ DLC ] c4110 of hawk
+5580:[ DLC ] c4150 abyss human eyes light animation offset
+5581:[ DLC ] c4150 abyss human eyes light doping
+5582:[ DLC ] c4160 abyss magician 's eyes light doping
+5590:Effect throw [ DLC ] c4510_ Black Dragon _ evil eye
+6000:[ 65 ] first [ six ] Baikiruto
+6010:Large shield of [ 94 ] [ rock repelling damage reduction effect ]
+6011:Large shield of [ 94 ] [ rock damage animation effect change ]
+6200:Stamina recovery down _ head _ Level 1
+6201:Stamina recovery down _ head _ level 2
+6202:Stamina recovery down _ head _ Level 3
+6203:Stamina recovery down _ head _ Level 4
+6210:Stamina recovery down _ body _ Level 1
+6211:Stamina recovery down _ body _ level 2
+6212:Stamina recovery down _ body _ Level 3
+6213:Stamina recovery down _ body _ Level 4
+6220:Stamina recovery arm _ down _ Level 1
+6221:Stamina recovery arm _ down _ level 2
+6222:Stamina recovery arm _ down _ Level 3
+6223:Stamina recovery arm _ down _ Level 4
+6230:Stamina recovery down leg _ _ Level 1
+6231:Stamina recovery down leg _ _ level 2
+6232:Stamina recovery down leg _ _ Level 3
+6233:Stamina recovery down leg _ _ Level 4
+6300:Super Armor
+6310:Weapon head
+6320:Arms body
+6330:Weapon arm
+6340:Arms legs
+6400:Bleeding _1
+6401:Bleeding _2
+6402:Bleeding _3
+6403:Bleeding _4
+6404:Bleeding _5
+6405:Bleeding _6
+6410:Ultra bleeding _1
+6420:Sickle _1 ultra bleeding _ Death
+6500:Poison _1
+6501:Poison _2
+6502:Poison _3
+6503:Poison _4
+6504:Poison _5
+6505:Poison _6
+6600:Deadly poison _1
+6601:Deadly poison _2
+6602:Deadly poison _3
+6603:Deadly poison _4
+6604:Deadly poison _5
+6605:Deadly poison _6
+6610:Song of the sword [ DLC ] [ bleeding ] Kiaran
+6620:Dagger of [ DLC ] [ Kiaran deadly poison ]
+6621:SA -up of [ DLC ] Kiaran
+6630:Whip [ DLC ] chimera [ poison ]
+6700:[ 117 ] [ RyuKen attack during correction effect ]
+6702:[ 117 ] [ RyuKen breath when stamina reduction ]
+6710:[ 117 ] [ RyuKen Baikiruto ]
+6711:[ 117 ] [ RyuKen Baikiruto ] _LV1
+6712:[ 117 ] [ RyuKen Baikiruto ] _LV2
+6713:[ 117 ] [ RyuKen Baikiruto ] _LV3
+6720:[ Sword ] Omagari _ HP drain attack hit
+6730:[ 70 ] Sumo / HP drain _ attack hit
+6740:[ HP ] Sanctus Rijenereito
+6750:Bleeding and poison shield [ of blood ] , deadly poison , curse resistance up
+6760:[ ] Poison dart poison effect
+6800:Bishop's staff / magic use half the number of [ 127 ] crystal
+6810:Ken / Physical Def up of [ 58 ] old dragon
+6820:[ 79 ] Moon Light / Magic Def.
+6830:Sword / Physical Def up of [ 98 ] old dragon
+6840:Ohno / bleeding and poison -resistant up of [ 125 ] Gargoyle
+6850:Large ax / Physical Def up of [ 106 ] Dragon King
+6860:[ Fang ] Dairyu / Physical Def up
+6870:[ 87 ] large keel / Physical Def up
+6880:/ Bleeding and poison -resistant up [ gargoyle halberd ( small)
+6890:Stamina recovery up [ shield ] Kusamon
+6900:Up a little weight equipment [ mask of Father's
+6910:I increase slightly mask [ Mother's HP
+6920:Up a little stamina recovery [ mask of child ]
+6930:Sharpness of magic [ head collar of Dusk ]
+6940:I strengthen [ crown of the sun shade ] of all the magic
+6950:[ Heliozoan ] Light
+6960:Item discovery rate up in Seoul and absorption [ stigma of greedy person ]
+6961:Reverse regen [ stigma of greedy person ]
+6970:Self-inflicted damage of chaos [ blade ]
+6980:Their ultra- bleeding [ sickle of the Grim Reaper ]
+6990:[ Meat ] switch knife _ HP drain attack hit
+7001:Level 1
+7002:Level 2
+7003:Level 3
+7004:Level 4
+7005:Level 5
+7006:Level 6
+7007:Level 7
+7008:Level 8
+7009:Level 9
+7010:Level 10
+7011:Level 11
+7012:Level 12
+7013:Level 13
+7014:Level 14
+7015:Level 15
+7100:Black Soul (2x HP, 1.8x attack, 1.2x defense)
+7401:Round -up power level _ 1
+7402:Round -up power _ level 2
+7403:Round -up power level 3 _
+7404:Round -up power _ Level 4
+7405:Round -up power level _ 5
+7406:Round -up power level _ 6
+7407:Round -up power level _ 7
+7408:Round -up power level _ 8
+7409:Round -up power level _ 9
+7410:Round -up power level _ 10
+7411:Round -up power level _ 11
+7412:Round -up power level _ 12
+7413:Round -up power level _ 13
+7414:Round -up power level _ 14
+7415:Round -up power level _ 15
+7500:One multi- doping _ white
+7501:Two multi- doping _ white
+7510:One person only _c4100 [ DLC ] SA multi- doping _ white
+7511:Two people dedicated __c4100 [ DLC ] SA multi- doping _ white
+7600:( 0.5 times the actual damage ) NPC doping
+7601:( 1.5 times the actual damage ) NPC doping
+7602:( 2 times the actual damage ) NPC doping
+7610:NPC doping ( defense 1.5 times )
+7611:NPC doping ( defense 2.0 times )
+7650:( Aunt of swamp ) NPC doping
+7651:NPC doping ( )
+7700:NPC cooperation multi- doping
+7800:[ DLC ] NPC_HP doping
+7801:[ DLC ] NPC_ stamina recovery doping
+8000:Wandering doping test ( middle)
+8001:Wandering doping test ( strong)
+71100:Disable all
+71110:Immortality system invalid
+71111:Enable all
+80000:Disable all
+80011:Relic &amp;吸魂invalid
+80101:Relic and fascinated invalid
+80111:Relic invalid
+81001:吸魂&amp; fascinated invalid
 81011:吸魂invalid
-81101:Fascinated_invalid
-81111:Enable_all
-90000:Disable_poison,_toxic,_bleed,_and_curse
-90001:Poison_and_bleeding_&amp;_plague_invalid
-90010:Poison_and_bleeding_and_curse_invalid
-90011:Poison_and_bleeding_invalid
-90100:Poison_and_plague_and_curse_invalid
-90101:Poison_and_plague_invalid
-90110:Poison_and_curse_invalid
-90111:Poison_invalid
-91000:Bleeding_and_plague_and_curse_invalid
-91001:Bleeding_&amp;_plague_invalid
-91010:Bleeding_and_curse_invalid
-91011:Bleeding_invalid
-91100:Plague_and_curse_invalid
-91101:Plague_invalid
-91110:Curse_invalid
-91111:Enable_all
+81101:Fascinated invalid
+81111:Enable all
+90000:Disable poison, toxic, bleed, and curse
+90001:Poison and bleeding &amp; plague invalid
+90010:Poison and bleeding and curse invalid
+90011:Poison and bleeding invalid
+90100:Poison and plague and curse invalid
+90101:Poison and plague invalid
+90110:Poison and curse invalid
+90111:Poison invalid
+91000:Bleeding and plague and curse invalid
+91001:Bleeding &amp; plague invalid
+91010:Bleeding and curse invalid
+91011:Bleeding invalid
+91100:Plague and curse invalid
+91101:Plague invalid
+91110:Curse invalid
+91111:Enable all
 </DropDownList>
-          <LastState Value="2350" RealAddress="1BD60080"/>
+          <LastState Value="2350" RealAddress="131F0000"/>
           <VariableType>4 Bytes</VariableType>
           <Address>selected_attack</Address>
         </CheatEntry>
         <CheatEntry>
           <ID>89788</ID>
           <Description>"SpEffect Base"</Description>
-          <LastState Value="4294967295" RealAddress="04AA9174"/>
-          <VariableType>4 Bytes</VariableType>
-          <Address>4aa9174</Address>
+          <LastState RealAddress="04B5BC04"/>
+          <VariableType>String</VariableType>
+          <Length>0</Length>
+          <Unicode>0</Unicode>
+          <CodePage>0</CodePage>
+          <ZeroTerminate>1</ZeroTerminate>
+          <Address>4b5bc04</Address>
           <CheatEntries>
             <CheatEntry>
               <ID>90820</ID>
               <Description>"iconId"</Description>
-              <LastState Value="-1" RealAddress="04AA9174"/>
+              <LastState Value="-1" RealAddress="04B5BC04"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+0</Address>
@@ -930,266 +936,266 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90821</ID>
               <Description>"conditionHp"</Description>
-              <LastState Value="-1" RealAddress="04AA9178"/>
+              <LastState Value="-1" RealAddress="04B5BC08"/>
               <VariableType>Float</VariableType>
               <Address>+04</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90822</ID>
               <Description>"Effect Duration (-1 = unlimited)"</Description>
-              <LastState Value="-1" RealAddress="04AA917C"/>
+              <LastState Value="-1" RealAddress="04B5BC0C"/>
               <VariableType>Float</VariableType>
               <Address>+08</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90823</ID>
               <Description>"motionInterval"</Description>
-              <LastState Value="0" RealAddress="04AA9180"/>
+              <LastState Value="0" RealAddress="04B5BC10"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+0C</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90824</ID>
               <Description>"Max HP modifier"</Description>
-              <LastState Value="5" RealAddress="04AA9184"/>
+              <LastState Value="1" RealAddress="04B5BC14"/>
               <VariableType>Float</VariableType>
               <Address>+10</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90825</ID>
               <Description>"Max FP Modifier"</Description>
-              <LastState Value="1" RealAddress="04AA9188"/>
+              <LastState Value="1" RealAddress="04B5BC18"/>
               <VariableType>Float</VariableType>
               <Address>+14</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90826</ID>
               <Description>"Max StaminaRate"</Description>
-              <LastState Value="1" RealAddress="04AA918C"/>
+              <LastState Value="1" RealAddress="04B5BC1C"/>
               <VariableType>Float</VariableType>
               <Address>+18</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90827</ID>
               <Description>"slashDamageCutRate"</Description>
-              <LastState Value="2" RealAddress="04AA9190"/>
+              <LastState Value="2" RealAddress="04B5BC20"/>
               <VariableType>Float</VariableType>
               <Address>+1C</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90828</ID>
               <Description>"blowDamageCutRate"</Description>
-              <LastState Value="2" RealAddress="04AA9194"/>
+              <LastState Value="2" RealAddress="04B5BC24"/>
               <VariableType>Float</VariableType>
               <Address>+20</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90829</ID>
               <Description>"thrustDamageCutRate"</Description>
-              <LastState Value="2" RealAddress="04AA9198"/>
+              <LastState Value="2" RealAddress="04B5BC28"/>
               <VariableType>Float</VariableType>
               <Address>+24</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90830</ID>
               <Description>"neutralDamageCutRate"</Description>
-              <LastState Value="2" RealAddress="04AA919C"/>
+              <LastState Value="2" RealAddress="04B5BC2C"/>
               <VariableType>Float</VariableType>
               <Address>+28</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90831</ID>
               <Description>"magicDamageCutRate"</Description>
-              <LastState Value="2" RealAddress="04AA91A0"/>
+              <LastState Value="2" RealAddress="04B5BC30"/>
               <VariableType>Float</VariableType>
               <Address>+2C</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90832</ID>
               <Description>"fireDamageCutRate"</Description>
-              <LastState Value="2" RealAddress="04AA91A4"/>
+              <LastState Value="2" RealAddress="04B5BC34"/>
               <VariableType>Float</VariableType>
               <Address>+30</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90833</ID>
               <Description>"thunderDamageCutRate"</Description>
-              <LastState Value="2" RealAddress="04AA91A8"/>
+              <LastState Value="2" RealAddress="04B5BC38"/>
               <VariableType>Float</VariableType>
               <Address>+34</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90834</ID>
               <Description>"physicsAttackRate"</Description>
-              <LastState Value="1" RealAddress="04AA91AC"/>
+              <LastState Value="1" RealAddress="04B5BC3C"/>
               <VariableType>Float</VariableType>
               <Address>+38</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90843</ID>
               <Description>"magicAttackRate"</Description>
-              <LastState Value="1" RealAddress="04AA91B0"/>
+              <LastState Value="1" RealAddress="04B5BC40"/>
               <VariableType>Float</VariableType>
               <Address>+3C</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90844</ID>
               <Description>"fireAttackRate"</Description>
-              <LastState Value="1" RealAddress="04AA91B4"/>
+              <LastState Value="1" RealAddress="04B5BC44"/>
               <VariableType>Float</VariableType>
               <Address>+40</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90845</ID>
               <Description>"thunderAttackRate"</Description>
-              <LastState Value="1" RealAddress="04AA91B8"/>
+              <LastState Value="1" RealAddress="04B5BC48"/>
               <VariableType>Float</VariableType>
               <Address>+44</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90846</ID>
               <Description>"physicsAttackPowerRate"</Description>
-              <LastState Value="1" RealAddress="04AA91BC"/>
+              <LastState Value="1" RealAddress="04B5BC4C"/>
               <VariableType>Float</VariableType>
               <Address>+48</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90847</ID>
               <Description>"magicAttackPowerRate"</Description>
-              <LastState Value="1" RealAddress="04AA91C0"/>
+              <LastState Value="1" RealAddress="04B5BC50"/>
               <VariableType>Float</VariableType>
               <Address>+4C</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90848</ID>
               <Description>"fireAttackPowerRate"</Description>
-              <LastState Value="1" RealAddress="04AA91C4"/>
+              <LastState Value="1" RealAddress="04B5BC54"/>
               <VariableType>Float</VariableType>
               <Address>+50</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90849</ID>
               <Description>"thunderAttackPowerRate"</Description>
-              <LastState Value="1" RealAddress="04AA91C8"/>
+              <LastState Value="1" RealAddress="04B5BC58"/>
               <VariableType>Float</VariableType>
               <Address>+54</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90850</ID>
               <Description>"physicsAttackPower"</Description>
-              <LastState Value="0" RealAddress="04AA91CC"/>
+              <LastState Value="0" RealAddress="04B5BC5C"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+58</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90851</ID>
               <Description>"magicAttackPower"</Description>
-              <LastState Value="0" RealAddress="04AA91D0"/>
+              <LastState Value="0" RealAddress="04B5BC60"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+5C</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90852</ID>
               <Description>"fireAttackPower"</Description>
-              <LastState Value="0" RealAddress="04AA91D4"/>
+              <LastState Value="0" RealAddress="04B5BC64"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+60</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90853</ID>
               <Description>"thunderAttackPower"</Description>
-              <LastState Value="0" RealAddress="04AA91D8"/>
+              <LastState Value="0" RealAddress="04B5BC68"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+64</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90854</ID>
               <Description>"physicsDiffenceRate"</Description>
-              <LastState Value="1" RealAddress="04AA91DC"/>
+              <LastState Value="1" RealAddress="04B5BC6C"/>
               <VariableType>Float</VariableType>
               <Address>+68</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90855</ID>
               <Description>"magicDiffenceRate"</Description>
-              <LastState Value="1" RealAddress="04AA91E0"/>
+              <LastState Value="1" RealAddress="04B5BC70"/>
               <VariableType>Float</VariableType>
               <Address>+6C</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90856</ID>
               <Description>"fireDiffenceRate"</Description>
-              <LastState Value="1" RealAddress="04AA91E4"/>
+              <LastState Value="1" RealAddress="04B5BC74"/>
               <VariableType>Float</VariableType>
               <Address>+70</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90857</ID>
               <Description>"thunderDiffenceRate"</Description>
-              <LastState Value="1" RealAddress="04AA91E8"/>
+              <LastState Value="1" RealAddress="04B5BC78"/>
               <VariableType>Float</VariableType>
               <Address>+74</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90858</ID>
               <Description>"physicsDiffence"</Description>
-              <LastState Value="0" RealAddress="04AA91EC"/>
+              <LastState Value="0" RealAddress="04B5BC7C"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+78</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90859</ID>
               <Description>"magicDiffence"</Description>
-              <LastState Value="0" RealAddress="04AA91F0"/>
+              <LastState Value="0" RealAddress="04B5BC80"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+7C</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90860</ID>
               <Description>"fireDiffence"</Description>
-              <LastState Value="0" RealAddress="04AA91F4"/>
+              <LastState Value="0" RealAddress="04B5BC84"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+80</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90861</ID>
               <Description>"thunderDiffence"</Description>
-              <LastState Value="0" RealAddress="04AA91F8"/>
+              <LastState Value="0" RealAddress="04B5BC88"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+84</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90862</ID>
               <Description>"NoGuardDamageRate"</Description>
-              <LastState Value="0" RealAddress="04AA91FC"/>
+              <LastState Value="0" RealAddress="04B5BC8C"/>
               <VariableType>Float</VariableType>
               <Address>+88</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90863</ID>
               <Description>"vitalSpotChangeRate"</Description>
-              <LastState Value="-1" RealAddress="04AA9200"/>
+              <LastState Value="-1" RealAddress="04B5BC90"/>
               <VariableType>Float</VariableType>
               <Address>+8C</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90864</ID>
               <Description>"normalSpotChangeRate"</Description>
-              <LastState Value="-1" RealAddress="04AA9204"/>
+              <LastState Value="-1" RealAddress="04B5BC94"/>
               <VariableType>Float</VariableType>
               <Address>+90</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90865</ID>
               <Description>"maxHpChangeRate"</Description>
-              <LastState Value="0" RealAddress="04AA9208"/>
+              <LastState Value="0" RealAddress="04B5BC98"/>
               <VariableType>Float</VariableType>
               <Address>+94</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90866</ID>
               <Description>"behaviorId"</Description>
-              <LastState Value="-1" RealAddress="04AA920C"/>
+              <LastState Value="-1" RealAddress="04B5BC9C"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+98</Address>
@@ -1197,154 +1203,154 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90867</ID>
               <Description>"changeHpRate"</Description>
-              <LastState Value="0" RealAddress="04AA9210"/>
+              <LastState Value="0" RealAddress="04B5BCA0"/>
               <VariableType>Float</VariableType>
               <Address>+9C</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90868</ID>
               <Description>"changeHpPoint"</Description>
-              <LastState Value="0" RealAddress="04AA9214"/>
+              <LastState Value="0" RealAddress="04B5BCA4"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+A0</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90869</ID>
               <Description>"changeMpRate"</Description>
-              <LastState Value="0" RealAddress="04AA9218"/>
+              <LastState Value="0" RealAddress="04B5BCA8"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+A4</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90870</ID>
               <Description>"changeMpPoint"</Description>
-              <LastState Value="0" RealAddress="04AA921C"/>
+              <LastState Value="0" RealAddress="04B5BCAC"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+A8</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90871</ID>
               <Description>"mpRecoverChangeSpeed"</Description>
-              <LastState Value="0" RealAddress="04AA9220"/>
+              <LastState Value="0" RealAddress="04B5BCB0"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+AC</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90872</ID>
               <Description>"changeStaminaRate"</Description>
-              <LastState Value="0" RealAddress="04AA9224"/>
+              <LastState Value="0" RealAddress="04B5BCB4"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+B0</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90873</ID>
               <Description>"changeStaminaPoint"</Description>
-              <LastState Value="0" RealAddress="04AA9228"/>
+              <LastState Value="0" RealAddress="04B5BCB8"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+B4</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90874</ID>
               <Description>"staminaRecoverChangeSpeed"</Description>
-              <LastState Value="0" RealAddress="04AA922C"/>
+              <LastState Value="0" RealAddress="04B5BCBC"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+B8</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90875</ID>
               <Description>"magicEffectTimeChange"</Description>
-              <LastState Value="0" RealAddress="04AA9230"/>
+              <LastState Value="0" RealAddress="04B5BCC0"/>
               <VariableType>Float</VariableType>
               <Address>+BC</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90876</ID>
               <Description>"insideDurability"</Description>
-              <LastState Value="0" RealAddress="04AA9234"/>
+              <LastState Value="0" RealAddress="04B5BCC4"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+C0</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90877</ID>
               <Description>"maxDurability"</Description>
-              <LastState Value="0" RealAddress="04AA9238"/>
+              <LastState Value="0" RealAddress="04B5BCC8"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+C4</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90878</ID>
               <Description>"staminaAttackRate"</Description>
-              <LastState Value="1" RealAddress="04AA923C"/>
+              <LastState Value="1" RealAddress="04B5BCCC"/>
               <VariableType>Float</VariableType>
               <Address>+C8</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90879</ID>
               <Description>"poizonAttackPower"</Description>
-              <LastState Value="0" RealAddress="04AA9240"/>
+              <LastState Value="0" RealAddress="04B5BCD0"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+CC</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90880</ID>
               <Description>"registIllness"</Description>
-              <LastState Value="0" RealAddress="04AA9244"/>
+              <LastState Value="0" RealAddress="04B5BCD4"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+D0</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90881</ID>
               <Description>"registBlood"</Description>
-              <LastState Value="0" RealAddress="04AA9248"/>
+              <LastState Value="0" RealAddress="04B5BCD8"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+D4</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90882</ID>
               <Description>"registCurse"</Description>
-              <LastState Value="0" RealAddress="04AA924C"/>
+              <LastState Value="0" RealAddress="04B5BCDC"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+D8</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90883</ID>
               <Description>"fallDamageRate"</Description>
-              <LastState Value="1" RealAddress="04AA9250"/>
+              <LastState Value="1" RealAddress="04B5BCE0"/>
               <VariableType>Float</VariableType>
               <Address>+DC</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90884</ID>
               <Description>"soulRate"</Description>
-              <LastState Value="1" RealAddress="04AA9254"/>
+              <LastState Value="1" RealAddress="04B5BCE4"/>
               <VariableType>Float</VariableType>
               <Address>+E0</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90885</ID>
               <Description>"equipWeightChangeRate"</Description>
-              <LastState Value="1" RealAddress="04AA9258"/>
+              <LastState Value="1" RealAddress="04B5BCE8"/>
               <VariableType>Float</VariableType>
               <Address>+E4</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90886</ID>
               <Description>"allItemWeightChangeRate"</Description>
-              <LastState Value="1" RealAddress="04AA925C"/>
+              <LastState Value="1" RealAddress="04B5BCEC"/>
               <VariableType>Float</VariableType>
               <Address>+E8</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90887</ID>
               <Description>"soul"</Description>
-              <LastState Value="0" RealAddress="04AA9260"/>
+              <LastState Value="0" RealAddress="04B5BCF0"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+EC</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90888</ID>
               <Description>"animIdOffset"</Description>
-              <LastState Value="0" RealAddress="04AA9264"/>
+              <LastState Value="0" RealAddress="04B5BCF4"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+F0</Address>
@@ -1352,91 +1358,91 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90889</ID>
               <Description>"haveSoulRate"</Description>
-              <LastState Value="1" RealAddress="04AA9268"/>
+              <LastState Value="1" RealAddress="04B5BCF8"/>
               <VariableType>Float</VariableType>
               <Address>+F4</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90890</ID>
               <Description>"targetPriority"</Description>
-              <LastState Value="0" RealAddress="04AA926C"/>
+              <LastState Value="0" RealAddress="04B5BCFC"/>
               <VariableType>Float</VariableType>
               <Address>+F8</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90891</ID>
               <Description>"sightSearchEnemyCut"</Description>
-              <LastState Value="0" RealAddress="04AA9270"/>
+              <LastState Value="0" RealAddress="04B5BD00"/>
               <VariableType>4 Bytes</VariableType>
               <Address>+FC</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90892</ID>
               <Description>"hearingSearchEnemyCut"</Description>
-              <LastState Value="0" RealAddress="04AA9274"/>
+              <LastState Value="0" RealAddress="04B5BD04"/>
               <VariableType>Float</VariableType>
               <Address>+100</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90893</ID>
               <Description>"grabityRate"</Description>
-              <LastState Value="1" RealAddress="04AA9278"/>
+              <LastState Value="1" RealAddress="04B5BD08"/>
               <VariableType>Float</VariableType>
               <Address>+104</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90894</ID>
               <Description>"registPoizonChangeRate"</Description>
-              <LastState Value="1" RealAddress="04AA927C"/>
+              <LastState Value="1" RealAddress="04B5BD0C"/>
               <VariableType>Float</VariableType>
               <Address>+108</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90895</ID>
               <Description>"toxicChangeRate"</Description>
-              <LastState Value="1" RealAddress="04AA9280"/>
+              <LastState Value="1" RealAddress="04B5BD10"/>
               <VariableType>Float</VariableType>
               <Address>+10C</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90896</ID>
               <Description>"registBloodChangeRate"</Description>
-              <LastState Value="1" RealAddress="04AA9284"/>
+              <LastState Value="1" RealAddress="04B5BD14"/>
               <VariableType>Float</VariableType>
               <Address>+110</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90897</ID>
               <Description>"registCurseChangeRate"</Description>
-              <LastState Value="1" RealAddress="04AA9288"/>
+              <LastState Value="1" RealAddress="04B5BD18"/>
               <VariableType>Float</VariableType>
               <Address>+114</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90898</ID>
               <Description>"soulStealRate"</Description>
-              <LastState Value="1" RealAddress="04AA928C"/>
+              <LastState Value="1" RealAddress="04B5BD1C"/>
               <VariableType>Float</VariableType>
               <Address>+118</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90899</ID>
               <Description>"lifeReductionRate"</Description>
-              <LastState Value="1" RealAddress="04AA9290"/>
+              <LastState Value="1" RealAddress="04B5BD20"/>
               <VariableType>Float</VariableType>
               <Address>+11C</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90900</ID>
               <Description>"hpRecoverRate"</Description>
-              <LastState Value="1" RealAddress="04AA9294"/>
+              <LastState Value="1" RealAddress="04B5BD24"/>
               <VariableType>Float</VariableType>
               <Address>+120</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90901</ID>
               <Description>"replaceSpEffectId"</Description>
-              <LastState Value="-1" RealAddress="04AA9298"/>
+              <LastState Value="-1" RealAddress="04B5BD28"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+124</Address>
@@ -1444,7 +1450,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90902</ID>
               <Description>"cycleOccurrenceSpEffectId"</Description>
-              <LastState Value="-1" RealAddress="04AA929C"/>
+              <LastState Value="-1" RealAddress="04B5BD2C"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+128</Address>
@@ -1452,7 +1458,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90903</ID>
               <Description>"atkOccurrenceSpEffectId"</Description>
-              <LastState Value="-1" RealAddress="04AA92A0"/>
+              <LastState Value="-1" RealAddress="04B5BD30"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+12C</Address>
@@ -1460,21 +1466,21 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90904</ID>
               <Description>"guardDefFlickPowerRate"</Description>
-              <LastState Value="1" RealAddress="04AA92A4"/>
+              <LastState Value="1" RealAddress="04B5BD34"/>
               <VariableType>Float</VariableType>
               <Address>+130</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90905</ID>
               <Description>"guardStaminaCutRate"</Description>
-              <LastState Value="1" RealAddress="04AA92A8"/>
+              <LastState Value="1" RealAddress="04B5BD38"/>
               <VariableType>Float</VariableType>
               <Address>+134</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90906</ID>
               <Description>"rayCastPassedTime"</Description>
-              <LastState Value="-1" RealAddress="04AA92AC"/>
+              <LastState Value="-1" RealAddress="04B5BD3C"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>2 Bytes</VariableType>
               <Address>+138</Address>
@@ -1482,35 +1488,35 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90907</ID>
               <Description>"changeSuperArmorPoint"</Description>
-              <LastState Value="0" RealAddress="04AA92AE"/>
+              <LastState Value="0" RealAddress="04B5BD3E"/>
               <VariableType>2 Bytes</VariableType>
               <Address>+13A</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90908</ID>
               <Description>"bowDistRate"</Description>
-              <LastState Value="0" RealAddress="04AA92B0"/>
+              <LastState Value="0" RealAddress="04B5BD40"/>
               <VariableType>2 Bytes</VariableType>
               <Address>+13C</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90044</ID>
               <Description>"spCategory"</Description>
-              <LastState Value="0" RealAddress="04AA92B2"/>
+              <LastState Value="0" RealAddress="04B5BD42"/>
               <VariableType>2 Bytes</VariableType>
               <Address>+13E</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90045</ID>
               <Description>"categoryPriority"</Description>
-              <LastState Value="0" RealAddress="04AA92B4"/>
+              <LastState Value="0" RealAddress="04B5BD44"/>
               <VariableType>Byte</VariableType>
               <Address>+140</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90046</ID>
               <Description>"saveCategory"</Description>
-              <LastState Value="-1" RealAddress="04AA92B5"/>
+              <LastState Value="-1" RealAddress="04B5BD45"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>Byte</VariableType>
               <Address>+141</Address>
@@ -1518,182 +1524,182 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90047</ID>
               <Description>"changeMagicSlot"</Description>
-              <LastState Value="0" RealAddress="04AA92B6"/>
+              <LastState Value="0" RealAddress="04B5BD46"/>
               <VariableType>Byte</VariableType>
               <Address>+142</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90048</ID>
               <Description>"changeMiracleSlot"</Description>
-              <LastState Value="0" RealAddress="04AA92B7"/>
+              <LastState Value="0" RealAddress="04B5BD47"/>
               <VariableType>Byte</VariableType>
               <Address>+143</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90049</ID>
               <Description>"heroPointDamage"</Description>
-              <LastState Value="0" RealAddress="04AA92B8"/>
+              <LastState Value="0" RealAddress="04B5BD48"/>
               <VariableType>Byte</VariableType>
               <Address>+144</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90050</ID>
               <Description>"defFlickPower"</Description>
-              <LastState Value="0" RealAddress="04AA92B9"/>
+              <LastState Value="0" RealAddress="04B5BD49"/>
               <VariableType>Byte</VariableType>
               <Address>+145</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90909</ID>
               <Description>"flickDamageCutRate"</Description>
-              <LastState Value="0" RealAddress="04AA92BA"/>
+              <LastState Value="0" RealAddress="04B5BD4A"/>
               <VariableType>Byte</VariableType>
               <Address>+146</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90052</ID>
               <Description>"bloodDamageRate"</Description>
-              <LastState Value="100" RealAddress="04AA92BB"/>
+              <LastState Value="100" RealAddress="04B5BD4B"/>
               <VariableType>Byte</VariableType>
               <Address>+147</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90053</ID>
               <Description>"dmgLv_None"</Description>
-              <LastState Value="0" RealAddress="04AA92BC"/>
+              <LastState Value="0" RealAddress="04B5BD4C"/>
               <VariableType>Byte</VariableType>
               <Address>+148</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90054</ID>
               <Description>"dmgLv_S"</Description>
-              <LastState Value="0" RealAddress="04AA92BD"/>
+              <LastState Value="0" RealAddress="04B5BD4D"/>
               <VariableType>Byte</VariableType>
               <Address>+149</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90055</ID>
               <Description>"dmgLv_M"</Description>
-              <LastState Value="0" RealAddress="04AA92BE"/>
+              <LastState Value="0" RealAddress="04B5BD4E"/>
               <VariableType>Byte</VariableType>
               <Address>+14A</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90056</ID>
               <Description>"dmgLv_L"</Description>
-              <LastState Value="0" RealAddress="04AA92BF"/>
+              <LastState Value="0" RealAddress="04B5BD4F"/>
               <VariableType>Byte</VariableType>
               <Address>+14B</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90057</ID>
               <Description>"dmgLv_BlowM"</Description>
-              <LastState Value="0" RealAddress="04AA92C0"/>
+              <LastState Value="0" RealAddress="04B5BD50"/>
               <VariableType>Byte</VariableType>
               <Address>+14C</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90058</ID>
               <Description>"dmgLv_Push"</Description>
-              <LastState Value="0" RealAddress="04AA92C1"/>
+              <LastState Value="0" RealAddress="04B5BD51"/>
               <VariableType>Byte</VariableType>
               <Address>+14D</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90059</ID>
               <Description>"dmgLv_Strike"</Description>
-              <LastState Value="0" RealAddress="04AA92C2"/>
+              <LastState Value="0" RealAddress="04B5BD52"/>
               <VariableType>Byte</VariableType>
               <Address>+14E</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90060</ID>
               <Description>"dmgLv_BlowS"</Description>
-              <LastState Value="0" RealAddress="04AA92C3"/>
+              <LastState Value="0" RealAddress="04B5BD53"/>
               <VariableType>Byte</VariableType>
               <Address>+14F</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90061</ID>
               <Description>"dmgLv_Min"</Description>
-              <LastState Value="0" RealAddress="04AA92C4"/>
+              <LastState Value="0" RealAddress="04B5BD54"/>
               <VariableType>Byte</VariableType>
               <Address>+150</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90910</ID>
               <Description>"dmgLv_Uppercut"</Description>
-              <LastState Value="0" RealAddress="04AA92C5"/>
+              <LastState Value="0" RealAddress="04B5BD55"/>
               <VariableType>Byte</VariableType>
               <Address>+151</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90911</ID>
               <Description>"dmgLv_BlowLL"</Description>
-              <LastState Value="0" RealAddress="04AA92C6"/>
+              <LastState Value="0" RealAddress="04B5BD56"/>
               <VariableType>Byte</VariableType>
               <Address>+152</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90912</ID>
               <Description>"dmgLv_Breath"</Description>
-              <LastState Value="0" RealAddress="04AA92C7"/>
+              <LastState Value="0" RealAddress="04B5BD57"/>
               <VariableType>Byte</VariableType>
               <Address>+153</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90913</ID>
               <Description>"atkAttribute"</Description>
-              <LastState Value="0" RealAddress="04AA92C8"/>
+              <LastState Value="0" RealAddress="04B5BD58"/>
               <VariableType>Byte</VariableType>
               <Address>+154</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90066</ID>
               <Description>"spAttribute"</Description>
-              <LastState Value="0" RealAddress="04AA92C9"/>
+              <LastState Value="0" RealAddress="04B5BD59"/>
               <VariableType>Byte</VariableType>
               <Address>+155</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90067</ID>
               <Description>"stateInfo"</Description>
-              <LastState Value="237" RealAddress="04AA92CA"/>
+              <LastState Value="237" RealAddress="04B5BD5A"/>
               <VariableType>Byte</VariableType>
               <Address>+156</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90068</ID>
               <Description>"wepParamChange"</Description>
-              <LastState Value="0" RealAddress="04AA92CB"/>
+              <LastState Value="0" RealAddress="04B5BD5B"/>
               <VariableType>Byte</VariableType>
               <Address>+157</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90069</ID>
               <Description>"moveType"</Description>
-              <LastState Value="0" RealAddress="04AA92CC"/>
+              <LastState Value="0" RealAddress="04B5BD5C"/>
               <VariableType>Byte</VariableType>
               <Address>+158</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90070</ID>
               <Description>"lifeReductionType"</Description>
-              <LastState Value="0" RealAddress="04AA92CD"/>
+              <LastState Value="0" RealAddress="04B5BD5D"/>
               <VariableType>Byte</VariableType>
               <Address>+159</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90071</ID>
               <Description>"throwCondition"</Description>
-              <LastState Value="0" RealAddress="04AA92CE"/>
+              <LastState Value="0" RealAddress="04B5BD5E"/>
               <VariableType>Byte</VariableType>
               <Address>+15A</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90072</ID>
               <Description>"addBehaviorJudgeId_condition"</Description>
-              <LastState Value="-1" RealAddress="04AA92CF"/>
+              <LastState Value="-1" RealAddress="04B5BD5F"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>Byte</VariableType>
               <Address>+15B</Address>
@@ -1701,14 +1707,14 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90073</ID>
               <Description>"addBehaviorJudgeId_add"</Description>
-              <LastState Value="0" RealAddress="04AA92D0"/>
+              <LastState Value="0" RealAddress="04B5BD60"/>
               <VariableType>Byte</VariableType>
               <Address>+15C</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>90074</ID>
               <Description>"effectTargetSelf"</Description>
-              <LastState Value="1" RealAddress="04AA92D1"/>
+              <LastState Value="1" RealAddress="04B5BD61"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>0</BitStart>
@@ -1719,7 +1725,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90075</ID>
               <Description>"effectTargetFriend"</Description>
-              <LastState Value="1" RealAddress="04AA92D1"/>
+              <LastState Value="1" RealAddress="04B5BD61"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>1</BitStart>
@@ -1730,7 +1736,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90076</ID>
               <Description>"effectTargetEnemy"</Description>
-              <LastState Value="1" RealAddress="04AA92D1"/>
+              <LastState Value="1" RealAddress="04B5BD61"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>2</BitStart>
@@ -1741,7 +1747,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90077</ID>
               <Description>"effectTargetPlayer"</Description>
-              <LastState Value="1" RealAddress="04AA92D1"/>
+              <LastState Value="1" RealAddress="04B5BD61"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>3</BitStart>
@@ -1752,7 +1758,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90078</ID>
               <Description>"effectTargetA"</Description>
-              <LastState Value="1" RealAddress="04AA92D1"/>
+              <LastState Value="1" RealAddress="04B5BD61"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>4</BitStart>
@@ -1763,7 +1769,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90079</ID>
               <Description>"effectTargetLive"</Description>
-              <LastState Value="1" RealAddress="04AA92D1"/>
+              <LastState Value="1" RealAddress="04B5BD61"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>5</BitStart>
@@ -1774,7 +1780,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90080</ID>
               <Description>"effectTargetGhost"</Description>
-              <LastState Value="1" RealAddress="04AA92D1"/>
+              <LastState Value="1" RealAddress="04B5BD61"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>6</BitStart>
@@ -1785,7 +1791,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90081</ID>
               <Description>"effectTargetWhiteGhost"</Description>
-              <LastState Value="0" RealAddress="04AA92D1"/>
+              <LastState Value="0" RealAddress="04B5BD61"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>7</BitStart>
@@ -1796,7 +1802,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90082</ID>
               <Description>"effectTargetBlackGhost"</Description>
-              <LastState Value="0" RealAddress="04AA92D2"/>
+              <LastState Value="0" RealAddress="04B5BD62"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>0</BitStart>
@@ -1807,7 +1813,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90914</ID>
               <Description>"effectTargetAttacker"</Description>
-              <LastState Value="0" RealAddress="04AA92D2"/>
+              <LastState Value="0" RealAddress="04B5BD62"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>1</BitStart>
@@ -1818,7 +1824,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90915</ID>
               <Description>"dispIconNonactive"</Description>
-              <LastState Value="0" RealAddress="04AA92D2"/>
+              <LastState Value="0" RealAddress="04B5BD62"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>2</BitStart>
@@ -1829,7 +1835,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90916</ID>
               <Description>"useSpEffectEffect"</Description>
-              <LastState Value="1" RealAddress="04AA92D2"/>
+              <LastState Value="1" RealAddress="04B5BD62"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>3</BitStart>
@@ -1840,7 +1846,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90917</ID>
               <Description>"bAdjustMagicAblity"</Description>
-              <LastState Value="0" RealAddress="04AA92D2"/>
+              <LastState Value="0" RealAddress="04B5BD62"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>4</BitStart>
@@ -1851,7 +1857,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90918</ID>
               <Description>"bAdjustFaithAblity"</Description>
-              <LastState Value="0" RealAddress="04AA92D2"/>
+              <LastState Value="0" RealAddress="04B5BD62"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>5</BitStart>
@@ -1862,7 +1868,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90088</ID>
               <Description>"bGameClearBonus"</Description>
-              <LastState Value="0" RealAddress="04AA92D2"/>
+              <LastState Value="0" RealAddress="04B5BD62"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>6</BitStart>
@@ -1873,7 +1879,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90089</ID>
               <Description>"magParamChange"</Description>
-              <LastState Value="0" RealAddress="04AA92D2"/>
+              <LastState Value="0" RealAddress="04B5BD62"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>7</BitStart>
@@ -1884,7 +1890,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90919</ID>
               <Description>"miracleParamChange"</Description>
-              <LastState Value="0" RealAddress="04AA92D3"/>
+              <LastState Value="0" RealAddress="04B5BD63"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>0</BitStart>
@@ -1895,7 +1901,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90920</ID>
               <Description>"clearSoul"</Description>
-              <LastState Value="0" RealAddress="04AA92D3"/>
+              <LastState Value="0" RealAddress="04B5BD63"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>1</BitStart>
@@ -1906,7 +1912,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90921</ID>
               <Description>"requestSOS"</Description>
-              <LastState Value="0" RealAddress="04AA92D3"/>
+              <LastState Value="0" RealAddress="04B5BD63"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>2</BitStart>
@@ -1917,7 +1923,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90922</ID>
               <Description>"requestBlackSOS"</Description>
-              <LastState Value="0" RealAddress="04AA92D3"/>
+              <LastState Value="0" RealAddress="04B5BD63"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>3</BitStart>
@@ -1928,7 +1934,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90923</ID>
               <Description>"requestForceJoinBlackSOS"</Description>
-              <LastState Value="0" RealAddress="04AA92D3"/>
+              <LastState Value="0" RealAddress="04B5BD63"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>4</BitStart>
@@ -1939,7 +1945,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90095</ID>
               <Description>"requestKickSession"</Description>
-              <LastState Value="0" RealAddress="04AA92D3"/>
+              <LastState Value="0" RealAddress="04B5BD63"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>5</BitStart>
@@ -1950,7 +1956,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90924</ID>
               <Description>"requestLeaveSession"</Description>
-              <LastState Value="0" RealAddress="04AA92D3"/>
+              <LastState Value="0" RealAddress="04B5BD63"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>6</BitStart>
@@ -1961,7 +1967,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90925</ID>
               <Description>"requestNpcInveda"</Description>
-              <LastState Value="0" RealAddress="04AA92D3"/>
+              <LastState Value="0" RealAddress="04B5BD63"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>7</BitStart>
@@ -1972,7 +1978,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90926</ID>
               <Description>"noDead"</Description>
-              <LastState Value="0" RealAddress="04AA92D4"/>
+              <LastState Value="1" RealAddress="04B5BD64"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>0</BitStart>
@@ -1983,7 +1989,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90099</ID>
               <Description>"bCurrHPIndependeMaxHP"</Description>
-              <LastState Value="0" RealAddress="04AA92D4"/>
+              <LastState Value="0" RealAddress="04B5BD64"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>1</BitStart>
@@ -1994,7 +2000,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90927</ID>
               <Description>"corrosionIgnore"</Description>
-              <LastState Value="0" RealAddress="04AA92D4"/>
+              <LastState Value="0" RealAddress="04B5BD64"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>2</BitStart>
@@ -2005,7 +2011,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90101</ID>
               <Description>"sightSearchCutIgnore"</Description>
-              <LastState Value="0" RealAddress="04AA92D4"/>
+              <LastState Value="0" RealAddress="04B5BD64"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>3</BitStart>
@@ -2016,7 +2022,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90928</ID>
               <Description>"hearingSearchCutIgnore"</Description>
-              <LastState Value="0" RealAddress="04AA92D4"/>
+              <LastState Value="0" RealAddress="04B5BD64"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>4</BitStart>
@@ -2027,7 +2033,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90929</ID>
               <Description>"antiMagicIgnore"</Description>
-              <LastState Value="0" RealAddress="04AA92D4"/>
+              <LastState Value="0" RealAddress="04B5BD64"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>5</BitStart>
@@ -2038,7 +2044,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90930</ID>
               <Description>"fakeTargetIgnore"</Description>
-              <LastState Value="0" RealAddress="04AA92D4"/>
+              <LastState Value="0" RealAddress="04B5BD64"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>6</BitStart>
@@ -2049,7 +2055,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90931</ID>
               <Description>"fakeTargetIgnoreUndead"</Description>
-              <LastState Value="0" RealAddress="04AA92D4"/>
+              <LastState Value="0" RealAddress="04B5BD64"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>7</BitStart>
@@ -2060,7 +2066,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90932</ID>
               <Description>"fakeTargetIgnoreAnimal"</Description>
-              <LastState Value="0" RealAddress="04AA92D5"/>
+              <LastState Value="0" RealAddress="04B5BD65"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>0</BitStart>
@@ -2071,7 +2077,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90933</ID>
               <Description>"grabityIgnore"</Description>
-              <LastState Value="1" RealAddress="04AA92D5"/>
+              <LastState Value="1" RealAddress="04B5BD65"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>1</BitStart>
@@ -2082,7 +2088,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90934</ID>
               <Description>"disablePoison"</Description>
-              <LastState Value="0" RealAddress="04AA92D5"/>
+              <LastState Value="0" RealAddress="04B5BD65"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>2</BitStart>
@@ -2093,7 +2099,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90935</ID>
               <Description>"disableDisease"</Description>
-              <LastState Value="0" RealAddress="04AA92D5"/>
+              <LastState Value="0" RealAddress="04B5BD65"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>3</BitStart>
@@ -2104,7 +2110,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90936</ID>
               <Description>"disableBlood"</Description>
-              <LastState Value="0" RealAddress="04AA92D5"/>
+              <LastState Value="0" RealAddress="04B5BD65"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>4</BitStart>
@@ -2115,7 +2121,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90937</ID>
               <Description>"disableCurse"</Description>
-              <LastState Value="0" RealAddress="04AA92D5"/>
+              <LastState Value="0" RealAddress="04B5BD65"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>5</BitStart>
@@ -2126,7 +2132,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90938</ID>
               <Description>"enableCharm"</Description>
-              <LastState Value="0" RealAddress="04AA92D5"/>
+              <LastState Value="0" RealAddress="04B5BD65"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>6</BitStart>
@@ -2137,7 +2143,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90939</ID>
               <Description>"enableLifeTime"</Description>
-              <LastState Value="0" RealAddress="04AA92D5"/>
+              <LastState Value="0" RealAddress="04B5BD65"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>7</BitStart>
@@ -2148,7 +2154,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90114</ID>
               <Description>"hasTarget"</Description>
-              <LastState Value="0" RealAddress="04AA92D6"/>
+              <LastState Value="0" RealAddress="04B5BD66"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>0</BitStart>
@@ -2159,7 +2165,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90940</ID>
               <Description>"isFireDamageCancel"</Description>
-              <LastState Value="0" RealAddress="04AA92D6"/>
+              <LastState Value="0" RealAddress="04B5BD66"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>1</BitStart>
@@ -2170,7 +2176,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90941</ID>
               <Description>"isExtendSpEffectLife"</Description>
-              <LastState Value="0" RealAddress="04AA92D6"/>
+              <LastState Value="0" RealAddress="04B5BD66"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>2</BitStart>
@@ -2181,7 +2187,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90942</ID>
               <Description>"requestLeaveColiseumSession"</Description>
-              <LastState Value="0" RealAddress="04AA92D6"/>
+              <LastState Value="0" RealAddress="04B5BD66"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>3</BitStart>
@@ -2192,7 +2198,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90943</ID>
               <Description>"vowType0"</Description>
-              <LastState Value="1" RealAddress="04AA92D7"/>
+              <LastState Value="1" RealAddress="04B5BD67"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>0</BitStart>
@@ -2203,7 +2209,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90944</ID>
               <Description>"vowType1"</Description>
-              <LastState Value="1" RealAddress="04AA92D7"/>
+              <LastState Value="1" RealAddress="04B5BD67"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>1</BitStart>
@@ -2214,7 +2220,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90120</ID>
               <Description>"vowType2"</Description>
-              <LastState Value="1" RealAddress="04AA92D7"/>
+              <LastState Value="1" RealAddress="04B5BD67"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>2</BitStart>
@@ -2225,7 +2231,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90121</ID>
               <Description>"vowType3"</Description>
-              <LastState Value="1" RealAddress="04AA92D7"/>
+              <LastState Value="1" RealAddress="04B5BD67"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>3</BitStart>
@@ -2236,7 +2242,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90122</ID>
               <Description>"vowType4"</Description>
-              <LastState Value="1" RealAddress="04AA92D7"/>
+              <LastState Value="1" RealAddress="04B5BD67"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>4</BitStart>
@@ -2247,7 +2253,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90123</ID>
               <Description>"vowType5"</Description>
-              <LastState Value="1" RealAddress="04AA92D7"/>
+              <LastState Value="1" RealAddress="04B5BD67"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>5</BitStart>
@@ -2258,7 +2264,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90124</ID>
               <Description>"vowType6"</Description>
-              <LastState Value="1" RealAddress="04AA92D7"/>
+              <LastState Value="1" RealAddress="04B5BD67"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>6</BitStart>
@@ -2269,7 +2275,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90125</ID>
               <Description>"vowType7"</Description>
-              <LastState Value="1" RealAddress="04AA92D7"/>
+              <LastState Value="1" RealAddress="04B5BD67"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>7</BitStart>
@@ -2280,7 +2286,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90126</ID>
               <Description>"vowType8"</Description>
-              <LastState Value="1" RealAddress="04AA92D8"/>
+              <LastState Value="1" RealAddress="04B5BD68"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>0</BitStart>
@@ -2291,7 +2297,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90127</ID>
               <Description>"vowType9"</Description>
-              <LastState Value="1" RealAddress="04AA92D8"/>
+              <LastState Value="1" RealAddress="04B5BD68"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>1</BitStart>
@@ -2302,7 +2308,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90128</ID>
               <Description>"vowType10"</Description>
-              <LastState Value="1" RealAddress="04AA92D8"/>
+              <LastState Value="1" RealAddress="04B5BD68"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>2</BitStart>
@@ -2313,7 +2319,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90129</ID>
               <Description>"vowType11"</Description>
-              <LastState Value="1" RealAddress="04AA92D8"/>
+              <LastState Value="1" RealAddress="04B5BD68"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>3</BitStart>
@@ -2324,7 +2330,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90130</ID>
               <Description>"vowType12"</Description>
-              <LastState Value="1" RealAddress="04AA92D8"/>
+              <LastState Value="1" RealAddress="04B5BD68"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>4</BitStart>
@@ -2335,7 +2341,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90131</ID>
               <Description>"vowType13"</Description>
-              <LastState Value="1" RealAddress="04AA92D8"/>
+              <LastState Value="1" RealAddress="04B5BD68"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>5</BitStart>
@@ -2346,7 +2352,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90132</ID>
               <Description>"vowType14"</Description>
-              <LastState Value="1" RealAddress="04AA92D8"/>
+              <LastState Value="1" RealAddress="04B5BD68"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>6</BitStart>
@@ -2357,7 +2363,7 @@ unregistersymbol(BaseP)
             <CheatEntry>
               <ID>90945</ID>
               <Description>"vowType15"</Description>
-              <LastState Value="1" RealAddress="04AA92D8"/>
+              <LastState Value="1" RealAddress="04B5BD68"/>
               <Color>000000</Color>
               <VariableType>Binary</VariableType>
               <BitStart>7</BitStart>
@@ -2372,6 +2378,194 @@ unregistersymbol(BaseP)
   </CheatEntries>
   <UserdefinedSymbols>
     <SymbolEntry>
+      <Name>TestCode</Name>
+      <Address>0040F578</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseF</Name>
+      <Address>0137A620</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>mypointer</Name>
+      <Address>0CB20188</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>newmem2</Name>
+      <Address>18EF0000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>newmem1</Name>
+      <Address>18B80020</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>newmem9</Name>
+      <Address>19400000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>AttackAddr</Name>
+      <Address>19400000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>addressG</Name>
+      <Address>18B80000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>GoodsStructure</Name>
+      <Address>05ABD570</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>addressE</Name>
+      <Address>18B80000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>address</Name>
+      <Address>18B80020</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>EscapeAddressToUse</Name>
+      <Address>18EF0000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Effect</Name>
+      <Address>00DBE5C0</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Goods</Name>
+      <Address>004F6097</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Bullet</Name>
+      <Address>01006196</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Attack</Name>
+      <Address>00E485DD</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>World</Name>
+      <Address>00D38CF3</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Move0</Name>
+      <Address>00FCAD71</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Move</Name>
+      <Address>00FCAD76</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>ChrIni</Name>
+      <Address>00D1F982</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Anim</Name>
+      <Address>007403B0</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>lastdroppeditem</Name>
+      <Address>00DC4AAA</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL</Name>
+      <Address>013784D2</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL2</Name>
+      <Address>013784D3</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL3</Name>
+      <Address>013784E9</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL4</Name>
+      <Address>013784EA</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL5</Name>
+      <Address>013784EB</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL6</Name>
+      <Address>013784EC</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL7</Name>
+      <Address>013784ED</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL8</Name>
+      <Address>013784EE</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL9</Name>
+      <Address>013784E4</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL0</Name>
+      <Address>013784E5</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL11</Name>
+      <Address>013784E6</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL12</Name>
+      <Address>01376EE7</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL13</Name>
+      <Address>013784E7</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL14</Name>
+      <Address>013784E8</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>GameFlagData</Name>
+      <Address>1532001D</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>GameFlagAOB</Name>
+      <Address>00D38C43</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseA</Name>
+      <Address>012E29E8</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseB</Name>
+      <Address>01378700</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseC</Name>
+      <Address>013784A0</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseD</Name>
+      <Address>0137855C</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseE</Name>
+      <Address>0137E204</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseX</Name>
+      <Address>0137D644</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseZ</Name>
+      <Address>0137D648</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseL</Name>
+      <Address>0137D6C8</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>NewKnockBackMode</Name>
+      <Address>0137D648</Address>
+    </SymbolEntry>
+    <SymbolEntry>
       <Name>selected_weapon</Name>
       <Address>1BE90000</Address>
     </SymbolEntry>
@@ -2381,47 +2575,109 @@ unregistersymbol(BaseP)
     </SymbolEntry>
     <SymbolEntry>
       <Name>selected_attack</Name>
-      <Address>1BD60080</Address>
+      <Address>131F0000</Address>
     </SymbolEntry>
     <SymbolEntry>
       <Name>selected_attack_var_name</Name>
-      <Address>1BD60090</Address>
+      <Address>131F0010</Address>
     </SymbolEntry>
   </UserdefinedSymbols>
   <LuaScript>AddressList = getAddressList()
-effect_base_entry = AddressList.getMemoryRecordByDescription('SpEffect Base')
+attack_base_entry = AddressList.getMemoryRecordByDescription('SpEffect Base')
 
 AddressList.getMemoryRecordByDescription('Open').OnActivate = function(record, before, currentstate)
-  speffect_param_pc_indicies_addr = AddressList.getMemoryRecordByDescription('SpEffectParamPC').getCurrentAddress()+0x24
+  attack_param_pc_indicies_addr = AddressList.getMemoryRecordByDescription('SpEffectParam').getCurrentAddress()+0x24
   return true
 end
 
-speffect_paramentry_offset_hex = 0
-effect_name = "UNKNOWNNAME"
+attack_paramentry_offset_hex = 0
+attack_name = "UNKNOWNNAME"
 
---on effect selection, get address from aob, and save default atribs
-selected_effect = AddressList.getMemoryRecordByDescription('Select Effect and check the box')
-selected_effect.OnActivate = function(record, before, currentstate)
+--on attack selection, get address from aob, and save default atribs
+selected_attack = AddressList.getMemoryRecordByDescription('Select effect and check the box')
+selected_attack.OnActivate = function(record, before, currentstate)
   --get id from selected attack dropdown
-  effect_id = readInteger(selected_effect.getCurrentAddress())
-  if effect_id ~= nil then
+  weapon_id = readInteger(selected_attack.getCurrentAddress())
+  if weapon_id ~= nil then
     --find in PARAM index array
-    for id_i=0,847 do
-      if readInteger(speffect_param_pc_indicies_addr+id_i*12) == effect_id then
-        effect_paramentry_offset = readInteger(speffect_param_pc_indicies_addr+id_i*12+4)-0x30
+    for id_i=0,848 do
+      if readInteger(attack_param_pc_indicies_addr+id_i*12) == weapon_id then
+        attack_paramentry_offset = readInteger(attack_param_pc_indicies_addr+id_i*12+4)-0x30
         break
       end
     end
     --use offset to get entry
-    effect_paramentry_address = speffect_param_pc_indicies_addr+effect_paramentry_offset
+    attack_paramentry_address = attack_param_pc_indicies_addr+attack_paramentry_offset
     --set Attack Base address
-    effect_base_entry.setAddress(string.format("%x",effect_paramentry_address))
+    attack_base_entry.setAddress(string.format("%x",attack_paramentry_address))
     --save attack paramentry offset for use in CE
-    speffect_paramentry_offset_hex = string.format("%x",effect_paramentry_offset)
+    attack_paramentry_offset_hex = string.format("%x",attack_paramentry_offset)
     --save the current (original) stats for the attack
-    --table_string_disable = GenerateStringForAttack()
+    table_string_disable = GenerateStringForAttack()
   end
 
+  return false
+end
+
+
+
+table_string_disable = ""
+
+function GenerateStringForAttack()
+  local table_string = "{$lua}\n" .. "AddressList = getAddressList()\n" .. "speffects_param_pcbase_addr = AddressList.getMemoryRecordByDescription('SpEffectParam').getCurrentAddress()+0x24\n"
+
+  --iterate through all children of the attack base (all variables in the struct)
+  --genreate lua because its really the only way for code that required dynamic param bases
+  for i=0,110 do
+
+    --handle the type cases
+    if attack_base_entry[i].Type == vtSingle then
+      local read_bytes = readFloat(attack_base_entry[i].CurrentAddress)
+      table_string = table_string .. "writeFloat(speffects_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[i].Address,2),16)) .. ","
+      table_string = table_string .. string.format("%f) --%s\n", read_bytes, attack_base_entry[i].Description)
+    elseif attack_base_entry[i].Type == vtDword then
+      local read_bytes = readInteger(attack_base_entry[i].CurrentAddress)
+      table_string = table_string .. "writeInteger(speffects_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[i].Address,2),16)) .. ","
+      table_string = table_string .. string.format("%d) --%s\n", read_bytes, attack_base_entry[i].Description)
+    elseif attack_base_entry[i].Type == vtWord then
+      local read_bytes = readSmallInteger(attack_base_entry[i].CurrentAddress)
+      table_string = table_string .. "writeSmallInteger(speffects_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[i].Address,2),16)) .. ","
+      table_string = table_string .. string.format("%d) --%s\n", read_bytes, attack_base_entry[i].Description)
+    elseif attack_base_entry[i].Type == vtByte then
+      local read_bytes = readBytes(attack_base_entry[i].CurrentAddress, 1, true)
+      table_string = table_string .. "writeBytes(speffects_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[i].Address,2),16)) .. ","
+      table_string = table_string .. string.format("%d) --%s\n", read_bytes[1], attack_base_entry[i].Description)
+    else
+      print("WARNING unknown type at i="..i)
+    end
+  end
+
+  --count the flags bytes as a single 7 byte chunk
+  table_string = table_string .. "writeBytes(speffects_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[110].Address,2),16)) .. ","
+  local flag_bytes = readBytes(attack_base_entry[110].CurrentAddress, 7, true)
+  table_string = table_string .. string.format("%d, %d, %d, %d, %d, %d, %d) --flags\n", flag_bytes[1], flag_bytes[2], flag_bytes[3], flag_bytes[4], flag_bytes[5], flag_bytes[6], flag_bytes[7])
+
+  table_string = table_string .. "{$asm}\n"
+
+  return table_string
+end
+
+
+--after attack weapon atribs, user triggers the generation of the CE script generation for the changes
+generate_code_entry = AddressList.getMemoryRecordByDescription('Generate CE Code')
+generate_code_entry.OnActivate = function(record, before, currentstate)
+  local table_string = "[ENABLE]\n"..
+                       GenerateStringForAttack() .. "\n" ..
+                       "[DISABLE]\n" ..
+                       table_string_disable
+
+  --get varable name for attack and fix up
+  local variable_name = readString(generate_code_entry.getCurrentAddress(), 100, false)
+  variable_name = variable_name:gsub(" ","_"):lower()
+  --insert variable name into table
+  table_string = table_string:gsub(attack_name,variable_name)
+
+  print(table_string)
   return false
 end
 </LuaScript>
