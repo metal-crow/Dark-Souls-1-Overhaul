@@ -509,7 +509,7 @@ void Game::increase_memory_limit()
 {
 	Mod::startup_messages.push_back(Mod::output_prefix + "Increasing available memory...");
 
-	uint8_t patch[5] = { 0x68, 0x00, 0x00, 0x00, 0x06 }; // push 0x06000000. The constant can be increased as desired, and represents dark souls total memory pool
+	uint8_t patch[5] = { 0x68, 0x00, 0x00, 0xDA, 0x00 }; // push 0x0DA0000. The constant can be increased as desired, and represents dark souls total memory pool
 
 	void *write_address = (uint8_t*)Game::ds1_base + 0xB8B7E5;
 	apply_byte_patch(write_address, patch, 5);
