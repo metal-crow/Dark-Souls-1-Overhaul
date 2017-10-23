@@ -259,6 +259,7 @@
     <ClInclude Include="include\Debug\GameParamDefsDebug.h" />
     <ClInclude Include="include\DllMain.h" />
     <ClInclude Include="include\GameData.h" />
+    <ClInclude Include="include\GameFiles.h" />
     <ClInclude Include="include\ModData.h" />
     <ClInclude Include="include\ParamDef.h" />
     <ClInclude Include="include\ParamDef\ArmorParamDef.h" />

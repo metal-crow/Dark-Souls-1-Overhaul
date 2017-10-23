@@ -15,26 +15,6 @@
 
 #include "SpPointer.h"
 
-// Default number of game archive file pairs
-#define ARCHIVE_FILE_PAIR_COUNT 4
-
-// Exact length of game file names or file name prefixes (when using custom files, the custom file names must be the same length as the real files)
-#define ARCHIVE_FILE_PREFIX_LENGTH 6
-#define SAVE_FILE_PREFIX_LENGTH 5
-#define GAME_CONFIG_FILE_NAME_LENGTH 13
-
-// Default file types for game archive files (wide char)
-extern const wchar_t *ARCHIVE_FILE_TYPE_W[2];
-
-// Default file types for game archive files (char)
-extern const char *ARCHIVE_FILE_TYPE[2];
-
-// Default filename suffix for game save file
-extern const wchar_t *DEFAULT_SAVE_FILE_SUFFIX;
-
-// Default filename for game config file
-extern const wchar_t *DEFAULT_GAME_CONFIG_FILE;
-
 
 
 enum DS1_GAME_VERSION_ENUM {
@@ -135,21 +115,61 @@ public:
 	// Increase available pool of memory Dark Souls allocates itself
 	static void increase_memory_limit();
 
-	// Set the .bdt files to be loaded by the game (NOTE: archive_name parameter must be exactly 6 characters)
-	static void load_custom_bdt_files(wchar_t *archive_name);
-
-	// Set the *.0005.sl2 file that will be loaded by the game (WARNING: filename_prefix parameter must be exactly 5 characters)
-	static void load_custom_save_file(wchar_t *filename_prefix);
-
-	// Set the config file that will be loaded by the game (WARNING: filename parameter must be exactly 13 characters)
-	static void load_custom_game_config_file(wchar_t *filename);
-
 	// Two-part patch to increase the multiplayer phantom limit:
 	static void increase_phantom_limit1(); // Called from on_process_attach()
 	static void increase_phantom_limit2(); // Called from initialize_plugin()
 
-};
 
+
+
+
+									/////////////////////////////////////////
+									////////////// FILE-RELATED /////////////
+									/////////////////////////////////////////
+	class Files {
+	public:
+
+		// Default number of game archive file pairs
+		#define ARCHIVE_FILE_PAIR_COUNT 4
+
+		// Default file types for game archive files (wide char)
+		static const wchar_t *ARCHIVE_FILE_TYPE_W[2];
+
+		// Default file types for game archive files (char)
+		static const char *ARCHIVE_FILE_TYPE[2];
+
+		// Default file type for game save file
+		static const wchar_t *DEFAULT_SAVE_FILE_TYPE_W;
+
+
+
+
+		// Called when the game attempts to call CreateFileW
+		static HANDLE WINAPI intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
+													LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition,
+													DWORD dwFlagsAndAttributes, HANDLE hTemplateFile);
+
+		// Called when the game attempts to call GetPrivateProfileIntW
+		static UINT WINAPI intercept_get_private_profile_int_w(LPCWSTR lpAppName, LPCWSTR lpKeyName, INT nDefault, LPCWSTR lpFileName);
+
+		// Called when the game attempts to call WritePrivatePrivateProfileW
+		static BOOL WINAPI intercept_write_private_profile_section_w(LPCWSTR lpAppName, LPCWSTR lpString, LPCWSTR lpFileName);
+
+
+		// Patches game calls to CreateFileW, redirecting them to Game::intercept_create_file()
+		static void apply_function_intercepts();
+
+		// Checks if custom archive files exist (.bdt/.bhd5)
+		static void check_custom_archive_files();
+
+		// Checks if custom save file exists (.sl2)
+		static void check_custom_save_file();
+
+		// Checks if custom game config file exists (.ini)
+		static void check_custom_game_config_file();
+	};
+};
+typedef Game::Files Files;
 
 
 
