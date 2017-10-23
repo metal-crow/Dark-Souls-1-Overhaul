@@ -44,6 +44,9 @@ SpPointer Game::saves_enabled;
 // Multiplayer node count
 int Game::node_count = -1;
 
+// Size of the pool of memory the game allocates for itself
+uint32_t Game::memory_limit = 0;
+
 
 
 
@@ -486,12 +489,24 @@ void Game::enable_low_fps_disconnect(bool enable)
 	}
 }
 
-// Increase available pool of memory Dark Souls allocates itself
-void Game::increase_memory_limit()
+// Set available pool of memory that Dark Souls allocates for itself
+void Game::set_memory_limit(uint32_t mem_limit)
 {
-	Mod::startup_messages.push_back(Mod::output_prefix + "Increasing available memory...");
+	if (mem_limit <= 0xA20000) // 0xA20000 = game default memory limit
+		return;
 
-	uint8_t patch[5] = { 0x68, 0x00, 0x00, 0xDA, 0x00 }; // push 0x0DA0000. The constant can be increased as desired, and represents dark souls total memory pool
+	if (mem_limit > 0x0FFFFFFF) // Game crashes if allocation is too large (not sure of the exact upper limit, but pretty sure 0x1FFFFFFF causes a crash)
+	{
+		Mod::startup_messages.push_back(Mod::output_prefix + "WARNING: Specified memory pool size is too large. Allocating maximum allowed memory instead: 268435455 (0x0FFFFFFF)");
+		mem_limit = 0x0FFFFFFF;
+	}
+	
+	std::stringstream hex_stream;
+	hex_stream << std::hex << (int)mem_limit;
+	Mod::startup_messages.push_back(Mod::output_prefix + "Setting game memory allocation size to " + std::to_string(mem_limit) + " (0x" + hex_stream.str() + ")...");
+
+	uint8_t *mem_limit_bytes = (uint8_t*)&mem_limit;
+	uint8_t patch[5] = { 0x68, mem_limit_bytes[0], mem_limit_bytes[1], mem_limit_bytes[2], mem_limit_bytes[3] }; // push 0x0DA0000. The constant can be increased as desired, and represents dark souls total memory pool
 
 	void *write_address = (uint8_t*)Game::ds1_base + 0xB8B7E5;
 	apply_byte_patch(write_address, patch, 5);

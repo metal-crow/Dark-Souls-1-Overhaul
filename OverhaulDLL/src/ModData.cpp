@@ -77,6 +77,11 @@ void Mod::get_startup_preferences()
 	// Check for custom game files
 	Mod::get_custom_game_files();
 
+	// Memory limit
+	Game::memory_limit = (uint32_t)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_MEMORY_LIMIT_, (int)Game::memory_limit, _DS1_OVERHAUL_SETTINGS_FILE_);
+
+
+
 	// @TODO Load additional startup preferences here
 
 
