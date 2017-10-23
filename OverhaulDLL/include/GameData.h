@@ -64,6 +64,9 @@ public:
 	// Multiplayer node count
 	static int node_count;
 
+	// Size of the pool of memory the game allocates for itself
+	static uint32_t memory_limit;
+
 
 
 					/////////////////////////////////////////
@@ -112,8 +115,8 @@ public:
 					//////////////// PATCHES ////////////////
 					/////////////////////////////////////////
 
-	// Increase available pool of memory Dark Souls allocates itself
-	static void increase_memory_limit();
+	// Set available pool of memory that Dark Souls allocates for itself
+	static void set_memory_limit(uint32_t mem_limit);
 
 	// Two-part patch to increase the multiplayer phantom limit:
 	static void increase_phantom_limit1(); // Called from on_process_attach()

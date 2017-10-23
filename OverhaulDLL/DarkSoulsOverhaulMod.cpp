@@ -40,7 +40,7 @@ void on_process_attach()
 	Game::set_game_version(DS1_VERSION_OVERHAUL);
 
 	// Apply increased memory limit patch
-	Game::increase_memory_limit();
+	Game::set_memory_limit(Game::memory_limit);
 
 	// Change game version number
 	Files::apply_function_intercepts();

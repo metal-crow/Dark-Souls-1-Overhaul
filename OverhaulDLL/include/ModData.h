@@ -20,6 +20,7 @@
 #define _DS1_OVERHAUL_KEYBINDS_SECTION_ "Dark Souls Overhaul Keybinds"
 // Startup preferences:
 #define _DS1_OVERHAUL_PREF_LEGACY_MODE_ "LegacyMode"
+#define _DS1_OVERHAUL_PREF_MEMORY_LIMIT_ "MemoryLimit"
 #define _DS1_OVERHAUL_PREF_CUSTOM_GAME_ARCHIVE_ "CustomArchiveFiles"
 #define _DS1_OVERHAUL_PREF_CUSTOM_SAVE_FILE_ "CustomSaveFile"
 #define _DS1_OVERHAUL_PREF_CUSTOM_GAME_CFG_FILE_ "CustomGameConfigFile"
