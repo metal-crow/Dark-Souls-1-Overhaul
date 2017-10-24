@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\ParamDefs">
+      <UniqueIdentifier>{01b81423-cd60-4fb5-b354-b12cb5a939e1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DarkSoulsOverhaulMod.cpp">
@@ -47,18 +50,6 @@
     <ClInclude Include="include\Debug\ConsoleCommandsDebug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Debug\GameParamDefsDebug.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ParamDef\ArmorParamDef.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ParamDef\BaseParamDef.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ParamDef.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\DllMain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -77,11 +68,50 @@
     <ClInclude Include="include\Plugin\KeybindFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ParamDef\LockCamParamDef.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\GameFiles.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ParamDef\ArmorParamDef.h">
+      <Filter>Header Files\ParamDefs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ParamDef\BaseParamDef.h">
+      <Filter>Header Files\ParamDefs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Debug\GameParamDefsDebug.h">
+      <Filter>Header Files\ParamDefs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ParamDef\LockCamParamDef.h">
+      <Filter>Header Files\ParamDefs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ParamDef\CharInitParamDef.h">
+      <Filter>Header Files\ParamDefs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ParamDef\NPCParamDef.h">
+      <Filter>Header Files\ParamDefs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ParamDef.h">
+      <Filter>Header Files\ParamDefs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ParamDef\MagicParamDef.h">
+      <Filter>Header Files\ParamDefs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ParamDef\ItemParamDef.h">
+      <Filter>Header Files\ParamDefs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ParamDef\ShopLineupParamDef.h">
+      <Filter>Header Files\ParamDefs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ParamDef\BehaviorNPCParamDef.h">
+      <Filter>Header Files\ParamDefs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ParamDef\BulletParamDef.h">
+      <Filter>Header Files\ParamDefs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ParamDef\SpecialEffectParamDef.h">
+      <Filter>Header Files\ParamDefs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ParamDef\ThrowParamDef.h">
+      <Filter>Header Files\ParamDefs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

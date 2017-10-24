@@ -21,8 +21,8 @@
 
 #pragma once
 
-#ifndef _DS1_OVERHAUL_LOCK_CAM_PARAM_DEF_EQUIP_PROTECTOR_H_
-	#define _DS1_OVERHAUL_LOCK_CAM_PARAM_DEF_EQUIP_PROTECTOR_H_
+#ifndef _DS1_OVERHAUL_LOCK_CAM_PARAM_DEF_FILE_H_
+	#define _DS1_OVERHAUL_LOCK_CAM_PARAM_DEF_FILE_H_
 
 
 #include "BaseParamDef.h"
@@ -30,12 +30,12 @@
 
 // LockCam parameter
 typedef struct LockCamParameter : public Param {
-	float camDistTarget = 4.0f;
-	float rotRangeMinX = -40.0f;
-	float lockRotXShiftRatio = 0.6f;
-	float chrOrgOffset_Y = 1.42f;
-	float chrLockRangeMaxRadius = 15.0f;
-	float camFovY = 43.0f;
+	float camDistTarget = 4.0f;           // For camera
+	float rotRangeMinX = -40.0f;          // For camera
+	float lockRotXShiftRatio = 0.6f;      // For camera
+	float chrOrgOffset_Y = 1.42f;         // For camera
+	float chrLockRangeMaxRadius = 15.0f;  // For lock
+	float camFovY = 43.0f;                // For camera
 	uint8_t pad[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 } LockCamParam;
 
@@ -87,4 +87,4 @@ public:
 
 
 
-#endif // _DS1_OVERHAUL_LOCK_CAM_PARAM_DEF_EQUIP_PROTECTOR_H_
+#endif // _DS1_OVERHAUL_LOCK_CAM_PARAM_DEF_FILE_H_

@@ -264,7 +264,16 @@
     <ClInclude Include="include\ParamDef.h" />
     <ClInclude Include="include\ParamDef\ArmorParamDef.h" />
     <ClInclude Include="include\ParamDef\BaseParamDef.h" />
+    <ClInclude Include="include\ParamDef\BehaviorNPCParamDef.h" />
+    <ClInclude Include="include\ParamDef\BulletParamDef.h" />
+    <ClInclude Include="include\ParamDef\CharInitParamDef.h" />
+    <ClInclude Include="include\ParamDef\ItemParamDef.h" />
     <ClInclude Include="include\ParamDef\LockCamParamDef.h" />
+    <ClInclude Include="include\ParamDef\MagicParamDef.h" />
+    <ClInclude Include="include\ParamDef\NPCParamDef.h" />
+    <ClInclude Include="include\ParamDef\ShopLineupParamDef.h" />
+    <ClInclude Include="include\ParamDef\SpecialEffectParamDef.h" />
+    <ClInclude Include="include\ParamDef\ThrowParamDef.h" />
     <ClInclude Include="include\PhantomLimit.h" />
     <ClInclude Include="include\Plugin\ConsoleCommands.h" />
     <ClInclude Include="include\Plugin\KeybindFunctions.h" />
