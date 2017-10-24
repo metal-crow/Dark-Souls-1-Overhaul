@@ -25,7 +25,7 @@
 	#define _DS1_OVERHAUL_GOODS_PARAM_DEF_FILE_H_
 
 
-#include "BaseParamDef.h"
+#include "GameParamDef.h"
 
 
 // Goods parameter
@@ -123,7 +123,7 @@ typedef struct ItemParameter : public Param {
 
 
 // Goods parameter definitions file
-class ItemParamDef : public BaseParamDef {
+class ItemParamDef : public GameParamDef {
 
 
 public:
@@ -135,12 +135,12 @@ public:
 	
 	ItemParam *data()
 	{
-		return (ItemParam*)BaseParamDef::data();
+		return (ItemParam*)GameParamDef::data();
 	}
 
 	ItemParam *get(int index)
 	{
-		return (ItemParam*)BaseParamDef::get(index);
+		return (ItemParam*)GameParamDef::get(index);
 	}
 
 
@@ -148,7 +148,7 @@ public:
 	
 private:
 	ItemParamDef()
-		: BaseParamDef(NULL, 0xBF0, 256, sizeof(ItemParam), "8C 0C 00 00 3B 68 00 00 66 00 00 00 E8 0C", "EquipParamGoods", "Item")
+		: GameParamDef(NULL, 0xBF0, 256, sizeof(ItemParam), "8C 0C 00 00 3B 68 00 00 66 00 00 00 E8 0C", "EquipParamGoods", "Item")
 	{
 	}
 	

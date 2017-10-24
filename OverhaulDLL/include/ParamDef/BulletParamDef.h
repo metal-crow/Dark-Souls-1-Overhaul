@@ -25,7 +25,7 @@
 	#define _DS1_OVERHAUL_BULLET_PARAM_DEF_FILE_H_
 
 
-#include "BaseParamDef.h"
+#include "GameParamDef.h"
 
 
 // Bullet parameter
@@ -121,7 +121,7 @@ typedef struct BulletParameter : public Param {
 
 
 // Bullet parameter definitions file
-class BulletParamDef : public BaseParamDef {
+class BulletParamDef : public GameParamDef {
 
 
 public:
@@ -133,12 +133,12 @@ public:
 	
 	BulletParam *data()
 	{
-		return (BulletParam*)BaseParamDef::data();
+		return (BulletParam*)GameParamDef::data();
 	}
 
 	BulletParam *get(int index)
 	{
-		return (BulletParam*)BaseParamDef::get(index);
+		return (BulletParam*)GameParamDef::get(index);
 	}
 
 
@@ -146,7 +146,7 @@ public:
 	
 private:
 	BulletParamDef()
-		: BaseParamDef(NULL, 0x1D84, 631, sizeof(BulletParam), "64 1E 00 00 2B A8 01 00 02 00 00 00 04 1F", "BulletParam", "Bullet")
+		: GameParamDef(NULL, 0x1D84, 631, sizeof(BulletParam), "64 1E 00 00 2B A8 01 00 02 00 00 00 04 1F", "BulletParam", "Bullet")
 	{
 	}
 	

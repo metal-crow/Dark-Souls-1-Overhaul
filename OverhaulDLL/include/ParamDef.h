@@ -21,15 +21,22 @@
 
 #include "ParamDef/ArmorParamDef.h"
 #include "ParamDef/BehaviorNPCParamDef.h"
+#include "ParamDef/BehaviorPCParamDef.h"
 #include "ParamDef/BulletParamDef.h"
 #include "ParamDef/CharInitParamDef.h"
 #include "ParamDef/ItemParamDef.h"
 #include "ParamDef/LockCamParamDef.h"
 #include "ParamDef/MagicParamDef.h"
+#include "ParamDef/MaterialSetParamDef.h"
+#include "ParamDef/MenuColorTableParamDef.h"
+#include "ParamDef/MoveParamDef.h"
 #include "ParamDef/NPCParamDef.h"
+#include "ParamDef/NPCThinkParamDef.h"
 #include "ParamDef/ShopLineupParamDef.h"
 #include "ParamDef/SpecialEffectParamDef.h"
+#include "ParamDef/SpecialEffectVFXParamDef.h"
 #include "ParamDef/ThrowParamDef.h"
+#include "ParamDef/WeaponParamDef.h"
 
 
 
@@ -61,6 +68,9 @@ namespace ParamDef {
 	// NPC Behavior parameters
 	static BehaviorNpcParamDef& BehaviorNpc() { return BehaviorNpcParamDef::get_instance(); }
 
+	// PC (Player character) Behavior parameters
+	static BehaviorPcParamDef& BehaviorPc() { return BehaviorPcParamDef::get_instance(); }
+
 	// Bullet (projectile) parameters
 	static BulletParamDef& Bullet() { return BulletParamDef::get_instance(); }
 	//static BulletParamDef& Projectile() { return BulletParamDef::get_instance(); } // Alias for Bullet
@@ -79,9 +89,21 @@ namespace ParamDef {
 	// Magic parameters
 	static MagicParamDef& Magic() { return MagicParamDef::get_instance(); }
 
+	// Material set parameters
+	static MaterialSetParamDef& MaterialSet() { return MaterialSetParamDef::get_instance(); }
+
+	// Menu color parameters
+	static MenuColorParamDef& MenuColor() { return MenuColorParamDef::get_instance(); }
+
+	// Movement parameters
+	static MoveParamDef& Move() { return MoveParamDef::get_instance(); }
+
 	// NPC parameters
 	static NpcParamDef& Npc() { return NpcParamDef::get_instance(); }
 	//static NpcParamDef& Enemy() { return NpcParamDef::get_instance(); } // Alias for Npc params
+
+	// NPC Thought parameters
+	static NpcThinkParamDef& NpcThink() { return NpcThinkParamDef::get_instance(); }
 
 	// Shop lineup parameters
 	static ShopLineupParamDef& ShopLineup() { return ShopLineupParamDef::get_instance(); }
@@ -89,8 +111,14 @@ namespace ParamDef {
 	// Special effect parameters
 	static SpEffectParamDef& SpEffect() { return SpEffectParamDef::get_instance(); }
 
+	// Special effect visual effects parameters
+	static SpEffectVfxParamDef& SpEffectVfx() { return SpEffectVfxParamDef::get_instance(); }
+
 	// Throw parameters
 	static ThrowParamDef& Throw() { return ThrowParamDef::get_instance(); }
+
+	// Weapon parameters
+	static WeaponParamDef& Weapon() { return WeaponParamDef::get_instance(); }
 
 }
 

@@ -25,7 +25,7 @@
 	#define _DS1_OVERHAUL_SPECIAL_EFFECT_PARAM_DEF_FILE_H_
 
 
-#include "BaseParamDef.h"
+#include "GameParamDef.h"
 
 
 // Special Effect parameter
@@ -287,7 +287,7 @@ typedef struct SpEffectParameter : public Param {
 
 
 // SpEffect parameter definitions file
-class SpEffectParamDef : public BaseParamDef {
+class SpEffectParamDef : public GameParamDef {
 
 
 public:
@@ -299,12 +299,12 @@ public:
 	
 	SpEffectParam *data()
 	{
-		return (SpEffectParam*)BaseParamDef::data();
+		return (SpEffectParam*)GameParamDef::data();
 	}
 
 	SpEffectParam *get(int index)
 	{
-		return (SpEffectParam*)BaseParamDef::get(index);
+		return (SpEffectParam*)GameParamDef::get(index);
 	}
 
 
@@ -312,7 +312,7 @@ public:
 	
 private:
 	SpEffectParamDef()
-		: BaseParamDef(NULL, 0x27A4, 847, sizeof(SpEffectParam), "54 29 00 00 7D E9 04 00 02 00 00 00 C4 2A", "SpEffectParam", "Special Effect")
+		: GameParamDef(NULL, 0x27A4, 847, sizeof(SpEffectParam), "54 29 00 00 7D E9 04 00 02 00 00 00 C4 2A", "SpEffectParam", "Special Effect")
 	{
 	}
 	

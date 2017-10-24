@@ -25,7 +25,7 @@
 	#define _DS1_OVERHAUL_SHOP_LINEUP_PARAM_DEF_FILE_H_
 
 
-#include "BaseParamDef.h"
+#include "GameParamDef.h"
 
 
 // ShopLineup parameter
@@ -52,7 +52,7 @@ typedef struct ShopLineupParameter : public Param {
 
 
 // ShopLineup parameter definitions file
-class ShopLineupParamDef : public BaseParamDef {
+class ShopLineupParamDef : public GameParamDef {
 
 
 public:
@@ -64,12 +64,12 @@ public:
 	
 	ShopLineupParam *data()
 	{
-		return (ShopLineupParam*)BaseParamDef::data();
+		return (ShopLineupParam*)GameParamDef::data();
 	}
 
 	ShopLineupParam *get(int index)
 	{
-		return (ShopLineupParam*)BaseParamDef::get(index);
+		return (ShopLineupParam*)GameParamDef::get(index);
 	}
 
 
@@ -77,7 +77,7 @@ public:
 	
 private:
 	ShopLineupParamDef()
-		: BaseParamDef(NULL, 0x1244, 391, sizeof(ShopLineupParam), "A4 12 00 00 71 43 00 00 4D 04 00 00 C4 12", "ShopLineupParam", "Shop Lineup")
+		: GameParamDef(NULL, 0x1244, 391, sizeof(ShopLineupParam), "A4 12 00 00 71 43 00 00 4D 04 00 00 C4 12", "ShopLineupParam", "Shop Lineup")
 	{
 	}
 	

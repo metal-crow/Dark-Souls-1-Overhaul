@@ -33,10 +33,10 @@ SpPointer Game::player_char_status;
 bool Game::characters_loaded = false;
 
 // File extension for parameter definition files
-const char *BaseParamDef::paramdef_extension = ".paramdef";
+const char *GameParamDef::paramdef_extension = ".paramdef";
 
 // File extension for parameter files
-const char *BaseParamDef::param_extension = ".param";
+const char *GameParamDef::param_extension = ".param";
 
 // Address of lava brightness effect (used for dimming lava)
 uint8_t *Game::lava_luminosity = NULL;
@@ -84,17 +84,25 @@ void Game::on_first_character_loaded()
 		Game::enable_dim_lava(true);
 
 	// Get param files
+	print_console(Mod::output_prefix + "Searching memory for loaded param files...");
 	ParamDef::Armor().init(true);
 	ParamDef::BehaviorNpc().init(true);
+	ParamDef::BehaviorPc().init(true);
 	ParamDef::Bullet().init(true);
 	ParamDef::CamLock().init(true);
 	ParamDef::CharInit().init(true);
 	ParamDef::Item().init(true);
 	ParamDef::Magic().init(true);
+	ParamDef::MaterialSet().init(true);
+	ParamDef::MenuColor().init(true);
+	ParamDef::Move().init(true);
 	ParamDef::Npc().init(true);
+	ParamDef::NpcThink().init(true);
 	ParamDef::ShopLineup().init(true);
 	ParamDef::SpEffect().init(true);
+	ParamDef::SpEffectVfx().init(true);
 	ParamDef::Throw().init(true);
+	ParamDef::Weapon().init(true);
 
 
 	// Disable armor sounds if it was specified in the config file
