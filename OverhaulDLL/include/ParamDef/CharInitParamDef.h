@@ -25,7 +25,7 @@
 	#define _DS1_OVERHAUL_CHAR_INIT_PARAM_DEF_FILE_H_
 
 
-#include "BaseParamDef.h"
+#include "GameParamDef.h"
 
 
 // CharInit parameter
@@ -143,7 +143,7 @@ typedef struct CharInitParameter : public Param {
 
 
 // CharInit parameter definitions file
-class CharInitParamDef : public BaseParamDef {
+class CharInitParamDef : public GameParamDef {
 
 
 public:
@@ -155,12 +155,12 @@ public:
 	
 	CharInitParam *data()
 	{
-		return (CharInitParam*)BaseParamDef::data();
+		return (CharInitParam*)GameParamDef::data();
 	}
 
 	CharInitParam *get(int index)
 	{
-		return (CharInitParam*)BaseParamDef::get(index);
+		return (CharInitParam*)GameParamDef::get(index);
 	}
 
 
@@ -168,7 +168,7 @@ public:
 	
 private:
 	CharInitParamDef()
-		: BaseParamDef(NULL, 0xE30, 312, sizeof(CharInitParam), "40 17 00 00 83 34 01 00 0B 00 00 00 30 18 00 00", "CharaInitParam", "Character Initialization")
+		: GameParamDef(NULL, 0xE30, 312, sizeof(CharInitParam), "40 17 00 00 83 34 01 00 0B 00 00 00 30 18 00 00", "CharaInitParam", "Character Initialization")
 	{
 	}
 	

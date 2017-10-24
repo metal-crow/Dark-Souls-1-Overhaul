@@ -25,7 +25,7 @@
 	#define _DS1_OVERHAUL_NEW_PARAM_DEF_FILE_H_
 
 
-#include "BaseParamDef.h"
+#include "GameParamDef.h"
 
 
 // Npc parameter
@@ -243,7 +243,7 @@ typedef struct NpcParameter : public Param {
 
 
 // Npc parameter definitions file
-class NpcParamDef : public BaseParamDef {
+class NpcParamDef : public GameParamDef {
 
 
 public:
@@ -255,12 +255,12 @@ public:
 	
 	NpcParam *data()
 	{
-		return (NpcParam*)BaseParamDef::data();
+		return (NpcParam*)GameParamDef::data();
 	}
 
 	NpcParam *get(int index)
 	{
-		return (NpcParam*)BaseParamDef::get(index);
+		return (NpcParam*)GameParamDef::get(index);
 	}
 
 
@@ -268,7 +268,7 @@ public:
 	
 private:
 	NpcParamDef()
-		: BaseParamDef(NULL, 0x18, 556, sizeof(NpcParam), "60 3D 08 00 60 F1 02 00 DB 2F 03 00 C4 3D 08 00 B0 F2 02 00 F2 2F 03 00", "NpcParam", "NPC")
+		: GameParamDef(NULL, 0x18, 556, sizeof(NpcParam), "60 3D 08 00 60 F1 02 00 DB 2F 03 00 C4 3D 08 00 B0 F2 02 00 F2 2F 03 00", "NpcParam", "NPC")
 	{
 	}
 	

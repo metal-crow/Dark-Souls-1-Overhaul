@@ -28,7 +28,7 @@
 	#define _DS1_OVERHAUL_ARMOR_PARAM_DEF_EQUIP_PROTECTOR_H_
 
 
-#include "BaseParamDef.h"
+#include "GameParamDef.h"
 
 
 // EquipParamProtector data structure (Armor parameters)
@@ -136,7 +136,7 @@ typedef struct ArmorParameter : public Param { // Armor
 
 
 // Armor parameter definitions file
-class ArmorParamDef : public BaseParamDef {
+class ArmorParamDef : public GameParamDef {
 
 
 public:
@@ -148,12 +148,12 @@ public:
 	
 	ArmorParam *data()
 	{
-		return (ArmorParam*)BaseParamDef::data();
+		return (ArmorParam*)GameParamDef::data();
 	}
 
 	ArmorParam *get(int index)
 	{
-		return (ArmorParam*)BaseParamDef::get(index);
+		return (ArmorParam*)GameParamDef::get(index);
 	}
 
 
@@ -170,7 +170,7 @@ public:
 private:
 	//ArmorParamDef() : base_ptr(&base) {}
 	ArmorParamDef()
-		: BaseParamDef(NULL, 0x30, 324, sizeof(ArmorParam),
+		: GameParamDef(NULL, 0x30, 324, sizeof(ArmorParam),
 			"80 48 28 00 60 31 01 00 9B 45 01 00 68 4C 28 00 "
 			"48 32 01 00 AA 45 01 00 50 50 28 00 30 33 01 00",
 			"EquipParamProtector", "Armor")

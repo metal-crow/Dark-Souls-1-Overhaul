@@ -25,7 +25,7 @@
 	#define _DS1_OVERHAUL_MAGIC_PARAM_DEF_FILE_H_
 
 
-#include "BaseParamDef.h"
+#include "GameParamDef.h"
 
 
 // Magic parameter
@@ -104,7 +104,7 @@ typedef struct MagicParameter : public Param {
 
 
 // Magic parameter definitions file
-class MagicParamDef : public BaseParamDef {
+class MagicParamDef : public GameParamDef {
 
 
 public:
@@ -116,12 +116,12 @@ public:
 	
 	MagicParam *data()
 	{
-		return (MagicParam*)BaseParamDef::data();
+		return (MagicParam*)GameParamDef::data();
 	}
 
 	MagicParam *get(int index)
 	{
-		return (MagicParam*)BaseParamDef::get(index);
+		return (MagicParam*)GameParamDef::get(index);
 	}
 
 
@@ -129,7 +129,7 @@ public:
 	
 private:
 	MagicParamDef()
-		: BaseParamDef(NULL, 0x69C, 141, sizeof(MagicParam), "B8 0B 00 00 CC 06 00 00 3C 21 00 00 C2 0B 00 00", "MagicParam", "Magic")
+		: GameParamDef(NULL, 0x69C, 141, sizeof(MagicParam), "B8 0B 00 00 CC 06 00 00 3C 21 00 00 C2 0B 00 00", "MagicParam", "Magic")
 	{
 	}
 	

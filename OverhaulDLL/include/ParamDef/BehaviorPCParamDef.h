@@ -5,9 +5,9 @@
 		Sean Pesce	-	C++
 
 
-	ParamDef/BehaviorNPCParamDef.h
+	ParamDef/BehaviorPCParamDef.h
 
-	NPC Behavior Parameters from BehaviorParam.paramdef
+	Player Character Behavior Parameters
 
 
 	References:
@@ -21,15 +21,15 @@
 
 #pragma once
 
-#ifndef _DS1_OVERHAUL_NPC_BEHAVIOR_PARAM_DEF_FILE_H_
-	#define _DS1_OVERHAUL_NPC_BEHAVIOR_PARAM_DEF_FILE_H_
+#ifndef _DS1_OVERHAUL_PC_BEHAVIOR_PARAM_DEF_FILE_H_
+	#define _DS1_OVERHAUL_PC_BEHAVIOR_PARAM_DEF_FILE_H_
 
 
 #include "GameParamDef.h"
 
 
-// NPC Behavior parameter
-typedef struct BehaviorNpcParameter : public Param {
+// PC Behavior parameter
+typedef struct BehaviorPcParameter : public Param {
 
 	int32_t
 		variationId = 0, // It is used to calculate the ID for attack parameters. It is not used directly on the actual machine.
@@ -49,49 +49,48 @@ typedef struct BehaviorNpcParameter : public Param {
 		mp = 0; // Set consumption MP amount during action.
 
 	uint8_t
-		category = 0, // Since there are effects (such as enchant weapons) whose parameters fluctuate with skills, magic, items, etc., set the action for each action so that the specified effect can correspond to the effect of "power up only weapon attacks" For varistors, etc. that do not require setting, set "none"
-		heroPoint = 0; // Set consumption amount of human consumption during behavior
+		category = 0; // Since there are effects (such as enchant weapons) whose parameters fluctuate with skills, magic, items, etc., set the action for each action so that the specified effect can correspond to the effect of "power up only weapon attacks" For varistors, etc. that do not require setting, set "none"
 
 	uint8_t
-		pad1[2] = { 0, 0 }; // Padding
+		pad1[3] = { 0, 0, 0 }; // Padding
 
-} BehaviorNpcParam;
+} BehaviorPcParam;
 
 
 
-// BehaviorNpc parameter definitions file
-class BehaviorNpcParamDef : public GameParamDef {
+// BehaviorPc parameter definitions file
+class BehaviorPcParamDef : public GameParamDef {
 
 
 public:
-	static BehaviorNpcParamDef& get_instance()
+	static BehaviorPcParamDef& get_instance()
 	{
-		static BehaviorNpcParamDef instance;
+		static BehaviorPcParamDef instance;
 		return instance;
 	}
 	
-	BehaviorNpcParam *data()
+	BehaviorPcParam *data()
 	{
-		return (BehaviorNpcParam*)GameParamDef::data();
+		return (BehaviorPcParam*)GameParamDef::data();
 	}
 
-	BehaviorNpcParam *get(int index)
+	BehaviorPcParam *get(int index)
 	{
-		return (BehaviorNpcParam*)GameParamDef::get(index);
+		return (BehaviorPcParam*)GameParamDef::get(index);
 	}
 
 
 	// @TODO: Member data specific to this class
 	
 private:
-	BehaviorNpcParamDef()
-		: GameParamDef(NULL, 0x7070, 2400, sizeof(BehaviorNpcParam), "D0 70 00 00 B9 9C 01 00 07 00 00 00 F0 70", "BehaviorNpcParam", "Behavior (NPC)")
+	BehaviorPcParamDef()
+		: GameParamDef(NULL, 0x10, 3162, sizeof(BehaviorPcParam), "78 60 03 00 10 BB 06 06 88 1F 02 00 8B 60 03 00", "BehaviorPcParam", "Behavior (Player character)")
 	{
 	}
 	
 public:
-	BehaviorNpcParamDef(BehaviorNpcParamDef const&) = delete;
-	void operator=(BehaviorNpcParamDef const&) = delete;
+	BehaviorPcParamDef(BehaviorPcParamDef const&) = delete;
+	void operator=(BehaviorPcParamDef const&) = delete;
 };
 
 
@@ -100,4 +99,4 @@ public:
 
 
 
-#endif // _DS1_OVERHAUL_NPC_BEHAVIOR_PARAM_DEF_FILE_H_
+#endif // _DS1_OVERHAUL_PC_BEHAVIOR_PARAM_DEF_FILE_H_

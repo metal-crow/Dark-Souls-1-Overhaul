@@ -74,9 +74,6 @@
     <ClInclude Include="include\ParamDef\ArmorParamDef.h">
       <Filter>Header Files\ParamDefs</Filter>
     </ClInclude>
-    <ClInclude Include="include\ParamDef\BaseParamDef.h">
-      <Filter>Header Files\ParamDefs</Filter>
-    </ClInclude>
     <ClInclude Include="include\Debug\GameParamDefsDebug.h">
       <Filter>Header Files\ParamDefs</Filter>
     </ClInclude>
@@ -111,6 +108,30 @@
       <Filter>Header Files\ParamDefs</Filter>
     </ClInclude>
     <ClInclude Include="include\ParamDef\ThrowParamDef.h">
+      <Filter>Header Files\ParamDefs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ParamDef\WeaponParamDef.h">
+      <Filter>Header Files\ParamDefs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ParamDef\SpecialEffectVFXParamDef.h">
+      <Filter>Header Files\ParamDefs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ParamDef\MoveParamDef.h">
+      <Filter>Header Files\ParamDefs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ParamDef\NPCThinkParamDef.h">
+      <Filter>Header Files\ParamDefs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ParamDef\MenuColorTableParamDef.h">
+      <Filter>Header Files\ParamDefs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ParamDef\MaterialSetParamDef.h">
+      <Filter>Header Files\ParamDefs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ParamDef\GameParamDef.h">
+      <Filter>Header Files\ParamDefs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ParamDef\BehaviorPCParamDef.h">
       <Filter>Header Files\ParamDefs</Filter>
     </ClInclude>
   </ItemGroup>

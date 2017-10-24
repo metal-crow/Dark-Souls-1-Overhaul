@@ -25,7 +25,7 @@
 	#define _DS1_OVERHAUL_NEW_PARAM_DEF_FILE_H_
 
 
-#include "BaseParamDef.h"
+#include "GameParamDef.h"
 
 
 // New parameter
@@ -36,7 +36,7 @@ typedef struct NewParameter : public Param {
 
 
 // New parameter definitions file
-class NewParamDef : public BaseParamDef {
+class NewParamDef : public GameParamDef {
 
 
 public:
@@ -48,12 +48,12 @@ public:
 	
 	NewParam *data()
 	{
-		return (NewParam*)BaseParamDef::data();
+		return (NewParam*)GameParamDef::data();
 	}
 
 	NewParam *get(int index)
 	{
-		return (NewParam*)BaseParamDef::get(index);
+		return (NewParam*)GameParamDef::get(index);
 	}
 
 
@@ -61,7 +61,7 @@ public:
 	
 private:
 	NewParamDef()
-		: BaseParamDef(/* @TODO: base, data_start_offset, param_count, sizeof(NewParam), scan_pattern, file, title */)
+		: GameParamDef(/* @TODO: NULL, 0xdata_start_offset, param_count, sizeof(NewParam), "scan_pattern", "file", "title" */)
 	{
 	}
 	

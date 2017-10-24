@@ -25,7 +25,7 @@
 	#define _DS1_OVERHAUL_LOCK_CAM_PARAM_DEF_FILE_H_
 
 
-#include "BaseParamDef.h"
+#include "GameParamDef.h"
 
 
 // LockCam parameter
@@ -42,7 +42,7 @@ typedef struct LockCamParameter : public Param {
 
 
 // LockCam parameter definitions file
-class LockCamParamDef : public BaseParamDef {
+class LockCamParamDef : public GameParamDef {
 
 
 public:
@@ -54,12 +54,12 @@ public:
 	
 	LockCamParam *data()
 	{
-		return (LockCamParam*)BaseParamDef::data();
+		return (LockCamParam*)GameParamDef::data();
 	}
 
 	LockCamParam *get(int index)
 	{
-		return (LockCamParam*)BaseParamDef::get(index);
+		return (LockCamParam*)GameParamDef::get(index);
 	}
 
 
@@ -67,7 +67,7 @@ public:
 	
 private:
 	LockCamParamDef()
-		: BaseParamDef(NULL, 0x20, 38, sizeof(LockCamParam),
+		: GameParamDef(NULL, 0x20, 38, sizeof(LockCamParam),
 			"58 06 00 00 25 09 00 00 14 27 00 00 78 06 00 00 "
 			"30 09 00 00 15 27 00 00 98 06 00 00 45 09 00 00 "
 			"00 00 80 40 00 00 20 C2 9A 99 19 3F 8F C2 B5 3F "

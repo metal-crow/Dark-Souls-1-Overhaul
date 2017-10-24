@@ -25,7 +25,7 @@
 	#define _DS1_OVERHAUL_THROW_PARAM_DEF_FILE_H_
 
 
-#include "BaseParamDef.h"
+#include "GameParamDef.h"
 
 
 // Throw parameter
@@ -77,7 +77,7 @@ typedef struct ThrowParameter : public Param {
 
 
 // Throw parameter definitions file
-class ThrowParamDef : public BaseParamDef {
+class ThrowParamDef : public GameParamDef {
 
 
 public:
@@ -89,12 +89,12 @@ public:
 	
 	ThrowParam *data()
 	{
-		return (ThrowParam*)BaseParamDef::data();
+		return (ThrowParam*)GameParamDef::data();
 	}
 
 	ThrowParam *get(int index)
 	{
-		return (ThrowParam*)BaseParamDef::get(index);
+		return (ThrowParam*)GameParamDef::get(index);
 	}
 
 
@@ -102,7 +102,7 @@ public:
 	
 private:
 	ThrowParamDef()
-		: BaseParamDef(NULL, 0x914, 195, sizeof(ThrowParam), "94 09 00 00 14 3A 00 00 02 00 00 00 D4 09 00 00", "ThrowParam", "Throw")
+		: GameParamDef(NULL, 0x914, 195, sizeof(ThrowParam), "94 09 00 00 14 3A 00 00 02 00 00 00 D4 09 00 00", "ThrowParam", "Throw")
 	{
 	}
 	

@@ -5,7 +5,7 @@
 		Sean Pesce	-	C++
 
 
-	ParamDef/BaseParamDef.h
+	ParamDef/GameParamDef.h
 
 	Generic base ParamDef class; all other ParamDef classes inherit
 	basic member data and functions from this class.
@@ -29,7 +29,7 @@ typedef struct Parameter {} Param;
 
 
 // Generic Dark Souls parameter definitions file class
-class BaseParamDef {
+class GameParamDef {
 public:
 
 	// Starting address of the parameters file
@@ -60,7 +60,7 @@ public:
 	static const char *param_extension;
 
 protected:
-	BaseParamDef(void *base_init = NULL, int32_t data_start_offset_init = 0, size_t param_count_init = 0, size_t param_size_init = sizeof(Param), const char *scan_pattern_init = "", const char *file_init = "", const char *title_init = "")
+	GameParamDef(void *base_init = NULL, int32_t data_start_offset_init = 0, size_t param_count_init = 0, size_t param_size_init = sizeof(Param), const char *scan_pattern_init = "", const char *file_init = "", const char *title_init = "")
 		: base(base_init), data_start_offset(data_start_offset_init), param_count(param_count_init), param_size(param_size_init), scan_pattern(scan_pattern_init), file(file_init), title(title_init)
 	{
 	}
@@ -77,20 +77,17 @@ protected:
 		if ((*start) != NULL && !re_init)
 			return (*start);
 
-		if (print_result)
-			print_console((std::string("Searching for param file: ") + this->file + this->param_extension).c_str());
-
 		(*start) = aob_scan(aob);
 
 		if ((*start) != NULL && print_result)
 		{
 			std::stringstream hex_stream;
 			hex_stream << std::hex << (int)(*start);
-			print_console(std::string("    Located param file (start: 0x").append(hex_stream.str()).append(")").c_str());
+			print_console(std::string("    Found param file: " + this->file + this->param_extension + " (Location: 0x").append(hex_stream.str()).append(")"));
 		}
 		else if (print_result)
 		{
-			print_console(std::string("    Failed to locate parameter data.").c_str());
+			print_console(std::string("    ERROR: Failed to locate parameter data file (").append(this->file + this->param_extension) + ")");
 		}
 
 		return (*start);
@@ -109,21 +106,21 @@ protected:
 	// Returns pointer to element at start of data array
 	Param *data()
 	{
-		return BaseParamDef::data(base, data_start_offset);
+		return GameParamDef::data(base, data_start_offset);
 	}
 
 
 	// Returns param struct at the specified index in the data array
 	Param *get(int index)
 	{
-		return BaseParamDef::get(index, param_size, BaseParamDef::data(base, data_start_offset));
+		return GameParamDef::get(index, param_size, GameParamDef::data(base, data_start_offset));
 	}
 
 public:
 	// Initializes file base pointer (start of the file, not the data array). Returns base address on success, and NULL otherwise
 	void *init(bool print_result = false, bool re_init = false)
 	{
-		return BaseParamDef::init(&base, scan_pattern.c_str(), print_result, re_init);
+		return GameParamDef::init(&base, scan_pattern.c_str(), print_result, re_init);
 	}
 };
 
