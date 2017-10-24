@@ -130,10 +130,8 @@ __declspec(dllexport) void __stdcall initialize_plugin()
 	Game::enable_low_fps_disconnect(false);
 
 	// Start thread for deferred tasks
-	if(!CreateThread(NULL, 0, deferred_tasks, NULL, 0, NULL))
-		// Error creating new thread
-
-	
+	if (!CreateThread(NULL, 0, deferred_tasks, NULL, 0, NULL))
+		; // Error creating new thread
 	
 	Mod::initialized = true; // Should be the last statement in this function
 }

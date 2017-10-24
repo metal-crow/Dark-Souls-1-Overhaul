@@ -32,8 +32,11 @@ SpPointer Game::player_char_status;
 // Flag to determine if any characters have been loaded since the game was launched (useful if player had a character loaded but returned to main menu)
 bool Game::characters_loaded = false;
 
-// File extension for param def files
-const char *BaseParamDef::extension = ".paramdef";
+// File extension for parameter definition files
+const char *BaseParamDef::paramdef_extension = ".paramdef";
+
+// File extension for parameter files
+const char *BaseParamDef::param_extension = ".param";
 
 // Address of lava brightness effect (used for dimming lava)
 uint8_t *Game::lava_luminosity = NULL;
@@ -80,9 +83,19 @@ void Game::on_first_character_loaded()
 	if (Mod::dim_lava_pref)
 		Game::enable_dim_lava(true);
 
-	// Get params def files
+	// Get param files
 	ParamDef::Armor().init(true);
+	ParamDef::BehaviorNpc().init(true);
+	ParamDef::Bullet().init(true);
 	ParamDef::CamLock().init(true);
+	ParamDef::CharInit().init(true);
+	ParamDef::Item().init(true);
+	ParamDef::Magic().init(true);
+	ParamDef::Npc().init(true);
+	ParamDef::ShopLineup().init(true);
+	ParamDef::SpEffect().init(true);
+	ParamDef::Throw().init(true);
+
 
 	// Disable armor sounds if it was specified in the config file
 	if (Mod::disable_armor_sfx_pref)

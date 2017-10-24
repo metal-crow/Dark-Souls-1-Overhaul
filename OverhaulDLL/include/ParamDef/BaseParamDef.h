@@ -53,8 +53,11 @@ public:
 	// File name of the param def file (without the .paramdef file extension)
 	std::string file;
 	
-	// File extension for param def files
-	static const char *extension;
+	// File extension for parameter definition files
+	static const char *paramdef_extension;
+
+	// File extension for parameter files
+	static const char *param_extension;
 
 protected:
 	BaseParamDef(void *base_init = NULL, int32_t data_start_offset_init = 0, size_t param_count_init = 0, size_t param_size_init = sizeof(Param), const char *scan_pattern_init = "", const char *file_init = "", const char *title_init = "")
@@ -75,7 +78,7 @@ protected:
 			return (*start);
 
 		if (print_result)
-			print_console((std::string("Searching for param def file: ") + this->file + this->extension).c_str());
+			print_console((std::string("Searching for param file: ") + this->file + this->param_extension).c_str());
 
 		(*start) = aob_scan(aob);
 
@@ -83,7 +86,7 @@ protected:
 		{
 			std::stringstream hex_stream;
 			hex_stream << std::hex << (int)(*start);
-			print_console(std::string("    Located param defs file (start: 0x").append(hex_stream.str()).append(")").c_str());
+			print_console(std::string("    Located param file (start: 0x").append(hex_stream.str()).append(")").c_str());
 		}
 		else if (print_result)
 		{
