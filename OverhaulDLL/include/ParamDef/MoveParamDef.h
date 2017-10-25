@@ -101,7 +101,9 @@ public:
 	
 private:
 	MoveParamDef()
-		: GameParamDef(NULL, 0x20, 65, sizeof(MoveParam), "1C 26 00 00 F8 2B 00 00 79 00 00 00 AC 26 00 00 03 2C 00 00 84 03 00 00", "MoveParam", "Movement")
+		: GameParamDef(NULL, 0x33C, 65, sizeof(MoveParam),
+			"D0 27 00 00 3C 03 01 00 01 00 41 00 4D 4F 56 45",
+			"MoveParam", "Movement")
 	{
 	}
 	

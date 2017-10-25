@@ -67,7 +67,9 @@ public:
 	
 private:
 	MenuColorParamDef()
-		: GameParamDef(NULL, 0xC, 81, sizeof(MenuColorParam), "13 94 00 00 3C 05 00 00 9E 0B 00 00", "MenuColorTableParam", "Menu Color")
+		: GameParamDef(NULL, 0x3FC, 81, sizeof(MenuColorParam),
+			"40 05 00 00 FC 03 01 00 01 00 51 00 4D 45 4E 55",
+			"MenuColorTableParam", "Menu Color")
 	{
 	}
 	

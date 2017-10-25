@@ -106,7 +106,9 @@ public:
 	
 private:
 	SpEffectVfxParamDef()
-		: GameParamDef(NULL, 0x18, 232, sizeof(SpEffectVfxParam), "F1 00 00 00 90 44 00 00 D2 51 00 00 F2 00 00 00 D0 44 00 00 E2 51 00 00", "SpEffectVfxParam", "Special Effect Visual Effects")
+		: GameParamDef(NULL, 0xB10, 232, sizeof(SpEffectVfxParam),
+			"10 45 00 00 10 0B 01 00 01 00 E8 00 53 50 5F 45",
+			"SpEffectVfxParam", "Special Effect Visual Effects")
 	{
 	}
 	

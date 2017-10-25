@@ -228,7 +228,9 @@ public:
 	
 private:
 	WeaponParamDef()
-		: GameParamDef(NULL, 0x20, 1245, sizeof(WeaponParam), "2C 62 05 00 9A C9 05 00 60 A2 89 00 3C 63 05 00 BA C9 05 00 48 A6 89 00 4C 64 05 00 CC C9 05 00", "EquipParamWeapon", "Weapon")
+		: GameParamDef(NULL, 0x3A8C, 1245, sizeof(WeaponParam),
+			"60 65 05 00 8C 3A 01 00 01 00 DD 04 45 51 55 49",
+			"EquipParamWeapon", "Weapon")
 	{
 	}
 	

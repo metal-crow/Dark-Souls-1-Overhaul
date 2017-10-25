@@ -132,7 +132,9 @@ public:
 	
 private:
 	NpcThinkParamDef()
-		: GameParamDef(NULL, 0x18, 476, sizeof(NpcThinkParam), "C4 3D 08 00 E0 E5 00 00 33 0D 01 00 58 50 0C 00 50 E6 00 00 44 0D 01 00", "NpcThinkParam", "NPC Thought")
+		: GameParamDef(NULL, 0x1680, 476, sizeof(NpcThinkParam),
+			"C0 E6 00 00 80 16 01 00 01 00 DC 01 4E 50 43 5F",
+			"NpcThinkParam", "NPC Thought")
 	{
 	}
 	

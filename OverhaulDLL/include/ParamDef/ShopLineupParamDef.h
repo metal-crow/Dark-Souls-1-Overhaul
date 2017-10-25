@@ -77,7 +77,9 @@ public:
 	
 private:
 	ShopLineupParamDef()
-		: GameParamDef(NULL, 0x1244, 391, sizeof(ShopLineupParam), "A4 12 00 00 71 43 00 00 4D 04 00 00 C4 12", "ShopLineupParam", "Shop Lineup")
+		: GameParamDef(NULL, 0x1284, 391, sizeof(ShopLineupParam),
+			"70 43 00 00 84 12 01 00 01 00 87 01 53 48 4F 50",
+			"ShopLineupParam", "Shop Lineup")
 	{
 	}
 	

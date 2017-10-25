@@ -102,7 +102,9 @@ public:
 	
 private:
 	ThrowParamDef()
-		: GameParamDef(NULL, 0x914, 195, sizeof(ThrowParam), "94 09 00 00 14 3A 00 00 02 00 00 00 D4 09 00 00", "ThrowParam", "Throw")
+		: GameParamDef(NULL, 0x954, 195, sizeof(ThrowParam),
+			"20 3A 00 00 54 09 00 00 01 00 C3 00 54 48 52 4F",
+			"ThrowParam", "Throw")
 	{
 	}
 	

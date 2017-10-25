@@ -86,7 +86,9 @@ public:
 	
 private:
 	MaterialSetParamDef()
-		: GameParamDef(NULL, 0x10, 276, sizeof(MaterialSetParam), "AA 39 00 00 2A 1C 00 00 80 2F 00 00 B3 39 00 00", "EquipMtrlSetParam", "Material Set")
+		: GameParamDef(NULL, 0xD20, 276, sizeof(MaterialSetParam),
+			"A0 2F 00 00 20 0D 00 00 01 00 14 01 45 51 55 49",
+			"EquipMtrlSetParam", "Material Set")
 	{
 	}
 	

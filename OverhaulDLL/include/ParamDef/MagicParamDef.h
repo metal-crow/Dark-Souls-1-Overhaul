@@ -129,7 +129,9 @@ public:
 	
 private:
 	MagicParamDef()
-		: GameParamDef(NULL, 0x69C, 141, sizeof(MagicParam), "B8 0B 00 00 CC 06 00 00 3C 21 00 00 C2 0B 00 00", "MagicParam", "Magic")
+		: GameParamDef(NULL, 0x6CC, 141, sizeof(MagicParam),
+			"40 21 00 00 CC 06 01 00 02 00 8D 00 4D 41 47 49",
+			"MagicParam", "Magic")
 	{
 	}
 	

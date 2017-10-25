@@ -168,7 +168,9 @@ public:
 	
 private:
 	CharInitParamDef()
-		: GameParamDef(NULL, 0xE30, 312, sizeof(CharInitParam), "40 17 00 00 83 34 01 00 0B 00 00 00 30 18 00 00", "CharaInitParam", "Character Initialization")
+		: GameParamDef(NULL, 0xED0, 312, sizeof(CharInitParam),
+			"50 33 01 00 D0 0E 00 00 01 00 38 01 43 48 41 52",
+			"CharaInitParam", "Character Initialization")
 	{
 	}
 	

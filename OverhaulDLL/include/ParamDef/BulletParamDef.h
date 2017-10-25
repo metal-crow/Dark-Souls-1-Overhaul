@@ -146,7 +146,9 @@ public:
 	
 private:
 	BulletParamDef()
-		: GameParamDef(NULL, 0x1D84, 631, sizeof(BulletParam), "64 1E 00 00 2B A8 01 00 02 00 00 00 04 1F", "BulletParam", "Bullet")
+		: GameParamDef(NULL, 0x1DC4, 631, sizeof(BulletParam),
+			"30 A8 01 00 C4 1D 00 00 02 00 77 02 42 55 4C 4C",
+			"BulletParam", "Bullet")
 	{
 	}
 	

@@ -148,7 +148,9 @@ public:
 	
 private:
 	ItemParamDef()
-		: GameParamDef(NULL, 0xBF0, 256, sizeof(ItemParam), "8C 0C 00 00 3B 68 00 00 66 00 00 00 E8 0C", "EquipParamGoods", "Item")
+		: GameParamDef(NULL, 0xC30, 256, sizeof(ItemParam),
+			"30 68 00 00 30 0C 01 00 01 00 00 01 45 51 55 49",
+			"EquipParamGoods", "Item")
 	{
 	}
 	
