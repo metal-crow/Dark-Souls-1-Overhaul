@@ -61,7 +61,7 @@ public:
 	
 private:
 	NewParamDef()
-		: GameParamDef(/* @TODO: NULL, 0xdata_start_offset, param_count, sizeof(NewParam), "scan_pattern", "file", "title" */)
+		: GameParamDef(/* @TODO: NULL, 0xdata_start_offset, param_count, sizeof(NewParam), "scan_pattern", "NewParam", "title" */)
 	{
 	}
 	

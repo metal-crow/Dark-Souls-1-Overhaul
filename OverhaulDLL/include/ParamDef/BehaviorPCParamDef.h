@@ -36,7 +36,10 @@ typedef struct BehaviorPcParameter : public Param {
 		behaviorJudgeId = 0; // It is used to calculate the ID for attack parameters. This ID matches the action judgment ID entered in TimeActEditor. It is not used directly on the actual machine.
 	
 	uint8_t
-		ezStateBehaviorType_old = 0, // For ID calculation rule
+		ezStateBehaviorType_old = 0; // For ID calculation rule
+
+	typedef uint8_t BEHAVIOR_REF_TYPE;
+	BEHAVIOR_REF_TYPE
 		refType = 0; // Specify not to mistake the reference ID.
 
 	uint8_t
@@ -48,11 +51,15 @@ typedef struct BehaviorPcParameter : public Param {
 		stamina = 0, // Set consumption amount of consumption stamina during action.
 		mp = 0; // Set consumption MP amount during action.
 
-	uint8_t
+	typedef uint8_t BEHAVIOR_CATEGORY;
+	BEHAVIOR_CATEGORY
 		category = 0; // Since there are effects (such as enchant weapons) whose parameters fluctuate with skills, magic, items, etc., set the action for each action so that the specified effect can correspond to the effect of "power up only weapon attacks" For varistors, etc. that do not require setting, set "none"
 
 	uint8_t
-		pad1[3] = { 0, 0, 0 }; // Padding
+		heroPoint = 0; // Set consumption amount of humanity consumption during behavior
+
+	uint8_t
+		pad1[2] = { 0, 0 }; // Padding
 
 } BehaviorPcParam;
 
@@ -84,7 +91,9 @@ public:
 	
 private:
 	BehaviorPcParamDef()
-		: GameParamDef(NULL, 0x10, 3162, sizeof(BehaviorPcParam), "78 60 03 00 10 BB 06 06 88 1F 02 00 8B 60 03 00", "BehaviorPcParam", "Behavior (Player character)")
+		: GameParamDef(NULL, 0x9468, 3162, sizeof(BehaviorPcParam),
+			"B0 1F 02 00 68 94 02 00 02 00 5A 0C 42 45 48 41",
+			"BehaviorPcParam", "Behavior (Player character)")
 	{
 	}
 	

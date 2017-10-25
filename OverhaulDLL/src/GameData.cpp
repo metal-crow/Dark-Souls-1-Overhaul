@@ -85,13 +85,15 @@ void Game::on_first_character_loaded()
 
 	// Get param files
 	print_console(Mod::output_prefix + "Searching memory for loaded param files...");
+	ParamDef::AiStandardInfo().init(true);
 	ParamDef::Armor().init(true);
 	ParamDef::BehaviorNpc().init(true);
 	ParamDef::BehaviorPc().init(true);
 	ParamDef::Bullet().init(true);
-	ParamDef::CamLock().init(true);
+	ParamDef::LockCam().init(true);
 	ParamDef::CharInit().init(true);
 	ParamDef::Item().init(true);
+	ParamDef::ItemLot().init(true);
 	ParamDef::Magic().init(true);
 	ParamDef::MaterialSet().init(true);
 	ParamDef::MenuColor().init(true);
@@ -103,7 +105,6 @@ void Game::on_first_character_loaded()
 	ParamDef::SpEffectVfx().init(true);
 	ParamDef::Throw().init(true);
 	ParamDef::Weapon().init(true);
-
 
 	// Disable armor sounds if it was specified in the config file
 	if (Mod::disable_armor_sfx_pref)
@@ -423,7 +424,11 @@ void Game::enable_dim_lava(bool dim)
 // Checks if armor sound effects are enabled
 bool Game::armor_sfx_enabled()
 {
-	ParamDef::Armor().init(true);
+	if (ParamDef::Armor().base == NULL)
+	{
+		print_console("ERROR: Waiting for Armor params to load");
+		return true;
+	}
 
 	ArmorParam *first_param = ParamDef::Armor().data();
 
@@ -434,8 +439,11 @@ bool Game::armor_sfx_enabled()
 // Toggles armor sound effecs
 void Game::enable_armor_sfx(bool enable)
 {
-	ParamDef::Armor().init(true);
-
+	if (ParamDef::Armor().base == NULL)
+	{
+		print_console("ERROR: Waiting for Armor params to load");
+		return;
+	}
 
 	// Static variable persists between function calls
 	static std::vector<std::vector<uint8_t>> default_armor_sfx_values;

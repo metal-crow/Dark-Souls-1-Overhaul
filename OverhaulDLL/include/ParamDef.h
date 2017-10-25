@@ -20,10 +20,12 @@
 
 
 #include "ParamDef/ArmorParamDef.h"
+#include "ParamDef/AIStandardInfoParamDef.h"
 #include "ParamDef/BehaviorNPCParamDef.h"
 #include "ParamDef/BehaviorPCParamDef.h"
 #include "ParamDef/BulletParamDef.h"
 #include "ParamDef/CharInitParamDef.h"
+#include "ParamDef/ItemLotParamDef.h"
 #include "ParamDef/ItemParamDef.h"
 #include "ParamDef/LockCamParamDef.h"
 #include "ParamDef/MagicParamDef.h"
@@ -60,6 +62,10 @@ namespace ParamDef {
 		NPC_DRAW_TYPE_HOLLOW = 4
 	};
 
+
+	// Default AI parameters
+	static AiStandardInfoParamDef& AiStandardInfo() { return AiStandardInfoParamDef::get_instance(); }
+
 	// Armor parameters
 	static ArmorParamDef& Armor() { return ArmorParamDef::get_instance(); }
 	//static ArmorParamDef& Protector() { return ArmorParamDef::get_instance(); } // Alias for armor params
@@ -76,7 +82,8 @@ namespace ParamDef {
 	//static BulletParamDef& Projectile() { return BulletParamDef::get_instance(); } // Alias for Bullet
 
 	// Camera lock paramters
-	static LockCamParamDef& CamLock() { return LockCamParamDef::get_instance(); }
+	static LockCamParamDef& LockCam() { return LockCamParamDef::get_instance(); }
+	static LockCamParamDef& CamLock() { return LockCamParamDef::get_instance(); } // Alias for LockCam
 
 	// Character initializer parameters (Human NPCs)
 	static CharInitParamDef& CharInit() { return CharInitParamDef::get_instance(); }
@@ -85,6 +92,9 @@ namespace ParamDef {
 	// Item parameters
 	static ItemParamDef& Item() { return ItemParamDef::get_instance(); }
 	static ItemParamDef& Goods() { return ItemParamDef::get_instance(); } // Alias for Item params
+
+	// Item Lot parameters
+	static ItemLotParamDef& ItemLot() { return ItemLotParamDef::get_instance(); }
 
 	// Magic parameters
 	static MagicParamDef& Magic() { return MagicParamDef::get_instance(); }

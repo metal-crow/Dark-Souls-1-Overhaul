@@ -268,7 +268,9 @@ public:
 	
 private:
 	NpcParamDef()
-		: GameParamDef(NULL, 0x18, 556, sizeof(NpcParam), "60 3D 08 00 60 F1 02 00 DB 2F 03 00 C4 3D 08 00 B0 F2 02 00 F2 2F 03 00", "NpcParam", "NPC")
+		: GameParamDef(NULL, 0x1A40, 556, sizeof(NpcParam),
+			"00 F4 02 00 40 1A 01 00 03 00 2C 02 4E 50 43 5F",
+			"NpcParam", "NPC")
 	{
 	}
 	

@@ -67,11 +67,8 @@ public:
 	
 private:
 	LockCamParamDef()
-		: GameParamDef(NULL, 0x20, 38, sizeof(LockCamParam),
-			"58 06 00 00 25 09 00 00 14 27 00 00 78 06 00 00 "
-			"30 09 00 00 15 27 00 00 98 06 00 00 45 09 00 00 "
-			"00 00 80 40 00 00 20 C2 9A 99 19 3F 8F C2 B5 3F "
-			"00 00 70 41 00 00 2C 42 00 00 00 00 00 00 00 00",
+		: GameParamDef(NULL, 0x1F8, 38, sizeof(LockCamParam),
+			"C0 06 00 00 F8 01 00 00 01 00 26 00 4C 4F 43 4B",
 			"LockCam", "Camera lock")
 	{
 	}

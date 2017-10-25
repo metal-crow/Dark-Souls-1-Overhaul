@@ -221,8 +221,6 @@ void Files::check_custom_save_file()
 	if (conversion_return = string_wide_to_mb((wchar_t*)Mod::custom_save_file.c_str(), filename_ch))
 	{
 		// Error converting from wide char to char
-		//Mod::startup_messages.push_back(std::string(Mod::output_prefix + "ERROR: Unable to parse custom config file name (Error code ").append(std::to_string(conversion_return)).append("). Using default save file instead."));
-		//Mod::custom_save_file = L"";
 		return;
 	}
 
@@ -236,8 +234,6 @@ void Files::check_custom_save_file()
 	else
 	{
 		// Custom save file doesn't exist
-		//Mod::startup_messages.push_back(std::string(Mod::output_prefix + "ERROR: The file \"").append(filename_ch).append("\" could not be found. Using default save file instead."));
-		//Mod::custom_save_file = L"";
 		Mod::startup_messages.push_back(std::string(Mod::output_prefix + "WARNING: Custom save file was not found (\"").append(filename_ch).append("\"). No characters will be available to load."));
 		return;
 	}
@@ -258,8 +254,6 @@ void Files::check_custom_game_config_file()
 	if (conversion_return = string_wide_to_mb((wchar_t*)Mod::custom_config_file.c_str(), filename_ch))
 	{
 		// Error converting from wide char to char
-		//Mod::startup_messages.push_back(std::string(Mod::output_prefix + "ERROR: Unable to parse custom config file name (Error code ").append(std::to_string(conversion_return)).append("). Using default config file instead."));
-		//Mod::custom_config_file = L"";
 		return;
 	}
 	
@@ -273,8 +267,6 @@ void Files::check_custom_game_config_file()
 	else
 	{
 		// Custom config file doesn't exist
-		//Mod::startup_messages.push_back(std::string(Mod::output_prefix + "ERROR: The file \"").append(filename_ch).append("\" could not be found. Using default config file instead."));
-		//Mod::custom_config_file = L"";
 		Mod::startup_messages.push_back(std::string(Mod::output_prefix + "WARNING: Custom config file was not found (\"").append(filename_ch).append("\"). Default configuration file will be automatically generated."));
 		return;
 	}

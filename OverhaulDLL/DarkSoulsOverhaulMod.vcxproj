@@ -259,15 +259,18 @@
     <ClInclude Include="include\Debug\GameParamDefsDebug.h" />
     <ClInclude Include="include\DllMain.h" />
     <ClInclude Include="include\GameData.h" />
+    <ClInclude Include="include\GameEnum.h" />
     <ClInclude Include="include\GameFiles.h" />
     <ClInclude Include="include\ModData.h" />
     <ClInclude Include="include\ParamDef.h" />
+    <ClInclude Include="include\ParamDef\AIStandardInfoParamDef.h" />
     <ClInclude Include="include\ParamDef\ArmorParamDef.h" />
     <ClInclude Include="include\ParamDef\BehaviorPCParamDef.h" />
     <ClInclude Include="include\ParamDef\GameParamDef.h" />
     <ClInclude Include="include\ParamDef\BehaviorNPCParamDef.h" />
     <ClInclude Include="include\ParamDef\BulletParamDef.h" />
     <ClInclude Include="include\ParamDef\CharInitParamDef.h" />
+    <ClInclude Include="include\ParamDef\ItemLotParamDef.h" />
     <ClInclude Include="include\ParamDef\ItemParamDef.h" />
     <ClInclude Include="include\ParamDef\LockCamParamDef.h" />
     <ClInclude Include="include\ParamDef\MagicParamDef.h" />
@@ -310,6 +313,7 @@
     </ClCompile>
     <ClCompile Include="src\Debug\ConsoleCommandsDebug.cpp" />
     <ClCompile Include="src\GameData.cpp" />
+    <ClCompile Include="src\GameEnum.cpp" />
     <ClCompile Include="src\ModData.cpp" />
     <ClCompile Include="src\PhantomLimit.cpp" />
     <ClCompile Include="src\Plugin\ConsoleCommands.cpp" />

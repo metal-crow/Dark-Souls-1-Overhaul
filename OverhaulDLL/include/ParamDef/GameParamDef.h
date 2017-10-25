@@ -21,7 +21,8 @@
 #include "PluginImports.h"
 #include "SP_AoB_Scan.hpp"
 
-
+// Macro for testing paramdef objects
+#define _test_param_def_(pd,p,attribute) {print_console(#p);int i = 0; p *param; for(i = 0; i < 5; i++){param = pd.get(i);print_console(std::to_string(i) + ":     "#attribute"=" + std::to_string(param->attribute));}i = pd.param_count-1;param=pd.get(i);print_console(std::to_string(i) + ":     "#attribute"=" + std::to_string(param->attribute) + "\n");}
 
 	
 // Ancestor struct to all Dark Souls game parameter data structure types

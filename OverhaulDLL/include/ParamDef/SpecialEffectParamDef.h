@@ -312,7 +312,9 @@ public:
 	
 private:
 	SpEffectParamDef()
-		: GameParamDef(NULL, 0x27A4, 847, sizeof(SpEffectParam), "54 29 00 00 7D E9 04 00 02 00 00 00 C4 2A", "SpEffectParam", "Special Effect")
+		: GameParamDef(NULL, 0x27E4, 847, sizeof(SpEffectParam),
+			"80 E9 04 00 E4 27 01 00 01 00 4F 03 53 50 5F 45",
+			"SpEffectParam", "Special Effect")
 	{
 	}
 	

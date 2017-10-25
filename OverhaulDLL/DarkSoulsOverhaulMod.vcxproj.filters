@@ -42,6 +42,9 @@
     <ClCompile Include="src\Plugin\KeybindFunctions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\GameEnum.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lib\PluginImports.h">
@@ -132,6 +135,15 @@
       <Filter>Header Files\ParamDefs</Filter>
     </ClInclude>
     <ClInclude Include="include\ParamDef\BehaviorPCParamDef.h">
+      <Filter>Header Files\ParamDefs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ParamDef\ItemLotParamDef.h">
+      <Filter>Header Files\ParamDefs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameEnum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ParamDef\AIStandardInfoParamDef.h">
       <Filter>Header Files\ParamDefs</Filter>
     </ClInclude>
   </ItemGroup>
