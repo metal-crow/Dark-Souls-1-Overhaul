@@ -255,7 +255,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\Debug\ConsoleCommandsDebug.h" />
     <ClInclude Include="include\Debug\GameParamDefsDebug.h" />
     <ClInclude Include="include\DllMain.h" />
     <ClInclude Include="include\GameData.h" />
@@ -311,7 +310,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Build|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\Debug\ConsoleCommandsDebug.cpp" />
     <ClCompile Include="src\GameData.cpp" />
     <ClCompile Include="src\GameEnum.cpp" />
     <ClCompile Include="src\ModData.cpp" />
