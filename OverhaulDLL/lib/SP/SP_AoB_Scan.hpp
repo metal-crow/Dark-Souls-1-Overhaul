@@ -58,7 +58,7 @@ void *aob_scan(uint8_t *aob, size_t length, bool *mask = NULL, void *start = NUL
 // Overloaded versions of aob_scan; see @aob_scan(uint8_t*, size_t, bool*, void*, std::vector<uint8_t*>*) for more info:
 void *aob_scan(const char *str_aob, void *start = NULL, std::vector<uint8_t*> *results = NULL);	// Calls string_to_aob before calling @aob_scan(uint8_t*, size_t, bool*, void*, std::vector<uint8_t*>*)
 void *aob_scan(char *str_aob, void *start = NULL, std::vector<uint8_t*> *results = NULL);		// Calls string_to_aob before calling @aob_scan(uint8_t*, size_t, bool*, void*, std::vector<uint8_t*>*)
-void *aob_scan(std::string *str_aob, void *start = NULL, std::vector<uint8_t*> *results = NULL);// Calls string_to_aob before calling @aob_scan(uint8_t*, size_t, bool*, void*, std::vector<uint8_t*>*)
+void *aob_scan(std::string& str_aob, void *start = NULL, std::vector<uint8_t*> *results = NULL);// Calls string_to_aob before calling @aob_scan(uint8_t*, size_t, bool*, void*, std::vector<uint8_t*>*)
 
 
 
@@ -111,6 +111,21 @@ bool compare_byte_arrays(uint8_t *mem, uint8_t *aob, size_t length, bool *mask);
     @return     true if the byte arrays match; false otherwise.
 */
 bool compare_byte_arrays(uint8_t *mem, uint8_t *aob, size_t length);
+
+/*
+    compare_byte_arrays(std::string&, uint8_t*, bool)
+
+    Takes a byte array and a string representing a byte array (of equal length) and determines whether the
+	byte array represented by the string is identical to the true byte array.
+
+    @param str_aob  A string representing the first byte array.
+	@param byte_aob The second byte array.
+	@param use_mask If true, the byte arrays are compared using the wildcard mask generated when the string
+	                was converted to a byte array.
+
+    @return     true if the byte arrays match; false otherwise.
+*/
+bool compare_byte_arrays(std::string& str_aob, uint8_t *byte_aob, bool use_mask = true);
 
 
 
@@ -186,7 +201,7 @@ size_t string_to_aob(char *str_aob, uint8_t *aob, bool *mask);
 
 
 /*
-    string_to_aob(std::string*, uint8_t*, bool*)
+    string_to_aob(std::string&, uint8_t*, bool*)
 
     Converts a C++ string (representing an AoB) to a true byte array
     and generates a corresponding mask for determining wildcards.
@@ -194,7 +209,7 @@ size_t string_to_aob(char *str_aob, uint8_t *aob, bool *mask);
     See @string_to_aob(const char*, uint8_t*, bool*) for string format, parameter,
     and return value information.
 */
-size_t string_to_aob(std::string *str_aob, uint8_t *aob, bool *mask);
+size_t string_to_aob(std::string& str_aob, uint8_t *aob, bool *mask);
 
 
 

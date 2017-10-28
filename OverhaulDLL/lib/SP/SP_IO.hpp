@@ -320,10 +320,11 @@ int append_current_date_string(std::string *date_string, bool surround_with_brac
 	@param out_string	Multibyte string where the converted string will be stored.
 	@param append		If true, the converted string is appended to the end of out_string.
 						Otherwise, out_string is erased and set to the converted string.
+	@param locale       Country-dependent formatting for the wide character string
 
 	@return 0 on success, otherwise returns a relevant error code
 */
-int string_wide_to_mb(wchar_t *in_string, std::string &out_string, bool append = false);
+int string_wide_to_mb(wchar_t *in_string, std::string &out_string, bool append = false, const char *locale = "en_US.utf8");
 
 
 /**
@@ -335,10 +336,11 @@ int string_wide_to_mb(wchar_t *in_string, std::string &out_string, bool append =
 	@param out_string	Wide character string where the converted string will be stored.
 	@param append		If true, the converted string is appended to the end of out_string.
 						Otherwise, out_string is erased and set to the converted string.
+	@param locale       Country-dependent formatting for the wide character string
 
 	@return 0 on success, otherwise returns a relevant error code
 */
-int string_mb_to_wide(char *in_string, std::wstring &out_string, bool append = false);
+int string_mb_to_wide(char *in_string, std::wstring &out_string, bool append = false, const char *locale = "en_US.utf8");
 
 
 
