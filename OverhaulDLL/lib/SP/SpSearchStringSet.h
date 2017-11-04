@@ -41,92 +41,112 @@
 
 
 
+/*
+	        //////// Enums ////////
+*/
+
+// String end options
+enum SSS_SIDE {
+	SSS_LEFT  = 0,
+	SSS_RIGHT = 1
+};
+
+// Letter case options for new strings
+enum SSS_PREFER_LETTER_CASE {
+	SSS_NO_CASE,
+	SSS_UPPERCASE,
+	SSS_LOWERCASE
+};
+
+
+// Whether or not letter case is considered when determining if two strings are distinct
+enum SSS_CASE_DISTINCTION {
+	SSS_CASE_DISTINCTION_DEFAULT,
+	SSS_CASE_SENSITIVE,
+	SSS_CASE_INSENSITIVE
+};
+
+
+// Options for action to be taken when attempting to insert an invalid string
+enum SSS_INVALID_INSERT_ACTION {
+	SSS_NO_ACTION,
+	SSS_REJECT,
+	SSS_CONFORM
+};
+
+
+// String search matching strictness. (Note: All options other than SSS_DEFAULT and SSS_NOT_EXACT return exact matches)
+enum SSS_MATCH_STRICTNESS {
+	SSS_DEFAULT,      // Uses the default search strictness for the object, which is one of the options below
+	SSS_EXACT,        // Returns exact matches only
+	SSS_STARTS_WITH,  // Returns strings that start with the search string
+	SSS_ENDS_WITH,    // Returns strings that end with the search string
+	SSS_NOT_EXACT,    // Returns any string that contains, but is not equivalent to, the search string
+	SSS_SUPER_STRING  // Returns any string that contains the search string
+};
+
+
+/*
+	        //////// Types ////////
+*/
+template <typename T>
+struct SSS_CONSTRAINT {
+	T value; // Value to compare against to determine if constraint is violated
+	SSS_INVALID_INSERT_ACTION act;  // Action to take if constraint is violated
+};
+
+
+
+
 template <typename charT>
 class SpSearchStringSet {
 private:
-	seqan::StringSet<seqan::String<charT>> set;
-	seqan::Index<seqan::StringSet<seqan::String<charT>>> *index = NULL;
+	seqan::StringSet<seqan::String<charT>> _set;
+	seqan::Index<seqan::StringSet<seqan::String<charT>>> *_search_index = NULL;
+
+	seqan::StringSet<seqan::String<charT>> _set_case_insensitive; // @TODO: Figure out better way to do this (method that uses less memory)
+	seqan::Index<seqan::StringSet<seqan::String<charT>>> *_search_index_case_insensitive = NULL;
+
+	// Signifies whether the search index is accurate for the current string set
+	bool _outdated_index = true;
+
+	// Determines which search strictness setting will be used if one is not specified
+	SSS_MATCH_STRICTNESS _default_search_strictness = SSS_EXACT;
+
+	// Returns whether the given string exists in the set. NOTE: Does not use indexing for search,
+	//    so this function can be extremely slow on larger data sets. Also, this function only
+	//    searches for exact matches.
+	int _index_of_exact(std::basic_string<charT>& string);
 
 public:
-
-
-	/*
-	            //////// Enums ////////
-	*/
-
-	// String end options
-	enum SSS_SIDE {
-		SSS_LEFT  = 0,
-		SSS_RIGHT = 1
-	};
-
-	// Letter case options
-	enum SSS_LETTER_CASE {
-		SSS_NO_CASE,
-		SSS_UPPERCASE,
-		SSS_LOWERCASE
-	};
-
-
-	// Options for action to be taken when attempting to insert an invalid string
-	enum SSS_INVALID_INSERT_ACTION {
-		SSS_NO_ACTION,
-		SSS_REJECT,
-		SSS_CONFORM
-	};
-
-
-	// String search matching strictness. (Note: All options other than SSS_NOT_EXACT return exact matches)
-	enum SSS_MATCH_STRICTNESS {
-		SSS_EXACT,        // Returns exact matches only
-		SSS_STARTS_WITH,  // Returns strings that start with the search string
-		SSS_ENDS_WITH,    // Returns strings that end with the search string
-		SSS_NOT_EXACT,    // Returns any string that contains, but is not equivalent to, the search string
-		SSS_SUPER_STRING  // Returns any string that contains the search string
-	};
-
-
-	/*
-	            //////// Types ////////
-	*/
-	template <typename T>
-	struct SSS_CONSTRAINT {
-		T value; // Value to compare against to determine if constraint is violated
-		SSS_INVALID_INSERT_ACTION act;  // Action to take if constraint is violated
-	};
-
-
-
-
 	
 	/*
 	            //////// Constructors & Destructors ////////
 	*/
 
 	// Default constructor (empty set)
-	SpSearchStringSet<charT>() { this->initialize_index(); }
+	SpSearchStringSet<charT>() { this->build_index(); }
 
 	// Destructor
 	~SpSearchStringSet<charT>()
 	{
-		if (index != NULL)
+		if (_search_index != NULL)
 		{
-			delete index;
-			index = NULL;
+			delete _search_index;
+			_search_index = NULL;
 		}
 	}
 
 
 
 	/*
-
-
 	            //////// Settings variables ////////
 
 
 	    Variables that affect the behavior of the string set
-		when new strings are inserted.
-
+		when certain actions are performed, such as:
+		    -Inserting new strings
+			-Searching the set for a string
 	*/
 
 
@@ -137,7 +157,6 @@ public:
 	     (and other trimmable characters) from the start and end
 		 of newly added strings
 	*/
-	//                 
 	bool trim[2] = {
 		             true,  // Trim left  side?
 		             true   // Trim right side?
@@ -153,7 +172,7 @@ public:
 
 
 	// Preferred letter case
-	SSS_CONSTRAINT<SSS_LETTER_CASE> prefer_case = { SSS_NO_CASE, SSS_CONFORM };
+	SSS_CONSTRAINT<SSS_PREFER_LETTER_CASE> prefer_case = { SSS_NO_CASE, SSS_CONFORM };
 
 
 	// Maximum number of characters
@@ -171,6 +190,8 @@ public:
 	// Substrings to replace (replace each instance of the first pair element with an instance of the second element)
 	std::list<std::pair<std::basic_string<charT>, std::basic_string<charT>>> replacements;
 
+	// Whether or not letter case is considered when determining if two strings are distinct
+	SSS_CASE_DISTINCTION case_distinction = SSS_CASE_SENSITIVE;
 
 	// Determines if each string must be unique
 	bool distinct_set = true;
@@ -182,13 +203,7 @@ public:
 
 
 	/*
-
-
 	            //////// Member Functions ////////
-
-
-	    
-
 	*/
 
 
@@ -196,22 +211,34 @@ public:
 	/*
 		Appends a new string to the set.
 	*/
-	int append(std::basic_string<charT>& new_string);
-	int append(const charT* new_string);
-	int append(charT* new_string);
+	int append(std::basic_string<charT>& new_string, bool rebuild_index = true);
+	int append(const charT* new_string, bool rebuild_index = true);
+	int append(charT* new_string, bool rebuild_index = true);
 
 
 	/*
 	    Searches the set for a string and stores matching results in the given container object.
 
+		If limit is set to 0, the function will return all matching strings.
+
 		Returns the number of results.
 	*/
 	template <class storageT>
-	int search(std::basic_string<charT>& string, storageT& container, size_t limit = 1, SSS_MATCH_STRICTNESS strictness = SSS_EXACT);
+	int search(std::basic_string<charT>& string, storageT& container, size_t limit = 1, SSS_MATCH_STRICTNESS strictness = SSS_DEFAULT);
 	template <class storageT>
-	int search(const charT* string, storageT& container, size_t limit = 1, SSS_MATCH_STRICTNESS strictness = SSS_EXACT);
+	int search(const charT* string, storageT& container, size_t limit = 1, SSS_MATCH_STRICTNESS strictness = SSS_DEFAULT);
 	template <class storageT>
-	int search(charT* string, storageT& container, size_t limit = 1, SSS_MATCH_STRICTNESS strictness = SSS_EXACT);
+	int search(charT* string, storageT& container, size_t limit = 1, SSS_MATCH_STRICTNESS strictness = SSS_DEFAULT);
+
+
+	/*
+		Searches the set for a string and returns the first matching result.
+
+		If no results are found, returns empty string ("") and error code is set to ERROR_FILE_NOT_FOUND.
+	*/
+	const char* quick_search(std::basic_string<charT>& string, SSS_MATCH_STRICTNESS strictness = SSS_DEFAULT);
+	const char* quick_search(const charT* string, SSS_MATCH_STRICTNESS strictness = SSS_DEFAULT);
+	const char* quick_search(charT* string, SSS_MATCH_STRICTNESS strictness = SSS_DEFAULT);
 
 	/*
 	    Checks if the set contains a string, and if so, returns the first index of a
@@ -219,15 +246,15 @@ public:
 
 		If the string does not exist in the set, returns -1.
 	*/
-	int index_of(std::basic_string<charT>& string, SSS_MATCH_STRICTNESS strictness = SSS_EXACT);
-	int index_of(const charT* string, SSS_MATCH_STRICTNESS strictness = SSS_EXACT);
-	int index_of(charT* string, SSS_MATCH_STRICTNESS strictness = SSS_EXACT);
+	int index_of(std::basic_string<charT>& string, SSS_MATCH_STRICTNESS strictness = SSS_DEFAULT);
+	int index_of(const charT* string, SSS_MATCH_STRICTNESS strictness = SSS_DEFAULT);
+	int index_of(charT* string, SSS_MATCH_STRICTNESS strictness = SSS_DEFAULT);
 
 
 	// Returns whether the set contains a string
-	bool contains(std::basic_string<charT>& string, SSS_MATCH_STRICTNESS strictness = SSS_EXACT);
-	bool contains(const charT* string, SSS_MATCH_STRICTNESS strictness = SSS_EXACT);
-	bool contains(charT* string, SSS_MATCH_STRICTNESS strictness = SSS_EXACT);
+	bool contains(std::basic_string<charT>& string, SSS_MATCH_STRICTNESS strictness = SSS_DEFAULT);
+	bool contains(const charT* string, SSS_MATCH_STRICTNESS strictness = SSS_DEFAULT);
+	bool contains(charT* string, SSS_MATCH_STRICTNESS strictness = SSS_DEFAULT);
 
 
 	/*
@@ -241,19 +268,26 @@ public:
 	// Returns the number of strings in the set
 	inline size_t size();
 
+	// Clears the string set (removes all strings, leaving an empty set)
+	inline void clear();
+
 	// (Re-)Initialize the set index structure
-	inline void initialize_index();
+	inline void build_index(bool force_rebuild = false);
+
+	// Returns default search strictness
+	inline SSS_MATCH_STRICTNESS get_default_search_strictness();
+
+	// Modifies default search strictness. Returns 0 on success, otherwise returns relevant error code
+	inline int set_default_search_strictness(SSS_MATCH_STRICTNESS strictness);
+
+	// Returns whether the search index is up-to-date
+	inline bool index_is_up_to_date();
+
 
 
 
 	/*
-
-
 	            //////// Static Class Functions ////////
-
-
-	    
-
 	*/
 
 	// Trim input string by removing leading and/or trailing characters if they exist in the mask string
@@ -298,10 +332,37 @@ typedef SpSearchStringSet<wchar_t> SpSearchStringSetW;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+// 
+template <typename charT>
+int SpSearchStringSet<charT>::_index_of_exact(std::basic_string<charT>& string)
+{
+	if (case_distinction == SSS_CASE_INSENSITIVE)
+	{
+		std::basic_string<charT> string_case_insensitive = string;
+		to_lowercase(string_case_insensitive);
+		int size = seqan::length(_set_case_insensitive);
+		for (int i = 0; i < size; i++)
+		{
+			if (string_case_insensitive == std::basic_string<charT>(seqan::toCString(_set_case_insensitive[i])))
+				return i;
+		}
+	}
+	else
+	{
+		int size = seqan::length(_set);
+		for (int i = 0; i < size; i++)
+		{
+			if (string == std::basic_string<charT>(seqan::toCString(_set[i])))
+				return i;
+		}
+	}
+	return -1;
+}
+
 
 // Append a new string to the set
 template <typename charT>
-int SpSearchStringSet<charT>::append(std::basic_string<charT>& new_string)
+int SpSearchStringSet<charT>::append(std::basic_string<charT>& new_string, bool rebuild_index)
 {
 	std::basic_string<charT> string = std::basic_string<charT>(new_string);
 
@@ -367,13 +428,26 @@ int SpSearchStringSet<charT>::append(std::basic_string<charT>& new_string)
 
 
 	// Check for uniqueness
-	if (distinct_set && (contains(string)))
-		return ERROR_DUP_NAME;
+	if (distinct_set)
+	{
+		if((_outdated_index && _index_of_exact(string) != -1) // Search index is outdated; use slow search
+			 || (!_outdated_index && contains(string, SSS_EXACT)))     // Search index is up-to-date; use fast search
+			return ERROR_DUP_NAME;
+	}
 
 
 	// New string is valid; insert into set
-	seqan::appendValue(set, string);
-	initialize_index(); // Rebuild index
+	seqan::appendValue(_set, string);
+
+	// Also create case-insensitive version
+	std::basic_string<charT> string_case_insensitive = string;
+	to_lowercase(string_case_insensitive);
+	seqan::appendValue(_set_case_insensitive, string_case_insensitive);
+
+	if (rebuild_index)
+		build_index(); // Rebuild index
+	else
+		_outdated_index = true; // Mark index as outdated
 
 	return ERROR_SUCCESS;
 }
@@ -385,31 +459,45 @@ template <typename charT>
 template <class storageT>
 int SpSearchStringSet<charT>::search(std::basic_string<charT>& string, storageT& container, size_t limit, SSS_MATCH_STRICTNESS strictness)
 {
+	// Rebuild index if it's outdated
+	if (_outdated_index)
+		build_index();
+
 	size_t count = 0;
 	std::vector<int> found_indices; // Indices of matching strings that were already found (to avoid duplicate results)
+	if (strictness == SSS_DEFAULT)
+		strictness = _default_search_strictness;
 
-	seqan::String<charT> search(string.c_str());
-
+	std::basic_string<charT> search_string = string;
 	seqan::Finder<seqan::Index<seqan::StringSet<seqan::String<charT>>>> string_finder;
+	if (case_distinction == SSS_CASE_INSENSITIVE)
+	{
+		seqan::setHaystack(string_finder, *_search_index_case_insensitive);
+		to_lowercase(search_string);
+	}
+	else
+	{
+		seqan::setHaystack(string_finder, *_search_index);
+	}
 
-	seqan::setHaystack(string_finder, *index);
+	seqan::String<charT> search(search_string);
 
-	while (count < limit && seqan::find(string_finder, search))
+	while ((limit == 0 || count < limit) && seqan::find(string_finder, search))
 	{
 		if (std::find(found_indices.begin(), found_indices.end(), seqan::position(string_finder).i1) == found_indices.end())
 		{
 			switch (strictness)
 			{
 				case SSS_SUPER_STRING: // Accept any superstring of the search string
-					container.insert(container.end(), std::basic_string<charT>(seqan::toCString(set[seqan::position(string_finder).i1])));
+					container.insert(container.end(), std::basic_string<charT>(seqan::toCString(_set[seqan::position(string_finder).i1])));
 					found_indices.push_back(seqan::position(string_finder).i1);
 					count++;
 					break;
 
 				case SSS_NOT_EXACT: // Accept any superstring of the search string that is not equivalent to the search string
-					if (!(seqan::length(seqan::value(set, seqan::position(string_finder).i1)) == seqan::length(search)))
+					if (!(seqan::length(seqan::value(_set, seqan::position(string_finder).i1)) == seqan::length(search)))
 					{
-						container.insert(container.end(), std::basic_string<charT>(seqan::toCString(set[seqan::position(string_finder).i1])));
+						container.insert(container.end(), std::basic_string<charT>(seqan::toCString(_set[seqan::position(string_finder).i1])));
 						found_indices.push_back(seqan::position(string_finder).i1);
 						count++;
 					}
@@ -418,7 +506,7 @@ int SpSearchStringSet<charT>::search(std::basic_string<charT>& string, storageT&
 				case SSS_STARTS_WITH: // Accept superstrings where search string starts at character index 0
 					if (seqan::position(string_finder).i2 == 0)
 					{
-						container.insert(container.end(), std::basic_string<charT>(seqan::toCString(set[seqan::position(string_finder).i1])));
+						container.insert(container.end(), std::basic_string<charT>(seqan::toCString(_set[seqan::position(string_finder).i1])));
 						found_indices.push_back(seqan::position(string_finder).i1);
 						count++;
 					}
@@ -426,9 +514,9 @@ int SpSearchStringSet<charT>::search(std::basic_string<charT>& string, storageT&
 
 				case SSS_ENDS_WITH: // Accept superstrings where search string is at the end of the superstring
 					//                                 i2 = starting character position in the matching string.              i1 = index in the "haystack" (set)
-					if (seqan::position(string_finder).i2 == (seqan::length(seqan::value(set, seqan::position(string_finder).i1)) - seqan::length(search)))
+					if (seqan::position(string_finder).i2 == (seqan::length(seqan::value(_set, seqan::position(string_finder).i1)) - seqan::length(search)))
 					{
-						container.insert(container.end(), std::basic_string<charT>(seqan::toCString(set[seqan::position(string_finder).i1])));
+						container.insert(container.end(), std::basic_string<charT>(seqan::toCString(_set[seqan::position(string_finder).i1])));
 						found_indices.push_back(seqan::position(string_finder).i1);
 						count++;
 					}
@@ -436,9 +524,9 @@ int SpSearchStringSet<charT>::search(std::basic_string<charT>& string, storageT&
 
 				case SSS_EXACT: // Only accept exact matches
 				default:
-					if (seqan::length(seqan::value(set, seqan::position(string_finder).i1)) == seqan::length(search))
+					if (seqan::length(seqan::value(_set, seqan::position(string_finder).i1)) == seqan::length(search))
 					{
-						container.insert(container.end(), std::basic_string<charT>(seqan::toCString(set[seqan::position(string_finder).i1])));
+						container.insert(container.end(), std::basic_string<charT>(seqan::toCString(_set[seqan::position(string_finder).i1])));
 						found_indices.push_back(seqan::position(string_finder).i1);
 						count++;
 					}
@@ -451,17 +539,59 @@ int SpSearchStringSet<charT>::search(std::basic_string<charT>& string, storageT&
 
 
 
+// Searches the set for a string and returns the first matching result
+template <typename charT>
+const char* SpSearchStringSet<charT>::quick_search(std::basic_string<charT>& string, SSS_MATCH_STRICTNESS strictness)
+{
+	static std::basic_string<charT> last_result; // Stores the last result until a new quicksearch is performed
+	last_result.clear(); // Clear last result
+
+	if (strictness == SSS_DEFAULT)
+		strictness = _default_search_strictness;
+
+	std::vector<std::basic_string<charT>> temp_result;
+	size_t result_count = this->search(string, temp_result, 1, strictness);
+
+	if (result_count == 0) // No results
+		SetLastError(ERROR_FILE_NOT_FOUND);
+	else
+	{
+		last_result = std::basic_string<charT>(temp_result.at(0).c_str());
+		SetLastError(ERROR_SUCCESS); // Clear error code
+	}
+
+	return last_result.c_str();
+}
+
+
+
 
 
 // Check if the set contains a string, and if so, return the index of the string in the set (otherwise return -1)
 template <typename charT>
 int SpSearchStringSet<charT>::index_of(std::basic_string<charT>& string, SSS_MATCH_STRICTNESS strictness)
 {
-	seqan::String<charT> search(string.c_str());
+	if (strictness == SSS_DEFAULT)
+		strictness = _default_search_strictness;
 
+	// Rebuild index if it's outdated
+	if (_outdated_index)
+		build_index();
+
+	std::basic_string<charT> search_string = string;
 	seqan::Finder<seqan::Index<seqan::StringSet<seqan::String<charT>>>> string_finder;
+	if (case_distinction == SSS_CASE_INSENSITIVE)
+	{
+		seqan::setHaystack(string_finder, *_search_index_case_insensitive);
+		to_lowercase(search_string);
+	}
+	else
+	{
+		seqan::setHaystack(string_finder, *_search_index);
+	}
 
-	seqan::setHaystack(string_finder, *index);
+	seqan::String<charT> search(search_string);
+	
 
 	while (seqan::find(string_finder, search))
 	{
@@ -472,7 +602,7 @@ int SpSearchStringSet<charT>::index_of(std::basic_string<charT>& string, SSS_MAT
 				break;
 
 			case SSS_NOT_EXACT: // Accept any superstring of the search string that is not equivalent to the search string
-				if (!(seqan::length(seqan::value(set, seqan::position(string_finder).i1)) == seqan::length(search)))
+				if (!(seqan::length(seqan::value(_set, seqan::position(string_finder).i1)) == seqan::length(search)))
 					return seqan::position(string_finder).i1;
 				break;
 
@@ -482,14 +612,14 @@ int SpSearchStringSet<charT>::index_of(std::basic_string<charT>& string, SSS_MAT
 				break;
 
 			case SSS_ENDS_WITH: // Accept superstrings where search string is at the end of the superstring
-				if (seqan::position(string_finder).i2 == (seqan::length(seqan::value(set, seqan::position(string_finder).i1)) - seqan::length(search)) )
+				if (seqan::position(string_finder).i2 == (seqan::length(seqan::value(_set, seqan::position(string_finder).i1)) - seqan::length(search)) )
 					return seqan::position(string_finder).i1;
 				break;
 
 			case SSS_EXACT: // Only accept exact matches
 			default:
 				//                                 i2 = starting character position in the matching string.                   i1 = index in the "haystack" (set)
-				if (seqan::length(seqan::value(set, seqan::position(string_finder).i1)) == seqan::length(search))
+				if (seqan::length(seqan::value(_set, seqan::position(string_finder).i1)) == seqan::length(search))
 					return seqan::position(string_finder).i1;
 				break;
 		}
@@ -502,6 +632,9 @@ int SpSearchStringSet<charT>::index_of(std::basic_string<charT>& string, SSS_MAT
 template <typename charT>
 bool SpSearchStringSet<charT>::contains(std::basic_string<charT>& string, SSS_MATCH_STRICTNESS strictness)
 {
+	if (strictness == SSS_DEFAULT)
+		strictness = _default_search_strictness;
+
 	return (index_of(string, strictness) != -1);
 }
 
@@ -512,14 +645,14 @@ const charT* SpSearchStringSet<charT>::get(unsigned int index)
 {
 	static const charT NOT_FOUND = (charT)0; // Return pointer to this empty string if no result was found
 
-	if (index >= seqan::length(set)) // Specified index is out of bounds
+	if (index >= seqan::length(_set)) // Specified index is out of bounds
 	{
 		SetLastError(ERROR_RANGE_NOT_FOUND);
 		return &NOT_FOUND;
 	}
 
 	SetLastError(ERROR_SUCCESS);
-	return (const charT*)(seqan::toCString(set[index]));
+	return (const charT*)(seqan::toCString(_set[index]));
 }
 
 
@@ -527,20 +660,68 @@ const charT* SpSearchStringSet<charT>::get(unsigned int index)
 template <typename charT>
 inline size_t SpSearchStringSet<charT>::size()
 {
-	return seqan::length(set);
+	return seqan::length(_set);
+}
+
+
+// Clears the string set (removes all strings, leaving an empty set)
+template <typename charT>
+inline void SpSearchStringSet<charT>::clear()
+{
+	seqan::clear(_set);
+	seqan::clear(_set_case_insensitive);
+	_outdated_index = true;
+	build_index(true);
 }
 
 
 // (Re-)Initialize the set index structure
 template <typename charT>
-inline void SpSearchStringSet<charT>::initialize_index()
+inline void SpSearchStringSet<charT>::build_index(bool force_rebuild)
 {
-	if (index != NULL)
+	if (_search_index == NULL || _outdated_index)
 	{
-		delete index;
-		index = NULL;
+		if (_search_index != NULL)
+		{
+			delete _search_index;
+			_search_index = NULL;
+			delete _search_index_case_insensitive;
+			_search_index_case_insensitive = NULL;
+		}
+		_search_index = new seqan::Index<seqan::StringSet<seqan::String<charT>>>(_set);
+		_search_index_case_insensitive = new seqan::Index<seqan::StringSet<seqan::String<charT>>>(_set_case_insensitive);
+		_outdated_index = false;
 	}
-	index = new seqan::Index<seqan::StringSet<seqan::String<charT>>>(set);
+}
+
+
+// Returns default search strictness
+template <typename charT>
+inline SSS_MATCH_STRICTNESS SpSearchStringSet<charT>::get_default_search_strictness()
+{
+	return _default_search_strictness;
+}
+
+// Modifies default search strictness. Returns 0 on success, otherwise returns relevant error code
+template <typename charT>
+inline int SpSearchStringSet<charT>::set_default_search_strictness(SSS_MATCH_STRICTNESS strictness)
+{
+	if (strictness != SSS_DEFAULT)
+	{
+		_default_search_strictness = strictness;
+		return ERROR_SUCCESS;
+	}
+	else
+	{
+		return ERROR_INVALID_PARAMETER;
+	}
+}
+
+// Returns whether the search index is up-to-date
+template <typename charT>
+inline bool SpSearchStringSet<charT>::index_is_up_to_date()
+{
+	return !_outdated_index;
 }
 
 
@@ -678,22 +859,22 @@ void SpSearchStringSet<charT>::replace(std::basic_string<charT>& string, std::ba
 
 // Overload of SpSearchStringSet::append(std::basic_string<charT>&)
 template <typename charT>
-int SpSearchStringSet<charT>::append(const charT* new_string)
+int SpSearchStringSet<charT>::append(const charT* new_string, bool rebuild_index)
 {
 	if (new_string == NULL)
 		return ERROR_INVALID_ADDRESS;
 
-	return append(std::basic_string<charT>(new_string));
+	return append(std::basic_string<charT>(new_string), rebuild_index);
 }
 
 // Overload of SpSearchStringSet::append(std::basic_string<charT>&)
 template <typename charT>
-int SpSearchStringSet<charT>::append(charT* new_string)
+int SpSearchStringSet<charT>::append(charT* new_string, bool rebuild_index)
 {
 	if (new_string == NULL)
 		return ERROR_INVALID_ADDRESS;
 
-	return append(std::basic_string<charT>(new_string));
+	return append(std::basic_string<charT>(new_string), rebuild_index);
 }
 
 // Overload of SpSearchStringSet::index_of(std::basic_string<charT>&)
@@ -775,6 +956,32 @@ int SpSearchStringSet<charT>::search(charT* string, storageT& container, size_t 
 	}
 
 	return search(std::basic_string<charT>(string), container, limit, strictness);
+}
+
+// Overload of SpSearchStringSet::quick_search(std::basic_string<charT>&, ...)
+template <typename charT>
+const char* SpSearchStringSet<charT>::quick_search(const charT* string, SSS_MATCH_STRICTNESS strictness)
+{
+	if (string == NULL)
+	{
+		SetLastError(ERROR_INVALID_ADDRESS);
+		return 0;
+	}
+
+	return quick_search(std::basic_string<charT>(string), strictness);
+}
+
+// Overload of SpSearchStringSet::quick_search(std::basic_string<charT>&, ...)
+template <typename charT>
+const char* SpSearchStringSet<charT>::quick_search(charT* string, SSS_MATCH_STRICTNESS strictness)
+{
+	if (string == NULL)
+	{
+		SetLastError(ERROR_INVALID_ADDRESS);
+		return 0;
+	}
+
+	return quick_search(std::basic_string<charT>(string), strictness);
 }
 
 
