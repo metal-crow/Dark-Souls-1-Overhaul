@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="26">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>0</ID>
+      <Description>"no kill bosses"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+alloc(newmem,256)
+label(returnhere)
+label(abort_damage)
+
+newmem:
+mov ebp,[esp+08]
+
+push eax
+mov eax, [ebp+28]
+mov eax, [eax+C0] //load flag info for entity.
+test eax, 1 //Bit 00000001 is EnableLogic for boss
+pop eax
+jz abort_damage //if result EnableLogic &amp; 1 is 0, abort
+
+test byte ptr [ebp+000003C4],40
+jmp returnhere
+
+abort_damage:
+pop ebp
+retn 8
+
+"DARKSOULS.exe"+A688E5:
+jmp newmem
+nop
+nop
+nop
+nop
+nop
+nop
+returnhere:
+
+
+ 
+ 
+[DISABLE]
+dealloc(newmem)
+"DARKSOULS.exe"+A688E5:
+mov ebp,[esp+08]
+test byte ptr [ebp+000003C4],40
+//Alt: db 8B 6C 24 08 F6 85 C4 03 00 00 40
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>1</ID>
+      <Description>"no kill npcs"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+alloc(newmem,512)
+label(returnhere)
+label(bypass_check)
+label(abort_damage)
+
+newmem:
+//esi is attacker entityPointer
+//check if they are true host
+push eax
+mov  eax, [137DC70]
+mov  eax, [eax+4] //eax is entityPointer to local player
+cmp  eax, esi //if entityPointer for local player == attacker
+pop  eax
+je bypass_check
+
+//eax is target entityPointer
+//check if they are a non-hostile npc
+push eax
+mov  eax, [eax+208] //the Event Entity ID for the entity
+//big check against npc event ids
+cmp eax, 1798 //Griggs of Vinheim - Undead Burg
+je abort_damage
+cmp eax, 179a //Griggs of Vinheim - Firelink
+je abort_damage
+cmp eax, 184c //Blacksmith Rickert
+je abort_damage
+cmp eax, 178e //Big Hat Logan
+je abort_damage
+cmp eax, 178f //Big Hat Logan (The Duke's Archives)
+je abort_damage
+cmp eax, 17a2 //Dusk of Oolacile
+je abort_damage
+cmp eax, 1a2c //Dusk of Oolacile ( past forest )
+je abort_damage
+cmp eax, 1824 //Ingward - New Londo
+je abort_damage
+cmp eax, 1825 //Ingward - Firelink
+je abort_damage
+cmp eax, 17f2 //Laurentius - Depths
+je abort_damage
+cmp eax, 17f3 //Laurentius - Firelink
+je abort_damage
+cmp eax, 181a //Quelana of Izalith
+je abort_damage
+cmp eax, 1810 //Eingyi
+je abort_damage
+cmp eax, 17c0 //Petrus of Thorolund
+je abort_damage
+cmp eax, 17c1 //Petrus of Thorolund
+je abort_damage
+cmp eax, 17b6 //Rhea of Thorolund
+je abort_damage
+cmp eax, 187e //Crestfallen Warrior
+je abort_damage
+cmp eax, 43238 //Anastacia
+je abort_damage
+cmp eax, 82208 //Frampt
+je abort_damage
+cmp eax, 17ca //Vince of Thorolund
+je abort_damage
+cmp eax, 17d4 //Nico of Thorolund
+je abort_damage
+cmp eax, 1770 //Solaire of Astora
+je abort_damage
+cmp eax, 1771 //Solaire of Astora (at Shrine in Undead Burg?)
+je abort_damage
+cmp eax, 1772 //Solaire of Astora (at Anor Londo)
+je abort_damage
+cmp eax, 1773 //Solaire of Astora (at Demon Ruins/Lost Izalith)
+je abort_damage
+cmp eax, 1774 //Solaire of Astora (at Demon Ruins/Lost Izalith; heliozoan?)
+je abort_damage
+cmp eax, 1775 //Solaire of Astora
+je abort_damage
+cmp eax, 1776 //Solaire of Astora
+je abort_damage
+cmp eax, 1777 //Solaire of Astora
+je abort_damage
+cmp eax, 1778 //Solaire of Astora
+je abort_damage
+cmp eax, 1856 //Undead Male Merchant
+je abort_damage
+cmp eax, 1857 //Undead Male Merchant
+je abort_damage
+cmp eax, 1858 //Undead Male Merchant
+je abort_damage
+cmp eax, 3d478 //Undead Merchant
+je abort_damage
+cmp eax, 3d479 //Undead Merchant
+je abort_damage
+cmp eax, 40740 //Andre of Astora
+je abort_damage
+cmp eax, 189c //Knight Lautrec of Carim
+je abort_damage
+cmp eax, 189d //Knight Lautrec of Carim
+je abort_damage
+cmp eax, 18e2 //Oswald of Carim
+je abort_damage
+cmp eax, 82e24 //Alvina (no textures)
+je abort_damage
+cmp eax, 82e88 //Alvina (no textures, gray)
+je abort_damage
+cmp eax, 18a6 //Shiva
+je abort_damage
+cmp eax, 1874 //Domhnall of Zena - Depths
+je abort_damage
+cmp eax, 1875 //Domhnall of Zena - Firelink
+je abort_damage
+cmp eax, 825f0 //The Fair Lady
+je abort_damage
+cmp eax, 1888 //Siegmeyer of Catarina (at Sen's Fortress)
+je abort_damage
+cmp eax, 1889 //Siegmeyer of Catarina (at Anor Londo)
+je abort_damage
+cmp eax, 188a //Siegmeyer of Catarina (at Firelink Shrine)
+je abort_damage
+cmp eax, 188b //Siegmeyer of Catarina (at Blighttown)
+je abort_damage
+cmp eax, 188c //Siegmeyer of Catarina (at Lost Izalith)
+je abort_damage
+cmp eax, 1892 //Sieglinde of Catarina (at The Duke's Archives)
+je abort_damage
+cmp eax, 1893 //Sieglinde of Catarina (at The Great Hollow)
+je abort_damage
+cmp eax, 186a //Crestfallen Merchant
+je abort_damage
+cmp eax, 82209 //Kaathe
+je abort_damage
+cmp eax, 177a //Lady of the Darkling
+je abort_damage
+cmp eax, 81a38 //Gwynevere
+je abort_damage
+cmp eax, 45d31 //Giant Blacksmith
+je abort_damage
+cmp eax, 474a0 //Vamos
+je abort_damage
+cmp eax, 474a2 //Vamos
+je abort_damage
+cmp eax, 65130 //Elizabeth
+je abort_damage
+cmp eax, 65130 //Elizabeth (no textures)
+je abort_damage
+cmp eax, 3f3b8 //Marvellous Chester
+je abort_damage
+cmp eax, 1a54 //Lord's Blade Ciaran
+je abort_damage
+cmp eax, 1a55 //Lord's Blade Ciaran
+je abort_damage
+cmp eax, 1a56 //Lord's Blade Ciaran
+je abort_damage
+cmp eax, 1a57 //Lord's Blade Ciaran
+je abort_damage
+cmp eax, 1a58 //Lord's Blade Ciaran
+je abort_damage
+cmp eax, 1a59 //Lord's Blade Ciaran
+je abort_damage
+cmp eax, 64578 //Hawkeye Gough
+je abort_damage
+cmp eax, 6476c //Hawkeye Gough (no textures)
+je abort_damage
+pop eax
+jmp bypass_check
+
+abort_damage:
+pop eax
+//set damage to 0
+mov [eax+16C], -1
+
+bypass_check:
+push ebp
+mov ebp,esp
+and esp,-08
+jmp returnhere
+
+
+
+"DARKSOULS.exe"+A6BFE0:
+jmp newmem
+nop
+returnhere:
+
+
+ 
+ 
+[DISABLE]
+dealloc(newmem)
+"DARKSOULS.exe"+A6BFE0:
+push ebp
+mov ebp,esp
+and esp,-08
+//Alt: db 55 8B EC 83 E4 F8
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>
