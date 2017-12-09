@@ -130,7 +130,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <PreprocessorDefinitions>WIN32;_DS1_OVERHAUL_MOD_DBG_;_WINDOWS;_USRDLL;DARKSOULSOVERHAULMOD_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>lib;lib\SP;lib\DirectX\Include;lib\D3DFont;include;lib\Detours;include\Debug;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files\Microsoft DirectX SDK (June 2010)\Include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>lib;lib\SP;lib\DirectX\Include;lib\D3DFont;lib\curl-7.56.1\include;lib\zlib-1.2.11;lib\zlib-1.2.11\src;lib\SP\DsGameFiles\include;include;lib\Detours;include\Debug;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files\Microsoft DirectX SDK (June 2010)\Include;</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <MinimalRebuild>false</MinimalRebuild>
@@ -148,8 +148,8 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>lib;lib\SP;lib\DirectX\Lib\x86_;lib\D3DFont;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>d3d9_sp_overlay.lib;SpPointer.lib;SP_IO.lib;SP_AoBScan.lib;SP_AsmInjectx86.lib;SP_SysUtils.lib;lib\Detours\Detours.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>lib;lib\SP;lib\DirectX\Lib\x86_;lib\D3DFont;lib\zlib-1.2.11;lib\SP\DsGameFiles;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>d3d9_sp_overlay.lib;DsGameFiles.lib;SpPointer.lib;SP_IO.lib;SP_AoBScan.lib;SP_AsmInjectx86.lib;SP_SysUtils.lib;zlib.lib;lib\Detours\Detours.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>Exports.def</ModuleDefinitionFile>
       <LinkTimeCodeGeneration>UseFastLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
@@ -161,7 +161,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;DARKSOULSOVERHAULMOD_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>lib;lib\SP;lib\DirectX\Include;lib\D3DFont;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files\Microsoft DirectX SDK (June 2010)\Include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>lib;lib\SP;lib\DirectX\Include;lib\D3DFont;lib\curl-7.56.1\include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files\Microsoft DirectX SDK (June 2010)\Include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -179,16 +179,17 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;DARKSOULSOVERHAULMOD_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>lib;lib\SP;lib\DirectX\Include;lib\D3DFont;include;lib\Detours;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files\Microsoft DirectX SDK (June 2010)\Include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>lib;lib\SP;lib\DirectX\Include;lib\D3DFont;lib\curl-7.56.1\include;lib\zlib-1.2.11;lib\zlib-1.2.11\src;lib\SP\DsGameFiles\include;include;lib\Detours;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files\Microsoft DirectX SDK (June 2010)\Include;</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <DisableSpecificWarnings>4503</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>lib;lib\SP;lib\DirectX\Lib\x86_;lib\D3DFont;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>d3d9_sp_overlay.lib;SpPointer.lib;SP_IO.lib;SP_AoBScan.lib;SP_AsmInjectx86.lib;SP_SysUtils.lib;lib\Detours\Detours.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>lib;lib\SP;lib\DirectX\Lib\x86_;lib\D3DFont;lib\zlib-1.2.11;lib\SP\DsGameFiles;lib\curl-7.56.1\lib;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>d3d9_sp_overlay.lib;DsGameFiles.lib;SpPointer.lib;SP_IO.lib;SP_AoBScan.lib;SP_AsmInjectx86.lib;SP_SysUtils.lib;libcurl_a.lib;zlib.lib;lib\Detours\Detours.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>Exports.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
@@ -201,7 +202,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;DARKSOULSOVERHAULMOD_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>lib;lib\SP;lib\DirectX\Include;lib\D3DFont;include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files\Microsoft DirectX SDK (June 2010)\Include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>lib;lib\SP;lib\DirectX\Include;lib\D3DFont;lib\curl-7.56.1\include;lib\zlib-1.2.11;lib\zlib-1.2.11\src;lib\SP\DsGameFiles\include;include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files\Microsoft DirectX SDK (June 2010)\Include;</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -209,8 +210,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>lib;lib\SP;lib\DirectX\Lib\x86_;lib\D3DFont;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>d3d9_sp_overlay.lib;SpPointer.lib;SP_IO.lib;SP_AoBScan.lib;SP_AsmInjectx86.lib;SP_SysUtils.lib;lib\Detours\Detours.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>lib;lib\SP;lib\DirectX\Lib\x86_;lib\D3DFont;lib\zlib-1.2.11;lib\SP\DsGameFiles;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>d3d9_sp_overlay.lib;DsGameFiles.lib;SpPointer.lib;SP_IO.lib;SP_AoBScan.lib;SP_AsmInjectx86.lib;SP_SysUtils.lib;zlib.lib;lib\Detours\Detours.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>Exports.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
@@ -223,7 +224,8 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;DARKSOULSOVERHAULMOD_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>lib;lib\SP;lib\DirectX\Include;lib\D3DFont;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files\Microsoft DirectX SDK (June 2010)\Include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>lib;lib\SP;lib\DirectX\Include;lib\D3DFont;lib\curl-7.56.1\include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files\Microsoft DirectX SDK (June 2010)\Include;</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4503</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -243,7 +245,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;DARKSOULSOVERHAULMOD_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>lib;lib\SP;lib\DirectX\Include;lib\D3DFont;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files\Microsoft DirectX SDK (June 2010)\Include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>lib;lib\SP;lib\DirectX\Include;lib\D3DFont;lib\curl-7.56.1\include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files\Microsoft DirectX SDK (June 2010)\Include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -255,34 +257,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\Debug\GameParamDefsDebug.h" />
     <ClInclude Include="include\DllMain.h" />
+    <ClInclude Include="include\Files.h" />
     <ClInclude Include="include\GameData.h" />
-    <ClInclude Include="include\GameEnum.h" />
-    <ClInclude Include="include\GameFiles.h" />
     <ClInclude Include="include\ModData.h" />
-    <ClInclude Include="include\ParamDef.h" />
-    <ClInclude Include="include\ParamDef\AIStandardInfoParamDef.h" />
-    <ClInclude Include="include\ParamDef\ArmorParamDef.h" />
-    <ClInclude Include="include\ParamDef\BehaviorPCParamDef.h" />
-    <ClInclude Include="include\ParamDef\GameParamDef.h" />
-    <ClInclude Include="include\ParamDef\BehaviorNPCParamDef.h" />
-    <ClInclude Include="include\ParamDef\BulletParamDef.h" />
-    <ClInclude Include="include\ParamDef\CharInitParamDef.h" />
-    <ClInclude Include="include\ParamDef\ItemLotParamDef.h" />
-    <ClInclude Include="include\ParamDef\ItemParamDef.h" />
-    <ClInclude Include="include\ParamDef\LockCamParamDef.h" />
-    <ClInclude Include="include\ParamDef\MagicParamDef.h" />
-    <ClInclude Include="include\ParamDef\MaterialSetParamDef.h" />
-    <ClInclude Include="include\ParamDef\MenuColorTableParamDef.h" />
-    <ClInclude Include="include\ParamDef\MoveParamDef.h" />
-    <ClInclude Include="include\ParamDef\NPCParamDef.h" />
-    <ClInclude Include="include\ParamDef\NPCThinkParamDef.h" />
-    <ClInclude Include="include\ParamDef\ShopLineupParamDef.h" />
-    <ClInclude Include="include\ParamDef\SpecialEffectParamDef.h" />
-    <ClInclude Include="include\ParamDef\SpecialEffectVFXParamDef.h" />
-    <ClInclude Include="include\ParamDef\ThrowParamDef.h" />
-    <ClInclude Include="include\ParamDef\WeaponParamDef.h" />
     <ClInclude Include="include\PhantomLimit.h" />
     <ClInclude Include="include\Plugin\ConsoleCommands.h" />
     <ClInclude Include="include\Plugin\KeybindFunctions.h" />
@@ -311,7 +289,6 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\GameData.cpp" />
-    <ClCompile Include="src\GameEnum.cpp" />
     <ClCompile Include="src\ModData.cpp" />
     <ClCompile Include="src\PhantomLimit.cpp" />
     <ClCompile Include="src\Plugin\ConsoleCommands.cpp" />

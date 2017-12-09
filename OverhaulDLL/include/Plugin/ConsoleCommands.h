@@ -27,6 +27,8 @@
 	and Console Command Aliases are prefixed with "cca".
 */
 
+// Error message displayed when not enough arguments are passed to a command
+const std::string ERROR_NOT_ENOUGH_ARGUMENTS = "ERROR: Not enough arguments";
 
 // Error message displayed when an invalid argument is passed to a command that only accepts a boolean argument
 const std::string ERROR_INVALID_BOOL_ARGUMENT = "ERROR: Assigned value must be either 1 or 0 (1 = enabled, 0 = disabled)";
@@ -138,29 +140,6 @@ void bool_to_string(bool boolean, std::string *str)
 }
 
 
-
-// Converts a character array to lowercase
-void to_lower(char *string)
-{
-	if (string == NULL)
-	{
-		// Invalid argument
-		SetLastError(ERROR_INVALID_PARAMETER);
-		return;
-	}
-
-	unsigned int index = 0;
-	while (string[index] != '\0')
-	{
-		if (string[index] >= 'A' && string[index] <= 'Z')
-		{
-			string[index] -= ('A' - 'a');
-		}
-		index++;
-	}
-}
-
-
 /*
 	Removes all leading/trailing characters from a string if they appear
 	in the character mask.
@@ -256,7 +235,7 @@ int parse_toggle_arg(const char *c_arg)
 		}
 	}
 
-	to_lower((char *)arg.c_str());
+	FileUtil::to_lowercase((char *)arg.c_str());
 
 	if ((strcmp(arg.c_str(), "true") == 0) || (strcmp(arg.c_str(), "on") == 0) || (strcmp(arg.c_str(), "enable") == 0) || (strcmp(arg.c_str(), "enabled") == 0))
 	{
