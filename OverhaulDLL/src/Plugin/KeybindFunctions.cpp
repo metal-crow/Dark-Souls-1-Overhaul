@@ -61,7 +61,7 @@ int kf_toggle_dim_lava()
 // Toggles armor sound effects
 int kf_toggle_armor_sfx()
 {
-	if (ParamDef::Armor().base == NULL)
+	if (Params::Armor().base == NULL)
 	{
 		if (!Game::characters_loaded)
 			print_console("ERROR: Unable to toggle armor sounds (try loading a character first)");

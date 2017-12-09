@@ -190,73 +190,69 @@ void Mod::get_single_user_keybind(const char *keybind_name, int(*function)())
 // Get custom game files from the settings file
 void Mod::get_custom_game_files()
 {
-	// Temporary storage for default game file extensions
-	std::string file_extension;
 
 	// Custom game archive file name prefix
-	char custom_archive_prefix_buff[MAX_PATH + 1];
-	custom_archive_prefix_buff[MAX_PATH] = '\0';
+	char custom_file_name_buff[MAX_PATH + 1];
+    custom_file_name_buff[MAX_PATH] = '\0';
 	GetPrivateProfileString(_DS1_OVERHAUL_PREFS_SECTION_,
 							_DS1_OVERHAUL_PREF_CUSTOM_GAME_ARCHIVE_,
 							NULL,
-							custom_archive_prefix_buff,
+                            custom_file_name_buff,
 							MAX_PATH + 1,
 							_DS1_OVERHAUL_SETTINGS_FILE_);
 
 	// Convert string to wide chars
 	errno_t return_error = 0;
-	if (return_error = string_mb_to_wide(custom_archive_prefix_buff, Mod::custom_game_archives)) {
+	if (return_error = string_mb_to_wide(custom_file_name_buff, Mod::custom_game_archives)) {
 		// Conversion error
 		Mod::custom_game_archives = L"";
 	}
-	else if (std::string(custom_archive_prefix_buff).length() > 0)
+	else if (std::string(custom_file_name_buff).length() > 0)
 	{
-		Mod::startup_messages.push_back(std::string("    Found custom game archive file definition: \"").append(custom_archive_prefix_buff).append("\""));
+		Mod::startup_messages.push_back(std::string("    Found custom game archive file definition: \"").append(custom_file_name_buff).append("\""));
 	}
 
 
 	// Custom game save file
-	char custom_save_file_buff[MAX_PATH + 1];
-	custom_save_file_buff[MAX_PATH] = '\0';
+    custom_file_name_buff[MAX_PATH] = '\0';
 	GetPrivateProfileString(_DS1_OVERHAUL_PREFS_SECTION_,
 							_DS1_OVERHAUL_PREF_CUSTOM_SAVE_FILE_,
 							NULL,
-							custom_save_file_buff,
+                            custom_file_name_buff,
 							MAX_PATH + 1,
 							_DS1_OVERHAUL_SETTINGS_FILE_);
 
 	// Convert string to wide chars
 	return_error = 0;
-	if (return_error = string_mb_to_wide(custom_save_file_buff, Mod::custom_save_file)) {
+	if (return_error = string_mb_to_wide(custom_file_name_buff, Mod::custom_save_file)) {
 		// Conversion error
 		Mod::custom_save_file = L"";
 	}
-	else if(std::string(custom_save_file_buff).length() > 0)
+	else if(std::string(custom_file_name_buff).length() > 0)
 	{
-		Mod::startup_messages.push_back(std::string("    Found custom game save file definition: \"").append(custom_save_file_buff).append("\""));
+		Mod::startup_messages.push_back(std::string("    Found custom game save file definition: \"").append(custom_file_name_buff).append("\""));
 	}
 		
 
 
 	// Custom game config file
-	char custom_game_cfg_buff[MAX_PATH + 1];
-	custom_game_cfg_buff[MAX_PATH] = '\0';
+    custom_file_name_buff[MAX_PATH] = '\0';
 	GetPrivateProfileString(_DS1_OVERHAUL_PREFS_SECTION_,
 							_DS1_OVERHAUL_PREF_CUSTOM_GAME_CFG_FILE_,
 							NULL,
-							custom_game_cfg_buff,
+                            custom_file_name_buff,
 							MAX_PATH + 1,
 							_DS1_OVERHAUL_SETTINGS_FILE_);
 
 	// Convert string to wide chars
 	return_error = 0;
-	if ((return_error = string_mb_to_wide(custom_game_cfg_buff, Mod::custom_config_file))) {
+	if ((return_error = string_mb_to_wide(custom_file_name_buff, Mod::custom_config_file))) {
 		// Conversion error
 		Mod::custom_config_file = L"";
 	}
-	else if (std::string(custom_game_cfg_buff).length() > 0)
+	else if (std::string(custom_file_name_buff).length() > 0)
 	{
-		Mod::startup_messages.push_back(std::string("    Found custom game config file definition: \"").append(custom_game_cfg_buff).append("\""));
+		Mod::startup_messages.push_back(std::string("    Found custom game config file definition: \"").append(custom_file_name_buff).append("\""));
 	}
 }
 
