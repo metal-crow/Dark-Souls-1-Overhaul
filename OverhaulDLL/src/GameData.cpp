@@ -12,7 +12,6 @@
 */
 
 #include "DllMain.h"
-#include "GameFiles.h"
 
 
 
@@ -31,12 +30,6 @@ SpPointer Game::player_char_status;
 
 // Flag to determine if any characters have been loaded since the game was launched (useful if player had a character loaded but returned to main menu)
 bool Game::characters_loaded = false;
-
-// File extension for parameter definition files
-const char *GameParamDef::paramdef_extension = ".paramdef";
-
-// File extension for parameter files
-const char *GameParamDef::param_extension = ".param";
 
 // Address of lava brightness effect (used for dimming lava)
 uint8_t *Game::lava_luminosity = NULL;
@@ -85,26 +78,7 @@ void Game::on_first_character_loaded()
 
 	// Get param files
 	print_console(Mod::output_prefix + "Searching memory for loaded param files...");
-	ParamDef::AiStandardInfo().init(true);
-	ParamDef::Armor().init(true);
-	ParamDef::BehaviorNpc().init(true);
-	ParamDef::BehaviorPc().init(true);
-	ParamDef::Bullet().init(true);
-	ParamDef::LockCam().init(true);
-	ParamDef::CharInit().init(true);
-	ParamDef::Item().init(true);
-	ParamDef::ItemLot().init(true);
-	ParamDef::Magic().init(true);
-	ParamDef::MaterialSet().init(true);
-	ParamDef::MenuColor().init(true);
-	ParamDef::Move().init(true);
-	ParamDef::Npc().init(true);
-	ParamDef::NpcThink().init(true);
-	ParamDef::ShopLineup().init(true);
-	ParamDef::SpEffect().init(true);
-	ParamDef::SpEffectVfx().init(true);
-	ParamDef::Throw().init(true);
-	ParamDef::Weapon().init(true);
+	Params::Armor().init(true);
 
 	// Disable armor sounds if it was specified in the config file
 	if (Mod::disable_armor_sfx_pref)
@@ -424,13 +398,13 @@ void Game::enable_dim_lava(bool dim)
 // Checks if armor sound effects are enabled
 bool Game::armor_sfx_enabled()
 {
-	if (ParamDef::Armor().base == NULL)
+	if (Params::Armor().base == NULL)
 	{
 		print_console("ERROR: Waiting for Armor params to load");
 		return true;
 	}
 
-	ArmorParam *first_param = ParamDef::Armor().data();
+	ArmorParam *first_param = Params::Armor().data();
 
 	return (first_param->defenseMaterial == 59 && first_param->defenseMaterial_Weak == 29);
 }
@@ -439,7 +413,7 @@ bool Game::armor_sfx_enabled()
 // Toggles armor sound effecs
 void Game::enable_armor_sfx(bool enable)
 {
-	if (ParamDef::Armor().base == NULL)
+	if (Params::Armor().base == NULL)
 	{
 		print_console("ERROR: Waiting for Armor params to load");
 		return;
@@ -452,23 +426,23 @@ void Game::enable_armor_sfx(bool enable)
 	bool backup_defaults = default_armor_sfx_values.empty();
 
 
-	for (int i = 0; i < (int)ParamDef::Armor().param_count; i++)
+	for (int i = 0; i < (int)Params::Armor().param_count; i++)
 	{
 		// First time, store default armor sound effects
 		if (backup_defaults)
 			default_armor_sfx_values.push_back({ 
-						ParamDef::Armor().get(i)->defenseMaterial,
-						ParamDef::Armor().get(i)->defenseMaterial_Weak });
+						Params::Armor().get(i)->defenseMaterial,
+						Params::Armor().get(i)->defenseMaterial_Weak });
 			
 		if (enable)
 		{
-			ParamDef::Armor().get(i)->defenseMaterial = default_armor_sfx_values.at(i).at(0);
-			ParamDef::Armor().get(i)->defenseMaterial_Weak = default_armor_sfx_values.at(i).at(1);
+			Params::Armor().get(i)->defenseMaterial = default_armor_sfx_values.at(i).at(0);
+			Params::Armor().get(i)->defenseMaterial_Weak = default_armor_sfx_values.at(i).at(1);
 		}
 		else
 		{
-			ParamDef::Armor().get(i)->defenseMaterial = 0;
-			ParamDef::Armor().get(i)->defenseMaterial_Weak = 0;
+			Params::Armor().get(i)->defenseMaterial = 0;
+			Params::Armor().get(i)->defenseMaterial_Weak = 0;
 		}
 	}
 }

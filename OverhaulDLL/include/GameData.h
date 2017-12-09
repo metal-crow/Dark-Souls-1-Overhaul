@@ -126,24 +126,23 @@ public:
 
 
 
-									/////////////////////////////////////////
-									////////////// FILE-RELATED /////////////
-									/////////////////////////////////////////
+					/////////////////////////////////////////
+					////////////// FILE-RELATED /////////////
+					/////////////////////////////////////////
 	class Files {
 	public:
 
-		// Default number of game archive file pairs
-		#define ARCHIVE_FILE_PAIR_COUNT 4
+		// If true, console messages will be printed when the game performs certain actions on the game files
+		static bool monitor_file_activity; // @TODO: Re-implement this (accidentally lost a lot of un-committed code somehow)
 
-		// Default file types for game archive files (wide char)
-		static const wchar_t *ARCHIVE_FILE_TYPE_W[2];
+		// File handles for archive header files
+		static std::vector<HANDLE> bhd_handle;
 
-		// Default file types for game archive files (char)
-		static const char *ARCHIVE_FILE_TYPE[2];
+		// File handles for archive files
+		static std::vector<HANDLE> bdt_handle;
 
-		// Default file type for game save file
-		static const wchar_t *DEFAULT_SAVE_FILE_TYPE_W;
-
+		// File handle for save file
+		static HANDLE sl2_handle;
 
 
 
@@ -158,6 +157,22 @@ public:
 		// Called when the game attempts to call WritePrivatePrivateProfileW
 		static BOOL WINAPI intercept_write_private_profile_section_w(LPCWSTR lpAppName, LPCWSTR lpString, LPCWSTR lpFileName);
 
+        /*
+                @TODO: Re-implement these functions (accidentally lost a lot of un-committed code somehow)
+
+		// Called when the game attempts to call ReadFile
+		static BOOL WINAPI intercept_read_file(HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead, LPDWORD lpNumberOfBytesRead, LPOVERLAPPED lpOverlapped);
+
+		// Called when the game attempted to call SetFilePointer
+		static DWORD WINAPI intercept_set_file_pointer(HANDLE hFile, LONG lDistanceToMove, PLONG lpDistanceToMoveHigh, DWORD dwMoveMethod);
+
+		// Called when the game attempts to call CloseHandle
+		static BOOL WINAPI intercept_close_handle(HANDLE hObject);
+
+        // Returns the name of the game file that the specified file handle corresponds to
+        static void filename_from_handle(HANDLE handle, std::string& filename);
+
+        */
 
 		// Patches game calls to CreateFileW, redirecting them to Game::intercept_create_file()
 		static void apply_function_intercepts();

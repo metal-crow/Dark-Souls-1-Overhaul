@@ -10,23 +10,17 @@
 #ifndef _DS1_OVERHAUL_GAME_FILES_H_
 	#define _DS1_OVERHAUL_GAME_FILES_H_
 
-#include "GameData.h"
+#include "DllMain.h"
 #include "Shlobj.h"
 #include "SP_IO.hpp"
+#include "Archive/Bdt.h"
+#include "Archive/Bhd5.h"
+#include "Save/Sl2.h"
 
 
 /*
 	Initialize constants:
 */
-
-// Default file types for game archive files (wide char)
-const wchar_t *Files::ARCHIVE_FILE_TYPE_W[2] = { L".bdt", L".bhd5" };
-
-// Default file types for game archive files (char)
-const char *Files::ARCHIVE_FILE_TYPE[2] = { ".bdt", ".bhd5" };
-
-// Default file type for game save file
-const wchar_t *Files::DEFAULT_SAVE_FILE_TYPE_W = L".sl2";
 
 
 
@@ -45,17 +39,17 @@ HANDLE WINAPI Files::intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesired
 		if ((int)load_file.length() >= 4)
 		{
 			load_file_ext = load_file.substr(load_file.length() - 4);
-			if ((int)Mod::custom_game_archives.length() > 0 && load_file_ext == Files::ARCHIVE_FILE_TYPE_W[0])
+			if ((int)Mod::custom_game_archives.length() > 0 && load_file_ext == BdtArchive::FILE_EXT_W)
 			{
 				// Intercept archive file load (.bdt)
 				load_file = Mod::custom_game_archives + load_file.substr(load_file.length() - 5);
 			}
-			else if ((int)Mod::custom_game_archives.length() > 0 && load_file_ext == &Files::ARCHIVE_FILE_TYPE_W[1][1])
+			else if ((int)Mod::custom_game_archives.length() > 0 && load_file_ext == &Bhd5Archive::FILE_EXT_W[1])
 			{
 				// Intercept archive file load (.bhd5)
 				load_file = Mod::custom_game_archives + load_file.substr(load_file.length() - 6);
 			}
-			else if ((int)Mod::custom_save_file.length() > 0 && (load_file_ext == Files::DEFAULT_SAVE_FILE_TYPE_W))
+			else if ((int)Mod::custom_save_file.length() > 0 && (load_file_ext == SaveFile::FILE_EXT_W))
 			{
 				// Intercept save file load (.sl2)
 				load_file = Mod::custom_save_file;
@@ -116,7 +110,7 @@ BOOL WINAPI Files::intercept_write_private_profile_section_w(LPCWSTR lpAppName, 
 void Files::apply_function_intercepts()
 {
 	// CreateFileW
-	static uint32_t intercept_func_w = (uint32_t)&Game::Files::intercept_create_file_w;
+	static uint32_t intercept_func_w = (uint32_t)&Files::intercept_create_file_w;
 	static uint32_t *intercept_func_w_ptr = &intercept_func_w;
 	uint8_t *intercept_func_w_b = (uint8_t *)&intercept_func_w_ptr;
 	uint8_t patch_w[4] = { intercept_func_w_b[0], intercept_func_w_b[1], intercept_func_w_b[2], intercept_func_w_b[3] };
@@ -176,31 +170,31 @@ void Files::check_custom_archive_files()
 
 
 	// Check that custom game archive files exist
-	for (int i = 0; i < ARCHIVE_FILE_PAIR_COUNT; i++)
+	for (int i = 0; i < BdtArchive::FILE_COUNT_DEFAULT; i++)
 	{
-		std::ifstream check_file(std::wstring(Mod::custom_game_archives).append(std::to_wstring(i)).append(ARCHIVE_FILE_TYPE_W[0]).c_str());
+		std::ifstream check_file(std::wstring(Mod::custom_game_archives).append(std::to_wstring(i)).append(BdtArchive::FILE_EXT_W).c_str());
 		if (!check_file.good())
 		{
 			// Custom .bdt file doesn't exist
-			Mod::startup_messages.push_back(std::string(Mod::output_prefix + "ERROR: The file \"").append(archive_name_ch).append(std::to_string(i)).append(ARCHIVE_FILE_TYPE[0]).append("\" could not be found. Using default archive files instead."));
+			Mod::startup_messages.push_back(std::string(Mod::output_prefix + "ERROR: The file \"").append(archive_name_ch).append(std::to_string(i)).append(BdtArchive::FILE_EXT).append("\" could not be found. Using default archive files instead."));
 			check_file.close();
 			Mod::custom_game_archives = L"";
 			return;
 		}
 		else
-			Mod::startup_messages.push_back(std::string("    Found ").append(archive_name_ch).append(std::to_string(i)).append(ARCHIVE_FILE_TYPE[0]));
+			Mod::startup_messages.push_back(std::string("    Found ").append(archive_name_ch).append(std::to_string(i)).append(BdtArchive::FILE_EXT));
 		check_file.close();
-		std::ifstream check_file2(std::wstring(Mod::custom_game_archives).append(std::to_wstring(i)).append(ARCHIVE_FILE_TYPE_W[1]).c_str());
+		std::ifstream check_file2(std::wstring(Mod::custom_game_archives).append(std::to_wstring(i)).append(Bhd5Archive::FILE_EXT_W).c_str());
 		if (!check_file2.good())
 		{
 			// Custom .bhd5 file doesn't exist
-			Mod::startup_messages.push_back(std::string(Mod::output_prefix + "ERROR: The file \"").append(archive_name_ch).append(std::to_string(i)).append(ARCHIVE_FILE_TYPE[1]).append("\" could not be found. Using default archive files."));
+			Mod::startup_messages.push_back(std::string(Mod::output_prefix + "ERROR: The file \"").append(archive_name_ch).append(std::to_string(i)).append(Bhd5Archive::FILE_EXT).append("\" could not be found. Using default archive files."));
 			check_file2.close();
 			Mod::custom_game_archives = L"";
 			return;
 		}
 		else
-			Mod::startup_messages.push_back(std::string("    Found ").append(archive_name_ch).append(std::to_string(i)).append(ARCHIVE_FILE_TYPE[1]));
+			Mod::startup_messages.push_back(std::string("    Found ").append(archive_name_ch).append(std::to_string(i)).append(Bhd5Archive::FILE_EXT));
 		check_file2.close();
 	}
 	
