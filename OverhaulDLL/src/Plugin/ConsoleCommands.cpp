@@ -20,6 +20,21 @@
 
 
 
+// Plays the mod credits (lists the people who helped create the mod)
+int cc_credits(std::vector<std::string> args, std::string *output)
+{
+    // @TODO
+    output->append("\n\n");
+    output->append("    ///////////////////////////////////////////////////////////\n");
+    output->append("    ///////////////// Dark Souls Overhaul Mod /////////////////\n");
+    output->append("    ///////////////////////////////////////////////////////////\n");
+    output->append("\n                ...credits coming eventually...\n\n");
+
+    return CONSOLE_COMMAND_SUCCESS;
+}
+
+
+
 // Enables cheats until game is restarted
 int cc_cheats(std::vector<std::string> args, std::string *output)
 {
@@ -307,6 +322,7 @@ int cc_developer_debug(std::vector<std::string> args, std::string *output)
 void Mod::register_console_commands()
 {
 	register_console_command(ccn_developer_debug, cc_developer_debug, chm_developer_debug);
+    register_console_command(ccn_credits, cc_credits, chm_credits);
 	register_console_command(ccn_armor_sfx, cc_armor_sfx, chm_armor_sfx);
 	register_console_alias(cca_armor_sounds, ccn_armor_sfx);
 	register_console_command(ccn_dim_lava, cc_dim_lava, chm_dim_lava);

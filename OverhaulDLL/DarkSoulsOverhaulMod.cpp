@@ -9,6 +9,7 @@
 
 #include "DllMain.h"
 #include "Files.h"
+#include "AntiCheat.h"
 
 /*
     Called from DllMain when the plugin DLL is first loaded into memory (PROCESS_ATTACH case).
@@ -35,9 +36,6 @@ void on_process_attach()
         exit(0);
     }
 
-    // Change game version number
-    Game::set_game_version(DS1_VERSION_OVERHAUL);
-
     // Apply increased memory limit patch
     Game::set_memory_limit(Game::memory_limit);
 
@@ -49,8 +47,17 @@ void on_process_attach()
     Files::check_custom_save_file();
     Files::check_custom_game_config_file();
 
-    // Apply first part of phantom limit patch
-    Game::increase_phantom_limit1();
+    if (!Mod::legacy_mode)
+    {
+        // Change game version number
+        Game::set_game_version(DS1_VERSION_OVERHAUL);
+
+        // Apply first part of phantom limit patch
+        Game::increase_phantom_limit1();
+    }
+
+    // Start anti-cheat
+    AntiCheat::start();
 }
 
 /*
@@ -109,11 +116,13 @@ __declspec(dllexport) void __stdcall initialize_plugin()
     // Initialize pointers
     Game::init_pointers();
 
-    // Apply secondary phantom limit patch
-    Game::increase_phantom_limit2();
+    if (!Mod::legacy_mode)
+        // Apply secondary phantom limit patch
+        Game::increase_phantom_limit2();
 
-    // Disable "Framerate insufficient for online play" error
-    Game::enable_low_fps_disconnect(false);
+    if (Mod::disable_low_fps_disconnect)
+        // Disable "Framerate insufficient for online play" error
+        Game::enable_low_fps_disconnect(false);
 
     // Start thread for deferred tasks
     if (!CreateThread(NULL, 0, deferred_tasks, NULL, 0, NULL))

@@ -69,6 +69,11 @@ const char *chm_cheats = ccn_cheats" [boolean]\n"
 									"    are disabled until the game is restarted.";
 
 
+#define ccn_credits "overhaul_credits"
+const char *chm_credits = ccn_credits"\n"
+                         "    Plays the credits for the Dark Souls Overhaul Mod.";
+
+
 #define ccn_multiplayer_network "multiplayer_network"
 const char *chm_multiplayer_network = ccn_multiplayer_network" \n"
 									"    Prints various multiplayer network information (Steam ID, ping, etc.) for each player in the current node network.";

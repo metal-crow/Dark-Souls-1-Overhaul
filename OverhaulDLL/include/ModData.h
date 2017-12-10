@@ -18,16 +18,22 @@
 #define _DS1_OVERHAUL_SETTINGS_FILE_ ".\\d3d9_Mod.ini"
 #define _DS1_OVERHAUL_PREFS_SECTION_ "Dark Souls Overhaul Settings"
 #define _DS1_OVERHAUL_KEYBINDS_SECTION_ "Dark Souls Overhaul Keybinds"
+#define _DS1_OVERHAUL_ANTICHEAT_SECTION_ "Dark Souls Overhaul Anti-Cheat"
 // Startup preferences:
 #define _DS1_OVERHAUL_PREF_LEGACY_MODE_ "LegacyMode"
 #define _DS1_OVERHAUL_PREF_MEMORY_LIMIT_ "MemoryLimit"
 #define _DS1_OVERHAUL_PREF_CUSTOM_GAME_ARCHIVE_ "CustomArchiveFiles"
 #define _DS1_OVERHAUL_PREF_CUSTOM_SAVE_FILE_ "CustomSaveFile"
 #define _DS1_OVERHAUL_PREF_CUSTOM_GAME_CFG_FILE_ "CustomGameConfigFile"
+// Anti-cheat:
+#define _DS1_OVERHAUL_PREF_AC_BOSS_GUARD_ "BossGuard"
+#define _DS1_OVERHAUL_PREF_AC_NPC_GUARD_ "NpcGuard"
+#define _DS1_OVERHAUL_PREF_AC_TELEBACKSTAB_PROT_ "TeleBackstabProtect"
 // Settings:
 #define _DS1_OVERHAUL_PREF_SHOW_NODE_COUNT_ "DisplayNodeCount"
 #define _DS1_OVERHAUL_PREF_DIM_LAVA_ "DimLava"
 #define _DS1_OVERHAUL_PREF_DISABLE_ARMOR_SFX_ "DisableArmorSounds"
+#define _DS1_OVERHAUL_PREF_DISABLE_LOW_FPS_DISCONNECT_ "DisableLowFpsDisconnect"
 // Keybinds:
 #define _DS1_OVERHAUL_HOTKEY_BONFIRE_INPUT_FIX_ "BonfireInputFix"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_NODE_COUNT_ "ToggleNodeCount"
@@ -56,6 +62,15 @@ class Mod
 {
 public:
 
+    // List of people who directly contributed to the Dark Souls Overhaul Mod
+    static std::vector<std::string> authors;
+
+    // List of people who indirectly contributed to the mod, but had no direct involvement
+    static std::vector<std::string> contributors;
+
+    // Others who made the project possible
+    static std::vector<std::string> special_thanks;
+
 	// Used in console messages to inform users that a message is being printed by the Overhaul mod
 	static const std::string output_prefix;
 
@@ -71,11 +86,14 @@ public:
 	// List of supported game versions
 	static std::vector<uint8_t> supported_game_versions;
 
-	// Determines whether to start in legacy mode (only applies fixes, no gameplay changes)
+	// Determines whether to start in legacy mode (only applies fixes/anti-cheat/QoL changes, no gameplay modifications)
 	static bool legacy_mode;
 
 	// Cheats on/off. If cheats are enabled, saving and multiplayer are disabled until the game is restarted
 	static bool cheats;
+
+    // Determines to disable the game's "Framerate insufficient for online play" disconnection
+    static bool disable_low_fps_disconnect;
 
 	// Determines whether node count is displayed on the overlay text feed info header
 	static bool show_node_count;
@@ -114,6 +132,9 @@ public:
 
 	// Get custom game files from the settings file
 	static void get_custom_game_files();
+
+    // Plays the credits for the Dark Souls Overhaul Mod (displays the list of people who contributed to development)
+    static void play_credits();
 	
 
 

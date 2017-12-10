@@ -7,6 +7,7 @@
 */
 
 #include "DllMain.h"
+#include "AntiCheat.h"
 
 #define _SP_DEFINE_VK_NAME_STRINGS_		// Must be defined to use Virtual-key code name strings from SP_IO_Strings.hpp (opt-in by default because it increases filesize by a few KB)
 
@@ -42,6 +43,9 @@ bool Mod::legacy_mode = false;
 // Cheats on/off. If cheats are enabled, saving and multiplayer are disabled until the game is restarted
 bool Mod::cheats = false;
 
+// Determines to disable the game's "Low framerate detected" disconnection
+bool Mod::disable_low_fps_disconnect = true;
+
 // Determines whether node count is displayed on the overlay text feed info header
 bool Mod::show_node_count = true;
 
@@ -65,7 +69,6 @@ std::wstring Mod::custom_config_file;
 // Get user-defined startup preferences from the settings file
 void Mod::get_startup_preferences()
 {
-
 	// Begin loading startup preferences
 	Mod::startup_messages.push_back(Mod::output_prefix + "Loading startup preferences...");
 
@@ -80,10 +83,14 @@ void Mod::get_startup_preferences()
 	// Memory limit
 	Game::memory_limit = (uint32_t)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_MEMORY_LIMIT_, (int)Game::memory_limit, _DS1_OVERHAUL_SETTINGS_FILE_);
 
+    
+    // Anti-cheat
+    BossGuard::active = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_ANTICHEAT_SECTION_, _DS1_OVERHAUL_PREF_AC_BOSS_GUARD_, (int)BossGuard::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    NpcGuard::active = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_ANTICHEAT_SECTION_, _DS1_OVERHAUL_PREF_AC_NPC_GUARD_, (int)NpcGuard::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    TeleBackstabProtect::active = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_ANTICHEAT_SECTION_, _DS1_OVERHAUL_PREF_AC_TELEBACKSTAB_PROT_, (int)TeleBackstabProtect::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
 
 
 	// @TODO Load additional startup preferences here
-
 
 }
 
@@ -102,6 +109,8 @@ void Mod::get_user_preferences()
 
 	// Begin loading setting preferences
 	print_console(Mod::output_prefix + "Loading user preferences...");
+
+    Mod::disable_low_fps_disconnect = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DISABLE_LOW_FPS_DISCONNECT_, (int)Mod::disable_low_fps_disconnect, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
 
 	// Display multiplayer node count in text feed info header
 	Mod::show_node_count = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_SHOW_NODE_COUNT_, (int)Mod::show_node_count, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
@@ -155,7 +164,6 @@ void Mod::get_user_keybinds()
 
 
 	// @TODO Load additional keybinds here
-
 
 
 }
