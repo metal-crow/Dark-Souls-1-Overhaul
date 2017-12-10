@@ -257,6 +257,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\AntiCheat.h" />
     <ClInclude Include="include\DllMain.h" />
     <ClInclude Include="include\Files.h" />
     <ClInclude Include="include\GameData.h" />
@@ -288,6 +289,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Build|x64'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\AntiCheat.cpp" />
+    <ClCompile Include="src\Authors.cpp" />
     <ClCompile Include="src\GameData.cpp" />
     <ClCompile Include="src\ModData.cpp" />
     <ClCompile Include="src\PhantomLimit.cpp" />

@@ -2,7 +2,8 @@
 	DARK SOULS OVERHAUL
 	
 	Contributors to this file:
-		Sean Pesce	-	C++
+        Metal-Crow  -  Reverse engineering, Phantom Limit patch
+		Sean Pesce  -  C++
 
 */
 
