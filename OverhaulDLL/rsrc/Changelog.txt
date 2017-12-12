@@ -1,0 +1,39 @@
+                    #################################################
+                    ###### DARK SOULS OVERHAUL DLL CHANGELOG  #######
+                    #################################################
+
+
+
+------------------------------------------------------------------------------------------
+12/12/2017:
+
+- New config settings:
+    - CompassRadial
+	    Enables/disables radial compass HUD element
+    - CompassBar
+	    Enables/disables bar compass HUD element (similar to Skyrim compass)
+    - ElevationMeter
+	    Enables/disables elevation meter HUD element
+
+- New console commands:
+    - hud_compass_radial
+	    Enables/disables radial compass HUD element
+    - hud_compass_bar
+	    Enables/disables bar compass HUD element
+    - hud_elevation_meter
+	    Enables/disables elevation meter HUD element
+
+- New keybinds:
+    - ToggleHudCompassRadial
+	    Toggles radial compass HUD element
+    - ToggleHudCompassBar
+	    Toggles bar compass HUD element
+    - ToggleHudElevationMeter
+	    Toggles elevation meter HUD element
+		
+- Fixes:
+    - Fixed issues with NpcGuard anti-cheat
+
+- Updates:
+    - Update DirectX 9 overlay library & resource files
+------------------------------------------------------------------------------------------

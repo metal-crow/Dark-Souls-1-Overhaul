@@ -37,6 +37,11 @@ int kf_toggle_dim_lava();
 // Toggles armor sound effects
 int kf_toggle_armor_sfx();
 
+// Toggles for additional HUD elements
+int kf_toggle_hud_compass_radial();
+int kf_toggle_hud_compass_bar();
+int kf_toggle_hud_elevation_meter();
+
 
 
 #endif // _DS1_OVERHAUL_KEYBIND_FUNCTIONS_H_

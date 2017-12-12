@@ -136,6 +136,22 @@ void Mod::get_user_preferences()
 		print_console("    Armor sound effects will be disabled when a character is loaded");
 
 
+    // Check if additional HUD elements should be displayed
+    if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_HUD_SECTION_, _DS1_OVERHAUL_PREF_COMPASS_RADIAL_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
+        Hud::set_show_compass_radial(true);
+        print_console("    HUD: Radial compass enabled");
+    }
+    
+    if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_HUD_SECTION_, _DS1_OVERHAUL_PREF_COMPASS_BAR_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
+        Hud::set_show_compass_bar(true);
+        print_console("    HUD: Bar compass enabled");
+    }
+        
+    if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_HUD_SECTION_, _DS1_OVERHAUL_PREF_ELEVATION_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
+        Hud::set_show_elevation_meter(true);
+        print_console("    HUD: Elevation meter enabled");
+    }
+
 
 	// @TODO Load additional user preferences here
 
@@ -164,7 +180,11 @@ void Mod::get_user_keybinds()
 
 	// Toggle armor sound effects
 	get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_ARMOR_SFX_, kf_toggle_armor_sfx);
-
+    
+    // Toggle additional HUD elements
+    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_COMPASS_RADIAL_, kf_toggle_hud_compass_radial);
+    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_COMPASS_BAR_, kf_toggle_hud_compass_bar);
+    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_ELEVATION_METER_, kf_toggle_hud_elevation_meter);
 
 	// @TODO Load additional keybinds here
 
