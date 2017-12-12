@@ -6,7 +6,7 @@
         Burton Radons    -     Reverse-engineering Dark Souls game files (Github: https://github.com/Burton-Radons )
 
 
-    Archive/Bnd3Archive.h
+    Archive/Bnd3.h
 
     References:
         https://github.com/Burton-Radons/Alexandria

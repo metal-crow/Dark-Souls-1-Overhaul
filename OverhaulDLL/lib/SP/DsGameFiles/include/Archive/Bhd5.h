@@ -3,10 +3,10 @@
 
     Contributors to this file:
         Sean Pesce    -  C++
-        Burton Radons -  Reverse-engineering Dark Souls game files. Github: https://github.com/Burton-Radons
+        Burton Radons -  Reverse-engineering Dark Souls game files. GitHub: https://github.com/Burton-Radons
 
 
-    Archive/Bhd5Archive.h
+    Archive/Bhd5.h
 
     Contains data about BHD5 (.bhd5) files, as well as functions and structures
     that facilitate working with this filetype.

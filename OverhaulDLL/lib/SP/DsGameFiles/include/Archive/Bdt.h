@@ -3,10 +3,10 @@
 
     Contributors to this file:
         Sean Pesce    -  C++
-        Burton Radons -  Reverse-engineering Dark Souls game files. Github: https://github.com/Burton-Radons
+        Burton Radons -  Reverse-engineering Dark Souls game files. GitHub: https://github.com/Burton-Radons
 
 
-    Archive/BdtArchive.h
+    Archive/Bdt.h
 
     Contains data about BDT (.bdt) archive files, as well as functions and
     structures that facilitate working with this filetype.
