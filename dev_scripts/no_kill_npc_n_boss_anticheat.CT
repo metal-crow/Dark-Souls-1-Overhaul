@@ -66,7 +66,7 @@ newmem:
 push eax
 mov  eax, [137DC70]
 mov  eax, [eax+4] //eax is entityPointer to local player
-cmp  eax, esi //if entityPointer for local player == attacker
+cmp  [eax], esi //if entityPointer for local player == attacker
 pop  eax
 je bypass_check
 
@@ -221,19 +221,18 @@ jmp bypass_check
 abort_damage:
 pop eax
 //set damage to 0
-mov [eax+16C], -1
+mov [ebx+16C], -1
 
 bypass_check:
-push ebp
-mov ebp,esp
-and esp,-08
+comiss xmm0,[ebx]
+push esi
+push edi
 jmp returnhere
 
 
 
-"DARKSOULS.exe"+A6BFE0:
+"DARKSOULS.exe"+A6BFF0:
 jmp newmem
-nop
 returnhere:
 
 
@@ -241,11 +240,11 @@ returnhere:
  
 [DISABLE]
 dealloc(newmem)
-"DARKSOULS.exe"+A6BFE0:
-push ebp
-mov ebp,esp
-and esp,-08
-//Alt: db 55 8B EC 83 E4 F8
+"DARKSOULS.exe"+A6BFF0:
+comiss xmm0,[ebx]
+push esi
+push edi
+//Alt: db 0F 2F 03 56 57
 </AssemblerScript>
     </CheatEntry>
   </CheatEntries>
