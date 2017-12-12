@@ -2,12 +2,13 @@
 	DARK SOULS OVERHAUL
 	
 	Contributors to this file:
-		Ashley						-	Reverse engineering, Low FPS Disconnect patch technique
-		jellybaby34					-	Game version number patch technique
-		Metal-Crow					-	Reverse engineering, Phantom Limit patch, C++
-		Sean Pesce					-	C++, automataed Bonfire Input Fix (FPSFix+)
-		Youri "NullBy7e" de Mooij	-	Original Bonfire Input Fix technique (FPSFix)
-		Zullie The Witch			-	Toggle armor sounds, Dim Lava Effects (C++ conversions by Sean)
+		Ashley                      -   Reverse engineering, Low FPS Disconnect patch technique
+		jellybaby34                 -   Game version number patch technique
+		Metal-Crow                  -   Reverse engineering, Phantom Limit patch, C++
+		Sean Pesce                  -   C++, automataed Bonfire Input Fix (FPSFix+), various C++ conversions of other contributors' work
+		Youri "NullBy7e" de Mooij   -   Original Bonfire Input Fix technique (FPSFix)
+		Zullie The Witch            -   Toggle armor sounds, Dim Lava Effects (C++ conversions by Sean)
+        RavagerChris                -  Reverse engineering of game files, gesture cancelling technique
 	
 */
 
