@@ -215,4 +215,14 @@ __declspec(dllimport) HWND get_game_window();
 
 
 
+/*
+	Gets the current global frame count (total number of frames rendered since the game was launched).
+
+	@return						Current global frame count if successful; otherwise returns 0.
+
+	@error						If the DirectX9 device or overlay is not yet initialized, last error code is set to ERROR_INVALID_ADDRESS
+*/
+__declspec(dllimport) unsigned long long get_global_frame_count();
+
+
 #endif // _SP_D3D9O_PLUGIN_IMPORTS_H_
