@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="26">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>91724</ID>
+      <Description>"These control both the temporary HP and temporary Stamina"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>91725</ID>
+      <Description>"The bars are controlled via a float value from 0 to 1, empty to full"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>91726</ID>
+      <Description>"A timer sitting at 0 will count up 0.03 (per tick?) all the way to 0.99, after which the temporary bar will begin to drop"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>91727</ID>
+      <Description>"These 3 scripts just nop a few lines of code controlling the float value and timer value"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>91728</ID>
+      <Description>" "</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>91723</ID>
+      <Description>"Stops bar from dropping (timer keeps going)"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>//DARKSOULS.exe+888CED - F3 0F11 48 3C         - movss [eax+3C],xmm1
+
+[ENABLE]
+DARKSOULS.exe+888CED:
+nop
+nop
+nop
+nop
+nop
+
+[DISABLE]
+DARKSOULS.exe+888CED:
+movss [eax+3C],xmm1
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>91721</ID>
+      <Description>"Stops timers from counting"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>//DARKSOULS.exe+88900F - F3 0F11 46 54         - movss [esi+54],xmm0
+
+[ENABLE]
+DARKSOULS.exe+88900F:
+nop
+nop
+nop
+nop
+nop
+
+[DISABLE]
+DARKSOULS.exe+88900F:
+movss [esi+54],xmm0
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>91720</ID>
+      <Description>"Bar will always drop, ignoring the timer (lots of similar code near this does the same thing)"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>//DARKSOULS.exe+889006 - F3 0F10 4E 5C         - movss xmm1,[esi+5C]
+
+[ENABLE]
+DARKSOULS.exe+889006:
+nop
+nop
+nop
+nop
+nop
+
+[DISABLE]
+DARKSOULS.exe+889006:
+movss xmm1,[esi+5C]
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>91729</ID>
+      <Description>"Rally System"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//track player previous hp and time of on player hit
+alloc(track_onhit_data,2048)
+globalalloc(previoushit_time,4)
+globalalloc(beforehit_hp,4)
+label(track_onhit_data_returnhere)
+label(track_onhit_data_exit)
+
+track_onhit_data:
+//check if trarget entity is host
+push ebx
+mov  ebx, [137DC70]
+mov  ebx, [ebx+4] //eax is entityPointer to local player
+cmp  [ebx], eax //if entityPointer for local player == target
+pop  ebx
+jne track_onhit_data_exit
+//save current time and player hp
+push ebx
+mov ebx, [eax+2D4] //player hp
+mov [beforehit_hp], ebx
+mov ebx, [100C42AC] //current time ms
+mov [previoushit_time], ebx
+pop ebx
+//continue normally
+track_onhit_data_exit:
+xorps xmm0,xmm0
+sub esp,14
+jmp track_onhit_data_returnhere
+
+"DARKSOULS.exe"+A6BFE6:
+jmp track_onhit_data
+nop
+track_onhit_data_returnhere:
+
+//track which ui bar is being smoothed
+alloc(track_what_bar,2048)
+globalalloc(current_selected_bar,4)
+label(track_what_bar_returnhere)
+
+track_what_bar:
+mov [current_selected_bar], eax
+inc eax
+cmp eax,[esi+10]
+mov [esp+28],eax
+jmp track_what_bar_returnhere
+
+"DARKSOULS.exe"+386D04:
+jmp track_what_bar
+nop
+nop
+nop
+track_what_bar_returnhere:
+
+//control the timer for the current ui bar
+alloc(controltimer,2048)
+globalalloc(timercounter,4)
+label(execute_orange_drop)
+label(controltimer_returnhere)
+label(start_controlling_timer)
+label(dont_control_timer)
+
+controltimer:
+//if this is the timer of interest
+cmp [current_selected_bar], 23
+je start_controlling_timer
+cmp [current_selected_bar], 24
+je start_controlling_timer
+cmp [current_selected_bar], 25
+je start_controlling_timer
+cmp [current_selected_bar], 26
+je start_controlling_timer
+jmp dont_control_timer
+
+//check and update our counter
+start_controlling_timer:
+cmp [timercounter], 100
+jge execute_orange_drop
+inc [timercounter]
+jmp controltimer_returnhere
+
+//if timer is at desired point, drop orange
+execute_orange_drop:
+mov [timercounter], 0
+mov [eax+3C],0
+jmp controltimer_returnhere
+
+//if timer not interested, normal instruction
+dont_control_timer:
+movss [eax+3C],xmm1
+jmp controltimer_returnhere
+
+"DARKSOULS.exe"+888CED:
+jmp controltimer
+controltimer_returnhere:
+ 
+[DISABLE]
+dealloc(controltimer)
+"DARKSOULS.exe"+888CED:
+movss [eax+3C],xmm1
+//Alt: db F3 0F 11 48 3C
+
+dealloc(track_what_bar)
+"DARKSOULS.exe"+386D04:
+inc eax
+cmp eax,[esi+10]
+mov [esp+28],eax
+//Alt: db 40 3B 46 10 89 44 24 28
+
+dealloc(track_onhit_data)
+"DARKSOULS.exe"+A6BFE6:
+xorps xmm0,xmm0
+sub esp,14
+//Alt: db 0F 57 C0 83 EC 14
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>91422</ID>
+      <Description>"ms since start"</Description>
+      <LastState Value="367701" RealAddress="100C42AC"/>
+      <VariableType>4 Bytes</VariableType>
+      <Address>fmodex.dll+C42AC</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>91730</ID>
+      <Description>"previoushit_time"</Description>
+      <LastState Value="262485" RealAddress="26020000"/>
+      <VariableType>4 Bytes</VariableType>
+      <Address>previoushit_time</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>91731</ID>
+      <Description>"beforehit_hp"</Description>
+      <LastState Value="1893" RealAddress="26020010"/>
+      <VariableType>4 Bytes</VariableType>
+      <Address>beforehit_hp</Address>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>timercounter</Name>
+      <Address>26020030</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>current_selected_bar</Name>
+      <Address>26020020</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>previoushit_time</Name>
+      <Address>26020000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>beforehit_hp</Name>
+      <Address>26020010</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+</CheatTable>
