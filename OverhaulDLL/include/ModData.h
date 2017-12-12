@@ -113,6 +113,9 @@ public:
 	// Custom game configuration file to load instead of the vanilla file
 	static std::wstring custom_config_file;
 
+    // Determines whether gesture cancelling is enabled
+    static bool gesture_cancelling;
+
 
 	// Registers all commands in ConsoleCommands.cpp for use with the in-game console
 	static void register_console_commands();

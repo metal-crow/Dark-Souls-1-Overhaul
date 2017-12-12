@@ -21,7 +21,7 @@
 void on_process_attach()
 {
     // Load startup preferences from settings file
-    Mod::get_startup_preferences(); // @TODO: If legacy mode is enabled, disable gameplay changes
+    Mod::get_startup_preferences();
 
     // Check if game version is supported
     if (!game_version_is_supported)
@@ -99,7 +99,14 @@ void on_process_detach()
 __declspec(dllexport) void __stdcall initialize_plugin()
 {
     // Set overlay info strings
-    set_text_feed_title("[Dark Souls Overhaul Mod]");
+    if (Mod::legacy_mode)
+    {
+        set_text_feed_title("[Dark Souls Overhaul Mod (Legacy Mode)]");
+    }
+    else
+    {
+        set_text_feed_title("[Dark Souls Overhaul Mod]");
+    }
     print("-------------DARK SOULS OVERHAUL TEST BUILD-------------", 0, false, SP_D3D9O_TEXT_COLOR_ORANGE);
 
     // Print startup messages
@@ -229,7 +236,7 @@ __declspec(dllexport) void __stdcall present(const RECT *pSourceRect, const RECT
         NOTE: Use the _d3d9_dev macro to obtain the game's IDirect3DDevice9 for drawing new elements.
 
         WARNING: This function is called from inside the DirectX9 Device Present() function. Keep
-        code in this function as optimized as possible to avoid lowering FPS.
+        code in this function as optimized as possible to avoid performance issues.
     */
 }
 
@@ -247,7 +254,7 @@ __declspec(dllexport) void __stdcall end_scene()
         NOTE: Use the _d3d9_dev macro to obtain the game's IDirect3DDevice9 for drawing new elements.
 
         WARNING: This function is called from inside the DirectX9 Device EndScene() function. Keep
-        code in this function as optimized as possible to avoid lowering FPS.
+        code in this function as optimized as possible to avoid performance issues.
     */
 }
 

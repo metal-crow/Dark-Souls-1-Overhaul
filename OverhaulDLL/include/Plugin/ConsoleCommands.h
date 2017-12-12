@@ -68,6 +68,10 @@ const char *chm_cheats = ccn_cheats" [boolean]\n"
 									"    Enables cheats, unlocking additional console commands (1 = enable). If cheats are enabled, saving and multiplayer"
 									"    are disabled until the game is restarted.";
 
+#define ccn_legacy_mode "legacy_mode"
+const char *chm_legacy_mode = ccn_legacy_mode"\n"
+                         "    Checks whether Legacy Mode is enabled (Dark Souls Overhaul Mod).\n    Note: Legacy Mode cannot be toggled. Exit the game and set the LegacyMode setting\n"
+                         "    in the Overhaul config file to turn Legacy Mode on/off.";
 
 #define ccn_credits "overhaul_credits"
 const char *chm_credits = ccn_credits"\n"

@@ -14,6 +14,7 @@
 
 
 #include "SpPointer.h"
+#include "Asset/Animation/Tae.h"
 
 
 
@@ -52,6 +53,9 @@ public:
 	// Player character status (loading, human, co-op, invader, hollow)
 	static SpPointer player_char_status;
 
+    // Time Action Events for the player character's animations
+    static Tae player_tae;
+
 	// Flag to determine if any characters have been loaded since the game was launched (useful if player had a character loaded but returned to main menu)
 	static bool characters_loaded;
 
@@ -66,6 +70,9 @@ public:
 
 	// Size of the pool of memory the game allocates for itself
 	static uint32_t memory_limit;
+
+    // Animation IDs for the default set of gesture animations in the game
+    const static uint32_t gesture_anim_ids[15];
 
 
 
@@ -108,6 +115,9 @@ public:
 
 	// Enables/Disables automatic game disconnection when low framerate is detected
 	static void enable_low_fps_disconnect(bool enable);
+
+    // Enables gesture cancelling via rolling
+    static bool enable_gesture_cencelling();
 
 
 
