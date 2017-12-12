@@ -2,8 +2,9 @@
 	DARK SOULS OVERHAUL
 	
 	Contributors to this file:
-		Sean Pesce	-	C++
-		Metal-Crow	-	C++
+		Sean Pesce   -  C++
+		Metal-Crow   -  C++
+        RavagerChris -  Reverse engineering of game files, gesture cancelling technique
 */
 
 #pragma once
