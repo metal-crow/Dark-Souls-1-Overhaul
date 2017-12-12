@@ -28,6 +28,9 @@ void *Game::player_char_base = NULL;
 // Player character status (loading, human, co-op, invader, hollow)
 SpPointer Game::player_char_status;
 
+// Time Action Events for the player character's animations
+Tae Game::player_tae = Tae();
+
 // Flag to determine if any characters have been loaded since the game was launched (useful if player had a character loaded but returned to main menu)
 bool Game::characters_loaded = false;
 
@@ -42,6 +45,9 @@ int Game::node_count = -1;
 
 // Size of the pool of memory the game allocates for itself
 uint32_t Game::memory_limit = 0;
+
+// Animation IDs for the default set of gesture animations in the game
+const uint32_t Game::gesture_anim_ids[15] = { 6800, 6801, 6802, 6803, 6804, 6805, 6806, 6807, 6808, 6809, 6810, 6815, 6820, 6825, 6830 };
 
 
 
@@ -83,6 +89,10 @@ void Game::on_first_character_loaded()
 	// Disable armor sounds if it was specified in the config file
 	if (Mod::disable_armor_sfx_pref)
 		Game::enable_armor_sfx(false);
+
+    void *ret_val = (void*)Game::player_tae.init_from_aob_scan("54 41 45 20 00 00 00 00 0B 00 01 00 B4 AE 09 00");
+    print_console("TAE file start address: " + std::to_string((int)ret_val));
+    Game::enable_gesture_cencelling();
 }
 
 
@@ -519,5 +529,36 @@ void Game::set_memory_limit(uint32_t mem_limit)
 
 	write_address = (uint8_t*)Game::ds1_base + 0x9E41;
 	apply_byte_patch(write_address, patch, 5);
+}
+
+
+// Enables gesture cancelling via rolling
+bool Game::enable_gesture_cencelling()
+{
+    int gestures_changed = 0;
+    if (Game::characters_loaded && Game::player_tae.is_initialized())
+    {
+        for (uint32_t id : gesture_anim_ids) {
+            int n_events = Game::player_tae.get_event_count_by_id(id);
+            for (int i = 0; i < n_events; i++) {
+                bool anim_updated = false;
+                if (Game::player_tae.get_event_type_by_id(id, i) == 0
+                    && (Game::player_tae.get_event_param_by_id(id, i, 0) == 87 || Game::player_tae.get_event_param_by_id(id, i, 0) == 26)) {
+                    Game::player_tae.set_event_start_by_id(id, i, 0.0f);
+                    //if (!print_console("Updated gesture " + std::to_string(id) + ", event " + std::to_string(i) + " to allow cancelling"))
+                    //    Mod::startup_messages.push_back("Updated gesture " + std::to_string(id) + ", event " + std::to_string(i) + " to allow cancelling");
+                    if (!anim_updated) {
+                        anim_updated = true;
+                        gestures_changed++;
+                    }
+                }
+            }
+        }
+        return (gestures_changed >= 15);
+    }
+    else
+    {
+        return false;
+    }
 }
 

@@ -35,7 +35,19 @@ int cc_credits(std::vector<std::string> args, std::string *output)
 
 
 
-// Enables cheats until game is restarted
+// Checks if Legacy Mode is enabled
+int cc_legacy_mode(std::vector<std::string> args, std::string *output)
+{
+    if (Mod::legacy_mode)
+        output->append("Legacy Mode is enabled.");
+    else
+        output->append("Legacy Mode is disabled.");
+
+    return CONSOLE_COMMAND_SUCCESS;
+}
+
+
+// Enables cheats until game is restarted (also disables saving and @TODO multiplayer)
 int cc_cheats(std::vector<std::string> args, std::string *output)
 {
 	int return_val = CONSOLE_COMMAND_SUCCESS;
@@ -152,7 +164,7 @@ int cc_armor_sfx(std::vector<std::string> args, std::string *output)
 
 
 
-// Applies the Bonfire input fix
+// Applies the Bonfire input fix (Probably unnecessary now that the fix is automatic)
 int cc_fix_bonfire_input(std::vector<std::string> args, std::string *output)
 {
 	// Apply fix and print message to console (and not to text feed)
@@ -323,6 +335,7 @@ void Mod::register_console_commands()
 {
 	register_console_command(ccn_developer_debug, cc_developer_debug, chm_developer_debug);
     register_console_command(ccn_credits, cc_credits, chm_credits);
+    register_console_command(ccn_legacy_mode, cc_legacy_mode, chm_legacy_mode);
 	register_console_command(ccn_armor_sfx, cc_armor_sfx, chm_armor_sfx);
 	register_console_alias(cca_armor_sounds, ccn_armor_sfx);
 	register_console_command(ccn_dim_lava, cc_dim_lava, chm_dim_lava);

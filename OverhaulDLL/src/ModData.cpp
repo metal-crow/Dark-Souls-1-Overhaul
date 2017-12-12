@@ -64,6 +64,9 @@ std::wstring Mod::custom_save_file;
 // Custom game configuration file to load instead of the vanilla file
 std::wstring Mod::custom_config_file;
 
+// Determines whether gesture cancelling is enabled
+bool Mod::gesture_cancelling = true;
+
 
 
 // Get user-defined startup preferences from the settings file
@@ -176,7 +179,6 @@ void Mod::get_single_user_keybind(const char *keybind_name, int(*function)())
 	// Variable that holds the Virtual-key code of the keybind when read from settings file
 	uint8_t key;
 
-	// Bonfire input fix keybind
 	if ( (key = (uint8_t)get_vk_hotkey(_DS1_OVERHAUL_SETTINGS_FILE_, _DS1_OVERHAUL_KEYBINDS_SECTION_, keybind_name)) // Obtain user's preferred key
 		&& register_hotkey_function(key, function) )	// Register the keybind
 	{
