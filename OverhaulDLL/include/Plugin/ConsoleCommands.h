@@ -77,6 +77,17 @@ const char *chm_legacy_mode = ccn_legacy_mode"\n"
 const char *chm_credits = ccn_credits"\n"
                          "    Plays the credits for the Dark Souls Overhaul Mod.";
 
+#define ccn_hud_compass_radial "hud_compass_radial"
+const char *chm_hud_compass_radial = ccn_hud_compass_radial" [boolean] \n"
+									"    Enables/disables radial compass HUD element from the Debug build.";
+
+#define ccn_hud_compass_bar "hud_compass_bar"
+const char *chm_hud_compass_bar = ccn_hud_compass_bar" [boolean] \n"
+									"    Enables/disables bar compass HUD element from the Debug build.";
+
+#define ccn_hud_elevation_meter "hud_elevation_meter"
+const char *chm_hud_elevation_meter = ccn_hud_elevation_meter" [boolean] \n"
+									"    Enables/disables elevation meter HUD element from the Debug build.";
 
 #define ccn_multiplayer_network "multiplayer_network"
 const char *chm_multiplayer_network = ccn_multiplayer_network" \n"

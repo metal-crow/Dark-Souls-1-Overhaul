@@ -471,6 +471,37 @@ int Game::get_node_count()
 }
 
 
+// Additional HUD elements
+bool Hud::get_show_compass_radial()
+{
+    return !!*(uint8_t*)((uint32_t)Game::ds1_base + 0xF7851B);
+}
+
+void Hud::set_show_compass_radial(bool enable)
+{
+    *(uint8_t*)((uint32_t)Game::ds1_base + 0xF7851B) = enable;
+}
+
+bool Hud::get_show_compass_bar()
+{
+    return !!*(uint8_t*)((uint32_t)Game::ds1_base + 0xF78525);
+}
+
+void Hud::set_show_compass_bar(bool enable)
+{
+    *(uint8_t*)((uint32_t)Game::ds1_base + 0xF78525) = enable;
+}
+
+bool Hud::get_show_elevation_meter()
+{
+    return !!*(uint8_t*)((uint32_t)Game::ds1_base + 0xF78524);
+}
+
+void Hud::set_show_elevation_meter(bool enable)
+{
+    *(uint8_t*)((uint32_t)Game::ds1_base + 0xF78524) = enable;
+}
+
 
 /////////////////////////////////////////
 //////////////// PATCHES ////////////////

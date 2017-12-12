@@ -4,6 +4,7 @@
 	Contributors to this file:
         Ainsley Harriott  -  NPC Guard & Boss Guard
         Ashley            -  Anti-Tele-Backstab
+        Metal-crow        -  NPC Guard
 		Sean Pesce        -  C++ conversions
 */
 
@@ -48,7 +49,7 @@ public:
         static bool active;
 
         // Offset (from DARKSOULS.exe) where NpcGuard anti-cheat code will be injected
-        static const uint32_t injection_offset = 0xA6BFE0;
+        static const uint32_t injection_offset = 0xA6BFF0;
 
         static void start();
 

@@ -79,3 +79,38 @@ int kf_toggle_armor_sfx()
 	Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
 	return ERROR_SUCCESS;
 }
+
+
+// Toggles for additional HUD elements
+int kf_toggle_hud_compass_radial()
+{
+    Hud::set_show_compass_radial(!Hud::get_show_compass_radial());
+    if (Hud::get_show_compass_radial())
+        print_console("Enabled radial compass HUD element");
+    else
+        print_console("Disabled radial compass HUD element");
+    Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
+    return ERROR_SUCCESS;
+}
+
+int kf_toggle_hud_compass_bar()
+{
+    Hud::set_show_compass_bar(!Hud::get_show_compass_bar());
+    if (Hud::get_show_compass_bar())
+        print_console("Enabled bar compass HUD element");
+    else
+        print_console("Disabled bar compass HUD element");
+    Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
+    return ERROR_SUCCESS;
+}
+
+int kf_toggle_hud_elevation_meter()
+{
+    Hud::set_show_elevation_meter(!Hud::get_show_elevation_meter());
+    if (Hud::get_show_elevation_meter())
+        print_console("Enabled elevation meter HUD element");
+    else
+        print_console("Disabled elevation meter HUD element");
+    Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
+    return ERROR_SUCCESS;
+}

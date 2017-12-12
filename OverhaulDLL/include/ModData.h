@@ -19,6 +19,7 @@
 #define _DS1_OVERHAUL_PREFS_SECTION_ "Dark Souls Overhaul Settings"
 #define _DS1_OVERHAUL_KEYBINDS_SECTION_ "Dark Souls Overhaul Keybinds"
 #define _DS1_OVERHAUL_ANTICHEAT_SECTION_ "Dark Souls Overhaul Anti-Cheat"
+#define _DS1_OVERHAUL_HUD_SECTION_ "Dark Souls Overhaul HUD"
 // Startup preferences:
 #define _DS1_OVERHAUL_PREF_LEGACY_MODE_ "LegacyMode"
 #define _DS1_OVERHAUL_PREF_MEMORY_LIMIT_ "MemoryLimit"
@@ -29,16 +30,23 @@
 #define _DS1_OVERHAUL_PREF_AC_BOSS_GUARD_ "BossGuard"
 #define _DS1_OVERHAUL_PREF_AC_NPC_GUARD_ "NpcGuard"
 #define _DS1_OVERHAUL_PREF_AC_TELEBACKSTAB_PROT_ "TeleBackstabProtect"
-// Settings:
+// General settings:
 #define _DS1_OVERHAUL_PREF_SHOW_NODE_COUNT_ "DisplayNodeCount"
 #define _DS1_OVERHAUL_PREF_DIM_LAVA_ "DimLava"
 #define _DS1_OVERHAUL_PREF_DISABLE_ARMOR_SFX_ "DisableArmorSounds"
 #define _DS1_OVERHAUL_PREF_DISABLE_LOW_FPS_DISCONNECT_ "DisableLowFpsDisconnect"
+// HUD settings:
+#define _DS1_OVERHAUL_PREF_COMPASS_RADIAL_ "CompassRadial"
+#define _DS1_OVERHAUL_PREF_COMPASS_BAR_ "CompassBar"
+#define _DS1_OVERHAUL_PREF_ELEVATION_ "ElevationMeter"
 // Keybinds:
 #define _DS1_OVERHAUL_HOTKEY_BONFIRE_INPUT_FIX_ "BonfireInputFix"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_NODE_COUNT_ "ToggleNodeCount"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_DIM_LAVA_ "ToggleLavaBrightness"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_ARMOR_SFX_ "ToggleArmorSounds"
+#define _DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_COMPASS_RADIAL_ "ToggleHudCompassRadial"
+#define _DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_COMPASS_BAR_ "ToggleHudCompassBar"
+#define _DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_ELEVATION_METER_ "ToggleHudElevationMeter"
 
 #define _DS1_OVERHAUL_SETTINGS_STRING_BUFF_LEN_ 256		// Length of the string buffer used when obtaining user preference-related string data
 

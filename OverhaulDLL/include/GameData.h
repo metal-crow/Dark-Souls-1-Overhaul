@@ -136,6 +136,23 @@ public:
 
 
 
+                    /////////////////////////////////////////
+                    ////////////// HUD-RELATED //////////////
+                    /////////////////////////////////////////
+
+    class Hud {
+    public:
+
+        // Additional HUD elements
+        static bool get_show_compass_radial();
+        static void set_show_compass_radial(bool enable);
+        static bool get_show_compass_bar();
+        static void set_show_compass_bar(bool enable);
+        static bool get_show_elevation_meter();
+        static void set_show_elevation_meter(bool enable);
+    };
+
+
 
 					/////////////////////////////////////////
 					////////////// FILE-RELATED /////////////
@@ -199,6 +216,7 @@ public:
 	};
 };
 typedef Game::Files Files;
+typedef Game::Hud Hud;
 
 
 

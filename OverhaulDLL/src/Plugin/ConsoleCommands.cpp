@@ -129,6 +129,104 @@ int cc_dim_lava(std::vector<std::string> args, std::string *output)
 }
 
 
+// Enables/disables radial compass HUD element
+int cc_hud_compass_radial(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = CONSOLE_COMMAND_SUCCESS;
+    if (args.size() > 0)
+    {
+        switch (parse_toggle_arg(args.at(0).c_str()))
+        {
+            case 0:
+                Hud::set_show_compass_radial(false);
+                break;
+            case 1:
+                Hud::set_show_compass_radial(true);
+                break;
+            default:
+                output->append(ERROR_INVALID_BOOL_ARGUMENT + "\n");
+                ret_val = ERROR_INVALID_PARAMETER;
+                break;
+        }
+    }
+
+    if (Hud::get_show_compass_radial())
+    {
+        output->append("Radial compass HUD element = enabled");
+    }
+    else
+    {
+        output->append("Radial compass HUD element = disabled");
+    }
+    return ret_val;
+}
+
+
+// Enables/disables bar compass HUD element (Skyrim-styled compass)
+int cc_hud_compass_bar(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = CONSOLE_COMMAND_SUCCESS;
+    if (args.size() > 0)
+    {
+        switch (parse_toggle_arg(args.at(0).c_str()))
+        {
+            case 0:
+                Hud::set_show_compass_bar(false);
+                break;
+            case 1:
+                Hud::set_show_compass_bar(true);
+                break;
+            default:
+                output->append(ERROR_INVALID_BOOL_ARGUMENT + "\n");
+                ret_val = ERROR_INVALID_PARAMETER;
+                break;
+        }
+    }
+
+    if (Hud::get_show_compass_bar())
+    {
+        output->append("Bar compass HUD element = enabled");
+    }
+    else
+    {
+        output->append("Bar compass HUD element = disabled");
+    }
+    return ret_val;
+}
+
+
+// Enables/disables elevation meter HUD element
+int cc_hud_elevation_meter(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = CONSOLE_COMMAND_SUCCESS;
+    if (args.size() > 0)
+    {
+        switch (parse_toggle_arg(args.at(0).c_str()))
+        {
+            case 0:
+                Hud::set_show_elevation_meter(false);
+                break;
+            case 1:
+                Hud::set_show_elevation_meter(true);
+                break;
+            default:
+                output->append(ERROR_INVALID_BOOL_ARGUMENT + "\n");
+                ret_val = ERROR_INVALID_PARAMETER;
+                break;
+        }
+    }
+
+    if (Hud::get_show_elevation_meter())
+    {
+        output->append("Elevation meter HUD element = enabled");
+    }
+    else
+    {
+        output->append("Elevation meter HUD element = disabled");
+    }
+    return ret_val;
+}
+
 
 // Enables/disables armor sound effects
 int cc_armor_sfx(std::vector<std::string> args, std::string *output)
@@ -344,8 +442,10 @@ void Mod::register_console_commands()
 	register_console_command(ccn_text_feed_node_count, cc_text_feed_node_count, chm_text_feed_node_count);
 	register_console_alias(cca_node_count, ccn_text_feed_node_count);
 	register_console_command(ccn_cheats, cc_cheats, chm_cheats);
-	register_console_command(ccn_multiplayer_network, cc_multiplayer_network, chm_multiplayer_network);
-
+    register_console_command(ccn_multiplayer_network, cc_multiplayer_network, chm_multiplayer_network);
+    register_console_command(ccn_hud_compass_radial, cc_hud_compass_radial, chm_hud_compass_radial);
+    register_console_command(ccn_hud_compass_bar, cc_hud_compass_bar, chm_hud_compass_bar);
+    register_console_command(ccn_hud_elevation_meter, cc_hud_elevation_meter, chm_hud_elevation_meter);
 
 
 	#ifdef _DS1_OVERHAUL_MOD_DBG_
