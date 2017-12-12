@@ -62,7 +62,7 @@ typedef struct ItemParameter : public Param {
 		consumeHeroPoint = 0, // Consumer humanity
 		overDexterity = 0, // Skill over start value
 		goodsType = 0, // Tool type
-		refCategory = 0, // Category of ID of ? [attack, jumping tool, special]
+		refCategory = 0, // Category of ID of Bullet [attack, jumping tool, special]
 		spEffectCategory = 0, // Since there are effects (such as enchant weapons) whose parameters fluctuate with skills, magic, items, etc., set the action for each action so that the specified effect can correspond to the effect of "power up only weapon attacks" For varistors, etc. that do not require setting, set "none"
 		goodsCategory = 0, // Tool category
 		goodsUseAnim = 0, // Set an animation to play when using tools

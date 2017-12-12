@@ -3,11 +3,11 @@
 
     Contributors to this file:
         Sean Pesce    -  C++
-        Burton Radons -  Reverse-engineering Dark Souls game files. Github: https://github.com/Burton-Radons
+        Burton Radons -  Reverse-engineering Dark Souls game files. GitHub: https://github.com/Burton-Radons
         zlib          -  Data compression/decompression library; used by the code in this file to extract data from .dcx archives. Homepage: https://www.zlib.net
 
 
-    Archive/DcxArchive.h
+    Archive/Dcx.h
 
     Contains data about DCX (.dcx) archive files, as well as functions and
     structures that facilitate working with this filetype.
