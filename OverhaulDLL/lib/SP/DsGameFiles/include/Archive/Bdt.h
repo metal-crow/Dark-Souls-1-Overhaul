@@ -63,11 +63,11 @@
         - [0x00-0x0F] Constant 16-byte string ("BDF307D7R6\0\0\0\0\0\0")
 */
 typedef struct BdtArchiveHeader : ArchiveFileHeader {
-/*  Magic identifier bytes (defined in ArchiveHeader ancestor struct):
-    ARCHIVE_MAGIC_0 magic32_0; // 0x33464442     = "BDF3"
-    ARCHIVE_MAGIC_1 magic32_1; // 0x37443730     = "07D7"
-    ARCHIVE_MAGIC_2 magic32_2; // 0x00003652     = "R6\0\0"
-*/  const uint32_t  magic32_3 = 0x00000000; // = "\0\0\0\0"
+    /*  Magic identifier bytes (defined in ArchiveHeader ancestor struct):
+        ARCHIVE_MAGIC_0 magic32_0; // 0x33464442     = "BDF3"
+        ARCHIVE_MAGIC_1 magic32_1; // 0x37443730     = "07D7"
+        ARCHIVE_MAGIC_2 magic32_2; // 0x00003652     = "R6\0\0"
+    */  const uint32_t  magic32_3 = 0x00000000; // = "\0\0\0\0"
 } BdtHeader;
 
 

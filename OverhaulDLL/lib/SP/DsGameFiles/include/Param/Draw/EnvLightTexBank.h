@@ -213,7 +213,7 @@ public:
         static EnvLightTexBankParamDef instance;
         return instance;
     }
-    
+
     EnvLightTexBankParam *data()
     {
         return (EnvLightTexBankParam*)ParamDef::data();
@@ -226,13 +226,13 @@ public:
 
 
     // @TODO: Member data specific to this class
-    
+
 private:
     EnvLightTexBankParamDef()
         : ParamDef(NULL, sizeof(EnvLightTexBankParam), "@TODO", "EnvLightTexBankParam", "Environment Lights Texture Bank")
     {
     }
-    
+
 public:
     EnvLightTexBankParamDef(EnvLightTexBankParamDef const&) = delete;
     void operator=(EnvLightTexBankParamDef const&) = delete;

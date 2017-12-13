@@ -30,7 +30,7 @@
 
 // GameArea parameter
 typedef struct GameAreaParameter : public Param {
-    
+
     uint32_t
         bonusSoul_single = 0, // Seoul amount that can be acquired when an area boss is defeated (at single play)
         bonusSoul_multi = 0; // The amount of soul that can be acquired when an area boss is defeated (in multiplayer)
@@ -64,7 +64,7 @@ public:
         static GameAreaParamDef instance;
         return instance;
     }
-    
+
     GameAreaParam *data()
     {
         return (GameAreaParam*)ParamDef::data();
@@ -77,7 +77,7 @@ public:
 
 
     // @TODO: Member data specific to this class
-    
+
 private:
     GameAreaParamDef()
         : ParamDef(NULL, sizeof(GameAreaParam),
@@ -85,7 +85,7 @@ private:
                    "GameAreaParam", "Game Area")
     {
     }
-    
+
 public:
     GameAreaParamDef(GameAreaParamDef const&) = delete;
     void operator=(GameAreaParamDef const&) = delete;

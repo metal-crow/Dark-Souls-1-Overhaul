@@ -30,7 +30,7 @@
 
 // Ragdoll parameter
 typedef struct RagdollParameter : public Param {
-    
+
     float
         hierarchyGain = 0.17f, // When it is lowered, it approaches the original pose, and when it gets larger, it gets on the edge.
         velocityDamping = 0, // Deceleration rate of ragdoll movement speed. Go slowly as you approach 0, get back at 1 as you approach 1
@@ -64,7 +64,7 @@ public:
         static RagdollParamDef instance;
         return instance;
     }
-    
+
     RagdollParam *data()
     {
         return (RagdollParam*)ParamDef::data();
@@ -77,7 +77,7 @@ public:
 
 
     // @TODO: Member data specific to this class
-    
+
 private:
     RagdollParamDef()
         : ParamDef(NULL, sizeof(RagdollParam),
@@ -85,7 +85,7 @@ private:
                    "RagdollParam", "Ragdoll")
     {
     }
-    
+
 public:
     RagdollParamDef(RagdollParamDef const&) = delete;
     void operator=(RagdollParamDef const&) = delete;

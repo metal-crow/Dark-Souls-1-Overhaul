@@ -95,7 +95,7 @@ public:
         static LightBankParamDef instance;
         return instance;
     }
-    
+
     LightBankParam *data()
     {
         return (LightBankParam*)ParamDef::data();
@@ -108,7 +108,7 @@ public:
 
 
     // @TODO: Member data specific to this class
-    
+
 private:
     LightBankParamDef()
         : ParamDef(NULL, sizeof(LightBankParam),
@@ -116,7 +116,7 @@ private:
                    "LightBankParam", "Light Bank")
     {
     }
-    
+
 public:
     LightBankParamDef(LightBankParamDef const&) = delete;
     void operator=(LightBankParamDef const&) = delete;

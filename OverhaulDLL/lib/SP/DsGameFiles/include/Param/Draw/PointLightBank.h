@@ -33,7 +33,7 @@ typedef struct PointLightBankParameter : public Param {
 
     float
         dwindleBegin = 0.5, // Point light source
-        dwindleEnd   = 2;   // Point light source
+        dwindleEnd = 2;   // Point light source
 
     int16_t
         colR = 255, // Point light source
@@ -55,7 +55,7 @@ public:
         static PointLightBankParamDef instance;
         return instance;
     }
-    
+
     PointLightBankParam *data()
     {
         return (PointLightBankParam*)ParamDef::data();
@@ -68,7 +68,7 @@ public:
 
 
     // @TODO: Member data specific to this class
-    
+
 private:
     PointLightBankParamDef()
         : ParamDef(NULL, sizeof(PointLightBankParam),
@@ -76,7 +76,7 @@ private:
                    "_PointLightBank", "Point Light Bank")
     {
     }
-    
+
 public:
     PointLightBankParamDef(PointLightBankParamDef const&) = delete;
     void operator=(PointLightBankParamDef const&) = delete;

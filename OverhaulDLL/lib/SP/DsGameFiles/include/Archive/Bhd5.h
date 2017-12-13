@@ -75,13 +75,13 @@
 
 */
 typedef struct Bhd5ArchiveHeader : ArchiveFileHeader {
-/*  Magic identifier bytes (defined in ArchiveHeader ancestor struct):
-    ARCHIVE_MAGIC_0 magic32_0;  // "BHD5"
-    ARCHIVE_MAGIC_1 magic32_1;  // 0x000000FF
-    ARCHIVE_MAGIC_2 magic32_2;  // 0x00000001
-*/  uint32_t file_size = 0; // Total size of the BHD5 file (in bytes)
-    uint32_t bin_count = 0;
-    const uint32_t bin_offset = 0x00000018; // Constant offset of the first bin struct (relative to beginning of file)
+    /*  Magic identifier bytes (defined in ArchiveHeader ancestor struct):
+        ARCHIVE_MAGIC_0 magic32_0;  // "BHD5"
+        ARCHIVE_MAGIC_1 magic32_1;  // 0x000000FF
+        ARCHIVE_MAGIC_2 magic32_2;  // 0x00000001
+    */  uint32_t file_size = 0; // Total size of the BHD5 file (in bytes)
+uint32_t bin_count = 0;
+const uint32_t bin_offset = 0x00000018; // Constant offset of the first bin struct (relative to beginning of file)
 } Bhd5Header;
 
 

@@ -2,8 +2,8 @@
     DARK SOULS OVERHAUL
 
     Contributors to this file:
-        Sean Pesce	-	C++
-        Metal-Crow	-	C++
+        Metal-Crow  -  C++
+        Sean Pesce  -  C++
 
 */
 

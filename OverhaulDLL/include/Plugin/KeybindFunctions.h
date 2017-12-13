@@ -1,25 +1,25 @@
 /*
-	DARK SOULS OVERHAUL
-	
-	Contributors to this file:
-		Sean Pesce	-	C++
+    DARK SOULS OVERHAUL
+
+    Contributors to this file:
+        Sean Pesce  -  C++
 
 
-	This file defines functions that will be associated
-	with keybinds at runtime. 
+    This file defines functions that will be associated
+    with keybinds at runtime.
 */
 
 #pragma once
 
 #ifndef _DS1_OVERHAUL_KEYBIND_FUNCTIONS_H_
-	#define _DS1_OVERHAUL_KEYBIND_FUNCTIONS_H_
+    #define _DS1_OVERHAUL_KEYBIND_FUNCTIONS_H_
 
 
 ///////////////////////////////////////////////////////////////////////
 //////////////// Keybind function forward declarations ////////////////
 ///////////////////////////////////////////////////////////////////////
 /*
-	Keybind function names should be prefixed with "kf".
+    Keybind function names should be prefixed with "kf".
 */
 
 

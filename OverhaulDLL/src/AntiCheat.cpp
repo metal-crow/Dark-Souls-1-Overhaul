@@ -1,11 +1,11 @@
 /*
-	DARK SOULS OVERHAUL
-	
-	Contributors to this file:
+    DARK SOULS OVERHAUL
+
+    Contributors to this file:
         Ainsley Harriott  -  NPC Guard & Boss Guard
         Ashley            -  Anti-Tele-Backstab
         Metal-crow        -  NPC Guard
-		Sean Pesce        -  C++ conversions
+        Sean Pesce        -  C++ conversions
 */
 
 
@@ -72,72 +72,72 @@ void __declspec(naked) __stdcall TeleBackstabProtect::check() {
     {
         // Check if movement is due to a backstab, and if so, check validity of movement
         //anti_tele_bs_check:
-            // If in backstab animation
-            cmp DWORD PTR[TeleBackstabProtect_anim_id_ptr], 0x2328
-            je  anti_tele_bs_check_is_backstab
-            cmp DWORD PTR[TeleBackstabProtect_anim_id_ptr], 0x24CC
-            je  anti_tele_bs_check_is_backstab
-            jmp no_tele_bs_detected
+        // If in backstab animation
+        cmp DWORD PTR[TeleBackstabProtect_anim_id_ptr], 0x2328
+        je  anti_tele_bs_check_is_backstab
+        cmp DWORD PTR[TeleBackstabProtect_anim_id_ptr], 0x24CC
+        je  anti_tele_bs_check_is_backstab
+        jmp no_tele_bs_detected
         anti_tele_bs_check_is_backstab:
-            // If this is the player's position
-            push eax
-            push ebx
-            mov eax, [0x137D644]
-            mov eax, [eax + 0x3C]
-            mov eax, [eax + 0x28]
-            mov eax, [eax + 0x1C]
-            mov ebx, [eax + 0x10]
-            cmp[esi + 0x10], ebx
-            jne no_tele_bs_detected_pre
-            mov ebx, [eax + 0x18]
-            cmp[esi + 0x18], ebx
-            jne no_tele_bs_detected_pre
-            pop ebx
-            pop eax
+        // If this is the player's position
+        push eax
+        push ebx
+        mov eax, [0x137D644]
+        mov eax, [eax + 0x3C]
+        mov eax, [eax + 0x28]
+        mov eax, [eax + 0x1C]
+        mov ebx, [eax + 0x10]
+        cmp[esi + 0x10], ebx
+        jne no_tele_bs_detected_pre
+        mov ebx, [eax + 0x18]
+        cmp[esi + 0x18], ebx
+        jne no_tele_bs_detected_pre
+        pop ebx
+        pop eax
         //anti_tele_bs_check__is_player:
-            // If the distance to move is reasonable
-            //save xmm0[0] and xmm1[0]
-            movss DWORD PTR[TeleBackstabProtect_math_storage_ptr], xmm1
-            movss DWORD PTR[TeleBackstabProtect_math_storage_ptr + 4], xmm0
-            // Calculate distance of movement
-            // old_x is [esi+0x10]; new_x is in xmm1
-            subss xmm1, DWORD PTR[esi + 0x10] // new_x - old_x
-            movss DWORD PTR[TeleBackstabProtect_math_storage_ptr + 8], xmm1
-            and DWORD PTR[TeleBackstabProtect_math_storage_ptr + 8], 0x7FFFFFFF // Make result abs
-            movss xmm1, DWORD PTR[TeleBackstabProtect_math_storage_ptr + 8] // xmm1 = abs(new_x-old_x)
-            mulss xmm1, xmm1 // xmm1 = abs(new_x-old_x)^2
-            // old_y is [esi+0x18], new_y is in xmm0
-            subss xmm0, DWORD PTR[esi + 0x18]
-            movss DWORD PTR[TeleBackstabProtect_math_storage_ptr + 8], xmm0
-            and DWORD PTR[TeleBackstabProtect_math_storage_ptr + 8], 0x7FFFFFFF
-            movss xmm0, DWORD PTR[TeleBackstabProtect_math_storage_ptr + 8]
-            mulss xmm0, xmm0 // xmm0 = abs(new_y-old_y)^2
-            // int(abs(new_x-old_x)^2 + abs(new_y-old_y)^2)
-            addss xmm1, xmm0
-            push eax
-            cvttss2si eax, xmm1
-            mov DWORD PTR[TeleBackstabProtect_math_storage_ptr + 8], eax
-            pop eax
-            // Restore xmm0 and xmm1
-            movss xmm1, DWORD PTR[TeleBackstabProtect_math_storage_ptr]
-            movss xmm0, DWORD PTR[TeleBackstabProtect_math_storage_ptr + 4]
-            // Reset our global
-            mov DWORD PTR[TeleBackstabProtect_anim_id_ptr], 0
-            // int(abs(new_x-old_x)^2 + abs(new_y-old_y)^2) > 8^2
-            cmp DWORD PTR[TeleBackstabProtect_math_storage_ptr + 8], 0x40
-            //jge DARKSOULS.exe + 0xABDBE5
-            jge no_move // Too great a distance; don't move the player
-            jmp no_tele_bs_detected
-            // else continue normally
+        // If the distance to move is reasonable
+        //save xmm0[0] and xmm1[0]
+        movss DWORD PTR[TeleBackstabProtect_math_storage_ptr], xmm1
+        movss DWORD PTR[TeleBackstabProtect_math_storage_ptr + 4], xmm0
+        // Calculate distance of movement
+        // old_x is [esi+0x10]; new_x is in xmm1
+        subss xmm1, DWORD PTR[esi + 0x10] // new_x - old_x
+        movss DWORD PTR[TeleBackstabProtect_math_storage_ptr + 8], xmm1
+        and DWORD PTR[TeleBackstabProtect_math_storage_ptr + 8], 0x7FFFFFFF // Make result abs
+        movss xmm1, DWORD PTR[TeleBackstabProtect_math_storage_ptr + 8] // xmm1 = abs(new_x-old_x)
+        mulss xmm1, xmm1 // xmm1 = abs(new_x-old_x)^2
+        // old_y is [esi+0x18], new_y is in xmm0
+        subss xmm0, DWORD PTR[esi + 0x18]
+        movss DWORD PTR[TeleBackstabProtect_math_storage_ptr + 8], xmm0
+        and DWORD PTR[TeleBackstabProtect_math_storage_ptr + 8], 0x7FFFFFFF
+        movss xmm0, DWORD PTR[TeleBackstabProtect_math_storage_ptr + 8]
+        mulss xmm0, xmm0 // xmm0 = abs(new_y-old_y)^2
+        // int(abs(new_x-old_x)^2 + abs(new_y-old_y)^2)
+        addss xmm1, xmm0
+        push eax
+        cvttss2si eax, xmm1
+        mov DWORD PTR[TeleBackstabProtect_math_storage_ptr + 8], eax
+        pop eax
+        // Restore xmm0 and xmm1
+        movss xmm1, DWORD PTR[TeleBackstabProtect_math_storage_ptr]
+        movss xmm0, DWORD PTR[TeleBackstabProtect_math_storage_ptr + 4]
+        // Reset our global
+        mov DWORD PTR[TeleBackstabProtect_anim_id_ptr], 0
+        // int(abs(new_x-old_x)^2 + abs(new_y-old_y)^2) > 8^2
+        cmp DWORD PTR[TeleBackstabProtect_math_storage_ptr + 8], 0x40
+        //jge DARKSOULS.exe + 0xABDBE5
+        jge no_move // Too great a distance; don't move the player
+        jmp no_tele_bs_detected
+        // else continue normally
         no_tele_bs_detected_pre:
-            pop ebx
-            pop eax
+        pop ebx
+        pop eax
         no_tele_bs_detected:
-            movss[esp + 8], xmm0
-            jmp TeleBackstabProtect_check_return
+        movss[esp + 8], xmm0
+        jmp TeleBackstabProtect_check_return
 
         no_move:
-            jmp TeleBackstabProtect_no_move
+        jmp TeleBackstabProtect_no_move
     }
 }
 
@@ -190,8 +190,8 @@ void __declspec(naked) __stdcall BossGuard::check() {
         jmp BossGuard_check_return
 
         abort_damage:
-            pop ebp
-            retn 8
+        pop ebp
+        retn 8
     }
 }
 
@@ -200,7 +200,7 @@ void __declspec(naked) __stdcall BossGuard::check() {
 void NpcGuard::start() {
     if (NpcGuard::active)
     {
-        if(!print_console("    Enabling NpcGuard..."))
+        if (!print_console("    Enabling NpcGuard..."))
             Mod::startup_messages.push_back("    Enabling NpcGuard...");
         uint8_t *write_address = (uint8_t*)(NpcGuard::injection_offset + ((uint32_t)Game::ds1_base));
         set_mem_protection(write_address, 5, MEM_PROTECT_RWX);
@@ -295,7 +295,7 @@ void __declspec(naked) __stdcall NpcGuard::check() {
         push eax
         mov  eax, [0x137DC70]
         mov  eax, [eax + 4] // eax is now entityPointer to local player
-        cmp  [eax], esi // If entityPointer for local player == attacker
+        cmp[eax], esi // If entityPointer for local player == attacker
         pop  eax
         je bypass_check
 
@@ -449,15 +449,15 @@ void __declspec(naked) __stdcall NpcGuard::check() {
         jmp bypass_check
 
         abort_damage:
-            pop eax
-            // Set damage to 0
-            mov[ebx + 0x16C], -1
+        pop eax
+        // Set damage to 0
+        mov[ebx + 0x16C], -1
 
         bypass_check:
-            comiss xmm0, [ebx]
-            push esi
-            push edi
-            jmp NpcGuard_check_return
+        comiss xmm0, [ebx]
+        push esi
+        push edi
+        jmp NpcGuard_check_return
     }
 }
 

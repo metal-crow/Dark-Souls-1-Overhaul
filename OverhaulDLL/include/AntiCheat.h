@@ -1,18 +1,18 @@
 /*
-	DARK SOULS OVERHAUL
-	
-	Contributors to this file:
+    DARK SOULS OVERHAUL
+
+    Contributors to this file:
         Ainsley Harriott  -  NPC Guard & Boss Guard
         Ashley            -  Anti-Tele-Backstab
         Metal-crow        -  NPC Guard
-		Sean Pesce        -  C++ conversions
+        Sean Pesce        -  C++ conversions
 */
 
 
 #pragma once
 
 #ifndef _DS1_OVERHAUL_ANTI_CHEAT_H_
-	#define _DS1_OVERHAUL_ANTI_CHEAT_H_
+    #define _DS1_OVERHAUL_ANTI_CHEAT_H_
 
 
 #include <cstdint>
@@ -68,10 +68,10 @@ public:
 
         // Offset (from DARKSOULS.exe) where Teleporting-Backstab-Protection anti-cheat code will be injected
         static const uint32_t store_anim_injection_offset = 0xA06A49;
-        static const uint32_t check_injection_offset      = 0xABDBB9;
+        static const uint32_t check_injection_offset = 0xABDBB9;
 
         static void start();
-        
+
         // Injected TeleBackstabProtect assembly functions
         static void __stdcall check();
         static void __stdcall store_new_animation_id();

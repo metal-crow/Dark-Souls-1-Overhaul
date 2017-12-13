@@ -138,7 +138,7 @@ public:
         static AttackParamDef instance;
         return instance;
     }
-    
+
     AttackParam *data()
     {
         return (AttackParam*)ParamDef::data();
@@ -151,7 +151,7 @@ public:
 
 
     // @TODO: Member data specific to this class
-    
+
 private:
     AttackParamDef()
         : ParamDef(NULL, sizeof(AttackParam),
@@ -159,7 +159,7 @@ private:
                    "AtkParam", "Attack")
     {
     }
-    
+
 public:
     AttackParamDef(AttackParamDef const&) = delete;
     void operator=(AttackParamDef const&) = delete;

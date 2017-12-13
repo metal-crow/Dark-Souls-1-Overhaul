@@ -7,7 +7,7 @@
 
     Param/Param.h
 
-    
+
 
 */
 
@@ -80,11 +80,11 @@ enum DS1_NPC_DRAW_TYPE {
 namespace Params {
 
 
-                        /////////////////////////////////////
-                        ////////// GAME PARAMETERS //////////
-                        /////////////////////////////////////
+    /////////////////////////////////////
+    ////////// GAME PARAMETERS //////////
+    /////////////////////////////////////
 
-    // Accessory parameters
+// Accessory parameters
     static AccessoryParamDef& Accessory() { return AccessoryParamDef::get_instance(); }
 
     // Default AI parameters
@@ -183,11 +183,11 @@ namespace Params {
 
 
 
-                    /////////////////////////////////////
-                    ////////// DRAW PARAMETERS //////////
-                    /////////////////////////////////////
+    /////////////////////////////////////
+    ////////// DRAW PARAMETERS //////////
+    /////////////////////////////////////
 
-    // Depth of Field Bank Parameters
+// Depth of Field Bank Parameters
     static DofBankParamDef& DofBank() { return DofBankParamDef::get_instance(); }
 
     // Fog Bank Parameters

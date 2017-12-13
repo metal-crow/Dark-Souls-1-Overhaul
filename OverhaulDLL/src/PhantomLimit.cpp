@@ -529,19 +529,19 @@ void __declspec(naked) __stdcall summon_char_types_newmem()
         startloop:
         //cmp  eax, 9 //MAXCHARACTERS
         cmp  eax, max_allowed_summons32_final
-            je  endloop
-            mov  ecx, edx
-            add  ecx, eax
-            mov[ecx], bl
-            inc  eax
-            jmp  startloop
-            endloop :
+        je  endloop
+        mov  ecx, edx
+        add  ecx, eax
+        mov[ecx], bl
+        inc  eax
+        jmp  startloop
+        endloop:
         pop  ecx
-            pop  eax
+        pop  eax
 
-            mov[sucessful_phantomfix], 1	// Success marker
-            call summon_char_types_callproc
-            jmp summon_char_types_returnhere
+        mov[sucessful_phantomfix], 1	// Success marker
+        call summon_char_types_callproc
+        jmp summon_char_types_returnhere
     }
 }
 

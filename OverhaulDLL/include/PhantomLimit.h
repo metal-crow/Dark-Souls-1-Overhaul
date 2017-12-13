@@ -1,16 +1,16 @@
 /*
-	DARK SOULS OVERHAUL
-	
-	Contributors to this file:
+    DARK SOULS OVERHAUL
+
+    Contributors to this file:
         Metal-Crow  -  Reverse engineering, Phantom Limit patch
-		Sean Pesce  -  C++
+        Sean Pesce  -  C++
 
 */
 
 #pragma once
 
 #ifndef _DS1_OVERHAUL_PHANTOM_LIMIT_H_
-	#define _DS1_OVERHAUL_PHANTOM_LIMIT_H_
+    #define _DS1_OVERHAUL_PHANTOM_LIMIT_H_
 
 
 #include "SpPointer.h"

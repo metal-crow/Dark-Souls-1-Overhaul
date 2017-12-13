@@ -2,7 +2,7 @@
     DARK SOULS GAME FILE C++ LIBRARY
 
     Contributors to this file:
-        Sean Pesce	-	C++
+        Sean Pesce  -  C++
 
 
     Archive/Archive.h
@@ -25,20 +25,20 @@
 
 // Fix for compatibility issues between SeQan and Windows API
 #ifdef min
-	#undef min
+    #undef min
 #endif // min
 #ifdef max
-	#undef max
+    #undef max
 #endif // max
 
 #ifdef _MSC_VER
     #pragma warning( disable : 4390) // Disable "';': empty controlled statement found; is this the intent?" warnings
-	#pragma warning( push )
-	#pragma warning( disable : 4521 4800 4244 4996 4503) // Disable "multiple copy constructors", "data loss", and "name truncated" warnings from SeQan library
+    #pragma warning( push )
+    #pragma warning( disable : 4521 4800 4244 4996 4503) // Disable "multiple copy constructors", "data loss", and "name truncated" warnings from SeQan library
 #endif // _MSC_VER
-    #include "seqan/index.h" // String, StringSet, Index, Finder
+#include "seqan/index.h" // String, StringSet, Index, Finder
 #ifdef _MSC_VER
-	#pragma warning( pop )
+    #pragma warning( pop )
 #endif // _MSC_VER
 
 
@@ -130,7 +130,7 @@ public:
 #ifdef __DS1_OVERHAUL_MOD
                     Mod::startup_messages.push_back(std::string(error_opening_file_write) + list_file);
 #else
-                ;
+                    ;
 #endif // __DS1_OVERHAUL_MOD
             }
 
@@ -163,7 +163,7 @@ public:
 #ifdef __DS1_OVERHAUL_MOD
                         Mod::startup_messages.push_back(std::string(error_curl) + curl_easy_strerror(result));
 #else
-                    ;
+                        ;
 #endif // __DS1_OVERHAUL_MOD
                 }
             }
@@ -178,7 +178,7 @@ public:
 #ifdef __DS1_OVERHAUL_MOD
                     Mod::startup_messages.push_back(std::string(error_closing_file[0]) + list_file + error_closing_file[1]);
 #else
-                ;
+                    ;
 #endif // __DS1_OVERHAUL_MOD
                 if (error_code == ERROR_SUCCESS)
                     error_code = ERROR_WRITE_FAULT;
@@ -219,7 +219,7 @@ public:
 #ifdef __DS1_OVERHAUL_MOD
                 Mod::startup_messages.push_back(Mod::output_prefix + success_message[0] + std::to_string(ArchiveFile::bdt_file_name_set.size()) + success_message[1] + list_file + success_message[2]);
 #else
-            ;
+                ;
 #endif // __DS1_OVERHAUL_MOD
             // Build search index
             ArchiveFile::bdt_file_name_set.build_index();
@@ -229,7 +229,7 @@ public:
 #ifdef __DS1_OVERHAUL_MOD
                 Mod::startup_messages.push_back(Mod::output_prefix + finished_indexing);
 #else
-            ;
+                ;
 #endif // __DS1_OVERHAUL_MOD
 
             bdt_file_name_set_loaded = true;
@@ -241,7 +241,7 @@ public:
 #ifdef __DS1_OVERHAUL_MOD
                 Mod::startup_messages.push_back(error_empty_list);
 #else
-            ;
+                ;
 #endif // __DS1_OVERHAUL_MOD
             error_code = ERROR_SOURCE_ELEMENT_EMPTY;
         }

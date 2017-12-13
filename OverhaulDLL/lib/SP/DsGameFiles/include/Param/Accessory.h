@@ -91,7 +91,7 @@ public:
         static AccessoryParamDef instance;
         return instance;
     }
-    
+
     AccessoryParam *data()
     {
         return (AccessoryParam*)ParamDef::data();
@@ -104,7 +104,7 @@ public:
 
 
     // @TODO: Member data specific to this class
-    
+
 private:
     AccessoryParamDef()
         : ParamDef(NULL, sizeof(AccessoryParam),
@@ -112,7 +112,7 @@ private:
                    "EquipAccessoryParam", "Accessory")
     {
     }
-    
+
 public:
     AccessoryParamDef(AccessoryParamDef const&) = delete;
     void operator=(AccessoryParamDef const&) = delete;

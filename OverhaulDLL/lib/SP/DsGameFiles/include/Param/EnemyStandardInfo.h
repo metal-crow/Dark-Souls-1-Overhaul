@@ -91,7 +91,7 @@ public:
         static EnemyStandardInfoParamDef instance;
         return instance;
     }
-    
+
     EnemyStandardInfoParam *data()
     {
         return (EnemyStandardInfoParam*)ParamDef::data();
@@ -104,7 +104,7 @@ public:
 
 
     // @TODO: Member data specific to this class
-    
+
 private:
     EnemyStandardInfoParamDef()
         : ParamDef(NULL, sizeof(EnemyStandardInfoParam),
@@ -112,7 +112,7 @@ private:
                    "default_EnemyBehaviorBank", "Default Enemy Behavior")
     {
     }
-    
+
 public:
     EnemyStandardInfoParamDef(EnemyStandardInfoParamDef const&) = delete;
     void operator=(EnemyStandardInfoParamDef const&) = delete;

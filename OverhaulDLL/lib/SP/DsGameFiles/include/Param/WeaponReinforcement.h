@@ -30,7 +30,7 @@
 
 // WeaponReinforce parameter
 typedef struct WeaponReinforceParameter : public Param {
-    
+
     float
         physicsAtkRate = 1, // Physical Attack Power Correction Value
         magicAtkRate = 1, // Magic Attack Power Correction Value
@@ -79,7 +79,7 @@ public:
         static WeaponReinforceParamDef instance;
         return instance;
     }
-    
+
     WeaponReinforceParam *data()
     {
         return (WeaponReinforceParam*)ParamDef::data();
@@ -92,7 +92,7 @@ public:
 
 
     // @TODO: Member data specific to this class
-    
+
 private:
     WeaponReinforceParamDef()
         : ParamDef(NULL, sizeof(WeaponReinforceParam),
@@ -100,7 +100,7 @@ private:
                    "ReinforceParamWeapon", "Weapon Reinforcement")
     {
     }
-    
+
 public:
     WeaponReinforceParamDef(WeaponReinforceParamDef const&) = delete;
     void operator=(WeaponReinforceParamDef const&) = delete;

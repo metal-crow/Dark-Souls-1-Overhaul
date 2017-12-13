@@ -2,7 +2,7 @@
     DARK SOULS GAME FILE C++ LIBRARY
 
     Contributors to this file:
-    Sean Pesce    -  C++
+        Sean Pesce  -  C++
 
     Archive/Header.h
 */

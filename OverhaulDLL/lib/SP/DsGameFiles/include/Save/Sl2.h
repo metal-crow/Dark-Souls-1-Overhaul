@@ -2,7 +2,7 @@
     DARK SOULS GAME FILE C++ LIBRARY
 
     Contributors to this file:
-        Sean Pesce    -  C++
+        Sean Pesce  -  C++
 
 
     Save/Sl2.h
@@ -21,7 +21,7 @@
 #pragma once
 
 #ifndef _DS1_FILE_LIB_SL2_SAVE_FILE_H_
-#define _DS1_FILE_LIB_SL2_SAVE_FILE_H_
+    #define _DS1_FILE_LIB_SL2_SAVE_FILE_H_
 
 #include "PluginImports.h"
 
@@ -31,7 +31,7 @@
     ///////////////////////////////////////////////////////////////////////////////
 
         @TODO
-    
+
 */
 
 

@@ -2,9 +2,9 @@
     DARK SOULS GAME FILE C++ LIBRARY
 
     Contributors to this file:
-        Wulf2k          -  Reversing and obtaining game filenames
-        Meowmaritus     -  Reversing and obtaining game filenames
         Sean Pesce	    -  Converting other contributers' data to C++ formatting
+        Meowmaritus     -  Reversing and obtaining game filenames
+        Wulf2k          -  Reversing and obtaining game filenames
 
 
     FileList.h
@@ -21,7 +21,7 @@
 
 
 #ifndef _DS1_FILE_LIB_BDT_FILE_LIST_H_
-#define _DS1_FILE_LIB_BDT_FILE_LIST_H_
+    #define _DS1_FILE_LIB_BDT_FILE_LIST_H_
 
 
 /*
