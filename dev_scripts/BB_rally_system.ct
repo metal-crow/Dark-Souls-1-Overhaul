@@ -97,32 +97,68 @@ movss xmm1,[esi+5C]
     <CheatEntry>
       <ID>91729</ID>
       <Description>"Rally System"</Description>
-      <LastState Activated="1"/>
+      <LastState/>
       <VariableType>Auto Assembler Script</VariableType>
       <AssemblerScript>[ENABLE]
-//track player previous hp and time of on player hit
+//*********track player previous hp and time of on player hit*********
 alloc(track_onhit_data,2048)
-globalalloc(previoushit_time,4)
+globalalloc(beforehit_time,4)
 globalalloc(beforehit_hp,4)
+globalalloc(gothit,1)
 label(track_onhit_data_returnhere)
 label(track_onhit_data_exit)
+label(check_if_player_attacking)
+label(track_onhit_data_exit_cleanup)
 
 track_onhit_data:
-//check if trarget entity is host
+//if (target entity is host)
+// {
 push ebx
 mov  ebx, [137DC70]
 mov  ebx, [ebx+4] //eax is entityPointer to local player
-cmp  [ebx], eax //if entityPointer for local player == target
+cmp  [ebx], eax //if entityPointer for local player == target (eax)
 pop  ebx
-jne track_onhit_data_exit
+jne check_if_player_attacking
 //save current time and player hp
 push ebx
 mov ebx, [eax+2D4] //player hp
 mov [beforehit_hp], ebx
 mov ebx, [100C42AC] //current time ms
-mov [previoushit_time], ebx
+mov [beforehit_time], ebx
+inc [gothit] //marker for getting hit (used for ui)
 pop ebx
-//continue normally
+jmp track_onhit_data_exit
+// }
+
+//if (attacking entity is host)
+// {
+check_if_player_attacking:
+push ebx
+push eax
+mov  eax, [ebp+C] //attacker
+mov  ebx, [137DC70]
+mov  ebx, [ebx+4]
+cmp  [ebx], eax
+pop eax
+pop ebx
+jne track_onhit_data_exit
+//rally code
+push eax
+        //if (currenttime-storedtime &lt; MAX RECOVERY TIME
+        mov eax, [100C42AC]
+        sub eax, [beforehit_time]
+        cmp eax, 1388
+        jge track_onhit_data_exit_cleanup
+        //&amp;&amp; weapon_is_occult)
+
+mov  eax, [ebp+C] //attacker
+//damage is attacker+16C
+
+// }
+
+track_onhit_data_exit_cleanup:
+pop eax
+//exit normally
 track_onhit_data_exit:
 xorps xmm0,xmm0
 sub esp,14
@@ -133,7 +169,7 @@ jmp track_onhit_data
 nop
 track_onhit_data_returnhere:
 
-//track which ui bar is being smoothed
+//*********track which ui bar is being smoothed*********
 alloc(track_what_bar,2048)
 globalalloc(current_selected_bar,4)
 label(track_what_bar_returnhere)
@@ -152,10 +188,10 @@ nop
 nop
 track_what_bar_returnhere:
 
-//control the timer for the current ui bar
+//*********control the timer for the current ui bar*********
 alloc(controltimer,2048)
-globalalloc(timercounter,4)
 label(execute_orange_drop)
+label(execute_partial_orange_drop)
 label(controltimer_returnhere)
 label(start_controlling_timer)
 label(dont_control_timer)
@@ -172,17 +208,48 @@ cmp [current_selected_bar], 26
 je start_controlling_timer
 jmp dont_control_timer
 
-//check and update our counter
 start_controlling_timer:
-cmp [timercounter], 100
+//check timer
+push eax
+mov eax, [beforehit_time]
+add eax, 1388 //MAX RECOVERY TIME
+cmp [100C42AC], eax //compare current time to hittime+MAX RECOVERY TIME
+pop eax
 jge execute_orange_drop
-inc [timercounter]
+//if we got hit before the timer went down
+cmp [gothit], 2
+jge execute_partial_orange_drop
 jmp controltimer_returnhere
 
 //if timer is at desired point, drop orange
 execute_orange_drop:
-mov [timercounter], 0
+mov [gothit],0
 mov [eax+3C],0
+jmp controltimer_returnhere
+
+//if we got interrupted before previous drop, drop orange to the _previous_ hp value
+execute_partial_orange_drop:
+mov [gothit],1
+//save sse's
+sub     esp, 16
+movdqu  dqword [esp], xmm0
+sub     esp, 16
+movdqu  dqword [esp], xmm1
+//calculate previous_hp/max_hp. This should be location of orange
+push    eax
+mov     eax, [00CE0FEB+5]
+mov     eax, [eax]
+mov     eax, [eax+0]
+movss   xmm0, [eax+2D8]//max hp
+pop     eax
+movss   xmm1, [beforehit_hp]
+divss   xmm1, xmm0
+movss   [eax+3C],xmm1
+//restore sse's
+movdqu  xmm1, dqword [esp]
+add     esp, 16
+movdqu  xmm0, dqword [esp]
+add     esp, 16
 jmp controltimer_returnhere
 
 //if timer not interested, normal instruction
@@ -217,41 +284,52 @@ sub esp,14
     <CheatEntry>
       <ID>91422</ID>
       <Description>"ms since start"</Description>
-      <LastState Value="367701" RealAddress="100C42AC"/>
       <VariableType>4 Bytes</VariableType>
       <Address>fmodex.dll+C42AC</Address>
     </CheatEntry>
     <CheatEntry>
       <ID>91730</ID>
-      <Description>"previoushit_time"</Description>
-      <LastState Value="262485" RealAddress="26020000"/>
+      <Description>"beforehit_time"</Description>
       <VariableType>4 Bytes</VariableType>
-      <Address>previoushit_time</Address>
+      <Address>beforehit_time</Address>
     </CheatEntry>
     <CheatEntry>
       <ID>91731</ID>
       <Description>"beforehit_hp"</Description>
-      <LastState Value="1893" RealAddress="26020010"/>
       <VariableType>4 Bytes</VariableType>
       <Address>beforehit_hp</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>91732</ID>
+      <Description>"gothit"</Description>
+      <VariableType>Byte</VariableType>
+      <Address>gothit</Address>
     </CheatEntry>
   </CheatEntries>
   <UserdefinedSymbols>
     <SymbolEntry>
       <Name>timercounter</Name>
-      <Address>26020030</Address>
+      <Address>24D60030</Address>
     </SymbolEntry>
     <SymbolEntry>
       <Name>current_selected_bar</Name>
-      <Address>26020020</Address>
+      <Address>148F0030</Address>
     </SymbolEntry>
     <SymbolEntry>
       <Name>previoushit_time</Name>
-      <Address>26020000</Address>
+      <Address>24D60000</Address>
     </SymbolEntry>
     <SymbolEntry>
       <Name>beforehit_hp</Name>
-      <Address>26020010</Address>
+      <Address>148F0010</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>beforehit_time</Name>
+      <Address>148F0000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>gothit</Name>
+      <Address>148F0020</Address>
     </SymbolEntry>
   </UserdefinedSymbols>
 </CheatTable>
