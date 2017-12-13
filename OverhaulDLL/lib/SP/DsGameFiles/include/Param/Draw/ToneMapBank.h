@@ -30,7 +30,7 @@
 
 // ToneMapBank parameter
 typedef struct ToneMapBankParameter : public Param {
-    
+
     int8_t
         bloomBegin = 50, // Bleeding begins when the brightness exceeds the threshold (near)
         bloomMul = 50, // It is a value to multiply the value above the threshold value (it will not be smeared with 0) (vicinity)
@@ -69,7 +69,7 @@ public:
         static ToneMapBankParamDef instance;
         return instance;
     }
-    
+
     ToneMapBankParam *data()
     {
         return (ToneMapBankParam*)ParamDef::data();
@@ -82,7 +82,7 @@ public:
 
 
     // @TODO: Member data specific to this class
-    
+
 private:
     ToneMapBankParamDef()
         : ParamDef(NULL, sizeof(ToneMapBankParam),
@@ -90,7 +90,7 @@ private:
                    "ToneMapBank", "Tone Map")
     {
     }
-    
+
 public:
     ToneMapBankParamDef(ToneMapBankParamDef const&) = delete;
     void operator=(ToneMapBankParamDef const&) = delete;

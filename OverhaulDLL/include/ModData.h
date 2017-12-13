@@ -1,15 +1,15 @@
 /*
-	DARK SOULS OVERHAUL
-	
-	Contributors to this file:
-		Sean Pesce	-	C++
-	
+    DARK SOULS OVERHAUL
+
+    Contributors to this file:
+        Sean Pesce  -  C++
+
 */
 
 #pragma once
 
 #ifndef _DS1_OVERHAUL_MOD_DATA_H_
-	#define _DS1_OVERHAUL_MOD_DATA_H_
+    #define _DS1_OVERHAUL_MOD_DATA_H_
 
 
 
@@ -79,82 +79,82 @@ public:
     // Others who made the project possible
     static std::vector<std::string> special_thanks;
 
-	// Used in console messages to inform users that a message is being printed by the Overhaul mod
-	static const std::string output_prefix;
+    // Used in console messages to inform users that a message is being printed by the Overhaul mod
+    static const std::string output_prefix;
 
-	// Set to true after inititalize_plugin() has executed
-	static bool initialized;
+    // Set to true after inititalize_plugin() has executed
+    static bool initialized;
 
-	// Set to true after deferred_tasks() has executed (or this boolean can be set to true to cancel unfinished deferred tasks)
-	static bool deferred_tasks_complete;
+    // Set to true after deferred_tasks() has executed (or this boolean can be set to true to cancel unfinished deferred tasks)
+    static bool deferred_tasks_complete;
 
-	// Console messages from events that took place before the in-game console was loaded
-	static std::vector<std::string> startup_messages;
+    // Console messages from events that took place before the in-game console was loaded
+    static std::vector<std::string> startup_messages;
 
-	// List of supported game versions
-	static std::vector<uint8_t> supported_game_versions;
+    // List of supported game versions
+    static std::vector<uint8_t> supported_game_versions;
 
-	// Determines whether to start in legacy mode (only applies fixes/anti-cheat/QoL changes, no gameplay modifications)
-	static bool legacy_mode;
+    // Determines whether to start in legacy mode (only applies fixes/anti-cheat/QoL changes, no gameplay modifications)
+    static bool legacy_mode;
 
-	// Cheats on/off. If cheats are enabled, saving and multiplayer are disabled until the game is restarted
-	static bool cheats;
+    // Cheats on/off. If cheats are enabled, saving and multiplayer are disabled until the game is restarted
+    static bool cheats;
 
     // Determines to disable the game's "Framerate insufficient for online play" disconnection
     static bool disable_low_fps_disconnect;
 
-	// Determines whether node count is displayed on the overlay text feed info header
-	static bool show_node_count;
+    // Determines whether node count is displayed on the overlay text feed info header
+    static bool show_node_count;
 
-	// User preference setting; determines whether the brightness of lava visual effects should be lowered
-	static bool dim_lava_pref;
+    // User preference setting; determines whether the brightness of lava visual effects should be lowered
+    static bool dim_lava_pref;
 
-	// User preference setting; determines whether armor sound effects will be disabled
-	static bool disable_armor_sfx_pref;
+    // User preference setting; determines whether armor sound effects will be disabled
+    static bool disable_armor_sfx_pref;
 
-	// Custom game archive files to load instead of the vanilla game files
-	static std::wstring custom_game_archives;
+    // Custom game archive files to load instead of the vanilla game files
+    static std::wstring custom_game_archives;
 
-	// Custom character save file to load instead of the vanilla file
-	static std::wstring custom_save_file;
+    // Custom character save file to load instead of the vanilla file
+    static std::wstring custom_save_file;
 
-	// Custom game configuration file to load instead of the vanilla file
-	static std::wstring custom_config_file;
+    // Custom game configuration file to load instead of the vanilla file
+    static std::wstring custom_config_file;
 
     // Determines whether gesture cancelling is enabled
     static bool gesture_cancelling;
 
 
-	// Registers all commands in ConsoleCommands.cpp for use with the in-game console
-	static void register_console_commands();
+    // Registers all commands in ConsoleCommands.cpp for use with the in-game console
+    static void register_console_commands();
 
 
-	// Get user-defined startup preferences from the settings file
-	static void get_startup_preferences();
+    // Get user-defined startup preferences from the settings file
+    static void get_startup_preferences();
 
-	// Get user-defined settings preferences from the settings file
-	static void get_user_preferences();
+    // Get user-defined settings preferences from the settings file
+    static void get_user_preferences();
 
-	// Get all user-defined keybinds from the settings file
-	static void get_user_keybinds();
+    // Get all user-defined keybinds from the settings file
+    static void get_user_keybinds();
 
-	// Helper function for get_user_keybinds() that loads the specified keybind from the config file and binds it to the specified function
-	static void get_single_user_keybind(const char *keybind_name, int(*function)());
+    // Helper function for get_user_keybinds() that loads the specified keybind from the config file and binds it to the specified function
+    static void get_single_user_keybind(const char *keybind_name, int(*function)());
 
-	// Get custom game files from the settings file
-	static void get_custom_game_files();
+    // Get custom game files from the settings file
+    static void get_custom_game_files();
 
     // Plays the credits for the Dark Souls Overhaul Mod (displays the list of people who contributed to development)
     static void play_credits();
-	
 
 
-	#ifdef _DS1_OVERHAUL_MOD_DBG_
-		
-		// Registers all commands in ConsoleCommandsDebug.cpp for use with the in-game console
-		static void register_console_commands_debug();
 
-	#endif // _DS1_OVERHAUL_MOD_DBG_
+#ifdef _DS1_OVERHAUL_MOD_DBG_
+
+    // Registers all commands in ConsoleCommandsDebug.cpp for use with the in-game console
+    static void register_console_commands_debug();
+
+#endif // _DS1_OVERHAUL_MOD_DBG_
 
 };
 

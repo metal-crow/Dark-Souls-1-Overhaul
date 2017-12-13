@@ -55,7 +55,7 @@ public:
         static FogBankParamDef instance;
         return instance;
     }
-    
+
     FogBankParam *data()
     {
         return (FogBankParam*)ParamDef::data();
@@ -68,7 +68,7 @@ public:
 
 
     // @TODO: Member data specific to this class
-    
+
 private:
     FogBankParamDef()
         : ParamDef(NULL, sizeof(FogBankParam),
@@ -76,7 +76,7 @@ private:
                    "FogBank", "Fog Bank")
     {
     }
-    
+
 public:
     FogBankParamDef(FogBankParamDef const&) = delete;
     void operator=(FogBankParamDef const&) = delete;

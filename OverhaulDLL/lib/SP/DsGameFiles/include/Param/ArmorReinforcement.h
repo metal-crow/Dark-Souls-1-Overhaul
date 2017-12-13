@@ -30,7 +30,7 @@
 
 // ArmorReinforce parameter
 typedef struct ArmorReinforceParameter : public Param {
-    
+
     float
         physicsDefRate = 1, // Physical defense correction value
         magicDefRate = 1, // Magic defense correction value
@@ -64,7 +64,7 @@ public:
         static ArmorReinforceParamDef instance;
         return instance;
     }
-    
+
     ArmorReinforceParam *data()
     {
         return (ArmorReinforceParam*)ParamDef::data();
@@ -77,7 +77,7 @@ public:
 
 
     // @TODO: Member data specific to this class
-    
+
 private:
     ArmorReinforceParamDef()
         : ParamDef(NULL, sizeof(ArmorReinforceParam),
@@ -85,7 +85,7 @@ private:
                    "ReinforceParamProtector", "Armor Reinforcement")
     {
     }
-    
+
 public:
     ArmorReinforceParamDef(ArmorReinforceParamDef const&) = delete;
     void operator=(ArmorReinforceParamDef const&) = delete;

@@ -1,8 +1,8 @@
 /*
-	DARK SOULS OVERHAUL
-	
-	Contributors to this file:
-		Sean Pesce        -  C++
+    DARK SOULS OVERHAUL
+
+    Contributors to this file:
+        Sean Pesce  -  C++
 */
 
 #include "DllMain.h"

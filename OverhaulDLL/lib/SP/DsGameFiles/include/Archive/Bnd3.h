@@ -2,8 +2,8 @@
     DARK SOULS GAME FILE C++ LIBRARY
 
     Contributors to this file:
-        Sean Pesce       -     C++
-        Burton Radons    -     Reverse-engineering Dark Souls game files (Github: https://github.com/Burton-Radons )
+        Sean Pesce     -  C++
+        Burton Radons  -  Reverse-engineering Dark Souls game files (Github: https://github.com/Burton-Radons )
 
 
     Archive/Bnd3.h

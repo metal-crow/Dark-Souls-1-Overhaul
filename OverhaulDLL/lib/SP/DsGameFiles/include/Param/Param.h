@@ -50,7 +50,7 @@ typedef struct Parameter {
 // Generic Dark Souls parameter definitions file class
 class ParamDef {
 public:
-    
+
     // Starting address of the parameters file
     void *base;
 

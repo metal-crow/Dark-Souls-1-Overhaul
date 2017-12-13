@@ -30,7 +30,7 @@
 
 // Object parameter
 typedef struct ObjectParameter : public Param {
-    
+
     int16_t
         hp = -1; // Durability up to destruction (-1: not destructible)
 
@@ -80,7 +80,7 @@ public:
         static ObjectParamDef instance;
         return instance;
     }
-    
+
     ObjectParam *data()
     {
         return (ObjectParam*)ParamDef::data();
@@ -93,7 +93,7 @@ public:
 
 
     // @TODO: Member data specific to this class
-    
+
 private:
     ObjectParamDef()
         : ParamDef(NULL, sizeof(ObjectParam),
@@ -101,7 +101,7 @@ private:
                    "ObjectParam", "Object")
     {
     }
-    
+
 public:
     ObjectParamDef(ObjectParamDef const&) = delete;
     void operator=(ObjectParamDef const&) = delete;

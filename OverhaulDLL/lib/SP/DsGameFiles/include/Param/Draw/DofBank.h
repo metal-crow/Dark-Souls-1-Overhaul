@@ -56,24 +56,24 @@ typedef struct DofBankParameter : public Param {
 
     float
         farDofBegin = 60,  // Distance at which depth of field begins blurring far away
-        farDofEnd   = 360; // Distance at which depth of field is far away at depth of field
-    
+        farDofEnd = 360; // Distance at which depth of field is far away at depth of field
+
     uint8_t
         farDofMul = 100; // Depth of field blurring (0 will not blur)
 
     uint8_t
         pad_0[3] = { 0, 0, 0 }; // Padding
-    
+
     float
         nearDofBegin = 3, // Distance at which the depth of field is close to blur starts (It is farther than the end distance)
-        nearDofEnd   = 0; // Distance at which the depth of field is close to the depth of field (closer than the starting distance)
-    
+        nearDofEnd = 0; // Distance at which the depth of field is close to the depth of field (closer than the starting distance)
+
     uint8_t
         nearDofMul = 100; // Depth of field blurring (0 will not blur)
-    
+
     uint8_t
         pad_1[3] = { 0, 0, 0 }; // Padding
-    
+
     float
         dispersionSq = 5; // Increasing the value increases the depth of field's blur
 
@@ -81,9 +81,9 @@ typedef struct DofBankParameter : public Param {
 
 
 /*
-        
+
         Unique AoBs:
-        
+
         default_DoFBank.param:
         "30 0A 00 00 ?? ?? 00 00  01 00 ?? ?? 44 4F 46 5F
          42 41 4E 4B 00 20 20 20  20 20 20 20 20 20 20 20
@@ -230,7 +230,7 @@ typedef struct DofBankParameter : public Param {
           00 00 00 00 13 00 00 00  44 05 00 00 49 0A 00 00
           14 00 00 00 60 05 00 00  56"
 
-          
+
          m17_DoFBank.param:
          "30 0A 00 00 ?? ?? 00 00  01 00 ?? ?? 44 4F 46 5F
           42 41 4E 4B 00 20 20 20  20 20 20 20 20 20 20 20
@@ -271,7 +271,7 @@ public:
         static DofBankParamDef instance;
         return instance;
     }
-    
+
     DofBankParam *data()
     {
         return (DofBankParam*)ParamDef::data();
@@ -284,19 +284,19 @@ public:
 
 
     // @TODO: Member data specific to this class
-    
-private:
-     // There are 11 DoF Bank param files
 
-    /*DofBankParamDef()
-        : ParamDef(NULL, sizeof(DofBankParam), @TODO, "default_DofBankParam", "Depth of Field Bank (Default)")
-    {
-    }*/
+private:
+    // There are 11 DoF Bank param files
+
+   /*DofBankParamDef()
+       : ParamDef(NULL, sizeof(DofBankParam), @TODO, "default_DofBankParam", "Depth of Field Bank (Default)")
+   {
+   }*/
     DofBankParamDef()
         : ParamDef(NULL, sizeof(DofBankParam), "@TODO", "@TODO_DofBankParam", "Depth of Field Bank (@TODO)")
     {
     }
-    
+
 public:
     DofBankParamDef(DofBankParamDef const&) = delete;
     void operator=(DofBankParamDef const&) = delete;

@@ -55,7 +55,7 @@ public:
         static ToneCorrectBankParamDef instance;
         return instance;
     }
-    
+
     ToneCorrectBankParam *data()
     {
         return (ToneCorrectBankParam*)ParamDef::data();
@@ -68,7 +68,7 @@ public:
 
 
     // @TODO: Member data specific to this class
-    
+
 private:
     ToneCorrectBankParamDef()
         : ParamDef(NULL, sizeof(ToneCorrectBankParam),
@@ -76,7 +76,7 @@ private:
                    "ToneCorrectBankParam", "Tone Correction Bank")
     {
     }
-    
+
 public:
     ToneCorrectBankParamDef(ToneCorrectBankParamDef const&) = delete;
     void operator=(ToneCorrectBankParamDef const&) = delete;

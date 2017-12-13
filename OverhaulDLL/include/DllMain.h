@@ -2,7 +2,7 @@
     DARK SOULS OVERHAUL
 
     Contributors to this file:
-        Sean Pesce	-	C++
+        Sean Pesce  -  C++
 
 
     DllMain.h: include file for standard system include files,
@@ -14,7 +14,7 @@
 #pragma once
 
 #ifndef _DS1_OVERHAUL_DLL_MAIN_H_
-#define _DS1_OVERHAUL_DLL_MAIN_H_
+    #define _DS1_OVERHAUL_DLL_MAIN_H_
 
 
 #define WIN32_LEAN_AND_MEAN   // Exclude rarely-used stuff from Windows headers

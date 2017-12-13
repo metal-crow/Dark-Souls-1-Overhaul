@@ -30,7 +30,7 @@
 
 // Skeleton parameter
 typedef struct SkeletonParameter : public Param {
-    
+
     float
         neckTurnGain = 0; // Head swing gain. Turn higher as soon as possible
 
@@ -83,7 +83,7 @@ public:
         static SkeletonParamDef instance;
         return instance;
     }
-    
+
     SkeletonParam *data()
     {
         return (SkeletonParam*)ParamDef::data();
@@ -96,7 +96,7 @@ public:
 
 
     // @TODO: Member data specific to this class
-    
+
 private:
     SkeletonParamDef()
         : ParamDef(NULL, sizeof(SkeletonParam),
@@ -104,7 +104,7 @@ private:
                    "SkeletonParam", "Skeleton")
     {
     }
-    
+
 public:
     SkeletonParamDef(SkeletonParamDef const&) = delete;
     void operator=(SkeletonParamDef const&) = delete;

@@ -2,7 +2,7 @@
     DARK SOULS GAME FILE C++ LIBRARY
 
     Contributors to this file:
-        Sean Pesce	-	C++
+        Sean Pesce  -  C++
 
     FileUtil.h
 
@@ -13,7 +13,7 @@
 #pragma once
 
 #ifndef _DS1_FILE_LIB_FILE_UTIL_H_
-#define _DS1_FILE_LIB_FILE_UTIL_H_
+    #define _DS1_FILE_LIB_FILE_UTIL_H_
 
 #include "Ds1GameFileLib.h"
 
@@ -30,9 +30,9 @@ public:
     */
 
     // Number of filename strings in the filename list used by hashing functions
-    #define FILENAME_LIST_SIZE 6128
+#define FILENAME_LIST_SIZE 6128
 
-    // List of game files that are packed into the Dark Souls game archives
+// List of game files that are packed into the Dark Souls game archives
     static const char* const FILENAMES[FILENAME_LIST_SIZE];
 
     // Stores hashed filenames

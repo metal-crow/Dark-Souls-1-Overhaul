@@ -86,25 +86,25 @@ enum DCX_COMPRESSION_ALGORITHM : uint32_t {
 
 */
 typedef struct DcxArchiveFileHeader : ArchiveFileHeader {
-/*  Magic identifier bytes (defined in ArchiveHeader ancestor struct):
-    ARCHIVE_MAGIC_0 magic32_0;  // "DCX\0"
-    ARCHIVE_MAGIC_1 magic32_1;  // 0x00000100
-    ARCHIVE_MAGIC_2 magic32_2;  // 0x18000000
-*/  const uint32_t magic32_3 = 0x24000000;
-    const uint32_t magic32_4 = 0x24000000;
-    uint32_t subheader_size_big_endian = 0; // Size (in bytes) of the DCX file subheader (WARNING: Big Endian)
-    const uint32_t DCS = 0x00534344; // "DCS\0"
-    uint32_t size_decompressed_big_endian = 0; // WARNING: Big Endian
-    uint32_t size_compressed_big_endian = 0;   // WARNING: Big Endian
-    const uint32_t DCP = 0x00504344; // "DCP\0"
-    DCX_COMPRESSION_ALGORITHM compression = DEFLATE; // Compression method (WARNING: Not null-terminated); Options are "DFLT" (DEFLATE algorithm) or "EDGE"
-    const uint32_t magic32_5 = 0x20000000;
-    const uint32_t magic32_6 = 0x00000009;
-    const uint32_t is_dark_souls_2_low = 0x0; // In Dark Souls 2 .dcx files, this would be 0x100
-    const uint32_t padding[2] = { 0x0, 0x0 };
-    const uint32_t is_dark_souls_2_high = 0x10100; // In Dark Souls 2 .dcx files, this would be 0x11000
-    const uint32_t DCA = 0x00414344; // "DCA\0"
-    uint32_t compression_header_size_big_endian = 0; // WARNING: Big Endian
+    /*  Magic identifier bytes (defined in ArchiveHeader ancestor struct):
+        ARCHIVE_MAGIC_0 magic32_0;  // "DCX\0"
+        ARCHIVE_MAGIC_1 magic32_1;  // 0x00000100
+        ARCHIVE_MAGIC_2 magic32_2;  // 0x18000000
+    */  const uint32_t magic32_3 = 0x24000000;
+const uint32_t magic32_4 = 0x24000000;
+uint32_t subheader_size_big_endian = 0; // Size (in bytes) of the DCX file subheader (WARNING: Big Endian)
+const uint32_t DCS = 0x00534344; // "DCS\0"
+uint32_t size_decompressed_big_endian = 0; // WARNING: Big Endian
+uint32_t size_compressed_big_endian = 0;   // WARNING: Big Endian
+const uint32_t DCP = 0x00504344; // "DCP\0"
+DCX_COMPRESSION_ALGORITHM compression = DEFLATE; // Compression method (WARNING: Not null-terminated); Options are "DFLT" (DEFLATE algorithm) or "EDGE"
+const uint32_t magic32_5 = 0x20000000;
+const uint32_t magic32_6 = 0x00000009;
+const uint32_t is_dark_souls_2_low = 0x0; // In Dark Souls 2 .dcx files, this would be 0x100
+const uint32_t padding[2] = { 0x0, 0x0 };
+const uint32_t is_dark_souls_2_high = 0x10100; // In Dark Souls 2 .dcx files, this would be 0x11000
+const uint32_t DCA = 0x00414344; // "DCA\0"
+uint32_t compression_header_size_big_endian = 0; // WARNING: Big Endian
 } DcxHeader;
 
 

@@ -69,7 +69,7 @@ public:
         static CalcCorrectParamDef instance;
         return instance;
     }
-    
+
     CalcCorrectParam *data()
     {
         return (CalcCorrectParam*)ParamDef::data();
@@ -82,7 +82,7 @@ public:
 
 
     // @TODO: Member data specific to this class
-    
+
 private:
     CalcCorrectParamDef()
         : ParamDef(NULL, sizeof(CalcCorrectParam),
@@ -90,7 +90,7 @@ private:
                    "CalcCorrectParam", "Calculation Correction")
     {
     }
-    
+
 public:
     CalcCorrectParamDef(CalcCorrectParamDef const&) = delete;
     void operator=(CalcCorrectParamDef const&) = delete;

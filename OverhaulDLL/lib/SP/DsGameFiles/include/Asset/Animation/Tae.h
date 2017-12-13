@@ -36,7 +36,7 @@
 
 // ??
 enum TaeAnimFileStructType {
-    TAEAFST_NAMED   = 0,
+    TAEAFST_NAMED = 0,
     TAEAFST_UNNAMED = 1
 };
 
@@ -55,7 +55,7 @@ private:
         When the game loads the file, addresses are resolved from the offsets before we access it.
         This means most member data that ends in "offset" is actually an absolute address when loading
         from game memory.
-        
+
         When we manually load from a file, however, offset_base should be set to the address of header,
         because we haven't calculated the final addresses yet.
     */
@@ -87,7 +87,7 @@ public:
         uint32_t subheader_offset = 0; // Offset (from start of file) of subheader (always(?) +4 from here)
     };
 
-    
+
     /*
         Sub-header (aka data header) structure; begins immediately after the main header structure.
     */
@@ -160,7 +160,7 @@ public:
             uint32_t anim_file_offset = 0; // Offset (from start of file) of the AnimFile::Header for this animation
             // Note: Events and File are not contiguous with Header
         };
-        
+
         Header header;
         std::vector<TimeActionEventFile::Event> events;
         TimeActionEventFile::AnimFile anim_file;
@@ -177,7 +177,7 @@ public:
     uint32_t  *group_count;
     uint32_t  *groups_offset; // Offset (from start of file) of animation group array (should just be +4 from here)
     AnimGroup *groups;        // Animation group array
-    AnimData::Header *data;   
+    AnimData::Header *data;
 
 
     // Constructor (reading from game memory)
@@ -196,7 +196,7 @@ public:
     {
     }
 
-    
+
     Header* init_from_memory(Header *new_header_start) {
         if (!from_file) {
             if (new_header_start != NULL)
@@ -270,7 +270,7 @@ public:
         SetLastError(ERROR_BAD_ENVIRONMENT);
         return NULL;
     }
-    
+
     // Returns whether this TAE object was loaded from a file (if not, it was already loaded into memory, probably by the game)
     bool loaded_from_file() {
         return from_file;
@@ -319,7 +319,7 @@ public:
             return -1;
         }
     }
-    
+
     // Returns pointer to animation ID structure at index i
     inline AnimId* get_id_struct(int unsigned i) {
         if (i < anim_id_count())
@@ -494,7 +494,7 @@ public:
     inline float get_event_end(int unsigned i, int unsigned ei) {
         AnimData::Header* d = get_data(i);
         if (d != NULL && ei < d->event_count) {
-            if(from_file)
+            if (from_file)
                 return *(float*)(offset_base + ((Event::Header*)(offset_base + d->events_offset))[ei].end_time_offset);
             else
                 return *(float*)&(((Event::Header*)(offset_base + d->events_offset))[ei].end_time_offset);
