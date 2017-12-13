@@ -1,0 +1,25 @@
+                      #############################################
+                      ######     DX9 OVERLAY CHANGELOG      #######
+                      #############################################
+
+
+
+------------------------------------------------------------------------------------------
+12/12/2017:
+
+- Add support for tracking global frame count (total frames rendered since game was launched)
+
+- New config setting:
+    - DisplayFrameCount:
+	    If DisplayFrameCount=1, global frame count is displayed in text feed info header at
+		startup. Default value is 0.
+
+- New console commands:
+    - text_feed_frame_count:
+	    Prints whether frame count is currently displayed in text feed
+	    info header; optional boolean argument can be used to toggle it
+    - frame_count (and global_frame_count alias):
+	    Prints current frame count in console output
+    - fps:
+	    Prints current FPS in console output
+------------------------------------------------------------------------------------------
