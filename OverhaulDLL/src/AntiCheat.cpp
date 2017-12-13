@@ -4,6 +4,7 @@
 	Contributors to this file:
         Ainsley Harriott  -  NPC Guard & Boss Guard
         Ashley            -  Anti-Tele-Backstab
+        Metal-crow        -  NPC Guard
 		Sean Pesce        -  C++ conversions
 */
 
@@ -203,7 +204,7 @@ void NpcGuard::start() {
             Mod::startup_messages.push_back("    Enabling NpcGuard...");
         uint8_t *write_address = (uint8_t*)(NpcGuard::injection_offset + ((uint32_t)Game::ds1_base));
         set_mem_protection(write_address, 5, MEM_PROTECT_RWX);
-        inject_jmp_5b(write_address, &NpcGuard_check_return, 1, &NpcGuard::check);
+        inject_jmp_5b(write_address, &NpcGuard_check_return, 0, &NpcGuard::check);
     }
     else
     {
@@ -294,7 +295,7 @@ void __declspec(naked) __stdcall NpcGuard::check() {
         push eax
         mov  eax, [0x137DC70]
         mov  eax, [eax + 4] // eax is now entityPointer to local player
-        cmp  eax, esi // If entityPointer for local player == attacker
+        cmp  [eax], esi // If entityPointer for local player == attacker
         pop  eax
         je bypass_check
 
@@ -450,12 +451,12 @@ void __declspec(naked) __stdcall NpcGuard::check() {
         abort_damage:
             pop eax
             // Set damage to 0
-            mov[eax + 0x16C], -1
+            mov[ebx + 0x16C], -1
 
         bypass_check:
-            push ebp
-            mov ebp, esp
-            and esp, -0x08
+            comiss xmm0, [ebx]
+            push esi
+            push edi
             jmp NpcGuard_check_return
     }
 }
