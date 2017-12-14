@@ -109,13 +109,14 @@ label(track_onhit_data_returnhere)
 label(track_onhit_data_exit)
 label(check_if_player_attacking)
 label(track_onhit_data_exit_cleanup)
+label(set_new_rally_hp)
 
 track_onhit_data:
 //if (target entity is host)
 // {
 push ebx
 mov  ebx, [137DC70]
-mov  ebx, [ebx+4] //eax is entityPointer to local player
+mov  ebx, [ebx+4] //ebx is entityPointer to local player
 cmp  [ebx], eax //if entityPointer for local player == target (eax)
 pop  ebx
 jne check_if_player_attacking
@@ -134,29 +135,37 @@ jmp track_onhit_data_exit
 // {
 check_if_player_attacking:
 push ebx
-push eax
-mov  eax, [ebp+C] //attacker
 mov  ebx, [137DC70]
 mov  ebx, [ebx+4]
-cmp  [ebx], eax
-pop eax
+cmp  [ebx], esi //attacker (esi)
 pop ebx
 jne track_onhit_data_exit
 //rally code
 push eax
+push edx
         //if (currenttime-storedtime &lt; MAX RECOVERY TIME
-        mov eax, [100C42AC]
-        sub eax, [beforehit_time]
-        cmp eax, 1388
-        jge track_onhit_data_exit_cleanup
-        //&amp;&amp; weapon_is_occult)
+        mov eax, [beforehit_time]
+        add eax, 1388
+        cmp eax, [100C42AC]
+        jl track_onhit_data_exit_cleanup
+        //&amp;&amp; weapon_is_occult) TODO
 
-mov  eax, [ebp+C] //attacker
-//damage is attacker+16C
+        mov  eax, [ebp+C] //attacker_ptr2
+        mov  eax, [eax+16C] //damage is attacker_ptr2+16C
+        mov  edx, 1 //TODO load scaling into edx
+        mul  edx //scaled recovery hp (eax is scaled dmg)
 
+        add  eax, [esi+2D4] //new possible hp after rally
+        //Playerhp = min(prehithp, playerhp+Recoveryhp)
+        cmp  eax, [beforehit_hp]
+        jle  set_new_rally_hp
+        mov  eax, [beforehit_hp]
+        set_new_rally_hp:
+        mov  [esi+2D4], eax
 // }
 
 track_onhit_data_exit_cleanup:
+pop edx
 pop eax
 //exit normally
 track_onhit_data_exit:
@@ -304,28 +313,28 @@ sub esp,14
     <CheatEntry>
       <ID>91422</ID>
       <Description>"ms since start"</Description>
-      <LastState Value="3534549" RealAddress="100C42AC"/>
+      <LastState Value="315840" RealAddress="100C42AC"/>
       <VariableType>4 Bytes</VariableType>
       <Address>fmodex.dll+C42AC</Address>
     </CheatEntry>
     <CheatEntry>
       <ID>91730</ID>
       <Description>"beforehit_time"</Description>
-      <LastState Value="3517994" RealAddress="24CC0000"/>
+      <LastState Value="292373" RealAddress="14990000"/>
       <VariableType>4 Bytes</VariableType>
       <Address>beforehit_time</Address>
     </CheatEntry>
     <CheatEntry>
       <ID>91731</ID>
       <Description>"beforehit_hp"</Description>
-      <LastState Value="1526" RealAddress="24CC0010"/>
+      <LastState Value="1486" RealAddress="14990010"/>
       <VariableType>4 Bytes</VariableType>
       <Address>beforehit_hp</Address>
     </CheatEntry>
     <CheatEntry>
       <ID>91732</ID>
       <Description>"gothit"</Description>
-      <LastState Value="0" RealAddress="24CC0020"/>
+      <LastState Value="2" RealAddress="14990020"/>
       <VariableType>Byte</VariableType>
       <Address>gothit</Address>
     </CheatEntry>
@@ -337,7 +346,7 @@ sub esp,14
     </SymbolEntry>
     <SymbolEntry>
       <Name>current_selected_bar</Name>
-      <Address>24CC0030</Address>
+      <Address>14990030</Address>
     </SymbolEntry>
     <SymbolEntry>
       <Name>previoushit_time</Name>
@@ -345,15 +354,15 @@ sub esp,14
     </SymbolEntry>
     <SymbolEntry>
       <Name>beforehit_hp</Name>
-      <Address>24CC0010</Address>
+      <Address>14990010</Address>
     </SymbolEntry>
     <SymbolEntry>
       <Name>beforehit_time</Name>
-      <Address>24CC0000</Address>
+      <Address>14990000</Address>
     </SymbolEntry>
     <SymbolEntry>
       <Name>gothit</Name>
-      <Address>24CC0020</Address>
+      <Address>14990020</Address>
     </SymbolEntry>
   </UserdefinedSymbols>
 </CheatTable>
