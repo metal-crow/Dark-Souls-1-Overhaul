@@ -104,12 +104,13 @@ movss xmm1,[esi+5C]
 alloc(track_onhit_data,2048)
 globalalloc(beforehit_time,4)
 globalalloc(beforehit_hp,4)
-globalalloc(gothit,1)
+globalalloc(gothit,4)
 label(track_onhit_data_returnhere)
 label(track_onhit_data_exit)
 label(check_if_player_attacking)
 label(track_onhit_data_exit_cleanup)
 label(set_new_rally_hp)
+label(gothit_bounds_check)
 
 track_onhit_data:
 //if (target entity is host)
@@ -127,6 +128,10 @@ mov [beforehit_hp], ebx
 mov ebx, [100C42AC] //current time ms
 mov [beforehit_time], ebx
 inc [gothit] //marker for getting hit (used for ui)
+cmp [gothit], 2
+jle gothit_bounds_check
+mov [gothit], 2
+gothit_bounds_check:
 pop ebx
 jmp track_onhit_data_exit
 // }
@@ -313,29 +318,29 @@ sub esp,14
     <CheatEntry>
       <ID>91422</ID>
       <Description>"ms since start"</Description>
-      <LastState Value="315840" RealAddress="100C42AC"/>
+      <LastState Value="1121194" RealAddress="100C42AC"/>
       <VariableType>4 Bytes</VariableType>
       <Address>fmodex.dll+C42AC</Address>
     </CheatEntry>
     <CheatEntry>
       <ID>91730</ID>
       <Description>"beforehit_time"</Description>
-      <LastState Value="292373" RealAddress="14990000"/>
+      <LastState Value="1109589" RealAddress="1CD70000"/>
       <VariableType>4 Bytes</VariableType>
       <Address>beforehit_time</Address>
     </CheatEntry>
     <CheatEntry>
       <ID>91731</ID>
       <Description>"beforehit_hp"</Description>
-      <LastState Value="1486" RealAddress="14990010"/>
+      <LastState Value="1800" RealAddress="1CD70010"/>
       <VariableType>4 Bytes</VariableType>
       <Address>beforehit_hp</Address>
     </CheatEntry>
     <CheatEntry>
       <ID>91732</ID>
       <Description>"gothit"</Description>
-      <LastState Value="2" RealAddress="14990020"/>
-      <VariableType>Byte</VariableType>
+      <LastState Value="1" RealAddress="1CD70020"/>
+      <VariableType>4 Bytes</VariableType>
       <Address>gothit</Address>
     </CheatEntry>
   </CheatEntries>
@@ -346,7 +351,7 @@ sub esp,14
     </SymbolEntry>
     <SymbolEntry>
       <Name>current_selected_bar</Name>
-      <Address>14990030</Address>
+      <Address>1CD70030</Address>
     </SymbolEntry>
     <SymbolEntry>
       <Name>previoushit_time</Name>
@@ -354,15 +359,15 @@ sub esp,14
     </SymbolEntry>
     <SymbolEntry>
       <Name>beforehit_hp</Name>
-      <Address>14990010</Address>
+      <Address>1CD70010</Address>
     </SymbolEntry>
     <SymbolEntry>
       <Name>beforehit_time</Name>
-      <Address>14990000</Address>
+      <Address>1CD70000</Address>
     </SymbolEntry>
     <SymbolEntry>
       <Name>gothit</Name>
-      <Address>14990020</Address>
+      <Address>1CD70020</Address>
     </SymbolEntry>
   </UserdefinedSymbols>
 </CheatTable>
