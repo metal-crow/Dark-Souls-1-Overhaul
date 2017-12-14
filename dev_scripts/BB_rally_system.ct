@@ -195,6 +195,9 @@ label(execute_partial_orange_drop)
 label(controltimer_returnhere)
 label(start_controlling_timer)
 label(dont_control_timer)
+label(timer_check_continue)
+label(cap_display_max_hp)
+label(dont_cap_max_hp)
 
 controltimer:
 //if this is the timer of interest
@@ -209,6 +212,14 @@ je start_controlling_timer
 jmp dont_control_timer
 
 start_controlling_timer:
+//fix for coming into section with too many hits
+//can happen if pc gets hit but doesn't take hp _bar_ damage (since hp can extend past visual)
+//causing this code not to get run immediatly after hit
+cmp [gothit], 2
+jle timer_check_continue
+mov [gothit], 1
+
+timer_check_continue:
 //check timer
 push eax
 mov eax, [beforehit_time]
@@ -216,9 +227,10 @@ add eax, 1388 //MAX RECOVERY TIME
 cmp [100C42AC], eax //compare current time to hittime+MAX RECOVERY TIME
 pop eax
 jge execute_orange_drop
+
 //if we got hit before the timer went down
 cmp [gothit], 2
-jge execute_partial_orange_drop
+je execute_partial_orange_drop
 jmp controltimer_returnhere
 
 //if timer is at desired point, drop orange
@@ -236,11 +248,19 @@ movdqu  dqword [esp], xmm0
 sub     esp, 16
 movdqu  dqword [esp], xmm1
 //calculate previous_hp/max_hp. This should be location of orange
+//NOTE: max hp must be capped at _displayable_ max hp (1900 in gui bar), otherwise get problems
 push    eax
 mov     eax, [00CE0FEB+5]
 mov     eax, [eax]
 mov     eax, [eax+0]
-movss   xmm0, [eax+2D8]//max hp
+mov     eax, [eax+2D8]//max hp
+cmp     eax, 76C
+jg      cap_display_max_hp
+jmp     dont_cap_max_hp
+cap_display_max_hp:
+mov     eax, 76C
+dont_cap_max_hp:
+movd    xmm0, eax
 pop     eax
 movss   xmm1, [beforehit_hp]
 divss   xmm1, xmm0
@@ -284,24 +304,28 @@ sub esp,14
     <CheatEntry>
       <ID>91422</ID>
       <Description>"ms since start"</Description>
+      <LastState Value="3534549" RealAddress="100C42AC"/>
       <VariableType>4 Bytes</VariableType>
       <Address>fmodex.dll+C42AC</Address>
     </CheatEntry>
     <CheatEntry>
       <ID>91730</ID>
       <Description>"beforehit_time"</Description>
+      <LastState Value="3517994" RealAddress="24CC0000"/>
       <VariableType>4 Bytes</VariableType>
       <Address>beforehit_time</Address>
     </CheatEntry>
     <CheatEntry>
       <ID>91731</ID>
       <Description>"beforehit_hp"</Description>
+      <LastState Value="1526" RealAddress="24CC0010"/>
       <VariableType>4 Bytes</VariableType>
       <Address>beforehit_hp</Address>
     </CheatEntry>
     <CheatEntry>
       <ID>91732</ID>
       <Description>"gothit"</Description>
+      <LastState Value="0" RealAddress="24CC0020"/>
       <VariableType>Byte</VariableType>
       <Address>gothit</Address>
     </CheatEntry>
@@ -313,7 +337,7 @@ sub esp,14
     </SymbolEntry>
     <SymbolEntry>
       <Name>current_selected_bar</Name>
-      <Address>148F0030</Address>
+      <Address>24CC0030</Address>
     </SymbolEntry>
     <SymbolEntry>
       <Name>previoushit_time</Name>
@@ -321,15 +345,15 @@ sub esp,14
     </SymbolEntry>
     <SymbolEntry>
       <Name>beforehit_hp</Name>
-      <Address>148F0010</Address>
+      <Address>24CC0010</Address>
     </SymbolEntry>
     <SymbolEntry>
       <Name>beforehit_time</Name>
-      <Address>148F0000</Address>
+      <Address>24CC0000</Address>
     </SymbolEntry>
     <SymbolEntry>
       <Name>gothit</Name>
-      <Address>148F0020</Address>
+      <Address>24CC0020</Address>
     </SymbolEntry>
   </UserdefinedSymbols>
 </CheatTable>
