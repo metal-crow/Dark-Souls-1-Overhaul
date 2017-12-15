@@ -39,6 +39,9 @@ void on_process_attach()
     // Apply increased memory limit patch
     Game::set_memory_limit(Game::memory_limit);
 
+    // Change game version number
+    Files::apply_function_intercepts();
+
     // Check for existence of non-default game files
     Files::check_custom_archive_files();
     Files::check_custom_save_file();
@@ -62,9 +65,6 @@ void on_process_attach()
 */
 DWORD WINAPI on_process_attach_async(LPVOID lpParam)
 {
-    // Change game version number
-    Files::apply_function_intercepts();
-
     // Start anti-cheat
     AntiCheat::start();
 
