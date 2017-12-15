@@ -221,9 +221,9 @@ push ecx
         //get weapon scaling
         mov  eax, ecx
         //save sse's
-        sub     esp, 16
+        sub     esp, 10
         movdqu  dqword [esp], xmm0
-        sub     esp, 16
+        sub     esp, 10
         movdqu  dqword [esp], xmm1
         mov  edx, 0
         mov  ebx, A
@@ -244,9 +244,9 @@ push ecx
         movd eax, xmm0 //scaled recovery hp (eax is scaled dmg)
         //restore sse's
         movdqu  xmm1, dqword [esp]
-        add     esp, 16
+        add     esp, 10
         movdqu  xmm0, dqword [esp]
-        add     esp, 16
+        add     esp, 10
 
         add  eax, [esi+2D4] //new possible hp after rally
         //Playerhp = min(prehithp, playerhp+Recoveryhp)
@@ -347,9 +347,9 @@ jmp controltimer_returnhere
 execute_partial_orange_drop:
 mov [gothit],1
 //save sse's
-sub     esp, 16
+sub     esp, 10
 movdqu  dqword [esp], xmm0
-sub     esp, 16
+sub     esp, 10
 movdqu  dqword [esp], xmm1
 //calculate previous_hp/max_hp. This should be location of orange
 //NOTE: max hp must be capped at _displayable_ max hp (1900 in gui bar), otherwise get problems
@@ -371,9 +371,9 @@ divss   xmm1, xmm0
 movss   [eax+3C],xmm1
 //restore sse's
 movdqu  xmm1, dqword [esp]
-add     esp, 16
+add     esp, 10
 movdqu  xmm0, dqword [esp]
-add     esp, 16
+add     esp, 10
 jmp controltimer_returnhere
 
 //if timer not interested, normal instruction
@@ -408,28 +408,28 @@ sub esp,14
     <CheatEntry>
       <ID>91422</ID>
       <Description>"ms since start"</Description>
-      <LastState Value="285824" RealAddress="100C42AC"/>
+      <LastState Value="4572885" RealAddress="100C42AC"/>
       <VariableType>4 Bytes</VariableType>
       <Address>fmodex.dll+C42AC</Address>
     </CheatEntry>
     <CheatEntry>
       <ID>91730</ID>
       <Description>"beforehit_time"</Description>
-      <LastState Value="250794" RealAddress="26FC0000"/>
+      <LastState Value="1018752" RealAddress="26FC0000"/>
       <VariableType>4 Bytes</VariableType>
       <Address>beforehit_time</Address>
     </CheatEntry>
     <CheatEntry>
       <ID>91731</ID>
       <Description>"beforehit_hp"</Description>
-      <LastState Value="421" RealAddress="26FC0010"/>
+      <LastState Value="2040" RealAddress="26FC0010"/>
       <VariableType>4 Bytes</VariableType>
       <Address>beforehit_hp</Address>
     </CheatEntry>
     <CheatEntry>
       <ID>91732</ID>
       <Description>"gothit"</Description>
-      <LastState Value="0" RealAddress="26FC0020"/>
+      <LastState Value="2" RealAddress="26FC0020"/>
       <VariableType>4 Bytes</VariableType>
       <Address>gothit</Address>
     </CheatEntry>
