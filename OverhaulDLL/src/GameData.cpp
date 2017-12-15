@@ -91,6 +91,7 @@ void Game::on_first_character_loaded()
     if (Mod::disable_armor_sfx_pref)
         Game::enable_armor_sfx(false);
 
+    // Perform TAE edits to animations
     void *ret_val = (void*)Game::player_tae.init_from_aob_scan("54 41 45 20 00 00 00 00 0B 00 01 00 B4 AE 09 00");
     print_console("TAE file start address: " + std::to_string((int)ret_val));
     Game::enable_gesture_cencelling();
