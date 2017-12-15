@@ -111,6 +111,10 @@ label(check_if_player_attacking)
 label(track_onhit_data_exit_cleanup)
 label(set_new_rally_hp)
 label(gothit_bounds_check)
+label(right_hand_wep_atk)
+label(left_hand_wep_atk)
+label(check_is_weapon_occult)
+label(weapon_is_occult)
 
 track_onhit_data:
 //if (target entity is host)
@@ -147,18 +151,102 @@ pop ebx
 jne track_onhit_data_exit
 //rally code
 push eax
+push ebx
 push edx
+push ecx
         //if (currenttime-storedtime &lt; MAX RECOVERY TIME
         mov eax, [beforehit_time]
         add eax, 1388
         cmp eax, [100C42AC]
         jl track_onhit_data_exit_cleanup
-        //&amp;&amp; weapon_is_occult) TODO
+        //&amp;&amp; weapon_is_occult)
+        //need to load weapon used data
+        mov  eax, [0137D644]
+        mov  eax, [eax+3C]
+        mov  eax, [eax+30]
+        mov  eax, [eax+C]
+        mov  eax, [eax+654]
+        mov  ebx, [ebp+C] //grab attack_data ptr
+        cmp  [ebx+44], -1 //indicates which hand used in attack
+        je   right_hand_wep_atk
+        cmp  [ebx+44], -2
+        je   left_hand_wep_atk
+        jmp  track_onhit_data_exit_cleanup
+        right_hand_wep_atk:
+        mov  eax, [eax+1F8] //grabs the weapon's id
+        jmp  check_is_weapon_occult
+        left_hand_wep_atk:
+        mov  eax, [eax+1B4]
+        check_is_weapon_occult:
+        mov  ecx, eax //save weaponid since we'll trash it but need it again
+        cmp  eax, DCB40 //Dark Hand
+        je   weapon_is_occult
+        //Priscilla's Dagger +1,+2,etc
+        cmp  eax, 19640
+        je   weapon_is_occult
+        cmp  eax, 19641
+        je   weapon_is_occult
+        cmp  eax, 19642
+        je   weapon_is_occult
+        cmp  eax, 19643
+        je   weapon_is_occult
+        cmp  eax, 19644
+        je   weapon_is_occult
+        cmp  eax, 19645
+        je   weapon_is_occult
+        //Velka's Rapier +1,+2,etc
+        cmp  eax, 93378
+        je   weapon_is_occult
+        cmp  eax, 93379
+        je   weapon_is_occult
+        cmp  eax, 9337A
+        je   weapon_is_occult
+        cmp  eax, 9337B
+        je   weapon_is_occult
+        cmp  eax, 9337C
+        je   weapon_is_occult
+        cmp  eax, 9337D
+        je   weapon_is_occult
+        mov  edx, 0 //clear dividend
+        mov  ebx, 64 //Occult upgrade (check if hundreds place == 7 via weaponid/100 % 10)
+        div  ebx //eax is set to div 100
+        mov  edx, 0
+        mov  ebx, A
+        div  ebx //edx is set to modulo 10 (weapon path)
+        cmp  edx, 7
+        je   weapon_is_occult
+        jmp  track_onhit_data_exit_cleanup
 
-        mov  eax, [ebp+C] //attacker_ptr2
-        mov  eax, [eax+16C] //damage is attacker_ptr2+16C
-        mov  edx, 1 //TODO load scaling into edx
-        mul  edx //scaled recovery hp (eax is scaled dmg)
+        weapon_is_occult:
+        //get weapon scaling
+        mov  eax, ecx
+        //save sse's
+        sub     esp, 16
+        movdqu  dqword [esp], xmm0
+        sub     esp, 16
+        movdqu  dqword [esp], xmm1
+        mov  edx, 0
+        mov  ebx, A
+        div  ebx //edx is set to modulo 10 (weapon upgrade)
+        //calculate (0.5+upgrade/10)
+        movd xmm0, edx
+        mov  edx, A
+        movd  xmm1, edx
+        divss xmm0, xmm1
+        mov  edx, 3F000000 //0.5
+        movd xmm1, edx
+        addss xmm0, xmm1 //xmm0 is our scaler
+        //calculate scaled recovery
+        mov  ebx, [ebp+C] //re-grab attack_data ptr
+        mov  eax, [ebx+16C] //damage is attack_data+16C
+        movd xmm1, eax
+        mulss xmm0, xmm1
+        movd eax, xmm0 //scaled recovery hp (eax is scaled dmg)
+        //restore sse's
+        movdqu  xmm1, dqword [esp]
+        add     esp, 16
+        movdqu  xmm0, dqword [esp]
+        add     esp, 16
 
         add  eax, [esi+2D4] //new possible hp after rally
         //Playerhp = min(prehithp, playerhp+Recoveryhp)
@@ -170,7 +258,9 @@ push edx
 // }
 
 track_onhit_data_exit_cleanup:
+pop ecx
 pop edx
+pop ebx
 pop eax
 //exit normally
 track_onhit_data_exit:
@@ -318,28 +408,28 @@ sub esp,14
     <CheatEntry>
       <ID>91422</ID>
       <Description>"ms since start"</Description>
-      <LastState Value="1121194" RealAddress="100C42AC"/>
+      <LastState Value="285824" RealAddress="100C42AC"/>
       <VariableType>4 Bytes</VariableType>
       <Address>fmodex.dll+C42AC</Address>
     </CheatEntry>
     <CheatEntry>
       <ID>91730</ID>
       <Description>"beforehit_time"</Description>
-      <LastState Value="1109589" RealAddress="1CD70000"/>
+      <LastState Value="250794" RealAddress="26FC0000"/>
       <VariableType>4 Bytes</VariableType>
       <Address>beforehit_time</Address>
     </CheatEntry>
     <CheatEntry>
       <ID>91731</ID>
       <Description>"beforehit_hp"</Description>
-      <LastState Value="1800" RealAddress="1CD70010"/>
+      <LastState Value="421" RealAddress="26FC0010"/>
       <VariableType>4 Bytes</VariableType>
       <Address>beforehit_hp</Address>
     </CheatEntry>
     <CheatEntry>
       <ID>91732</ID>
       <Description>"gothit"</Description>
-      <LastState Value="1" RealAddress="1CD70020"/>
+      <LastState Value="0" RealAddress="26FC0020"/>
       <VariableType>4 Bytes</VariableType>
       <Address>gothit</Address>
     </CheatEntry>
@@ -351,7 +441,7 @@ sub esp,14
     </SymbolEntry>
     <SymbolEntry>
       <Name>current_selected_bar</Name>
-      <Address>1CD70030</Address>
+      <Address>26FC0030</Address>
     </SymbolEntry>
     <SymbolEntry>
       <Name>previoushit_time</Name>
@@ -359,15 +449,15 @@ sub esp,14
     </SymbolEntry>
     <SymbolEntry>
       <Name>beforehit_hp</Name>
-      <Address>1CD70010</Address>
+      <Address>26FC0010</Address>
     </SymbolEntry>
     <SymbolEntry>
       <Name>beforehit_time</Name>
-      <Address>1CD70000</Address>
+      <Address>26FC0000</Address>
     </SymbolEntry>
     <SymbolEntry>
       <Name>gothit</Name>
-      <Address>1CD70020</Address>
+      <Address>26FC0020</Address>
     </SymbolEntry>
   </UserdefinedSymbols>
 </CheatTable>
