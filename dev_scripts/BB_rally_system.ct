@@ -228,12 +228,12 @@ push ecx
         mov  edx, 0
         mov  ebx, A
         div  ebx //edx is set to modulo 10 (weapon upgrade)
-        //calculate (0.5+upgrade/10)
+        //calculate (0.05+upgrade/10)
         movd xmm0, edx
         mov  edx, A
         movd  xmm1, edx
         divss xmm0, xmm1
-        mov  edx, 3F000000 //0.5
+        mov  edx, 3d4ccccd //0.05
         movd xmm1, edx
         addss xmm0, xmm1 //xmm0 is our scaler
         //calculate scaled recovery
@@ -358,7 +358,7 @@ mov     eax, [00CE0FEB+5]
 mov     eax, [eax]
 mov     eax, [eax+0]
 mov     eax, [eax+2D8]//max hp
-cmp     eax, 76C
+cmp     eax, 76C //_displayable_ max hp (1900)
 jg      cap_display_max_hp
 jmp     dont_cap_max_hp
 cap_display_max_hp:
@@ -408,7 +408,7 @@ sub esp,14
     <CheatEntry>
       <ID>91422</ID>
       <Description>"ms since start"</Description>
-      <LastState Value="4572885" RealAddress="100C42AC"/>
+      <LastState Value="9566720" RealAddress="100C42AC"/>
       <VariableType>4 Bytes</VariableType>
       <Address>fmodex.dll+C42AC</Address>
     </CheatEntry>
