@@ -97,6 +97,18 @@ void __declspec(naked) __stdcall BloodborneRally::control_timer_injection() {
     //Alt: db F3 0F 11 48 3C
     __asm
     {
+        //if this is the timer of interest
+        cmp [current_selected_bar], 0x23
+        je  start_controlling_timer
+        cmp [current_selected_bar], 0x24
+        je  start_controlling_timer
+        cmp [current_selected_bar], 0x25
+        je  start_controlling_timer
+        cmp [current_selected_bar], 0x26
+        je  start_controlling_timer
+        jmp dont_control_timer
+
+        start_controlling_timer:
         //fix for coming into section with too many hits
         //can happen if pc gets hit but doesn't take hp _bar_ damage (since hp can extend past visual)
         //causing this code not to get run immediatly after hit
@@ -116,22 +128,22 @@ void __declspec(naked) __stdcall BloodborneRally::control_timer_injection() {
         //if we got hit before the timer went down
         cmp [gothit_ptr], 2
         je  execute_partial_orange_drop
-        jmp controltimer_returnhere
+        jmp control_timer_injection_return
 
         //if timer is at desired point, drop orange
         execute_orange_drop:
         mov [gothit_ptr], 0
         mov [eax + 0x3C], 0
-        jmp controltimer_returnhere
+        jmp control_timer_injection_return
 
         //if we got interrupted before previous drop, drop orange to the _previous_ hp value
         execute_partial_orange_drop:
         mov     [gothit_ptr], 1
         //save sse's
         sub     esp, 0x10
-        movdqu  dqword[esp], xmm0
+        movdqu  [esp], xmm0
         sub     esp, 0x10
-        movdqu  dqword[esp], xmm1
+        movdqu  [esp], xmm1
         //calculate previous_hp/max_hp. This should be location of orange
         //NOTE: max hp must be capped at _displayable_ max hp (1900 in gui bar), otherwise get problems
         push    eax
@@ -151,11 +163,11 @@ void __declspec(naked) __stdcall BloodborneRally::control_timer_injection() {
         divss   xmm1, xmm0
         movss   [eax + 0x3C], xmm1
         //restore sse's
-        movdqu  xmm1, dqword[esp]
+        movdqu  xmm1, [esp]
         add     esp, 0x10
-        movdqu  xmm0, dqword[esp]
+        movdqu  xmm0, [esp]
         add     esp, 0x10
-        jmp controltimer_returnhere
+        jmp     control_timer_injection_return
 
         //if timer not interested, normal instruction
         dont_control_timer:
@@ -283,9 +295,9 @@ void __declspec(naked) __stdcall BloodborneRally::main_rally_injection() {
         mov  eax, ecx
         //save sse's
         sub     esp, 0x10
-        movdqu  dqword[esp], xmm0
+        movdqu  [esp], xmm0
         sub     esp, 0x10
-        movdqu  dqword[esp], xmm1
+        movdqu  [esp], xmm1
         mov     edx, 0
         mov     ebx, 10
         div     ebx //edx is set to modulo 10 (weapon upgrade)
@@ -304,9 +316,9 @@ void __declspec(naked) __stdcall BloodborneRally::main_rally_injection() {
         mulss   xmm0, xmm1
         movd    eax, xmm0 //scaled recovery hp (eax is scaled dmg)
                           //restore sse's
-        movdqu  xmm1, dqword[esp]
+        movdqu  xmm1, [esp]
         add     esp, 0x10
-        movdqu  xmm0, dqword[esp]
+        movdqu  xmm0, [esp]
         add     esp, 0x10
 
         add  eax, [esi + 0x2D4] //new possible hp after rally

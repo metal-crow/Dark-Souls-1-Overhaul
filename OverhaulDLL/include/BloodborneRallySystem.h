@@ -20,6 +20,6 @@ private:
     static void __stdcall control_timer_injection();
     static const uint32_t main_rally_injection_offset = 0xA6BFE6;
     static void __stdcall main_rally_injection();
-}
+};
 
 #endif //_DS1_OVERHAUL_BB_RALLY_SYSTEM_H_
