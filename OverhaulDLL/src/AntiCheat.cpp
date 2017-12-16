@@ -55,7 +55,7 @@ void TeleBackstabProtect::start() {
 
         // Inject main anti-cheat function
         write_address = (uint8_t*)(TeleBackstabProtect::check_injection_offset + ((uint32_t)Game::ds1_base));
-        set_mem_protection(write_address, 5, MEM_PROTECT_RWX);
+        set_mem_protection(write_address, 6, MEM_PROTECT_RWX);
         inject_jmp_5b(write_address, &TeleBackstabProtect_check_return, 1, &TeleBackstabProtect::check);
     }
     else
