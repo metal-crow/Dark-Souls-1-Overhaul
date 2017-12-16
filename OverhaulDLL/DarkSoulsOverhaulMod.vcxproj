@@ -258,6 +258,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\AntiCheat.h" />
+    <ClInclude Include="include\BloodborneRallySystem.h" />
     <ClInclude Include="include\DllMain.h" />
     <ClInclude Include="include\Files.h" />
     <ClInclude Include="include\GameData.h" />
@@ -291,6 +292,7 @@
     </ClCompile>
     <ClCompile Include="src\AntiCheat.cpp" />
     <ClCompile Include="src\Authors.cpp" />
+    <ClCompile Include="src\BloodborneRallySystem.cpp" />
     <ClCompile Include="src\GameData.cpp" />
     <ClCompile Include="src\ModData.cpp" />
     <ClCompile Include="src\PhantomLimit.cpp" />
