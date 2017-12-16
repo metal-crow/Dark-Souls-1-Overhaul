@@ -100,6 +100,20 @@ movss xmm1,[esi+5C]
       <LastState/>
       <VariableType>Auto Assembler Script</VariableType>
       <AssemblerScript>[ENABLE]
+//*********on weapon toggle drop rally*********
+alloc(toggle_drop_rally,2048)
+label(toggle_drop_rally_returnhere)
+
+toggle_drop_rally:
+mov [beforehit_time], 0 //we got hit infin ago, drop it
+mov [ebx-08],eax
+mov eax,[ebx]
+jmp toggle_drop_rally_returnhere
+
+"DARKSOULS.exe"+B37F31:
+jmp toggle_drop_rally
+toggle_drop_rally_returnhere:
+
 //*********track player previous hp and time of on player hit*********
 alloc(track_onhit_data,2048)
 globalalloc(beforehit_time,4)
@@ -403,33 +417,39 @@ dealloc(track_onhit_data)
 xorps xmm0,xmm0
 sub esp,14
 //Alt: db 0F 57 C0 83 EC 14
+
+dealloc(toggle_drop_rally)
+"DARKSOULS.exe"+B37F31:
+mov [ebx-08],eax
+mov eax,[ebx]
+//Alt: db 89 43 F8 8B 03
 </AssemblerScript>
     </CheatEntry>
     <CheatEntry>
       <ID>91422</ID>
       <Description>"ms since start"</Description>
-      <LastState Value="9566720" RealAddress="100C42AC"/>
+      <LastState Value="30631787" RealAddress="100C42AC"/>
       <VariableType>4 Bytes</VariableType>
       <Address>fmodex.dll+C42AC</Address>
     </CheatEntry>
     <CheatEntry>
       <ID>91730</ID>
       <Description>"beforehit_time"</Description>
-      <LastState Value="1018752" RealAddress="26FC0000"/>
+      <LastState Value="0" RealAddress="26FC0000"/>
       <VariableType>4 Bytes</VariableType>
       <Address>beforehit_time</Address>
     </CheatEntry>
     <CheatEntry>
       <ID>91731</ID>
       <Description>"beforehit_hp"</Description>
-      <LastState Value="2040" RealAddress="26FC0010"/>
+      <LastState Value="1334" RealAddress="26FC0010"/>
       <VariableType>4 Bytes</VariableType>
       <Address>beforehit_hp</Address>
     </CheatEntry>
     <CheatEntry>
       <ID>91732</ID>
       <Description>"gothit"</Description>
-      <LastState Value="2" RealAddress="26FC0020"/>
+      <LastState Value="1" RealAddress="26FC0020"/>
       <VariableType>4 Bytes</VariableType>
       <Address>gothit</Address>
     </CheatEntry>
