@@ -35,7 +35,7 @@ void BloodborneRally::start() {
 
     //Inject function to track which ui bar is being smoothed
     write_address = (uint8_t*)(BloodborneRally::current_selected_bar_injection_offset + ((uint32_t)Game::ds1_base));
-    set_mem_protection(write_address, 5, MEM_PROTECT_RWX);
+    set_mem_protection(write_address, 8, MEM_PROTECT_RWX);
     inject_jmp_5b(write_address, &current_selected_bar_injection_return, 3, &BloodborneRally::selected_bar_injection);
 
     //Inject function to control the timer for the current ui bar
@@ -45,7 +45,7 @@ void BloodborneRally::start() {
 
     //Inject function to perform the main rally code
     write_address = (uint8_t*)(BloodborneRally::main_rally_injection_offset + ((uint32_t)Game::ds1_base));
-    set_mem_protection(write_address, 5, MEM_PROTECT_RWX);
+    set_mem_protection(write_address, 6, MEM_PROTECT_RWX);
     inject_jmp_5b(write_address, &main_rally_injection_return, 1, &BloodborneRally::main_rally_injection);
 }
 
@@ -98,13 +98,13 @@ void __declspec(naked) __stdcall BloodborneRally::control_timer_injection() {
     __asm
     {
         //if this is the timer of interest
-        cmp [current_selected_bar], 0x23
+        cmp [current_selected_bar_ptr], 0x23
         je  start_controlling_timer
-        cmp [current_selected_bar], 0x24
+        cmp [current_selected_bar_ptr], 0x24
         je  start_controlling_timer
-        cmp [current_selected_bar], 0x25
+        cmp [current_selected_bar_ptr], 0x25
         je  start_controlling_timer
-        cmp [current_selected_bar], 0x26
+        cmp [current_selected_bar_ptr], 0x26
         je  start_controlling_timer
         jmp dont_control_timer
 
@@ -197,7 +197,7 @@ void __declspec(naked) __stdcall BloodborneRally::main_rally_injection() {
         mov  ebx, [ebx + 4] //ebx is entityPointer to local player
         cmp  [ebx], eax //if entityPointer for local player == target (eax)
         pop  ebx
-        jne check_if_player_attacking
+        jne  check_if_player_attacking
         //save current time and player hp
         push ebx
         mov  ebx, [eax + 0x2D4] //player hp
@@ -228,10 +228,10 @@ void __declspec(naked) __stdcall BloodborneRally::main_rally_injection() {
         push edx
         push ecx
         //if (currenttime-storedtime < MAX RECOVERY TIME
-        mov eax, [beforehit_time_ptr]
-        add eax, MAX_RALLY_RECOVERY_TIME_MS
-        cmp eax, [0x100C42AC]
-        jl  track_onhit_data_exit_cleanup
+        mov  eax, [beforehit_time_ptr]
+        add  eax, MAX_RALLY_RECOVERY_TIME_MS
+        cmp  eax, [0x100C42AC]
+        jl   track_onhit_data_exit_cleanup
         //&& weapon_is_occult)
         //need to load weapon used data
         mov  eax, [0x0137D644]
@@ -278,7 +278,7 @@ void __declspec(naked) __stdcall BloodborneRally::main_rally_injection() {
         je   weapon_is_occult
         cmp  eax, (VELKASRAPIER_ID + 4)
         je   weapon_is_occult
-        cmp  eax, (VELKASRAPIER_ID + 8)
+        cmp  eax, (VELKASRAPIER_ID + 5)
         je   weapon_is_occult
         mov  edx, 0 //clear dividend
         mov  ebx, 100 //Occult upgrade (check if hundreds place == 7 via weaponid/100 % 10)
@@ -292,7 +292,7 @@ void __declspec(naked) __stdcall BloodborneRally::main_rally_injection() {
 
         weapon_is_occult:
         //get weapon scaling
-        mov  eax, ecx
+        mov     eax, ecx
         //save sse's
         sub     esp, 0x10
         movdqu  [esp], xmm0

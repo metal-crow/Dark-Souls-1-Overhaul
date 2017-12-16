@@ -10,6 +10,7 @@
 #include "DllMain.h"
 #include "Files.h"
 #include "AntiCheat.h"
+#include "BloodborneRallySystem.h"
 
 /*
     Called from DllMain when the plugin DLL is first loaded into memory (PROCESS_ATTACH case).
@@ -67,6 +68,12 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
 {
     // Start anti-cheat
     AntiCheat::start();
+
+    //Enable rally system
+    if (!Mod::legacy_mode)
+    {
+        BloodborneRally::start();
+    }
 
     return 0;
 }
