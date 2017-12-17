@@ -133,7 +133,7 @@ void __declspec(naked) __stdcall BloodborneRally::control_timer_injection() {
         //if timer is at desired point, drop orange
         execute_orange_drop:
         mov [gothit_ptr], 0
-        mov [eax + 0x3C], 0
+        mov DWORD PTR [eax + 0x3C], 0
         jmp control_timer_injection_return
 
         //if we got interrupted before previous drop, drop orange to the _previous_ hp value
@@ -147,7 +147,7 @@ void __declspec(naked) __stdcall BloodborneRally::control_timer_injection() {
         //calculate previous_hp/max_hp. This should be location of orange
         //NOTE: max hp must be capped at _displayable_ max hp (1900 in gui bar), otherwise get problems
         push    eax
-        mov     eax, [0x00CE0FEB + 5]
+        mov     eax, DWORD PTR ds:(0x00CE0FEB + 5)
         mov     eax, [eax]
         mov     eax, [eax + 0]
         mov     eax, [eax + 0x2D8] //max hp
@@ -193,7 +193,7 @@ void __declspec(naked) __stdcall BloodborneRally::main_rally_injection() {
         //if (target entity is host)
         // {
         push ebx
-        mov  ebx, [0x137DC70]
+        mov  ebx, DWORD PTR ds:0x137DC70
         mov  ebx, [ebx + 4] //ebx is entityPointer to local player
         cmp  [ebx], eax //if entityPointer for local player == target (eax)
         pop  ebx
@@ -202,7 +202,7 @@ void __declspec(naked) __stdcall BloodborneRally::main_rally_injection() {
         push ebx
         mov  ebx, [eax + 0x2D4] //player hp
         mov  [beforehit_hp_ptr], ebx
-        mov  ebx, [0x100C42AC] //current time ms
+        mov  ebx, DWORD PTR ds:0x100C42AC //current time ms
         mov  [beforehit_time_ptr], ebx
         inc  [gothit_ptr] //marker for getting hit (used for ui)
         cmp  [gothit_ptr], 2
@@ -217,7 +217,7 @@ void __declspec(naked) __stdcall BloodborneRally::main_rally_injection() {
         // {
         check_if_player_attacking:
         push ebx
-        mov  ebx, [0x137DC70]
+        mov  ebx, DWORD PTR ds:0x137DC70
         mov  ebx, [ebx + 4]
         cmp  [ebx], esi //attacker (esi)
         pop  ebx
@@ -230,19 +230,19 @@ void __declspec(naked) __stdcall BloodborneRally::main_rally_injection() {
         //if (currenttime-storedtime < MAX RECOVERY TIME
         mov  eax, [beforehit_time_ptr]
         add  eax, MAX_RALLY_RECOVERY_TIME_MS
-        cmp  eax, [0x100C42AC]
+        cmp  eax, DWORD PTR ds:0x100C42AC
         jl   track_onhit_data_exit_cleanup
         //&& weapon_is_occult)
         //need to load weapon used data
-        mov  eax, [0x0137D644]
+        mov  eax, DWORD PTR ds:0x0137D644
         mov  eax, [eax + 0x3C]
         mov  eax, [eax + 0x30]
         mov  eax, [eax + 0xC]
         mov  eax, [eax + 0x654]
         mov  ebx, [ebp + 0xC] //grab attack_data ptr
-        cmp  [ebx + 0x44], -1 //indicates which hand used in attack
+        cmp  DWORD PTR [ebx + 0x44], -1 //indicates which hand used in attack
         je   right_hand_wep_atk
-        cmp  [ebx + 0x44], -2
+        cmp  DWORD PTR [ebx + 0x44], -2
         je   left_hand_wep_atk
         jmp  track_onhit_data_exit_cleanup
         right_hand_wep_atk:
