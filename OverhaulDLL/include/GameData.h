@@ -160,19 +160,56 @@ public:
     class Files {
     public:
 
+        // @TODO: Create struct to hold handle, I/O offset, default file name, and custom file name for the monitored files (.sl2, .bhd5, .bdt)
+
         // If true, console messages will be printed when the game performs certain actions on the game files
         static bool monitor_file_activity; // @TODO: Re-implement this (accidentally lost a lot of un-committed code somehow)
 
         // File handles for archive header files
-        static std::vector<HANDLE> bhd_handle;
+        static std::vector<HANDLE> bhd_handles;
+
+        // File I/O positions for archive header files
+        static std::vector<uint32_t> bhd_io_pos;
 
         // File handles for archive files
-        static std::vector<HANDLE> bdt_handle;
+        static std::vector<HANDLE> bdt_handles;
+
+        // File I/O positions for archive files
+        static std::vector<uint32_t> bdt_io_pos;
 
         // File handle for save file
         static HANDLE sl2_handle;
 
+        // File I/O position for save file
+        static uint32_t sl2_io_pos;
 
+
+
+        // Returns the name of the game file that the specified file handle corresponds to
+        static const char* default_filename_from_handle(HANDLE handle, std::string& filename);
+
+        // Patches game calls to CreateFileW, redirecting them to Game::intercept_create_file()
+        static void apply_function_intercepts();
+
+        // Checks if custom archive files exist (.bdt/.bhd5)
+        static void check_custom_archive_file_path();
+
+        // Checks if custom save file exists (.sl2)
+        static void check_custom_save_file_path();
+
+        // Checks if custom game config file exists (.ini)
+        static void check_custom_game_config_file_path();
+
+        // Removes the specified file handle from the list of monitored file handles
+        static void forget_file_handle(HANDLE handle);
+
+        // Updates the I/O offset of a monitored game file
+        static uint32_t update_file_position(HANDLE handle, int32_t offset, bool absolute_offset = false);
+
+                                            
+                                            //////////////////////////////////////////////////////////
+                                            ////////////// Win32 API File I/O Intercepts /////////////
+                                            //////////////////////////////////////////////////////////
 
         // Called when the game attempts to call CreateFileW
         static HANDLE WINAPI intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
@@ -185,34 +222,17 @@ public:
         // Called when the game attempts to call WritePrivatePrivateProfileW
         static BOOL WINAPI intercept_write_private_profile_section_w(LPCWSTR lpAppName, LPCWSTR lpString, LPCWSTR lpFileName);
 
-        /*
-                @TODO: Re-implement these functions (accidentally lost a lot of un-committed code somehow)
-
         // Called when the game attempts to call ReadFile
         static BOOL WINAPI intercept_read_file(HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead, LPDWORD lpNumberOfBytesRead, LPOVERLAPPED lpOverlapped);
 
-        // Called when the game attempted to call SetFilePointer
-        static DWORD WINAPI intercept_set_file_pointer(HANDLE hFile, LONG lDistanceToMove, PLONG lpDistanceToMoveHigh, DWORD dwMoveMethod);
+        // Called when the game attempts to call WriteFile
+        static BOOL WINAPI intercept_write_file(HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite, LPDWORD lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped);
 
         // Called when the game attempts to call CloseHandle
         static BOOL WINAPI intercept_close_handle(HANDLE hObject);
 
-        // Returns the name of the game file that the specified file handle corresponds to
-        static void filename_from_handle(HANDLE handle, std::string& filename);
-
-        */
-
-        // Patches game calls to CreateFileW, redirecting them to Game::intercept_create_file()
-        static void apply_function_intercepts();
-
-        // Checks if custom archive files exist (.bdt/.bhd5)
-        static void check_custom_archive_files();
-
-        // Checks if custom save file exists (.sl2)
-        static void check_custom_save_file();
-
-        // Checks if custom game config file exists (.ini)
-        static void check_custom_game_config_file();
+        // Called when the game attempted to call SetFilePointer
+        static DWORD WINAPI intercept_set_file_pointer(HANDLE hFile, LONG lDistanceToMove, PLONG lpDistanceToMoveHigh, DWORD dwMoveMethod);
     };
 };
 typedef Game::Files Files;
