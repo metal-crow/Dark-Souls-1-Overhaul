@@ -293,7 +293,7 @@ void __declspec(naked) __stdcall NpcGuard::check() {
         // esi is entityPointer of the attacker
         // If local player is attacking, do not protect NPCs
         push eax
-        mov  eax, [0x137DC70]
+        mov  eax, DWORD PTR ds:0x137DC70
         mov  eax, [eax + 4] // eax is now entityPointer to local player
         cmp[eax], esi // If entityPointer for local player == attacker
         pop  eax
