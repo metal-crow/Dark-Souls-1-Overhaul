@@ -82,7 +82,7 @@ void __declspec(naked) __stdcall TeleBackstabProtect::check() {
         // If this is the player's position
         push eax
         push ebx
-        mov eax, [0x137D644]
+        mov eax, DWORD PTR ds:0x137D644
         mov eax, [eax + 0x3C]
         mov eax, [eax + 0x28]
         mov eax, [eax + 0x1C]
