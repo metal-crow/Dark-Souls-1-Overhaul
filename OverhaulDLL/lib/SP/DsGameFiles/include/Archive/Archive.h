@@ -47,7 +47,8 @@ typedef enum ARCHIVE_FILE_TYPE {
     BDT = 0,
     BHD5 = 1,
     BND3 = 2,
-    DCX = 3
+    BND4 = 3,
+    DCX = 4
 } ARCHIVE_TYPE;
 
 

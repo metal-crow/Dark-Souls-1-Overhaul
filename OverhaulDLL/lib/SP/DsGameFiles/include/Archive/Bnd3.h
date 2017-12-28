@@ -31,7 +31,11 @@
 
 // Header structure of BND3 archive file (.*bnd)
 typedef struct Bnd3ArchiveHeader : ArchiveFileHeader {
-    uint32_t version = 0x00000074; // BND file version
+/*  Magic identifier bytes (defined in ArchiveHeader ancestor struct):
+    ARCHIVE_MAGIC_0 magic32_0; // 0x33444E42     = "BND3"
+    ARCHIVE_MAGIC_1 magic32_1; // 0x37443730
+    ARCHIVE_MAGIC_2 magic32_2; // 0x00003652
+*/  uint32_t version = 0x00000074; // BND file version
     uint32_t record_count = 0;
     uint32_t header_size = 0; // Size of header section + record structs section + file name section
     const uint32_t const32b_0 = 0x00000000;
