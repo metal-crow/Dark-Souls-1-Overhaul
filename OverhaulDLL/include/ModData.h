@@ -113,13 +113,13 @@ public:
     static bool disable_armor_sfx_pref;
 
     // Custom game archive files to load instead of the vanilla game files
-    static std::wstring custom_game_archives;
+    static std::wstring custom_game_archive_path;
 
     // Custom character save file to load instead of the vanilla file
-    static std::wstring custom_save_file;
+    static std::wstring custom_save_file_path;
 
     // Custom game configuration file to load instead of the vanilla file
-    static std::wstring custom_config_file;
+    static std::wstring custom_config_file_path;
 
     // Determines whether gesture cancelling is enabled
     static bool gesture_cancelling;

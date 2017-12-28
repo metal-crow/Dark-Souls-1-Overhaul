@@ -234,9 +234,9 @@ void Files::apply_function_intercepts()
     static uint32_t *create_file_w_func_ptr = &create_file_w_func;
     uint8_t *create_file_w_func_b = (uint8_t *)&create_file_w_func_ptr;
     uint8_t patch_w[4] = { create_file_w_func_b[0], create_file_w_func_b[1], create_file_w_func_b[2], create_file_w_func_b[3] };
-    void *write_address = (uint8_t*)Game::ds1_base + 0x2B7D04;	// Game archives and savegame file
+    void *write_address = (uint8_t*)Game::ds1_base + 0x2B7D04; // Game archives and savegame file
     apply_byte_patch(write_address, patch_w, 4);
-    write_address = (uint8_t*)Game::ds1_base + 0x2B7FEE;	// Savegame file and config directory
+    write_address = (uint8_t*)Game::ds1_base + 0x2B7FEE; // Savegame file and config directory
     apply_byte_patch(write_address, patch_w, 4);
 
 

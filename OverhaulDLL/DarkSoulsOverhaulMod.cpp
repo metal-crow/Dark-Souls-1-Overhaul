@@ -44,9 +44,9 @@ void on_process_attach()
     Files::apply_function_intercepts();
 
     // Check for existence of non-default game files
-    Files::check_custom_archive_files();
-    Files::check_custom_save_file();
-    Files::check_custom_game_config_file();
+    Files::check_custom_archive_file_path();
+    Files::check_custom_save_file_path();
+    Files::check_custom_game_config_file_path();
 
     if (!Mod::legacy_mode)
     {
@@ -69,7 +69,7 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     // Start anti-cheat
     AntiCheat::start();
 
-    //allow modded effectids
+    // Allow modded effectIDs
     Game::unrestrict_network_synced_effectids();
 
     //Enable rally system
@@ -77,7 +77,6 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     {
         BloodborneRally::start();
     }
-
     return 0;
 }
 

@@ -56,13 +56,13 @@ bool Mod::dim_lava_pref = false;
 bool Mod::disable_armor_sfx_pref = false;
 
 // Custom game archive files to load instead of the vanilla game files
-std::wstring Mod::custom_game_archives;
+std::wstring Mod::custom_game_archive_path;
 
 // Custom character save file to load instead of the vanilla file
-std::wstring Mod::custom_save_file;
+std::wstring Mod::custom_save_file_path;
 
 // Custom game configuration file to load instead of the vanilla file
-std::wstring Mod::custom_config_file;
+std::wstring Mod::custom_config_file_path;
 
 // Determines whether gesture cancelling is enabled
 bool Mod::gesture_cancelling = true;
@@ -233,9 +233,9 @@ void Mod::get_custom_game_files()
 
     // Convert string to wide chars
     errno_t return_error = 0;
-    if (return_error = string_mb_to_wide(custom_file_name_buff, Mod::custom_game_archives)) {
+    if (return_error = string_mb_to_wide(custom_file_name_buff, Mod::custom_game_archive_path)) {
         // Conversion error
-        Mod::custom_game_archives = L"";
+        Mod::custom_game_archive_path = L"";
     }
     else if (std::string(custom_file_name_buff).length() > 0)
     {
@@ -254,9 +254,9 @@ void Mod::get_custom_game_files()
 
     // Convert string to wide chars
     return_error = 0;
-    if (return_error = string_mb_to_wide(custom_file_name_buff, Mod::custom_save_file)) {
+    if (return_error = string_mb_to_wide(custom_file_name_buff, Mod::custom_save_file_path)) {
         // Conversion error
-        Mod::custom_save_file = L"";
+        Mod::custom_save_file_path = L"";
     }
     else if (std::string(custom_file_name_buff).length() > 0)
     {
@@ -276,9 +276,9 @@ void Mod::get_custom_game_files()
 
     // Convert string to wide chars
     return_error = 0;
-    if ((return_error = string_mb_to_wide(custom_file_name_buff, Mod::custom_config_file))) {
+    if ((return_error = string_mb_to_wide(custom_file_name_buff, Mod::custom_config_file_path))) {
         // Conversion error
-        Mod::custom_config_file = L"";
+        Mod::custom_config_file_path = L"";
     }
     else if (std::string(custom_file_name_buff).length() > 0)
     {

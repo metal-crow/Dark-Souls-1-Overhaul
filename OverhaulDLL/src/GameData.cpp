@@ -614,12 +614,12 @@ bool Game::enable_gesture_cencelling()
     }
 }
 
-//Allow effect ids to be transfered between clients without bounds restrictions
+
+// Allow effect ids to be transfered between clients without bounds restrictions
 void Game::unrestrict_network_synced_effectids() {
-    Mod::startup_messages.push_back(Mod::output_prefix + "Unrestricting effectids sent over network.");
+    Mod::startup_messages.push_back(Mod::output_prefix + "Unrestricting effectIDs sent over network.");
 
     uint8_t nop_patch[3] = { 0x90, 0x90, 0x90 };
-
     void *write_address = (uint8_t*)Game::ds1_base + 0xA3EC84;
     apply_byte_patch(write_address, nop_patch, 3);
 
