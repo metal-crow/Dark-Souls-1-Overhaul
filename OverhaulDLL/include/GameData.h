@@ -129,6 +129,9 @@ public:
 // Set available pool of memory that Dark Souls allocates for itself
     static void set_memory_limit(uint32_t mem_limit);
 
+    //Allow effect ids to be transfered between clients without bounds restrictions
+    static void unrestrict_network_synced_effectids();
+
     // Two-part patch to increase the multiplayer phantom limit:
     static void increase_phantom_limit1(); // Called from on_process_attach()
     static void increase_phantom_limit2(); // Called from initialize_plugin()

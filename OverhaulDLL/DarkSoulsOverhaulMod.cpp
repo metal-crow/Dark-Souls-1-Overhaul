@@ -69,6 +69,9 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     // Start anti-cheat
     AntiCheat::start();
 
+    //allow modded effectids
+    Game::unrestrict_network_synced_effectids();
+
     //Enable rally system
     if (!Mod::legacy_mode)
     {
