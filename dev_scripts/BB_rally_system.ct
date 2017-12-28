@@ -269,6 +269,11 @@ push ecx
         mov  eax, [beforehit_hp]
         set_new_rally_hp:
         mov  [esi+2D4], eax
+
+        //apply the rally sfx
+        push  16760 //effect id
+        push  2710 //character id
+        call  D611C0 //call lua_SetEventSpecialEffect_2
 // }
 
 track_onhit_data_exit_cleanup:
@@ -428,28 +433,24 @@ mov eax,[ebx]
     <CheatEntry>
       <ID>91422</ID>
       <Description>"ms since start"</Description>
-      <LastState Value="30631787" RealAddress="100C42AC"/>
       <VariableType>4 Bytes</VariableType>
       <Address>fmodex.dll+C42AC</Address>
     </CheatEntry>
     <CheatEntry>
       <ID>91730</ID>
       <Description>"beforehit_time"</Description>
-      <LastState Value="0" RealAddress="26FC0000"/>
       <VariableType>4 Bytes</VariableType>
       <Address>beforehit_time</Address>
     </CheatEntry>
     <CheatEntry>
       <ID>91731</ID>
       <Description>"beforehit_hp"</Description>
-      <LastState Value="1334" RealAddress="26FC0010"/>
       <VariableType>4 Bytes</VariableType>
       <Address>beforehit_hp</Address>
     </CheatEntry>
     <CheatEntry>
       <ID>91732</ID>
       <Description>"gothit"</Description>
-      <LastState Value="1" RealAddress="26FC0020"/>
       <VariableType>4 Bytes</VariableType>
       <Address>gothit</Address>
     </CheatEntry>
