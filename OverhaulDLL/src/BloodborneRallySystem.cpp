@@ -179,6 +179,7 @@ void __declspec(naked) __stdcall BloodborneRally::control_timer_injection() {
 #define DARKHAND_ID 0xDCB40
 #define PRISCILLADAGGER_ID 0x19640
 #define VELKASRAPIER_ID 0x93378
+#define RALLY_EFFECT_ID 92000
 
 void __declspec(naked) __stdcall BloodborneRally::main_rally_injection() {
     //Inject into funciton that is called on hit
@@ -301,7 +302,7 @@ void __declspec(naked) __stdcall BloodborneRally::main_rally_injection() {
         mov     edx, 0
         mov     ebx, 10
         div     ebx //edx is set to modulo 10 (weapon upgrade)
-                    //calculate (0.05+upgrade/10)
+        //calculate (0.05+upgrade/10)
         movd    xmm0, edx
         mov     edx, 10
         movd    xmm1, edx
@@ -327,7 +328,12 @@ void __declspec(naked) __stdcall BloodborneRally::main_rally_injection() {
         jle  set_new_rally_hp
         mov  eax, [beforehit_hp_ptr]
         set_new_rally_hp:
-        mov[esi + 0x2D4], eax
+        mov  [esi + 0x2D4], eax
+        
+        //apply the rally sfx
+        push  RALLY_EFFECT_ID //effect id
+        push  10000 //character id 
+        call  DWORD PTR ds:0xD611C0 //call lua_SetEventSpecialEffect_2
         // }
 
         track_onhit_data_exit_cleanup:
