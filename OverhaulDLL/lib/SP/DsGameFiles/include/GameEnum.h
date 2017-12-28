@@ -23,9 +23,25 @@
 
 
 #ifndef _DS1_FILE_LIB_GAME_ENUMS_H_
-#define _DS1_FILE_LIB_GAME_ENUMS_H_
+    #define _DS1_FILE_LIB_GAME_ENUMS_H_
 
 #include <stdint.h>
+
+
+
+typedef enum GAME_VERSION_NUMBER {
+    DEBUG_BUILD   = 0x2C, // 44
+    STEAM_BETA    = 0x2D, // 45
+    RELEASE_BUILD = 0x2E  // 46
+} GAME_VERSION;
+
+typedef enum PLAYER_STATUS {
+    LOADING_PLAYER = -1,
+    HUMAN = 0,
+    COOP = 1,
+    INVADER = 2,
+    HOLLOW = 8
+} STATUS;
 
 
 
@@ -39,8 +55,8 @@ enum class ATTACK_TYPE : uint8_t {
 //typedef ATTACK_TYPE BEHAVIOR_REF_TYPE;
 
 
-enum class SPECIAL_EFFECT_CATEGORY : uint8_t {
-    NONE = 0,
+enum SPECIAL_EFFECT_CATEGORY : uint8_t {
+    NO_SPECIAL_EFFECT = 0,
     MAGIC = 3, // Fire, magic, lightning
     MIRACLE = 4,
     BELT_ITEM = 5,
@@ -50,10 +66,82 @@ enum class SPECIAL_EFFECT_CATEGORY : uint8_t {
 //typedef SPECIAL_EFFECT_CATEGORY BEHAVIOR_CATEGORY;
 
 
+//////////////////// Published by Tarvitz ////////////////////
+typedef enum HOMELAND : uint8_t {
+    COMMONER = 0, // "Very average commoner face"
+    DELTA_FARMER = 1, // "Commonly-seen face in the Fivefinger Delta"
+    ASTORA_NOBLE = 2, // "Handsome face of the refined. Common in Astora"
+    DRAGON_SCHOLAR = 3, // "Intelligent, sharp lines, but scholarly looks invite insult"
+    THOROLUND_CLERIC = 4, // "Look common in Thorolund, known for its stalwart clerics"
+    JUBILANT_CATARINA = 5, // "Jovial features of Catarina, known for festivity and drink"
+    DUBIOUS_CARIM = 6, // "Ominous features associated with the Earl of Carim"
+    CLASSIC_ZENA = 7, // "Thoughtful, mature face common in historical Zena"
+    EERIE_GREAT_SWAMP = 8, // "Great Swamp heretics face prejudice for their atypical looks"
+    FAR_EAST_TRAVELLER = 9 // "Face from a distant Eastern land of almond eyes and thin lips"
+} FACE;
+
+typedef enum GENDER : uint8_t {
+    FEMALE = 0,
+    MALE = 1
+} SEX;
+
+typedef enum BODY_TYPE : uint8_t {
+    average = 0,
+    slim = 1,
+    very_slim = 2,
+    large = 3,
+    very_large = 4,
+    large_upper_body = 5,
+    large_lower_body = 6,
+    top_heavy = 7,
+    tiny_head = 8
+} PHYSIQUE;
+
+typedef enum HAIR_TYPE: uint8_t {
+    shaved = 0,
+    receding = 1,
+    short_h = 2,
+    swept_black = 3,
+    ponytail = 4,
+    wild = 5,
+    parted_center = 6,
+    semi_long = 7,
+    curly = 8,
+    bobbed = 9
+} HAIR_STYLE;
+
+// Hair/eye color is a single choice in character creation menu
+typedef enum HAIR_COLOR : uint8_t {
+    black = 0,
+    dark_brown = 1,
+    light_brown = 2,
+    dark_red = 3,
+    dark_blue = 4,
+    gray = 5,
+    gold = 6,
+    silver = 7,
+    dark_purple = 8,
+    red = 9
+} EYE_COLOR;
+
+typedef enum STARTING_GIFT : uint8_t {
+    no_gift = 0,
+    divine_blessing = 1,
+    black_firebomb = 2,
+    twin_humanities = 3,
+    binoculars = 4,
+    pendant = 5,
+    master_key = 6,
+    tiny_being_ring = 7,
+    old_witch_ring = 8
+} GIFT;
+
+
+
 //////////////////// Published by HotPocketRemix ////////////////////
 
 enum class ENUM_AI_STATUS_TYPE {
-    Normal = 0,
+    NormalAiStatus = 0,
     Recognition = 1,
     Alert = 2,
     Battle = 3
@@ -114,7 +202,7 @@ enum class ENUM_CHARACTER_UPDATE_RATE {
 
 // Note: The translations are not accurate. Instead, they are based on what classes the game actually has corresponding to each value.
 
-enum class ENUM_CLASS_TYPE {
+enum ENUM_CLASS_TYPE {
     Warrior = 0,
     Knight = 1,
     Wanderer = 2,
@@ -385,8 +473,8 @@ enum class ENUM_UPDATE_AUTH {
 // This is not a real enum class in the file, but it's convenient to record these values somewhere.
 // It's normally just encoded as integer value between 0 and 20.
 
-enum class ENUM_COVENANT_TYPE {
-    None = 0,
+enum ENUM_COVENANT_TYPE {
+    NoCovenant = 0,
     WayofWhite = 1,
     PrincessGuard = 2,
     WarriorofSunlight = 3,

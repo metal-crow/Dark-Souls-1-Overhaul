@@ -15,6 +15,8 @@
 #ifndef _DS1_FILE_LIB_FILE_UTIL_H_
     #define _DS1_FILE_LIB_FILE_UTIL_H_
 
+#include <string>
+#include <vector>
 #include "Ds1GameFileLib.h"
 
 
@@ -70,7 +72,18 @@ public:
         If from_endian_int is an unsigned 32-bit Litte Endian integer, return value is an unsigned 32-bit Big Endian integer.
     */
     static uint32_t reverse_endian(uint32_t from_endian_int);
+    
+    /*
+        Converts the given integer value to hexadecimal string representation
+        and stores it in the supplied output string.
+    */
+    static const char *to_hex_string(int number, std::string &out_string, bool hex_prefix = false, bool full_bytes = true);
 
+
+    /*
+        Calculates the MD5 hash for the data in a given block of memory
+    */
+    static uint32_t calculate_md5_hash(uint8_t *data, uint32_t size, uint32_t hash_length, std::vector<uint8_t> &output);
 };
 typedef Ds1FileUtil FileUtil;
 
