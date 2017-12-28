@@ -181,6 +181,8 @@ void __declspec(naked) __stdcall BloodborneRally::control_timer_injection() {
 #define VELKASRAPIER_ID 0x93378
 #define RALLY_EFFECT_ID 92000
 
+static uint32_t lua_SetEventSpecialEffect_2 = 0xD611C0;
+
 void __declspec(naked) __stdcall BloodborneRally::main_rally_injection() {
     //Inject into funciton that is called on hit
 
@@ -333,7 +335,7 @@ void __declspec(naked) __stdcall BloodborneRally::main_rally_injection() {
         // Apply the rally sfx
         push  RALLY_EFFECT_ID // effect ID
         push  10000 // character ID
-        call  DWORD PTR ds:0xD611C0 // call lua_SetEventSpecialEffect_2
+        call  [lua_SetEventSpecialEffect_2]
         // }
 
         track_onhit_data_exit_cleanup:
