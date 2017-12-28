@@ -1,0 +1,858 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="26">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>90767</ID>
+      <Description>"VFXParam"</Description>
+      <LastState RealAddress="04D84A2C"/>
+      <VariableType>String</VariableType>
+      <Length>32</Length>
+      <Unicode>0</Unicode>
+      <CodePage>0</CodePage>
+      <ZeroTerminate>1</ZeroTerminate>
+      <Address>BaseP</Address>
+      <Offsets>
+        <Offset>c</Offset>
+        <Offset>20</Offset>
+        <Offset>24c</Offset>
+      </Offsets>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>89915</ID>
+      <Description>"Open"</Description>
+      <Options moHideChildren="1"/>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+globalalloc(selected_attack,4)
+globalalloc(selected_attack_var_name,100)
+
+aobscan(finditP,A1????????39A8400400000F)
+label(BaseP)
+registersymbol(BaseP)
+[finditP+1]:
+BaseP:
+
+[DISABLE]
+dealloc(selected_attack_var_name)
+dealloc(selected_attack)
+
+unregistersymbol(BaseP)
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>89917</ID>
+          <Description>"Set the value to the effect name, and check the box"</Description>
+          <LastState Value="" RealAddress="00000000"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>89916</ID>
+              <Description>"Generate CE Code"</Description>
+              <LastState RealAddress="24A90010"/>
+              <VariableType>String</VariableType>
+              <Length>100</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>selected_attack_var_name</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>10322</ID>
+          <Description>"Select effect and check the box"</Description>
+          <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">0:Test
+1:Flame
+2:Poison
+3:Hill
+4:Corrosion
+5:Epidemic
+6:Bleeding
+8:Hidden figure
+9:Gravity user
+10:Abnormal state recovery [ poison ]
+11:Abnormal state recovery [ plague ]
+12:Abnormal state recovery [ bleeding ]
+13:Abnormal state recovery [ all-around ]
+14:Seoul Steel
+15:Zoom
+16:Warp
+17:Demon's Souls
+18:Black ghost dispel
+19:Strength ghost
+20:White hope
+21:Black hope
+22:Black ghosting
+23:Resuscitation
+24:Magic disabled
+25:Miracle motion extension
+26:Grindstone
+27:Asphyxia resuscitation
+28:Weapon enhancement
+29:Protection shield
+30:Thread covered
+31:[ System ] ghost Parham change
+32:Sleep paralysis
+33:Flies racketeering
+34:Flame Phantom _ first stage
+35:Flame Phantom _ the second stage
+36:Flame Phantom _ third stage
+37:Flame Phantom _ fourth stage
+38:Auditory hallucination
+39:Seoul coin
+40:Strong defense shield
+41:Fire -resistant shield
+42:HP recovery state
+43:Force ghost of the first stage
+44:Force ghost of the second stage
+45:Force ghosted third stage
+46:Pheromone
+47:Cat landing
+48:Pinch attack power up
+49:Pinch Def.
+50:Rijenereito
+51:Torch
+52:Weak Rijenereito
+54:Weak figure hidden
+55:Tip blood character
+56:Hill Foot
+57:Kikoromo
+58:Point light source
+59:Blood character evaluation
+60:Weapon enhancement [ medium ]
+61:Weapons Inc Large
+62:Flame strengthening
+63:Flame Inc Large
+64:Magic enhancement
+65:Chimeric strengthening
+66:Dropped correction
+67:MP Rijenereito
+68:Weak MP Rijenereito
+69:When revival dead
+70:Poison -resistant UP
+71:Magic power UP
+72:Magic defense UP
+73:Bleeding -resistant UP
+74:Plague -resistant UP
+75:Stamina recovery UP
+76:Seoul acquisition UP
+77:Flame -resistant UP
+78:Shield one step left foot of the king
+79:Shield two-step left foot of the king
+80:Shield three stages left foot of the king
+91:Shield one step right foot of the king
+92:Two-step right foot shield of the king
+93:3 shield stage right foot of the king
+94:Judge stomach bleeding
+95:Mimicry
+96:Transformation
+97:Gassmann
+98:Detection
+99:Wait cooperation
+100:Cooperation
+101:Submit cooperation
+102:Gravity
+103:Evil Eye
+104:State release [ waiting ] cooperation
+105:Effect Lv1
+106:Effect Lv2
+107:Effect Lv3
+108:Evil eye Lv1
+109:Evil Eye Lv2
+110:Counter
+111:Uetamago standby
+112:Uetamago
+113:Tamagoatama standby
+114:Tamagoatama
+115:Ultra-light travel
+116:Curse
+117:Mineralization
+118:Curse release
+119:Human nature damage
+120:Damage anime change _SA time limit
+121:Damage anime change _ Add
+122:Underwater behavior
+123:Weapon head
+124:Arms body
+125:Weapon hand
+126:Arms legs
+127:Sleep
+128:_ Mimic mimicry
+129:_ Mimic mimicry sleep
+130:_ Mimic normal
+131:Mimic _ usually sleep
+132:Fascination
+133:Blood character acquisition
+134:Repelling change
+135:He started mimic _ usually sleep
+136:Crystallization
+137:Resonance Lv0
+138:Resonance Lv1
+139:Resonance Lv2
+140:Resonance Lv3
+141:Resonance Lv4
+142:Action ID specified
+143:Enemy _ immortality
+144:Enemy _ asphyxia
+145:St. attribute
+146:Systemic grindstone
+147:Light magic
+148:Relief request
+149:White relief
+150:Black relief
+151:Thunder strengthening
+152:Poison strengthening
+153:Plague strengthening
+154:Est disabled
+155:SA strengthening
+156:Durability decrease invalid
+157:Tairei strengthening
+158:Guard strengthening
+159:Ring resurrection when dead usually
+160:Ring revival when he died in the curse
+161:Warp B
+162:Warp C
+163:Warp D
+164:Warp E
+165:A Warp
+166:Pledge destroyed
+167:Systemic transformation
+168:Precision enhancement
+169:Resonance enhancement
+170:Retributive justice
+171:Retributive justice explosion
+172:Sheath invincible 1
+173:Sheath invincible 2
+174:Sheath invincible 3
+175:Humanity revival
+176:Seoul coin ( immortality system)
+177:Seoul coin ( beast system)
+178:Ally strengthening magic
+179:Curse effect Lv1
+180:Curse effect Lv2
+181:Curse effect Lv3
+182:Curse effect Lv4
+183:SOS visible
+184:Invisible Weapon
+185:Nits effect
+186:Flame kick
+187:Death of
+188:Bandits summons hope the forest
+189:Bandits territory of forest
+190:Ohaha brother summoned hope
+191:Ohahaototo territory
+192:Tamagoatama _ two -stage
+193:Lifetime extension
+194:Magic number of uses up
+195:Dragon Newt Sign
+196:Sign bounty
+197:Up counter
+198:The beat egg
+199:HP drain
+200:The power of madness
+201:Ban magic effect for
+202:Dragon roar
+203:Use magic number down
+204:Guard Inc Large
+205:[ DLC ] darkness strengthening
+206:Arena one-to-one [ small ] territory
+207:Arena 2 vs 2 [ small ] territory
+208:Arena Battle Royal [ small ] territory
+209:Arena one-to-one [ small ] summons hope A
+210:Arena one-to-one [ small ] summons hope B
+211:Arena 2 vs 2 [ small ] summons hope A1
+212:Arena 2 vs 2 [ small ] summons would like A2
+213:Arena 2 vs 2 [ small ] summons would like B1
+214:Arena 2 vs 2 [ small ] summons would like B2
+215:Arena Battle Royal [ small ] summons hope A
+216:Arena Battle Royal [ small ] summons hope B
+217:Arena Battle Royal [ small ] summons hope C
+218:Arena Battle Royal [ small ] summons hope D
+219:Arena one-to-one [ large ] territory
+220:Arena 2 vs 2 [ large ] territory
+221:Arena Battle Royal [ large ] territory
+222:Arena one-to-one [ large ] summons hope A
+223:Arena one-to-one [ large ] summons hope B
+224:Arena 2 vs 2 [ large ] summons hope A1
+225:Arena 2 vs 2 [ large ] summons would like A2
+226:Arena 2 vs 2 [ large ] summons would like B1
+227:Arena 2 vs 2 [ large ] summons would like B2
+228:Arena Battle Royal [ large ] summons hope A
+229:Arena Battle Royal [ large ] summons hope B
+230:Arena Battle Royal [ large ] summons hope C
+231:Arena Battle Royal [ large ] summons hope D
+232:Arena disabled item disabled
+233:Arena death
+234:1 in arena interim
+235:Arena NoDead
+236:1 in the arena the same rate
+237:Ring of Black Dragon
+238:10 wins or more arena
+239:30 wins or more arena
+240:50 wins or more arena
+241:100 wins or more arena
+242:The maximum number ( Inhibited )
+</DropDownList>
+          <LastState Value="29" RealAddress="24A90000"/>
+          <VariableType>4 Bytes</VariableType>
+          <Address>selected_attack</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>89788</ID>
+          <Description>"VFX Base"</Description>
+          <LastState RealAddress="04D85C70"/>
+          <VariableType>String</VariableType>
+          <Length>0</Length>
+          <Unicode>0</Unicode>
+          <CodePage>0</CodePage>
+          <ZeroTerminate>1</ZeroTerminate>
+          <Address>4d85c70</Address>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>90820</ID>
+              <Description>"midstSfxId"</Description>
+              <LastState Value="20252" RealAddress="04D85C70"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+0</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90821</ID>
+              <Description>"midstSeId"</Description>
+              <LastState Value="20004" RealAddress="04D85C74"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+04</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90822</ID>
+              <Description>"initSfxId"</Description>
+              <LastState Value="-1" RealAddress="04D85C78"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+08</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90823</ID>
+              <Description>"initSeId"</Description>
+              <LastState Value="-1" RealAddress="04D85C7C"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+0C</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90824</ID>
+              <Description>"finishSfxId"</Description>
+              <LastState Value="-1" RealAddress="04D85C80"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+10</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90825</ID>
+              <Description>"finishSeId"</Description>
+              <LastState Value="-1" RealAddress="04D85C84"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+14</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90826</ID>
+              <Description>"camouflageBeginDist"</Description>
+              <LastState Value="-1" RealAddress="04D85C88"/>
+              <VariableType>Float</VariableType>
+              <Address>+18</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90827</ID>
+              <Description>"camouflageEndDist"</Description>
+              <LastState Value="-1" RealAddress="04D85C8C"/>
+              <VariableType>Float</VariableType>
+              <Address>+1C</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90828</ID>
+              <Description>"transformProtectorId"</Description>
+              <LastState Value="-1" RealAddress="04D85C90"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+20</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90829</ID>
+              <Description>"midstDmyId"</Description>
+              <LastState Value="200" RealAddress="04D85C94"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+24</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90830</ID>
+              <Description>"initDmyId"</Description>
+              <LastState Value="-1" RealAddress="04D85C96"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+26</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90831</ID>
+              <Description>"finishDmyId"</Description>
+              <LastState Value="-1" RealAddress="04D85C98"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+28</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90832</ID>
+              <Description>"effectType (0 - body, 1 - weapon, 2 - shield)"</Description>
+              <LastState Value="0" RealAddress="04D85C9A"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>+2a</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90833</ID>
+              <Description>"soulParamIdForWepEnchant"</Description>
+              <LastState Value="0" RealAddress="04D85C9B"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>+2b</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90834</ID>
+              <Description>"playCategory"</Description>
+              <LastState Value="3" RealAddress="04D85C9C"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>+2c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90835</ID>
+              <Description>"playPriority"</Description>
+              <LastState Value="51" RealAddress="04D85C9D"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>+2d</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90836</ID>
+              <Description>"existEffectForLarge"</Description>
+              <LastState Value="0" RealAddress="04D85C9E"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Binary</VariableType>
+              <BitStart>0</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2e</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90837</ID>
+              <Description>"existEffectForSoul"</Description>
+              <LastState Value="0" RealAddress="04D85C9E"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Binary</VariableType>
+              <BitStart>1</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2e</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90838</ID>
+              <Description>"effectInvisibleAtCamouflage"</Description>
+              <LastState Value="0" RealAddress="04D85C9E"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Binary</VariableType>
+              <BitStart>2</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2e</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90839</ID>
+              <Description>"useCamouflage"</Description>
+              <LastState Value="0" RealAddress="04D85C9E"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Binary</VariableType>
+              <BitStart>3</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2e</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90840</ID>
+              <Description>"invisibleAtFriendCamouflage"</Description>
+              <LastState Value="0" RealAddress="04D85C9E"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Binary</VariableType>
+              <BitStart>4</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2e</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90841</ID>
+              <Description>"addMapAreaBlockOffset"</Description>
+              <LastState Value="0" RealAddress="04D85C9E"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Binary</VariableType>
+              <BitStart>5</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2e</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90842</ID>
+              <Description>"halfCamouflage"</Description>
+              <LastState Value="0" RealAddress="04D85C9E"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Binary</VariableType>
+              <BitStart>6</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2e</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90843</ID>
+              <Description>"isFullBodyTransformProtectorId"</Description>
+              <LastState Value="0" RealAddress="04D85C9E"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Binary</VariableType>
+              <BitStart>7</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2e</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90844</ID>
+              <Description>"isInvisibleWeapon"</Description>
+              <LastState Value="0" RealAddress="04D85C9F"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Binary</VariableType>
+              <BitStart>0</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2f</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90845</ID>
+              <Description>"isSilence"</Description>
+              <LastState Value="0" RealAddress="04D85C9F"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Binary</VariableType>
+              <BitStart>1</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+2f</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>TestCode</Name>
+      <Address>0040F578</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseF</Name>
+      <Address>0137A620</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>mypointer</Name>
+      <Address>0CB20188</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>newmem2</Name>
+      <Address>18EF0000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>newmem1</Name>
+      <Address>18B80020</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>newmem9</Name>
+      <Address>19400000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>AttackAddr</Name>
+      <Address>19400000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>addressG</Name>
+      <Address>18B80000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>GoodsStructure</Name>
+      <Address>05ABD570</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>addressE</Name>
+      <Address>18B80000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>address</Name>
+      <Address>18B80020</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>EscapeAddressToUse</Name>
+      <Address>18EF0000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Effect</Name>
+      <Address>00DBE5C0</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Goods</Name>
+      <Address>004F6097</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Bullet</Name>
+      <Address>01006196</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Attack</Name>
+      <Address>00E485DD</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>World</Name>
+      <Address>00D38CF3</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Move0</Name>
+      <Address>00FCAD71</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Move</Name>
+      <Address>00FCAD76</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>ChrIni</Name>
+      <Address>00D1F982</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Anim</Name>
+      <Address>007403B0</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>lastdroppeditem</Name>
+      <Address>00DC4AAA</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL</Name>
+      <Address>013784D2</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL2</Name>
+      <Address>013784D3</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL3</Name>
+      <Address>013784E9</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL4</Name>
+      <Address>013784EA</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL5</Name>
+      <Address>013784EB</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL6</Name>
+      <Address>013784EC</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL7</Name>
+      <Address>013784ED</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL8</Name>
+      <Address>013784EE</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL9</Name>
+      <Address>013784E4</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL0</Name>
+      <Address>013784E5</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL11</Name>
+      <Address>013784E6</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL12</Name>
+      <Address>01376EE7</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL13</Name>
+      <Address>013784E7</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL14</Name>
+      <Address>013784E8</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>GameFlagData</Name>
+      <Address>1532001D</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>GameFlagAOB</Name>
+      <Address>00D38C43</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseA</Name>
+      <Address>012E29E8</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseB</Name>
+      <Address>01378700</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseC</Name>
+      <Address>013784A0</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseD</Name>
+      <Address>0137855C</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseE</Name>
+      <Address>0137E204</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseX</Name>
+      <Address>0137D644</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseZ</Name>
+      <Address>0137D648</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseL</Name>
+      <Address>0137D6C8</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>NewKnockBackMode</Name>
+      <Address>0137D648</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>selected_weapon</Name>
+      <Address>1BE90000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>selected_weapon_var_name</Name>
+      <Address>1BE90030</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>selected_attack</Name>
+      <Address>24A90000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>selected_attack_var_name</Name>
+      <Address>24A90010</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+  <LuaScript>AddressList = getAddressList()
+attack_base_entry = AddressList.getMemoryRecordByDescription('VFX Base')
+
+AddressList.getMemoryRecordByDescription('Open').OnActivate = function(record, before, currentstate)
+  attack_param_pc_indicies_addr = AddressList.getMemoryRecordByDescription('VFXParam').getCurrentAddress()+0x24
+  return true
+end
+
+attack_paramentry_offset_hex = 0
+attack_name = "UNKNOWNNAME"
+
+--on attack selection, get address from aob, and save default atribs
+selected_attack = AddressList.getMemoryRecordByDescription('Select effect and check the box')
+selected_attack.OnActivate = function(record, before, currentstate)
+  --get id from selected attack dropdown
+  weapon_id = readInteger(selected_attack.getCurrentAddress())
+  if weapon_id ~= nil then
+    --find in PARAM index array
+    for id_i=0,233 do
+      if readInteger(attack_param_pc_indicies_addr+id_i*12) == weapon_id then
+        attack_paramentry_offset = readInteger(attack_param_pc_indicies_addr+id_i*12+4)-0x30
+        break
+      end
+    end
+    --use offset to get entry
+    attack_paramentry_address = attack_param_pc_indicies_addr+attack_paramentry_offset
+    --set Attack Base address
+    attack_base_entry.setAddress(string.format("%x",attack_paramentry_address))
+    --save attack paramentry offset for use in CE
+    attack_paramentry_offset_hex = string.format("%x",attack_paramentry_offset)
+    --save the current (original) stats for the attack
+    --table_string_disable = GenerateStringForAttack()
+  end
+
+  return false
+end
+
+
+
+table_string_disable = ""
+
+function GenerateStringForAttack()
+  local table_string = "{$lua}\n" .. "AddressList = getAddressList()\n" .. "speffects_param_pcbase_addr = AddressList.getMemoryRecordByDescription('SpEffectParam').getCurrentAddress()+0x24\n"
+
+  --iterate through all children of the attack base (all variables in the struct)
+  --genreate lua because its really the only way for code that required dynamic param bases
+  for i=0,110 do
+
+    --handle the type cases
+    if attack_base_entry[i].Type == vtSingle then
+      local read_bytes = readFloat(attack_base_entry[i].CurrentAddress)
+      table_string = table_string .. "writeFloat(speffects_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[i].Address,2),16)) .. ","
+      table_string = table_string .. string.format("%f) --%s\n", read_bytes, attack_base_entry[i].Description)
+    elseif attack_base_entry[i].Type == vtDword then
+      local read_bytes = readInteger(attack_base_entry[i].CurrentAddress)
+      table_string = table_string .. "writeInteger(speffects_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[i].Address,2),16)) .. ","
+      table_string = table_string .. string.format("%d) --%s\n", read_bytes, attack_base_entry[i].Description)
+    elseif attack_base_entry[i].Type == vtWord then
+      local read_bytes = readSmallInteger(attack_base_entry[i].CurrentAddress)
+      table_string = table_string .. "writeSmallInteger(speffects_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[i].Address,2),16)) .. ","
+      table_string = table_string .. string.format("%d) --%s\n", read_bytes, attack_base_entry[i].Description)
+    elseif attack_base_entry[i].Type == vtByte then
+      local read_bytes = readBytes(attack_base_entry[i].CurrentAddress, 1, true)
+      table_string = table_string .. "writeBytes(speffects_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[i].Address,2),16)) .. ","
+      table_string = table_string .. string.format("%d) --%s\n", read_bytes[1], attack_base_entry[i].Description)
+    else
+      print("WARNING unknown type at i="..i)
+    end
+  end
+
+  --count the flags bytes as a single 7 byte chunk
+  table_string = table_string .. "writeBytes(speffects_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[110].Address,2),16)) .. ","
+  local flag_bytes = readBytes(attack_base_entry[110].CurrentAddress, 7, true)
+  table_string = table_string .. string.format("%d, %d, %d, %d, %d, %d, %d) --flags\n", flag_bytes[1], flag_bytes[2], flag_bytes[3], flag_bytes[4], flag_bytes[5], flag_bytes[6], flag_bytes[7])
+
+  table_string = table_string .. "{$asm}\n"
+
+  return table_string
+end
+
+
+--after attack weapon atribs, user triggers the generation of the CE script generation for the changes
+generate_code_entry = AddressList.getMemoryRecordByDescription('Generate CE Code')
+generate_code_entry.OnActivate = function(record, before, currentstate)
+  local table_string = "[ENABLE]\n"..
+                       GenerateStringForAttack() .. "\n" ..
+                       "[DISABLE]\n" ..
+                       table_string_disable
+
+  --get varable name for attack and fix up
+  local variable_name = readString(generate_code_entry.getCurrentAddress(), 100, false)
+  variable_name = variable_name:gsub(" ","_"):lower()
+  --insert variable name into table
+  table_string = table_string:gsub(attack_name,variable_name)
+
+  print(table_string)
+  return false
+end
+</LuaScript>
+</CheatTable>
