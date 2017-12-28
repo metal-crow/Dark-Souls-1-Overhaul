@@ -292,17 +292,17 @@ void __declspec(naked) __stdcall BloodborneRally::main_rally_injection() {
         jmp  track_onhit_data_exit_cleanup
 
         weapon_is_occult:
-        //get weapon scaling
+        // Get weapon scaling
         mov     eax, ecx
-        //save sse's
+        // Save sse's
         sub     esp, 0x10
         movdqu  [esp], xmm0
         sub     esp, 0x10
         movdqu  [esp], xmm1
         mov     edx, 0
         mov     ebx, 10
-        div     ebx //edx is set to modulo 10 (weapon upgrade)
-        //calculate (0.05+upgrade/10)
+        div     ebx // edx is set to modulo 10 (weapon upgrade)
+        // Calculate (0.05+upgrade/10)
         movd    xmm0, edx
         mov     edx, 10
         movd    xmm1, edx
@@ -310,30 +310,30 @@ void __declspec(naked) __stdcall BloodborneRally::main_rally_injection() {
         mov     edx, 0x3d4ccccd //0.05
         movd    xmm1, edx
         addss   xmm0, xmm1 //xmm0 is our scaler
-                           //calculate scaled recovery
+        //calculate scaled recovery
         mov     ebx, [ebp + 0xC] //re-grab attack_data ptr
         mov     eax, [ebx + 0x16C] //damage is attack_data+16C
         movd    xmm1, eax
         mulss   xmm0, xmm1
         movd    eax, xmm0 //scaled recovery hp (eax is scaled dmg)
-                          //restore sse's
+        //restore sse's
         movdqu  xmm1, [esp]
         add     esp, 0x10
         movdqu  xmm0, [esp]
         add     esp, 0x10
 
         add  eax, [esi + 0x2D4] //new possible hp after rally
-                                //Playerhp = min(prehithp, playerhp+Recoveryhp)
+        // Playerhp = min(prehithp, playerhp+Recoveryhp)
         cmp  eax, [beforehit_hp_ptr]
         jle  set_new_rally_hp
         mov  eax, [beforehit_hp_ptr]
         set_new_rally_hp:
         mov  [esi + 0x2D4], eax
-        
-        //apply the rally sfx
-        push  RALLY_EFFECT_ID //effect id
-        push  10000 //character id 
-        call  DWORD PTR ds:0xD611C0 //call lua_SetEventSpecialEffect_2
+
+        // Apply the rally sfx
+        push  RALLY_EFFECT_ID // effect ID
+        push  10000 // character ID
+        call  DWORD PTR ds:0xD611C0 // call lua_SetEventSpecialEffect_2
         // }
 
         track_onhit_data_exit_cleanup:
