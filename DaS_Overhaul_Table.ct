@@ -1452,6 +1452,486 @@ BlackKnightShield+D4:
 </AssemblerScript>
     </CheatEntry>
     <CheatEntry>
+      <ID>90799</ID>
+      <Description>"Occult weapons faith change"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscan(occult_dagger,D0 07 00 00 08 00 00 00 58 09 03 00)
+occult_dagger+f0:
+ db a //properFaith
+
+aobscan(occult_parrying_dagger,D0 07 00 00 12 00 00 00 58 09 03 00)
+occult_parrying_dagger+f0:
+ db a //properFaith
+
+aobscan(occult_knife,D1 07 00 00 1C 00 00 00 58 09 03 00)
+occult_knife+f0:
+ db c //properFaith
+
+aobscan(occult_shortsword,FC 08 00 00 6C 00 00 00 F8 8F 04 00)
+occult_shortsword+f0:
+ db d //properFaith
+
+aobscan(occult_longsword,FC 08 00 00 76 00 00 00 F8 8F 04 00)
+occult_longsword+f0:
+ db d //properFaith
+
+aobscan(occult_broadsword,FD 08 00 00 80 00 00 00 F8 8F 04 00)
+occult_broadsword+f0:
+ db d //properFaith
+
+aobscan(occult_balder_side_sword,FE 08 00 00 8A 00 00 00 F8 8F 04 00)
+occult_balder_side_sword+f0:
+ db 10 //properFaith
+
+aobscan(occult_darksword,00 09 00 00 A8 00 00 00 F8 8F 04 00)
+occult_darksword+f0:
+ db 10 //properFaith
+
+aobscan(occult_straight_sword_hilt,FD 08 00 00 E4 00 00 00 F8 8F 04 00)
+occult_straight_sword_hilt+f0:
+ db 6 //properFaith
+
+aobscan(occult_bastard_sword,C4 09 00 00 34 01 00 00 B0 12 06 00)
+occult_bastard_sword+f0:
+ db e //properFaith
+
+aobscan(occult_claymore,C9 09 00 00 3E 01 00 00 B0 12 06 00)
+occult_claymore+f0:
+ db 10 //properFaith
+
+aobscan(occult_flamberge,C6 09 00 00 52 01 00 00 B0 12 06 00)
+occult_flamberge+f0:
+ db f //properFaith
+
+aobscan(occult_zweihander,28 A 00 00 06 02 00 00 98 16 06 00)
+occult_zweihander+f0:
+ db d //properFaith
+
+aobscan(occult_greatsword,2A A 00 00 FC 01 00 00 98 16 06 00)
+occult_greatsword+f0:
+ db d //properFaith
+
+aobscan(occult_demon_great_machete,2B A 00 00 10 02 00 00 98 16 06 00)
+occult_demon_great_machete+f0:
+ db c //properFaith
+
+aobscan(occult_scimitar,F0 A 00 00 60 02 00 00 50 99 07 00)
+occult_scimitar+f0:
+ db 12 //properFaith
+
+aobscan(occult_falchion,F0 A 00 00 6A 02 00 00 50 99 07 00)
+occult_falchion+f0:
+ db 13 //properFaith
+
+aobscan(occult_shotel,F1 A 00 00 74 02 00 00 50 99 07 00)
+occult_shotel+f0:
+ db 10 //properFaith
+
+aobscan(occult_server,EC 13 00 00 CE 02 00 00 38 9D 07 00)
+occult_server+f0:
+ db 0 //properFaith
+
+aobscan(occult_murakumo,EC 13 00 00 C4 02 00 00 38 9D 07 00)
+occult_murakumo+f0:
+ db 11 //properFaith
+
+aobscan(occult_uchigatana,54 B 00 00 28 03 00 00 D8 23 09 00)
+occult_uchigatana+f0:
+ db 12 //properFaith
+
+aobscan(occult_washing_pole,54 B 00 00 3C 03 00 00 D8 23 09 00)
+occult_washing_pole+f0:
+ db 11 //properFaith
+
+aobscan(occult_iaito,55 B 00 00 32 03 00 00 D8 23 09 00)
+occult_iaito+f0:
+ db 12 //properFaith
+
+aobscan(occult_mail_breaker,8D A 00 00 8C 03 00 00 78 AA A 00)
+occult_mail_breaker+f0:
+ db a //properFaith
+
+aobscan(occult_rapier,8C A 00 00 96 03 00 00 78 AA A 00)
+occult_rapier+f0:
+ db d //properFaith
+
+aobscan(occult_estoc,8E A 00 00 A0 03 00 00 78 AA A 00)
+occult_estoc+f0:
+ db 12 //properFaith
+
+aobscan(occult_ricards_rapier,90 A 00 00 AA 03 00 00 78 AA A 00)
+occult_ricards_rapier+f0:
+ db e //properFaith
+
+aobscan(occult_hand_axe,B9 B 00 00 F0 03 00 00 30 2D C 00)
+occult_hand_axe+f0:
+ db a //properFaith
+
+aobscan(occult_battle_axe,B8 B 00 00 FA 03 00 00 30 2D C 00)
+occult_battle_axe+f0:
+ db b //properFaith
+
+aobscan(occult_butcher_knife,BB B 00 00 04 04 00 00 30 2D C 00)
+occult_butcher_knife+f0:
+ db 0 //properFaith
+
+aobscan(occult_gargoyle_tail_axe,BC B 00 00 E 04 00 00 30 2D C 00)
+occult_gargoyle_tail_axe+f0:
+ db b //properFaith
+
+aobscan(occult_greataxe,80 C 00 00 54 04 00 00 18 31 C 00)
+occult_greataxe+f0:
+ db a //properFaith
+
+aobscan(occult_demons_greataxe,82 C 00 00 5E 04 00 00 18 31 C 00)
+occult_demons_greataxe+f0:
+ db a //properFaith
+
+aobscan(occult_club,E6 C 00 00 AE 04 00 00 D0 B3 D 00)
+occult_club+f0:
+ db a //properFaith
+
+aobscan(occult_mace,E4 C 00 00 CC 04 00 00 D0 B3 D 00)
+occult_mace+f0:
+ db b //properFaith
+
+aobscan(occult_morning_star,E4 C 00 00 D6 04 00 00 D0 B3 D 00)
+occult_morning_star+f0:
+ db b //properFaith
+
+aobscan(occult_warpick,E5 C 00 00 E0 04 00 00 D0 B3 D 00)
+occult_warpick+f0:
+ db b //properFaith
+
+aobscan(occult_pickaxe,E7 C 00 00 EA 04 00 00 D0 B3 D 00)
+occult_pickaxe+f0:
+ db a //properFaith
+
+aobscan(occult_reinforced_club,E6 C 00 00 B8 04 00 00 D0 B3 D 00)
+occult_reinforced_club+f0:
+ db a //properFaith
+
+aobscan(occult_blacksmith_hammer,E4 C 00 00 F4 04 00 00 D0 B3 D 00)
+occult_blacksmith_hammer+f0:
+ db a //properFaith
+
+aobscan(occult_great_club,AD D 00 00 26 05 00 00 B8 B7 D 00)
+occult_great_club+f0:
+ db d //properFaith
+
+aobscan(occult_large_club,AE D 00 00 1C 05 00 00 B8 B7 D 00)
+occult_large_club+f0:
+ db d //properFaith
+
+aobscan(occult_caestus,68 10 00 00 DE 06 00 00 58 3E F 00)
+occult_caestus+f0:
+ db a //properFaith
+
+aobscan(occult_claw,6A 10 00 00 E8 06 00 00 58 3E F 00)
+occult_claw+f0:
+ db 8 //properFaith
+
+aobscan(occult_spear,10 E 00 00 80 05 00 00 F8 C4 10 00)
+occult_spear+f0:
+ db 12 //properFaith
+
+aobscan(occult_winged_spear,10 E 00 00 8A 05 00 00 F8 C4 10 00)
+occult_winged_spear+f0:
+ db 12 //properFaith
+
+aobscan(occult_partizan,14 E 00 00 94 05 00 00 F8 C4 10 00)
+occult_partizan+f0:
+ db 12 //properFaith
+
+aobscan(occult_pike,11 E 00 00 A8 05 00 00 F8 C4 10 00)
+occult_pike+f0:
+ db 10 //properFaith
+
+aobscan(occult_halberd,D8 E 00 00 E4 05 00 00 98 4B 12 00)
+occult_halberd+f0:
+ db c //properFaith
+
+aobscan(occult_gargoyles_halberd,D8 E 00 00 02 06 00 00 98 4B 12 00)
+occult_gargoyles_halberd+f0:
+ db c //properFaith
+
+aobscan(occult_lucerne,DA E 00 00 EE 05 00 00 98 4B 12 00)
+occult_lucerne+f0:
+ db c //properFaith
+
+aobscan(occult_scythe,D9 E 00 00 F8 05 00 00 98 4B 12 00)
+occult_scythe+f0:
+ db 0 //properFaith
+
+aobscan(occult_great_scythe,88 13 00 00 48 06 00 00 98 4B 12 00)
+occult_great_scythe+f0:
+ db 0 //properFaith
+
+aobscan(occult_short_bow,30 11 00 00 10 07 00 00 50 CE 13 00)
+occult_short_bow+f0:
+ db a //properFaith
+
+aobscan(occult_longbow,30 11 00 00 24 07 00 00 50 CE 13 00)
+occult_longbow+f0:
+ db c //properFaith
+
+aobscan(occult_black_bow_of_pharis,30 11 00 00 2E 07 00 00 50 CE 13 00)
+occult_black_bow_of_pharis+f0:
+ db c //properFaith
+
+aobscan(occult_composite_bow,30 11 00 00 1A 07 00 00 50 CE 13 00)
+occult_composite_bow+f0:
+ db c //properFaith
+
+aobscan(occult_whip,CC 10 00 00 AC 06 00 00 B8 EC 19 00)
+occult_whip+f0:
+ db c //properFaith
+
+aobscan(occult_notched_whip,CC 10 00 00 B6 06 00 00 B8 EC 19 00)
+occult_notched_whip+f0:
+ db c //properFaith
+
+[DISABLE]
+occult_dagger+f0:
+ db 0 //properFaith
+unregistersymbol(occult_dagger)
+
+occult_parrying_dagger+f0:
+ db 0 //properFaith
+unregistersymbol(occult_parrying_dagger)
+
+occult_knife+f0:
+ db 0 //properFaith
+unregistersymbol(occult_knife)
+
+occult_shortsword+f0:
+ db 0 //properFaith
+unregistersymbol(occult_shortsword)
+
+occult_longsword+f0:
+ db 0 //properFaith
+unregistersymbol(occult_longsword)
+
+occult_broadsword+f0:
+ db 0 //properFaith
+unregistersymbol(occult_broadsword)
+
+occult_balder_side_sword+f0:
+ db 0 //properFaith
+unregistersymbol(occult_balder_side_sword)
+
+occult_darksword+f0:
+ db 0 //properFaith
+unregistersymbol(occult_darksword)
+
+occult_straight_sword_hilt+f0:
+ db 0 //properFaith
+unregistersymbol(occult_straight_sword_hilt)
+
+occult_bastard_sword+f0:
+ db 0 //properFaith
+unregistersymbol(occult_bastard_sword)
+
+occult_claymore+f0:
+ db 0 //properFaith
+unregistersymbol(occult_claymore)
+
+occult_flamberge+f0:
+ db 0 //properFaith
+unregistersymbol(occult_flamberge)
+
+occult_zweihander+f0:
+ db 0 //properFaith
+unregistersymbol(occult_zweihander)
+
+occult_greatsword+f0:
+ db 0 //properFaith
+unregistersymbol(occult_greatsword)
+
+occult_demon_great_machete+f0:
+ db 0 //properFaith
+unregistersymbol(occult_demon_great_machete)
+
+occult_scimitar+f0:
+ db 0 //properFaith
+unregistersymbol(occult_scimitar)
+
+occult_falchion+f0:
+ db 0 //properFaith
+unregistersymbol(occult_falchion)
+
+occult_shotel+f0:
+ db 0 //properFaith
+unregistersymbol(occult_shotel)
+
+occult_server+f0:
+ db 0 //properFaith
+unregistersymbol(occult_server)
+
+occult_murakumo+f0:
+ db 0 //properFaith
+unregistersymbol(occult_murakumo)
+
+occult_uchigatana+f0:
+ db 0 //properFaith
+unregistersymbol(occult_uchigatana)
+
+occult_washing_pole+f0:
+ db 0 //properFaith
+unregistersymbol(occult_washing_pole)
+
+occult_iaito+f0:
+ db 0 //properFaith
+unregistersymbol(occult_iaito)
+
+occult_mail_breaker+f0:
+ db 0 //properFaith
+unregistersymbol(occult_mail_breaker)
+
+occult_rapier+f0:
+ db 0 //properFaith
+unregistersymbol(occult_rapier)
+
+occult_estoc+f0:
+ db 0 //properFaith
+unregistersymbol(occult_estoc)
+
+occult_ricards_rapier+f0:
+ db 0 //properFaith
+unregistersymbol(occult_ricards_rapier)
+
+occult_hand_axe+f0:
+ db 0 //properFaith
+unregistersymbol(occult_hand_axe)
+
+occult_battle_axe+f0:
+ db 0 //properFaith
+unregistersymbol(occult_battle_axe)
+
+occult_butcher_knife+f0:
+ db 0 //properFaith
+unregistersymbol(occult_butcher_knife)
+
+occult_gargoyle_tail_axe+f0:
+ db 0 //properFaith
+unregistersymbol(occult_gargoyle_tail_axe)
+
+occult_greataxe+f0:
+ db 0 //properFaith
+unregistersymbol(occult_greataxe)
+
+occult_demons_greataxe+f0:
+ db 0 //properFaith
+unregistersymbol(occult_demons_greataxe)
+
+occult_club+f0:
+ db 0 //properFaith
+unregistersymbol(occult_club)
+
+occult_mace+f0:
+ db 0 //properFaith
+unregistersymbol(occult_mace)
+
+occult_morning_star+f0:
+ db 0 //properFaith
+unregistersymbol(occult_morning_star)
+
+occult_warpick+f0:
+ db 0 //properFaith
+unregistersymbol(occult_warpick)
+
+occult_pickaxe+f0:
+ db 0 //properFaith
+unregistersymbol(occult_pickaxe)
+
+occult_reinforced_club+f0:
+ db 0 //properFaith
+unregistersymbol(occult_reinforced_club)
+
+occult_blacksmith_hammer+f0:
+ db 0 //properFaith
+unregistersymbol(occult_blacksmith_hammer)
+
+occult_great_club+f0:
+ db 0 //properFaith
+unregistersymbol(occult_great_club)
+
+occult_large_club+f0:
+ db 0 //properFaith
+unregistersymbol(occult_large_club)
+
+occult_caestus+f0:
+ db 0 //properFaith
+unregistersymbol(occult_caestus)
+
+occult_claw+f0:
+ db 0 //properFaith
+unregistersymbol(occult_claw)
+
+occult_spear+f0:
+ db 0 //properFaith
+unregistersymbol(occult_spear)
+
+occult_winged_spear+f0:
+ db 0 //properFaith
+unregistersymbol(occult_winged_spear)
+
+occult_partizan+f0:
+ db 0 //properFaith
+unregistersymbol(occult_partizan)
+
+occult_pike+f0:
+ db 0 //properFaith
+unregistersymbol(occult_pike)
+
+occult_halberd+f0:
+ db 0 //properFaith
+unregistersymbol(occult_halberd)
+
+occult_gargoyles_halberd+f0:
+ db 0 //properFaith
+unregistersymbol(occult_gargoyles_halberd)
+
+occult_lucerne+f0:
+ db 0 //properFaith
+unregistersymbol(occult_lucerne)
+
+occult_scythe+f0:
+ db 0 //properFaith
+unregistersymbol(occult_scythe)
+
+occult_great_scythe+f0:
+ db 0 //properFaith
+unregistersymbol(occult_great_scythe)
+
+occult_short_bow+f0:
+ db 0 //properFaith
+unregistersymbol(occult_short_bow)
+
+occult_longbow+f0:
+ db 0 //properFaith
+unregistersymbol(occult_longbow)
+
+occult_black_bow_of_pharis+f0:
+ db 0 //properFaith
+unregistersymbol(occult_black_bow_of_pharis)
+
+occult_composite_bow+f0:
+ db 0 //properFaith
+unregistersymbol(occult_composite_bow)
+
+occult_whip+f0:
+ db 0 //properFaith
+unregistersymbol(occult_whip)
+
+occult_notched_whip+f0:
+ db 0 //properFaith
+unregistersymbol(occult_notched_whip)
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
       <ID>12426</ID>
       <Description>"Other Scripts"</Description>
       <Options moHideChildren="1"/>
