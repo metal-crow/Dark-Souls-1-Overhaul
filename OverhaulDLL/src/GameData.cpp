@@ -13,6 +13,7 @@
 */
 
 #include "DllMain.h"
+#include "BloodborneRallySystem.h"
 
 
 
@@ -114,6 +115,12 @@ void Game::on_first_character_loaded()
     std::string temp;
     print_console(std::string("    Found Time Action Event file for player character animations at 0x") + FileUtil::to_hex_string((int)ret_val, temp) + ". Enabling gesture cancelling...");
     Game::enable_gesture_cencelling();
+
+    //Enable rally system vfx
+    if (!Mod::legacy_mode)
+    {
+        BloodborneRally::start_vfx_thread();
+    }
 }
 
 

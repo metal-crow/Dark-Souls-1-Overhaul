@@ -49,6 +49,13 @@ void BloodborneRally::start() {
     inject_jmp_5b(write_address, &main_rally_injection_return, 1, &BloodborneRally::main_rally_injection);
 }
 
+static DWORD WINAPI Apply_rally_capable_sfx(void*);
+
+void BloodborneRally::start_vfx_thread() {
+    //start new thread dedicated to applying rally-capable weapon sfx
+    CreateThread(NULL, 0, Apply_rally_capable_sfx, NULL, 0, NULL);
+}
+
 void __declspec(naked) __stdcall BloodborneRally::weapon_toggle_injection() {
     // Assembly code below is injected into the function that is triggered on weapon toggle
 
@@ -349,4 +356,52 @@ void __declspec(naked) __stdcall BloodborneRally::main_rally_injection() {
         sub   esp, 0x14
         jmp main_rally_injection_return
     }
+}
+
+#define RALLY_CAPABLE_WEAPON_EFFECT_ID_RHAND 92001
+#define RALLY_CAPABLE_WEAPON_EFFECT_ID_LHAND 92002
+
+static DWORD WINAPI Apply_rally_capable_sfx(void* unused) {
+    uint32_t weaponid_R = 0;
+    uint32_t weaponid_L = 0;
+
+    while (true) {
+        __asm {
+            mov  eax, DWORD PTR ds:0x0137D644
+            mov  eax, [eax + 0x3C]
+            mov  eax, [eax + 0x30]
+            mov  eax, [eax + 0xC]
+            mov  eax, [eax + 0x654]
+            mov  ebx, [eax + 0x1F8] //grabs the R-hand weapon's id
+            mov  weaponid_R, ebx
+            mov  ebx, [eax + 0x1B4] //grabs the L-hand weapon's id
+            mov  weaponid_L, ebx
+        }
+
+        if ((weaponid_R >= PRISCILLADAGGER_ID && weaponid_R <= (PRISCILLADAGGER_ID + 5)) ||
+            (weaponid_R >= VELKASRAPIER_ID && weaponid_R <= (VELKASRAPIER_ID + 5)) ||
+            (weaponid_R / 100 % 10 == 7)
+            )
+        {
+            __asm {
+                push  RALLY_CAPABLE_WEAPON_EFFECT_ID_RHAND
+                push  10000
+                call  [lua_SetEventSpecialEffect_2]
+            }
+        }
+
+        if ((weaponid_L >= PRISCILLADAGGER_ID && weaponid_L <= (PRISCILLADAGGER_ID + 5)) ||
+            (weaponid_L >= VELKASRAPIER_ID && weaponid_L <= (VELKASRAPIER_ID + 5)) ||
+            (weaponid_L / 100 % 10 == 7)
+            )
+        {
+            __asm {
+                push  RALLY_CAPABLE_WEAPON_EFFECT_ID_LHAND
+                push  10000
+                call  [lua_SetEventSpecialEffect_2]
+            }
+        }
+    }
+
+    return 0;
 }
