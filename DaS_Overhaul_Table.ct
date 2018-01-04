@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<CheatTable CheatEngineTableVersion="24">
+<CheatTable CheatEngineTableVersion="26">
   <CheatEntries>
     <CheatEntry>
       <ID>12422</ID>
@@ -1452,1255 +1452,6 @@ BlackKnightShield+D4:
 </AssemblerScript>
     </CheatEntry>
     <CheatEntry>
-      <ID>12376</ID>
-      <Description>"Activate on Attach"</Description>
-      <Options moActivateChildrenAsWell="1" moDeactivateChildrenAsWell="1"/>
-      <LastState Value="" RealAddress="00000000"/>
-      <GroupHeader>1</GroupHeader>
-      <CheatEntries>
-        <CheatEntry>
-          <ID>10316</ID>
-          <Description>"Load Param Bases"</Description>
-          <LastState/>
-          <VariableType>Auto Assembler Script</VariableType>
-          <AssemblerScript>[ENABLE]
-aobscan(finditP,A1????????39A8400400000F)
-label(BaseP)
-registersymbol(BaseP)
-[finditP+1]:
-BaseP:
-
-[DISABLE]
-unregistersymbol(BaseP)
-</AssemblerScript>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>90768</ID>
-          <Description>"Disable Framerate Warning Disconnection"</Description>
-          <LastState/>
-          <VariableType>Auto Assembler Script</VariableType>
-          <AssemblerScript>// Credits to Jellybaby34
-[ENABLE]
-// This aob may not work due to multiple results
-aobscan(FrameRateWarnAOB,74 17 b9 * * * * e8 * * * * 8b)
-registersymbol(FrameRateWarnAOB)
-//code from here to '[DISABLE]' will be used to enable the cheat
-FrameRateWarnAOB-1E:
-db C3
-
-
-[DISABLE]
-//code from here till the end of the code will be used to disable the cheat
-FrameRateWarnAOB-1E:
-db 51
-unregistersymbol(FrameRateWarnAOB)
-</AssemblerScript>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>12424</ID>
-          <Description>"Change Version Number"</Description>
-          <LastState/>
-          <VariableType>Auto Assembler Script</VariableType>
-          <AssemblerScript>[ENABLE]
-//code from here to '[DISABLE]' will be used to enable the cheat
-
-// 2C is the version number of debug, 2E is current release
-DARKSOULS.exe+7E73FA:
-mov byte ptr [esp+1C],3C
-
-DARKSOULS.exe+7E719D:
-cmp byte ptr [eax],3C
-
-DARKSOULS.exe+7E7229:
-cmp byte ptr [eax],3C
-
-[DISABLE]
-//code from here till the end of the code will be used to disable the cheat
-DARKSOULS.exe+7E73FA:
-mov byte ptr [esp+1C],2E
-
-DARKSOULS.exe+7E719D:
-cmp byte ptr [eax],2E
-
-DARKSOULS.exe+7E7229:
-cmp byte ptr [eax],2E
-</AssemblerScript>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>12375</ID>
-          <Description>"Multiphantom Patch"</Description>
-          <LastState/>
-          <VariableType>Auto Assembler Script</VariableType>
-          <AssemblerScript>[ENABLE]
-"DARKSOULS.exe"+A63CA6:
-push 00000120//(desired num of phantoms * 0x20)
-
-"DARKSOULS.exe"+A63CBA:
-push 00000120
-
-"DARKSOULS.exe"+A63CC1:
-mov [edi],00000009//number of character slots
-
-//one of these governs red signs, another white
-//(probably some other around governs dragon)
-"DARKSOULS.exe"+9B51B7:
-push 09 //max number of summons before signs dissapear
-"DARKSOULS.exe"+9B51EB:
-push 09 //max number of summons before signs dissapear
-
-//Check that sums up all phantoms
-"DARKSOULS.exe"+9B11BE:
-cmp edx,3f //this is more than number of phantoms, but not sure by how much
-
-//not 100% on these ones
-"DARKSOULS.exe"+92A47C:
-cmp dword ptr [eax+10],09
-"DARKSOULS.exe"+92A465:
-cmp dword ptr [eax+90],09
-
-//I dunno
-alloc(forceshowsigns_newmem,64)
-label(forceshowsigns_returnhere)
-
-forceshowsigns_newmem:
-cmp eax,9
-jmp forceshowsigns_returnhere
-
-"DARKSOULS.exe"+9B1271:
-jmp forceshowsigns_newmem
-nop
-forceshowsigns_returnhere:
-
-//allocation of the summon_chars_data array put in the info_about_summons struct
-"DARKSOULS.exe"+806848:
-push 2AD0 //16 + 1216*number of character slots
-
-//counter limit for initing all items in summon_chars_data array
-"DARKSOULS.exe"+8068A4:
-cmp esi,09
-"DARKSOULS.exe"+806ADE:
-cmp ebx,2AC0//this is not index, but byte offset. So 1216*number of character slots
-
-//believe this is length of summon_chars_data array, stored in struct
-"DARKSOULS.exe"+8068A9:
-mov [ecx-04],00000009
-
-//bounds checks
-"DARKSOULS.exe"+8037A7:
-cmp edx,09
-"DARKSOULS.exe"+8037BF:
-cmp ecx,2AC0//1216*number of chars
-"DARKSOULS.exe"+802CC0:
-cmp eax,09
-
-//size of summon_char_types array in info_about_summons struct
-"DARKSOULS.exe"+8068C3:
-push 09
-
-//write to a variable to alert us if inject was done in time
-globalalloc(sucessful_phantomfix,4)
-
-//init rest of the summon_char_types array to zero
-alloc(summon_char_types_newmem,64)
-label(summon_char_types_returnhere)
-summon_char_types_newmem:
-mov [edx+02],bl
-mov [edx+03],bl
-mov [edx+04],bl
-mov [edx+05],bl
-mov [edx+06],bl
-mov [edx+07],bl
-mov [edx+08],bl
-mov [sucessful_phantomfix], 1//success marker
-call DARKSOULS.exe+1629C0
-jmp summon_char_types_returnhere
-
-sucessful_phantomfix:
-dd 0
-
-"DARKSOULS.exe"+8068DF:
-jmp summon_char_types_newmem
-nop
-nop
-nop
-summon_char_types_returnhere:
-
-//hardcoded limits for summon_char_types length (some are &lt;=)
-"DARKSOULS.exe"+802CB7:
-cmp eax,09
-"DARKSOULS.exe"+802C80:
-cmp ecx,08
-"DARKSOULS.exe"+92E7A9:
-cmp ebx,08
-"DARKSOULS.exe"+92E6AF:
-cmp ebx,08
-"DARKSOULS.exe"+92FB73:
-cmp esi,08
-"DARKSOULS.exe"+92FDF1:
-cmp edi,08
-"DARKSOULS.exe"+930431:
-cmp eax,08
-"DARKSOULS.exe"+931C66:
-cmp esi,08
-"DARKSOULS.exe"+928135:
-cmp eax,08
-"DARKSOULS.exe"+92B19A:
-cmp edi,08
-"DARKSOULS.exe"+AE2B8A:
-cmp eax,08
-
-//size to init an array of char pointers to
-"DARKSOULS.exe"+322A00:
-push 09
-
-//number of black signs visible
-//this aob is in memory for the defaults dark souls normally sets. Will not work with we change
-// - BlackSos.[First/Second/Third]LevelRange[Max/Min]
-aobscan(BlackSosNum,05 00 00 00 03 00 00 00 03 00 00 00 05 00 00 00 05 00 00 00 0A 00 00 00 0A 00 00 00)
-BlackSosNum:
- db 08 00 00 00
-
-//something to do with number of allowed invaders? just adding to be safe
-//this aob is in memory for the defaults dark souls normally sets. Will not work with we change
-// - Invade.[First/Second/Third]LevelRange[Max/Min]
-aobscan(InvadeNum,05 00 00 00 FA FF FF FF 08 00 00 00 FC FF FF FF 0A 00 00 00 FE FF FF FF 0C 00 00 00)
-InvadeNum:
- db 08 00 00 00
-
-//max connection tickets
-//Alt AOB: 05 00 00 00 00 00 90 41 00 00 10 42 00 00 A0 40 00 00 20 41 00 00 A0 41
-DARKSOULS.exe+EDE2CC:
- db 08 00 00 00
-
- //Lobby Access Max Count
-"DARKSOULS.exe"+7E9AD1:
-mov [esi+000000D4],00000008
-
-//in initing players_connected_array, number of chars to init
-"DARKSOULS.exe"+AA24AA:
-push 09
-
-//for mallocing players_connected_array: 24+20*(number of characters)+36
-"DARKSOULS.exe"+ABB55D:
-push 000000F0
-
-//in initing players_connected_array, offsets after newly updated number of chars to init
-alloc(players_connected_array_offsets,512)
-
-players_connected_array_offsets:
-mov [esi+D8],ebx
-mov [esi+000000EC],ebx
-or edi,-01
-push ecx
-mov [esi+DC],ebx
-mov [esi+E0],edi
-mov [esi+000000E4],edi
-mov [esi+000000E8],edi
-call DARKSOULS.exe+AA2320
-mov [esi+CC],edi
-mov [esi+D0],edi
-mov [esi+D4],edi
-
-jmp DARKSOULS.exe+AA24FF
-
-"DARKSOULS.exe"+AA24D2:
-jmp players_connected_array_offsets
-nop
-nop
-nop
-nop
-
-//the number of char slots iterated through the players_connected_array (functions that reference it)
-"DARKSOULS.exe"+AA1A86:
-mov [esp+10],00000009
-"DARKSOULS.exe"+AA2FDE:
-mov [esp+14],00000009
-"DARKSOULS.exe"+AA2554:
-cmp edx,09
-"DARKSOULS.exe"+AA2569:
-cmp ebx,09
-"DARKSOULS.exe"+C12C71:
-cmp esi,09
-"DARKSOULS.exe"+AA2932:
-mov [esp+14],00000009
-"DARKSOULS.exe"+AA2C8E:
-mov [esp+14],00000009
-"DARKSOULS.exe"+AA2A2C:
-cmp eax,09
-"DARKSOULS.exe"+AA2C06:
-cmp edi,09
-"DARKSOULS.exe"+AA2C18:
-cmp eax,09
-//^ but number of phantom slots
-"DARKSOULS.exe"+AA1788:
-cmp ecx,08
-"DARKSOULS.exe"+AA1798:
-mov ecx,00000008
-"DARKSOULS.exe"+AA2BFF:
-lea ebx,[edi+08]
-
-//where the variables after the inline character array in the players_connected_array
-//whose offsets have changed, are referenced
-//OFFSET+=num additional chars*0x20
-alloc(pca_off1,24)
-label(pca_off1_ret)
-pca_off1:
-  cmp [eax+E0],esi
-  setne al
-  jmp pca_off1_ret
-"DARKSOULS.exe"+A6615A:
-  jmp pca_off1
-  nop
-  pca_off1_ret:
-
-alloc(pca_off2,24)
-label(pca_off2_ret)
-pca_off2:
-  cmp dword ptr [eax+E0],-01
-  je DARKSOULS.exe+A5B939
-  jmp pca_off2_ret
-"DARKSOULS.exe"+A5B900:
-  jmp pca_off2
-  nop
-  pca_off2_ret:
-
-alloc(pca_off3,24)
-label(pca_off3_ret)
-pca_off3:
-  cmp dword ptr [eax+E0],-01
-  setne al
-  jmp pca_off3_ret
-"DARKSOULS.exe"+9C83DB:
-  jmp pca_off3
-  nop
-  nop
-  pca_off3_ret:
-
-alloc(pca_off4,24)
-label(pca_off4_ret)
-pca_off4:
-  cmp dword ptr [eax+E0],-01
-  jne DARKSOULS.exe+9C6BDB
-  jmp pca_off4_ret
-"DARKSOULS.exe"+9C6BBE:
-  jmp pca_off4
-  nop
-  pca_off4_ret:
-
-alloc(pca_off5,24)
-label(pca_off5_ret)
-pca_off5:
-  cmp dword ptr [edx+E0],-01
-  jne DARKSOULS.exe+92A453
-  jmp pca_off5_ret
-"DARKSOULS.exe"+92A44A:
-  jmp pca_off5
-  nop
-  pca_off5_ret:
-
-alloc(pca_off6,24)
-label(pca_off6_ret)
-pca_off6:
-  cmp dword ptr [eax+E0],-01
-  jne DARKSOULS.exe+9B5405
-  jmp pca_off6_ret
-"DARKSOULS.exe"+9B53FB:
-  jmp pca_off6
-  nop
-  pca_off6_ret:
-
-alloc(pca_off7,24)
-label(pca_off7_ret)
-pca_off7:
-  cmp dword ptr [ecx+E0],-01
-  mov byte ptr [esp+0E],00
-  jmp pca_off7_ret
-"DARKSOULS.exe"+93FEEE:
-  jmp pca_off7
-  nop
-  nop
-  nop
-  nop
-  pca_off7_ret:
-
-alloc(pca_off8,24)
-label(pca_off8_ret)
-pca_off8:
-  lea eax,[edx+CC]
-  push esi
-  xor bl,bl
-  jmp pca_off8_ret
-"DARKSOULS.exe"+AA1771:
-  jmp pca_off8
-  nop
-  pca_off8_ret:
-
-alloc(pca_off9,24)
-label(pca_off9_ret)
-pca_off9:
-  mov [edx+D8],00000000
-  jmp pca_off9_ret
-"DARKSOULS.exe"+AA1791:
-  jmp pca_off9
-  nop
-  nop
-  pca_off9_ret:
-
-alloc(pca_off10,24)
-label(pca_off10_ret)
-pca_off10:
-  inc [edx+D8]
-  add eax,04
-  jmp pca_off10_ret
-"DARKSOULS.exe"+AA17AD:
-  jmp pca_off10
-  nop
-  pca_off10_ret:
-
-alloc(pca_off11,24)
-label(pca_off11_ret)
-pca_off11:
-  mov edx,[ebx+D4]
-  mov [esp+24],ecx
-  jmp pca_off11_ret
-"DARKSOULS.exe"+AA29A9:
-  jmp pca_off11
-  nop
-  nop
-  pca_off11_ret:
-
-alloc(pca_off12,24)
-label(pca_off12_ret)
-pca_off12:
-  mov edi,[eax+E0]
-  cmp edi,-01
-  jmp pca_off12_ret
-"DARKSOULS.exe"+AA3141:
-  jmp pca_off12
-  nop
-  pca_off12_ret:
-
-alloc(pca_off13,24)
-label(pca_off13_ret)
-pca_off13:
-  mov edi,[eax+E0]
-  cmp edi,-01
-  jmp pca_off13_ret
-"DARKSOULS.exe"+AA3268:
-  jmp pca_off13
-  nop
-  pca_off13_ret:
-
-alloc(pca_off14,24)
-label(pca_off14_ret)
-pca_off14:
-  mov eax,[esi+D8]
-  jmp pca_off14_ret
-"DARKSOULS.exe"+AA18E2:
-  jmp pca_off14
-  pca_off14_ret:
-
-alloc(pca_off15,24)
-label(pca_off15_ret)
-pca_off15:
-  mov edx,[esi+DC]
-  cmp edx,01
-  jmp pca_off15_ret
-"DARKSOULS.exe"+AA18E7:
-  jmp pca_off15
-  nop
-  pca_off15_ret:
-
-alloc(pca_off16,24)
-label(pca_off16_ret)
-pca_off16:
-  cmp dword ptr [edi+DC],02
-  jne DARKSOULS.exe+AA27A9
-  jmp pca_off16_ret
-"DARKSOULS.exe"+AA2748:
-  jmp pca_off16
-  nop
-  pca_off16_ret:
-
-alloc(pca_off17,24)
-label(pca_off17_ret)
-pca_off17:
-  mov [edi+DC],00000003
-  jmp pca_off17_ret
-"DARKSOULS.exe"+AA27A1:
-  jmp pca_off17
-  nop
-  nop
-  pca_off17_ret:
-
-alloc(pca_off18,24)
-label(pca_off18_ret)
-pca_off18:
-  mov ecx,[edi+E0]
-  cmp ecx,-01
-  jmp pca_off18_ret
-"DARKSOULS.exe"+AA2740:
-  jmp pca_off18
-  nop
-  pca_off18_ret:
-
-"DARKSOULS.exe"+AA277A:
-  mov ecx,[edi+000000E4]
-
-[DISABLE]
-"DARKSOULS.exe"+A63CA6:
-push 00000080
-
-"DARKSOULS.exe"+A63CBA:
-push 00000080
-
-"DARKSOULS.exe"+A63CC1:
-mov [edi],00000004
-
-dealloc(forceshowsigns_newmem)
-"DARKSOULS.exe"+9B51B7:
-push 03
-
-"DARKSOULS.exe"+9B51EB:
-push 02
-
-"DARKSOULS.exe"+9B11BE:
-cmp edx,03
-
-"DARKSOULS.exe"+92A47C:
-cmp dword ptr [eax+10],02
-"DARKSOULS.exe"+92A465:
-cmp dword ptr [eax+90],03
-
-"DARKSOULS.exe"+9B1271:
-cmp eax,[esi+00000168]
-
-"DARKSOULS.exe"+AA2554:
-cmp edx,04
-"DARKSOULS.exe"+AA2569:
-cmp ebx,04
-
-"DARKSOULS.exe"+806848:
-push 00000E50
-
-"DARKSOULS.exe"+8068A4:
-cmp esi,03
-"DARKSOULS.exe"+806ADE:
-cmp ebx,0E40
-
-"DARKSOULS.exe"+8068A9:
-mov [ecx-04],00000003
-
-"DARKSOULS.exe"+8037A7:
-cmp edx,02
-"DARKSOULS.exe"+8037BF:
-cmp ecx,00000E40
-"DARKSOULS.exe"+802CC0:
-cmp eax,02
-
-"DARKSOULS.exe"+8068C3:
-push 03
-
-//unregistersymbol(sucessful_phantomfix)
-dealloc(sucessful_phantomfix)
-
-dealloc(summon_char_types_newmem)
-"DARKSOULS.exe"+8068DF:
-mov [edx+02],bl
-call DARKSOULS.exe+1629C0
-
-"DARKSOULS.exe"+802CB7:
-cmp eax,03
-"DARKSOULS.exe"+802C80:
-cmp ecx,02
-"DARKSOULS.exe"+92E7A9:
-cmp ebx,02
-"DARKSOULS.exe"+92E6AF:
-cmp ebx,02
-"DARKSOULS.exe"+92FB73:
-cmp esi,02
-"DARKSOULS.exe"+92FDF1:
-cmp edi,02
-"DARKSOULS.exe"+930431:
-cmp eax,02
-"DARKSOULS.exe"+931C66:
-cmp esi,02
-"DARKSOULS.exe"+928135:
-cmp eax,02
-"DARKSOULS.exe"+92B19A:
-cmp edi,02
-"DARKSOULS.exe"+AE2B8A:
-cmp eax,02
-
-"DARKSOULS.exe"+322A00:
-push 05
-
-BlackSosNum:
- db 05 00 00 00
-
-InvadeNum:
- db 05 00 00 00
-
-DARKSOULS.exe+EDE2CC:
- db 05 00 00 00
-
-"DARKSOULS.exe"+7E9AD1:
-mov [esi+000000D4],00000005
-
-"DARKSOULS.exe"+AA24AA:
-push 04
-
-"DARKSOULS.exe"+ABB55D:
-push 0000008C
-
-dealloc(players_connected_array_offsets)
-"DARKSOULS.exe"+AA24D2:
-mov [esi+74],ebx
-mov [esi+00000088],ebx
-
-"DARKSOULS.exe"+AA1A86:
-mov [esp+10],00000004
-"DARKSOULS.exe"+AA2FDE:
-mov [esp+14],00000004
-"DARKSOULS.exe"+C12C71:
-cmp esi,06
-"DARKSOULS.exe"+AA2932:
-mov [esp+14],00000004
-"DARKSOULS.exe"+AA2C8E:
-mov [esp+14],00000004
-"DARKSOULS.exe"+AA2A2C:
-cmp eax,04
-"DARKSOULS.exe"+AA2C06:
-cmp edi,04
-"DARKSOULS.exe"+AA2C18:
-cmp eax,04
-"DARKSOULS.exe"+AA1788:
-cmp ecx,03
-"DARKSOULS.exe"+AA1798:
-mov ecx,00000003
-"DARKSOULS.exe"+AA2BFF:
-lea ebx,[edi+02]
-
-dealloc(pca_off1)
-"DARKSOULS.exe"+A6615A:
-cmp [eax+7C],esi
-dealloc(pca_off2)
-"DARKSOULS.exe"+A5B900:
-cmp dword ptr [eax+7C],-01
-dealloc(pca_off3)
-"DARKSOULS.exe"+9C83DB:
-cmp dword ptr [eax+7C],-01
-dealloc(pca_off4)
-"DARKSOULS.exe"+9C6BBE:
-cmp dword ptr [eax+7C],-01
-dealloc(pca_off5)
-"DARKSOULS.exe"+92A44A:
-cmp dword ptr [edx+7C],-01
-dealloc(pca_off6)
-"DARKSOULS.exe"+9B53FB:
-cmp dword ptr [eax+7C],-01
-dealloc(pca_off7)
-"DARKSOULS.exe"+93FEEE:
-cmp dword ptr [ecx+7C],-01
-dealloc(pca_off8)
-"DARKSOULS.exe"+AA1771:
-lea eax,[edx+68]
-dealloc(pca_off9)
-"DARKSOULS.exe"+AA1791:
-mov [edx+74],00000000
-dealloc(pca_off10)
-"DARKSOULS.exe"+AA17AD:
-inc [edx+74]
-dealloc(pca_off11)
-"DARKSOULS.exe"+AA29A9:
-mov edx,[ebx+70]
-dealloc(pca_off12)
-"DARKSOULS.exe"+AA3141:
-mov edi,[eax+7C]
-dealloc(pca_off13)
-"DARKSOULS.exe"+AA3268:
-mov edi,[eax+7C]
-dealloc(pca_off14)
-"DARKSOULS.exe"+AA18E2:
-mov eax,[esi+74]
-dealloc(pca_off15)
-"DARKSOULS.exe"+AA18E7:
-mov edx,[esi+78]
-dealloc(pca_off16)
-"DARKSOULS.exe"+AA2748:
-cmp dword ptr [edi+78],02
-dealloc(pca_off17)
-"DARKSOULS.exe"+AA27A1:
-mov [edi+78],00000003
-dealloc(pca_off18)
-"DARKSOULS.exe"+AA2740:
-mov ecx,[edi+7C]
-"DARKSOULS.exe"+AA277A:
-mov ecx,[edi+00000080]
-</AssemblerScript>
-        </CheatEntry>
-      </CheatEntries>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>12423</ID>
-      <Description>"Extra variables"</Description>
-      <Options moHideChildren="1"/>
-      <LastState Value="" RealAddress="00000000"/>
-      <GroupHeader>1</GroupHeader>
-      <CheatEntries>
-        <CheatEntry>
-          <ID>10322</ID>
-          <Description>"sucessful_phantomfix"</Description>
-          <VariableType>4 Bytes</VariableType>
-          <Address>sucessful_phantomfix</Address>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>19</ID>
-          <Description>"max_allowed_summons"</Description>
-          <LastState Value="4" RealAddress="0479B12C"/>
-          <VariableType>4 Bytes</VariableType>
-          <Address>0137D82C</Address>
-          <Offsets>
-            <Offset>08c</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>90796</ID>
-          <Description>"Params"</Description>
-          <Options moHideChildren="1"/>
-          <LastState Value="" RealAddress="00000000"/>
-          <GroupHeader>1</GroupHeader>
-          <CheatEntries>
-            <CheatEntry>
-              <ID>90797</ID>
-              <Description>"AttackParamNPC"</Description>
-              <LastState RealAddress="04A11C4C"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>108</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90798</ID>
-              <Description>"AttackParamPC"</Description>
-              <LastState RealAddress="049D80DC"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>12c</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90775</ID>
-              <Description>"BehaviorParam"</Description>
-              <LastState RealAddress="0493360C"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>1BC</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90774</ID>
-              <Description>"BehaviorParamPC"</Description>
-              <LastState RealAddress="04967B2C"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>1E0</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90776</ID>
-              <Description>"BulletParam"</Description>
-              <LastState RealAddress="04A9271C"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>198</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90793</ID>
-              <Description>"CaclCorrectGraph"</Description>
-              <LastState RealAddress="04BCCE9C"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>444</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90784</ID>
-              <Description>"CharacterInitParam"</Description>
-              <LastState RealAddress="04BA681C"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>300</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90783</ID>
-              <Description>"EquipMTRLSetParam"</Description>
-              <LastState RealAddress="0492723C"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>324</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90761</ID>
-              <Description>"EquipParamAccessory"</Description>
-              <LastState RealAddress="0490EC3C"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>54</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90762</ID>
-              <Description>"EquipParamGoods"</Description>
-              <LastState RealAddress="0490FC8C"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>78</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90760</ID>
-              <Description>"EquipParamProtector"</Description>
-              <LastState RealAddress="048F9C0C"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>30</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90759</ID>
-              <Description>"EquipParamWeapon"</Description>
-              <LastState RealAddress="0489AB1C"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>c</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90782</ID>
-              <Description>"FaceParam"</Description>
-              <LastState RealAddress="04BBC79C"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>348</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90795</ID>
-              <Description>"GameAreaParam"</Description>
-              <LastState RealAddress="04BCB4CC"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>3FC</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90790</ID>
-              <Description>"HitMtrlParam"</Description>
-              <LastState RealAddress="04BCF3AC"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>4b0</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90786</ID>
-              <Description>"ItemLotParam"</Description>
-              <LastState RealAddress="04B5DBEC"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>2b8</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90789</ID>
-              <Description>"KnockbackParam"</Description>
-              <LastState RealAddress="04BCF97C"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>4d4</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90792</ID>
-              <Description>"LockCamParam"</Description>
-              <LastState RealAddress="04BCDA5C"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>468</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90773</ID>
-              <Description>"MagicParam"</Description>
-              <LastState RealAddress="04A735EC"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>204</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90769</ID>
-              <Description>"MenuParamColorTable"</Description>
-              <LastState RealAddress="04B5CD4C"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>294</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90785</ID>
-              <Description>"MoveParam"</Description>
-              <LastState RealAddress="04BA393C"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>2dc</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90763</ID>
-              <Description>"NpcParam"</Description>
-              <LastState RealAddress="049A3F0C"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>e4</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90766</ID>
-              <Description>"NpcThinkParam"</Description>
-              <LastState RealAddress="04A7621C"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>150</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90777</ID>
-              <Description>"ObjectParam"</Description>
-              <LastState RealAddress="04A87EBC"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>174</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90791</ID>
-              <Description>"ObjectParam"</Description>
-              <LastState RealAddress="04BCE55C"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>48c</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90779</ID>
-              <Description>"QwcChangeParam"</Description>
-              <LastState RealAddress="04BC9E2C"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>3b4</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90778</ID>
-              <Description>"QwcJudgeParam"</Description>
-              <LastState RealAddress="04BCA16C"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>3d8</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90781</ID>
-              <Description>"RagdollParam"</Description>
-              <LastState RealAddress="04BC266C"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>36c</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90764</ID>
-              <Description>"ReinforceParamProtector"</Description>
-              <LastState RealAddress="04926C6C"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>C0</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90765</ID>
-              <Description>"ReinforceParamWeapon"</Description>
-              <LastState RealAddress="04917AAC"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>9c</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90780</ID>
-              <Description>"ShopLineUpParam"</Description>
-              <LastState RealAddress="04BC32DC"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>390</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90794</ID>
-              <Description>"SkeletonParam"</Description>
-              <LastState RealAddress="04BCC23C"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>420</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90772</ID>
-              <Description>"SpEffectParam"</Description>
-              <LastState RealAddress="04AB27CC"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>228</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90771</ID>
-              <Description>"SpEffectVFXParam"</Description>
-              <LastState RealAddress="04B0747C"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>24c</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>90770</ID>
-              <Description>"TalkParam"</Description>
-              <LastState RealAddress="04B0CE1C"/>
-              <VariableType>String</VariableType>
-              <Length>32</Length>
-              <Unicode>0</Unicode>
-              <ZeroTerminate>1</ZeroTerminate>
-              <Address>BaseP</Address>
-              <Offsets>
-                <Offset>c</Offset>
-                <Offset>20</Offset>
-                <Offset>270</Offset>
-              </Offsets>
-            </CheatEntry>
-          </CheatEntries>
-        </CheatEntry>
-      </CheatEntries>
-    </CheatEntry>
-    <CheatEntry>
       <ID>12426</ID>
       <Description>"Other Scripts"</Description>
       <Options moHideChildren="1"/>
@@ -3394,6 +2145,574 @@ UnregisterSymbol(EmitForceHit)
         </CheatEntry>
       </CheatEntries>
     </CheatEntry>
+    <CheatEntry>
+      <ID>12376</ID>
+      <Description>"Activate on Attach"</Description>
+      <Options moHideChildren="1" moActivateChildrenAsWell="1" moDeactivateChildrenAsWell="1"/>
+      <LastState Value="" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>10316</ID>
+          <Description>"Load Param Bases"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+aobscan(finditP,A1????????39A8400400000F)
+label(BaseP)
+registersymbol(BaseP)
+[finditP+1]:
+BaseP:
+
+[DISABLE]
+unregistersymbol(BaseP)
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>12423</ID>
+      <Description>"Extra variables"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Value="" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>90796</ID>
+          <Description>"Params"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>90797</ID>
+              <Description>"AttackParamNPC"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>108</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90798</ID>
+              <Description>"AttackParamPC"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>12c</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90775</ID>
+              <Description>"BehaviorParam"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>1BC</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90774</ID>
+              <Description>"BehaviorParamPC"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>1E0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90776</ID>
+              <Description>"BulletParam"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>198</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90793</ID>
+              <Description>"CaclCorrectGraph"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>444</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90784</ID>
+              <Description>"CharacterInitParam"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>300</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90783</ID>
+              <Description>"EquipMTRLSetParam"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>324</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90761</ID>
+              <Description>"EquipParamAccessory"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>54</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90762</ID>
+              <Description>"EquipParamGoods"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>78</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90760</ID>
+              <Description>"EquipParamProtector"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>30</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90759</ID>
+              <Description>"EquipParamWeapon"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>c</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90782</ID>
+              <Description>"FaceParam"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>348</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90795</ID>
+              <Description>"GameAreaParam"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>3FC</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90790</ID>
+              <Description>"HitMtrlParam"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>4b0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90786</ID>
+              <Description>"ItemLotParam"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>2b8</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90789</ID>
+              <Description>"KnockbackParam"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>4d4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90792</ID>
+              <Description>"LockCamParam"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>468</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90773</ID>
+              <Description>"MagicParam"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>204</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90769</ID>
+              <Description>"MenuParamColorTable"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>294</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90785</ID>
+              <Description>"MoveParam"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>2dc</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90763</ID>
+              <Description>"NpcParam"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>e4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90766</ID>
+              <Description>"NpcThinkParam"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>150</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90777</ID>
+              <Description>"ObjectParam"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>174</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90791</ID>
+              <Description>"ObjectParam"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>48c</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90779</ID>
+              <Description>"QwcChangeParam"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>3b4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90778</ID>
+              <Description>"QwcJudgeParam"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>3d8</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90781</ID>
+              <Description>"RagdollParam"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>36c</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90764</ID>
+              <Description>"ReinforceParamProtector"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>C0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90765</ID>
+              <Description>"ReinforceParamWeapon"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>9c</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90780</ID>
+              <Description>"ShopLineUpParam"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>390</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90794</ID>
+              <Description>"SkeletonParam"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>420</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90772</ID>
+              <Description>"SpEffectParam"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>228</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90771</ID>
+              <Description>"SpEffectVFXParam"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>24c</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90770</ID>
+              <Description>"TalkParam"</Description>
+              <VariableType>String</VariableType>
+              <Length>32</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>BaseP</Address>
+              <Offsets>
+                <Offset>c</Offset>
+                <Offset>20</Offset>
+                <Offset>270</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
   </CheatEntries>
   <UserdefinedSymbols>
     <SymbolEntry>
@@ -3402,7 +2721,7 @@ UnregisterSymbol(EmitForceHit)
     </SymbolEntry>
     <SymbolEntry>
       <Name>FrameRateWarnAOB</Name>
-      <Address> 00D7841E</Address>
+      <Address>00D7841E</Address>
     </SymbolEntry>
   </UserdefinedSymbols>
   <LuaScript>AddressList = getAddressList()
@@ -3474,32 +2793,6 @@ function checkProccessAttached()
     local result = activateOnAttach()
 
     if result == true then
-      --wait for patches to be hit
-      sleep(3000)
-
-      local max_allowed_summons_ptr = AddressList.getMemoryRecordByDescription('max_allowed_summons')
-      if max_allowed_summons_ptr ~= nil then
-        if readInteger(max_allowed_summons_ptr.getCurrentAddress()) == 4 then
-          writeInteger(max_allowed_summons_ptr.getCurrentAddress(),9)
-        else
-          return
-        end
-      else
-        return
-      end
-
-      --check if the multiphantom patch was applied on time
-      local sucessful_phantomfix_ptr = getAddress('sucessful_phantomfix')
-      if sucessful_phantomfix_ptr ~= nil then
-         if readInteger(sucessful_phantomfix_ptr) &gt; 0 then
-            beep()
-         else
-            showMessage("Could not attach to Dark Souls in time to apply MultiPhantom patch. Please restart")
-         end
-      else
-        showMessage("Could not attach to Dark Souls in time to apply MultiPhantom patch. Please restart")
-      end
-
       --turn off the timer, so this doesnt repeat anymore
       timer_setEnabled(AttachTimer, false)
     end
