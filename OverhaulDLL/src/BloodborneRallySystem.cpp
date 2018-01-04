@@ -47,6 +47,9 @@ void BloodborneRally::start() {
     write_address = (uint8_t*)(BloodborneRally::main_rally_injection_offset + ((uint32_t)Game::ds1_base));
     set_mem_protection(write_address, 6, MEM_PROTECT_RWX);
     inject_jmp_5b(write_address, &main_rally_injection_return, 1, &BloodborneRally::main_rally_injection);
+
+    //prevent first hit having a beforehit hp of zero
+    *beforehit_hp_ptr = UINT16_MAX;
 }
 
 static DWORD WINAPI Apply_rally_capable_sfx(void*);
@@ -378,6 +381,8 @@ static DWORD WINAPI Apply_rally_capable_sfx(void* unused) {
             mov  weaponid_L, ebx
         }
 
+        //There appears to be some bug here where both the effects cannot be applied simultaneously
+        //But it just alternates which is applied, so it works ok
         if ((weaponid_R >= PRISCILLADAGGER_ID && weaponid_R <= (PRISCILLADAGGER_ID + 5)) ||
             (weaponid_R >= VELKASRAPIER_ID && weaponid_R <= (VELKASRAPIER_ID + 5)) ||
             (weaponid_R / 100 % 10 == 7)

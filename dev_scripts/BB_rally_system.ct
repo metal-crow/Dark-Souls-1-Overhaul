@@ -57,6 +57,7 @@ alloc(track_onhit_data,2048)
 globalalloc(beforehit_time,4)
 globalalloc(beforehit_hp,4)
 globalalloc(gothit,4)
+label(start_check_if_player_attacking)
 label(track_onhit_data_returnhere)
 label(track_onhit_data_exit)
 label(check_if_player_attacking)
@@ -69,8 +70,14 @@ label(check_is_weapon_occult)
 label(weapon_is_occult)
 
 track_onhit_data:
+//if prehit hp is zero
+cmp [beforehit_hp], 0
+jne start_check_if_player_attacking
+mov [beforehit_hp], ffff
+
 //if (target entity is host)
 // {
+start_check_if_player_attacking:
 push ebx
 mov  ebx, [137DC70]
 mov  ebx, [ebx+4] //ebx is entityPointer to local player
