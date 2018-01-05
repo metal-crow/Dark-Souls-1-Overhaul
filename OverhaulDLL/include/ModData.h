@@ -20,6 +20,7 @@
 #define _DS1_OVERHAUL_KEYBINDS_SECTION_ "Dark Souls Overhaul Keybinds"
 #define _DS1_OVERHAUL_ANTICHEAT_SECTION_ "Dark Souls Overhaul Anti-Cheat"
 #define _DS1_OVERHAUL_HUD_SECTION_ "Dark Souls Overhaul HUD"
+#define _DS1_OVERHAUL_DEBUG_SECTION_ "Dark Souls Overhaul Debug"
 // Startup preferences:
 #define _DS1_OVERHAUL_PREF_LEGACY_MODE_ "LegacyMode"
 #define _DS1_OVERHAUL_PREF_MEMORY_LIMIT_ "MemoryLimit"
@@ -30,6 +31,8 @@
 #define _DS1_OVERHAUL_PREF_AC_BOSS_GUARD_ "BossGuard"
 #define _DS1_OVERHAUL_PREF_AC_NPC_GUARD_ "NpcGuard"
 #define _DS1_OVERHAUL_PREF_AC_TELEBACKSTAB_PROT_ "TeleBackstabProtect"
+#define _DS1_OVERHAUL_PREF_AC_BINOCS_TRIGGER_BLOCK_ "BinocsTriggerBlock"
+#define _DS1_OVERHAUL_PREF_AC_DRAGON_TRIGGER_BLOCK_ "DragonTriggerBlock"
 // General settings:
 #define _DS1_OVERHAUL_PREF_SHOW_NODE_COUNT_ "DisplayNodeCount"
 #define _DS1_OVERHAUL_PREF_DIM_LAVA_ "DimLava"
@@ -39,6 +42,11 @@
 #define _DS1_OVERHAUL_PREF_COMPASS_RADIAL_ "CompassRadial"
 #define _DS1_OVERHAUL_PREF_COMPASS_BAR_ "CompassBar"
 #define _DS1_OVERHAUL_PREF_ELEVATION_ "ElevationMeter"
+#define _DS1_OVERHAUL_PREF_NODE_GRAPH_ "NodeGraph"
+// Debug:
+#define _DS1_OVERHAUL_PREF_MONITOR_BDT_ "MonitorBdtFiles"
+#define _DS1_OVERHAUL_PREF_MONITOR_BHD_ "MonitorBhdFiles"
+#define _DS1_OVERHAUL_PREF_MONITOR_SL2_ "MonitorSaveFile"
 // Keybinds:
 #define _DS1_OVERHAUL_HOTKEY_BONFIRE_INPUT_FIX_ "BonfireInputFix"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_NODE_COUNT_ "ToggleNodeCount"
@@ -47,6 +55,9 @@
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_COMPASS_RADIAL_ "ToggleHudCompassRadial"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_COMPASS_BAR_ "ToggleHudCompassBar"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_ELEVATION_METER_ "ToggleHudElevationMeter"
+#define _DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_NODE_GRAPH_ "ToggleHudNodeGraph"
+#define _DS1_OVERHAUL_HOTKEY_TOGGLE_AC_BINOCS_TRIG_BLOCK_ "ToggleBinocsTriggerBlockAC"
+#define _DS1_OVERHAUL_HOTKEY_TOGGLE_AC_DRAGON_TRIG_BLOCK_ "ToggleDragonTriggerBlockAC"
 
 #define _DS1_OVERHAUL_SETTINGS_STRING_BUFF_LEN_ 256		// Length of the string buffer used when obtaining user preference-related string data
 
@@ -112,6 +123,9 @@ public:
     // User preference setting; determines whether armor sound effects will be disabled
     static bool disable_armor_sfx_pref;
 
+    // User preference setting; determines whether multiplayer node graph HUD element will be enabled when network is loaded
+    static bool hud_node_graph_pref;
+
     // Custom game archive files to load instead of the vanilla game files
     static std::wstring custom_game_archive_path;
 
@@ -149,12 +163,13 @@ public:
 
 
 
-#ifdef _DS1_OVERHAUL_MOD_DBG_
-
-    // Registers all commands in ConsoleCommandsDebug.cpp for use with the in-game console
-    static void register_console_commands_debug();
-
-#endif // _DS1_OVERHAUL_MOD_DBG_
+    class Debug {
+    public:
+        // Configurable flags for monitoring game file I/O
+        static bool monitor_bdt;
+        static bool monitor_bhd;
+        static bool monitor_sl2;
+    };
 
 };
 

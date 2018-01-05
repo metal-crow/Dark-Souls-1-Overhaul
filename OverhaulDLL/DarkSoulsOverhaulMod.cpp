@@ -12,6 +12,7 @@
 #include "AntiCheat.h"
 #include "BloodborneRallySystem.h"
 
+
 /*
     Called from DllMain when the plugin DLL is first loaded into memory (PROCESS_ATTACH case).
     NOTE: This function runs in the same thread as DllMain, so code implemented here will halt
@@ -21,6 +22,9 @@
 */
 void on_process_attach()
 {
+    // Initialize file I/O monitoring data structs
+    Files::init_io_monitors();
+
     // Load startup preferences from settings file
     Mod::get_startup_preferences();
 
@@ -30,7 +34,7 @@ void on_process_attach()
         // @TODO: Handle wrong game version: Show dialog box and continue loading without applying mod
 
         // Placeholder handling of wrong game version:
-        Mod::startup_messages.push_back("WARNING: Unsupported game version detected.");
+        Mod::startup_messages.push_back(Mod::output_prefix + "WARNING: Unsupported game version detected.");
         MessageBox(NULL, std::string("Invalid game version detected. Change to supported game version, or disable the Dark Souls Overhaul Mod.").c_str(),
                    "ERROR: Dark Souls Overhaul Mod - Wrong game version", NULL);
 
@@ -72,7 +76,7 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     // Allow modded effectIDs
     Game::unrestrict_network_synced_effectids();
 
-    //Enable rally system
+    // Enable Bloodborne rally system
     if (!Mod::legacy_mode)
     {
         BloodborneRally::start();
@@ -156,6 +160,9 @@ __declspec(dllexport) void __stdcall main_loop()
 
     if (Mod::initialized)
     {
+        // Update multiplayer node graph HUD element display status
+        Hud::set_show_node_graph(Hud::get_show_node_graph());
+
         // Update multiplayer node count
         Game::node_count = Game::get_node_count();
 

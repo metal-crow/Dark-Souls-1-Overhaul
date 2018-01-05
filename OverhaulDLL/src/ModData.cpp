@@ -55,6 +55,9 @@ bool Mod::dim_lava_pref = false;
 // User preference setting; determines whether armor sound effects will be disabled
 bool Mod::disable_armor_sfx_pref = false;
 
+// User preference setting; determines whether multiplayer node graph HUD element is enabled
+bool Mod::hud_node_graph_pref = false;
+
 // Custom game archive files to load instead of the vanilla game files
 std::wstring Mod::custom_game_archive_path;
 
@@ -66,6 +69,11 @@ std::wstring Mod::custom_config_file_path;
 
 // Determines whether gesture cancelling is enabled
 bool Mod::gesture_cancelling = true;
+
+// Configurable flags for monitoring game file I/O
+bool Mod::Debug::monitor_bdt = false;
+bool Mod::Debug::monitor_bhd = false;
+bool Mod::Debug::monitor_sl2 = false;
 
 
 
@@ -91,7 +99,29 @@ void Mod::get_startup_preferences()
     BossGuard::active = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_ANTICHEAT_SECTION_, _DS1_OVERHAUL_PREF_AC_BOSS_GUARD_, (int)BossGuard::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
     NpcGuard::active = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_ANTICHEAT_SECTION_, _DS1_OVERHAUL_PREF_AC_NPC_GUARD_, (int)NpcGuard::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
     TeleBackstabProtect::active = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_ANTICHEAT_SECTION_, _DS1_OVERHAUL_PREF_AC_TELEBACKSTAB_PROT_, (int)TeleBackstabProtect::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    BinocsTriggerBlock::active = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_ANTICHEAT_SECTION_, _DS1_OVERHAUL_PREF_AC_BINOCS_TRIGGER_BLOCK_, (int)BinocsTriggerBlock::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    DragonTriggerBlock::active = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_ANTICHEAT_SECTION_, _DS1_OVERHAUL_PREF_AC_DRAGON_TRIGGER_BLOCK_, (int)DragonTriggerBlock::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
 
+
+    // Debug settings
+    Mod::Debug::monitor_bdt = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_DEBUG_SECTION_, _DS1_OVERHAUL_PREF_MONITOR_BDT_, (int)Mod::Debug::monitor_bdt, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    if (Mod::Debug::monitor_bdt) {
+        Files::io_monitors[Files::BDT0].monitor = true;
+        Files::io_monitors[Files::BDT1].monitor = true;
+        Files::io_monitors[Files::BDT2].monitor = true;
+        Files::io_monitors[Files::BDT3].monitor = true;
+    }
+    Mod::Debug::monitor_bhd = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_DEBUG_SECTION_, _DS1_OVERHAUL_PREF_MONITOR_BHD_, (int)Mod::Debug::monitor_bhd, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    if (Mod::Debug::monitor_bhd) {
+        Files::io_monitors[Files::BHD0].monitor = true;
+        Files::io_monitors[Files::BHD1].monitor = true;
+        Files::io_monitors[Files::BHD2].monitor = true;
+        Files::io_monitors[Files::BHD3].monitor = true;
+    }
+    Mod::Debug::monitor_sl2 = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_DEBUG_SECTION_, _DS1_OVERHAUL_PREF_MONITOR_SL2_, (int)Mod::Debug::monitor_sl2, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    if (Mod::Debug::monitor_sl2) {
+        Files::io_monitors[Files::SL2].monitor = true;
+    }
 
     // @TODO Load additional startup preferences here
 
@@ -152,6 +182,11 @@ void Mod::get_user_preferences()
         print_console("    HUD: Elevation meter enabled");
     }
 
+    if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_HUD_SECTION_, _DS1_OVERHAUL_PREF_NODE_GRAPH_, Hud::get_show_node_graph(), _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
+        Hud::set_show_node_graph(true, false);
+        print_console("    HUD: Multiplayer node graph enabled");
+    }
+
 
     // @TODO Load additional user preferences here
 
@@ -185,6 +220,11 @@ void Mod::get_user_keybinds()
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_COMPASS_RADIAL_, kf_toggle_hud_compass_radial);
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_COMPASS_BAR_, kf_toggle_hud_compass_bar);
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_ELEVATION_METER_, kf_toggle_hud_elevation_meter);
+    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_NODE_GRAPH_, kf_toggle_hud_node_graph);
+
+    // Toggle anti-cheats (not all are togglable)
+    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_AC_BINOCS_TRIG_BLOCK_, kf_toggle_ac_binocs_trigger_block);
+    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_AC_DRAGON_TRIG_BLOCK_, kf_toggle_ac_dragon_trigger_block);
 
     // @TODO Load additional keybinds here
 

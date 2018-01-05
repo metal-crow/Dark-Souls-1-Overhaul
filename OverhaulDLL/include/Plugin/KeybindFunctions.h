@@ -41,6 +41,11 @@ int kf_toggle_armor_sfx();
 int kf_toggle_hud_compass_radial();
 int kf_toggle_hud_compass_bar();
 int kf_toggle_hud_elevation_meter();
+int kf_toggle_hud_node_graph();
+
+// Toggles for anti-cheat services
+int kf_toggle_ac_binocs_trigger_block();
+int kf_toggle_ac_dragon_trigger_block();
 
 
 

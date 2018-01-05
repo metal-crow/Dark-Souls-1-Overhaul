@@ -25,6 +25,49 @@
 
 #include <cstdint>
 
+typedef enum HAIR_STYLE_ID {
+    Shaved = 1000,
+    Receding = 1100,
+    Short = 1200,
+    Swept_Back = 1300,
+    Ponytail = 1400,
+    Wild = 1500,
+    Parted_Center = 1600,
+    Semi_Long = 1700,
+    Curly = 1800,
+    Bobbed = 1900,
+    Male_11 = 2000,
+    Male_12 = 2100,
+    Male_13 = 2200,
+    Male_14 = 2300,
+    Male_15 = 2400,
+    Male_16 = 2500,
+    Male_17 = 2600,
+    Male_18 = 2700,
+    Male_19 = 2800,
+    Male_20 = 2900,
+    Shaved1 = 3000,
+    Very_Short = 3100,
+    Wave = 3200,
+    Straight_A = 3300,
+    Straight_B = 3400,
+    Ponytail_A = 3500,
+    Ponytail_B = 3600,
+    Pigtails = 3700,
+    Bun = 3800,
+    Braided = 3900,
+    Female_11 = 4000,
+    Female_12 = 4100,
+    Female_13 = 4200,
+    Female_14 = 4300,
+    Female_15 = 4400,
+    Female_16 = 4500,
+    Female_17 = 4600,
+    Female_18 = 4700,
+    Female_19 = 4800,
+    Female_20 = 4900,
+    Travel_Hairstyle = 5000
+} HairStyle;
 
 class ITEM {
 public:

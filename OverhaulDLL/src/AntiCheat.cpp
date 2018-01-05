@@ -4,7 +4,7 @@
     Contributors to this file:
         Ainsley Harriott  -  NPC Guard & Boss Guard
         Ashley            -  Anti-Tele-Backstab
-        Metal-crow        -  NPC Guard
+        Metal-crow        -  NPC Guard, in-line ASM fixes
         Sean Pesce        -  C++ conversions
 */
 
@@ -28,6 +28,17 @@ static uint32_t BossGuard_check_return;
 bool NpcGuard::active = true;
 static uint32_t NpcGuard_check_return;
 
+bool BinocsTriggerBlock::active = false;
+void *BinocsTriggerBlock::patch_address = NULL;
+uint8_t BinocsTriggerBlock::original_bytes[1] = { 0x7F };
+uint8_t BinocsTriggerBlock::patched_bytes[1] = { 0x79 };
+
+bool DragonTriggerBlock::active = false;
+void *DragonTriggerBlock::patch_address_head = NULL;
+void *DragonTriggerBlock::patch_address_body = NULL;
+uint8_t DragonTriggerBlock::original_bytes[1] = { 0x7F };
+uint8_t DragonTriggerBlock::patched_bytes[1] = { 0x79 };
+
 
 void AntiCheat::start() {
     if (!print_console(Mod::output_prefix + "Starting anti-cheat protections:"))
@@ -38,6 +49,110 @@ void AntiCheat::start() {
     BossGuard::start();
     // Start TeleBackstabProtect anti-cheat
     TeleBackstabProtect::start();
+}
+
+
+void BinocsTriggerBlock::enable() {
+    if (!Game::characters_loaded) {
+        if (!print_console(Mod::output_prefix + "ERROR: Unable to start BinocsTriggerBlock anti-cheat protection (data not yet loaded)"))
+            Mod::startup_messages.push_back(Mod::output_prefix + "ERROR: Unable to start BinocsTriggerBlock anti-cheat protection (data not yet loaded)");
+        return;
+    }
+    if (BinocsTriggerBlock::patch_address == NULL) {
+        // First time enabling; get patch address
+        BinocsTriggerBlock::patch_address = aob_scan("00 0F 00 00 00 00 FF 00 7F");
+        if (BinocsTriggerBlock::patch_address == NULL) {
+            if (!print_console(Mod::output_prefix + "ERROR: Unable to start BinocsTriggerBlock anti-cheat protection (data not yet loaded)"))
+                Mod::startup_messages.push_back(Mod::output_prefix + "ERROR: Unable to start BinocsTriggerBlock anti-cheat protection (data not yet loaded)");
+            return;
+        } else {
+            BinocsTriggerBlock::patch_address = (void*)(((uint32_t)BinocsTriggerBlock::patch_address) + 8);
+        }
+    }
+    if (!print_console(Mod::output_prefix + "Enabling BinocsTriggerBlock anti-cheat protection"))
+        Mod::startup_messages.push_back(Mod::output_prefix + "Enabling BinocsTriggerBlock anti-cheat protection");
+    apply_byte_patch(BinocsTriggerBlock::patch_address, BinocsTriggerBlock::patched_bytes, 1);
+    BinocsTriggerBlock::active = true;
+}
+
+void BinocsTriggerBlock::disable() {
+    if (BinocsTriggerBlock::patch_address == NULL) {
+        if (!print_console(Mod::output_prefix + "Disabling BinocsTriggerBlock anti-cheat protection"))
+            Mod::startup_messages.push_back(Mod::output_prefix + "Disabling BinocsTriggerBlock anti-cheat protection");
+        BinocsTriggerBlock::active = false;
+    }
+    if (BinocsTriggerBlock::active) {
+        if (!print_console(Mod::output_prefix + "Disabling BinocsTriggerBlock anti-cheat protection"))
+            Mod::startup_messages.push_back(Mod::output_prefix + "Disabling BinocsTriggerBlock anti-cheat protection");
+        apply_byte_patch(BinocsTriggerBlock::patch_address, BinocsTriggerBlock::original_bytes, 1);
+        BinocsTriggerBlock::active = false;
+    }
+}
+
+void BinocsTriggerBlock::toggle() {
+    if (BinocsTriggerBlock::active) {
+        BinocsTriggerBlock::disable();
+    } else {
+        BinocsTriggerBlock::enable();
+    }
+}
+
+
+void DragonTriggerBlock::enable() {
+    if (!Game::characters_loaded) {
+        if (!print_console(Mod::output_prefix + "ERROR: Unable to start DragonTriggerBlock anti-cheat protection (data not yet loaded)"))
+            Mod::startup_messages.push_back(Mod::output_prefix + "ERROR: Unable to start DragonTriggerBlock anti-cheat protection (data not yet loaded)");
+        return;
+    }
+    // First time enabling; get patch addresses
+    if (DragonTriggerBlock::patch_address_head == NULL) {
+        DragonTriggerBlock::patch_address_head = aob_scan("60 00 00 00 00 FF 00 7F");
+        if (DragonTriggerBlock::patch_address_head == NULL) {
+            if (!print_console(Mod::output_prefix + "ERROR: Unable to start DragonTriggerBlock anti-cheat protection (data not yet loaded)"))
+                Mod::startup_messages.push_back(Mod::output_prefix + "ERROR: Unable to start DragonTriggerBlock anti-cheat protection (data not yet loaded)");
+            return;
+        } else {
+            DragonTriggerBlock::patch_address_head = (void*)(((uint32_t)DragonTriggerBlock::patch_address_head) + 7);
+        }
+    }
+    if (DragonTriggerBlock::patch_address_body == NULL) {
+        DragonTriggerBlock::patch_address_body = aob_scan("A7 00 00 00 00 FF 00 7F");
+        if (DragonTriggerBlock::patch_address_body == NULL) {
+            if (!print_console(Mod::output_prefix + "ERROR: Unable to start DragonTriggerBlock anti-cheat protection (data not yet loaded)"))
+                Mod::startup_messages.push_back(Mod::output_prefix + "ERROR: Unable to start DragonTriggerBlock anti-cheat protection (data not yet loaded)");
+            return;
+        } else {
+            DragonTriggerBlock::patch_address_body = (void*)(((uint32_t)DragonTriggerBlock::patch_address_body) + 7);
+        }
+    }
+    if (!print_console(Mod::output_prefix + "Enabling DragonTriggerBlock anti-cheat protection"))
+        Mod::startup_messages.push_back(Mod::output_prefix + "Enabling DragonTriggerBlock anti-cheat protection");
+    apply_byte_patch(DragonTriggerBlock::patch_address_head, DragonTriggerBlock::patched_bytes, 1);
+    apply_byte_patch(DragonTriggerBlock::patch_address_body, DragonTriggerBlock::patched_bytes, 1);
+    DragonTriggerBlock::active = true;
+}
+
+void DragonTriggerBlock::disable() {
+    if (DragonTriggerBlock::patch_address_head == NULL || DragonTriggerBlock::patch_address_body == NULL) {
+        if (!print_console(Mod::output_prefix + "Disabling DragonTriggerBlock anti-cheat protection"))
+            Mod::startup_messages.push_back(Mod::output_prefix + "Disabling DragonTriggerBlock anti-cheat protection");
+        DragonTriggerBlock::active = false;
+    }
+    if (DragonTriggerBlock::active) {
+        if (!print_console(Mod::output_prefix + "Disabling DragonTriggerBlock anti-cheat protection"))
+            Mod::startup_messages.push_back(Mod::output_prefix + "Disabling DragonTriggerBlock anti-cheat protection");
+        apply_byte_patch(DragonTriggerBlock::patch_address_head, DragonTriggerBlock::original_bytes, 1);
+        apply_byte_patch(DragonTriggerBlock::patch_address_body, DragonTriggerBlock::original_bytes, 1);
+        DragonTriggerBlock::active = false;
+    }
+}
+
+void DragonTriggerBlock::toggle() {
+    if (DragonTriggerBlock::active) {
+        DragonTriggerBlock::disable();
+    } else {
+        DragonTriggerBlock::enable();
+    }
 }
 
 

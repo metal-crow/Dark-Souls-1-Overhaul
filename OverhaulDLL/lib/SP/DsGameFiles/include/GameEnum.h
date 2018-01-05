@@ -61,7 +61,7 @@ enum SPECIAL_EFFECT_CATEGORY : uint8_t {
     MIRACLE = 4,
     BELT_ITEM = 5,
     PHYSICAL = 6,
-    PHYISCAL2 = 7
+    PHYSICAL2 = 7
 };
 //typedef SPECIAL_EFFECT_CATEGORY BEHAVIOR_CATEGORY;
 
@@ -77,7 +77,7 @@ typedef enum HOMELAND : uint8_t {
     DUBIOUS_CARIM = 6, // "Ominous features associated with the Earl of Carim"
     CLASSIC_ZENA = 7, // "Thoughtful, mature face common in historical Zena"
     EERIE_GREAT_SWAMP = 8, // "Great Swamp heretics face prejudice for their atypical looks"
-    FAR_EAST_TRAVELLER = 9 // "Face from a distant Eastern land of almond eyes and thin lips"
+    FAR_EAST_TRAVELER = 9 // "Face from a distant Eastern land of almond eyes and thin lips"
 } FACE;
 
 typedef enum GENDER : uint8_t {

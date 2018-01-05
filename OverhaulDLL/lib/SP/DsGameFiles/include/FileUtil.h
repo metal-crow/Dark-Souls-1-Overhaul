@@ -34,7 +34,7 @@ public:
     // Number of filename strings in the filename list used by hashing functions
 #define FILENAME_LIST_SIZE 6128
 
-// List of game files that are packed into the Dark Souls game archives
+    // List of game files that are packed into the Dark Souls game archives
     static const char* const FILENAMES[FILENAME_LIST_SIZE];
 
     // Stores hashed filenames

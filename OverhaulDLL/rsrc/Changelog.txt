@@ -5,6 +5,69 @@
 
 
 ------------------------------------------------------------------------------------------
+01/05/2018:
+
+- New config settings:
+    - NodeGraph
+	    Enables/disables multiplayer node graph HUD element
+
+- New console commands:
+    - hud_node_graph
+	    Enables/disables multiplayer node graph HUD element
+
+- New keybinds:
+    - ToggleHudNodeGraph
+	    Toggles multiplayer node graph HUD element
+		
+- Updates:
+    - Rally special effect now loops
+
+
+------------------------------------------------------------------------------------------
+12/30/2017:
+
+- New features:
+    - BinocsTriggerBlock Anti-cheat:
+        Prevents hackers from triggering the binoculars item-use effect on hit, leaving
+        their victim defenseless.
+    - DragonTriggerBlock Anti-cheat:
+        Prevents hackers from triggering dragonification of a victim's head/body on hit.
+
+- New config settings:
+    - BinocsTriggerBlock
+	    Enables/disables BinocsTriggerBlock anti-cheat on startup.
+    - DragonTriggerBlock
+	    Enables/disables DragonTriggerBlock anti-cheat on startup.
+    - MonitorBdtFiles
+	    Enables/disables file I/O monitoring for the BDT archive files.
+    - MonitorBhdFiles
+        Enables/disables file I/O monitoring for the BHD5 archive header files.
+    - MonitorSaveFile
+        Enables/disables file I/O monitoring for the save file.
+
+- New console commands:
+    - ac_binocs_trigger_block
+	    Enables/disables BinocsTriggerBlock anti-cheat
+    - ac_dragon_trigger_block
+	    Enables/disables DragonTriggerBlock anti-cheat
+
+- New keybinds:
+    - ToggleBinocsTriggerBlockAC
+	    Toggles BinocsTriggerBlock anti-cheat
+    - ToggleDragonTriggerBlockAC
+	    Toggles DragonTriggerBlock anti-cheat
+		
+- Fixes:
+    - Fixed anomalous issues with a specific type of in-line assembly dereference
+
+- Updates:
+    - Update DsGameFile library & resource files
+
+
+------------------------------------------------------------------------------------------
+
+
+
 12/12/2017:
 
 - New config settings:
@@ -36,4 +99,6 @@
 
 - Updates:
     - Update DirectX 9 overlay library & resource files
+
+
 ------------------------------------------------------------------------------------------

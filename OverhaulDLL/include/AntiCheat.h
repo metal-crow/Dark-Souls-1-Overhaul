@@ -4,7 +4,7 @@
     Contributors to this file:
         Ainsley Harriott  -  NPC Guard & Boss Guard
         Ashley            -  Anti-Tele-Backstab
-        Metal-crow        -  NPC Guard
+        Metal-crow        -  NPC Guard, in-line ASM fixes
         Sean Pesce        -  C++ conversions
 */
 
@@ -77,9 +77,38 @@ public:
         static void __stdcall store_new_animation_id();
     };
 
+    class BinocsTriggerBlock
+    {
+    public:
+        // Denotes whether protection against forced binoculars-on-hit hacks is active
+        static bool active;
+        static void *patch_address;
+        static uint8_t original_bytes[1];
+        static uint8_t  patched_bytes[1];
+        static void enable();
+        static void disable();
+        static void toggle();
+    };
+
+    class DragonTriggerBlock
+    {
+    public:
+        // Denotes whether protection against forced dragon-transformation-on-hit hacks is active
+        static bool active;
+        static void *patch_address_head;
+        static void *patch_address_body;
+        static uint8_t original_bytes[1];
+        static uint8_t  patched_bytes[1];
+        static void enable();
+        static void disable();
+        static void toggle();
+    };
+
 };
 typedef AntiCheat::BossGuard BossGuard;
 typedef AntiCheat::NpcGuard NpcGuard;
 typedef AntiCheat::TeleBackstabProtect TeleBackstabProtect;
+typedef AntiCheat::BinocsTriggerBlock BinocsTriggerBlock;
+typedef AntiCheat::DragonTriggerBlock DragonTriggerBlock;
 
 #endif // _DS1_OVERHAUL_ANTI_CHEAT_H_

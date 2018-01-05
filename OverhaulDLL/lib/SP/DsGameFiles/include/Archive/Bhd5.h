@@ -148,7 +148,8 @@ public:
     static const wchar_t *FILE_EXT_W; // L".bhd5" (wide char)
 
     // Default filename for Dark Souls BHD5 files
-    static const char *FILE_NAME_DEFAULT;  // "dvdbnd"
+    static const char    *FILE_NAME_DEFAULT;   //  "dvdbnd" (char)
+    static const wchar_t *FILE_NAME_DEFAULT_W; // L"dvdbnd" (wide char)
 
     // Default number of Dark Souls BHD5 files
     static const unsigned int FILE_COUNT_DEFAULT = 4;

@@ -1,7 +1,15 @@
+/*
+    DARK SOULS OVERHAUL
+
+    Contributors to this file:
+        Metal-Crow    -    Reverse engineering, Bloodborne rally system, C++
+
+*/
+
 #pragma once
 
 #ifndef _DS1_OVERHAUL_BB_RALLY_SYSTEM_H_
-#define _DS1_OVERHAUL_BB_RALLY_SYSTEM_H_
+    #define _DS1_OVERHAUL_BB_RALLY_SYSTEM_H_
 
 
 #include <cstdint>
