@@ -119,7 +119,7 @@ void Game::on_first_character_loaded()
     //Enable rally system vfx
     if (!Mod::legacy_mode)
     {
-        BloodborneRally::start_vfx_thread();
+        BloodborneRally::on_char_load();
     }
 }
 
