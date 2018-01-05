@@ -22,7 +22,8 @@
     Initialize constants:
 */
 
-
+// Default save file path used by the game
+std::string Files::default_save_file_path;
 
 
 // Called when the game attempts to call CreateFileW
@@ -35,6 +36,7 @@ HANDLE WINAPI Files::intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesired
     std::string fn_buff;
     std::wstring load_file;
     std::wstring load_file_ext;
+    bool print_action = false;
     if (lpFileName != NULL)
     {
         load_file = lpFileName;
@@ -44,59 +46,73 @@ HANDLE WINAPI Files::intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesired
             if ((int)Mod::custom_game_archive_path.length() > 0 && load_file_ext == BdtArchive::FILE_EXT_W)
             {
                 // Intercept archive file load (.bdt)
+                print_action = Mod::Debug::monitor_bdt;
                 load_file = Mod::custom_game_archive_path + load_file.substr(load_file.length() - 5);
                 // Store file handle for monitoring
                 switch (load_file.c_str()[load_file.length() - 5]) {
                     case L'0':
-                        return_val = &Files::bdt_handles[0];
-                        Files::bdt_io_pos[0] = 0;
+                        return_val = &Files::io_monitors[BDT0].handle;
+                        Files::io_monitors[BDT0].io_pos = 0;
                         break;
                     case L'1':
-                        return_val = &Files::bdt_handles[1];
-                        Files::bdt_io_pos[1] = 0;
+                        return_val = &Files::io_monitors[BDT1].handle;
+                        Files::io_monitors[BDT1].io_pos = 0;
                         break;
                     case L'2':
-                        return_val = &Files::bdt_handles[2];
-                        Files::bdt_io_pos[2] = 0;
+                        return_val = &Files::io_monitors[BDT2].handle;
+                        Files::io_monitors[BDT2].io_pos = 0;
                         break;
                     case L'3':
                     default:
-                        return_val = &Files::bdt_handles[3];
-                        Files::bdt_io_pos[3] = 0;
+                        return_val = &Files::io_monitors[BDT3].handle;
+                        Files::io_monitors[BDT3].io_pos = 0;
                         break;
                 }
             }
             else if ((int)Mod::custom_game_archive_path.length() > 0 && load_file_ext == std::wstring(&Bhd5Archive::FILE_EXT_W[1]))
             {
                 // Intercept archive file load (.bhd5)
+                print_action = Mod::Debug::monitor_bhd;
                 load_file = Mod::custom_game_archive_path + load_file.substr(load_file.length() - 6);
                 // Store file handle for monitoring
+                
                 switch (load_file.c_str()[load_file.length() - 6]) {
                     case L'0':
-                        return_val = &Files::bhd_handles[0];
-                        Files::bhd_io_pos[0] = 0;
+                        return_val = &Files::io_monitors[BHD0].handle;
+                        Files::io_monitors[BHD0].io_pos = 0;
                         break;
                     case L'1':
-                        return_val = &Files::bhd_handles[1];
-                        Files::bhd_io_pos[1] = 0;
+                        return_val = &Files::io_monitors[BHD1].handle;
+                        Files::io_monitors[BHD1].io_pos = 0;
                         break;
                     case L'2':
-                        return_val = &Files::bhd_handles[2];
-                        Files::bhd_io_pos[2] = 0;
+                        return_val = &Files::io_monitors[BHD2].handle;
+                        Files::io_monitors[BHD2].io_pos = 0;
                         break;
                     case L'3':
                     default:
-                        return_val = &Files::bhd_handles[3];
-                        Files::bhd_io_pos[3] = 0;
+                        return_val = &Files::io_monitors[BHD3].handle;
+                        Files::io_monitors[BHD3].io_pos = 0;
                         break;
                 }
             }
             else if ((int)Mod::custom_save_file_path.length() > 0 && (load_file_ext == SaveFile::FILE_EXT_W))
             {
                 // Intercept save file load (.sl2)
+                print_action = Mod::Debug::monitor_sl2;
                 load_file = Mod::custom_save_file_path;
-                return_val = &Files::sl2_handle;
-                Files::sl2_io_pos = 0;
+                return_val = &Files::io_monitors[SL2].handle;
+                Files::io_monitors[SL2].io_pos = 0;
+
+                // On first load, store default save file path
+                if (Files::default_save_file_path.length() <= 0) {
+                    int conversion_ret = string_wide_to_mb((wchar_t*)lpFileName, Files::default_save_file_path);
+                    if (conversion_ret != 0) {
+                        // Error converting file path string
+                        print_console("ERROR: Failed to obtain default save file path");
+                        Files::default_save_file_path = Sl2::FILE_NAME_DEFAULT;
+                    }
+                }
             }
         }
         // Call original function
@@ -108,9 +124,33 @@ HANDLE WINAPI Files::intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesired
         *return_val = CreateFileW(lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
     }
 
-    Files::default_filename_from_handle(*return_val, fn_buff);
-    if (fn_buff.length() > 0) {
-        print_console("Intercepted loading of " + fn_buff);
+    //if (save_file && (*return_val) != NULL) {
+    //    // Find open save file I/O monitor
+    //    if (Files::io_monitors[SL2_0].handle == NULL || (*return_val == Files::io_monitors[SL2_0].handle)) {
+    //        Files::io_monitors[SL2_0].io_pos = 0;
+    //        Files::io_monitors[SL2_0].handle = *return_val;
+    //    } else if (Files::io_monitors[SL2_1].handle == NULL || (*return_val == Files::io_monitors[SL2_1].handle)) {
+    //        Files::io_monitors[SL2_1].io_pos = 0;
+    //        Files::io_monitors[SL2_1].handle = *return_val;
+    //    } else if (Files::io_monitors[SL2_2].handle == NULL || (*return_val == Files::io_monitors[SL2_2].handle)) {
+    //        Files::io_monitors[SL2_2].io_pos = 0;
+    //        Files::io_monitors[SL2_2].handle = *return_val;
+    //    } else if (Files::io_monitors[SL2_3].handle == NULL || (*return_val == Files::io_monitors[SL2_3].handle)) {
+    //        Files::io_monitors[SL2_3].io_pos = 0;
+    //        Files::io_monitors[SL2_3].handle = *return_val;
+    //    } else {
+    //        // If this message ever appears, add more save file monitors -SeanP
+    //        print_console("\n!!!!!!!!!!!!!!!\nWARNING: No available save file I/O monitors (Contact Sean if you see this message)\n!!!!!!!!!!!!!!!\n");
+    //    }
+    //}
+
+    //Files::default_filename_from_handle(*return_val, fn_buff);
+    IoMonitor *io_monitor = Files::io_monitor_from_handle(*return_val);
+    if (io_monitor != NULL) {
+        fn_buff = io_monitor->default_filename;
+    }
+    if (print_action && fn_buff.length() > 0) {
+        print_console("Intercepted loading of " + fn_buff + " (" + FileUtil::to_hex_string((int)io_monitor->handle, fn_buff, true) + ")");
     }
     return *return_val;
 }
@@ -150,6 +190,7 @@ BOOL WINAPI Files::intercept_read_file(HANDLE hFile, LPVOID lpBuffer, DWORD nNum
     BOOL return_val;
     std::string fn_buff;
     int32_t file_pos_offset = 0;
+    IoMonitor *io_monitor = Files::io_monitor_from_handle(hFile);
     // Call original function
     return_val = ReadFile(hFile, lpBuffer, nNumberOfBytesToRead, lpNumberOfBytesRead, lpOverlapped);
     
@@ -157,13 +198,17 @@ BOOL WINAPI Files::intercept_read_file(HANDLE hFile, LPVOID lpBuffer, DWORD nNum
         file_pos_offset = *lpNumberOfBytesRead;
     }
 
-    Files::default_filename_from_handle(hFile, fn_buff);
+    if (io_monitor != NULL) {
+        fn_buff = io_monitor->default_filename;
+    }
     if ((return_val || (lpNumberOfBytesRead && *lpNumberOfBytesRead)) && fn_buff.length() > 0) {
         if (lpOverlapped != NULL) {
             fn_buff += " (WARNING: Async read operation)";
         }
-        uint32_t new_io_pos = Files::update_file_position(hFile, file_pos_offset);
-        print_console("Reading " + std::to_string(nNumberOfBytesToRead) + " bytes from " + fn_buff + " at offset " + std::to_string(new_io_pos) + " (" + FileUtil::to_hex_string(new_io_pos, fn_buff, true) + ")");
+        if (io_monitor->monitor) {
+            print_console("Reading " + std::to_string(nNumberOfBytesToRead) + " bytes from " + fn_buff + " at offset " + std::to_string(io_monitor->io_pos) + " (" + FileUtil::to_hex_string(io_monitor->io_pos, fn_buff, true) + ") and storing in buffer at " + FileUtil::to_hex_string((uint32_t)lpBuffer, fn_buff, true));
+        }
+        io_monitor->io_pos += file_pos_offset;
     }
     return return_val;
 }
@@ -174,6 +219,7 @@ BOOL WINAPI Files::intercept_write_file(HANDLE hFile, LPCVOID lpBuffer, DWORD nN
     BOOL return_val;
     std::string fn_buff;
     int32_t file_pos_offset = 0;
+    IoMonitor *io_monitor = Files::io_monitor_from_handle(hFile);
     // Call original function
     return_val = WriteFile(hFile, lpBuffer, nNumberOfBytesToWrite, lpNumberOfBytesWritten, lpOverlapped);
 
@@ -181,13 +227,17 @@ BOOL WINAPI Files::intercept_write_file(HANDLE hFile, LPCVOID lpBuffer, DWORD nN
         file_pos_offset = *lpNumberOfBytesWritten;
     }
 
-    Files::default_filename_from_handle(hFile, fn_buff);
+    if (io_monitor != NULL) {
+        fn_buff = io_monitor->default_filename;
+    }
     if ((return_val || (lpNumberOfBytesWritten && *lpNumberOfBytesWritten)) && fn_buff.length() > 0) {
         if (lpOverlapped != NULL) {
             fn_buff += " (WARNING: Async write operation)";
         }
-        uint32_t new_io_pos = Files::update_file_position(hFile, file_pos_offset);
-        print_console("Writing " + std::to_string(nNumberOfBytesToWrite) + " bytes to " + fn_buff + " at offset " + std::to_string(new_io_pos) + " (" + FileUtil::to_hex_string(new_io_pos, fn_buff, true) + ")");
+        if (io_monitor->monitor) {
+            print_console("Writing " + std::to_string(nNumberOfBytesToWrite) + " bytes to " + fn_buff + " at offset " + std::to_string(io_monitor->io_pos) + " (" + FileUtil::to_hex_string(io_monitor->io_pos, fn_buff, true) + ")");
+        }
+        io_monitor->io_pos += file_pos_offset;
     }
     return return_val;
 }
@@ -198,13 +248,19 @@ BOOL WINAPI Files::intercept_close_handle(HANDLE hObject)
 {
     BOOL return_val;
     std::string fn_buff;
+    IoMonitor *io_monitor = Files::io_monitor_from_handle(hObject);
     // Call original function
     return_val = CloseHandle(hObject);
 
-    Files::default_filename_from_handle(hObject, fn_buff);
+    if (io_monitor != NULL) {
+        fn_buff = io_monitor->default_filename;
+    }
     if (return_val && fn_buff.length() > 0) {
-        Files::forget_file_handle(hObject);
-        print_console("Closed file handle: " + fn_buff);
+        io_monitor->io_pos = 0;
+        io_monitor->handle = NULL;
+        if (io_monitor->monitor) {
+            print_console("Closed file handle: " + fn_buff);
+        }
     }
     return return_val;
 }
@@ -214,13 +270,18 @@ DWORD WINAPI Files::intercept_set_file_pointer(HANDLE hFile, LONG lDistanceToMov
 {
     DWORD return_val;
     std::string fn_buff;
+    IoMonitor *io_monitor = Files::io_monitor_from_handle(hFile);
     // Call original function
     return_val = SetFilePointer(hFile, lDistanceToMove, lpDistanceToMoveHigh, dwMoveMethod);
 
-    Files::default_filename_from_handle(hFile, fn_buff);
+    if (io_monitor != NULL) {
+        fn_buff = io_monitor->default_filename;
+    }
     if ((return_val != INVALID_SET_FILE_POINTER) && fn_buff.length() > 0) {
-        print_console("New file pointer position for " + fn_buff + ": " + std::to_string(return_val) + " (" + FileUtil::to_hex_string(return_val, fn_buff, true) + ")");
-        Files::update_file_position(hFile, return_val, true);
+        if (io_monitor->monitor) {
+            print_console("New file pointer position for " + fn_buff + ": " + std::to_string(return_val) + " (" + FileUtil::to_hex_string(return_val, fn_buff, true) + ")");
+        }
+        io_monitor->io_pos = return_val;
     }
     return return_val;
 }
@@ -293,6 +354,31 @@ void Files::apply_function_intercepts()
     uint8_t patch_set_file_ptr[4] = { intercept_set_file_ptr_b[0], intercept_set_file_ptr_b[1], intercept_set_file_ptr_b[2], intercept_set_file_ptr_b[3] };
     write_address = (uint8_t*)Game::ds1_base + 0x2B69EE;
     apply_byte_patch(write_address, patch_set_file_ptr, 4);
+}
+
+// Initializes game file I/O monitor structs
+void Files::init_io_monitors()
+{
+    io_monitors[SL2].default_filename   = std::string(Sl2::FILE_NAME_DEFAULT)    + Sl2::FILE_EXT;
+    io_monitors[SL2].default_filename_w = std::wstring(Sl2::FILE_NAME_DEFAULT_W) + Sl2::FILE_EXT_W;
+
+    io_monitors[BDT0].default_filename   = std::string(BdtArchive::FILE_NAME_DEFAULT)    +  "0" + BdtArchive::FILE_EXT;
+    io_monitors[BDT0].default_filename_w = std::wstring(BdtArchive::FILE_NAME_DEFAULT_W) + L"0" + BdtArchive::FILE_EXT_W;
+    io_monitors[BDT1].default_filename   = std::string(BdtArchive::FILE_NAME_DEFAULT)    +  "1" + BdtArchive::FILE_EXT;
+    io_monitors[BDT1].default_filename_w = std::wstring(BdtArchive::FILE_NAME_DEFAULT_W) + L"1" + BdtArchive::FILE_EXT_W;
+    io_monitors[BDT2].default_filename   = std::string(BdtArchive::FILE_NAME_DEFAULT)    +  "2" + BdtArchive::FILE_EXT;
+    io_monitors[BDT2].default_filename_w = std::wstring(BdtArchive::FILE_NAME_DEFAULT_W) + L"2" + BdtArchive::FILE_EXT_W;
+    io_monitors[BDT3].default_filename   = std::string(BdtArchive::FILE_NAME_DEFAULT)    +  "3" + BdtArchive::FILE_EXT;
+    io_monitors[BDT3].default_filename_w = std::wstring(BdtArchive::FILE_NAME_DEFAULT_W) + L"3" + BdtArchive::FILE_EXT_W;
+
+    io_monitors[BHD0].default_filename   = std::string(Bhd5Archive::FILE_NAME_DEFAULT)    +  "0" + Bhd5Archive::FILE_EXT;
+    io_monitors[BHD0].default_filename_w = std::wstring(Bhd5Archive::FILE_NAME_DEFAULT_W) + L"0" + Bhd5Archive::FILE_EXT_W;
+    io_monitors[BHD1].default_filename   = std::string(Bhd5Archive::FILE_NAME_DEFAULT)    +  "1" + Bhd5Archive::FILE_EXT;
+    io_monitors[BHD1].default_filename_w = std::wstring(Bhd5Archive::FILE_NAME_DEFAULT_W) + L"1" + Bhd5Archive::FILE_EXT_W;
+    io_monitors[BHD2].default_filename   = std::string(Bhd5Archive::FILE_NAME_DEFAULT)    +  "2" + Bhd5Archive::FILE_EXT;
+    io_monitors[BHD2].default_filename_w = std::wstring(Bhd5Archive::FILE_NAME_DEFAULT_W) + L"2" + Bhd5Archive::FILE_EXT_W;
+    io_monitors[BHD3].default_filename   = std::string(Bhd5Archive::FILE_NAME_DEFAULT)    +  "3" + Bhd5Archive::FILE_EXT;
+    io_monitors[BHD3].default_filename_w = std::wstring(Bhd5Archive::FILE_NAME_DEFAULT_W) + L"3" + Bhd5Archive::FILE_EXT_W;
 }
 
 
@@ -397,72 +483,31 @@ void Files::check_custom_game_config_file_path()
 }
 
 
-// Returns the name of the game file that the specified file handle corresponds to
-const char* Files::default_filename_from_handle(HANDLE handle, std::string& filename)
-{
-    filename.clear();
+// Returns the address of the file I/O monitoring struct corresponding to the specified file handle
+Files::IoMonitor *Files::io_monitor_from_handle(HANDLE handle) {
     if (handle != NULL) {
         // Unfortuntely switch statements aren't allowed for HANDLE
-        if (handle == Files::sl2_handle) {
-            filename = Sl2::FILE_NAME_DEFAULT + std::string(Sl2::FILE_EXT);
-        } else {
-            auto res = find(Files::bdt_handles.begin(), Files::bdt_handles.end(), handle);
-            if (res != Files::bdt_handles.end()) {
-                filename = BdtArchive::FILE_NAME_DEFAULT + std::to_string(res - Files::bdt_handles.begin()) + BdtArchive::FILE_EXT;
-            } else if ((res = find(Files::bhd_handles.begin(), Files::bhd_handles.end(), handle)) != Files::bhd_handles.end()) {
-                filename = Bhd5Archive::FILE_NAME_DEFAULT + std::to_string(res - Files::bhd_handles.begin()) + Bhd5Archive::FILE_EXT;
-            }
+        if (handle == io_monitors[SL2].handle) {
+            return &(io_monitors[SL2]);
+        }  else if (handle == io_monitors[BDT0].handle) {
+            return &(io_monitors[BDT0]);
+        } else if (handle == io_monitors[BDT1].handle) {
+            return &(io_monitors[BDT1]);
+        } else if (handle == io_monitors[BDT2].handle) {
+            return &(io_monitors[BDT2]);
+        } else if (handle == io_monitors[BDT3].handle) {
+            return &(io_monitors[BDT3]);
+        } else if (handle == io_monitors[BHD0].handle) {
+            return &(io_monitors[BHD0]);
+        } else if (handle == io_monitors[BHD1].handle) {
+            return &(io_monitors[BHD1]);
+        } else if (handle == io_monitors[BHD2].handle) {
+            return &(io_monitors[BHD2]);
+        } else if (handle == io_monitors[BHD3].handle) {
+            return &(io_monitors[BHD3]);
         }
     }
-    return filename.c_str();
-}
-
-
-// Removes the specified file handle from the list of monitored file handles
-void Files::forget_file_handle(HANDLE handle)
-{
-    int i = -1;
-    if (handle != NULL) {
-        if (handle == Files::sl2_handle) {
-            Files::sl2_handle = NULL;
-            Files::sl2_io_pos = 0;
-        } else {
-            auto res = find(Files::bdt_handles.begin(), Files::bdt_handles.end(), handle);
-            if (res != Files::bdt_handles.end()) {
-                i = res - Files::bdt_handles.begin();
-                Files::bdt_handles[i] = NULL;
-                Files::bdt_io_pos[i] = 0;
-            } else if ((res = find(Files::bhd_handles.begin(), Files::bhd_handles.end(), handle)) != Files::bhd_handles.end()) {
-                i = res - Files::bhd_handles.begin();
-                Files::bhd_handles[i] = NULL;
-                Files::bhd_io_pos[i] = 0;
-            }
-        }
-    }
-}
-
-// Updates the I/O offset of a monitored game file
-uint32_t Files::update_file_position(HANDLE handle, int32_t offset, bool absolute_offset)
-{
-    int i = -1;
-    if (handle != NULL) {
-        if (handle == Files::sl2_handle) {
-            Files::sl2_io_pos = (absolute_offset ? offset : (Files::sl2_io_pos + offset));
-            return Files::sl2_io_pos;
-        } else {
-            auto res = find(Files::bdt_handles.begin(), Files::bdt_handles.end(), handle);
-            if (res != Files::bdt_handles.end()) {
-                i = res - Files::bdt_handles.begin();
-                Files::bdt_io_pos[i] = (absolute_offset ? offset : (Files::bdt_io_pos[i] + offset));
-                return Files::bdt_io_pos[i];
-            } else if ((res = find(Files::bhd_handles.begin(), Files::bhd_handles.end(), handle)) != Files::bhd_handles.end()) {
-                i = res - Files::bhd_handles.begin();
-                Files::bhd_io_pos[i] = (absolute_offset ? offset : (Files::bhd_io_pos[i] + offset));
-                return Files::bhd_io_pos[i];
-            }
-        }
-    }
-    return -1;
+    return NULL;
 }
 
 #endif // _DS1_OVERHAUL_GAME_FILES_H_

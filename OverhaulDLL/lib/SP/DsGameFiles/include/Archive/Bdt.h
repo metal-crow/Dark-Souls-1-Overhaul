@@ -84,7 +84,8 @@ public:
     static const wchar_t *FILE_EXT_W; // L".bdt" (wide char)
 
     // Default filename for Dark Souls BDT files
-    static const char *FILE_NAME_DEFAULT;  // "dvdbnd"
+    static const char    *FILE_NAME_DEFAULT;   //  "dvdbnd" (char)
+    static const wchar_t *FILE_NAME_DEFAULT_W; // L"dvdbnd" (wide char)
 
     // Default number of Dark Souls BDT files
     static const unsigned int FILE_COUNT_DEFAULT = 4;

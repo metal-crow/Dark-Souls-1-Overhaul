@@ -10,6 +10,7 @@
 */
 
 #include "DllMain.h"
+#include "AntiCheat.h"
 
 
 // Fixes input bug that causes players to be stuck at a bonfire (usually after turning human with framerate unlocked)
@@ -111,6 +112,33 @@ int kf_toggle_hud_elevation_meter()
         print_console("Enabled elevation meter HUD element");
     else
         print_console("Disabled elevation meter HUD element");
+    Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
+    return ERROR_SUCCESS;
+}
+
+int kf_toggle_hud_node_graph()
+{
+    Hud::set_show_node_graph(!Hud::get_show_node_graph(), false);
+    if (Hud::get_show_node_graph())
+        print_console("Enabled multiplayer node graph HUD element");
+    else
+        print_console("Disabled multiplayer node graph HUD element");
+    Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
+    return ERROR_SUCCESS;
+}
+
+
+// Toggles for anti-cheat services
+int kf_toggle_ac_binocs_trigger_block()
+{
+    BinocsTriggerBlock::toggle();
+    Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
+    return ERROR_SUCCESS;
+}
+
+int kf_toggle_ac_dragon_trigger_block()
+{
+    DragonTriggerBlock::toggle();
     Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
     return ERROR_SUCCESS;
 }

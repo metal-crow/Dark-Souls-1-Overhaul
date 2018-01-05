@@ -4,15 +4,16 @@
     Contributors to this file:
         Ashley                      -   Reverse engineering, Low FPS Disconnect patch technique
         jellybaby34                 -   Game version number patch technique
-        Metal-Crow                  -   Reverse engineering, Phantom Limit patch, C++
+        Metal-Crow                  -   Reverse engineering, Phantom Limit patch, special effect ID sync, C++
         RavagerChris                -   Reverse engineering of game files, gesture cancelling technique
         Sean Pesce                  -   C++, automataed Bonfire Input Fix (FPSFix+), various C++ conversions of other contributors' work
         Youri "NullBy7e" de Mooij   -   Original Bonfire Input Fix technique (FPSFix)
-        Zullie The Witch            -   Toggle armor sounds, Dim Lava Effects (C++ conversions by Sean)
+        Zullie The Witch            -   Toggle armor sounds, Dim Lava Effects
 
 */
 
 #include "DllMain.h"
+#include "AntiCheat.h"
 #include "BloodborneRallySystem.h"
 
 
@@ -51,23 +52,9 @@ uint32_t Game::memory_limit = 0;
 // Animation IDs for the default set of gesture animations in the game
 const uint32_t Game::gesture_anim_ids[15] = { 6800, 6801, 6802, 6803, 6804, 6805, 6806, 6807, 6808, 6809, 6810, 6815, 6820, 6825, 6830 };
 
-// File handles for archive header files
-std::vector<HANDLE> Files::bhd_handles = std::vector<HANDLE>({ NULL, NULL, NULL, NULL });
 
-// File handles for archive files
-std::vector<HANDLE> Files::bdt_handles = std::vector<HANDLE>({ NULL, NULL, NULL, NULL });
-
-// File handle for save file
-HANDLE Files::sl2_handle = NULL;
-
-// File I/O positions for archive header files
-std::vector<uint32_t> Files::bhd_io_pos = std::vector<uint32_t>({ 0, 0, 0, 0 });
-
-// File I/O positions for archive files
-std::vector<uint32_t> Files::bdt_io_pos = std::vector<uint32_t>({ 0, 0, 0, 0 });
-
-// File I/O position for save file
-uint32_t Files::sl2_io_pos = 0;
+// Strutures for tracking file I/O data for the game's BDT, BHD5, and SL2 files
+Files::IoMonitor Files::io_monitors[9];
 
 
 
@@ -114,13 +101,19 @@ void Game::on_first_character_loaded()
     void *ret_val = (void*)Game::player_tae.init_from_aob_scan("54 41 45 20 00 00 00 00 0B 00 01 00 B4 AE 09 00");
     std::string temp;
     print_console(std::string("    Found Time Action Event file for player character animations at 0x") + FileUtil::to_hex_string((int)ret_val, temp) + ". Enabling gesture cancelling...");
-    Game::enable_gesture_cencelling();
+    Game::enable_gesture_cancelling();
 
     //Enable rally system vfx
     if (!Mod::legacy_mode)
     {
         BloodborneRally::on_char_load();
     }
+
+    // Enable forced binoculars/dragonification PvP protections
+    if (BinocsTriggerBlock::active)
+        BinocsTriggerBlock::enable();
+    if (DragonTriggerBlock::active)
+        DragonTriggerBlock::enable();
 }
 
 
@@ -529,6 +522,21 @@ void Hud::set_show_elevation_meter(bool enable)
     *(uint8_t*)((uint32_t)Game::ds1_base + 0xF78524) = enable;
 }
 
+bool Hud::get_show_node_graph()
+{
+    return Mod::hud_node_graph_pref;
+    // return !!*(uint8_t*)((uint32_t)Game::ds1_base + 0x??);
+}
+
+void Hud::set_show_node_graph(bool enable, bool game_flag_only)
+{
+    if (!game_flag_only) {
+        Mod::hud_node_graph_pref = enable;
+    }
+    SpPointer node_graph_ptr = SpPointer((uint8_t*)ds1_base + 0xF7F77C, { 0x2C, 0x778, 0x90 });
+    node_graph_ptr.write((uint8_t)enable);
+}
+
 
                 /////////////////////////////////////////
                 //////////////// PATCHES ////////////////
@@ -592,7 +600,7 @@ void Game::set_memory_limit(uint32_t mem_limit)
 
 
 // Enables gesture cancelling via rolling
-bool Game::enable_gesture_cencelling()
+bool Game::enable_gesture_cancelling()
 {
     int gestures_changed = 0;
     if (Game::characters_loaded && Game::player_tae.is_initialized())
@@ -622,7 +630,7 @@ bool Game::enable_gesture_cencelling()
 }
 
 
-// Allow effect ids to be transfered between clients without bounds restrictions
+// Allow effect IDs to be transferred between clients without bounds restrictions
 void Game::unrestrict_network_synced_effectids() {
     Mod::startup_messages.push_back(Mod::output_prefix + "Unrestricting effectIDs sent over network.");
 

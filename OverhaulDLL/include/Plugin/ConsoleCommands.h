@@ -68,6 +68,13 @@ const char *chm_cheats = ccn_cheats" [boolean]\n"
 "    Enables cheats, unlocking additional console commands (1 = enable). If cheats are enabled, saving and multiplayer"
 "    are disabled until the game is restarted.";
 
+#define ccn_binocs_trigger_block "ac_binocs_trigger_block"
+const char *chm_binocs_trigger_block = ccn_binocs_trigger_block" [boolean]\n     Enables/disables anti-cheat protection against forced binoculars effect on hit (1 = enabled, 0 = disabled).";
+
+#define ccn_dragon_trigger_block "ac_dragon_trigger_block"
+const char *chm_dragon_trigger_block = ccn_dragon_trigger_block" [boolean]\n     Enables/disables anti-cheat protection against forced dragonification effect on hit (1 = enabled, 0 = disabled).";
+
+
 #define ccn_legacy_mode "legacy_mode"
 const char *chm_legacy_mode = ccn_legacy_mode"\n"
 "    Checks whether Legacy Mode is enabled (Dark Souls Overhaul Mod).\n    Note: Legacy Mode cannot be toggled. Exit the game and set the LegacyMode setting\n"
@@ -88,6 +95,10 @@ const char *chm_hud_compass_bar = ccn_hud_compass_bar" [boolean] \n"
 #define ccn_hud_elevation_meter "hud_elevation_meter"
 const char *chm_hud_elevation_meter = ccn_hud_elevation_meter" [boolean] \n"
 "    Enables/disables elevation meter HUD element from the Debug build.";
+
+#define ccn_hud_node_graph "hud_node_graph"
+const char *chm_hud_node_graph = ccn_hud_node_graph" [boolean] \n"
+"    Enables/disables multiplayer node graph HUD element from the Debug build.";
 
 #define ccn_multiplayer_network "multiplayer_network"
 const char *chm_multiplayer_network = ccn_multiplayer_network" \n"

@@ -118,7 +118,7 @@ public:
     static void enable_low_fps_disconnect(bool enable);
 
     // Enables gesture cancelling via rolling
-    static bool enable_gesture_cencelling();
+    static bool enable_gesture_cancelling();
 
 
 
@@ -129,7 +129,7 @@ public:
     // Set available pool of memory that Dark Souls allocates for itself
     static void set_memory_limit(uint32_t mem_limit);
 
-    // Allow effect ids to be transfered between clients without bounds restrictions
+    // Allow effect IDs to be transferred between clients without bounds restrictions
     static void unrestrict_network_synced_effectids();
 
     // Two-part patch to increase the multiplayer phantom limit:
@@ -153,6 +153,8 @@ public:
         static void set_show_compass_bar(bool enable);
         static bool get_show_elevation_meter();
         static void set_show_elevation_meter(bool enable);
+        static bool get_show_node_graph();
+        static void set_show_node_graph(bool enable, bool game_flag_only = true);
     };
 
 
@@ -163,33 +165,42 @@ public:
     class Files {
     public:
 
-        // @TODO: Create struct to hold handle, I/O offset, default file name, and custom file name for the monitored files (.sl2, .bhd5, .bdt)
+        enum IoMonitorIndex {
+            BHD0 = 0,
+            BHD1 = 1,
+            BHD2 = 2,
+            BHD3 = 3,
+            BDT0 = 4,
+            BDT1 = 5,
+            BDT2 = 6,
+            BDT3 = 7,
+            SL2 = 8
+        };
 
-        // If true, console messages will be printed when the game performs certain actions on the game files
-        static bool monitor_file_activity; // @TODO: Re-implement this (accidentally lost a lot of un-committed code somehow)
+        // Structure for managing game file I/O
+        struct IoMonitor {
+            HANDLE handle = NULL;
+            uint32_t io_pos = 0;
+            bool monitor = false;
+            std::string  default_filename;
+            std::wstring default_filename_w;
+            // @TODO: Fill in custom filename (if a custom file path was specified)
+            std::string  custom_filename;
+            std::wstring custom_filename_w;
+        };
 
-        // File handles for archive header files
-        static std::vector<HANDLE> bhd_handles;
+        // Strutures for tracking file I/O data for the game's BDT, BHD5, and SL2 files
+        static IoMonitor io_monitors[9];
 
-        // File I/O positions for archive header files
-        static std::vector<uint32_t> bhd_io_pos;
-
-        // File handles for archive files
-        static std::vector<HANDLE> bdt_handles;
-
-        // File I/O positions for archive files
-        static std::vector<uint32_t> bdt_io_pos;
-
-        // File handle for save file
-        static HANDLE sl2_handle;
-
-        // File I/O position for save file
-        static uint32_t sl2_io_pos;
+        // Default save file path used by the game
+        static std::string default_save_file_path;
 
 
+        // Returns the address of the file I/O monitoring struct corresponding to the specified file handle
+        static IoMonitor *io_monitor_from_handle(HANDLE handle);
 
-        // Returns the name of the game file that the specified file handle corresponds to
-        static const char* default_filename_from_handle(HANDLE handle, std::string& filename);
+        // Initializes game file I/O monitor structs
+        static void init_io_monitors();
 
         // Patches game calls to CreateFileW, redirecting them to Game::intercept_create_file()
         static void apply_function_intercepts();
@@ -203,11 +214,7 @@ public:
         // Checks if custom game config file exists (.ini)
         static void check_custom_game_config_file_path();
 
-        // Removes the specified file handle from the list of monitored file handles
-        static void forget_file_handle(HANDLE handle);
-
-        // Updates the I/O offset of a monitored game file
-        static uint32_t update_file_position(HANDLE handle, int32_t offset, bool absolute_offset = false);
+        
 
                                             
                                             //////////////////////////////////////////////////////////

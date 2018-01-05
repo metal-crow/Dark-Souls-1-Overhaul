@@ -32,12 +32,12 @@
 #include <vector>
 
 
-struct RgbaColor {
+typedef struct RgbaColor {
     float r;
     float g;
     float b;
     float a;
-};
+} Ds1Color;
 
 typedef struct GameCoordinates {
     float x;
@@ -87,6 +87,7 @@ public:
     static const uint8_t CHECKSUM_FOOTER_DEFAULT[16];
 
     static const uint32_t SAVE_SLOT_SIZE_DEFAULT = 393248;
+    static const uint32_t SAVE_FILE_SIZE_DEFAULT = 4326432;
 
     // Maximum number of attunement slots in unmodified game (10 from maxed Attunement stat + 1 each from Darkmoon & White Seance Rings)
     static const uint32_t ATTUNEMENT_MAX_DEFAULT = 12;
@@ -126,8 +127,8 @@ public:
     /*
         Note: Save slot title is not the same as character name.
         
-        Slot titles are null-terminated wide-character strings following a preset structure:
-            "USER_DATA000", where "000" is the save slot index
+        Slot titles are null-terminated wide-character strings following a preset format:
+            "USER_DATA***", where "***" is the save slot index ("000" to "999")
 
         Total size: 26 bytes (0x1A)
     */
@@ -721,7 +722,7 @@ public:
                         case 10:
                             // Summon sign container
                             if (container.length > 8) {
-                                print_console("initializing signs container...");
+                                //print_console("initializing signs container...");
                                 summon_signs[1] = SummonSigns(container.start());
                             }
                             break;
@@ -788,10 +789,6 @@ public:
             return (header->slot_size + 12); // Or (header->slot_size + header->padding_size) ?
         }
 
-        uint32_t next_slot() {
-            return (((uint32_t)end_data) + 28); // + 16 + 12
-        }
-
         uint32_t calculate_checksums(std::vector<uint8_t> &store_primary, std::vector<uint8_t> &store_secondary) {
             
             uint32_t return_val = FileUtil::calculate_md5_hash(((uint8_t*)(start_data->checksum_header)) + 20, size() - 36, 16, store_secondary);
@@ -821,7 +818,6 @@ public:
             FileUtil::calculate_md5_hash(((uint8_t*)(start_data->checksum_header)) + 20, size() - 36, 16, calculated_secondary);
             for (int b = 0; b < (int)sizeof(Sl2SaveFile::CHECKSUM_FOOTER_DEFAULT); b++) {
                 if (calculated_secondary[b] != end_data->checksum[b]) {
-                    print_console("Invalid footer checksum");
                     return false;
                 }
             }
@@ -830,7 +826,6 @@ public:
             FileUtil::calculate_md5_hash(((uint8_t*)(start_data->checksum_header)) + 16, size() - 16, 16, calculated_primary);
             for (int b = 0; b < (int)sizeof(Sl2SaveFile::CHECKSUM_HEADER_DEFAULT); b++) {
                 if (calculated_primary[b] != start_data->checksum_header[b]) {
-                    print_console("Invalid header checksum");
                     return false;
                 }
             }
@@ -843,13 +838,6 @@ public:
                 calc_prim += FileUtil::to_hex_string(calculated_primary[b], tmp);
                 calc_sec += FileUtil::to_hex_string(calculated_secondary[b], tmp);
             }
-            print_console("");
-            print_console("Current secondary:    " + check_sec);
-            print_console("Calculated secondary: " + calc_sec);
-            print_console("");
-            print_console("Current primary:      " + check_prim);
-            print_console("Calculated primary:   " + calc_prim);
-            print_console("");
 
             return true;
         }
@@ -870,6 +858,106 @@ public:
         }
     } Save;
 
+
+    typedef class MainMenuSlot {
+    public:
+
+        #pragma pack(push, 1)
+        struct StartData {
+            uint8_t checksum_header[16];
+            uint32_t length;
+            uint32_t version; // Should be 19 (0x13), but some other values also work (Invalid value yields error message with string ID = 45001)
+            uint16_t unknown_data0[3];
+            uint8_t unknown_data1; // Thought this was # of slots, but not sure anymore
+            uint8_t unknown_flags0[8];
+            uint8_t unknown_data2;
+            uint8_t slot_occupied[10]; // Each flag (1 or 0) denotes whether a saved character resides in the corresponding save slot (Array length = Sl2Header.slot_count - 1)
+            uint8_t unknown_flags1[6];
+        };
+        #pragma pack(pop)
+
+        #pragma pack(push, 1)
+        typedef struct CharacterData {
+
+            typedef struct CharacterPreview {
+                uint32_t unknown_data0[6];
+                RgbaColor hair_color;
+                RgbaColor eye_color;
+                uint8_t face_geo_data[50];
+                uint8_t skin_tone;
+                uint8_t face_tex_data[49];
+                uint8_t unknown_data1[60];
+                // Equipment IDs
+                uint32_t L_hand_primary;
+                uint32_t R_hand_primary;
+                uint32_t L_hand_secondary;
+                uint32_t R_hand_secondary;
+                uint32_t L_arrows;
+                uint32_t L_bolts;
+                uint32_t R_arrows;
+                uint32_t R_bolts;
+                uint32_t head;
+                uint32_t torso;
+                uint32_t hands;
+                uint32_t legs;
+                uint32_t hairstyle;
+                uint32_t L_ring;
+                uint32_t R_ring;
+                uint32_t belt[5]; // belt[0] is ID of left-most belt (Quickslot) item
+                uint32_t unknown_data2[2];
+            } CharPreview;
+
+
+            wchar_t name[14];
+            uint32_t unknown_data0[2];
+            uint32_t level; // Soul level
+            uint32_t playtime = 0; // Total playtime in seconds; overflows at 999:59:59 (3599999)
+            uint32_t earned_souls = 0; // Unconfirmed?
+            uint16_t unknown_data1[2];
+            uint32_t location; // Game world location string ID from .fmg file in msg/<LANGUAGE>/item.msgbnd.dcx
+            CharPreview char_preview;
+            uint16_t unknown_data2[4];
+
+        } CharData;
+        #pragma pack(pop)
+
+        StartData *start_data;
+        CharData *char_previews; // Array of character previews
+        uint8_t (*checksum_footer)[16];
+        uint8_t *padding; // Array with length = Sl2Header.slot_headers[Sl2Header.slot_count - 1]->padding_size
+
+
+        // Instance data
+        void *file_start;
+        SaveHeader *header;
+        wchar_t *title;
+
+        uint32_t file_start_val() {
+            return (uint32_t)file_start;
+        }
+
+        int unsigned slot_count() {
+            return ((Sl2SaveFile::Header*)file_start)->slot_count - 1;
+        }
+
+        // Constructor
+        MainMenuSlot(void *new_file_start, SaveHeader *new_header) : file_start(new_file_start), header(new_header)
+        {
+            title = (wchar_t*)(file_start_val() + header->title_offset);
+            
+            start_data = (StartData*)(file_start_val() + header->offset);
+            char_previews = (CharData*)(start_data + 1);
+            checksum_footer = (uint8_t(*)[16])((((uint32_t)start_data) + header->slot_size) - 16);
+            padding = (uint8_t*)(checksum_footer + 1);
+        }
+        MainMenuSlot() {}
+
+        // Destructor
+        ~MainMenuSlot()
+        {}
+
+    } MainMenuData;
+
 private:
 
 
@@ -884,14 +972,14 @@ public:
     // uint8_t *slot_titles_pad;
 
     std::vector<SaveSlot> saves = std::vector<SaveSlot>();
-
+    MainMenuData main_menu;
 
     Sl2SaveFile(void *new_start): header((Header*)new_start), slot_headers((SaveHeader*)(&header[1])), slot_titles((SaveTitle*)(((uint32_t)new_start) + slot_headers[0].title_offset))
     {
-        // @TODO: Implement MainMenuSlot class
-        for (int i = 0; i < (int)header->slot_count; i++) {
+        for (int i = 0; i < (int)(header->slot_count - 1); i++) {
             saves.push_back(SaveSlot(new_start, &slot_headers[i]));
         }
+        main_menu = MainMenuData(new_start, &slot_headers[header->slot_count - 1]);
     };
 
     Sl2SaveFile() {}
@@ -906,7 +994,86 @@ public:
         return (FileUtil::dump_file(header, total_size(), new_file_name) == ERROR_SUCCESS);
     }
 
+
+
     /*
+        Creates an empty save file
+    */
+    static uint32_t generate_empty_save_file(const char *new_filename = NULL, bool overwrite = false) {
+        std::string base_filename, filename;
+        if (new_filename == NULL) {
+            base_filename = Sl2SaveFile::FILE_NAME_DEFAULT;
+        } else {
+            base_filename = new_filename;
+        }
+        filename = base_filename;
+
+        if (!overwrite) {
+            int unsigned file_count = 1;
+            while (FileUtil::file_exists(filename.c_str()) && file_count < 100) {
+                if (file_count < 10) {
+                    filename = base_filename + "_0" + std::to_string(file_count);
+                } else {
+                    filename = base_filename + "_" + std::to_string(file_count);
+                }
+                file_count++;
+            }
+            if (file_count >= 100 && FileUtil::file_exists(filename.c_str())) {
+                // Too many save files; don't create a new one
+                return ERROR_FILE_EXISTS;
+            }
+        }
+
+        void *buff = CoTaskMemAlloc(Sl2SaveFile::SAVE_FILE_SIZE_DEFAULT);
+        if (buff == NULL) {
+            return ERROR_OUTOFMEMORY;
+        }
+        memset(buff, 0, Sl2SaveFile::SAVE_FILE_SIZE_DEFAULT);
+
+        Sl2SaveFile::Header tmp_header;
+        Sl2SaveFile::SaveSlotHeader tmp_save_header;
+        tmp_save_header.offset = tmp_header.size;
+        tmp_save_header.title_offset = sizeof(Sl2SaveFile::Header) + (sizeof(Sl2SaveFile::SaveSlotHeader) * Sl2SaveFile::SLOT_COUNT_DEFAULT);
+        Sl2SaveFile::SaveSlotTitle tmp_save_title;
+        memcpy_s(buff, Sl2SaveFile::SAVE_FILE_SIZE_DEFAULT, &tmp_header, sizeof(Sl2SaveFile::Header));
+        uint32_t tmp_offset = sizeof(Sl2SaveFile::Header);
+        // Write non-zero data
+        for (int i = 0; i < Sl2SaveFile::SLOT_COUNT_DEFAULT; i++) {
+            // Write save slot header data
+            if (i > 0) {
+                tmp_save_header.offset += Sl2SaveFile::SAVE_SLOT_SIZE_DEFAULT;
+                tmp_save_header.title_offset += sizeof(Sl2SaveFile::SaveSlotTitle);
+                memcpy_s((void*)(((uint32_t)buff) + (tmp_save_header.offset - (12 + sizeof(Sl2SaveFile::CHECKSUM_FOOTER_DEFAULT)))), Sl2SaveFile::SAVE_FILE_SIZE_DEFAULT - tmp_save_header.offset, Sl2SaveFile::CHECKSUM_FOOTER_DEFAULT, sizeof(Sl2SaveFile::CHECKSUM_FOOTER_DEFAULT));
+            }
+            memcpy_s((void*)(((uint32_t)buff) + tmp_offset), Sl2SaveFile::SAVE_FILE_SIZE_DEFAULT - tmp_offset, &tmp_save_header, sizeof(Sl2SaveFile::SaveSlotHeader));
+            tmp_offset += sizeof(Sl2SaveFile::SaveSlotHeader);
+            
+            // Write save slot title data
+            std::wstring index_str = L"0";
+            if (i < 10) {
+                index_str += L"0";
+            }
+            index_str += std::to_wstring(i);
+            tmp_save_title.index[1] = index_str.c_str()[1];
+            tmp_save_title.index[2] = index_str.c_str()[2];
+            memcpy_s((void*)(((uint32_t)buff) + tmp_save_header.title_offset), Sl2SaveFile::SAVE_FILE_SIZE_DEFAULT - tmp_save_header.title_offset, &tmp_save_title, sizeof(Sl2SaveFile::SaveSlotTitle));
+        
+            memcpy_s((void*)(((uint32_t)buff) + tmp_save_header.offset), Sl2SaveFile::SAVE_FILE_SIZE_DEFAULT - tmp_save_header.offset, Sl2SaveFile::CHECKSUM_HEADER_DEFAULT, sizeof(Sl2SaveFile::CHECKSUM_HEADER_DEFAULT));
+            *(uint32_t*)(((uint32_t)buff) + tmp_save_header.offset + sizeof(Sl2SaveFile::CHECKSUM_HEADER_DEFAULT)) = (Sl2SaveFile::SAVE_SLOT_SIZE_DEFAULT - (sizeof(Sl2SaveFile::CHECKSUM_HEADER_DEFAULT) + sizeof(Sl2SaveFile::CHECKSUM_FOOTER_DEFAULT)));
+        }
+
+        // Write MainMenuSlot footer checksum
+        memcpy_s((void*)(((uint32_t)buff) + ((tmp_save_header.offset + Sl2SaveFile::SAVE_SLOT_SIZE_DEFAULT) - (12 + sizeof(Sl2SaveFile::CHECKSUM_FOOTER_DEFAULT)))), Sl2SaveFile::SAVE_FILE_SIZE_DEFAULT - tmp_save_header.offset, Sl2SaveFile::CHECKSUM_FOOTER_DEFAULT, sizeof(Sl2SaveFile::CHECKSUM_FOOTER_DEFAULT));
+
+        FileUtil::dump_file(buff, Sl2SaveFile::SAVE_FILE_SIZE_DEFAULT, filename.c_str(), overwrite);
+        CoTaskMemFree(buff);
+        return ERROR_SUCCESS;
+    }
+
+
+    /*
+        EXPERIMENTAL FUNCTION (UNFINISHED)
+
         Generates an empty save slot in the given buffer. If buffer is not NULL, it is assumed to be at least 393,248 bytes,
         which is the amount of memory this function uses to create an empty save slot. If buffer is NULL, 393,248 bytes of
         memory are allocated using CoTaskMemAlloc, and must be manually freed by the caller with CoTaskMemFree.
@@ -946,7 +1113,7 @@ public:
 
 
     /*
-    
+        EXPERIMENTAL FUNCTION (UNFINISHED)
     */
     bool insert_new_save_slot(const char *new_file_name) {
         if (new_file_name == NULL) {

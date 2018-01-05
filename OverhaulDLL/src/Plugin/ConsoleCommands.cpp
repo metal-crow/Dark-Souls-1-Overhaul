@@ -12,6 +12,7 @@
 
 #include "DllMain.h"
 #include "Plugin/ConsoleCommands.h"
+#include "AntiCheat.h"
 
 
 ///////////////////////////////////////////////////////////
@@ -93,6 +94,80 @@ int cc_cheats(std::vector<std::string> args, std::string *output)
 
     return return_val;
 }
+
+
+// Enables/disables anti-cheat protection against forced binoculars effect on hit
+int cc_binocs_trigger_block(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = CONSOLE_COMMAND_SUCCESS;
+    if (args.size() > 0)
+    {
+        switch (parse_toggle_arg(args.at(0).c_str()))
+        {
+            case 0:
+                if (BinocsTriggerBlock::active) {
+                    BinocsTriggerBlock::disable();
+                }
+                break;
+            case 1:
+                if (!BinocsTriggerBlock::active) {
+                    BinocsTriggerBlock::enable();
+                }
+                break;
+            default:
+                output->append(ERROR_INVALID_BOOL_ARGUMENT + "\n");
+                ret_val = ERROR_INVALID_PARAMETER;
+                break;
+        }
+    }
+
+    if (BinocsTriggerBlock::active)
+    {
+        output->append("BinocsTriggerBlock = enabled");
+    }
+    else
+    {
+        output->append("BinocsTriggerBlock = disabled");
+    }
+    return ret_val;
+}
+
+// Enables/disables anti-cheat protection against forced dragonification effect on hit
+int cc_dragon_trigger_block(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = CONSOLE_COMMAND_SUCCESS;
+    if (args.size() > 0)
+    {
+        switch (parse_toggle_arg(args.at(0).c_str()))
+        {
+            case 0:
+                if (DragonTriggerBlock::active) {
+                    DragonTriggerBlock::disable();
+                }
+                break;
+            case 1:
+                if (!DragonTriggerBlock::active) {
+                    DragonTriggerBlock::enable();
+                }
+                break;
+            default:
+                output->append(ERROR_INVALID_BOOL_ARGUMENT + "\n");
+                ret_val = ERROR_INVALID_PARAMETER;
+                break;
+        }
+    }
+
+    if (DragonTriggerBlock::active)
+    {
+        output->append("DragonTriggerBlock = enabled");
+    }
+    else
+    {
+        output->append("DragonTriggerBlock = disabled");
+    }
+    return ret_val;
+}
+
 
 
 
@@ -223,6 +298,39 @@ int cc_hud_elevation_meter(std::vector<std::string> args, std::string *output)
     else
     {
         output->append("Elevation meter HUD element = disabled");
+    }
+    return ret_val;
+}
+
+
+// Enables/disables multiplayer node graph HUD element
+int cc_hud_node_graph(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = CONSOLE_COMMAND_SUCCESS;
+    if (args.size() > 0)
+    {
+        switch (parse_toggle_arg(args.at(0).c_str()))
+        {
+            case 0:
+                Hud::set_show_node_graph(false, false);
+                break;
+            case 1:
+                Hud::set_show_node_graph(true, false);
+                break;
+            default:
+                output->append(ERROR_INVALID_BOOL_ARGUMENT + "\n");
+                ret_val = ERROR_INVALID_PARAMETER;
+                break;
+        }
+    }
+
+    if (Hud::get_show_node_graph())
+    {
+        output->append("Multiplayer node graph HUD element = enabled");
+    }
+    else
+    {
+        output->append("Multiplayer node graph HUD element = disabled");
     }
     return ret_val;
 }
@@ -446,6 +554,9 @@ void Mod::register_console_commands()
     register_console_command(ccn_hud_compass_radial, cc_hud_compass_radial, chm_hud_compass_radial);
     register_console_command(ccn_hud_compass_bar, cc_hud_compass_bar, chm_hud_compass_bar);
     register_console_command(ccn_hud_elevation_meter, cc_hud_elevation_meter, chm_hud_elevation_meter);
+    register_console_command(ccn_hud_node_graph, cc_hud_node_graph, chm_hud_node_graph);
+    register_console_command(ccn_binocs_trigger_block, cc_binocs_trigger_block, chm_binocs_trigger_block);
+    register_console_command(ccn_dragon_trigger_block, cc_dragon_trigger_block, chm_dragon_trigger_block);
 
 
 #ifdef _DS1_OVERHAUL_MOD_DBG_
