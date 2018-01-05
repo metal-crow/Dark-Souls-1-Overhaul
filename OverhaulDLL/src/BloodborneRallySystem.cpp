@@ -47,16 +47,13 @@ void BloodborneRally::start() {
     write_address = (uint8_t*)(BloodborneRally::main_rally_injection_offset + ((uint32_t)Game::ds1_base));
     set_mem_protection(write_address, 6, MEM_PROTECT_RWX);
     inject_jmp_5b(write_address, &main_rally_injection_return, 1, &BloodborneRally::main_rally_injection);
-
-    //prevent first hit having a beforehit hp of zero
-    *beforehit_hp_ptr = UINT16_MAX;
 }
 
-static DWORD WINAPI Apply_rally_capable_sfx(void*);
+static DWORD WINAPI Apply_rally_capable_sfx_and_starting_hp(void*);
 
-void BloodborneRally::start_vfx_thread() {
-    //start new thread dedicated to applying rally-capable weapon sfx
-    CreateThread(NULL, 0, Apply_rally_capable_sfx, NULL, 0, NULL);
+void BloodborneRally::on_char_load() {
+    //start new thread dedicated to applying rally-capable weapon sfx and setting the starting hp
+    CreateThread(NULL, 0, Apply_rally_capable_sfx_and_starting_hp, NULL, 0, NULL);
 }
 
 void __declspec(naked) __stdcall BloodborneRally::weapon_toggle_injection() {
@@ -364,48 +361,62 @@ void __declspec(naked) __stdcall BloodborneRally::main_rally_injection() {
 #define RALLY_CAPABLE_WEAPON_EFFECT_ID_RHAND 92001
 #define RALLY_CAPABLE_WEAPON_EFFECT_ID_LHAND 92002
 
-static DWORD WINAPI Apply_rally_capable_sfx(void* unused) {
+static DWORD WINAPI Apply_rally_capable_sfx_and_starting_hp(void* unused) {
+    int char_status = DS1_PLAYER_STATUS_LOADING;
+
     uint32_t weaponid_R = 0;
     uint32_t weaponid_L = 0;
 
     while (true) {
-        __asm {
-            mov  eax, DWORD PTR ds:0x0137D644
-            mov  eax, [eax + 0x3C]
-            mov  eax, [eax + 0x30]
-            mov  eax, [eax + 0xC]
-            mov  eax, [eax + 0x654]
-            mov  ebx, [eax + 0x1F8] //grabs the R-hand weapon's id
-            mov  weaponid_R, ebx
-            mov  ebx, [eax + 0x1B4] //grabs the L-hand weapon's id
-            mov  weaponid_L, ebx
+        //prevent first hit having a beforehit hp of zero
+        *beforehit_hp_ptr = UINT16_MAX;
+
+        //only apply the rally sfx if character is loaded
+        Game::player_char_status.read(&char_status);
+
+        while (char_status != DS1_PLAYER_STATUS_LOADING) {
+            __asm {
+                mov  eax, DWORD PTR ds : 0x0137D644
+                mov  eax, [eax + 0x3C]
+                mov  eax, [eax + 0x30]
+                mov  eax, [eax + 0xC]
+                mov  eax, [eax + 0x654]
+                mov  ebx, [eax + 0x1F8] //grabs the R-hand weapon's id
+                mov  weaponid_R, ebx
+                mov  ebx, [eax + 0x1B4] //grabs the L-hand weapon's id
+                mov  weaponid_L, ebx
+            }
+
+            //There appears to be some bug here where both the effects cannot be applied simultaneously
+            //But it just alternates which is applied, so it works ok
+            if ((weaponid_R >= PRISCILLADAGGER_ID && weaponid_R <= (PRISCILLADAGGER_ID + 5)) ||
+                (weaponid_R >= VELKASRAPIER_ID && weaponid_R <= (VELKASRAPIER_ID + 5)) ||
+                (weaponid_R / 100 % 10 == 7)
+                )
+            {
+                __asm {
+                    push  RALLY_CAPABLE_WEAPON_EFFECT_ID_RHAND
+                    push  10000
+                    call[lua_SetEventSpecialEffect_2]
+                }
+            }
+
+            if ((weaponid_L >= PRISCILLADAGGER_ID && weaponid_L <= (PRISCILLADAGGER_ID + 5)) ||
+                (weaponid_L >= VELKASRAPIER_ID && weaponid_L <= (VELKASRAPIER_ID + 5)) ||
+                (weaponid_L / 100 % 10 == 7)
+                )
+            {
+                __asm {
+                    push  RALLY_CAPABLE_WEAPON_EFFECT_ID_LHAND
+                    push  10000
+                    call[lua_SetEventSpecialEffect_2]
+                }
+            }
+
+            Game::player_char_status.read(&char_status);
         }
 
-        //There appears to be some bug here where both the effects cannot be applied simultaneously
-        //But it just alternates which is applied, so it works ok
-        if ((weaponid_R >= PRISCILLADAGGER_ID && weaponid_R <= (PRISCILLADAGGER_ID + 5)) ||
-            (weaponid_R >= VELKASRAPIER_ID && weaponid_R <= (VELKASRAPIER_ID + 5)) ||
-            (weaponid_R / 100 % 10 == 7)
-            )
-        {
-            __asm {
-                push  RALLY_CAPABLE_WEAPON_EFFECT_ID_RHAND
-                push  10000
-                call  [lua_SetEventSpecialEffect_2]
-            }
-        }
-
-        if ((weaponid_L >= PRISCILLADAGGER_ID && weaponid_L <= (PRISCILLADAGGER_ID + 5)) ||
-            (weaponid_L >= VELKASRAPIER_ID && weaponid_L <= (VELKASRAPIER_ID + 5)) ||
-            (weaponid_L / 100 % 10 == 7)
-            )
-        {
-            __asm {
-                push  RALLY_CAPABLE_WEAPON_EFFECT_ID_LHAND
-                push  10000
-                call  [lua_SetEventSpecialEffect_2]
-            }
-        }
+        Sleep(500);
     }
 
     return 0;

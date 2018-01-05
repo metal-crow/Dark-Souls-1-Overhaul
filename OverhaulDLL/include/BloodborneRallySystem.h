@@ -11,7 +11,7 @@ class BloodborneRally
 {
 public:
     static void start();
-    static void start_vfx_thread();
+    static void on_char_load();
 private:
     static const uint32_t weapon_toggle_injection_offset = 0xB37F31;
     static void __stdcall weapon_toggle_injection();
