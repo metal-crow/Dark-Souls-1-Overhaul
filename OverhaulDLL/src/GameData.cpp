@@ -473,7 +473,7 @@ void Game::enable_armor_sfx(bool enable)
         else
         {
             Params::Armor().get(i)->defenseMaterial = 0;
-            Params::Armor().get(i)->defenseMaterial_Weak = 0;
+            //Params::Armor().get(i)->defenseMaterial_Weak = 0;
         }
     }
 }

@@ -37,6 +37,10 @@ int kf_toggle_dim_lava();
 // Toggles armor sound effects
 int kf_toggle_armor_sfx();
 
+// Next/previous save file
+int kf_save_file_next();
+int kf_save_file_prev();
+
 // Toggles for additional HUD elements
 int kf_toggle_hud_compass_radial();
 int kf_toggle_hud_compass_bar();

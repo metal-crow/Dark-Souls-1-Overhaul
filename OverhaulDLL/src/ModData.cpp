@@ -43,6 +43,9 @@ bool Mod::legacy_mode = false;
 // Cheats on/off. If cheats are enabled, saving and multiplayer are disabled until the game is restarted
 bool Mod::cheats = false;
 
+// Cheats warning message on/off
+bool Mod::cheats_warning = true;
+
 // Determines to disable the game's "Low framerate detected" disconnection
 bool Mod::disable_low_fps_disconnect = true;
 
@@ -143,6 +146,8 @@ void Mod::get_user_preferences()
     // Begin loading setting preferences
     print_console(Mod::output_prefix + "Loading user preferences...");
 
+    Mod::cheats_warning = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_CHEATS_WARNING_, (int)Mod::cheats_warning, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+
     Mod::disable_low_fps_disconnect = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DISABLE_LOW_FPS_DISCONNECT_, (int)Mod::disable_low_fps_disconnect, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
 
     // Display multiplayer node count in text feed info header
@@ -215,6 +220,10 @@ void Mod::get_user_keybinds()
 
     // Toggle armor sound effects
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_ARMOR_SFX_, kf_toggle_armor_sfx);
+
+    // Next/previous save file
+    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_SAVE_FILE_NEXT_, kf_save_file_next);
+    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_SAVE_FILE_PREV_, kf_save_file_prev);
 
     // Toggle additional HUD elements
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_COMPASS_RADIAL_, kf_toggle_hud_compass_radial);

@@ -20,10 +20,11 @@
 
 
 enum DS1_GAME_VERSION_ENUM {
-    DS1_VERSION_DEBUG = 0x2C,		// 44
-    DS1_VERSION_STEAM_BETA = 0x2D,	// 45
-    DS1_VERSION_RELEASE = 0x2E,		// 46
-    DS1_VERSION_OVERHAUL = 0x3C		// 60
+    DS1_VERSION_DEBUG = 0x2C,          // 44
+    DS1_VERSION_STEAM_BETA = 0x2D,     // 45
+    DS1_VERSION_RELEASE = 0x2E,        // 46
+    DS1_VERSION_OVERHAUL = 0x3C,       // 60
+    DS1_VERSION_OVERHAUL_CHEATS = 0x3D // 61     // Multiplayer network for players that have cheats enabled
 };
 
 enum DS1_PLAYER_STATUS_ENUM {
@@ -195,6 +196,9 @@ public:
         // Default save file path used by the game
         static std::string default_save_file_path;
 
+        // Index of the save file currently being read/written by the game
+        static int save_file_index;
+
 
         // Returns the address of the file I/O monitoring struct corresponding to the specified file handle
         static IoMonitor *io_monitor_from_handle(HANDLE handle);
@@ -213,6 +217,18 @@ public:
 
         // Checks if custom game config file exists (.ini)
         static void check_custom_game_config_file_path();
+
+        // Returns the full file path of the current save file (with index)
+        static const wchar_t *get_save_file_path(std::wstring &buffer);
+
+        // Changes the current save file index (and writes all corresponding data)
+        static void set_save_file_index(int unsigned index, bool print_output = true);
+
+        // Changes the to the next save file (if current save file is the last one, new file is first save file)
+        static void set_save_file_next(bool print_output = true);
+
+        // Changes the to the previous save file (if current save file is the first one, new file is last save file)
+        static void set_save_file_prev(bool print_output = true);
 
         
 

@@ -997,6 +997,145 @@ public:
 
 
     /*
+        Returns the number of save files with the specified base file name
+
+        @param filename      Base file name for the save file (no index)
+        @param char_count    (Optional) Buffer to store total number of saved characters across all save files
+        @param first_free    (Optional) Buffer to store the file and slot index for the first free character slot
+                             across all save files as a tuple {file, slot}. Returns {-1, -1} if no free slots exist.
+    */
+    static int get_save_file_count(const char *filename, int *char_count = NULL, std::tuple<int, int> *first_free = NULL) {
+        int count = 0;
+        std::string file;
+        if (filename == NULL) {
+            SetLastError(ERROR_INVALID_ADDRESS);
+            return -1;
+        }
+        if (char_count != NULL) {
+            *char_count = 0;
+        }
+        if (first_free != NULL) {
+            std::get<0>(*first_free) = -1;
+            std::get<1>(*first_free) = -1;
+        }
+
+        file = filename;
+        while (FileUtil::file_exists(file.c_str())) {
+            int first_free_slot = -1;
+            int n = Sl2SaveFile::get_occupied_slot_count_from_file(file.c_str(), &first_free_slot);
+            // Save first free character slot
+            if (first_free != NULL && std::get<0>(*first_free) < 0 && first_free_slot >= 0) {
+                std::get<0>(*first_free) = count;
+                std::get<1>(*first_free) = first_free_slot;
+            }
+            if (char_count != NULL && n >= 0) {
+                *char_count += n;
+            }
+            count++;
+            if (count < 10) {
+                file = std::string(filename) + "_0" + std::to_string(count);
+            } else {
+                file = std::string(filename) + "_" + std::to_string(count);
+            }
+            if (count >= 99) {
+                break;
+            }
+        }
+        return count;
+    }
+
+    /*
+        Returns the number of occupied save slots in the specified save file
+    */
+    static int get_occupied_slot_count_from_file(const char *filename, int *first_free = NULL) {
+        int slot_count = 0;
+        Header header;
+        uint8_t *slot_flags = NULL;
+        uint32_t menu_slot_offset = 0;
+        if (filename == NULL) {
+            SetLastError(ERROR_INVALID_ADDRESS);
+            return -1;
+        } else if (!FileUtil::file_exists(filename)) {
+            SetLastError(ERROR_FILE_NOT_FOUND);
+            return -1;
+        }
+        if (first_free != NULL) {
+            *first_free = -1;
+        }
+
+        // Read save file size and slot count data
+        if (FileUtil::read_from_offset(filename, 0, sizeof(header), &header, false) == NULL) {
+            SetLastError(ERROR_READ_FAULT);
+            return -1;
+        }
+        slot_flags = (uint8_t*)CoTaskMemAlloc(sizeof(uint8_t) * (header.slot_count - 1));
+        if (slot_flags == NULL) {
+            SetLastError(ERROR_OUTOFMEMORY);
+            return -1;
+        }
+
+        // Read menu slot offset
+        if (FileUtil::read_from_offset(filename, sizeof(header) + 16 + (sizeof(SaveSlotHeader) * (header.slot_count - 1)), sizeof(menu_slot_offset), &menu_slot_offset, false) == NULL) {
+            SetLastError(ERROR_READ_FAULT);
+            CoTaskMemFree(slot_flags);
+            return -1;
+        }
+
+        // Read save slot flags
+        if (FileUtil::read_from_offset(filename, menu_slot_offset + 40, sizeof(uint8_t) * (header.slot_count - 1), slot_flags, false) == NULL) {
+            SetLastError(ERROR_READ_FAULT);
+            CoTaskMemFree(slot_flags);
+            return -1;
+        }
+
+        // Count occupied save slots
+        for (int i = 0; i < (int)(header.slot_count - 1); i++) {
+            if (slot_flags[i]) {
+                slot_count++;
+            } else if (first_free != NULL && *first_free < 0) {
+                *first_free = i;
+            }
+        }
+        CoTaskMemFree(slot_flags);
+        return slot_count;
+    }
+
+    /*
+        Reads character preview data from the specified save file and stores it in memory
+        at the specified address
+    */
+    static int read_character_preview_data_from_file(const char *filename, void *buffer) {
+        Header header;
+        uint32_t menu_slot_offset = 0;
+        if (filename == NULL || buffer == NULL) {
+            SetLastError(ERROR_INVALID_ADDRESS);
+            return -1;
+        } else if (!FileUtil::file_exists(filename)) {
+            SetLastError(ERROR_FILE_NOT_FOUND);
+            return -1;
+        }
+
+        // Read save file size and slot count data
+        if (FileUtil::read_from_offset(filename, 0, sizeof(header), &header, false) == NULL) {
+            SetLastError(ERROR_READ_FAULT);
+            return -1;
+        }
+        // Read menu slot offset
+        if (FileUtil::read_from_offset(filename, sizeof(header) + 16 + (sizeof(SaveSlotHeader) * (header.slot_count - 1)), sizeof(menu_slot_offset), &menu_slot_offset, false) == NULL) {
+            SetLastError(ERROR_READ_FAULT);
+            return -1;
+        }
+
+        // Read character preview data
+        if (FileUtil::read_from_offset(filename, menu_slot_offset + 40, 16 + (sizeof(MainMenuData::CharacterData) * 10), buffer, false) == NULL) {
+            SetLastError(ERROR_READ_FAULT);
+            return -1;
+        }
+        return ERROR_SUCCESS;
+    }
+
+
+    /*
         Creates an empty save file
     */
     static uint32_t generate_empty_save_file(const char *new_filename = NULL, bool overwrite = false) {
