@@ -25,6 +25,9 @@
 // Default save file path used by the game
 std::string Files::default_save_file_path;
 
+// Index of the save file currently being read/written by the game
+int Files::save_file_index = 0;
+
 
 // Called when the game attempts to call CreateFileW
 HANDLE WINAPI Files::intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
@@ -96,11 +99,10 @@ HANDLE WINAPI Files::intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesired
                         break;
                 }
             }
-            else if ((int)Mod::custom_save_file_path.length() > 0 && (load_file_ext == SaveFile::FILE_EXT_W))
+            else if (load_file_ext == SaveFile::FILE_EXT_W)
             {
                 // Intercept save file load (.sl2)
                 print_action = Mod::Debug::monitor_sl2;
-                load_file = Mod::custom_save_file_path;
                 return_val = &Files::io_monitors[SL2].handle;
                 Files::io_monitors[SL2].io_pos = 0;
 
@@ -112,6 +114,53 @@ HANDLE WINAPI Files::intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesired
                         print_console("ERROR: Failed to obtain default save file path");
                         Files::default_save_file_path = Sl2::FILE_NAME_DEFAULT;
                     }
+
+                    // Check save files
+                    std::string save_path, current_save_file;
+                    int file_index = 0;
+                    if ((int)Mod::custom_save_file_path.length() > 0) {
+                        conversion_ret = string_wide_to_mb((wchar_t*)Mod::custom_save_file_path.c_str(), save_path);
+                        if (conversion_ret != 0) {
+                            conversion_ret = 0;
+                            save_path = Files::default_save_file_path;
+                        }
+                    } else {
+                        conversion_ret = 0;
+                        save_path = Files::default_save_file_path;
+                    }
+                    if (conversion_ret == 0) {
+                        // Count save files/characters and find first free save slot
+                        int save_file_count = 0, saved_char_count = 0;
+                        std::tuple<int, int> first_free(-1, -1);
+                        std::string free_slot_msg;
+                        save_file_count = Sl2::get_save_file_count(save_path.c_str(), &saved_char_count, &first_free);
+                        free_slot_msg = Mod::output_prefix + "Found " + std::to_string(saved_char_count) + " character";
+                        if (saved_char_count != 1) {
+                            free_slot_msg += 's';
+                        }
+                        free_slot_msg += " in " + std::to_string(save_file_count) + " save file";
+                        if (save_file_count != 1) {
+                            free_slot_msg += 's';
+                        }
+                        if (std::get<0>(first_free) >= 0 && std::get<1>(first_free) >= 0) {
+                            free_slot_msg += " (first free slot: " + std::to_string(std::get<0>(first_free)) + "," + std::to_string(std::get<1>(first_free)) + ")";
+                        }
+                        print_console(free_slot_msg);
+                        // If all save files are full, generate new (empty) save file
+                        if (std::get<0>(first_free) < 0 && std::get<1>(first_free) < 0) {
+                            if (save_file_count < 10) {
+                                current_save_file = save_path + "_0" + std::to_string(save_file_count);
+                            } else {
+                                current_save_file = save_path + "_" + std::to_string(save_file_count);
+                            }
+                            print_console(Mod::output_prefix + "No free character slots; generating next empty save file:\n    " + current_save_file);
+                            Sl2::generate_empty_save_file(current_save_file.c_str());
+                        }
+                    }
+                }
+
+                if ((int)Mod::custom_save_file_path.length() > 0) {
+                    Files::get_save_file_path(load_file);
                 }
             }
         }
@@ -124,27 +173,6 @@ HANDLE WINAPI Files::intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesired
         *return_val = CreateFileW(lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
     }
 
-    //if (save_file && (*return_val) != NULL) {
-    //    // Find open save file I/O monitor
-    //    if (Files::io_monitors[SL2_0].handle == NULL || (*return_val == Files::io_monitors[SL2_0].handle)) {
-    //        Files::io_monitors[SL2_0].io_pos = 0;
-    //        Files::io_monitors[SL2_0].handle = *return_val;
-    //    } else if (Files::io_monitors[SL2_1].handle == NULL || (*return_val == Files::io_monitors[SL2_1].handle)) {
-    //        Files::io_monitors[SL2_1].io_pos = 0;
-    //        Files::io_monitors[SL2_1].handle = *return_val;
-    //    } else if (Files::io_monitors[SL2_2].handle == NULL || (*return_val == Files::io_monitors[SL2_2].handle)) {
-    //        Files::io_monitors[SL2_2].io_pos = 0;
-    //        Files::io_monitors[SL2_2].handle = *return_val;
-    //    } else if (Files::io_monitors[SL2_3].handle == NULL || (*return_val == Files::io_monitors[SL2_3].handle)) {
-    //        Files::io_monitors[SL2_3].io_pos = 0;
-    //        Files::io_monitors[SL2_3].handle = *return_val;
-    //    } else {
-    //        // If this message ever appears, add more save file monitors -SeanP
-    //        print_console("\n!!!!!!!!!!!!!!!\nWARNING: No available save file I/O monitors (Contact Sean if you see this message)\n!!!!!!!!!!!!!!!\n");
-    //    }
-    //}
-
-    //Files::default_filename_from_handle(*return_val, fn_buff);
     IoMonitor *io_monitor = Files::io_monitor_from_handle(*return_val);
     if (io_monitor != NULL) {
         fn_buff = io_monitor->default_filename;
@@ -479,6 +507,159 @@ void Files::check_custom_game_config_file_path()
     {
         // Custom config file doesn't exist
         Mod::startup_messages.push_back(std::string(Mod::output_prefix + "WARNING: Custom config file was not found (\"").append(filename_ch).append("\"). Default configuration file will be automatically generated."));
+    }
+}
+
+// Returns the full file path of the current save file (with index)
+const wchar_t *Files::get_save_file_path(std::wstring &buffer)
+{
+    buffer.clear();
+    // Get base file name
+    if (Mod::custom_save_file_path.length() <= 0) {
+        if (Files::default_save_file_path.length() <= 0 || (string_mb_to_wide((char*)Files::default_save_file_path.c_str(), buffer) != 0)) {
+            buffer = Sl2::FILE_NAME_DEFAULT_W;
+        }
+    } else {
+        buffer = Mod::custom_save_file_path;
+    }
+    // Append index
+    if (Files::save_file_index > 0) {
+        if (Files::save_file_index < 10) {
+            buffer += L"_0" + std::to_wstring(Files::save_file_index);
+        } else {
+            buffer += L"_" + std::to_wstring(Files::save_file_index);
+        }
+    }
+    return buffer.c_str();
+}
+
+
+// Changes the current save file index (and writes all corresponding data)
+void Files::set_save_file_index(int unsigned index, bool print_output)
+{
+    std::string save_path;
+    int save_file_count = 0, player_char_status = DS1_PLAYER_STATUS_LOADING;
+    uint8_t saved_chars_menu_flag = 0;
+    SpPointer char_preview_data = SpPointer((void*)((uint32_t)Game::ds1_base + 0xF78700), { 0x30, 0x10 });
+    SpPointer menu_logo = SpPointer((void*)((uint32_t)Game::ds1_base + 0xF786D0), { 0x6C });
+    SpPointer saved_chars_menu_flag_ptr = SpPointer((void*)((uint32_t)Game::ds1_base + 0xF786D0), { 0x90 });
+    bool return_to_saves_screen = false;
+    if ((int)index > 99) {
+        SetLastError(ERROR_INVALID_PARAMETER);
+        return;
+    }
+    if (Game::ds1_base == NULL || char_preview_data.resolve() == NULL) {
+        SetLastError(ERROR_BAD_ENVIRONMENT);
+        return;
+    }
+    // Get base save file name
+    if (Mod::custom_save_file_path.length() <= 0) {
+        if (Files::default_save_file_path.length() <= 0) {
+            save_path = Sl2::FILE_NAME_DEFAULT;
+        } else {
+            save_path = Files::default_save_file_path;
+        }
+    } else {
+        if (string_wide_to_mb((wchar_t*)Mod::custom_save_file_path.c_str(), save_path) != 0) {
+            SetLastError(ERROR_CLUSTER_INVALID_STRING_FORMAT);
+            if (print_output)
+                print_console("ERROR: Failed to set save file index (Conversion error)");
+            return;
+        }
+    }
+    // Check if index is out of range
+    save_file_count = Sl2::get_save_file_count(save_path.c_str());
+    if ((int)index >= save_file_count) {
+        SetLastError(ERROR_RANGE_NOT_FOUND);
+        if (print_output)
+            print_console("ERROR: Failed to set save file index (out of range)");
+        return;
+    }
+    // Check if character is loaded
+    if (Game::player_char_status.read(&player_char_status) != ERROR_SUCCESS || player_char_status != DS1_PLAYER_STATUS_LOADING) {
+        SetLastError(ERROR_BAD_ENVIRONMENT);
+        if (print_output)
+            print_console("ERROR: Failed to set save file index (Character is loaded)");
+        return;
+    }
+    // Check if viewing saves menu
+    if (saved_chars_menu_flag_ptr.read(&saved_chars_menu_flag) != ERROR_SUCCESS || (saved_chars_menu_flag != 4 && saved_chars_menu_flag != 3)) {
+        SetLastError(ERROR_BAD_ENVIRONMENT);
+        if (print_output)
+            print_console("ERROR: Failed to set save file index (Must be viewing saved characters)");
+        return;
+    }
+    saved_chars_menu_flag_ptr.write((uint8_t)0);
+    Files::save_file_index = index;
+    // Get full filename (with index)
+    if (Files::save_file_index > 0) {
+        if (Files::save_file_index < 10) {
+            save_path += "_0" + std::to_string(Files::save_file_index);
+        }
+        else {
+            save_path += "_" + std::to_string(Files::save_file_index);
+        }
+    }
+    // Overwrite character preview data
+    if (Sl2::read_character_preview_data_from_file(save_path.c_str(), char_preview_data.resolve()) != ERROR_SUCCESS) {
+        if (print_output)
+            print_console("ERROR: Failed to set save file index (I/O error)");
+        saved_chars_menu_flag_ptr.write((uint8_t)3);
+        return;
+    }
+    Sleep(500);
+    // Re-load saved characters menu
+    saved_chars_menu_flag_ptr.write((uint8_t)3);
+    if (print_output)
+        print_console("Save file index changed to " + std::to_string(index));
+    SetLastError(ERROR_SUCCESS);
+}
+
+// Changes the to the next save file (if current save file is the last one, new file is first save file)
+void Files::set_save_file_next(bool print_output)
+{
+    int count;
+    std::string file;
+    if (Mod::custom_save_file_path.length() > 0) {
+        if (string_wide_to_mb((wchar_t*)Mod::custom_save_file_path.c_str(), file)) {
+            SetLastError(ERROR_CLUSTER_INVALID_STRING_FORMAT);
+            return;
+        }
+    } else if (Files::default_save_file_path.length() > 0) {
+        file = Files::default_save_file_path;
+    } else {
+        SetLastError(ERROR_FILE_NOT_FOUND);
+        return;
+    }
+    count = Sl2::get_save_file_count(file.c_str());
+    if (Files::save_file_index == (count - 1)) {
+        Files::set_save_file_index(0, print_output);
+    } else {
+        Files::set_save_file_index(Files::save_file_index + 1, print_output);
+    }
+}
+
+// Changes the to the previous save file (if current save file is the first one, new file is last save file)
+void Files::set_save_file_prev(bool print_output)
+{
+    int count;
+    std::string file;
+    if (Mod::custom_save_file_path.length() > 0) {
+        if (string_wide_to_mb((wchar_t*)Mod::custom_save_file_path.c_str(), file)) {
+            SetLastError(ERROR_CLUSTER_INVALID_STRING_FORMAT);
+            return;
+        }
+    } else if (Files::default_save_file_path.length() > 0) {
+        file = Files::default_save_file_path;
+    } else {
+        SetLastError(ERROR_FILE_NOT_FOUND);
+        return;
+    }
+    count = Sl2::get_save_file_count(file.c_str());
+    if (Files::save_file_index == 0) {
+        Files::set_save_file_index(count - 1, print_output);
+    } else {
+        Files::set_save_file_index(Files::save_file_index - 1, print_output);
     }
 }
 

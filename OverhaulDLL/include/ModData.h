@@ -38,6 +38,7 @@
 #define _DS1_OVERHAUL_PREF_DIM_LAVA_ "DimLava"
 #define _DS1_OVERHAUL_PREF_DISABLE_ARMOR_SFX_ "DisableArmorSounds"
 #define _DS1_OVERHAUL_PREF_DISABLE_LOW_FPS_DISCONNECT_ "DisableLowFpsDisconnect"
+#define _DS1_OVERHAUL_PREF_CHEATS_WARNING_ "CheatsWarning"
 // HUD settings:
 #define _DS1_OVERHAUL_PREF_COMPASS_RADIAL_ "CompassRadial"
 #define _DS1_OVERHAUL_PREF_COMPASS_BAR_ "CompassBar"
@@ -52,6 +53,8 @@
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_NODE_COUNT_ "ToggleNodeCount"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_DIM_LAVA_ "ToggleLavaBrightness"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_ARMOR_SFX_ "ToggleArmorSounds"
+#define _DS1_OVERHAUL_HOTKEY_SAVE_FILE_NEXT_ "NextSaveFile"
+#define _DS1_OVERHAUL_HOTKEY_SAVE_FILE_PREV_ "PrevSaveFile"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_COMPASS_RADIAL_ "ToggleHudCompassRadial"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_COMPASS_BAR_ "ToggleHudCompassBar"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_ELEVATION_METER_ "ToggleHudElevationMeter"
@@ -110,6 +113,9 @@ public:
 
     // Cheats on/off. If cheats are enabled, saving and multiplayer are disabled until the game is restarted
     static bool cheats;
+
+    // Cheats warning message on/off
+    static bool cheats_warning;
 
     // Determines to disable the game's "Framerate insufficient for online play" disconnection
     static bool disable_low_fps_disconnect;

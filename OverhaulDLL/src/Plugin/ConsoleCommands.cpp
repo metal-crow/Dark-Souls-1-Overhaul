@@ -13,6 +13,7 @@
 #include "DllMain.h"
 #include "Plugin/ConsoleCommands.h"
 #include "AntiCheat.h"
+#include "Save/Sl2.h"
 
 
 ///////////////////////////////////////////////////////////
@@ -67,8 +68,12 @@ int cc_cheats(std::vector<std::string> args, std::string *output)
                 if (!Mod::cheats)
                 {
                     Game::saves_enabled.write(false);
+                    Game::set_game_version(DS1_VERSION_OVERHAUL_CHEATS);
                     // @TODO: Disable multiplayer
-                    print("WARNING: Cheats enabled. Saving and multiplayer functions disabled. Restart game to disable cheats", 0, false, SP_D3D9O_TEXT_COLOR_RED);
+                    if (Mod::cheats_warning)
+                        print("WARNING: Cheats enabled. Saving and multiplayer functions disabled. Restart game to disable cheats", 0, false, SP_D3D9O_TEXT_COLOR_RED);
+                    else
+                        print_console("WARNING: Cheats enabled. Saving and multiplayer functions disabled. Restart game to disable cheats");
                 }
                 else
                     output->append("Cheats = enabled. Saving and multiplayer functions have been disabled. Restart the game to disable cheats.");
@@ -93,6 +98,107 @@ int cc_cheats(std::vector<std::string> args, std::string *output)
     }
 
     return return_val;
+}
+
+
+// Sets the current save file index (must be called while viewing saved characters menu)
+int cc_save_file_index(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = ERROR_SUCCESS;
+    int new_index = -1;
+    if (args.size() > 0)
+    {
+        if (args.at(0) == "next") {
+            SetLastError(ERROR_SUCCESS);
+            Files::set_save_file_next();
+            ret_val = GetLastError();
+        } else if (args.at(0) == "prev" || args.at(0) == "previous") {
+            SetLastError(ERROR_SUCCESS);
+            Files::set_save_file_prev();
+            ret_val = GetLastError();
+        } else {
+            // Index specified
+            try {
+                new_index = std::stoi(args.at(0).c_str(), NULL);
+            }
+            catch (std::invalid_argument) {
+                ret_val = ERROR_BAD_ARGUMENTS;
+            }
+            catch (std::out_of_range) {
+                ret_val = ERROR_RANGE_NOT_FOUND;
+            }
+        }
+        
+        if (new_index >= 0) {
+            SetLastError(ERROR_SUCCESS);
+            Files::set_save_file_index(new_index);
+            ret_val = GetLastError();
+            if (ret_val != ERROR_SUCCESS)
+            {
+                output->append("ERROR: Failed to update index\n");
+            }
+        } else if (ret_val != ERROR_SUCCESS) {
+            output->append("ERROR: Invalid argument (Index must be a positive integer)\n");
+        }
+    }
+    output->append("Save file index = " + std::to_string(Files::save_file_index));
+    return ret_val;
+}
+
+
+// Sets the current save file index to the next save file (must be called while viewing saved characters menu)
+int cc_save_file_next(std::vector<std::string> args, std::string *output)
+{
+    Files::set_save_file_next();
+    int ret_val = GetLastError();
+    output->append("Save file index = " + std::to_string(Files::save_file_index));
+    return ret_val;
+}
+
+
+// Sets the current save file index to the previous save file (must be called while viewing saved characters menu)
+int cc_save_file_prev(std::vector<std::string> args, std::string *output)
+{
+    Files::set_save_file_prev();
+    int ret_val = GetLastError();
+    output->append("Save file index = " + std::to_string(Files::save_file_index));
+    return ret_val;
+}
+
+
+// Creates a new save file with 10 empty character slots (Existing save files are not modified)
+int cc_save_file_create(std::vector<std::string> args, std::string *output)
+{
+    std::string file, out;
+    if (Mod::custom_save_file_path.length() > 0) {
+        if (string_wide_to_mb((wchar_t*)Mod::custom_save_file_path.c_str(), file)) {
+            output->append("ERROR: Failed to create new save file (Conversion error)");
+            return ERROR_CLUSTER_INVALID_STRING_FORMAT;
+        }
+        if (SaveFile::generate_empty_save_file(file.c_str())) {
+            output->append("ERROR: Failed to create new save file (Write error)");
+            return ERROR_WRITE_FAULT;
+        }
+    } else if (Files::default_save_file_path.length() > 0) {
+        if (SaveFile::generate_empty_save_file(Files::default_save_file_path.c_str())) {
+            output->append("ERROR: Failed to create new save file (Write error)");
+            return ERROR_WRITE_FAULT;
+        }
+    } else {
+        if (SaveFile::generate_empty_save_file()) {
+            output->append("ERROR: Failed to create new save file (Write error)");
+            return ERROR_WRITE_FAULT;
+        }
+    }
+    int count = Sl2::get_save_file_count(file.c_str());
+    out = "Created new save file: " + file;
+    if (count < 11) {
+        out += "_0" + std::to_string(count - 1);
+    } else {
+        out += "_" + std::to_string(count - 1);
+    }
+    output->append(out);
+    return ERROR_SUCCESS;
 }
 
 
@@ -557,6 +663,10 @@ void Mod::register_console_commands()
     register_console_command(ccn_hud_node_graph, cc_hud_node_graph, chm_hud_node_graph);
     register_console_command(ccn_binocs_trigger_block, cc_binocs_trigger_block, chm_binocs_trigger_block);
     register_console_command(ccn_dragon_trigger_block, cc_dragon_trigger_block, chm_dragon_trigger_block);
+    register_console_command(ccn_save_file_index, cc_save_file_index, chm_save_file_index);
+    register_console_command(ccn_save_file_next, cc_save_file_next, chm_save_file_next);
+    register_console_command(ccn_save_file_prev, cc_save_file_prev, chm_save_file_prev);
+    register_console_command(ccn_save_file_create, cc_save_file_create, chm_save_file_create);
 
 
 #ifdef _DS1_OVERHAUL_MOD_DBG_

@@ -173,7 +173,11 @@ __declspec(dllexport) void __stdcall main_loop()
                 // Cheats are on, but saving is enabled; disable saving
                 Game::saves_enabled.write(false);
 
-            // @TODO: Check that multiplayer is disabled (first figure out how to disable it)
+            if (Game::get_game_version() != DS1_VERSION_OVERHAUL_CHEATS)
+                // Change to network for players that have cheats enabled
+                Game::set_game_version(DS1_VERSION_OVERHAUL_CHEATS);
+
+            // @TODO: Check that multiplayer is disabled? (first figure out how to disable it)
         }
 
         // Check if the player is stuck at the bonfire, and if so, automatically apply the bonfire input fix
@@ -282,7 +286,7 @@ __declspec(dllexport) void __stdcall end_scene()
         Microsoft documentation for GetRawInputData:
         https://msdn.microsoft.com/en-us/library/windows/desktop/ms645596(v=vs.85).aspx
 
-    @return		True if the given input message should be cancelled before being sent to
+    @return     True if the given input message should be cancelled before being sent to
                 the game, thereby disabling game input. Otherwise, returns false.
 */
 __declspec(dllexport) bool __stdcall get_raw_input_data(RAWINPUT *pData, PUINT pcbSize)

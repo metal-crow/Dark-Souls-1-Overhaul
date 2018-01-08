@@ -5,6 +5,43 @@
 
 
 ------------------------------------------------------------------------------------------
+01/08/2018:
+
+- New features:
+    - Basic implementation of infinite save slots
+
+- New config settings:
+    - CheatsWarning
+	    Enables/disables permanent "Cheats enabled" warning when player enables cheats
+
+- New console commands:
+    - save_file_create
+	    Creates a new save file with 10 empty character slots (Existing save files are
+        not modified)
+    - save_file_index
+        Sets the current save file index (must be called while viewing saved characters
+        menu)
+    - save_file_next
+        Sets the current save file index to the next save file (must be called while
+        viewing saved characters menu)
+    - save_file_prev
+        Sets the current save file index to the previous save file (must be called while
+        viewing saved characters menu)
+
+- New keybinds:
+    - NextSaveFile
+	    Sets the current save file index to the next save file (only works when viewing
+        saved characters menu)
+    - PrevSaveFile
+        Sets the current save file index to the previous save file (only works when
+        viewing saved characters menu)
+		
+- Updates:
+    - When cheats are enabled, player will now be switched to a dedicated multiplayer
+      network with other players using cheats.
+
+
+------------------------------------------------------------------------------------------
 01/05/2018:
 
 - New config settings:
@@ -20,7 +57,7 @@
 	    Toggles multiplayer node graph HUD element
 		
 - Updates:
-    - Rally special effect now loops
+    - Rally special effect now loops correctly
 
 
 ------------------------------------------------------------------------------------------

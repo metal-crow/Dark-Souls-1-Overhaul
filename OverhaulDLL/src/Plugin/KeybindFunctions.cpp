@@ -82,6 +82,24 @@ int kf_toggle_armor_sfx()
 }
 
 
+// Next/previous save file
+int kf_save_file_next()
+{
+    Files::set_save_file_next(false);
+    if (GetLastError() == ERROR_SUCCESS)
+        Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
+    return ERROR_SUCCESS;
+}
+
+int kf_save_file_prev()
+{
+    Files::set_save_file_prev(false);
+    if (GetLastError() == ERROR_SUCCESS)
+        Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
+    return ERROR_SUCCESS;
+}
+
+
 // Toggles for additional HUD elements
 int kf_toggle_hud_compass_radial()
 {

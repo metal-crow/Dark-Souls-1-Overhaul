@@ -55,18 +55,29 @@ const char *chm_fix_bonfire_input = ccn_fix_bonfire_input"\n"
 "    which is a bug that can cause the player to be stuck at the bonfire (usually after restoring\n"
 "    humanity with the framerate unlocked).";
 
+#define ccn_save_file_index "save_file_index"
+const char *chm_save_file_index = ccn_save_file_index" [index|next|previous]\n     Sets the current save file index (must be called while viewing saved characters menu)";
+
+#define ccn_save_file_next "save_file_next"
+const char *chm_save_file_next = ccn_save_file_next"\n     Sets the current save file index to the next save file (must be called while viewing saved characters menu)";
+
+#define ccn_save_file_prev "save_file_previous"
+const char *chm_save_file_prev = ccn_save_file_prev"\n     Sets the current save file index to the previous save file (must be called while viewing saved characters menu)";
+
+#define ccn_save_file_create "save_file_create"
+const char *chm_save_file_create = ccn_save_file_create"\n     Creates a new save file with 10 empty character slots. Existing save files are not modified.";
 
 
 #define ccn_text_feed_node_count "text_feed_node_count"
 const char *chm_text_feed_node_count = ccn_text_feed_node_count" [boolean]\n"
-"    Enables/disables the multiplayer node count element of the overlay text feed info bar (1 = enabled, 0 = disabled).";
+"    Enables/disables the multiplayer node count element of the overlay info bar (1 = enabled, 0 = disabled).";
 #define cca_node_count "node_count"
 
 
 #define ccn_cheats "cheats"
 const char *chm_cheats = ccn_cheats" [boolean]\n"
-"    Enables cheats, unlocking additional console commands (1 = enable). If cheats are enabled, saving and multiplayer"
-"    are disabled until the game is restarted.";
+"    Enables cheats, unlocking additional console commands (1 = enable). If cheats are enabled, saving and multiplayer\n"
+"    will be disabled until the game is restarted.";
 
 #define ccn_binocs_trigger_block "ac_binocs_trigger_block"
 const char *chm_binocs_trigger_block = ccn_binocs_trigger_block" [boolean]\n     Enables/disables anti-cheat protection against forced binoculars effect on hit (1 = enabled, 0 = disabled).";
@@ -235,7 +246,7 @@ bool string_is_zero(const char *c_str)
 
 
 // Parses a string argument and determines whether it equals true, false, or neither (invalid).
-//	Return value: 1 = true; 0 = false; -1 = invalid argument
+//   Return value: 1 = true; 0 = false; -1 = invalid argument
 int parse_toggle_arg(const char *c_arg)
 {
     if (c_arg == NULL)
