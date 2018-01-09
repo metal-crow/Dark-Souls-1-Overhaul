@@ -46,7 +46,7 @@ public:
     ////////////// GAME DATA ///////////////
     ////////////////////////////////////////
 
-// Base address of Dark Souls game process
+    // Base address of Dark Souls game process
     static void *ds1_base;
 
     // Base address for player character data
@@ -82,7 +82,7 @@ public:
     /////////////// FUNCTIONS ///////////////
     /////////////////////////////////////////
 
-// Initializes pointers that depend on the game's base address
+    // Initializes pointers that depend on the game's base address
     static void init_pointers();
 
     // Runs tasks that were deferred until a character was loaded
@@ -121,6 +121,14 @@ public:
     // Enables gesture cancelling via rolling
     static bool enable_gesture_cancelling();
 
+    // Checks if player is currently locked onto an enemy
+    static bool player_is_locked_on();
+
+    // Returns current player character body animation ID (attacking, rolling, gestures, etc)
+    static int32_t get_player_body_anim_id();
+
+    // Sets whether player character will automatically turn toward enemies when locked on
+    static bool allow_rotation_when_locked_on(bool allow);
 
 
                     /////////////////////////////////////////
@@ -199,6 +207,10 @@ public:
         // Index of the save file currently being read/written by the game
         static int save_file_index;
 
+        // Pending save file index changes
+        static bool save_file_index_pending_set_next;
+        static bool save_file_index_pending_set_prev;
+
 
         // Returns the address of the file I/O monitoring struct corresponding to the specified file handle
         static IoMonitor *io_monitor_from_handle(HANDLE handle);
@@ -206,7 +218,7 @@ public:
         // Initializes game file I/O monitor structs
         static void init_io_monitors();
 
-        // Patches game calls to CreateFileW, redirecting them to Game::intercept_create_file()
+        // Patches game calls to Win32 API file I/O funcs, redirecting them to interceptor functions
         static void apply_function_intercepts();
 
         // Checks if custom archive files exist (.bdt/.bhd5)
@@ -229,6 +241,9 @@ public:
 
         // Changes the to the previous save file (if current save file is the first one, new file is last save file)
         static void set_save_file_prev(bool print_output = true);
+
+        // Checks if the saved characters menu is currently open
+        static bool saves_menu_is_open();
 
         
 

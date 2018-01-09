@@ -11,6 +11,7 @@
 #include "Files.h"
 #include "AntiCheat.h"
 #include "BloodborneRallySystem.h"
+#include "XInputUtil.h"
 
 
 /*
@@ -81,6 +82,9 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     {
         BloodborneRally::start();
     }
+
+    // Initialize XInput hooks
+    XInput::initialize();
     return 0;
 }
 
@@ -160,6 +164,20 @@ __declspec(dllexport) void __stdcall main_loop()
 
     if (Mod::initialized)
     {
+        // Check for pending save file index changes
+        if (Files::save_file_index_pending_set_next) {
+            if (Files::saves_menu_is_open()) {
+                Files::set_save_file_next();
+            }
+            Files::save_file_index_pending_set_next = false;
+        }
+        if (Files::save_file_index_pending_set_prev) {
+            if (Files::saves_menu_is_open()) {
+                Files::set_save_file_prev();
+            }
+            Files::save_file_index_pending_set_prev = false;
+        }
+
         // Update multiplayer node graph HUD element display status
         Hud::set_show_node_graph(Hud::get_show_node_graph());
 

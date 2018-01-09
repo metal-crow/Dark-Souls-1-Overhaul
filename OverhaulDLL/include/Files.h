@@ -28,6 +28,10 @@ std::string Files::default_save_file_path;
 // Index of the save file currently being read/written by the game
 int Files::save_file_index = 0;
 
+// Pending save file index changes
+bool Files::save_file_index_pending_set_next = false;
+bool Files::save_file_index_pending_set_prev = false;
+
 
 // Called when the game attempts to call CreateFileW
 HANDLE WINAPI Files::intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
@@ -541,7 +545,7 @@ void Files::set_save_file_index(int unsigned index, bool print_output)
     int save_file_count = 0, player_char_status = DS1_PLAYER_STATUS_LOADING;
     uint8_t saved_chars_menu_flag = 0;
     SpPointer char_preview_data = SpPointer((void*)((uint32_t)Game::ds1_base + 0xF78700), { 0x30, 0x10 });
-    SpPointer menu_logo = SpPointer((void*)((uint32_t)Game::ds1_base + 0xF786D0), { 0x6C });
+    //SpPointer menu_logo = SpPointer((void*)((uint32_t)Game::ds1_base + 0xF786D0), { 0x6C });
     SpPointer saved_chars_menu_flag_ptr = SpPointer((void*)((uint32_t)Game::ds1_base + 0xF786D0), { 0x90 });
     bool return_to_saves_screen = false;
     if ((int)index > 99) {
@@ -595,8 +599,7 @@ void Files::set_save_file_index(int unsigned index, bool print_output)
     if (Files::save_file_index > 0) {
         if (Files::save_file_index < 10) {
             save_path += "_0" + std::to_string(Files::save_file_index);
-        }
-        else {
+        } else {
             save_path += "_" + std::to_string(Files::save_file_index);
         }
     }
@@ -661,6 +664,22 @@ void Files::set_save_file_prev(bool print_output)
     } else {
         Files::set_save_file_index(Files::save_file_index - 1, print_output);
     }
+}
+
+
+// Checks if the saved characters menu is currently open
+bool Files::saves_menu_is_open()
+{
+    SpPointer saved_chars_menu_flag = SpPointer((void*)((uint32_t)Game::ds1_base + 0xF786D0), { 0x90 });
+    uint8_t flag_value = 0;
+    int status = 0;
+    saved_chars_menu_flag.read(&flag_value);
+    // Check if viewing saves menu
+    if (saved_chars_menu_flag.resolve() == NULL || (flag_value != 4 && flag_value != 3)) {
+        return false;
+    }
+    // Check if character is loaded
+    return !(Game::player_char_status.read(&status) != ERROR_SUCCESS || status != DS1_PLAYER_STATUS_LOADING);
 }
 
 

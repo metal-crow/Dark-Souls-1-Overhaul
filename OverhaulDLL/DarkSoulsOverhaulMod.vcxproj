@@ -149,7 +149,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>lib;lib\SP;lib\DirectX\Lib\x86_;lib\D3DFont;lib\zlib-1.2.11;lib\SP\DsGameFiles;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>d3d9_sp_overlay.lib;DsGameFiles.lib;SpPointer.lib;SP_IO.lib;SP_AoBScan.lib;SP_AsmInjectx86.lib;SP_SysUtils.lib;zlib.lib;lib\Detours\Detours.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9_sp_overlay.lib;DsGameFiles.lib;SpPointer.lib;SP_IO.lib;SP_AoBScan.lib;SP_AsmInjectx86.lib;SP_SysUtils.lib;XInput.lib;zlib.lib;lib\Detours\Detours.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>Exports.def</ModuleDefinitionFile>
       <LinkTimeCodeGeneration>UseFastLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
@@ -189,7 +189,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>lib;lib\SP;lib\DirectX\Lib\x86_;lib\D3DFont;lib\zlib-1.2.11;lib\SP\DsGameFiles;lib\curl-7.56.1\lib;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>d3d9_sp_overlay.lib;DsGameFiles.lib;SpPointer.lib;SP_IO.lib;SP_AoBScan.lib;SP_AsmInjectx86.lib;SP_SysUtils.lib;libcurl_a.lib;zlib.lib;lib\Detours\Detours.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9_sp_overlay.lib;DsGameFiles.lib;SpPointer.lib;SP_IO.lib;SP_AoBScan.lib;SP_AsmInjectx86.lib;SP_SysUtils.lib;XInput.lib;libcurl_a.lib;zlib.lib;lib\Detours\Detours.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>Exports.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
@@ -211,7 +211,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>lib;lib\SP;lib\DirectX\Lib\x86_;lib\D3DFont;lib\zlib-1.2.11;lib\SP\DsGameFiles;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>d3d9_sp_overlay.lib;DsGameFiles.lib;SpPointer.lib;SP_IO.lib;SP_AoBScan.lib;SP_AsmInjectx86.lib;SP_SysUtils.lib;zlib.lib;lib\Detours\Detours.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9_sp_overlay.lib;DsGameFiles.lib;SpPointer.lib;SP_IO.lib;SP_AoBScan.lib;SP_AsmInjectx86.lib;SP_SysUtils.lib;XInput.lib;zlib.lib;lib\Detours\Detours.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>Exports.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
@@ -266,6 +266,7 @@
     <ClInclude Include="include\PhantomLimit.h" />
     <ClInclude Include="include\Plugin\ConsoleCommands.h" />
     <ClInclude Include="include\Plugin\KeybindFunctions.h" />
+    <ClInclude Include="include\XInputUtil.h" />
     <ClInclude Include="lib\PluginImports.h" />
   </ItemGroup>
   <ItemGroup>
@@ -298,6 +299,7 @@
     <ClCompile Include="src\PhantomLimit.cpp" />
     <ClCompile Include="src\Plugin\ConsoleCommands.cpp" />
     <ClCompile Include="src\Plugin\KeybindFunctions.cpp" />
+    <ClCompile Include="src\XInputUtil.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Exports.def" />
