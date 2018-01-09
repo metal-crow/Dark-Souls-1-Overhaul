@@ -9,6 +9,7 @@
 
 - New features:
     - Basic implementation of infinite save slots
+    - XInput hooking (allows reading and modifying controller input)
 
 - New config settings:
     - CheatsWarning
@@ -35,10 +36,16 @@
     - PrevSaveFile
         Sets the current save file index to the previous save file (only works when
         viewing saved characters menu)
+
+- New controller button functions:
+    - Left bumper and left D-pad button now switch to previous save file index when
+        viewing saved characters menu
+    - Right bumper and right D-pad button now switch to next save file index when
+        viewing saved characters menu
 		
 - Updates:
     - When cheats are enabled, player will now be switched to a dedicated multiplayer
-      network with other players using cheats.
+      network with other players who also have cheats enabled.
 
 
 ------------------------------------------------------------------------------------------

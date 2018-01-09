@@ -17,7 +17,6 @@
 #include "BloodborneRallySystem.h"
 
 
-
 /*
     Initialize static variables:
 */
@@ -630,8 +629,41 @@ bool Game::enable_gesture_cancelling()
 }
 
 
+// Checks if player is currently locked onto an enemy
+bool Game::player_is_locked_on()
+{
+    //SpPointer lock_on_flag = SpPointer((void*)((uint32_t)Game::ds1_base + 0xEE29E8), { 0x0, 0x128 }); // Read-only
+    SpPointer lock_on_flag = SpPointer((void*)((uint32_t)Game::ds1_base + 0xF7D6C8), { 0x48C, 0x32C, 0x56C, 0x2C1 });
+    return !(lock_on_flag.resolve() == NULL || *((uint8_t*)lock_on_flag.resolve()) == 0);
+}
+
+
+// Returns current player character body animation ID (attacking, rolling, gestures, etc)
+int32_t Game::get_player_body_anim_id()
+{
+    SpPointer anim_id = SpPointer((void*)((uint32_t)Game::ds1_base + 0xEE29E8), { 0x0, 0xFF0 });
+    if (anim_id.resolve() == NULL) {
+        return -1;
+    } else {
+        return *(int32_t*)anim_id.resolve();
+    }
+}
+
+
+// Sets whether player character will automatically turn toward enemies when locked on
+bool Game::allow_rotation_when_locked_on(bool allow)
+{
+    uint8_t new_value = allow ? 0 : 1;
+    SpPointer flag = SpPointer((void*)((uint32_t)Game::ds1_base + 0xF7D6C8), { 0x48C, 0x32C, 0x56C, 0x3F0 });
+    flag.write(new_value);
+    // Return true if successful
+    return !(flag.resolve() == NULL);
+}
+
+
 // Allow effect IDs to be transferred between clients without bounds restrictions
-void Game::unrestrict_network_synced_effectids() {
+void Game::unrestrict_network_synced_effectids()
+{
     Mod::startup_messages.push_back(Mod::output_prefix + "Unrestricting effectIDs sent over network.");
 
     uint8_t nop_patch[3] = { 0x90, 0x90, 0x90 };
