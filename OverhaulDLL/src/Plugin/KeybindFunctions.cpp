@@ -15,12 +15,38 @@
 #include "Challenge/GravelordPhantoms.h"
 
 
+// Toggles mouse input
+int kf_toggle_mouse_input()
+{
+    Mod::mouse_input = !Mod::mouse_input;
+    if (Mod::mouse_input) {
+        print_console("Mouse input enabled");
+    } else {
+        print_console("Mouse input disabled");
+    }
+    Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_); // Sleep to avoid keypress being detected multiple times
+    return ERROR_SUCCESS;
+}
+
+// Toggles camera lock when console is open
+int kf_toggle_console_lock_cam()
+{
+    Mod::console_lock_camera = !Mod::console_lock_camera;
+    if (Mod::console_lock_camera) {
+        print_console("Camera lock when console is open = enabled");
+    } else {
+        print_console("Camera lock when console is open = disabled");
+    }
+    Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
+    return ERROR_SUCCESS;
+}
+
 // Fixes input bug that causes players to be stuck at a bonfire (usually after turning human with framerate unlocked)
 int kf_fix_bonfire_input()
 {
     // Apply fix and print message to text feed
     int return_value = Game::fix_bonfire_input(true);
-    Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_); // Sleep to avoid keypress being detected multiple times
+    Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
     return return_value;
 }
 

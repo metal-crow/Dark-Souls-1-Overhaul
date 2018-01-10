@@ -18,8 +18,9 @@
 #define _DS1_OVERHAUL_SETTINGS_FILE_ ".\\d3d9_Mod.ini"
 #define _DS1_OVERHAUL_PREFS_SECTION_ "Dark Souls Overhaul Settings"
 #define _DS1_OVERHAUL_KEYBINDS_SECTION_ "Dark Souls Overhaul Keybinds"
-#define _DS1_OVERHAUL_ANTICHEAT_SECTION_ "Dark Souls Overhaul Anti-Cheat"
-#define _DS1_OVERHAUL_HUD_SECTION_ "Dark Souls Overhaul HUD"
+#define _DS1_OVERHAUL_INPUT_SECTION_ "Game Input"
+#define _DS1_OVERHAUL_ANTICHEAT_SECTION_ "Anti-Cheat"
+#define _DS1_OVERHAUL_HUD_SECTION_ "HUD"
 #define _DS1_OVERHAUL_DEBUG_SECTION_ "Dark Souls Overhaul Debug"
 #define _DS1_OVERHAUL_CHALLENGE_SECTION_ "Challenge Mods"
 // Startup preferences:
@@ -28,6 +29,9 @@
 #define _DS1_OVERHAUL_PREF_CUSTOM_GAME_ARCHIVE_ "CustomArchiveFiles"
 #define _DS1_OVERHAUL_PREF_CUSTOM_SAVE_FILE_ "CustomSaveFile"
 #define _DS1_OVERHAUL_PREF_CUSTOM_GAME_CFG_FILE_ "CustomGameConfigFile"
+// Game input settings:
+#define _DS1_OVERHAUL_PREF_MOUSE_INPUT_ "MouseInput"
+#define _DS1_OVERHAUL_PREF_CONSOLE_LOCK_CAM_ "ConsoleLockCamera"
 // Anti-cheat:
 #define _DS1_OVERHAUL_PREF_AC_BOSS_GUARD_ "BossGuard"
 #define _DS1_OVERHAUL_PREF_AC_NPC_GUARD_ "NpcGuard"
@@ -47,12 +51,15 @@
 #define _DS1_OVERHAUL_PREF_NODE_GRAPH_ "NodeGraph"
 // Challenge mods:
 #define _DS1_OVERHAUL_PREF_CM_BP_ENEMIES_ "BlackPhantomEnemies"
+#define _DS1_OVERHAUL_PREF_CM_BP_ENEMY_DRAW_TYPE_ "BlackPhantomEnemyDrawType"
 #define _DS1_OVERHAUL_PREF_CM_GL_PHANTOMS_ "GravelordPhantoms"
 // Debug:
 #define _DS1_OVERHAUL_PREF_MONITOR_BDT_ "MonitorBdtFiles"
 #define _DS1_OVERHAUL_PREF_MONITOR_BHD_ "MonitorBhdFiles"
 #define _DS1_OVERHAUL_PREF_MONITOR_SL2_ "MonitorSaveFile"
 // Keybinds:
+#define _DS1_OVERHAUL_HOTKEY_TOGGLE_MOUSE_INPUT_ "ToggleMouseInput"
+#define _DS1_OVERHAUL_HOTKEY_TOGGLE_CONSOLE_LOCK_CAM_ "ToggleConsoleLockCamera"
 #define _DS1_OVERHAUL_HOTKEY_BONFIRE_INPUT_FIX_ "BonfireInputFix"
 #define _DS1_OVERHAUL_HOTKEY_DESPAWN_GL_PHANTOMS_ "DespawnGravelordPhantoms"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_NODE_COUNT_ "ToggleNodeCount"
@@ -114,6 +121,12 @@ public:
 
     // List of supported game versions
     static std::vector<uint8_t> supported_game_versions;
+
+    // Enable/disable mouse input
+    static bool mouse_input;
+
+    // Lock camera when console is open
+    static bool console_lock_camera;
 
     // Determines whether to start in legacy mode (only applies fixes/anti-cheat/QoL changes, no gameplay modifications)
     static bool legacy_mode;
