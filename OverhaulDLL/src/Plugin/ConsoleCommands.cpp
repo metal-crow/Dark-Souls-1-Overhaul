@@ -373,13 +373,13 @@ int cc_binocs_trigger_block(std::vector<std::string> args, std::string *output)
         switch (parse_toggle_arg(args.at(0).c_str()))
         {
             case 0:
-                if (BinocsTriggerBlock::active) {
-                    BinocsTriggerBlock::disable();
+                if (AntiCheat::BinocsTriggerBlock::active) {
+                    AntiCheat::BinocsTriggerBlock::disable();
                 }
                 break;
             case 1:
-                if (!BinocsTriggerBlock::active) {
-                    BinocsTriggerBlock::enable();
+                if (!AntiCheat::BinocsTriggerBlock::active) {
+                    AntiCheat::BinocsTriggerBlock::enable();
                 }
                 break;
             default:
@@ -388,7 +388,7 @@ int cc_binocs_trigger_block(std::vector<std::string> args, std::string *output)
                 break;
         }
     }
-    if (BinocsTriggerBlock::active) {
+    if (AntiCheat::BinocsTriggerBlock::active) {
         output->append("BinocsTriggerBlock = enabled");
     } else {
         output->append("BinocsTriggerBlock = disabled");
@@ -404,13 +404,13 @@ int cc_dragon_trigger_block(std::vector<std::string> args, std::string *output)
         switch (parse_toggle_arg(args.at(0).c_str()))
         {
             case 0:
-                if (DragonTriggerBlock::active) {
-                    DragonTriggerBlock::disable();
+                if (AntiCheat::DragonTriggerBlock::active) {
+                    AntiCheat::DragonTriggerBlock::disable();
                 }
                 break;
             case 1:
-                if (!DragonTriggerBlock::active) {
-                    DragonTriggerBlock::enable();
+                if (!AntiCheat::DragonTriggerBlock::active) {
+                    AntiCheat::DragonTriggerBlock::enable();
                 }
                 break;
             default:
@@ -419,7 +419,7 @@ int cc_dragon_trigger_block(std::vector<std::string> args, std::string *output)
                 break;
         }
     }
-    if (DragonTriggerBlock::active) {
+    if (AntiCheat::DragonTriggerBlock::active) {
         output->append("DragonTriggerBlock = enabled");
     } else {
         output->append("DragonTriggerBlock = disabled");

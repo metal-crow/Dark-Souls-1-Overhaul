@@ -293,7 +293,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Build|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\AntiCheat.cpp" />
+    <ClCompile Include="src\AntiCheat\AntiCheat.cpp" />
+    <ClCompile Include="src\AntiCheat\BinocsTriggerBlock.cpp" />
+    <ClCompile Include="src\AntiCheat\BossGuard.cpp" />
+    <ClCompile Include="src\AntiCheat\DragonTriggerBlock.cpp" />
+    <ClCompile Include="src\AntiCheat\NpcGuard.cpp" />
+    <ClCompile Include="src\AntiCheat\TeleBackstabProtect.cpp" />
     <ClCompile Include="src\Authors.cpp" />
     <ClCompile Include="src\BloodborneRallySystem.cpp" />
     <ClCompile Include="src\Challenge\BlackPhantomEnemies.cpp" />

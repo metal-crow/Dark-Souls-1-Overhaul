@@ -25,6 +25,9 @@
     <Filter Include="Header Files\Overlay Plugin">
       <UniqueIdentifier>{84b0a03f-c0b2-46ca-9b77-efe5568ca6a2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\AntiCheat">
+      <UniqueIdentifier>{48782bfb-bc19-4cb8-b68c-e35df21fd2b6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DarkSoulsOverhaulMod.cpp">
@@ -40,9 +43,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\PhantomLimit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\AntiCheat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Authors.cpp">
@@ -66,6 +66,24 @@
     <ClCompile Include="src\Challenge\GravelordPhantoms.cpp">
       <Filter>Source Files\Challenge</Filter>
     </ClCompile>
+    <ClCompile Include="src\AntiCheat\TeleBackstabProtect.cpp">
+      <Filter>Source Files\AntiCheat</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AntiCheat\NpcGuard.cpp">
+      <Filter>Source Files\AntiCheat</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AntiCheat\BossGuard.cpp">
+      <Filter>Source Files\AntiCheat</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AntiCheat\BinocsTriggerBlock.cpp">
+      <Filter>Source Files\AntiCheat</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AntiCheat\DragonTriggerBlock.cpp">
+      <Filter>Source Files\AntiCheat</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AntiCheat\AntiCheat.cpp">
+      <Filter>Source Files\AntiCheat</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\DllMain.h">
@@ -81,9 +99,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Files.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\AntiCheat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\BloodborneRallySystem.h">
@@ -106,6 +121,9 @@
     </ClInclude>
     <ClInclude Include="include\Challenge\GravelordPhantoms.h">
       <Filter>Header Files\Challenge</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AntiCheat.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

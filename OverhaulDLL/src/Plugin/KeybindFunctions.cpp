@@ -185,14 +185,14 @@ int kf_toggle_hud_node_graph()
 // Toggles for anti-cheat services
 int kf_toggle_ac_binocs_trigger_block()
 {
-    BinocsTriggerBlock::toggle();
+    AntiCheat::BinocsTriggerBlock::toggle();
     Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
     return ERROR_SUCCESS;
 }
 
 int kf_toggle_ac_dragon_trigger_block()
 {
-    DragonTriggerBlock::toggle();
+    AntiCheat::DragonTriggerBlock::toggle();
     Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
     return ERROR_SUCCESS;
 }

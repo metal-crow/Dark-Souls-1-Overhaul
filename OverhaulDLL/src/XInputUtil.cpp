@@ -55,7 +55,7 @@ void initialize() {
         base = GetModuleHandle("XINPUT1_3.dll");
         Sleep(500);
     }
-    if (!print_console(Mod::output_prefix + "Initializing XInput hooks..."))
+    if (!print_console(Mod::output_prefix + "Initializing XInput hook..."))
         Mod::startup_messages.push_back(Mod::output_prefix + "Initializing XInput hooks...");
     apply_function_intercepts();
 }
