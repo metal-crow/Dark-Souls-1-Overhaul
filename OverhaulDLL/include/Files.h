@@ -15,6 +15,7 @@
 #include "SP_IO.hpp"
 #include "Archive/Bdt.h"
 #include "Archive/Bhd5.h"
+#include "Menu/SavedCharacters.h"
 #include "Save/Sl2.h"
 
 
@@ -112,6 +113,7 @@ HANDLE WINAPI Files::intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesired
 
                 // On first load, store default save file path
                 if (Files::default_save_file_path.length() <= 0) {
+                    int save_file_count = 0;
                     int conversion_ret = string_wide_to_mb((wchar_t*)lpFileName, Files::default_save_file_path);
                     if (conversion_ret != 0) {
                         // Error converting file path string
@@ -134,7 +136,7 @@ HANDLE WINAPI Files::intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesired
                     }
                     if (conversion_ret == 0) {
                         // Count save files/characters and find first free save slot
-                        int save_file_count = 0, saved_char_count = 0;
+                        int saved_char_count = 0;
                         std::tuple<int, int> first_free(-1, -1);
                         std::string free_slot_msg;
                         save_file_count = Sl2::get_save_file_count(save_path.c_str(), &saved_char_count, &first_free);
@@ -161,6 +163,16 @@ HANDLE WINAPI Files::intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesired
                             Sl2::generate_empty_save_file(current_save_file.c_str());
                         }
                     }
+                    // Update menu text
+                    std::wstring custom_header = L"                                            Save file: "
+                        + std::to_wstring(Files::save_file_index + 1)
+                        + L"/" + std::to_wstring(save_file_count);
+                        //+ L"      Slots " + std::to_wstring(Files::save_file_index + 1)
+                        //+ L"-" + std::to_wstring(((Files::save_file_index) + 1) * (Sl2::SLOT_COUNT_DEFAULT - 1))
+                        //+ L" of " + std::to_wstring(save_file_count * (Sl2::SLOT_COUNT_DEFAULT - 1));
+                    std::wstring custom_buttons = L"<?conclusion?>:Enter <?cancel?>:Back <?viewChange?>:Toggle Display <?commando?>:Delete  <?categoryChangeL?>/<?categoryChangeR?>:Change save file";
+                    Menu::Saves::set_custom_header_msgs(L"Select data to load." + custom_header, L"Select data to delete." + custom_header);
+                    Menu::Saves::set_custom_buttons_msgs(L"<?selectUD?>:Select "+custom_buttons, custom_buttons, L"<?selectUD?>:Select "+custom_buttons);
                 }
 
                 if ((int)Mod::custom_save_file_path.length() > 0) {
@@ -610,6 +622,14 @@ void Files::set_save_file_index(int unsigned index, bool print_output)
         saved_chars_menu_flag_ptr.write((uint8_t)3);
         return;
     }
+    // Update menu text
+    std::wstring custom_header = L"                                            Save file: "
+        + std::to_wstring(Files::save_file_index + 1)
+        + L"/" + std::to_wstring(save_file_count);
+        //+ L"      Slots " + std::to_wstring(Files::save_file_index + 1)
+        //+ L"-" + std::to_wstring(((Files::save_file_index) + 1) * (Sl2::SLOT_COUNT_DEFAULT - 1))
+        //+ L" of " + std::to_wstring(save_file_count * (Sl2::SLOT_COUNT_DEFAULT - 1));
+    Menu::Saves::set_custom_header_msgs(L"Select data to load." + custom_header, L"Select data to delete." + custom_header);
     Sleep(500);
     // Re-load saved characters menu
     saved_chars_menu_flag_ptr.write((uint8_t)3);
