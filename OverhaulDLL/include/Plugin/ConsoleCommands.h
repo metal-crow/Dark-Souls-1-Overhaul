@@ -68,6 +68,26 @@ const char *chm_save_file_prev = ccn_save_file_prev"\n     Sets the current save
 const char *chm_save_file_create = ccn_save_file_create"\n     Creates a new save file with 10 empty character slots. Existing save files are not modified.";
 
 
+#define ccn_challenge_bp_enemies "challenge_black_phantom_enemies"
+const char *chm_challenge_bp_enemies = ccn_challenge_bp_enemies" [boolean]\n     Enables/disables Black Phantom Enemies challenge mod (1 = enabled, 0 = disabled), which turns all enemies (and bosses) into\n"
+                                                                           "     Black Phantoms, meaning they appear with a red glow and have buffed stats (2x HP, 1.8x attack, and 1.2x defense)";
+#define ccn_challenge_gravelord_phantoms "challenge_gravelord_phantoms"
+const char *chm_challenge_gravelord_phantoms = ccn_challenge_gravelord_phantoms" [boolean]\n     Enables/disables Gravelord Phantoms challenge mod (1 = enabled, 0 = disabled), which spawns additional Gravelord\n"
+                                                                                           "     Phantom enemies, even when the player has not been cursed by another player from the Gravelord covenant.\n"
+                                                                                           "     WARNING:  Gravelord Phantoms can only be de-spawned immediately if the current character is in their first\n"
+                                                                                           "               playthrough (NG+0). This is to prevent players from abusing this feature by de-spawning phantoms\n"
+                                                                                           "               that were created legitimately by a member of the Gravelord covenant, which can only happen in\n"
+                                                                                           "               NG+ (NG+1) or above. To de-spawn phantoms in NG+ or above, wait for 10 minutes without resting\n"
+                                                                                           "               at a bonfire or triggering a loading screen (warping, death, cutscenes, etc).\n"
+                                                                                           "     SEE ALSO: Related \"gravelord_phantoms_despawn\" console command.";
+
+#define ccn_gravelord_phantoms_despawn "gravelord_phantoms_despawn"
+const char *chm_gravelord_phantoms_despawn = ccn_gravelord_phantoms_despawn"\n     De-spawns existing Gravelord phantoms, but only if current character is in their first playthrough (NG+0).\n"
+                                                                             "     This is to prevent players from abusing this feature by de-spawning phantoms that were created legitimately\n"
+                                                                             "     by a member of the Gravelord covenant, which can only happen in NG+ (NG+1) or above. To de-spawn phantoms in\n"
+                                                                             "     NG+ or above, wait for 10 minutes without resting at a bonfire or triggering a loading screen (warping, death,\n"
+                                                                             "     cutscenes, etc).";
+
 #define ccn_text_feed_node_count "text_feed_node_count"
 const char *chm_text_feed_node_count = ccn_text_feed_node_count" [boolean]\n"
 "    Enables/disables the multiplayer node count element of the overlay info bar (1 = enabled, 0 = disabled).";

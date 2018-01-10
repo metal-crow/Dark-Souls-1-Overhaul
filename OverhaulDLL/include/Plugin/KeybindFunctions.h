@@ -37,6 +37,9 @@ int kf_toggle_dim_lava();
 // Toggles armor sound effects
 int kf_toggle_armor_sfx();
 
+// De-spawns existing Gravelord phantoms, but only if current character is in NG+0
+int kf_gravelord_phantoms_despawn();
+
 // Next/previous save file
 int kf_save_file_next();
 int kf_save_file_prev();
@@ -51,6 +54,9 @@ int kf_toggle_hud_node_graph();
 int kf_toggle_ac_binocs_trigger_block();
 int kf_toggle_ac_dragon_trigger_block();
 
+// Toggles for challenge mods
+int kf_toggle_cm_bp_enemies();
+int kf_toggle_cm_gravelord_phantoms();
 
 
 #endif // _DS1_OVERHAUL_KEYBIND_FUNCTIONS_H_

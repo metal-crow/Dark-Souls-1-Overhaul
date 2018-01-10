@@ -14,6 +14,8 @@
 #include "Plugin/ConsoleCommands.h"
 #include "AntiCheat.h"
 #include "Save/Sl2.h"
+#include "Challenge/BlackPhantomEnemies.h"
+#include "Challenge/GravelordPhantoms.h"
 
 
 ///////////////////////////////////////////////////////////
@@ -199,6 +201,79 @@ int cc_save_file_create(std::vector<std::string> args, std::string *output)
     }
     output->append(out);
     return ERROR_SUCCESS;
+}
+
+// Enables/disables "Black Phantom Enemies" challenge mod
+int cc_challenge_bp_enemies(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = CONSOLE_COMMAND_SUCCESS;
+    if (args.size() > 0) {
+        switch (parse_toggle_arg(args.at(0).c_str()))
+        {
+            case 0:
+                if (Challenge::BlackPhantomEnemies::active) {
+                    Challenge::BlackPhantomEnemies::disable();
+                }
+                break;
+            case 1:
+                if (!Challenge::BlackPhantomEnemies::active) {
+                    Challenge::BlackPhantomEnemies::enable();
+                }
+                break;
+            default:
+                output->append(ERROR_INVALID_BOOL_ARGUMENT + "\n");
+                ret_val = ERROR_INVALID_PARAMETER;
+                break;
+        }
+    }
+
+    if (Challenge::BlackPhantomEnemies::active) {
+        output->append("\"Black Phantom Enemies\" challenge mod = enabled");
+    } else {
+        output->append("\"Black Phantom Enemies\" challenge mod = disabled");
+    }
+    return ret_val;
+}
+
+
+// Enables/disables "Gravelord Phantoms" challenge mod
+int cc_challenge_gravelord_phantoms(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = CONSOLE_COMMAND_SUCCESS;
+    if (args.size() > 0) {
+        switch (parse_toggle_arg(args.at(0).c_str()))
+        {
+            case 0:
+                if (Challenge::GravelordPhantoms::active) {
+                    Challenge::GravelordPhantoms::disable();
+                }
+                break;
+            case 1:
+                if (!Challenge::GravelordPhantoms::active) {
+                    Challenge::GravelordPhantoms::enable();
+                }
+                break;
+            default:
+                output->append(ERROR_INVALID_BOOL_ARGUMENT + "\n");
+                ret_val = ERROR_INVALID_PARAMETER;
+                break;
+        }
+    }
+
+    if (Challenge::GravelordPhantoms::active) {
+        output->append("\"Gravelord Phantoms\" challenge mod = enabled");
+    } else {
+        output->append("\"Gravelord Phantoms\" challenge mod = disabled");
+    }
+    return ret_val;
+}
+
+
+// De-spawns existing Gravelord phantoms, but only if current character is in NG+0
+int cc_gravelord_phantoms_despawn(std::vector<std::string> args, std::string *output)
+{
+    Challenge::GravelordPhantoms::despawn_gravelord_phantoms();
+    return CONSOLE_COMMAND_SUCCESS;
 }
 
 
@@ -667,6 +742,9 @@ void Mod::register_console_commands()
     register_console_command(ccn_save_file_next, cc_save_file_next, chm_save_file_next);
     register_console_command(ccn_save_file_prev, cc_save_file_prev, chm_save_file_prev);
     register_console_command(ccn_save_file_create, cc_save_file_create, chm_save_file_create);
+    register_console_command(ccn_challenge_bp_enemies, cc_challenge_bp_enemies, chm_challenge_bp_enemies);
+    register_console_command(ccn_challenge_gravelord_phantoms, cc_challenge_gravelord_phantoms, chm_challenge_gravelord_phantoms);
+    register_console_command(ccn_gravelord_phantoms_despawn, cc_gravelord_phantoms_despawn, chm_gravelord_phantoms_despawn);
 
 
 #ifdef _DS1_OVERHAUL_MOD_DBG_

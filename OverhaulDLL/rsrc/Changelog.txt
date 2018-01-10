@@ -5,6 +5,42 @@
 
 
 ------------------------------------------------------------------------------------------
+01/09/2018:
+
+- New features:
+    - Black Phantom Enemies challenge mod:
+        Turns all enemies (and bosses) into Black Phantoms, meaning they appear with a
+        red glow and receive a stat buff (2x HP, 1.8x attack, and 1.2x defense).
+    - Gravelord Phantoms challenge mod:
+        Auto-spawns additional Gravelord Phantom enemies, even when the player has not
+        been cursed by another player from the Gravelord covenant.
+
+- New config settings:
+    - BlackPhantomEnemies
+	    Enables/disables Black Phantom Enemies challenge mod at startup
+    - GravelordPhantoms
+        Enables/disables Gravelord Phantoms challenge mod at startup
+
+- New console commands:
+    - challenge_black_phantom_enemies
+	    Enables/disables Black Phantom Enemies challenge mod
+    - challenge_gravelord_phantoms
+	    Enables/disables Gravelord Phantoms challenge mod
+    - gravelord_phantoms_despawn
+        De-spawns existing Gravelord phantoms, but only if current character is in
+        their first playthrough (NG+0)
+
+- New keybinds:
+    - ToggleChallengeBlackPhantomEnemies
+	    Enables/disables Black Phantom Enemies challenge mod
+    - ToggleChallengeGravelordPhantoms
+	    Enables/disables Gravelord Phantoms challenge mod
+    - DespawnGravelordPhantoms
+        De-spawns existing Gravelord phantoms, but only if current character is in
+        their first playthrough (NG+0)
+
+
+------------------------------------------------------------------------------------------
 01/08/2018:
 
 - New features:

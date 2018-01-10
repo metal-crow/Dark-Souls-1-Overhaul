@@ -8,12 +8,13 @@
 
 #include "DllMain.h"
 #include "AntiCheat.h"
+#include "Challenge/GravelordPhantoms.h"
+#include "Challenge/BlackPhantomEnemies.h"
 
 #define _SP_DEFINE_VK_NAME_STRINGS_		// Must be defined to use Virtual-key code name strings from SP_IO_Strings.hpp (opt-in by default because it increases filesize by a few KB)
 
 #include "SP_IO.hpp"
 #include "SP_IO_Strings.hpp"
-//#include <clocale>
 
 
 
@@ -192,6 +193,13 @@ void Mod::get_user_preferences()
         print_console("    HUD: Multiplayer node graph enabled");
     }
 
+    // Check if challenge mods should be enabled
+    if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_GL_PHANTOMS_, Challenge::GravelordPhantoms::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
+        print_console("    Challenge: Auto-spawning Gravelord Phantoms will be enabled");
+    }
+    if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_BP_ENEMIES_, Challenge::BlackPhantomEnemies::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
+        print_console("    Challenge: Black Phantom Enemies will be enabled");
+    }
 
     // @TODO Load additional user preferences here
 
@@ -221,6 +229,9 @@ void Mod::get_user_keybinds()
     // Toggle armor sound effects
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_ARMOR_SFX_, kf_toggle_armor_sfx);
 
+    // De-spawn existing Gravelord phantoms
+    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_DESPAWN_GL_PHANTOMS_, kf_gravelord_phantoms_despawn);
+
     // Next/previous save file
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_SAVE_FILE_NEXT_, kf_save_file_next);
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_SAVE_FILE_PREV_, kf_save_file_prev);
@@ -234,6 +245,10 @@ void Mod::get_user_keybinds()
     // Toggle anti-cheats (not all are togglable)
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_AC_BINOCS_TRIG_BLOCK_, kf_toggle_ac_binocs_trigger_block);
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_AC_DRAGON_TRIG_BLOCK_, kf_toggle_ac_dragon_trigger_block);
+
+    // Toggle challenge mods
+    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_CM_BP_ENEMIES_, kf_toggle_cm_bp_enemies);
+    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_CM_GL_PHANTOMS_, kf_toggle_cm_gravelord_phantoms);
 
     // @TODO Load additional keybinds here
 

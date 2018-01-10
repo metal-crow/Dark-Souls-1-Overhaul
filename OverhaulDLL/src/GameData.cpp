@@ -3,7 +3,7 @@
 
     Contributors to this file:
         Ashley                      -   Reverse engineering, Low FPS Disconnect patch technique
-        jellybaby34                 -   Game version number patch technique
+        Jellybaby34                 -   Game version number patch technique
         Metal-Crow                  -   Reverse engineering, Phantom Limit patch, special effect ID sync, C++
         RavagerChris                -   Reverse engineering of game files, gesture cancelling technique
         Sean Pesce                  -   C++, automataed Bonfire Input Fix (FPSFix+), various C++ conversions of other contributors' work
@@ -15,6 +15,7 @@
 #include "DllMain.h"
 #include "AntiCheat.h"
 #include "BloodborneRallySystem.h"
+#include "Challenge/BlackPhantomEnemies.h"
 
 
 /*
@@ -91,6 +92,7 @@ void Game::on_first_character_loaded()
     // Get param files
     print_console(Mod::output_prefix + "Searching memory for files...");
     Params::Armor().init(true);
+    Params::Npc().init(true);
 
     // Disable armor sounds if it was specified in the config file
     if (Mod::disable_armor_sfx_pref)
@@ -113,6 +115,11 @@ void Game::on_first_character_loaded()
         BinocsTriggerBlock::enable();
     if (DragonTriggerBlock::active)
         DragonTriggerBlock::enable();
+
+    // Enable challenge mods
+    if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_BP_ENEMIES_, Challenge::BlackPhantomEnemies::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
+        Challenge::BlackPhantomEnemies::enable();
+    }
 }
 
 
