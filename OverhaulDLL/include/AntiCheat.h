@@ -11,8 +11,8 @@
 
 #pragma once
 
-#ifndef _DS1_OVERHAUL_ANTI_CHEAT_MAIN_H_
-    #define _DS1_OVERHAUL_ANTI_CHEAT_MAIN_H_
+#ifndef DS1_OVERHAUL_ANTI_CHEAT_MAIN_H_
+    #define DS1_OVERHAUL_ANTI_CHEAT_MAIN_H_
 
 #include <cstdint>
 
@@ -65,4 +65,4 @@ namespace DragonTriggerBlock {
 
 } // namespace AntiCheat
 
-#endif // _DS1_OVERHAUL_ANTI_CHEAT_MAIN_H_
+#endif // DS1_OVERHAUL_ANTI_CHEAT_MAIN_H_

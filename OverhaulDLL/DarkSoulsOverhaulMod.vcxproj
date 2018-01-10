@@ -264,6 +264,7 @@
     <ClInclude Include="include\DllMain.h" />
     <ClInclude Include="include\Files.h" />
     <ClInclude Include="include\GameData.h" />
+    <ClInclude Include="include\Menu\SavedCharacters.h" />
     <ClInclude Include="include\ModData.h" />
     <ClInclude Include="include\PhantomLimit.h" />
     <ClInclude Include="include\Plugin\ConsoleCommands.h" />
@@ -304,6 +305,7 @@
     <ClCompile Include="src\Challenge\BlackPhantomEnemies.cpp" />
     <ClCompile Include="src\Challenge\GravelordPhantoms.cpp" />
     <ClCompile Include="src\GameData.cpp" />
+    <ClCompile Include="src\Menu\SavedCharacters.cpp" />
     <ClCompile Include="src\ModData.cpp" />
     <ClCompile Include="src\PhantomLimit.cpp" />
     <ClCompile Include="src\Plugin\ConsoleCommands.cpp" />

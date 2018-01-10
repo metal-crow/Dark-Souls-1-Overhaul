@@ -12,6 +12,7 @@
 #include "AntiCheat.h"
 #include "BloodborneRallySystem.h"
 #include "Challenge/GravelordPhantoms.h"
+#include "Menu/SavedCharacters.h"
 #include "XInputUtil.h"
 
 
@@ -74,6 +75,9 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     // Start anti-cheat
     AntiCheat::start();
 
+    // Inject custom strings for saved characters menu
+    Menu::Saves::init_custom_strings();
+
     // Allow modded effectIDs
     Game::unrestrict_network_synced_effectids();
 
@@ -82,7 +86,7 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
         BloodborneRally::start();
     }
 
-    // Initialize XInput hooks
+    // Initialize XInput hook
     XInput::initialize();
 
     if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_GL_PHANTOMS_,

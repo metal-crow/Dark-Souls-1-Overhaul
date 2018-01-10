@@ -28,6 +28,12 @@
     <Filter Include="Source Files\AntiCheat">
       <UniqueIdentifier>{48782bfb-bc19-4cb8-b68c-e35df21fd2b6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Menu">
+      <UniqueIdentifier>{f3606149-6977-4712-af4e-dc039a0a8bb3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Menu">
+      <UniqueIdentifier>{0fc6c7b8-8d99-400f-aedb-22aa10252148}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DarkSoulsOverhaulMod.cpp">
@@ -84,6 +90,9 @@
     <ClCompile Include="src\AntiCheat\AntiCheat.cpp">
       <Filter>Source Files\AntiCheat</Filter>
     </ClCompile>
+    <ClCompile Include="src\Menu\SavedCharacters.cpp">
+      <Filter>Source Files\Menu</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\DllMain.h">
@@ -124,6 +133,9 @@
     </ClInclude>
     <ClInclude Include="include\AntiCheat.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Menu\SavedCharacters.h">
+      <Filter>Header Files\Menu</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
