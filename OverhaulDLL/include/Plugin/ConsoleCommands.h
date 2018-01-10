@@ -39,6 +39,13 @@ const std::string ERROR_INVALID_BOOL_ARGUMENT = "ERROR: Assigned value must be e
 const char *chm_developer_debug = ccn_developer_debug" \n    For developer use.";
 
 
+#define ccn_mouse_input "mouse_input"
+const char *chm_mouse_input = ccn_mouse_input" [boolean]\n    Enables/disables mouse input (1 = enabled, 0 = disabled).";
+
+#define ccn_console_lock_cam "camera_lock_when_console_open"
+const char *chm_console_lock_cam = ccn_console_lock_cam" [boolean]\n    Enables/disables camera lock when console is open (1 = lock camera, 0 = free camera).";
+#define cca_console_lock_cam "console_lock_cam"
+
 #define ccn_dim_lava "dim_lava"
 const char *chm_dim_lava = ccn_dim_lava" [boolean]\n     Enables/disables dimmed visual effects for lava (1 = enabled, 0 = disabled).";
 #define cca_lava_brightness_fix "lava_brightness_fix"
@@ -71,6 +78,11 @@ const char *chm_save_file_create = ccn_save_file_create"\n     Creates a new sav
 #define ccn_challenge_bp_enemies "challenge_black_phantom_enemies"
 const char *chm_challenge_bp_enemies = ccn_challenge_bp_enemies" [boolean]\n     Enables/disables Black Phantom Enemies challenge mod (1 = enabled, 0 = disabled), which turns all enemies (and bosses) into\n"
                                                                            "     Black Phantoms, meaning they appear with a red glow and have buffed stats (2x HP, 1.8x attack, and 1.2x defense)";
+
+#define ccn_challenge_bp_enemy_draw_type "challenge_black_phantom_enemy_draw_type"
+const char *chm_challenge_bp_enemy_draw_type = ccn_challenge_bp_enemy_draw_type" [DRAW_TYPE|default]\n     Sets the draw type for NPCs modified by the \"Black Phantom Enemies\" challenge mod.\n"
+                                                                                                     "     Draw type must be a value between 0 and 255 (or \"default\" to revert to default value).";
+
 #define ccn_challenge_gravelord_phantoms "challenge_gravelord_phantoms"
 const char *chm_challenge_gravelord_phantoms = ccn_challenge_gravelord_phantoms" [boolean]\n     Enables/disables Gravelord Phantoms challenge mod (1 = enabled, 0 = disabled), which spawns additional Gravelord\n"
                                                                                            "     Phantom enemies, even when the player has not been cursed by another player from the Gravelord covenant.\n"

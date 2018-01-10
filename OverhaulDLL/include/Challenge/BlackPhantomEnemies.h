@@ -20,11 +20,22 @@ namespace BlackPhantomEnemies {
 
 // Used to store original special effects and draw type for an NPC affected by this challenge mod
 struct OriginalNpcData {
+    int32_t sp_effect_id0;
+    int32_t sp_effect_id1;
+    int32_t sp_effect_id2;
+    int32_t sp_effect_id3;
     int32_t sp_effect_id4;
+    int32_t sp_effect_id5;
+    int32_t sp_effect_id6;
+    int32_t sp_effect_id7;
     uint8_t draw_type;
+    bool changed = false;
 };
 
+const uint8_t DRAW_TYPE_DEFAULT = 2;
+
 extern bool active;
+extern uint8_t DRAW_TYPE;
 
 // Stores original special effects and draw types for all NPCs affected by this challenge mod
 extern std::vector<OriginalNpcData> original_values;

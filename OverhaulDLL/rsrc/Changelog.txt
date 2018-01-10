@@ -14,21 +14,36 @@
     - Gravelord Phantoms challenge mod:
         Auto-spawns additional Gravelord Phantom enemies, even when the player has not
         been cursed by another player from the Gravelord covenant.
+    - New configuration file section: "Input"
 
 - New config settings:
     - BlackPhantomEnemies
 	    Enables/disables Black Phantom Enemies challenge mod at startup
+    - BlackPhantomEnemyDrawType
+        Sets the draw type (phantom color) for NPCs affected by the "Black Phantom
+        Enemies" challenge mod at startup
     - GravelordPhantoms
         Enables/disables Gravelord Phantoms challenge mod at startup
+    - MouseInput
+        Enables/disables mouse input at startup
+    - ConsoleLockCamera
+        Enables/disables locking camera angle when console is open
 
 - New console commands:
     - challenge_black_phantom_enemies
 	    Enables/disables Black Phantom Enemies challenge mod
+    - challenge_black_phantom_enemy_draw_type
+        Sets the draw type (phantom color) for NPCs affected by the "Black Phantom
+        Enemies" challenge mod
     - challenge_gravelord_phantoms
 	    Enables/disables Gravelord Phantoms challenge mod
     - gravelord_phantoms_despawn
         De-spawns existing Gravelord phantoms, but only if current character is in
         their first playthrough (NG+0)
+    - mouse_input
+        Enables/disables mouse input
+    - camera_lock_when_console_open (and alias: console_lock_cam)
+        Enables/disables locking camera angle when console is open
 
 - New keybinds:
     - ToggleChallengeBlackPhantomEnemies
@@ -38,6 +53,15 @@
     - DespawnGravelordPhantoms
         De-spawns existing Gravelord phantoms, but only if current character is in
         their first playthrough (NG+0)
+    - ToggleMouseInput
+        Enables/disables mouse input
+    - ToggleConsoleLockCamera
+        Enables/disables locking camera angle when console is open
+
+- Changes:
+    - Renamed the following configuration file sections:
+        - "Dark Souls Overhaul HUD" to "HUD"
+        - "Dark Souls Overhaul Anti-Cheat" to "Anti-Cheat"
 
 
 ------------------------------------------------------------------------------------------

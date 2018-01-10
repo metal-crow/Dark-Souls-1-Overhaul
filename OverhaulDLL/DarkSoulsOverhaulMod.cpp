@@ -395,6 +395,11 @@ __declspec(dllexport) bool __stdcall get_raw_input_data(RAWINPUT *pData, PUINT p
                     break;
             }
 
+            if (!Mod::mouse_input || (Mod::console_lock_camera && console_is_open())) {
+                // Mouse input is disabled; return true to ignore this input
+                return true;
+            }
+
             break; // case RIM_TYPEMOUSE
 
         case RIM_TYPEKEYBOARD:

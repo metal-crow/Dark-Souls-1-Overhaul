@@ -38,6 +38,61 @@ int cc_credits(std::vector<std::string> args, std::string *output)
 }
 
 
+// Enables/disables mouse input
+int cc_mouse_input(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = CONSOLE_COMMAND_SUCCESS;
+    if (args.size() > 0) {
+        switch (parse_toggle_arg(args.at(0).c_str()))
+        {
+            case 0:
+                Mod::mouse_input = false;
+                break;
+            case 1:
+                Mod::mouse_input = true;
+                break;
+            default:
+                output->append(ERROR_INVALID_BOOL_ARGUMENT + "\n");
+                ret_val = ERROR_INVALID_PARAMETER;
+                break;
+        }
+    }
+    if (Mod::mouse_input) {
+        output->append("Mouse input = enabled");
+    } else {
+        output->append("Mouse input = disabled");
+    }
+    return ret_val;
+}
+
+
+// Enables/disables camera lock when console is open
+int cc_console_lock_cam(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = CONSOLE_COMMAND_SUCCESS;
+    if (args.size() > 0) {
+        switch (parse_toggle_arg(args.at(0).c_str()))
+        {
+            case 0:
+                Mod::console_lock_camera = false;
+                break;
+            case 1:
+                Mod::console_lock_camera = true;
+                break;
+            default:
+                output->append(ERROR_INVALID_BOOL_ARGUMENT + "\n");
+                ret_val = ERROR_INVALID_PARAMETER;
+                break;
+        }
+    }
+    if (Mod::console_lock_camera) {
+        output->append("Camera lock when console is open = enabled");
+    } else {
+        output->append("Camera lock when console is open = disabled");
+    }
+    return ret_val;
+}
+
 
 // Checks if Legacy Mode is enabled
 int cc_legacy_mode(std::vector<std::string> args, std::string *output)
@@ -46,7 +101,6 @@ int cc_legacy_mode(std::vector<std::string> args, std::string *output)
         output->append("Legacy Mode is enabled.");
     else
         output->append("Legacy Mode is disabled.");
-
     return CONSOLE_COMMAND_SUCCESS;
 }
 
@@ -56,8 +110,7 @@ int cc_cheats(std::vector<std::string> args, std::string *output)
 {
     int return_val = CONSOLE_COMMAND_SUCCESS;
 
-    if (args.size() > 0)
-    {
+    if (args.size() > 0) {
         switch (parse_toggle_arg(args.at(0).c_str()))
         {
             case 0:
@@ -98,7 +151,6 @@ int cc_cheats(std::vector<std::string> args, std::string *output)
         else
             output->append("Cheats = disabled");
     }
-
     return return_val;
 }
 
@@ -108,8 +160,7 @@ int cc_save_file_index(std::vector<std::string> args, std::string *output)
 {
     int ret_val = ERROR_SUCCESS;
     int new_index = -1;
-    if (args.size() > 0)
-    {
+    if (args.size() > 0) {
         if (args.at(0) == "next") {
             SetLastError(ERROR_SUCCESS);
             Files::set_save_file_next();
@@ -226,12 +277,50 @@ int cc_challenge_bp_enemies(std::vector<std::string> args, std::string *output)
                 break;
         }
     }
-
     if (Challenge::BlackPhantomEnemies::active) {
         output->append("\"Black Phantom Enemies\" challenge mod = enabled");
     } else {
         output->append("\"Black Phantom Enemies\" challenge mod = disabled");
     }
+    return ret_val;
+}
+
+// Sets draw type for NPCs modified by the "Black Phantom Enemies" challenge mod
+int cc_challenge_bp_enemy_draw_type(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = ERROR_SUCCESS;
+    int new_draw_type = -1;
+    if (args.size() > 0) {
+        if (args.at(0) == "default") {
+            new_draw_type = Challenge::BlackPhantomEnemies::DRAW_TYPE_DEFAULT;
+        } else {
+            // Draw type specified
+            try {
+                new_draw_type = std::stoi(args.at(0).c_str(), NULL);
+            } catch (std::invalid_argument) {
+                ret_val = ERROR_BAD_ARGUMENTS;
+                new_draw_type = -1;
+            } catch (std::out_of_range) {
+                ret_val = ERROR_RANGE_NOT_FOUND;
+                new_draw_type = -1;
+            }
+        }
+
+        if (new_draw_type >= 0 && new_draw_type <= 255) {
+            bool reapply = (new_draw_type != Challenge::BlackPhantomEnemies::DRAW_TYPE);
+            Challenge::BlackPhantomEnemies::DRAW_TYPE = new_draw_type;
+            if (Challenge::BlackPhantomEnemies::active && reapply) {
+                Challenge::BlackPhantomEnemies::disable();
+                Challenge::BlackPhantomEnemies::enable();
+            }
+        } else {
+            if (ret_val == ERROR_SUCCESS) {
+                ret_val = ERROR_INVALID_PARAMETER;
+            }
+            output->append("ERROR: Invalid argument (Index must be an integer between 0 and 255)\n");
+        }
+    }
+    output->append("Black Phantom Enemies challenge mod enemy draw type = " + std::to_string(Challenge::BlackPhantomEnemies::DRAW_TYPE));
     return ret_val;
 }
 
@@ -259,7 +348,6 @@ int cc_challenge_gravelord_phantoms(std::vector<std::string> args, std::string *
                 break;
         }
     }
-
     if (Challenge::GravelordPhantoms::active) {
         output->append("\"Gravelord Phantoms\" challenge mod = enabled");
     } else {
@@ -281,8 +369,7 @@ int cc_gravelord_phantoms_despawn(std::vector<std::string> args, std::string *ou
 int cc_binocs_trigger_block(std::vector<std::string> args, std::string *output)
 {
     int ret_val = CONSOLE_COMMAND_SUCCESS;
-    if (args.size() > 0)
-    {
+    if (args.size() > 0) {
         switch (parse_toggle_arg(args.at(0).c_str()))
         {
             case 0:
@@ -301,13 +388,9 @@ int cc_binocs_trigger_block(std::vector<std::string> args, std::string *output)
                 break;
         }
     }
-
-    if (BinocsTriggerBlock::active)
-    {
+    if (BinocsTriggerBlock::active) {
         output->append("BinocsTriggerBlock = enabled");
-    }
-    else
-    {
+    } else {
         output->append("BinocsTriggerBlock = disabled");
     }
     return ret_val;
@@ -317,8 +400,7 @@ int cc_binocs_trigger_block(std::vector<std::string> args, std::string *output)
 int cc_dragon_trigger_block(std::vector<std::string> args, std::string *output)
 {
     int ret_val = CONSOLE_COMMAND_SUCCESS;
-    if (args.size() > 0)
-    {
+    if (args.size() > 0) {
         switch (parse_toggle_arg(args.at(0).c_str()))
         {
             case 0:
@@ -337,13 +419,9 @@ int cc_dragon_trigger_block(std::vector<std::string> args, std::string *output)
                 break;
         }
     }
-
-    if (DragonTriggerBlock::active)
-    {
+    if (DragonTriggerBlock::active) {
         output->append("DragonTriggerBlock = enabled");
-    }
-    else
-    {
+    } else {
         output->append("DragonTriggerBlock = disabled");
     }
     return ret_val;
@@ -356,8 +434,7 @@ int cc_dragon_trigger_block(std::vector<std::string> args, std::string *output)
 int cc_dim_lava(std::vector<std::string> args, std::string *output)
 {
     int ret_val = CONSOLE_COMMAND_SUCCESS;
-    if (args.size() > 0)
-    {
+    if (args.size() > 0) {
         switch (parse_toggle_arg(args.at(0).c_str()))
         {
             case 0:
@@ -372,13 +449,9 @@ int cc_dim_lava(std::vector<std::string> args, std::string *output)
                 break;
         }
     }
-
-    if (Game::dim_lava_enabled())
-    {
+    if (Game::dim_lava_enabled()) {
         output->append("Dim lava = enabled");
-    }
-    else
-    {
+    } else {
         output->append("Dim lava = disabled");
     }
     return ret_val;
@@ -389,8 +462,7 @@ int cc_dim_lava(std::vector<std::string> args, std::string *output)
 int cc_hud_compass_radial(std::vector<std::string> args, std::string *output)
 {
     int ret_val = CONSOLE_COMMAND_SUCCESS;
-    if (args.size() > 0)
-    {
+    if (args.size() > 0) {
         switch (parse_toggle_arg(args.at(0).c_str()))
         {
             case 0:
@@ -405,13 +477,9 @@ int cc_hud_compass_radial(std::vector<std::string> args, std::string *output)
                 break;
         }
     }
-
-    if (Hud::get_show_compass_radial())
-    {
+    if (Hud::get_show_compass_radial()) {
         output->append("Radial compass HUD element = enabled");
-    }
-    else
-    {
+    } else {
         output->append("Radial compass HUD element = disabled");
     }
     return ret_val;
@@ -422,8 +490,7 @@ int cc_hud_compass_radial(std::vector<std::string> args, std::string *output)
 int cc_hud_compass_bar(std::vector<std::string> args, std::string *output)
 {
     int ret_val = CONSOLE_COMMAND_SUCCESS;
-    if (args.size() > 0)
-    {
+    if (args.size() > 0) {
         switch (parse_toggle_arg(args.at(0).c_str()))
         {
             case 0:
@@ -438,13 +505,9 @@ int cc_hud_compass_bar(std::vector<std::string> args, std::string *output)
                 break;
         }
     }
-
-    if (Hud::get_show_compass_bar())
-    {
+    if (Hud::get_show_compass_bar()) {
         output->append("Bar compass HUD element = enabled");
-    }
-    else
-    {
+    } else {
         output->append("Bar compass HUD element = disabled");
     }
     return ret_val;
@@ -455,8 +518,7 @@ int cc_hud_compass_bar(std::vector<std::string> args, std::string *output)
 int cc_hud_elevation_meter(std::vector<std::string> args, std::string *output)
 {
     int ret_val = CONSOLE_COMMAND_SUCCESS;
-    if (args.size() > 0)
-    {
+    if (args.size() > 0) {
         switch (parse_toggle_arg(args.at(0).c_str()))
         {
             case 0:
@@ -471,13 +533,9 @@ int cc_hud_elevation_meter(std::vector<std::string> args, std::string *output)
                 break;
         }
     }
-
-    if (Hud::get_show_elevation_meter())
-    {
+    if (Hud::get_show_elevation_meter()) {
         output->append("Elevation meter HUD element = enabled");
-    }
-    else
-    {
+    } else {
         output->append("Elevation meter HUD element = disabled");
     }
     return ret_val;
@@ -488,8 +546,7 @@ int cc_hud_elevation_meter(std::vector<std::string> args, std::string *output)
 int cc_hud_node_graph(std::vector<std::string> args, std::string *output)
 {
     int ret_val = CONSOLE_COMMAND_SUCCESS;
-    if (args.size() > 0)
-    {
+    if (args.size() > 0) {
         switch (parse_toggle_arg(args.at(0).c_str()))
         {
             case 0:
@@ -504,13 +561,9 @@ int cc_hud_node_graph(std::vector<std::string> args, std::string *output)
                 break;
         }
     }
-
-    if (Hud::get_show_node_graph())
-    {
+    if (Hud::get_show_node_graph()) {
         output->append("Multiplayer node graph HUD element = enabled");
-    }
-    else
-    {
+    } else {
         output->append("Multiplayer node graph HUD element = disabled");
     }
     return ret_val;
@@ -521,8 +574,7 @@ int cc_hud_node_graph(std::vector<std::string> args, std::string *output)
 int cc_armor_sfx(std::vector<std::string> args, std::string *output)
 {
     int ret_val = CONSOLE_COMMAND_SUCCESS;
-    if (args.size() > 0)
-    {
+    if (args.size() > 0) {
         switch (parse_toggle_arg(args.at(0).c_str()))
         {
             case 0:
@@ -537,13 +589,9 @@ int cc_armor_sfx(std::vector<std::string> args, std::string *output)
                 break;
         }
     }
-
-    if (Game::armor_sfx_enabled())
-    {
+    if (Game::armor_sfx_enabled()) {
         output->append("Armor sfx = enabled");
-    }
-    else
-    {
+    } else {
         output->append("Armor sfx = disabled");
     }
     return ret_val;
@@ -562,29 +610,22 @@ int cc_fix_bonfire_input(std::vector<std::string> args, std::string *output)
 // Prints information on every player in the user's multiplayer node network
 int cc_multiplayer_network(std::vector<std::string> args, std::string *output)
 {
-    if (Game::node_count < 0)
-    {
+    if (Game::node_count < 0) {
         output->append("Multiplayer network is unavailable.");
-    }
-    else if (Game::node_count == 0)
-    {
+    } else if (Game::node_count == 0) {
         output->append("No players in multiplayer network.");
-    }
-    else
-    {
+    } else {
         output->append("\n");
         std::string header = "     Steam64 ID         |    Steam64 ID (Hex)   |   Ping    ";
         output->append(header);
         output->append("\n");
-        for (int i = 0; i < (int)header.length(); i++)
-        {
+        for (int i = 0; i < (int)header.length(); i++) {
             output->append("-");
         }
         output->append("\n");
         SpPointer connection_list = SpPointer((uint8_t*)Game::ds1_base + 0xF62D24, { 0x54 });
         SpPointer entry = SpPointer(NULL);
-        for (int i = 0; i < Game::node_count && connection_list.resolve() != entry.resolve(); i++)
-        {
+        for (int i = 0; i < Game::node_count && connection_list.resolve() != entry.resolve(); i++) {
             if (i == 0)
                 entry = SpPointer(connection_list.resolve(), { 0x0 });
 
@@ -594,8 +635,7 @@ int cc_multiplayer_network(std::vector<std::string> args, std::string *output)
 
             int status;
             status_ptr.read(&status);
-            if (status > 2)
-            {
+            if (status > 2) {
                 output->append("  ");
 
                 // Get Steam64 ID as decimal string
@@ -607,12 +647,10 @@ int cc_multiplayer_network(std::vector<std::string> args, std::string *output)
                 output->append(steam64_id);
                 output->append("|    ");
 
-
                 // Get Steam64 ID as hex string
                 uint8_t steam_id_bytes[8];
                 memcpy_s(steam_id_bytes, 8, steam_id_ptr.resolve(), 8);
-                for (int j = 0; j < 8; j++)
-                {
+                for (int j = 0; j < 8; j++) {
                     uint8_t b = steam_id_bytes[7 - j];
                     std::stringstream hex_stream;
                     hex_stream << std::hex << (int)b; // Convert Virtual-key code to hex string
@@ -621,7 +659,6 @@ int cc_multiplayer_network(std::vector<std::string> args, std::string *output)
                     output->append(hex_stream.str());
                 }
                 output->append("   |   ");
-
 
                 // Get ping
                 int ping;
@@ -635,7 +672,6 @@ int cc_multiplayer_network(std::vector<std::string> args, std::string *output)
                     output->append(" ");
                 output->append("\n");
             }
-
             // Get next connection
             entry = SpPointer(entry.resolve(), { 0x0 });
         }
@@ -649,9 +685,7 @@ int cc_multiplayer_network(std::vector<std::string> args, std::string *output)
 int cc_text_feed_node_count(std::vector<std::string> args, std::string *output)
 {
     int return_val = CONSOLE_COMMAND_SUCCESS;
-
-    if (args.size() > 0)
-    {
+    if (args.size() > 0) {
         switch (parse_toggle_arg(args.at(0).c_str()))
         {
             case 0:
@@ -665,29 +699,19 @@ int cc_text_feed_node_count(std::vector<std::string> args, std::string *output)
                 return_val = ERROR_INVALID_PARAMETER;
                 break;
         }
-    }
-    else
-    {
-        if (Game::node_count < 0)
-        {
+    } else {
+        if (Game::node_count < 0) {
             output->append("Multiplayer network is unavailable.\n");
-        }
-        else
-        {
+        } else {
             output->append("Current node count: ").append(std::to_string(Game::node_count)).append("\n");
         }
     }
-
     // If no argument is specified, simply print the status
-    if (Mod::show_node_count)
-    {
+    if (Mod::show_node_count) {
         output->append("Display multiplayer node count = enabled");
-    }
-    else
-    {
+    } else {
         output->append("Display multiplayer node count = disabled");
     }
-
     return return_val;
 }
 
@@ -721,6 +745,9 @@ int cc_developer_debug(std::vector<std::string> args, std::string *output)
 void Mod::register_console_commands()
 {
     register_console_command(ccn_developer_debug, cc_developer_debug, chm_developer_debug);
+    register_console_command(ccn_mouse_input, cc_mouse_input, chm_mouse_input);
+    register_console_command(ccn_console_lock_cam, cc_console_lock_cam, chm_console_lock_cam);
+    register_console_alias(cca_console_lock_cam, ccn_console_lock_cam);
     register_console_command(ccn_credits, cc_credits, chm_credits);
     register_console_command(ccn_legacy_mode, cc_legacy_mode, chm_legacy_mode);
     register_console_command(ccn_armor_sfx, cc_armor_sfx, chm_armor_sfx);
@@ -743,6 +770,7 @@ void Mod::register_console_commands()
     register_console_command(ccn_save_file_prev, cc_save_file_prev, chm_save_file_prev);
     register_console_command(ccn_save_file_create, cc_save_file_create, chm_save_file_create);
     register_console_command(ccn_challenge_bp_enemies, cc_challenge_bp_enemies, chm_challenge_bp_enemies);
+    register_console_command(ccn_challenge_bp_enemy_draw_type, cc_challenge_bp_enemy_draw_type, chm_challenge_bp_enemy_draw_type);
     register_console_command(ccn_challenge_gravelord_phantoms, cc_challenge_gravelord_phantoms, chm_challenge_gravelord_phantoms);
     register_console_command(ccn_gravelord_phantoms_despawn, cc_gravelord_phantoms_despawn, chm_gravelord_phantoms_despawn);
 

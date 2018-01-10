@@ -24,9 +24,14 @@
 
 
 
+// Toggles mouse input
+int kf_toggle_mouse_input();
+
+// Toggles camera lock when console is open
+int kf_toggle_console_lock_cam();
+
 // Fixes input bug that causes players to be stuck at a bonfire (usually after turning human with framerate unlocked)
 int kf_fix_bonfire_input();
-
 
 // Toggles node count element of overlay text feed
 int kf_toggle_node_count();

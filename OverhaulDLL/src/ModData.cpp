@@ -38,6 +38,12 @@ std::vector<std::string> Mod::startup_messages;
 // List of supported game versions
 std::vector<uint8_t> Mod::supported_game_versions = { DS1_VERSION_RELEASE };
 
+// Enable/disable mouse input
+bool Mod::mouse_input = true;
+
+// Lock camera when console is open
+bool Mod::console_lock_camera = true;
+
 // Determines whether to start in legacy mode (only applies fixes, no gameplay changes)
 bool Mod::legacy_mode = false;
 
@@ -86,6 +92,11 @@ void Mod::get_startup_preferences()
 {
     // Begin loading startup preferences
     Mod::startup_messages.push_back(Mod::output_prefix + "Loading startup preferences...");
+
+    // Check if mouse input should be disabled
+    Mod::mouse_input = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_INPUT_SECTION_, _DS1_OVERHAUL_PREF_MOUSE_INPUT_, (int)Mod::mouse_input, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    if (!Mod::mouse_input)
+        Mod::startup_messages.push_back("    Mouse input disabled.");
 
     // Check if legacy mode is enabled
     Mod::legacy_mode = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_LEGACY_MODE_, (int)Mod::legacy_mode, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
@@ -147,6 +158,9 @@ void Mod::get_user_preferences()
     // Begin loading setting preferences
     print_console(Mod::output_prefix + "Loading user preferences...");
 
+    // Check if camera should be locked when console is open
+    Mod::console_lock_camera = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_INPUT_SECTION_, _DS1_OVERHAUL_PREF_CONSOLE_LOCK_CAM_, (int)Mod::console_lock_camera, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+
     Mod::cheats_warning = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_CHEATS_WARNING_, (int)Mod::cheats_warning, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
 
     Mod::disable_low_fps_disconnect = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DISABLE_LOW_FPS_DISCONNECT_, (int)Mod::disable_low_fps_disconnect, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
@@ -200,6 +214,7 @@ void Mod::get_user_preferences()
     if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_BP_ENEMIES_, Challenge::BlackPhantomEnemies::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
         print_console("    Challenge: Black Phantom Enemies will be enabled");
     }
+    Challenge::BlackPhantomEnemies::DRAW_TYPE = (uint8_t)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_BP_ENEMY_DRAW_TYPE_, Challenge::BlackPhantomEnemies::DRAW_TYPE_DEFAULT, _DS1_OVERHAUL_SETTINGS_FILE_);
 
     // @TODO Load additional user preferences here
 
@@ -215,6 +230,12 @@ void Mod::get_user_keybinds()
     // Begin loading keybinds
     print_console(Mod::output_prefix + "Loading keybinds...");
 
+
+    // Toggle mouse input keybind
+    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_MOUSE_INPUT_, kf_toggle_mouse_input);
+
+    // Toggle camera lock when console is open
+    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_CONSOLE_LOCK_CAM_, kf_toggle_console_lock_cam);
 
     // Bonfire input fix keybind
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_BONFIRE_INPUT_FIX_, kf_fix_bonfire_input);
