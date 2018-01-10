@@ -5,110 +5,64 @@
         Ainsley Harriott  -  NPC Guard & Boss Guard
         Ashley            -  Anti-Tele-Backstab
         Metal-crow        -  NPC Guard, in-line ASM fixes
-        Sean Pesce        -  C++ conversions
+        Sean Pesce        -  C++
 */
 
 
 #pragma once
 
-#ifndef _DS1_OVERHAUL_ANTI_CHEAT_H_
-    #define _DS1_OVERHAUL_ANTI_CHEAT_H_
-
+#ifndef _DS1_OVERHAUL_ANTI_CHEAT_MAIN_H_
+    #define _DS1_OVERHAUL_ANTI_CHEAT_MAIN_H_
 
 #include <cstdint>
 
+namespace AntiCheat {
 
-class AntiCheat
-{
-public:
+void start();
 
-    static void start();
+namespace BossGuard {
+    extern bool active;
+    void start();
 
-    class BossGuard
-    {
-    public:
-        // Denotes whether BossGuard anti-cheat is active
-        static bool active;
-
-        // Offset (from DARKSOULS.exe) where BossGuard anti-cheat code will be injected
-        static const uint32_t injection_offset = 0xA688E5;
-
-        static void start();
-
-        // Injected BossGuard assembly function
-        static void __stdcall check();
-    };
+    // Injected BossGuard assembly function
+    void __stdcall asm_check();
+} // namespace BossGuard
 
 
+namespace NpcGuard {
+    extern bool active;
+    void start();
+
+    // Injected NpcGuard assembly function
+    void __stdcall asm_check();
+} // namespace NpcGuard
 
 
-    class NpcGuard
-    {
-    public:
-        // Denotes whether NpcGuard anti-cheat is active
-        static bool active;
+namespace TeleBackstabProtect {
+    extern bool active;
+    void start();
 
-        // Offset (from DARKSOULS.exe) where NpcGuard anti-cheat code will be injected
-        static const uint32_t injection_offset = 0xA6BFF0;
-
-        static void start();
-
-        // Injected NpcGuard assembly function
-        static void __stdcall check();
-    };
+    // Injected TeleBackstabProtect assembly functions
+    void __stdcall asm_check();
+    void __stdcall asm_store_new_animation_id();
+} // namespace TeleBackstabProtect
 
 
+namespace BinocsTriggerBlock {
+    extern bool active;
+    void enable();
+    void disable();
+    void toggle();
+} // namespace BinocsTriggerBlock
 
 
-    class TeleBackstabProtect
-    {
-    public:
-        // Denotes whether Teleporting-Backstab-Protection anti-cheat is active
-        static bool active;
+namespace DragonTriggerBlock {
+    extern bool active;
+    void enable();
+    void disable();
+    void toggle();
+} // namespace DragonTriggerBlock
 
-        // Offset (from DARKSOULS.exe) where Teleporting-Backstab-Protection anti-cheat code will be injected
-        static const uint32_t store_anim_injection_offset = 0xA06A49;
-        static const uint32_t check_injection_offset = 0xABDBB9;
+} // namespace AntiCheat
 
-        static void start();
-
-        // Injected TeleBackstabProtect assembly functions
-        static void __stdcall check();
-        static void __stdcall store_new_animation_id();
-    };
-
-    class BinocsTriggerBlock
-    {
-    public:
-        // Denotes whether protection against forced binoculars-on-hit hacks is active
-        static bool active;
-        static void *patch_address;
-        static uint8_t original_bytes[1];
-        static uint8_t  patched_bytes[1];
-        static void enable();
-        static void disable();
-        static void toggle();
-    };
-
-    class DragonTriggerBlock
-    {
-    public:
-        // Denotes whether protection against forced dragon-transformation-on-hit hacks is active
-        static bool active;
-        static void *patch_address_head;
-        static void *patch_address_body;
-        static uint8_t original_bytes[1];
-        static uint8_t  patched_bytes[1];
-        static void enable();
-        static void disable();
-        static void toggle();
-    };
-
-};
-typedef AntiCheat::BossGuard BossGuard;
-typedef AntiCheat::NpcGuard NpcGuard;
-typedef AntiCheat::TeleBackstabProtect TeleBackstabProtect;
-typedef AntiCheat::BinocsTriggerBlock BinocsTriggerBlock;
-typedef AntiCheat::DragonTriggerBlock DragonTriggerBlock;
-
-#endif // _DS1_OVERHAUL_ANTI_CHEAT_H_
+#endif // _DS1_OVERHAUL_ANTI_CHEAT_MAIN_H_

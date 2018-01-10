@@ -24,11 +24,11 @@
 */
 void on_process_attach()
 {
-    // Initialize file I/O monitoring data structs
-    Files::init_io_monitors();
-
     // Load startup preferences from settings file
     Mod::get_startup_preferences();
+
+    // Initialize file I/O monitoring data structs
+    Files::init_io_monitors();
 
     // Check if game version is supported
     if (!game_version_is_supported)
@@ -39,7 +39,6 @@ void on_process_attach()
         Mod::startup_messages.push_back(Mod::output_prefix + "WARNING: Unsupported game version detected.");
         MessageBox(NULL, std::string("Invalid game version detected. Change to supported game version, or disable the Dark Souls Overhaul Mod.").c_str(),
                    "ERROR: Dark Souls Overhaul Mod - Wrong game version", NULL);
-
         exit(0);
     }
 

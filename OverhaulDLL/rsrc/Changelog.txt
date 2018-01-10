@@ -14,7 +14,7 @@
     - Gravelord Phantoms challenge mod:
         Auto-spawns additional Gravelord Phantom enemies, even when the player has not
         been cursed by another player from the Gravelord covenant.
-    - New configuration file section: "Input"
+    - New configuration file section: "Game Input"
 
 - New config settings:
     - BlackPhantomEnemies

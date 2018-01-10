@@ -111,10 +111,10 @@ void Game::on_first_character_loaded()
     }
 
     // Enable forced binoculars/dragonification PvP protections
-    if (BinocsTriggerBlock::active)
-        BinocsTriggerBlock::enable();
-    if (DragonTriggerBlock::active)
-        DragonTriggerBlock::enable();
+    if (AntiCheat::BinocsTriggerBlock::active)
+        AntiCheat::BinocsTriggerBlock::enable();
+    if (AntiCheat::DragonTriggerBlock::active)
+        AntiCheat::DragonTriggerBlock::enable();
 
     // Enable challenge mods
     if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_BP_ENEMIES_, Challenge::BlackPhantomEnemies::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {

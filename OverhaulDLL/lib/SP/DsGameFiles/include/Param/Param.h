@@ -69,7 +69,7 @@ public:
     // Unique array of bytes that can be used to find the param file
     std::string scan_pattern; // @TODO: Find a more efficient technique for obtaining base addresses
 
-    // Title of the param def file (used when printing feedback to overlay)
+    // (Unofficial) title of the param def file (used when printing feedback to overlay)
     std::string title;
 
     // File name of the param def file (without the .paramdef file extension)
@@ -92,8 +92,18 @@ public:
     static Bhd5Record game_param_dcx_record;
 
 protected:
-    ParamDef(void *base_init = NULL, /*int32_t data_start_offset_init = 0, size_t param_count_init = 0,*/ size_t param_size_init = sizeof(Param), const char *scan_pattern_init = "", const char *file_init = "", const char *title_init = "")
-        : base(base_init), /*data_start_offset(data_start_offset_init), param_count(param_count_init),*/ param_size(param_size_init), scan_pattern(scan_pattern_init), file(file_init), title(title_init)
+    ParamDef(void *base_init = NULL,
+             /*int32_t data_start_offset_init = 0, size_t param_count_init = 0,*/
+             size_t param_size_init = sizeof(Param),
+             const char *scan_pattern_init = "",
+             const char *file_init = "",
+             const char *title_init = "")
+        : base(base_init),
+        /*data_start_offset(data_start_offset_init), param_count(param_count_init),*/
+        param_size(param_size_init),
+        scan_pattern(scan_pattern_init),
+        file(file_init),
+        title(title_init)
     {
     }
 
