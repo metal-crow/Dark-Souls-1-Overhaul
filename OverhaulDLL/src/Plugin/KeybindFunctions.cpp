@@ -11,6 +11,8 @@
 
 #include "DllMain.h"
 #include "AntiCheat.h"
+#include "Challenge/BlackPhantomEnemies.h"
+#include "Challenge/GravelordPhantoms.h"
 
 
 // Fixes input bug that causes players to be stuck at a bonfire (usually after turning human with framerate unlocked)
@@ -77,6 +79,14 @@ int kf_toggle_armor_sfx()
         print_console("Enabled armor sounds");
     else
         print_console("Disabled armor sounds");
+    Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
+    return ERROR_SUCCESS;
+}
+
+
+// De-spawns existing Gravelord phantoms, but only if current character is in NG+0
+int kf_gravelord_phantoms_despawn() {
+    Challenge::GravelordPhantoms::despawn_gravelord_phantoms();
     Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
     return ERROR_SUCCESS;
 }
@@ -157,6 +167,21 @@ int kf_toggle_ac_binocs_trigger_block()
 int kf_toggle_ac_dragon_trigger_block()
 {
     DragonTriggerBlock::toggle();
+    Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
+    return ERROR_SUCCESS;
+}
+
+
+// Toggles for challenge mods
+int kf_toggle_cm_bp_enemies()
+{
+    Challenge::BlackPhantomEnemies::toggle();
+    Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
+    return ERROR_SUCCESS;
+}
+
+int kf_toggle_cm_gravelord_phantoms() {
+    Challenge::GravelordPhantoms::toggle();
     Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
     return ERROR_SUCCESS;
 }

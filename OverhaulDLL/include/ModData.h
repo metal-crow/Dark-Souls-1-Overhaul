@@ -21,6 +21,7 @@
 #define _DS1_OVERHAUL_ANTICHEAT_SECTION_ "Dark Souls Overhaul Anti-Cheat"
 #define _DS1_OVERHAUL_HUD_SECTION_ "Dark Souls Overhaul HUD"
 #define _DS1_OVERHAUL_DEBUG_SECTION_ "Dark Souls Overhaul Debug"
+#define _DS1_OVERHAUL_CHALLENGE_SECTION_ "Challenge Mods"
 // Startup preferences:
 #define _DS1_OVERHAUL_PREF_LEGACY_MODE_ "LegacyMode"
 #define _DS1_OVERHAUL_PREF_MEMORY_LIMIT_ "MemoryLimit"
@@ -44,12 +45,16 @@
 #define _DS1_OVERHAUL_PREF_COMPASS_BAR_ "CompassBar"
 #define _DS1_OVERHAUL_PREF_ELEVATION_ "ElevationMeter"
 #define _DS1_OVERHAUL_PREF_NODE_GRAPH_ "NodeGraph"
+// Challenge mods:
+#define _DS1_OVERHAUL_PREF_CM_BP_ENEMIES_ "BlackPhantomEnemies"
+#define _DS1_OVERHAUL_PREF_CM_GL_PHANTOMS_ "GravelordPhantoms"
 // Debug:
 #define _DS1_OVERHAUL_PREF_MONITOR_BDT_ "MonitorBdtFiles"
 #define _DS1_OVERHAUL_PREF_MONITOR_BHD_ "MonitorBhdFiles"
 #define _DS1_OVERHAUL_PREF_MONITOR_SL2_ "MonitorSaveFile"
 // Keybinds:
 #define _DS1_OVERHAUL_HOTKEY_BONFIRE_INPUT_FIX_ "BonfireInputFix"
+#define _DS1_OVERHAUL_HOTKEY_DESPAWN_GL_PHANTOMS_ "DespawnGravelordPhantoms"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_NODE_COUNT_ "ToggleNodeCount"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_DIM_LAVA_ "ToggleLavaBrightness"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_ARMOR_SFX_ "ToggleArmorSounds"
@@ -61,6 +66,8 @@
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_NODE_GRAPH_ "ToggleHudNodeGraph"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_AC_BINOCS_TRIG_BLOCK_ "ToggleBinocsTriggerBlockAC"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_AC_DRAGON_TRIG_BLOCK_ "ToggleDragonTriggerBlockAC"
+#define _DS1_OVERHAUL_HOTKEY_TOGGLE_CM_BP_ENEMIES_ "ToggleChallengeBlackPhantomEnemies"
+#define _DS1_OVERHAUL_HOTKEY_TOGGLE_CM_GL_PHANTOMS_ "ToggleChallengeGravelordPhantoms"
 
 #define _DS1_OVERHAUL_SETTINGS_STRING_BUFF_LEN_ 256		// Length of the string buffer used when obtaining user preference-related string data
 

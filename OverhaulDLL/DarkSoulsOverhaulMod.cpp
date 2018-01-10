@@ -11,6 +11,7 @@
 #include "Files.h"
 #include "AntiCheat.h"
 #include "BloodborneRallySystem.h"
+#include "Challenge/GravelordPhantoms.h"
 #include "XInputUtil.h"
 
 
@@ -78,13 +79,19 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     Game::unrestrict_network_synced_effectids();
 
     // Enable Bloodborne rally system
-    if (!Mod::legacy_mode)
-    {
+    if (!Mod::legacy_mode) {
         BloodborneRally::start();
     }
 
     // Initialize XInput hooks
     XInput::initialize();
+
+    if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_GL_PHANTOMS_,
+                                  Challenge::GravelordPhantoms::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
+        // Enable auto-spawning Gravelord Phantoms challenge mod
+        Challenge::GravelordPhantoms::enable();
+    }
+
     return 0;
 }
 
@@ -116,12 +123,9 @@ void on_process_detach()
 __declspec(dllexport) void __stdcall initialize_plugin()
 {
     // Set overlay info strings
-    if (Mod::legacy_mode)
-    {
+    if (Mod::legacy_mode) {
         set_text_feed_title("[Dark Souls Overhaul Mod (Legacy Mode)]");
-    }
-    else
-    {
+    } else {
         set_text_feed_title("[Dark Souls Overhaul Mod]");
     }
     print("-------------DARK SOULS OVERHAUL TEST BUILD-------------", 0, false, SP_D3D9O_TEXT_COLOR_ORANGE);
@@ -185,8 +189,7 @@ __declspec(dllexport) void __stdcall main_loop()
         Game::node_count = Game::get_node_count();
 
         // If cheats are enabled, make sure saveing and multiplayer are disabled
-        if (Mod::cheats)
-        {
+        if (Mod::cheats) {
             if (*(bool*)Game::saves_enabled.resolve())
                 // Cheats are on, but saving is enabled; disable saving
                 Game::saves_enabled.write(false);
@@ -215,8 +218,7 @@ DWORD WINAPI deferred_tasks(LPVOID lpParam)
 
     // Wait for event: first character loaded in this instance of the game
     int char_status = DS1_PLAYER_STATUS_LOADING;
-    while ((!Mod::deferred_tasks_complete) && char_status == DS1_PLAYER_STATUS_LOADING)
-    {
+    while ((!Mod::deferred_tasks_complete) && char_status == DS1_PLAYER_STATUS_LOADING) {
         Game::player_char_status.read(&char_status);
         Sleep(wait_time);
     }
@@ -250,8 +252,7 @@ __declspec(dllexport) void __stdcall draw_overlay(std::string *text_feed_info_he
         code in this function as optimized as possible to avoid lowering FPS.
     */
 
-    if (Mod::show_node_count)
-    {
+    if (Mod::show_node_count) {
         // Show node count in text feed info header
         if (Game::node_count > -1)
             text_feed_info_header->append("[Nodes: ").append(std::to_string(Game::node_count)).append("]  ");
@@ -347,12 +348,9 @@ __declspec(dllexport) bool __stdcall get_raw_input_data(RAWINPUT *pData, PUINT p
                     break;
 
                 case RI_MOUSE_WHEEL:
-                    if (pData->data.mouse.usButtonData == 120)
-                    {
+                    if (pData->data.mouse.usButtonData == 120) {
                         // Scrolling up
-                    }
-                    else if (pData->data.mouse.usButtonData == 65416)
-                    {
+                    } else if (pData->data.mouse.usButtonData == 65416) {
                         // Scrolling down
                     }
                     break;
@@ -380,25 +378,18 @@ __declspec(dllexport) bool __stdcall get_raw_input_data(RAWINPUT *pData, PUINT p
 
                     // Keep cursor on-screen
                     RECT window_rect;
-                    if (!GetClientRect(_game_window, &window_rect))
-                    {
+                    if (!GetClientRect(_game_window, &window_rect)) {
                         // Handle error
                         break;
                     }
-                    if (cursor_position.x < 0) // Too far left
-                    {
+                    if (cursor_position.x < 0) { // Too far left
                         cursor_position.x = 0;
-                    }
-                    else if (cursor_position.x > window_rect.right) // Too far right
-                    {
+                    } else if (cursor_position.x > window_rect.right) { // Too far right
                         cursor_position.x = window_rect.right;
                     }
-                    if (cursor_position.y < 0) // Too far up
-                    {
+                    if (cursor_position.y < 0) {  // Too far up
                         cursor_position.y = 0;
-                    }
-                    else if (cursor_position.y > window_rect.bottom) // Too far down
-                    {
+                    } else if (cursor_position.y > window_rect.bottom) { // Too far down
                         cursor_position.x = window_rect.bottom;
                     }
                     break;

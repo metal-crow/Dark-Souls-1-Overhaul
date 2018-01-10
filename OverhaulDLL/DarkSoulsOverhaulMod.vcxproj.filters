@@ -13,6 +13,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Challenge">
+      <UniqueIdentifier>{c76d2037-38b6-4262-bcf5-355a550a432a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Challenge">
+      <UniqueIdentifier>{1c4d071b-5cf6-4cf8-bfcd-d42f75b3028d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Overlay Plugin">
+      <UniqueIdentifier>{27e6737a-7f8c-4b09-b3bd-d7d910df3b2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Overlay Plugin">
+      <UniqueIdentifier>{84b0a03f-c0b2-46ca-9b77-efe5568ca6a2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DarkSoulsOverhaulMod.cpp">
@@ -30,12 +42,6 @@
     <ClCompile Include="src\PhantomLimit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Plugin\ConsoleCommands.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Plugin\KeybindFunctions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\AntiCheat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -48,11 +54,20 @@
     <ClCompile Include="src\XInputUtil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Challenge\BlackPhantomEnemies.cpp">
+      <Filter>Source Files\Challenge</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Plugin\ConsoleCommands.cpp">
+      <Filter>Source Files\Overlay Plugin</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Plugin\KeybindFunctions.cpp">
+      <Filter>Source Files\Overlay Plugin</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Challenge\GravelordPhantoms.cpp">
+      <Filter>Source Files\Challenge</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="lib\PluginImports.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\DllMain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -63,12 +78,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\PhantomLimit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Plugin\ConsoleCommands.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Plugin\KeybindFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Files.h">
@@ -82,6 +91,21 @@
     </ClInclude>
     <ClInclude Include="include\XInputUtil.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Challenge\BlackPhantomEnemies.h">
+      <Filter>Header Files\Challenge</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Plugin\ConsoleCommands.h">
+      <Filter>Header Files\Overlay Plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Plugin\KeybindFunctions.h">
+      <Filter>Header Files\Overlay Plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\PluginImports.h">
+      <Filter>Header Files\Overlay Plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Challenge\GravelordPhantoms.h">
+      <Filter>Header Files\Challenge</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
