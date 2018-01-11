@@ -21,6 +21,7 @@ public:
     static void start();
     static void on_char_load();
 private:
+    static void set_weapon_faith_requirements();
     static const uint32_t weapon_toggle_injection_offset = 0xB37F31;
     static void __stdcall weapon_toggle_injection();
     static const uint32_t current_selected_bar_injection_offset = 0x386D04;

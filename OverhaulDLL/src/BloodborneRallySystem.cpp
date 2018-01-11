@@ -9,6 +9,7 @@
 #include "BloodborneRallySystem.h"
 #include "DllMain.h"
 
+#define DS1_BB_RALLY_SYS_OCCULT_MAT_ID 700
 
 static uint32_t weapon_toggle_injection_return;
 static uint32_t current_selected_bar_injection_return;
@@ -62,6 +63,23 @@ static DWORD WINAPI Apply_rally_capable_sfx_and_starting_hp(void*);
 void BloodborneRally::on_char_load() {
     // Start new thread dedicated to applying rally-capable weapon sfx and setting the starting HP
     CreateThread(NULL, 0, Apply_rally_capable_sfx_and_starting_hp, NULL, 0, NULL);
+    BloodborneRally::set_weapon_faith_requirements();
+}
+
+void BloodborneRally::set_weapon_faith_requirements() {
+    SetLastError(ERROR_SUCCESS);
+    if (Params::Weapon().base == NULL) {
+        // Weapon parameters not loaded yet
+        print_console("ERROR: Failed to set faith requirements for Occult weapons (wait for Weapon params to load)");
+        SetLastError(ERROR_FILE_NOT_FOUND);
+        return;
+    }
+    for (int i = 0; i < (int)Params::Weapon().param_count; i++) {
+        if (Params::Weapon().get(i)->materialSetId == DS1_BB_RALLY_SYS_OCCULT_MAT_ID) {
+            // Set faith requirement
+            //Params::Weapon().get(i)->properFaith = ??;  // @TODO: Implement algorithm to calculate a fair faith requirement for each weapon
+        }
+    }
 }
 
 void __declspec(naked) __stdcall BloodborneRally::weapon_toggle_injection() {
@@ -429,3 +447,5 @@ static DWORD WINAPI Apply_rally_capable_sfx_and_starting_hp(void* unused) {
 
     return 0;
 }
+
+#undef DS1_BB_RALLY_SYS_OCCULT_MAT_ID
