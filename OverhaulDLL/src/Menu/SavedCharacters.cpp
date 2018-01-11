@@ -208,25 +208,19 @@ void __declspec(naked) __stdcall asm_custom_strings()
         jmp original_code
 
         string_id_load:
-        cmp edx, 0xBD2   // 0xBD2  = Offset of (original) header string from FMG file struct base address
-        je display_custom_load_string
-        cmp edx, 0x1F46  // 0x1F46 = Offset of (original) buttons string from FMG file struct base address
+        cmp byte ptr[eax], 0x3C // 0x3C == '<'; First character of buttons string but not header string (language-independent implementation)
+        jne display_custom_load_string
         je display_custom_load_buttons_string
-        jmp original_code
 
         string_id_load_alt:
-        cmp edx, 0xC26   // 0xC26  = Offset of (original) header string (alt) from FMG file struct base address
-        je display_custom_load_string
-        cmp edx, 0x20F2  // 0x20F2 = Offset of (original) buttons string (alt) from FMG file struct base address
+        cmp byte ptr[eax], 0x3C
+        jne display_custom_load_string
         je display_custom_load_buttons_string_alt
-        jmp original_code
 
         string_id_delete:
-        cmp edx, 0xBFA   // 0xBFA  = Offset of (original) header string from FMG file struct base address
-        je display_custom_delete_string
-        cmp edx, 0x201C  // 0x201C = Offset of (original) buttons string from FMG file struct base address
+        cmp byte ptr[eax], 0x3C
+        jne display_custom_delete_string
         je display_custom_delete_buttons_string
-        jmp original_code
 
         // Display custom message in place of "Select data to load"
         display_custom_load_string:

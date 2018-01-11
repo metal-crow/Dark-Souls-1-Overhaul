@@ -16,6 +16,7 @@
 #include "Save/Sl2.h"
 #include "Challenge/BlackPhantomEnemies.h"
 #include "Challenge/GravelordPhantoms.h"
+#include "Menu/SavedCharacters.h"
 
 
 ///////////////////////////////////////////////////////////
@@ -244,6 +245,11 @@ int cc_save_file_create(std::vector<std::string> args, std::string *output)
         }
     }
     int count = Sl2::get_save_file_count(file.c_str());
+    std::wstring custom_header =
+        L"                                            Save file "
+        + std::to_wstring(Files::save_file_index + 1)
+        + L"/" + std::to_wstring(count);
+    Menu::Saves::set_custom_header_msgs(L"Select data to load." + custom_header, L"Select data to delete." + custom_header);
     out = "Created new save file: " + file;
     if (count < 11) {
         out += "_0" + std::to_string(count - 1);
