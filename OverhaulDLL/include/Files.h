@@ -164,12 +164,10 @@ HANDLE WINAPI Files::intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesired
                         }
                     }
                     // Update menu text
-                    std::wstring custom_header = L"                                            Save file: "
+                    std::wstring custom_header =
+                        L"                                            Save file "
                         + std::to_wstring(Files::save_file_index + 1)
                         + L"/" + std::to_wstring(save_file_count);
-                        //+ L"      Slots " + std::to_wstring(Files::save_file_index + 1)
-                        //+ L"-" + std::to_wstring(((Files::save_file_index) + 1) * (Sl2::SLOT_COUNT_DEFAULT - 1))
-                        //+ L" of " + std::to_wstring(save_file_count * (Sl2::SLOT_COUNT_DEFAULT - 1));
                     std::wstring custom_buttons = L"<?conclusion?>:Enter <?cancel?>:Back <?viewChange?>:Toggle Display <?commando?>:Delete  <?categoryChangeL?>/<?categoryChangeR?>:Change save file";
                     Menu::Saves::set_custom_header_msgs(L"Select data to load." + custom_header, L"Select data to delete." + custom_header);
                     Menu::Saves::set_custom_buttons_msgs(L"<?selectUD?>:Select "+custom_buttons, custom_buttons, L"<?selectUD?>:Select "+custom_buttons);
@@ -623,12 +621,10 @@ void Files::set_save_file_index(int unsigned index, bool print_output)
         return;
     }
     // Update menu text
-    std::wstring custom_header = L"                                            Save file: "
+    std::wstring custom_header =
+        L"                                            Save file "
         + std::to_wstring(Files::save_file_index + 1)
         + L"/" + std::to_wstring(save_file_count);
-        //+ L"      Slots " + std::to_wstring(Files::save_file_index + 1)
-        //+ L"-" + std::to_wstring(((Files::save_file_index) + 1) * (Sl2::SLOT_COUNT_DEFAULT - 1))
-        //+ L" of " + std::to_wstring(save_file_count * (Sl2::SLOT_COUNT_DEFAULT - 1));
     Menu::Saves::set_custom_header_msgs(L"Select data to load." + custom_header, L"Select data to delete." + custom_header);
     Sleep(500);
     // Re-load saved characters menu
