@@ -260,6 +260,46 @@ int cc_save_file_create(std::vector<std::string> args, std::string *output)
     return ERROR_SUCCESS;
 }
 
+// Creates a copy of the current save file (Existing save files are not modified)
+int cc_save_file_copy(std::vector<std::string> args, std::string *output)
+{
+    std::string file, out;
+    if (Mod::custom_save_file_path.length() > 0) {
+        if (string_wide_to_mb((wchar_t*)Mod::custom_save_file_path.c_str(), file)) {
+            output->append("ERROR: Failed to create new save file (Conversion error)");
+            return ERROR_CLUSTER_INVALID_STRING_FORMAT;
+        }
+        if (SaveFile::copy_save_file(file.c_str(), Files::save_file_index)) {
+            output->append("ERROR: Failed to create new save file (Write error)");
+            return ERROR_WRITE_FAULT;
+        }
+    } else if (Files::default_save_file_path.length() > 0) {
+        if (SaveFile::copy_save_file(file.c_str(), Files::save_file_index)) {
+            output->append("ERROR: Failed to create new save file (Write error)");
+            return ERROR_WRITE_FAULT;
+        }
+    } else {
+        if (SaveFile::copy_save_file(Sl2::FILE_NAME_DEFAULT, Files::save_file_index)) {
+            output->append("ERROR: Failed to create new save file (Write error)");
+            return ERROR_WRITE_FAULT;
+        }
+    }
+    int count = Sl2::get_save_file_count(file.c_str());
+    std::wstring custom_header =
+        L"                                            Save file "
+        + std::to_wstring(Files::save_file_index + 1)
+        + L"/" + std::to_wstring(count);
+    Menu::Saves::set_custom_header_msgs(L"Select data to load." + custom_header, L"Select data to delete." + custom_header);
+    out = "Created save file copy: " + file;
+    if (count < 11) {
+        out += "_0" + std::to_string(count - 1);
+    } else {
+        out += "_" + std::to_string(count - 1);
+    }
+    output->append(out);
+    return ERROR_SUCCESS;
+}
+
 // Enables/disables "Black Phantom Enemies" challenge mod
 int cc_challenge_bp_enemies(std::vector<std::string> args, std::string *output)
 {
@@ -775,6 +815,7 @@ void Mod::register_console_commands()
     register_console_command(ccn_save_file_next, cc_save_file_next, chm_save_file_next);
     register_console_command(ccn_save_file_prev, cc_save_file_prev, chm_save_file_prev);
     register_console_command(ccn_save_file_create, cc_save_file_create, chm_save_file_create);
+    register_console_command(ccn_save_file_copy, cc_save_file_copy, chm_save_file_copy);
     register_console_command(ccn_challenge_bp_enemies, cc_challenge_bp_enemies, chm_challenge_bp_enemies);
     register_console_command(ccn_challenge_bp_enemy_draw_type, cc_challenge_bp_enemy_draw_type, chm_challenge_bp_enemy_draw_type);
     register_console_command(ccn_challenge_gravelord_phantoms, cc_challenge_gravelord_phantoms, chm_challenge_gravelord_phantoms);

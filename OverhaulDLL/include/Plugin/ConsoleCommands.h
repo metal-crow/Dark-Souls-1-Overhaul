@@ -74,6 +74,10 @@ const char *chm_save_file_prev = ccn_save_file_prev"\n     Sets the current save
 #define ccn_save_file_create "save_file_create"
 const char *chm_save_file_create = ccn_save_file_create"\n     Creates a new save file with 10 empty character slots. Existing save files are not modified.";
 
+#define ccn_save_file_copy "save_file_copy"
+const char *chm_save_file_copy = ccn_save_file_copy"\n     Copies the current save file (to see your current save file index, use the save_file_index console command).\n"
+                                                     "     Existing save files are not modified.";
+
 
 #define ccn_challenge_bp_enemies "challenge_black_phantom_enemies"
 const char *chm_challenge_bp_enemies = ccn_challenge_bp_enemies" [boolean]\n     Enables/disables Black Phantom Enemies challenge mod (1 = enabled, 0 = disabled), which turns all enemies (and bosses) into\n"
