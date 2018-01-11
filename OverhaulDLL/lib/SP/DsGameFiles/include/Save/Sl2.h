@@ -1211,6 +1211,61 @@ public:
 
 
     /*
+        Copies the specified save file using the pre-defined naming scheme
+    */
+    static uint32_t copy_save_file(const char *new_filename = NULL, int index = 0, bool overwrite = false) {
+        std::string base_filename, old_filename, filename;
+        uint32_t file_size;
+        if (new_filename == NULL) {
+            base_filename = Sl2SaveFile::FILE_NAME_DEFAULT;
+        } else {
+            base_filename = new_filename;
+        }
+        filename = base_filename;
+        if (index > 0 && index < 10) {
+            old_filename = base_filename + "_0" + std::to_string(index);
+        } else if (index > 0) {
+            old_filename = base_filename + "_" + std::to_string(index);
+        } else {
+            old_filename = base_filename;
+        }
+        if (!FileUtil::file_exists(old_filename.c_str())) {
+            print_console("File not found");
+            return ERROR_FILE_NOT_FOUND;
+        }
+        file_size = FileUtil::file_size(old_filename.c_str());
+        print_console("current file: " + old_filename);
+
+        if (!overwrite) {
+            int unsigned file_count = 1;
+            while (FileUtil::file_exists(filename.c_str()) && file_count < 100) {
+                if (file_count < 10) {
+                    filename = base_filename + "_0" + std::to_string(file_count);
+                } else {
+                    filename = base_filename + "_" + std::to_string(file_count);
+                }
+                file_count++;
+            }
+            if (file_count >= 100 && FileUtil::file_exists(filename.c_str())) {
+                // Too many save files; don't create a new one
+                return ERROR_FILE_EXISTS;
+            }
+        }
+
+        void *buff = CoTaskMemAlloc(file_size);
+        if (buff == NULL) {
+            return ERROR_OUTOFMEMORY;
+        }
+        memset(buff, 0, file_size);
+        FileUtil::read_from_offset(old_filename.c_str(), 0, file_size, buff, false);
+        print_console("new file: " + filename);
+        FileUtil::dump_file(buff, file_size, filename.c_str(), overwrite);
+        CoTaskMemFree(buff);
+        return ERROR_SUCCESS;
+    }
+
+
+    /*
         EXPERIMENTAL FUNCTION (UNFINISHED)
 
         Generates an empty save slot in the given buffer. If buffer is not NULL, it is assumed to be at least 393,248 bytes,

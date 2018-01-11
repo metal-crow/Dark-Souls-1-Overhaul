@@ -208,19 +208,25 @@ void __declspec(naked) __stdcall asm_custom_strings()
         jmp original_code
 
         string_id_load:
-        cmp byte ptr[eax], 0x3C // 0x3C == '<'; First character of buttons string but not header string (language-independent implementation)
+        cmp byte ptr[eax], 0x3C // 0x3C == '<'; First character of buttons/dialog strings but not header string (language-independent implementation)
         jne display_custom_load_string
+        cmp byte ptr[eax + 0x6], 0x65 // 0x65 == 'e'; Fourth character of buttons string (and not dialog string)
         je display_custom_load_buttons_string
+        jmp original_code
 
         string_id_load_alt:
         cmp byte ptr[eax], 0x3C
         jne display_custom_load_string
+        cmp byte ptr[eax + 0x6], 0x65
         je display_custom_load_buttons_string_alt
+        jmp original_code
 
         string_id_delete:
         cmp byte ptr[eax], 0x3C
         jne display_custom_delete_string
+        cmp byte ptr[eax + 0x6], 0x65
         je display_custom_delete_buttons_string
+        jmp original_code
 
         // Display custom message in place of "Select data to load"
         display_custom_load_string:
