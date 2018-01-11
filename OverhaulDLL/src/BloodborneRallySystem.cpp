@@ -377,7 +377,7 @@ static DWORD WINAPI Apply_rally_capable_sfx_and_starting_hp(void* unused) {
 
     while (true) {
         //prevent first hit having a beforehit hp of zero
-        *beforehit_hp_ptr = UINT16_MAX;
+        beforehit_hp_ptr = (uint32_t*)UINT16_MAX;
 
         //only apply the rally sfx if character is loaded
         Game::player_char_status.read(&char_status);
