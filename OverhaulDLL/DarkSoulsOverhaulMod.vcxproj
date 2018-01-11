@@ -271,6 +271,7 @@
     <ClInclude Include="include\Plugin\KeybindFunctions.h" />
     <ClInclude Include="include\XInputUtil.h" />
     <ClInclude Include="lib\PluginImports.h" />
+    <ClInclude Include="PhantomUnshackle.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DarkSoulsOverhaulMod.cpp" />
@@ -294,6 +295,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Build|x64'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="PhantomUnshackle.cpp" />
     <ClCompile Include="src\AntiCheat\AntiCheat.cpp" />
     <ClCompile Include="src\AntiCheat\BinocsTriggerBlock.cpp" />
     <ClCompile Include="src\AntiCheat\BossGuard.cpp" />
