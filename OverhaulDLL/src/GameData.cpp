@@ -93,6 +93,7 @@ void Game::on_first_character_loaded()
     print_console(Mod::output_prefix + "Searching memory for files...");
     Params::Armor().init(true);
     Params::Npc().init(true);
+    Params::Weapon().init(true);
 
     // Disable armor sounds if it was specified in the config file
     if (Mod::disable_armor_sfx_pref)
