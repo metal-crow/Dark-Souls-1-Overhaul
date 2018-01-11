@@ -1234,7 +1234,6 @@ public:
             return ERROR_FILE_NOT_FOUND;
         }
         file_size = FileUtil::file_size(old_filename.c_str());
-        print_console("current file: " + old_filename);
 
         if (!overwrite) {
             int unsigned file_count = 1;
@@ -1258,7 +1257,6 @@ public:
         }
         memset(buff, 0, file_size);
         FileUtil::read_from_offset(old_filename.c_str(), 0, file_size, buff, false);
-        print_console("new file: " + filename);
         FileUtil::dump_file(buff, file_size, filename.c_str(), overwrite);
         CoTaskMemFree(buff);
         return ERROR_SUCCESS;
