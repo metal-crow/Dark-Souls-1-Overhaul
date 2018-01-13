@@ -169,7 +169,8 @@ public:
 private:
     CharInitParamDef()
         : ParamDef(NULL, /*0xED0, 312,*/ sizeof(CharInitParam),
-                   "50 33 01 00 ?? ?? 00 00 01 00 ?? ?? 43 48 41 52",
+                   //"50 33 01 00 ?? ?? 00 00 01 00 ?? ?? 43 48 41 52",
+                   "?? ?? ?? ?? ?? ?? 00 00 01 00 ?? ?? 43 48 41 52 41 43 54 45 52 5F 49 4E 49 54 5F 50 41 52 41 4D 00",
                    "CharaInitParam", "Character Initialization")
     {
     }

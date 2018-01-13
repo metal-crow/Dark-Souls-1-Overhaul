@@ -96,7 +96,8 @@ public:
 private:
     WeaponReinforceParamDef()
         : ParamDef(NULL, sizeof(WeaponReinforceParam),
-                   "10 C6 00 00 ?? ?? 00 00 01 00 ?? ?? 52 45 49 4E",
+                   //"10 C6 00 00 ?? ?? 00 00 01 00 ?? ?? 52 45 49 4E",
+                   "?? ?? ?? ?? ?? ?? 00 00 01 00 ?? ?? 52 45 49 4E 46 4F 52 43 45 5F 50 41 52 41 4D 5F 57 45 41 50 4F 4E 5F 53 54 00",
                    "ReinforceParamWeapon", "Weapon Reinforcement")
     {
     }

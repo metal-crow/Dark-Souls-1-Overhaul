@@ -102,7 +102,8 @@ public:
 private:
     MoveParamDef()
         : ParamDef(NULL, /*0x33C, 65,*/ sizeof(MoveParam),
-                   "D0 27 00 00 ?? ?? 01 00 01 00 ?? ?? 4D 4F 56 45",
+                   //"D0 27 00 00 ?? ?? 01 00 01 00 ?? ?? 4D 4F 56 45",
+                   "?? ?? ?? ?? ?? ?? 01 00 01 00 ?? ?? 4D 4F 56 45 5F 50 41 52 41 4D 5F 53 54 00",
                    "MoveParam", "Movement")
     {
     }

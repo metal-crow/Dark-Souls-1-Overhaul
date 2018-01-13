@@ -68,8 +68,9 @@ public:
 private:
     LockCamParamDef()
         : ParamDef(NULL, /*0x1F8, 38,*/ sizeof(LockCamParam),
-                   "C0 06 00 00 ?? ?? 00 00 01 00 ?? ?? 4C 4F 43 4B",
-                   "LockCam", "Camera lock")
+                   //"C0 06 00 00 ?? ?? 00 00 01 00 ?? ?? 4C 4F 43 4B",
+                   "?? ?? ?? ?? ?? ?? 00 00 01 00 ?? ?? 4C 4F 43 4B 5F 43 41 4D 5F 50 41 52 41 4D 5F 53 54 00",
+                   "LockCamParam", "Camera lock")
     {
     }
 

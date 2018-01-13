@@ -68,7 +68,8 @@ public:
 private:
     MenuColorParamDef()
         : ParamDef(NULL, /*0x3FC, 81,*/ sizeof(MenuColorParam),
-                   "40 05 00 00 ?? ?? 01 00 01 00 ?? ?? 4D 45 4E 55",
+                   //"40 05 00 00 ?? ?? 01 00 01 00 ?? ?? 4D 45 4E 55",
+                   "?? ?? ?? ?? ?? ?? 01 00 01 00 ?? ?? 4D 45 4E 55 5F 50 41 52 41 4D 5F 43 4F 4C 4F 52 5F 54 41 42 4C 45 5F 53 54 00",
                    "MenuColorTableParam", "Menu Color")
     {
     }

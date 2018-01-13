@@ -87,7 +87,8 @@ public:
 private:
     MaterialSetParamDef()
         : ParamDef(NULL, /*0xD20, 276,*/ sizeof(MaterialSetParam),
-                   "A0 2F 00 00 ?? ?? 00 00 01 00 ?? ?? 45 51 55 49",
+                   //"A0 2F 00 00 ?? ?? 00 00 01 00 ?? ?? 45 51 55 49",
+                   "?? ?? ?? ?? ?? ?? 00 00 01 00 ?? ?? 45 51 55 49 50 5F 4D 54 52 4C 5F 53 45 54 5F 50 41 52 41 4D 5F 53 54 00",
                    "EquipMtrlSetParam", "Material Set")
     {
     }

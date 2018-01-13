@@ -108,8 +108,9 @@ public:
 private:
     AccessoryParamDef()
         : ParamDef(NULL, sizeof(AccessoryParam),
-                   "60 0C 00 00 ?? ?? 01 00 01 00 ?? ?? 45 51 55 49",
-                   "EquipAccessoryParam", "Accessory")
+                   //"60 0C 00 00 ?? ?? 01 00 01 00 ?? ?? 45 51 55 49",
+                   "?? ?? ?? ?? ?? ?? 01 00 01 00 ?? ?? 45 51 55 49 50 5F 50 41 52 41 4D 5F 41 43 43 45 53 53 4F 52 59 5F 53 54 00",
+                   "EquipParamAccessory", "Accessory")
     {
     }
 

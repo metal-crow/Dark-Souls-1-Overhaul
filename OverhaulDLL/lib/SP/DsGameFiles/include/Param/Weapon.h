@@ -229,7 +229,8 @@ public:
 private:
     WeaponParamDef()
         : ParamDef(NULL, /*0x3A8C, 1245,*/ sizeof(WeaponParam),
-                   "60 65 05 00 ?? ?? 01 00 01 00 ?? ?? 45 51 55 49",
+                   //"60 65 05 00 ?? ?? 01 00 01 00 ?? ?? 45 51 55 49",
+                   "?? ?? ?? ?? ?? ?? 01 00 01 00 ?? ?? 45 51 55 49 50 5F 50 41 52 41 4D 5F 57 45 41 50 4F 4E 5F 53 54 00",
                    "EquipParamWeapon", "Weapon")
     {
     }

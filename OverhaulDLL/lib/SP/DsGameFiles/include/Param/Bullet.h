@@ -147,8 +147,9 @@ public:
 private:
     BulletParamDef()
         : ParamDef(NULL, /*0x1DC4, 631,*/ sizeof(BulletParam),
-                   "30 A8 01 00 ?? ?? 00 00 02 00 ?? ?? 42 55 4C 4C",
-                   "BulletParam", "Bullet")
+                   //"30 A8 01 00 ?? ?? 00 00 02 00 ?? ?? 42 55 4C 4C",
+                   "?? ?? ?? ?? ?? ?? 00 00 02 00 ?? ?? 42 55 4C 4C 45 54 5F 50 41 52 41 4D 5F 53 54 00",
+                   "Bullet", "Bullet")
     {
     }
 

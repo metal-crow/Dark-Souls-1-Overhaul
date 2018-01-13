@@ -130,7 +130,8 @@ public:
 private:
     MagicParamDef()
         : ParamDef(NULL, /*0x6CC, 141,*/ sizeof(MagicParam),
-                   "40 21 00 00 ?? ?? 01 00 02 00 ?? ?? 4D 41 47 49",
+                   //"40 21 00 00 ?? ?? 01 00 02 00 ?? ?? 4D 41 47 49",
+                   "?? ?? ?? ?? ?? ?? 01 00 02 00 ?? ?? 4D 41 47 49 43 5F 50 41 52 41 4D 5F 53 54 00",
                    "MagicParam", "Magic")
     {
     }

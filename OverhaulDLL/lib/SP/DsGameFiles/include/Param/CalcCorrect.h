@@ -86,8 +86,9 @@ public:
 private:
     CalcCorrectParamDef()
         : ParamDef(NULL, sizeof(CalcCorrectParam),
-                   "90 09 00 00 ?? ?? 01 00 01 00 ?? ?? 43 41 43 4C",
-                   "CalcCorrectParam", "Calculation Correction")
+                   //"90 09 00 00 ?? ?? 01 00 01 00 ?? ?? 43 41 43 4C",
+                   "?? ?? ?? ?? ?? ?? 01 00 01 00 ?? ?? 43 41 43 4C 5F 43 4F 52 52 45 43 54 5F 47 52 41 50 48 5F 53 54 00",
+                   "CalcCorrectGraph", "Calculation Correction")
     {
     }
 
