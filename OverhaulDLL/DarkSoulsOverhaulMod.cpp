@@ -26,6 +26,9 @@
 */
 void on_process_attach()
 {
+    Mod::startup_messages.push_back(DS1_OVERHAUL_TXT_INTRO);
+    Mod::startup_messages.push_back("");
+
     // Load startup preferences from settings file
     Mod::get_startup_preferences();
 
@@ -55,16 +58,17 @@ void on_process_attach()
     Files::check_custom_save_file_path();
     Files::check_custom_game_config_file_path();
 
-    if (!Mod::legacy_mode)
-    {
+    if (!Mod::legacy_mode) {
         // Change game version number
-        Game::set_game_version(DS1_VERSION_OVERHAUL);
+        Game::set_game_version(DS1_OVERHAUL_GAME_VER_NUM);
 
         // Apply first part of phantom limit patch
         Game::increase_phantom_limit1();
 
         // Apply phantom unshackle patch
         PhantomUnshackle::start();
+    } else {
+        Game::set_game_version(DS1_OVERHAUL_LEGACY_GAME_VER_NUM);
     }
 }
 
@@ -131,7 +135,11 @@ __declspec(dllexport) void __stdcall initialize_plugin()
 {
     // Set overlay info strings
     if (Mod::legacy_mode) {
+#ifndef DS1_OVERHAUL_QOL_PREVIEW
         set_text_feed_title("[Dark Souls Overhaul Mod (Legacy Mode)]");
+#else
+        set_text_feed_title("[Dark Souls Overhaul Mod (QoL Preview)]");
+#endif // DS1_OVERHAUL_QOL_PREVIEW
     } else {
         set_text_feed_title("[Dark Souls Overhaul Mod]");
     }

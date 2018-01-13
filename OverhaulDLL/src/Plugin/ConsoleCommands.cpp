@@ -14,6 +14,7 @@
 #include "Plugin/ConsoleCommands.h"
 #include "AntiCheat.h"
 #include "Save/Sl2.h"
+#include "Challenge/AggressiveAi.h"
 #include "Challenge/BlackPhantomEnemies.h"
 #include "Challenge/GravelordPhantoms.h"
 #include "Menu/SavedCharacters.h"
@@ -35,6 +36,15 @@ int cc_credits(std::vector<std::string> args, std::string *output)
     output->append("    ///////////////////////////////////////////////////////////\n");
     output->append("\n                ...credits coming eventually...\n\n");
 
+    return CONSOLE_COMMAND_SUCCESS;
+}
+
+
+// Prints build title and compile time for this build of the Dark Souls Overhaul project
+int cc_build(std::vector<std::string> args, std::string *output)
+{
+    print_console(DS1_OVERHAUL_TXT_INTRO "\nCompiled:  " __DATE__ "   " __TIME__);
+    print_console("");
     return CONSOLE_COMMAND_SUCCESS;
 }
 
@@ -234,11 +244,13 @@ int cc_save_file_create(std::vector<std::string> args, std::string *output)
             return ERROR_WRITE_FAULT;
         }
     } else if (Files::default_save_file_path.length() > 0) {
+        file = Files::default_save_file_path;
         if (SaveFile::generate_empty_save_file(Files::default_save_file_path.c_str())) {
             output->append("ERROR: Failed to create new save file (Write error)");
             return ERROR_WRITE_FAULT;
         }
     } else {
+        file = Sl2::FILE_NAME_DEFAULT;
         if (SaveFile::generate_empty_save_file()) {
             output->append("ERROR: Failed to create new save file (Write error)");
             return ERROR_WRITE_FAULT;
@@ -274,11 +286,13 @@ int cc_save_file_copy(std::vector<std::string> args, std::string *output)
             return ERROR_WRITE_FAULT;
         }
     } else if (Files::default_save_file_path.length() > 0) {
+        file = Files::default_save_file_path;
         if (SaveFile::copy_save_file(file.c_str(), Files::save_file_index)) {
             output->append("ERROR: Failed to create new save file (Write error)");
             return ERROR_WRITE_FAULT;
         }
     } else {
+        file = Sl2::FILE_NAME_DEFAULT;
         if (SaveFile::copy_save_file(Sl2::FILE_NAME_DEFAULT, Files::save_file_index)) {
             output->append("ERROR: Failed to create new save file (Write error)");
             return ERROR_WRITE_FAULT;
@@ -298,6 +312,37 @@ int cc_save_file_copy(std::vector<std::string> args, std::string *output)
     }
     output->append(out);
     return ERROR_SUCCESS;
+}
+
+// Enables/disables "Aggressive AI" challenge mod
+int cc_challenge_aggressive_ai(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = CONSOLE_COMMAND_SUCCESS;
+    if (args.size() > 0) {
+        switch (parse_toggle_arg(args.at(0).c_str()))
+        {
+            case 0:
+                if (Challenge::AggressiveAi::active()) {
+                    Challenge::AggressiveAi::disable();
+                }
+                break;
+            case 1:
+                if (!Challenge::AggressiveAi::active()) {
+                    Challenge::AggressiveAi::enable();
+                }
+                break;
+            default:
+                output->append(ERROR_INVALID_BOOL_ARGUMENT + "\n");
+                ret_val = ERROR_INVALID_PARAMETER;
+                break;
+        }
+    }
+    if (Challenge::AggressiveAi::active()) {
+        output->append("\"Aggressive AI\" challenge mod = enabled");
+    } else {
+        output->append("\"Aggressive AI\" challenge mod = disabled");
+    }
+    return ret_val;
 }
 
 // Enables/disables "Black Phantom Enemies" challenge mod
@@ -791,19 +836,16 @@ int cc_developer_debug(std::vector<std::string> args, std::string *output)
 void Mod::register_console_commands()
 {
     register_console_command(ccn_developer_debug, cc_developer_debug, chm_developer_debug);
+    register_console_command(ccn_overhaul_build, cc_build, chm_overhaul_build);
     register_console_command(ccn_mouse_input, cc_mouse_input, chm_mouse_input);
     register_console_command(ccn_console_lock_cam, cc_console_lock_cam, chm_console_lock_cam);
     register_console_alias(cca_console_lock_cam, ccn_console_lock_cam);
     register_console_command(ccn_credits, cc_credits, chm_credits);
-    register_console_command(ccn_legacy_mode, cc_legacy_mode, chm_legacy_mode);
-    register_console_command(ccn_armor_sfx, cc_armor_sfx, chm_armor_sfx);
-    register_console_alias(cca_armor_sounds, ccn_armor_sfx);
     register_console_command(ccn_dim_lava, cc_dim_lava, chm_dim_lava);
     register_console_alias(cca_lava_brightness_fix, ccn_dim_lava);
     register_console_command(ccn_fix_bonfire_input, cc_fix_bonfire_input, chm_fix_bonfire_input);
     register_console_command(ccn_text_feed_node_count, cc_text_feed_node_count, chm_text_feed_node_count);
     register_console_alias(cca_node_count, ccn_text_feed_node_count);
-    register_console_command(ccn_cheats, cc_cheats, chm_cheats);
     register_console_command(ccn_multiplayer_network, cc_multiplayer_network, chm_multiplayer_network);
     register_console_command(ccn_hud_compass_radial, cc_hud_compass_radial, chm_hud_compass_radial);
     register_console_command(ccn_hud_compass_bar, cc_hud_compass_bar, chm_hud_compass_bar);
@@ -816,10 +858,19 @@ void Mod::register_console_commands()
     register_console_command(ccn_save_file_prev, cc_save_file_prev, chm_save_file_prev);
     register_console_command(ccn_save_file_create, cc_save_file_create, chm_save_file_create);
     register_console_command(ccn_save_file_copy, cc_save_file_copy, chm_save_file_copy);
+    register_console_command(ccn_challenge_aggressive_ai, cc_challenge_aggressive_ai, chm_challenge_aggressive_ai);
     register_console_command(ccn_challenge_bp_enemies, cc_challenge_bp_enemies, chm_challenge_bp_enemies);
     register_console_command(ccn_challenge_bp_enemy_draw_type, cc_challenge_bp_enemy_draw_type, chm_challenge_bp_enemy_draw_type);
     register_console_command(ccn_challenge_gravelord_phantoms, cc_challenge_gravelord_phantoms, chm_challenge_gravelord_phantoms);
     register_console_command(ccn_gravelord_phantoms_despawn, cc_gravelord_phantoms_despawn, chm_gravelord_phantoms_despawn);
+
+
+#ifndef DS1_OVERHAUL_QOL_PREVIEW
+    register_console_command(ccn_cheats, cc_cheats, chm_cheats);
+    register_console_command(ccn_legacy_mode, cc_legacy_mode, chm_legacy_mode);
+    register_console_command(ccn_armor_sfx, cc_armor_sfx, chm_armor_sfx);
+    register_console_alias(cca_armor_sounds, ccn_armor_sfx);
+#endif // DS1_OVERHAUL_QOL_PREVIEW
 
 
 #ifdef _DS1_OVERHAUL_MOD_DBG_

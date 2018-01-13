@@ -16,6 +16,11 @@
 #include "SP_IO.hpp"
 #include "SP_IO_Strings.hpp"
 
+#ifdef DS1_OVERHAUL_QOL_PREVIEW
+    #define DS1_OVERHAUL_LEGACY_MODE_DEFAULT_VAL true
+#else
+    #define DS1_OVERHAUL_LEGACY_MODE_DEFAULT_VAL false
+#endif // DS1_OVERHAUL_QOL_PREVIEW
 
 
 /*
@@ -45,7 +50,7 @@ bool Mod::mouse_input = true;
 bool Mod::console_lock_camera = true;
 
 // Determines whether to start in legacy mode (only applies fixes, no gameplay changes)
-bool Mod::legacy_mode = false;
+bool Mod::legacy_mode = DS1_OVERHAUL_LEGACY_MODE_DEFAULT_VAL;
 
 // Cheats on/off. If cheats are enabled, saving and multiplayer are disabled until the game is restarted
 bool Mod::cheats = false;
@@ -98,10 +103,12 @@ void Mod::get_startup_preferences()
     if (!Mod::mouse_input)
         Mod::startup_messages.push_back("    Mouse input disabled.");
 
+#ifndef DS1_OVERHAUL_QOL_PREVIEW
     // Check if legacy mode is enabled
     Mod::legacy_mode = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_LEGACY_MODE_, (int)Mod::legacy_mode, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
     if (Mod::legacy_mode)
         Mod::startup_messages.push_back("    Legacy mode enabled. Gameplay changes will not be applied.");
+#endif // DS1_OVERHAUL_QOL_PREVIEW
 
     // Check for custom game files
     Mod::get_custom_game_files();
@@ -181,9 +188,11 @@ void Mod::get_user_preferences()
 
 
     // Check whether to disable armor sound effects
+#ifndef DS1_OVERHAUL_QOL_PREVIEW
     Mod::disable_armor_sfx_pref = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DISABLE_ARMOR_SFX_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
     if (Mod::disable_armor_sfx_pref)
         print_console("    Armor sound effects will be disabled when a character is loaded");
+#endif // DS1_OVERHAUL_QOL_PREVIEW
 
 
     // Check if additional HUD elements should be displayed
@@ -247,8 +256,10 @@ void Mod::get_user_keybinds()
     // Toggle dimmed lava visual effects
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_DIM_LAVA_, kf_toggle_dim_lava);
 
+#ifndef DS1_OVERHAUL_QOL_PREVIEW
     // Toggle armor sound effects
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_ARMOR_SFX_, kf_toggle_armor_sfx);
+#endif // DS1_OVERHAUL_QOL_PREVIEW
 
     // De-spawn existing Gravelord phantoms
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_DESPAWN_GL_PHANTOMS_, kf_gravelord_phantoms_despawn);
@@ -262,12 +273,13 @@ void Mod::get_user_keybinds()
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_COMPASS_BAR_, kf_toggle_hud_compass_bar);
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_ELEVATION_METER_, kf_toggle_hud_elevation_meter);
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_NODE_GRAPH_, kf_toggle_hud_node_graph);
-
+    
     // Toggle anti-cheats (not all are togglable)
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_AC_BINOCS_TRIG_BLOCK_, kf_toggle_ac_binocs_trigger_block);
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_AC_DRAGON_TRIG_BLOCK_, kf_toggle_ac_dragon_trigger_block);
 
     // Toggle challenge mods
+    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_CM_AGGRO_AI_, kf_toggle_cm_aggressive_ai);
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_CM_BP_ENEMIES_, kf_toggle_cm_bp_enemies);
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_CM_GL_PHANTOMS_, kf_toggle_cm_gravelord_phantoms);
 
@@ -369,5 +381,16 @@ void Mod::get_custom_game_files()
     {
         Mod::startup_messages.push_back(std::string("    Found custom game config file definition: \"").append(custom_file_name_buff).append("\""));
     }
+
+    // Get I/O output filter
+    Files::io_output_filter;
+    custom_file_name_buff[MAX_PATH] = '\0';
+    GetPrivateProfileString(_DS1_OVERHAUL_DEBUG_SECTION_,
+                            _DS1_OVERHAUL_PREF_IO_OUT_FILTER_,
+                            NULL,
+                            custom_file_name_buff,
+                            MAX_PATH + 1,
+                            _DS1_OVERHAUL_SETTINGS_FILE_);
+    Files::io_output_filter = std::string(custom_file_name_buff);
 }
 

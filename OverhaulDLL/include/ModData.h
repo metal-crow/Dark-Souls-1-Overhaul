@@ -50,6 +50,7 @@
 #define _DS1_OVERHAUL_PREF_ELEVATION_ "ElevationMeter"
 #define _DS1_OVERHAUL_PREF_NODE_GRAPH_ "NodeGraph"
 // Challenge mods:
+#define _DS1_OVERHAUL_PREF_CM_AGGRO_AI_ "AggressiveAI"
 #define _DS1_OVERHAUL_PREF_CM_BP_ENEMIES_ "BlackPhantomEnemies"
 #define _DS1_OVERHAUL_PREF_CM_BP_ENEMY_DRAW_TYPE_ "BlackPhantomEnemyDrawType"
 #define _DS1_OVERHAUL_PREF_CM_GL_PHANTOMS_ "GravelordPhantoms"
@@ -57,6 +58,7 @@
 #define _DS1_OVERHAUL_PREF_MONITOR_BDT_ "MonitorBdtFiles"
 #define _DS1_OVERHAUL_PREF_MONITOR_BHD_ "MonitorBhdFiles"
 #define _DS1_OVERHAUL_PREF_MONITOR_SL2_ "MonitorSaveFile"
+#define _DS1_OVERHAUL_PREF_IO_OUT_FILTER_ "IoMonitorFilter"
 // Keybinds:
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_MOUSE_INPUT_ "ToggleMouseInput"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_CONSOLE_LOCK_CAM_ "ToggleConsoleLockCamera"
@@ -73,6 +75,7 @@
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_NODE_GRAPH_ "ToggleHudNodeGraph"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_AC_BINOCS_TRIG_BLOCK_ "ToggleBinocsTriggerBlockAC"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_AC_DRAGON_TRIG_BLOCK_ "ToggleDragonTriggerBlockAC"
+#define _DS1_OVERHAUL_HOTKEY_TOGGLE_CM_AGGRO_AI_ "ToggleChallengeAggressiveAI"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_CM_BP_ENEMIES_ "ToggleChallengeBlackPhantomEnemies"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_CM_GL_PHANTOMS_ "ToggleChallengeGravelordPhantoms"
 

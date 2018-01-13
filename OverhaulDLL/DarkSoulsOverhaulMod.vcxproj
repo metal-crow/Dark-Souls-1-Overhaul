@@ -259,6 +259,7 @@
   <ItemGroup>
     <ClInclude Include="include\AntiCheat.h" />
     <ClInclude Include="include\BloodborneRallySystem.h" />
+    <ClInclude Include="include\Challenge\AggressiveAI.h" />
     <ClInclude Include="include\Challenge\BlackPhantomEnemies.h" />
     <ClInclude Include="include\Challenge\GravelordPhantoms.h" />
     <ClInclude Include="include\DllMain.h" />
@@ -304,6 +305,7 @@
     <ClCompile Include="src\AntiCheat\TeleBackstabProtect.cpp" />
     <ClCompile Include="src\Authors.cpp" />
     <ClCompile Include="src\BloodborneRallySystem.cpp" />
+    <ClCompile Include="src\Challenge\AggressiveAI.cpp" />
     <ClCompile Include="src\Challenge\BlackPhantomEnemies.cpp" />
     <ClCompile Include="src\Challenge\GravelordPhantoms.cpp" />
     <ClCompile Include="src\GameData.cpp" />

@@ -122,6 +122,14 @@ void handle_input(XINPUT_GAMEPAD &old, XINPUT_GAMEPAD &current, bool changed, in
                 Files::save_file_index_pending_set_next = true;
             }
         }
+
+        // B (Xbox) or Circle (Playstation)
+        if (Button::pressed(old, current, XINPUT_GAMEPAD_B)) {
+            if (console_is_open()) {
+                execute_console_command("close");
+                current.wButtons &= (~XINPUT_GAMEPAD_B);
+            }
+        }
         
 
         // Test code for omni-directional rolling while locked:

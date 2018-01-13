@@ -2,7 +2,7 @@
     DARK SOULS GAME FILE C++ LIBRARY
 
     Contributors to this file:
-        Sean Pesce    -    C++
+        Sean Pesce  -  C++
 
 
     Param/New.h
@@ -61,7 +61,9 @@ public:
     
 private:
     NewParamDef()
-        : ParamDef(/* @TODO: NULL, sizeof(NewParam), "scan_pattern", "NewParam", "title" */)
+        : ParamDef(/* @TODO: NULL, sizeof(NewParam),
+                   "scan_pattern", 
+                   "NewParam", "title" */)
     {
     }
     

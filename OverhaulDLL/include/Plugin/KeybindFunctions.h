@@ -60,6 +60,7 @@ int kf_toggle_ac_binocs_trigger_block();
 int kf_toggle_ac_dragon_trigger_block();
 
 // Toggles for challenge mods
+int kf_toggle_cm_aggressive_ai();
 int kf_toggle_cm_bp_enemies();
 int kf_toggle_cm_gravelord_phantoms();
 

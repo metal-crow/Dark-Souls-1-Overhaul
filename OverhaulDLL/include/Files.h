@@ -18,10 +18,12 @@
 #include "Menu/SavedCharacters.h"
 #include "Save/Sl2.h"
 
-
 /*
     Initialize constants:
 */
+
+// Filter for I/O monitoring output; only strings containing this string will be printed
+std::string Files::io_output_filter;
 
 // Default save file path used by the game
 std::string Files::default_save_file_path;
@@ -51,11 +53,13 @@ HANDLE WINAPI Files::intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesired
         if ((int)load_file.length() >= 4)
         {
             load_file_ext = load_file.substr(load_file.length() - 4);
-            if ((int)Mod::custom_game_archive_path.length() > 0 && load_file_ext == BdtArchive::FILE_EXT_W)
+            if (load_file_ext == BdtArchive::FILE_EXT_W)
             {
                 // Intercept archive file load (.bdt)
                 print_action = Mod::Debug::monitor_bdt;
-                load_file = Mod::custom_game_archive_path + load_file.substr(load_file.length() - 5);
+                if ((int)Mod::custom_game_archive_path.length() > 0) {
+                    load_file = Mod::custom_game_archive_path + load_file.substr(load_file.length() - 5);
+                }
                 // Store file handle for monitoring
                 switch (load_file.c_str()[load_file.length() - 5]) {
                     case L'0':
@@ -77,13 +81,14 @@ HANDLE WINAPI Files::intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesired
                         break;
                 }
             }
-            else if ((int)Mod::custom_game_archive_path.length() > 0 && load_file_ext == std::wstring(&Bhd5Archive::FILE_EXT_W[1]))
+            else if (load_file_ext == std::wstring(&Bhd5Archive::FILE_EXT_W[1]))
             {
                 // Intercept archive file load (.bhd5)
                 print_action = Mod::Debug::monitor_bhd;
-                load_file = Mod::custom_game_archive_path + load_file.substr(load_file.length() - 6);
+                if ((int)Mod::custom_game_archive_path.length() > 0) {
+                    load_file = Mod::custom_game_archive_path + load_file.substr(load_file.length() - 6);
+                }
                 // Store file handle for monitoring
-                
                 switch (load_file.c_str()[load_file.length() - 6]) {
                     case L'0':
                         return_val = &Files::io_monitors[BHD0].handle;
@@ -119,6 +124,8 @@ HANDLE WINAPI Files::intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesired
                         // Error converting file path string
                         print_console("ERROR: Failed to obtain default save file path");
                         Files::default_save_file_path = Sl2::FILE_NAME_DEFAULT;
+                    } else if ((int)Mod::custom_save_file_path.length() <= 0) {
+                        print_console("Using default save file: " + Files::default_save_file_path);
                     }
 
                     // Check save files
@@ -172,10 +179,7 @@ HANDLE WINAPI Files::intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesired
                     Menu::Saves::set_custom_header_msgs(L"Select data to load." + custom_header, L"Select data to delete." + custom_header);
                     Menu::Saves::set_custom_buttons_msgs(L"<?selectUD?>:Select "+custom_buttons, custom_buttons, L"<?selectUD?>:Select "+custom_buttons);
                 }
-
-                if ((int)Mod::custom_save_file_path.length() > 0) {
-                    Files::get_save_file_path(load_file);
-                }
+                Files::get_save_file_path(load_file);
             }
         }
         // Call original function
@@ -192,7 +196,10 @@ HANDLE WINAPI Files::intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesired
         fn_buff = io_monitor->default_filename;
     }
     if (print_action && fn_buff.length() > 0) {
-        print_console("Intercepted loading of " + fn_buff + " (" + FileUtil::to_hex_string((int)io_monitor->handle, fn_buff, true) + ")");
+        std::string out = "Intercepted loading of " + fn_buff + " (" + FileUtil::to_hex_string((int)io_monitor->handle, fn_buff, true) + ")";
+        if (Files::io_output_filter.length() == 0 || out.find(Files::io_output_filter) != std::string::npos) {
+            print_console(out);
+        }
     }
     return *return_val;
 }
@@ -248,7 +255,19 @@ BOOL WINAPI Files::intercept_read_file(HANDLE hFile, LPVOID lpBuffer, DWORD nNum
             fn_buff += " (WARNING: Async read operation)";
         }
         if (io_monitor->monitor) {
-            print_console("Reading " + std::to_string(nNumberOfBytesToRead) + " bytes from " + fn_buff + " at offset " + std::to_string(io_monitor->io_pos) + " (" + FileUtil::to_hex_string(io_monitor->io_pos, fn_buff, true) + ") and storing in buffer at " + FileUtil::to_hex_string((uint32_t)lpBuffer, fn_buff, true));
+            std::string out = "Reading " + std::to_string(nNumberOfBytesToRead) + " bytes from " + fn_buff + " at offset " + std::to_string(io_monitor->io_pos) + " (" + FileUtil::to_hex_string(io_monitor->io_pos, fn_buff, true) + ") and storing in buffer at " + FileUtil::to_hex_string((uint32_t)lpBuffer, fn_buff, true);
+            if (Files::io_output_filter.length() == 0 || out.find(Files::io_output_filter) != std::string::npos) {
+                print_console(out);
+                // Log packed file name:
+                //try {
+                //    out = bdt_off_to_fn.at(io_monitor->io_pos);
+                //} catch (const std::out_of_range&) {
+                //    out = "";
+                //}
+                //if (out.length() > 0) {
+                //    print_console("    File: " + out);
+                //}
+            }
         }
         io_monitor->io_pos += file_pos_offset;
     }
@@ -277,7 +296,10 @@ BOOL WINAPI Files::intercept_write_file(HANDLE hFile, LPCVOID lpBuffer, DWORD nN
             fn_buff += " (WARNING: Async write operation)";
         }
         if (io_monitor->monitor) {
-            print_console("Writing " + std::to_string(nNumberOfBytesToWrite) + " bytes to " + fn_buff + " at offset " + std::to_string(io_monitor->io_pos) + " (" + FileUtil::to_hex_string(io_monitor->io_pos, fn_buff, true) + ")");
+            std::string out = "Writing " + std::to_string(nNumberOfBytesToWrite) + " bytes to " + fn_buff + " at offset " + std::to_string(io_monitor->io_pos) + " (" + FileUtil::to_hex_string(io_monitor->io_pos, fn_buff, true) + ")";
+            if (Files::io_output_filter.length() == 0 || out.find(Files::io_output_filter) != std::string::npos) {
+                print_console(out);
+            }
         }
         io_monitor->io_pos += file_pos_offset;
     }
@@ -301,7 +323,10 @@ BOOL WINAPI Files::intercept_close_handle(HANDLE hObject)
         io_monitor->io_pos = 0;
         io_monitor->handle = NULL;
         if (io_monitor->monitor) {
-            print_console("Closed file handle: " + fn_buff);
+            std::string out = "Closed file handle: " + fn_buff;
+            if (Files::io_output_filter.length() == 0 || out.find(Files::io_output_filter) != std::string::npos) {
+                print_console(out);
+            }
         }
     }
     return return_val;
@@ -321,7 +346,10 @@ DWORD WINAPI Files::intercept_set_file_pointer(HANDLE hFile, LONG lDistanceToMov
     }
     if ((return_val != INVALID_SET_FILE_POINTER) && fn_buff.length() > 0) {
         if (io_monitor->monitor) {
-            print_console("New file pointer position for " + fn_buff + ": " + std::to_string(return_val) + " (" + FileUtil::to_hex_string(return_val, fn_buff, true) + ")");
+            std::string out = "New file pointer position for " + fn_buff + ": " + std::to_string(return_val) + " (" + FileUtil::to_hex_string(return_val, fn_buff, true) + ")";
+            if (Files::io_output_filter.length() == 0 || out.find(Files::io_output_filter) != std::string::npos) {
+                print_console(out);
+            }
         }
         io_monitor->io_pos = return_val;
     }
