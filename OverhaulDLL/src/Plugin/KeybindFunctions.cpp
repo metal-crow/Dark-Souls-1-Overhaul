@@ -11,6 +11,7 @@
 
 #include "DllMain.h"
 #include "AntiCheat.h"
+#include "Challenge/AggressiveAi.h"
 #include "Challenge/BlackPhantomEnemies.h"
 #include "Challenge/GravelordPhantoms.h"
 
@@ -199,6 +200,13 @@ int kf_toggle_ac_dragon_trigger_block()
 
 
 // Toggles for challenge mods
+int kf_toggle_cm_aggressive_ai()
+{
+    Challenge::AggressiveAi::toggle();
+    Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
+    return ERROR_SUCCESS;
+}
+
 int kf_toggle_cm_bp_enemies()
 {
     Challenge::BlackPhantomEnemies::toggle();

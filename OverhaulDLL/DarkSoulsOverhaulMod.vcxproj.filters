@@ -96,6 +96,9 @@
     <ClCompile Include="PhantomUnshackle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Challenge\AggressiveAI.cpp">
+      <Filter>Source Files\Challenge</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\DllMain.h">
@@ -142,6 +145,9 @@
     </ClInclude>
     <ClInclude Include="PhantomUnshackle.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Challenge\AggressiveAI.h">
+      <Filter>Header Files\Challenge</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

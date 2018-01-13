@@ -15,6 +15,7 @@
 #include "DllMain.h"
 #include "AntiCheat.h"
 #include "BloodborneRallySystem.h"
+#include "Challenge/AggressiveAi.h"
 #include "Challenge/BlackPhantomEnemies.h"
 
 
@@ -91,8 +92,10 @@ void Game::on_first_character_loaded()
 
     // Get param files
     print_console(Mod::output_prefix + "Searching memory for files...");
+    Params::AiStandardInfo().init(true);
     Params::Armor().init(true);
     Params::Npc().init(true);
+    Params::NpcThink().init(true);
     Params::Weapon().init(true);
 
     // Disable armor sounds if it was specified in the config file
@@ -118,6 +121,9 @@ void Game::on_first_character_loaded()
         AntiCheat::DragonTriggerBlock::enable();
 
     // Enable challenge mods
+    if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_AGGRO_AI_, Challenge::AggressiveAi::active(), _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
+        Challenge::AggressiveAi::enable();
+    }
     if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_BP_ENEMIES_, Challenge::BlackPhantomEnemies::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
         Challenge::BlackPhantomEnemies::enable();
     }
@@ -451,6 +457,7 @@ bool Game::armor_sfx_enabled()
 // Toggles armor sound effecs
 void Game::enable_armor_sfx(bool enable)
 {
+#ifndef DS1_OVERHAUL_QOL_PREVIEW
     if (Params::Armor().base == NULL)
     {
         print_console("ERROR: Waiting for Armor params to load");
@@ -483,6 +490,7 @@ void Game::enable_armor_sfx(bool enable)
             //Params::Armor().get(i)->defenseMaterial_Weak = 0;
         }
     }
+#endif // DS1_OVERHAUL_QOL_PREVIEW
 }
 
 

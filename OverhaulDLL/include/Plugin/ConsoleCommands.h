@@ -39,6 +39,9 @@ const std::string ERROR_INVALID_BOOL_ARGUMENT = "ERROR: Assigned value must be e
 const char *chm_developer_debug = ccn_developer_debug" \n    For developer use.";
 
 
+#define ccn_overhaul_build "overhaul_build"
+const char *chm_overhaul_build = ccn_overhaul_build" \n    Prints build title and compile time for this build of the Dark Souls Overhaul project.";
+
 #define ccn_mouse_input "mouse_input"
 const char *chm_mouse_input = ccn_mouse_input" [boolean]\n    Enables/disables mouse input (1 = enabled, 0 = disabled).";
 
@@ -78,6 +81,9 @@ const char *chm_save_file_create = ccn_save_file_create"\n     Creates a new sav
 const char *chm_save_file_copy = ccn_save_file_copy"\n     Copies the current save file (to see your current save file index, use the save_file_index console command).\n"
                                                      "     Existing save files are not modified.";
 
+
+#define ccn_challenge_aggressive_ai "challenge_aggressive_ai"
+const char *chm_challenge_aggressive_ai = ccn_challenge_aggressive_ai" [boolean]\n     Enables/disables Aggressive AI challenge mod (1 = enabled, 0 = disabled)";
 
 #define ccn_challenge_bp_enemies "challenge_black_phantom_enemies"
 const char *chm_challenge_bp_enemies = ccn_challenge_bp_enemies" [boolean]\n     Enables/disables Black Phantom Enemies challenge mod (1 = enabled, 0 = disabled), which turns all enemies (and bosses) into\n"

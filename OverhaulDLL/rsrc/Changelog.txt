@@ -5,6 +5,40 @@
 
 
 ------------------------------------------------------------------------------------------
+01/13/2018:
+
+- New features:
+    - Aggressive AI challenge mod:
+        Makes enemies extra aggressive, and aware of your presence from extremely long
+        distances
+    - Console can now be closed with the B button on the gamepad
+
+- New config settings:
+    - AggressiveAI
+	    Enables/disables Aggressive AI challenge mod at startup
+    - IoMonitorFilter
+        Filters file I/O monitoring output to strings containing the specified filter
+        string.
+
+- New console commands:
+    - challenge_aggressive_ai
+	    Enables/disables Aggressive AI challenge mod
+    - overhaul_build
+        Prints build title and compile time for the current build of the Dark Souls
+        Overhaul project
+
+- New keybinds:
+    - ToggleChallengeAggressiveAI
+	    Enables/disables Aggressive AI challenge mod
+
+- Fixes:
+    - Fixed issue when not using custom save file path that could result in the current
+      save file being overwritten.
+    - Fixed file I/O monitoring with non-custom archive file paths
+    - Fixed in-memory parameter editing for modified param files
+
+
+------------------------------------------------------------------------------------------
 01/09/2018:
 
 - New features:

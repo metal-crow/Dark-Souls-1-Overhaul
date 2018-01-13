@@ -20,8 +20,34 @@
 #define WIN32_LEAN_AND_MEAN   // Exclude rarely-used stuff from Windows headers
 
 
-// Preprocessor definition utilized by the Dark Souls Game File C++ library
+// Preprocessor definition utilized by the Dark Souls Game Files C++ library (DsGameFiles.lib)
 #define __DS1_OVERHAUL_MOD
+
+// Quality of Life preview build
+//#define DS1_OVERHAUL_QOL_PREVIEW
+
+// LordOfSandvich's Rekindled build
+//#define DS1_OVERHAUL_REKINDLED_BUILD
+
+#ifdef DS1_OVERHAUL_REKINDLED_BUILD
+    // Rekindled edition build
+    #define DS1_OVERHAUL_GAME_VER_NUM DS1_VERSION_REKINDLED
+    #define DS1_OVERHAUL_LEGACY_GAME_VER_NUM DS1_VERSION_REKINDLED
+    #ifndef DS1_OVERHAUL_QOL_PREVIEW
+        #define DS1_OVERHAUL_QOL_PREVIEW
+    #endif // !DS1_OVERHAUL_QOL_PREVIEW
+    #define DS1_OVERHAUL_TXT_INTRO "\n+-------------------------------+\n|      Dark Souls Overhaul      |\n| Quality of Life Preview Build |\n|      (Rekindled Edition)      |\n+-------------------------------+"
+#elif defined DS1_OVERHAUL_QOL_PREVIEW
+    // QoL Preview build
+    #define DS1_OVERHAUL_GAME_VER_NUM DS1_VERSION_OVERHAUL
+    #define DS1_OVERHAUL_LEGACY_GAME_VER_NUM DS1_VERSION_RELEASE
+    #define DS1_OVERHAUL_TXT_INTRO "\n+-------------------------------+\n|      Dark Souls Overhaul      |\n| Quality of Life Preview Build |\n+-------------------------------+"
+#else
+    // Normal Overhaul build
+    #define DS1_OVERHAUL_GAME_VER_NUM DS1_VERSION_OVERHAUL
+    #define DS1_OVERHAUL_LEGACY_GAME_VER_NUM DS1_VERSION_RELEASE
+    #define DS1_OVERHAUL_TXT_INTRO "\n+-------------------------------+\n|      Dark Souls Overhaul      |\n+-------------------------------+"
+#endif // DS1_OVERHAUL_REKINDLED_BUILD
 
 // Windows Header Files:
 #include <Windows.h>
