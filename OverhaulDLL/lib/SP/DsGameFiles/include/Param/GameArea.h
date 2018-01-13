@@ -81,7 +81,8 @@ public:
 private:
     GameAreaParamDef()
         : ParamDef(NULL, sizeof(GameAreaParam),
-                   "44 08 00 00 ?? ?? 00 00 01 00 ?? ?? 47 41 4D 45",
+                   //"44 08 00 00 ?? ?? 00 00 01 00 ?? ?? 47 41 4D 45",
+                   "?? ?? ?? ?? ?? ?? 00 00 01 00 ?? ?? 47 41 4D 45 5F 41 52 45 41 5F 50 41 52 41 4D 5F 53 54 00",
                    "GameAreaParam", "Game Area")
     {
     }

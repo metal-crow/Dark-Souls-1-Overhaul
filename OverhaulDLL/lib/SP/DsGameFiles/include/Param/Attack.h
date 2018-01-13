@@ -7,7 +7,9 @@
 
     Param/Attack.h
 
-    Attack Parameters from AtkParam.paramdef
+    WARNING: There are two different AtkParam files: AtkParam_Npc and AtkParam_Pc (both contain the same starting AoB)
+
+    Attack Parameters from AtkParam_??.paramdef
 
 
     References:
@@ -153,10 +155,12 @@ public:
     // @TODO: Member data specific to this class
 
 private:
+    // WARNING: There are two different AtkParam files: AtkParam_Npc and AtkParam_Pc (both contain the same starting AoB)
     AttackParamDef()
         : ParamDef(NULL, sizeof(AttackParam),
-                   "A0 FB 02 00 ?? ?? 00 00 01 00 ?? ?? 41 54 4B 5F",
-                   "AtkParam", "Attack")
+                   //"A0 FB 02 00 ?? ?? 00 00 01 00 ?? ?? 41 54 4B 5F",
+                   "?? ?? ?? ?? ?? ?? 00 00 01 00 ?? ?? 41 54 4B 5F 50 41 52 41 4D 5F 53 54 00",
+                   "AtkParam_??", "Attack")
     {
     }
 

@@ -28,6 +28,7 @@
 #include "Param/CalcCorrect.h"
 #include "Param/CharInit.h"
 #include "Param/EnemyStandardInfo.h"
+#include "Param/FaceGeneration.h"
 #include "Param/GameArea.h"
 #include "Param/Item.h"
 #include "Param/ItemLot.h"
@@ -120,6 +121,9 @@ namespace Params {
 
     // Default Enemy Behavior Parameters
     static EnemyStandardInfoParamDef& EnemyStandardInfo() { return EnemyStandardInfoParamDef::get_instance(); }
+
+    // Game Area parameters
+    static FaceGenParamDef& FaceGen() { return FaceGenParamDef::get_instance(); }
 
     // Game Area parameters
     static GameAreaParamDef& GameArea() { return GameAreaParamDef::get_instance(); }

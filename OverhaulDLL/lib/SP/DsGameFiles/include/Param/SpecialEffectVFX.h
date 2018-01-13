@@ -107,7 +107,8 @@ public:
 private:
     SpEffectVfxParamDef()
         : ParamDef(NULL, /*0xB10, 232,*/ sizeof(SpEffectVfxParam),
-                   "10 45 00 00 ?? ?? 01 00 01 00 ?? ?? 53 50 5F 45",
+                   //"10 45 00 00 ?? ?? 01 00 01 00 ?? ?? 53 50 5F 45",
+                   "?? ?? ?? ?? ?? ?? 01 00 01 00 ?? ?? 53 50 5F 45 46 46 45 43 54 5F 56 46 58 5F 50 41 52 41 4D 5F 53 54 00",
                    "SpEffectVfxParam", "Special Effect Visual Effects")
     {
     }

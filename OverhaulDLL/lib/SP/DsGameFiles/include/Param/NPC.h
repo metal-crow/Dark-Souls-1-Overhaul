@@ -269,7 +269,8 @@ public:
 private:
     NpcParamDef()
         : ParamDef(NULL, /*0x1A40, 556,*/ sizeof(NpcParam),
-                   "00 F4 02 00 ?? ?? 01 00 03 00 ?? ?? 4E 50 43 5F",
+                   //"00 F4 02 00 ?? ?? 01 00 03 00 ?? ?? 4E 50 43 5F",
+                   "?? ?? ?? ?? ?? ?? 01 00 03 00 ?? ?? 4E 50 43 5F 50 41 52 41 4D 5F 53 54 00",
                    "NpcParam", "NPC")
     {
     }

@@ -9,6 +9,7 @@
 
     NPC Behavior Parameters from BehaviorParam.paramdef
 
+    // WARNING: There are two different BehaviorParam files: BehaviorParam and BehaviorParam_Pc (both contain the same starting AoB)
 
     References:
         - Burton Radons' ParamDefs Sheet
@@ -90,10 +91,12 @@ public:
     // @TODO: Member data specific to this class
 
 private:
+    // WARNING: There are two different BehaviorParam files: BehaviorParam and BehaviorParam_Pc (both contain the same starting AoB)
     BehaviorNpcParamDef()
         : ParamDef(NULL, /*0x70B0, 2400,*/ sizeof(BehaviorNpcParam),
-                   "B0 9C 01 00 ?? ?? 02 00 02 00 ?? ?? 42 45 48 41",
-                   "BehaviorNpcParam", "Behavior (NPC)")
+                   //"B0 9C 01 00 ?? ?? 02 00 02 00 ?? ?? 42 45 48 41",
+                   "?? ?? ?? ?? ?? ?? 02 00 02 00 ?? ?? 42 45 48 41 56 49 4F 52 5F 50 41 52 41 4D 5F 53 54 00",
+                   "BehaviorParam (??)", "Behavior (NPC)")
     {
     }
 

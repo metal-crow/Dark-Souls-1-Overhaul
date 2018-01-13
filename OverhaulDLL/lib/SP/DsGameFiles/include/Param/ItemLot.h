@@ -164,7 +164,8 @@ public:
 private:
     ItemLotParamDef()
         : ParamDef(NULL, /*0x47A0, 1524,*/ sizeof(ItemLotParam),
-                   "B0 B8 03 00 ?? ?? 00 00 02 00 ?? ?? 49 54 45 4D",
+                   //"B0 B8 03 00 ?? ?? 00 00 02 00 ?? ?? 49 54 45 4D",
+                   "?? ?? ?? ?? ?? ?? 00 00 02 00 ?? ?? 49 54 45 4D 4C 4F 54 5F 50 41 52 41 4D 5F 53 54 00",
                    "ItemLotParam", "Item Lot")
     {
     }

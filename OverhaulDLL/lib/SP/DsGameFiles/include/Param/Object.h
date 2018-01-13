@@ -97,7 +97,8 @@ public:
 private:
     ObjectParamDef()
         : ParamDef(NULL, sizeof(ObjectParam),
-                   "D0 67 00 00 ?? ?? 01 00 01 00 ?? ?? 4F 42 4A 45",
+                   //"D0 67 00 00 ?? ?? 01 00 01 00 ?? ?? 4F 42 4A 45",
+                   "?? ?? ?? ?? ?? ?? 01 00 01 00 ?? ?? 4F 42 4A 45 43 54 5F 50 41 52 41 4D 5F 53 54 00",
                    "ObjectParam", "Object")
     {
     }

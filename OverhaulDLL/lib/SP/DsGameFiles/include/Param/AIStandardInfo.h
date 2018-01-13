@@ -138,8 +138,9 @@ public:
 private:
     AiStandardInfoParamDef()
         : ParamDef(NULL, /*0x230, 40,*/ sizeof(AiStandardInfoParam),
-                   "30 16 00 00 ?? ?? 01 00 01 00 ?? ?? 41 49 5F 53",
-                   "default_AiStandardInfoParam", "Default AI")
+                   //"30 16 00 00 ?? ?? 01 00 01 00 ?? ?? 41 49 5F 53",
+                   "?? ?? ?? ?? ?? ?? 01 00 01 00 ?? ?? 41 49 5F 53 54 41 4E 44 41 52 44 5F 49 4E 46 4F 5F 42 41 4E 4B 00",
+                   "default_AIStandardInfoBank", "Default AI")
     {
     }
 

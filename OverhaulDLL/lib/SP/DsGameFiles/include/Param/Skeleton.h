@@ -100,7 +100,8 @@ public:
 private:
     SkeletonParamDef()
         : ParamDef(NULL, sizeof(SkeletonParam),
-                   "E0 08 00 00 ?? ?? 01 00 01 00 ?? ?? 53 4B 45 4C",
+                   //"E0 08 00 00 ?? ?? 01 00 01 00 ?? ?? 53 4B 45 4C",
+                   "?? ?? ?? ?? ?? ?? 01 00 01 00 ?? ?? 53 4B 45 4C 45 54 4F 4E 5F 50 41 52 41 4D 5F 53 54 00",
                    "SkeletonParam", "Skeleton")
     {
     }

@@ -170,7 +170,8 @@ public:
 private:
     ArmorParamDef()
         : ParamDef(NULL, /*0xF60, 324,*/ sizeof(ArmorParam),
-                   "00 35 01 00 ?? ?? 01 00 02 00 ?? ?? 45 51 55 49",
+                   //"00 35 01 00 ?? ?? 01 00 02 00 ?? ?? 45 51 55 49",
+                   "?? ?? ?? ?? ?? ?? 01 00 02 00 ?? ?? 45 51 55 49 50 5F 50 41 52 41 4D 5F 50 52 4F 54 45 43 54 4F 52 5F 53 54 00",
                    "EquipParamProtector", "Armor")
     {
     }

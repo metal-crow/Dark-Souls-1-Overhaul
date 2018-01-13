@@ -78,7 +78,8 @@ public:
 private:
     ShopLineupParamDef()
         : ParamDef(NULL, /*0x1284, 391,*/ sizeof(ShopLineupParam),
-                   "70 43 00 00 ?? ?? 01 00 01 00 ?? ?? 53 48 4F 50",
+                   //"70 43 00 00 ?? ?? 01 00 01 00 ?? ?? 53 48 4F 50",
+                   "?? ?? ?? ?? ?? ?? 01 00 01 00 ?? ?? 53 48 4F 50 5F 4C 49 4E 45 55 50 5F 50 41 52 41 4D 00",
                    "ShopLineupParam", "Shop Lineup")
     {
     }

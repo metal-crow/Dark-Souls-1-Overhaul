@@ -108,7 +108,8 @@ public:
 private:
     EnemyStandardInfoParamDef()
         : ParamDef(NULL, sizeof(EnemyStandardInfoParam),
-                   "60 0C 00 00 ?? ?? 01 00 01 00 ?? ?? 45 4E 45 4D",
+                   //"60 0C 00 00 ?? ?? 01 00 01 00 ?? ?? 45 4E 45 4D",
+                   "?? ?? ?? ?? ?? ?? 01 00 01 00 ?? ?? 45 4E 45 4D 59 5F 53 54 41 4E 44 41 52 44 5F 49 4E 46 4F 5F 42 41 4E 4B 00",
                    "default_EnemyBehaviorBank", "Default Enemy Behavior")
     {
     }

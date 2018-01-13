@@ -313,7 +313,8 @@ public:
 private:
     SpEffectParamDef()
         : ParamDef(NULL, /*0x27E4, 847,*/ sizeof(SpEffectParam),
-                   "80 E9 04 00 ?? ?? 01 00 01 00 ?? ?? 53 50 5F 45",
+                   //"80 E9 04 00 ?? ?? 01 00 01 00 ?? ?? 53 50 5F 45",
+                   "?? ?? ?? ?? ?? ?? 01 00 01 00 ?? ?? 53 50 5F 45 46 46 45 43 54 5F 50 41 52 41 4D 5F 53 54 00",
                    "SpEffectParam", "Special Effect")
     {
     }

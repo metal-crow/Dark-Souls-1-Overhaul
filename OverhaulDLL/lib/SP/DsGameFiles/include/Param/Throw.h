@@ -103,7 +103,8 @@ public:
 private:
     ThrowParamDef()
         : ParamDef(NULL, /*0x954, 195,*/ sizeof(ThrowParam),
-                   "20 3A 00 00 ?? ?? 00 00 01 00 ?? ?? 54 48 52 4F",
+                   //"20 3A 00 00 ?? ?? 00 00 01 00 ?? ?? 54 48 52 4F",
+                   "?? ?? ?? ?? ?? ?? 00 00 01 00 ?? ?? 54 48 52 4F 57 5F 49 4E 46 4F 5F 42 41 4E 4B 00",
                    "ThrowParam", "Throw")
     {
     }

@@ -81,7 +81,8 @@ public:
 private:
     ArmorReinforceParamDef()
         : ParamDef(NULL, sizeof(ArmorReinforceParam),
-                   "30 04 00 00 ?? ?? 00 00 01 00 ?? ?? 52 45 49 4E",
+                   //"30 04 00 00 ?? ?? 00 00 01 00 ?? ?? 52 45 49 4E",
+                   "?? ?? ?? ?? ?? ?? 00 00 01 00 ?? ?? 52 45 49 4E 46 4F 52 43 45 5F 50 41 52 41 4D 5F 50 52 4F 54 45 43 54 4F 52 5F 53 54 00",
                    "ReinforceParamProtector", "Armor Reinforcement")
     {
     }

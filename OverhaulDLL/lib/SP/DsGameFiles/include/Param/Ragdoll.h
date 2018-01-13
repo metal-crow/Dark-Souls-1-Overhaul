@@ -81,7 +81,8 @@ public:
 private:
     RagdollParamDef()
         : ParamDef(NULL, sizeof(RagdollParam),
-                   "A0 08 00 00 ?? ?? 01 00 01 00 ?? ?? 52 41 47 44",
+                   //"A0 08 00 00 ?? ?? 01 00 01 00 ?? ?? 52 41 47 44",
+                   "?? ?? ?? ?? ?? ?? 01 00 01 00 ?? ?? 52 41 47 44 4F 4C 4C 5F 50 41 52 41 4D 5F 53 54 00",
                    "RagdollParam", "Ragdoll")
     {
     }

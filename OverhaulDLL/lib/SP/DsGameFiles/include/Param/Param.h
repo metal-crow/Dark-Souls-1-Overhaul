@@ -137,7 +137,7 @@ protected:
 
             std::stringstream hex_stream;
             hex_stream << std::hex << (int)(*start);
-            print_console(std::string("    Found param file: " + this->file + Param::FILE_EXT + " (Location: 0x").append(hex_stream.str()).append(") containing " + std::to_string(param_count) + " parameters"));
+            print_console(std::string("    Found param file: " + this->file + Param::FILE_EXT + " (\"" + this->header_title + "\"; Location: 0x").append(hex_stream.str()).append(") containing " + std::to_string(param_count) + " parameters"));
         }
         else if (print_result)
         {
