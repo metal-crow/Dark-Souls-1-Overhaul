@@ -25,6 +25,13 @@ void PhantomUnshackle::start() {
     set_mem_protection(write_address, 6, MEM_PROTECT_RWX);
     inject_jmp_5b(write_address, &mp_zone_changing_injection_return, 1, &mp_zone_changing_injection);
 
+    // Injection to prevent MP zone ID from being set to -2
+    uint8_t nop_patch[10] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
+    write_address = (uint8_t*)(PhantomUnshackle::mp_zone_neg2_force_offset + ((uint32_t)Game::ds1_base));
+    apply_byte_patch(write_address, nop_patch, 10);
+    write_address = (uint8_t*)(PhantomUnshackle::mp_zone_neg2_force_offset_part2 + ((uint32_t)Game::ds1_base));
+    apply_byte_patch(write_address, nop_patch, 10);
+
     // Start thread for controlling mp zone
     CreateThread(NULL, 0, change_mp_zone, NULL, 0, NULL);
 }
@@ -40,7 +47,15 @@ void __declspec(naked) __stdcall PhantomUnshackle::mp_zone_changing_injection() 
     //mov   [edi + 00000284], eax
     //Alt: db 89 87 84 02 00 00
     __asm {
+        push    ebx
+        mov     ebx, DWORD PTR ds: 0x0137D644
+        mov     ebx, [ebx + 0x28]
+        mov     ebx, [ebx + 0]
+        cmp     edi, ebx //check if the ptr being written to is for player
+        jne     immediate_ret
         mov     vanilla_mp_zone, eax
+        immediate_ret:
+        pop     ebx
         jmp     mp_zone_changing_injection_return
     }
 }
@@ -78,6 +93,7 @@ static DWORD WINAPI change_mp_zone(void* unused) {
                 *mp_id = area_id & 0x0000ffff;
             }
 
+            Sleep(25);
             Game::player_char_status.read(&char_status);
         }
 
