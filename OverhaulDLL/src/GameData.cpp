@@ -17,6 +17,7 @@
 #include "BloodborneRallySystem.h"
 #include "Challenge/AggressiveAi.h"
 #include "Challenge/BlackPhantomEnemies.h"
+#include "PhantomUnshackle.h"
 
 
 /*
@@ -108,10 +109,13 @@ void Game::on_first_character_loaded()
     print_console(std::string("    Found Time Action Event file for player character animations at 0x") + FileUtil::to_hex_string((int)ret_val, temp) + ". Enabling gesture cancelling...");
     Game::enable_gesture_cancelling();
 
-    //Enable rally system vfx
     if (!Mod::legacy_mode)
     {
+        //Enable rally system vfx
         BloodborneRally::on_char_load();
+
+        // Apply phantom unshackle patch
+        PhantomUnshackle::start();
     }
 
     // Enable forced binoculars/dragonification PvP protections

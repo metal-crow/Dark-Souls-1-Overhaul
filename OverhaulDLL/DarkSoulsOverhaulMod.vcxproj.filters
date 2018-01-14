@@ -93,11 +93,11 @@
     <ClCompile Include="src\Menu\SavedCharacters.cpp">
       <Filter>Source Files\Menu</Filter>
     </ClCompile>
-    <ClCompile Include="PhantomUnshackle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Challenge\AggressiveAI.cpp">
       <Filter>Source Files\Challenge</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PhantomUnshackle.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -143,11 +143,11 @@
     <ClInclude Include="include\Menu\SavedCharacters.h">
       <Filter>Header Files\Menu</Filter>
     </ClInclude>
-    <ClInclude Include="PhantomUnshackle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Challenge\AggressiveAI.h">
       <Filter>Header Files\Challenge</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PhantomUnshackle.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

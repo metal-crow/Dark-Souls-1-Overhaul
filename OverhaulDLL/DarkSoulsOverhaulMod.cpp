@@ -14,7 +14,6 @@
 #include "Challenge/GravelordPhantoms.h"
 #include "Menu/SavedCharacters.h"
 #include "XInputUtil.h"
-#include "PhantomUnshackle.h"
 
 
 /*
@@ -64,9 +63,6 @@ void on_process_attach()
 
         // Apply first part of phantom limit patch
         Game::increase_phantom_limit1();
-
-        // Apply phantom unshackle patch
-        PhantomUnshackle::start();
     } else {
         Game::set_game_version(DS1_OVERHAUL_LEGACY_GAME_VER_NUM);
     }
