@@ -17,6 +17,16 @@ bool is_active = false;
 std::vector<OriginalAiData>         original_ai_values          = std::vector<OriginalAiData>();
 std::vector<OriginalNpcThoughtData> original_npc_thought_values = std::vector<OriginalNpcThoughtData>();
 
+// Default NPC detection sense values when Aggressive AI mod is enabled
+const uint16_t DEFAULT_EYE_DISTANCE  = 65535; // Max = 65535
+const uint16_t DEFAULT_EAR_DISTANCE  = 10;    // Max = 65535
+const uint16_t DEFAULT_NOSE_DISTANCE = 10;    // Max = 65535
+
+// NPC detection sense values when Aggressive AI mod is enabled
+uint16_t eye_distance  = DEFAULT_EYE_DISTANCE;
+uint16_t ear_distance  = DEFAULT_EAR_DISTANCE;
+uint16_t nose_distance = DEFAULT_NOSE_DISTANCE;
+
 // Returns whether the Aggressive AI challenge mod is currently enabled
 bool active()
 {
@@ -77,24 +87,28 @@ void enable()
         print_console("Activating Aggressive AI challenge mod");
         // Set black phantom draw type and special effect for all enemy NPCs
         for (int i = 0; i < (int)Params::AiStandardInfo().param_count; i++) {
-            Params::AiStandardInfo().get(i)->RadarRange = 30000; // Max = 30000
-            Params::AiStandardInfo().get(i)->RadarAngleX = 90; // Max = 90
+            Params::AiStandardInfo().get(i)->RadarRange  = 30000; // Max = 30000
+            Params::AiStandardInfo().get(i)->RadarAngleX = 90;  // Max = 90
             Params::AiStandardInfo().get(i)->RadarAngleY = 180; // Max = 180
-            Params::AiStandardInfo().get(i)->TerritorySize = 29999; // Max = 30000
+            Params::AiStandardInfo().get(i)->TerritorySize = 30000; // Max = 30000
             original_ai_values.at(i).changed = true;
         }
         for (int i = 0; i < (int)Params::NpcThink().param_count; i++) {
             //Params::NpcThink().get(i)->BackHomeLife_OnHitEneWal = ; // Max = 999
-            Params::NpcThink().get(i)->eye_dist = 30000; // Max = 65535
-            Params::NpcThink().get(i)->ear_dist = 30000; // Max = 65535
-            Params::NpcThink().get(i)->nose_dist = 30000; // Max = 65535
+            Params::NpcThink().get(i)->eye_dist = eye_distance; // Max = 65535
+            if (Params::NpcThink().get(i)->ear_dist < ear_distance) {
+                Params::NpcThink().get(i)->ear_dist = ear_distance; // Max = 65535
+            }
+            if (Params::NpcThink().get(i)->nose_dist < nose_distance) {
+                Params::NpcThink().get(i)->nose_dist = nose_distance; // Max = 65535
+            }
             Params::NpcThink().get(i)->maxBackhomeDist = 30000; // Max = 65535
             Params::NpcThink().get(i)->backhomeDist = 30000; // Max = 65535
             Params::NpcThink().get(i)->backhomeBattleDist = 30000; // Max = 65535
             Params::NpcThink().get(i)->BattleStartDist = 30000; // Max = 65534
             Params::NpcThink().get(i)->eye_angX = 180; // Max = 180
             Params::NpcThink().get(i)->eye_angY = 180; // Max = 180
-            Params::NpcThink().get(i)->ear_angX = 90; // Max = 90
+            Params::NpcThink().get(i)->ear_angX = 90;  // Max = 90
             Params::NpcThink().get(i)->ear_angY = 180; // Max = 180
             original_npc_thought_values.at(i).changed = true;
         }

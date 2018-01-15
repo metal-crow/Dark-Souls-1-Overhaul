@@ -1,8 +1,13 @@
-                      #############################################
-                      ######     DX9 OVERLAY CHANGELOG      #######
-                      #############################################
+                      +-------------------------------------+
+                      | DirectX 9 Overlay & In-game Console |
+                      |        Created by Sean Pesce        |
+                      +-------------------------------------+
 
+                             
 
+                      #######################################
+                      #########      CHANGELOG      #########
+                      #######################################
 
 ------------------------------------------------------------------------------------------
 12/12/2017:
@@ -23,3 +28,21 @@
     - fps:
 	    Prints current FPS in console output
 ------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
++-------------------------------------+
+| DirectX 9 Overlay & In-game Console |
+|        Created by Sean Pesce        |
++-------------------------------------+
+ Contact:
+   pesce.sean@gmail.com
+   https://reddit.com/u/SeanPesce 
+   https://twitter.com/SeanPesce 
+   https://github.com/SeanPesce 
+   https://www.youtube.com/channel/UCgsMpXiR3PawqKM7MWLJGzQ 
+   Discord: @SeanP#560

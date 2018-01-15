@@ -23,6 +23,7 @@
 #define _DS1_OVERHAUL_HUD_SECTION_ "HUD"
 #define _DS1_OVERHAUL_DEBUG_SECTION_ "Dark Souls Overhaul Debug"
 #define _DS1_OVERHAUL_CHALLENGE_SECTION_ "Challenge Mods"
+#define _DS1_OVERHAUL_CHALLENGE_SETTINGS_SECTION_ "Challenge Mod Settings"
 // Startup preferences:
 #define _DS1_OVERHAUL_PREF_LEGACY_MODE_ "LegacyMode"
 #define _DS1_OVERHAUL_PREF_MEMORY_LIMIT_ "MemoryLimit"
@@ -43,6 +44,7 @@
 #define _DS1_OVERHAUL_PREF_DIM_LAVA_ "DimLava"
 #define _DS1_OVERHAUL_PREF_DISABLE_ARMOR_SFX_ "DisableArmorSounds"
 #define _DS1_OVERHAUL_PREF_DISABLE_LOW_FPS_DISCONNECT_ "DisableLowFpsDisconnect"
+#define _DS1_OVERHAUL_PREF_DISABLE_GESTURE_CANCELLING_ "GestureCancelling"
 #define _DS1_OVERHAUL_PREF_CHEATS_WARNING_ "CheatsWarning"
 // HUD settings:
 #define _DS1_OVERHAUL_PREF_COMPASS_RADIAL_ "CompassRadial"
@@ -52,8 +54,11 @@
 // Challenge mods:
 #define _DS1_OVERHAUL_PREF_CM_AGGRO_AI_ "AggressiveAI"
 #define _DS1_OVERHAUL_PREF_CM_BP_ENEMIES_ "BlackPhantomEnemies"
-#define _DS1_OVERHAUL_PREF_CM_BP_ENEMY_DRAW_TYPE_ "BlackPhantomEnemyDrawType"
 #define _DS1_OVERHAUL_PREF_CM_GL_PHANTOMS_ "GravelordPhantoms"
+// Challenge mod settings:
+#define _DS1_OVERHAUL_PREF_CM_AGGRO_AI_EAR_DIST_  "AggressiveAIHearingDistance"
+#define _DS1_OVERHAUL_PREF_CM_AGGRO_AI_NOSE_DIST_ "AggressiveAISmellDistance"
+#define _DS1_OVERHAUL_PREF_CM_BP_ENEMY_DRAW_TYPE_ "BlackPhantomEnemyDrawType"
 // Debug:
 #define _DS1_OVERHAUL_PREF_MONITOR_BDT_ "MonitorBdtFiles"
 #define _DS1_OVERHAUL_PREF_MONITOR_BHD_ "MonitorBhdFiles"

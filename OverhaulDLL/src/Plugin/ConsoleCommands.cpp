@@ -345,6 +345,82 @@ int cc_challenge_aggressive_ai(std::vector<std::string> args, std::string *outpu
     return ret_val;
 }
 
+// Sets smell distance for NPCs modified by the "Aggressive AI" challenge mod
+int cc_challenge_aggressive_ai_nose_distance(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = ERROR_SUCCESS;
+    int new_nose_dist = -1;
+    if (args.size() > 0) {
+        if (args.at(0) == "default") {
+            new_nose_dist = Challenge::AggressiveAi::DEFAULT_NOSE_DISTANCE;
+        } else {
+            // Nose distance specified
+            try {
+                new_nose_dist = std::stoi(args.at(0).c_str(), NULL);
+            } catch (std::invalid_argument) {
+                ret_val = ERROR_BAD_ARGUMENTS;
+                new_nose_dist = -1;
+            } catch (std::out_of_range) {
+                ret_val = ERROR_RANGE_NOT_FOUND;
+                new_nose_dist = -1;
+            }
+        }
+        if (new_nose_dist >= 0 && new_nose_dist <= 65535) {
+            bool reapply = (new_nose_dist != Challenge::AggressiveAi::nose_distance);
+            Challenge::AggressiveAi::nose_distance = new_nose_dist;
+            if (Challenge::AggressiveAi::active() && reapply) {
+                Challenge::AggressiveAi::disable();
+                Challenge::AggressiveAi::enable();
+            }
+        } else {
+            if (ret_val == ERROR_SUCCESS) {
+                ret_val = ERROR_INVALID_PARAMETER;
+            }
+            output->append("ERROR: Invalid argument (Distance value must be an integer between 0 and 65535)\n");
+        }
+    }
+    output->append("(Aggressive AI challenge mod) AI smell distance = " + std::to_string(Challenge::AggressiveAi::nose_distance));
+    return ret_val;
+}
+
+// Sets hearing distance for NPCs modified by the "Aggressive AI" challenge mod
+int cc_challenge_aggressive_ai_ear_distance(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = ERROR_SUCCESS;
+    int new_ear_dist = -1;
+    if (args.size() > 0) {
+        if (args.at(0) == "default") {
+            new_ear_dist = Challenge::AggressiveAi::DEFAULT_EAR_DISTANCE;
+        } else {
+            // Nose distance specified
+            try {
+                new_ear_dist = std::stoi(args.at(0).c_str(), NULL);
+            } catch (std::invalid_argument) {
+                ret_val = ERROR_BAD_ARGUMENTS;
+                new_ear_dist = -1;
+            } catch (std::out_of_range) {
+                ret_val = ERROR_RANGE_NOT_FOUND;
+                new_ear_dist = -1;
+            }
+        }
+        if (new_ear_dist >= 0 && new_ear_dist <= 65535) {
+            bool reapply = (new_ear_dist != Challenge::AggressiveAi::ear_distance);
+            Challenge::AggressiveAi::ear_distance = new_ear_dist;
+            if (Challenge::AggressiveAi::active() && reapply) {
+                Challenge::AggressiveAi::disable();
+                Challenge::AggressiveAi::enable();
+            }
+        } else {
+            if (ret_val == ERROR_SUCCESS) {
+                ret_val = ERROR_INVALID_PARAMETER;
+            }
+            output->append("ERROR: Invalid argument (Distance value must be an integer between 0 and 65535)\n");
+        }
+    }
+    output->append("(Aggressive AI challenge mod) AI hearing distance = " + std::to_string(Challenge::AggressiveAi::ear_distance));
+    return ret_val;
+}
+
 // Enables/disables "Black Phantom Enemies" challenge mod
 int cc_challenge_bp_enemies(std::vector<std::string> args, std::string *output)
 {
@@ -396,7 +472,6 @@ int cc_challenge_bp_enemy_draw_type(std::vector<std::string> args, std::string *
                 new_draw_type = -1;
             }
         }
-
         if (new_draw_type >= 0 && new_draw_type <= 255) {
             bool reapply = (new_draw_type != Challenge::BlackPhantomEnemies::DRAW_TYPE);
             Challenge::BlackPhantomEnemies::DRAW_TYPE = new_draw_type;
@@ -408,10 +483,10 @@ int cc_challenge_bp_enemy_draw_type(std::vector<std::string> args, std::string *
             if (ret_val == ERROR_SUCCESS) {
                 ret_val = ERROR_INVALID_PARAMETER;
             }
-            output->append("ERROR: Invalid argument (Index must be an integer between 0 and 255)\n");
+            output->append("ERROR: Invalid argument (Draw type must be an integer between 0 and 255)\n");
         }
     }
-    output->append("Black Phantom Enemies challenge mod enemy draw type = " + std::to_string(Challenge::BlackPhantomEnemies::DRAW_TYPE));
+    output->append("(Black Phantom Enemies challenge mod) Enemy draw type = " + std::to_string(Challenge::BlackPhantomEnemies::DRAW_TYPE));
     return ret_val;
 }
 
@@ -859,6 +934,8 @@ void Mod::register_console_commands()
     register_console_command(ccn_save_file_create, cc_save_file_create, chm_save_file_create);
     register_console_command(ccn_save_file_copy, cc_save_file_copy, chm_save_file_copy);
     register_console_command(ccn_challenge_aggressive_ai, cc_challenge_aggressive_ai, chm_challenge_aggressive_ai);
+    register_console_command(ccn_challenge_aggressive_ai_ear_distance, cc_challenge_aggressive_ai_ear_distance, chm_challenge_aggressive_ai_ear_distance);
+    register_console_command(ccn_challenge_aggressive_ai_nose_distance, cc_challenge_aggressive_ai_nose_distance, chm_challenge_aggressive_ai_nose_distance);
     register_console_command(ccn_challenge_bp_enemies, cc_challenge_bp_enemies, chm_challenge_bp_enemies);
     register_console_command(ccn_challenge_bp_enemy_draw_type, cc_challenge_bp_enemy_draw_type, chm_challenge_bp_enemy_draw_type);
     register_console_command(ccn_challenge_gravelord_phantoms, cc_challenge_gravelord_phantoms, chm_challenge_gravelord_phantoms);
