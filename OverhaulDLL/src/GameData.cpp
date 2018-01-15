@@ -51,6 +51,9 @@ int Game::node_count = -1;
 // Size of the pool of memory the game allocates for itself
 uint32_t Game::memory_limit = 0;
 
+// Gesture cancelling enabled/disabled
+bool Game::gesture_cancelling = true;
+
 // Animation IDs for the default set of gesture animations in the game
 const uint32_t Game::gesture_anim_ids[15] = { 6800, 6801, 6802, 6803, 6804, 6805, 6806, 6807, 6808, 6809, 6810, 6815, 6820, 6825, 6830 };
 
@@ -103,11 +106,13 @@ void Game::on_first_character_loaded()
     if (Mod::disable_armor_sfx_pref)
         Game::enable_armor_sfx(false);
 
-    // Perform TAE edits to player animations to enable gesture cancelling
-    void *ret_val = (void*)Game::player_tae.init_from_aob_scan("54 41 45 20 00 00 00 00 0B 00 01 00 B4 AE 09 00");
-    std::string temp;
-    print_console(std::string("    Found Time Action Event file for player character animations at 0x") + FileUtil::to_hex_string((int)ret_val, temp) + ". Enabling gesture cancelling...");
-    Game::enable_gesture_cancelling();
+    if (Game::gesture_cancelling) {
+        // Perform TAE edits to player animations to enable gesture cancelling
+        void *ret_val = (void*)Game::player_tae.init_from_aob_scan("54 41 45 20 00 00 00 00 0B 00 01 00 B4 AE 09 00");
+        std::string temp;
+        print_console(std::string("    Found Time Action Event file for player character animations at 0x") + FileUtil::to_hex_string((int)ret_val, temp) + ". Enabling gesture cancelling...");
+        Game::enable_gesture_cancelling();
+    }
 
     if (!Mod::legacy_mode)
     {
@@ -641,9 +646,7 @@ bool Game::enable_gesture_cancelling()
             }
         }
         return (gestures_changed >= 15);
-    }
-    else
-    {
+    } else {
         return false;
     }
 }

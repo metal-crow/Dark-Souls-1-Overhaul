@@ -50,6 +50,16 @@ struct OriginalNpcThoughtData {
 extern std::vector<OriginalAiData> original_ai_values;
 extern std::vector<OriginalNpcThoughtData> original_npc_thought_values;
 
+// Default NPC detection sense values when Aggressive AI mod is enabled
+extern const uint16_t DEFAULT_EYE_DISTANCE;
+extern const uint16_t DEFAULT_EAR_DISTANCE;
+extern const uint16_t DEFAULT_NOSE_DISTANCE;
+
+// NPC detection sense values when Aggressive AI mod is enabled
+extern uint16_t eye_distance;
+extern uint16_t ear_distance;
+extern uint16_t nose_distance;
+
 // Returns whether the Aggressive AI challenge mod is currently enabled
 bool active();
 

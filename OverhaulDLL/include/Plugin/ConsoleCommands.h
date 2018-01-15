@@ -85,13 +85,22 @@ const char *chm_save_file_copy = ccn_save_file_copy"\n     Copies the current sa
 #define ccn_challenge_aggressive_ai "challenge_aggressive_ai"
 const char *chm_challenge_aggressive_ai = ccn_challenge_aggressive_ai" [boolean]\n     Enables/disables Aggressive AI challenge mod (1 = enabled, 0 = disabled)";
 
+#define ccn_challenge_aggressive_ai_nose_distance "challenge_aggressive_ai_smell_distance"
+const char *chm_challenge_aggressive_ai_nose_distance = ccn_challenge_aggressive_ai_nose_distance" [DISTANCE|default]\n     Sets the distance from which enemies can smell the player when the \"Aggressive AI\" challenge mod is enabled.\n"
+                                                                                                                      "     Distance must be a value between 0 and 65535 (or \"default\" to revert to default value).";
+
+#define ccn_challenge_aggressive_ai_ear_distance "challenge_aggressive_ai_hearing_distance"
+const char *chm_challenge_aggressive_ai_ear_distance = ccn_challenge_aggressive_ai_ear_distance" [DISTANCE|default]\n     Sets the distance from which enemies can hear the player when the \"Aggressive AI\" challenge mod is enabled.\n"
+                                                                                                                    "     Distance must be a value between 0 and 65535 (or \"default\" to revert to default value).";
+
 #define ccn_challenge_bp_enemies "challenge_black_phantom_enemies"
 const char *chm_challenge_bp_enemies = ccn_challenge_bp_enemies" [boolean]\n     Enables/disables Black Phantom Enemies challenge mod (1 = enabled, 0 = disabled), which turns all enemies (and bosses) into\n"
                                                                            "     Black Phantoms, meaning they appear with a red glow and have buffed stats (2x HP, 1.8x attack, and 1.2x defense)";
 
 #define ccn_challenge_bp_enemy_draw_type "challenge_black_phantom_enemy_draw_type"
 const char *chm_challenge_bp_enemy_draw_type = ccn_challenge_bp_enemy_draw_type" [DRAW_TYPE|default]\n     Sets the draw type for NPCs modified by the \"Black Phantom Enemies\" challenge mod.\n"
-                                                                                                     "     Draw type must be a value between 0 and 255 (or \"default\" to revert to default value).";
+                                                                                                     "     Draw type must be a value between 0 and 255 (or \"default\" to revert to default value).\n"
+                                                                                                     "     Known values: 2 = Black (red) phantom, 1 = White phantom, 0 = Normal colors";
 
 #define ccn_challenge_gravelord_phantoms "challenge_gravelord_phantoms"
 const char *chm_challenge_gravelord_phantoms = ccn_challenge_gravelord_phantoms" [boolean]\n     Enables/disables Gravelord Phantoms challenge mod (1 = enabled, 0 = disabled), which spawns additional Gravelord\n"

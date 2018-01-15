@@ -75,6 +75,9 @@ public:
     // Size of the pool of memory the game allocates for itself
     static uint32_t memory_limit;
 
+    // Gesture cancelling enabled/disabled
+    static bool gesture_cancelling;
+
     // Animation IDs for the default set of gesture animations in the game
     const static uint32_t gesture_anim_ids[15];
 

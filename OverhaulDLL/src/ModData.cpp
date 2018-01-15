@@ -8,8 +8,9 @@
 
 #include "DllMain.h"
 #include "AntiCheat.h"
-#include "Challenge/GravelordPhantoms.h"
+#include "Challenge/AggressiveAI.h"
 #include "Challenge/BlackPhantomEnemies.h"
+#include "Challenge/GravelordPhantoms.h"
 
 #define _SP_DEFINE_VK_NAME_STRINGS_		// Must be defined to use Virtual-key code name strings from SP_IO_Strings.hpp (opt-in by default because it increases filesize by a few KB)
 
@@ -172,26 +173,31 @@ void Mod::get_user_preferences()
 
     Mod::disable_low_fps_disconnect = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DISABLE_LOW_FPS_DISCONNECT_, (int)Mod::disable_low_fps_disconnect, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
 
+    Game::gesture_cancelling = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DISABLE_GESTURE_CANCELLING_, (int)Game::gesture_cancelling, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    if (Game::gesture_cancelling) {
+        print_console(msg.append("    Gesture cancelling enabled"));
+    }
+
     // Display multiplayer node count in text feed info header
     Mod::show_node_count = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_SHOW_NODE_COUNT_, (int)Mod::show_node_count, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
     msg = "    Display multiplayer node count = ";
     if (Mod::show_node_count)
-        print_console(msg.append("enabled").c_str());
+        print_console(msg.append("enabled"));
     else
-        print_console(msg.append("disabled").c_str());
+        print_console(msg.append("disabled"));
 
 
     // Check whether to lower the brightness of lava effects
     Mod::dim_lava_pref = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DIM_LAVA_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
     if (Mod::dim_lava_pref)
-        print_console("    Lava visual effects will be dimmed when a character is loaded");
+        print_console("    Lava visual effects will be dimmed");
 
 
     // Check whether to disable armor sound effects
 #ifndef DS1_OVERHAUL_QOL_PREVIEW
     Mod::disable_armor_sfx_pref = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DISABLE_ARMOR_SFX_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
     if (Mod::disable_armor_sfx_pref)
-        print_console("    Armor sound effects will be disabled when a character is loaded");
+        print_console("    Armor sound effects will be disabled");
 #endif // DS1_OVERHAUL_QOL_PREVIEW
 
 
@@ -217,13 +223,18 @@ void Mod::get_user_preferences()
     }
 
     // Check if challenge mods should be enabled
+    if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_AGGRO_AI_, Challenge::AggressiveAi::active(), _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
+        print_console("    Challenge: Aggressive AI will be enabled");
+    }
     if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_GL_PHANTOMS_, Challenge::GravelordPhantoms::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
         print_console("    Challenge: Auto-spawning Gravelord Phantoms will be enabled");
     }
     if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_BP_ENEMIES_, Challenge::BlackPhantomEnemies::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
         print_console("    Challenge: Black Phantom Enemies will be enabled");
     }
-    Challenge::BlackPhantomEnemies::DRAW_TYPE = (uint8_t)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_BP_ENEMY_DRAW_TYPE_, Challenge::BlackPhantomEnemies::DRAW_TYPE_DEFAULT, _DS1_OVERHAUL_SETTINGS_FILE_);
+    Challenge::AggressiveAi::ear_distance  = (uint16_t)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SETTINGS_SECTION_, _DS1_OVERHAUL_PREF_CM_AGGRO_AI_EAR_DIST_,  Challenge::AggressiveAi::DEFAULT_EAR_DISTANCE,  _DS1_OVERHAUL_SETTINGS_FILE_);
+    Challenge::AggressiveAi::nose_distance = (uint16_t)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SETTINGS_SECTION_, _DS1_OVERHAUL_PREF_CM_AGGRO_AI_NOSE_DIST_, Challenge::AggressiveAi::DEFAULT_NOSE_DISTANCE, _DS1_OVERHAUL_SETTINGS_FILE_);
+    Challenge::BlackPhantomEnemies::DRAW_TYPE = (uint8_t)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SETTINGS_SECTION_, _DS1_OVERHAUL_PREF_CM_BP_ENEMY_DRAW_TYPE_, Challenge::BlackPhantomEnemies::DRAW_TYPE_DEFAULT, _DS1_OVERHAUL_SETTINGS_FILE_);
 
     // @TODO Load additional user preferences here
 
