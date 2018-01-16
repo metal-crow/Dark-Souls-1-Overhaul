@@ -94,13 +94,9 @@ void Game::on_first_character_loaded()
     if (Mod::dim_lava_pref)
         Game::enable_dim_lava(true);
 
-    // Get param files
     print_console(Mod::output_prefix + "Searching memory for files...");
-    Params::AiStandardInfo().init(true);
-    Params::Armor().init(true);
-    Params::Npc().init(true);
-    Params::NpcThink().init(true);
-    Params::Weapon().init(true);
+    // Initialize param files
+    Params::init();
 
     // Disable armor sounds if it was specified in the config file
     if (Mod::disable_armor_sfx_pref)
@@ -116,7 +112,7 @@ void Game::on_first_character_loaded()
 
     if (!Mod::legacy_mode)
     {
-        //Enable rally system vfx
+        // Enable rally system vfx
         BloodborneRally::on_char_load();
 
         // Apply phantom unshackle patch
