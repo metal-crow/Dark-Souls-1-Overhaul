@@ -21,8 +21,8 @@
 
 #pragma once
 
-#ifndef _DS1_FILE_LIB_ITEM_LOT_PARAM_DEF_FILE_H_
-    #define _DS1_FILE_LIB_ITEM_LOT_PARAM_DEF_FILE_H_
+#ifndef DS1_FILE_LIB_ITEM_LOT_PARAM_DEF_FILE_H_
+    #define DS1_FILE_LIB_ITEM_LOT_PARAM_DEF_FILE_H_
 
 
 #include "Param.h"
@@ -181,4 +181,4 @@ public:
 
 
 
-#endif // _DS1_FILE_LIB_ITEM_LOT_PARAM_DEF_FILE_H_
+#endif // DS1_FILE_LIB_ITEM_LOT_PARAM_DEF_FILE_H_

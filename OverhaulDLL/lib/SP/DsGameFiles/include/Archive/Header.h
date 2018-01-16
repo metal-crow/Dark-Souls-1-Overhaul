@@ -9,8 +9,8 @@
 
 #pragma once
 
-#ifndef _DS1_FILE_LIB_ARCHIVE_FILE_HEADER_H_
-    #define _DS1_FILE_LIB_ARCHIVE_FILE_HEADER_H_
+#ifndef DS1_FILE_LIB_ARCHIVE_FILE_HEADER_H_
+    #define DS1_FILE_LIB_ARCHIVE_FILE_HEADER_H_
 
 #include "Windows.h"
 #include <stdint.h>
@@ -57,4 +57,4 @@ typedef struct ArchiveFileHeader {
     ARCHIVE_MAGIC_2 magic32_2; // Identifier bytes 0x8-0xB
 } ArchiveHeader;
 
-#endif // _DS1_FILE_LIB_ARCHIVE_FILE_HEADER_H_
+#endif // DS1_FILE_LIB_ARCHIVE_FILE_HEADER_H_

@@ -20,8 +20,8 @@
 
 #pragma once
 
-#ifndef _DS1_FILE_LIB_SL2_SAVE_FILE_ENUM_H_
-    #define _DS1_FILE_LIB_SL2_SAVE_FILE_ENUM_H_
+#ifndef DS1_FILE_LIB_SL2_SAVE_FILE_ENUM_H_
+    #define DS1_FILE_LIB_SL2_SAVE_FILE_ENUM_H_
 
 #include <cstdint>
 
@@ -11747,4 +11747,4 @@ public:
 
 };
 
-#endif // _DS1_FILE_LIB_SL2_SAVE_FILE_ENUM_H_
+#endif // DS1_FILE_LIB_SL2_SAVE_FILE_ENUM_H_
