@@ -28,6 +28,9 @@ void on_process_attach()
     Mod::startup_messages.push_back(DS1_OVERHAUL_TXT_INTRO);
     Mod::startup_messages.push_back("");
 
+    // Inject code to capture starting addresses of all Param files (removes need for AoB scans)
+    Params::patch();
+
     // Load startup preferences from settings file
     Mod::get_startup_preferences();
 
