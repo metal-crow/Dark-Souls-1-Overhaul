@@ -18,8 +18,8 @@
 
 #pragma once
 
-#ifndef _DS1_FILE_LIB_GENERIC_BASE_PARAM_DEF_FILE_H_
-    #define _DS1_FILE_LIB_GENERIC_BASE_PARAM_DEF_FILE_H_
+#ifndef DS1_FILE_LIB_GENERIC_BASE_PARAM_DEF_FILE_H_
+    #define DS1_FILE_LIB_GENERIC_BASE_PARAM_DEF_FILE_H_
 
 
 #include "PluginImports.h"
@@ -29,7 +29,6 @@
 
 // Macro for testing paramdef objects
 #define _test_param_def_(pd,p,attribute) {print_console(#p);int i = 0; p *param; for(i = 0; i < 5; i++){param = pd.get(i);print_console(std::to_string(i) + ":     "#attribute"=" + std::to_string(param->attribute));}i = pd.param_count-1;param=pd.get(i);print_console(std::to_string(i) + ":     "#attribute"=" + std::to_string(param->attribute) + "\n");}
-
 
 // Struct that maps parameter structs to their IDs (array of ParamBasicInfo structs found at 0x30 in .param files)
 typedef struct ParameterBasicInfo {
@@ -93,13 +92,11 @@ public:
 
 protected:
     ParamDef(void *base_init = NULL,
-             /*int32_t data_start_offset_init = 0, size_t param_count_init = 0,*/
              size_t param_size_init = sizeof(Param),
              const char *scan_pattern_init = "",
              const char *file_init = "",
              const char *title_init = "")
         : base(base_init),
-        /*data_start_offset(data_start_offset_init), param_count(param_count_init),*/
         param_size(param_size_init),
         scan_pattern(scan_pattern_init),
         file(file_init),
@@ -107,11 +104,21 @@ protected:
     {
     }
 
+    //ParamDef(void *base_init = NULL,
+    //         size_t param_size_init = sizeof(Param),
+    //         const char *file_init = "",
+    //         const char *title_init = "")
+    //    : base(base_init),
+    //    param_size(param_size_init),
+    //    file(file_init),
+    //    title(title_init)
+    //{
+    //}
+
     // Initializes file base pointer (start of the file, not the data array). Returns base address on success, and NULL otherwise
     void *init(void **start, const char *aob, bool print_result = false, bool re_init = false)
     {
-        if (start == NULL || aob == NULL)
-        {
+        if (start == NULL || aob == NULL) {
             SetLastError(ERROR_INVALID_PARAMETER);
             return NULL;
         }
@@ -121,8 +128,7 @@ protected:
 
         (*start) = aob_scan(aob);
 
-        if ((*start) != NULL && print_result)
-        {
+        if ((*start) != NULL && print_result) {
             // Get number of parameters and file header title:
             param_count = *(uint16_t*)(((uint8_t*)(*start)) + 0xA);
             header_title = (char*)(((uint8_t*)(*start)) + 0xC);
@@ -138,12 +144,9 @@ protected:
             std::stringstream hex_stream;
             hex_stream << std::hex << (int)(*start);
             print_console(std::string("    Found param file: " + this->file + Param::FILE_EXT + " (\"" + this->header_title + "\"; Location: 0x").append(hex_stream.str()).append(") containing " + std::to_string(param_count) + " parameters"));
-        }
-        else if (print_result)
-        {
+        } else if (print_result) {
             print_console(std::string("    ERROR: Failed to locate parameter data file (").append(this->file + Param::FILE_EXT) + ")");
         }
-
         return (*start);
     }
 
@@ -175,9 +178,42 @@ protected:
 
 public:
     // Initializes file base pointer (start of the file, not the data array). Returns base address on success, and NULL otherwise
-    void *init(bool print_result = false, bool re_init = false)
+    //void *init(bool print_result = false, bool re_init = false)
+    //{
+    //    return ParamDef::init(&base, scan_pattern.c_str(), print_result, re_init);
+    //}
+
+    // Initializes file base pointer (start of the file, not the data array). Returns base address on success, and NULL otherwise
+    void *init(void *new_base, bool print_result = false)
     {
-        return ParamDef::init(&base, scan_pattern.c_str(), print_result, re_init);
+        if (this->base != NULL) {
+            SetLastError(ERROR_ALREADY_INITIALIZED);
+            return base;
+        }
+        if (new_base == NULL) {
+            SetLastError(ERROR_INVALID_PARAMETER);
+            return NULL;
+        }
+        base = new_base;
+
+        // Get number of parameters and file header title:
+        param_count = *(uint16_t*)(((uint8_t*)new_base) + 0xA);
+        header_title = (char*)(((uint8_t*)new_base) + 0xC);
+
+        // Save start of param structure array
+        ParamBasicInfo *info = (ParamBasicInfo*)(((uint8_t*)new_base) + 0x30);
+        data_start_offset = info[0].param_offset;
+
+        // Map indices to unique IDs
+        for (int i = 0; i < (int)param_count; i++)
+            id_to_index.insert(std::make_pair(info[i].id, i));
+
+        if (print_result) {
+            std::stringstream hex_stream;
+            hex_stream << std::hex << (int)new_base;
+            print_console(std::string("    Found param file: " + this->file + Param::FILE_EXT + " (\"" + this->header_title + "\"; Location: 0x").append(hex_stream.str()).append(") containing " + std::to_string(param_count) + " parameters"));
+        }
+        return new_base;
     }
 
     // Returns param struct with the specified ID in the data array
@@ -186,11 +222,9 @@ public:
         if (base == NULL)
             return NULL;
 
-
         try {
             return get(id_to_index.at(id));
-        }
-        catch (const std::out_of_range&) {
+        } catch (const std::out_of_range&) {
             return NULL;
         }
     }
@@ -200,10 +234,9 @@ public:
     {
         if (base == NULL)
             return -1;
-
         return ((ParamBasicInfo*)(((uint8_t*)base) + 0x30))[index].id;
     }
 };
 
 
-#endif // _DS1_FILE_LIB_GENERIC_BASE_PARAM_DEF_FILE_H_
+#endif // DS1_FILE_LIB_GENERIC_BASE_PARAM_DEF_FILE_H_

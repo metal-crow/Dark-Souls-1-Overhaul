@@ -5,11 +5,9 @@
         Sean Pesce    -    C++
 
 
-    Param/Attack.h
+    Param/AttackPc.h
 
-    WARNING: There are two different AtkParam files: AtkParam_Npc and AtkParam_Pc (both contain the same starting AoB)
-
-    Attack Parameters from AtkParam_??.paramdef
+    Attack Parameters from AtkParam_Pc.paramdef
 
 
     References:
@@ -23,15 +21,15 @@
 
 #pragma once
 
-#ifndef _DS1_OVERHAUL_ATTACK_PARAM_DEF_FILE_H_
-    #define _DS1_OVERHAUL_ATTACK_PARAM_DEF_FILE_H_
+#ifndef DS1_FILE_LIB_PC_ATTACK_PARAM_DEF_FILE_H_
+    #define DS1_FILE_LIB_PC_ATTACK_PARAM_DEF_FILE_H_
 
 
 #include "Param.h"
 
 
 // Attack parameter
-typedef struct AttackParameter : public Param {
+typedef struct AttackPcParameter : public Param {
 
     float
         hit0_Radius = 0, // Sphere, radius of the capsule
@@ -126,29 +124,29 @@ typedef struct AttackParameter : public Param {
     uint8_t
         pad = 0; // Pad
 
-} AttackParam;
+} AttackPcParam;
 
 
 
 // Attack parameter definitions file
-class AttackParamDef : public ParamDef {
+class AttackPcParamDef : public ParamDef {
 
 
 public:
-    static AttackParamDef& get_instance()
+    static AttackPcParamDef& get_instance()
     {
-        static AttackParamDef instance;
+        static AttackPcParamDef instance;
         return instance;
     }
 
-    AttackParam *data()
+    AttackPcParam *data()
     {
-        return (AttackParam*)ParamDef::data();
+        return (AttackPcParam*)ParamDef::data();
     }
 
-    AttackParam *get(int index)
+    AttackPcParam *get(int index)
     {
-        return (AttackParam*)ParamDef::get(index);
+        return (AttackPcParam*)ParamDef::get(index);
     }
 
 
@@ -156,17 +154,17 @@ public:
 
 private:
     // WARNING: There are two different AtkParam files: AtkParam_Npc and AtkParam_Pc (both contain the same starting AoB)
-    AttackParamDef()
-        : ParamDef(NULL, sizeof(AttackParam),
+    AttackPcParamDef()
+        : ParamDef(NULL, sizeof(AttackPcParam),
                    //"A0 FB 02 00 ?? ?? 00 00 01 00 ?? ?? 41 54 4B 5F",
                    "?? ?? ?? ?? ?? ?? 00 00 01 00 ?? ?? 41 54 4B 5F 50 41 52 41 4D 5F 53 54 00",
-                   "AtkParam_??", "Attack")
+                   "AtkParam_Pc", "(Player) Attack")
     {
     }
 
 public:
-    AttackParamDef(AttackParamDef const&) = delete;
-    void operator=(AttackParamDef const&) = delete;
+    AttackPcParamDef(AttackPcParamDef const&) = delete;
+    void operator=(AttackPcParamDef const&) = delete;
 };
 
 
@@ -175,4 +173,4 @@ public:
 
 
 
-#endif // _DS1_OVERHAUL_ATTACK_PARAM_DEF_FILE_H_
+#endif // DS1_FILE_LIB_PC_ATTACK_PARAM_DEF_FILE_H_

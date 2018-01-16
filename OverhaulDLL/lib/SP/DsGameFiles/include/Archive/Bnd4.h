@@ -16,8 +16,8 @@
 
 #pragma once
 
-#ifndef _DS1_FILE_LIB_BND4_ARCHIVE_FILE_H_
-    #define _DS1_FILE_LIB_BND4_ARCHIVE_FILE_H_
+#ifndef DS1_FILE_LIB_BND4_ARCHIVE_FILE_H_
+    #define DS1_FILE_LIB_BND4_ARCHIVE_FILE_H_
 
 
 #include "Windows.h"
@@ -41,4 +41,4 @@ typedef Bnd4Archive Bnd4;
 
 
 
-#endif // _DS1_FILE_LIB_BND4_ARCHIVE_FILE_H_
+#endif // DS1_FILE_LIB_BND4_ARCHIVE_FILE_H_

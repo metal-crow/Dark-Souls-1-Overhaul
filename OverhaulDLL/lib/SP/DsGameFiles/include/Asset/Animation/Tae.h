@@ -20,8 +20,8 @@
 
 #pragma once
 
-#ifndef _DS1_FILE_LIB_TAE_ANIMATION_FILE_H_
-    #define _DS1_FILE_LIB_TAE_ANIMATION_FILE_H_
+#ifndef DS1_FILE_LIB_TAE_ANIMATION_FILE_H_
+    #define DS1_FILE_LIB_TAE_ANIMATION_FILE_H_
 
 
 #include "Windows.h"
@@ -662,4 +662,4 @@ public:
 
 
 
-#endif // _DS1_FILE_LIB_TAE_ANIMATION_FILE_H_
+#endif // DS1_FILE_LIB_TAE_ANIMATION_FILE_H_

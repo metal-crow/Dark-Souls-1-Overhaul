@@ -21,8 +21,8 @@
 
 #pragma once
 
-#ifndef _DS1_FILE_LIB_DCX_ARCHIVE_FILE_H_
-    #define _DS1_FILE_LIB_DCX_ARCHIVE_FILE_H_
+#ifndef DS1_FILE_LIB_DCX_ARCHIVE_FILE_H_
+    #define DS1_FILE_LIB_DCX_ARCHIVE_FILE_H_
 
 
 #include "Archive/Header.h"
@@ -319,4 +319,4 @@ public:
 } DcxArchive;
 
 
-#endif // _DS1_FILE_LIB_DCX_ARCHIVE_FILE_H_
+#endif // DS1_FILE_LIB_DCX_ARCHIVE_FILE_H_

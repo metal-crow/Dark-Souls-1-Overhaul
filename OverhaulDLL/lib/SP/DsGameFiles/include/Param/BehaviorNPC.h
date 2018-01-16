@@ -9,8 +9,6 @@
 
     NPC Behavior Parameters from BehaviorParam.paramdef
 
-    // WARNING: There are two different BehaviorParam files: BehaviorParam and BehaviorParam_Pc (both contain the same starting AoB)
-
     References:
         - Burton Radons' ParamDefs Sheet
           https://docs.google.com/spreadsheets/d/1KukblWL61We64-gNIyaAShga9h8RTXYmyFs98eQhY4E/
@@ -22,8 +20,8 @@
 
 #pragma once
 
-#ifndef _DS1_FILE_LIB_NPC_BEHAVIOR_PARAM_DEF_FILE_H_
-    #define _DS1_FILE_LIB_NPC_BEHAVIOR_PARAM_DEF_FILE_H_
+#ifndef DS1_FILE_LIB_NPC_BEHAVIOR_PARAM_DEF_FILE_H_
+    #define DS1_FILE_LIB_NPC_BEHAVIOR_PARAM_DEF_FILE_H_
 
 
 #include "Param.h"
@@ -96,7 +94,7 @@ private:
         : ParamDef(NULL, /*0x70B0, 2400,*/ sizeof(BehaviorNpcParam),
                    //"B0 9C 01 00 ?? ?? 02 00 02 00 ?? ?? 42 45 48 41",
                    "?? ?? ?? ?? ?? ?? 02 00 02 00 ?? ?? 42 45 48 41 56 49 4F 52 5F 50 41 52 41 4D 5F 53 54 00",
-                   "BehaviorParam (??)", "Behavior (NPC)")
+                   "BehaviorParam", "Behavior (NPC)")
     {
     }
 
@@ -111,4 +109,4 @@ public:
 
 
 
-#endif // _DS1_FILE_LIB_NPC_BEHAVIOR_PARAM_DEF_FILE_H_
+#endif // DS1_FILE_LIB_NPC_BEHAVIOR_PARAM_DEF_FILE_H_

@@ -21,14 +21,15 @@
 
 #pragma once
 
-#ifndef _DS1_FILE_LIB_SL2_SAVE_FILE_H_
-    #define _DS1_FILE_LIB_SL2_SAVE_FILE_H_
+#ifndef DS1_FILE_LIB_SL2_SAVE_FILE_H_
+    #define DS1_FILE_LIB_SL2_SAVE_FILE_H_
 
 #include "Archive/Bnd4.h"
 #include "GameEnum.h"
 #include "FileUtil.h"
 #include "Save/Enum.h"
 
+#include <tuple>
 #include <vector>
 
 
@@ -1230,7 +1231,7 @@ public:
             old_filename = base_filename;
         }
         if (!FileUtil::file_exists(old_filename.c_str())) {
-            print_console("File not found");
+            //print_console("File not found");
             return ERROR_FILE_NOT_FOUND;
         }
         file_size = FileUtil::file_size(old_filename.c_str());
@@ -1404,4 +1405,4 @@ typedef Sl2SaveFile Sl2;
 
 
 
-#endif // _DS1_FILE_LIB_SL2_SAVE_FILE_H_
+#endif // DS1_FILE_LIB_SL2_SAVE_FILE_H_

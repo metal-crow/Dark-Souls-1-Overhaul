@@ -21,8 +21,8 @@
 
 #pragma once
 
-#ifndef _DS1_OVERHAUL_FOG_BANK_PARAM_DEF_FILE_H_
-    #define _DS1_OVERHAUL_FOG_BANK_PARAM_DEF_FILE_H_
+#ifndef DS1_FILE_LIB_FOG_BANK_PARAM_DEF_FILE_H_
+    #define DS1_FILE_LIB_FOG_BANK_PARAM_DEF_FILE_H_
 
 
 #include "Param/Param.h"
@@ -88,4 +88,4 @@ public:
 
 
 
-#endif // _DS1_OVERHAUL_FOG_BANK_PARAM_DEF_FILE_H_
+#endif // DS1_FILE_LIB_FOG_BANK_PARAM_DEF_FILE_H_

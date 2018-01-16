@@ -22,8 +22,8 @@
 
 
 
-#ifndef _DS1_FILE_LIB_GAME_ENUMS_H_
-    #define _DS1_FILE_LIB_GAME_ENUMS_H_
+#ifndef DS1_FILE_LIB_GAME_ENUMS_H_
+    #define DS1_FILE_LIB_GAME_ENUMS_H_
 
 #include <stdint.h>
 
@@ -1055,4 +1055,4 @@ class Event_Define_LUA_Constants {
 typedef Event_Define_LUA_Constants LuaEventConst;
 
 
-#endif // _DS1_FILE_LIB_GAME_ENUMS_H_
+#endif // DS1_FILE_LIB_GAME_ENUMS_H_

@@ -12,8 +12,8 @@
 
 #pragma once
 
-#ifndef _DS1_FILE_LIB_FILE_UTIL_H_
-    #define _DS1_FILE_LIB_FILE_UTIL_H_
+#ifndef DS1_FILE_LIB_FILE_UTIL_H_
+    #define DS1_FILE_LIB_FILE_UTIL_H_
 
 #include <string>
 #include <vector>
@@ -25,7 +25,7 @@ class Ds1FileUtil
 public:
 
 
-#ifdef _DS1_FILE_LIB_INCLUDE_BDT_FILE_LIST_
+#ifdef DS1_FILE_LIB_INCLUDE_BDT_FILE_LIST_
     /*
         Use of the packed file list header must be explicitly defined because
         its inclusion increases compiled file size by ~200KB
@@ -42,7 +42,7 @@ public:
 
     // Calculates and stores hashes for all default game filenames
     static int hash_default_filenames();
-#endif // _DS1_FILE_LIB_INCLUDE_BDT_FILE_LIST_
+#endif // DS1_FILE_LIB_INCLUDE_BDT_FILE_LIST_
 
 
     // Checks if the specified file exists
@@ -88,4 +88,4 @@ public:
 typedef Ds1FileUtil FileUtil;
 
 
-#endif // _DS1_FILE_LIB_FILE_UTIL_H_
+#endif // DS1_FILE_LIB_FILE_UTIL_H_

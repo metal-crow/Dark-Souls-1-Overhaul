@@ -20,15 +20,15 @@
 
 
 
-#ifndef _DS1_FILE_LIB_BDT_FILE_LIST_H_
-    #define _DS1_FILE_LIB_BDT_FILE_LIST_H_
+#ifndef DS1_FILE_LIB_BDT_FILE_LIST_H_
+    #define DS1_FILE_LIB_BDT_FILE_LIST_H_
 
 
 /*
     Use of this header must be explicitly defined because
     its inclusion increases compiled file size by ~200KB
 */
-#ifdef _DS1_FILE_LIB_INCLUDE_BDT_FILE_LIST_
+#ifdef DS1_FILE_LIB_INCLUDE_BDT_FILE_LIST_
 
 // Calculates and stores hashes for the default game filenames
 int FileUtil::hash_default_filenames()
@@ -6172,6 +6172,6 @@ const char* const FileUtil::FILENAMES[FILENAME_LIST_SIZE] = {
     "/sound/frpg_xm18.itl"
 };
 
-#endif // _DS1_FILE_LIB_INCLUDE_BDT_FILE_LIST_
+#endif // DS1_FILE_LIB_INCLUDE_BDT_FILE_LIST_
 
-#endif // _DS1_FILE_LIB_BDT_FILE_LIST_H_
+#endif // DS1_FILE_LIB_BDT_FILE_LIST_H_
