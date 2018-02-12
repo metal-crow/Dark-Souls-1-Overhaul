@@ -56,7 +56,7 @@ void initialize() {
         Sleep(500);
     }
     if (!print_console(Mod::output_prefix + "Initializing XInput hook..."))
-        Mod::startup_messages.push_back(Mod::output_prefix + "Initializing XInput hooks...");
+        Mod::startup_messages.push_back(Mod::output_prefix + "Initializing XInput hook...");
     apply_function_intercepts();
 }
 

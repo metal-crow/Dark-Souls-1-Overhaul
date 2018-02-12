@@ -165,7 +165,10 @@ void Game::set_game_version(uint8_t version_number)
     hex_stream.str(""); // Clear string stream
     hex_stream << std::hex << (int)Game::get_game_version();
 
-    Mod::startup_messages.push_back(std::string(Mod::output_prefix + "Changing game version number from 0x").append(hex_stream.str()).append(" to 0x").append(new_version_str).append("..."));
+    if (version_number != Game::get_game_version()) {
+        Mod::startup_messages.push_back(std::string(Mod::output_prefix + "Changing game version number from 0x").append(hex_stream.str()).append(" to 0x").append(new_version_str).append("..."));
+    }
+
     uint8_t patch1[5] = { 0xC6, 0x44, 0x24, 0x1C, version_number }; // mov byte ptr [esp+0x1C],0x3C
     uint8_t patch2[3] = { 0x80, 0x38, version_number }; // cmp byte ptr [eax],0x3C
 

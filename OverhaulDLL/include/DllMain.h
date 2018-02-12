@@ -36,7 +36,7 @@
     #ifndef DS1_OVERHAUL_QOL_PREVIEW
         #define DS1_OVERHAUL_QOL_PREVIEW
     #endif // !DS1_OVERHAUL_QOL_PREVIEW
-    #define DS1_OVERHAUL_TXT_INTRO "\n+-------------------------------+\n|      Dark Souls Overhaul      |\n| Quality of Life Preview Build |\n|      (Rekindled Edition)      |\n+-------------------------------+"
+    #define DS1_OVERHAUL_TXT_INTRO "\n+-------------------------------+\n|      Dark Souls Overhaul      |\n| Quality of Life Preview Build |\n|          (Rekindled)          |\n+-------------------------------+"
 #elif defined DS1_OVERHAUL_QOL_PREVIEW
     // QoL Preview build
     #define DS1_OVERHAUL_GAME_VER_NUM DS1_VERSION_OVERHAUL
