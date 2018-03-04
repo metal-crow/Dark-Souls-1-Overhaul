@@ -466,6 +466,9 @@ void __declspec(naked) __stdcall BloodborneRally::main_rally_injection() {
 #define RALLY_CAPABLE_WEAPON_EFFECT_ID_RHAND 92001
 #define RALLY_CAPABLE_WEAPON_EFFECT_ID_LHAND 92002
 
+SpPointer rh_weapon_id = new SpPointer((void*)((uint32_t)Game::ds1_base + 0xF7D644), { 0x3c, 0x30, 0xc, 0x654, 0x1f8 });
+SpPointer lh_weapon_id = new SpPointer((void*)((uint32_t)Game::ds1_base + 0xF7D644), { 0x3c, 0x30, 0xc, 0x654, 0x1b4 });
+
 static DWORD WINAPI Apply_rally_capable_sfx_and_starting_hp(void* unused) {
     int char_status = DS1_PLAYER_STATUS_LOADING;
 
@@ -480,17 +483,8 @@ static DWORD WINAPI Apply_rally_capable_sfx_and_starting_hp(void* unused) {
         Game::player_char_status.read(&char_status);
 
         while (char_status != DS1_PLAYER_STATUS_LOADING) {
-            __asm {
-                mov  eax, DWORD PTR ds : 0x0137D644
-                mov  eax, [eax + 0x3C]
-                mov  eax, [eax + 0x30]
-                mov  eax, [eax + 0xC]
-                mov  eax, [eax + 0x654]
-                mov  ebx, [eax + 0x1F8] //grabs the R-hand weapon's id
-                mov  weaponid_R, ebx
-                mov  ebx, [eax + 0x1B4] //grabs the L-hand weapon's id
-                mov  weaponid_L, ebx
-            }
+            rh_weapon_id.read(&weaponid_R);
+            lh_weapon_id.read(&weaponid_L);
 
             //There appears to be some bug here where both the effects cannot be applied simultaneously
             //But it just alternates which is applied, so it works ok
