@@ -88,7 +88,8 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     // Allow modded effectIDs
     Game::unrestrict_network_synced_effectids();
 
-    // Enable Bloodborne rally system
+    Game::increase_gui_hpbar_max();
+
     if (!Mod::legacy_mode) {
         BloodborneRally::start();
     }
