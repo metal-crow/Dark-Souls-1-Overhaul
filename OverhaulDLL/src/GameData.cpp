@@ -18,6 +18,7 @@
 #include "Challenge/AggressiveAi.h"
 #include "Challenge/BlackPhantomEnemies.h"
 #include "PhantomUnshackle.h"
+#include "MoveWhileCasting.h"
 
 
 /*
@@ -68,7 +69,7 @@ enum TAE_type0_param_values {
     cancel_by_using_consumable = 31,
     cancel_by_two_handing = 32,
     allow_animation_cancel_events = 87,
-    allow_movement_at_half_speed = 90,
+    cap_movement_to_walk_speed = 90,
 };
 
 
@@ -131,6 +132,9 @@ void Game::on_first_character_loaded()
 
         // Apply phantom unshackle patch
         PhantomUnshackle::start();
+
+        //Allow movement during spells
+        CastingMovement::start();
     }
 
     // Enable forced binoculars/dragonification PvP protections
@@ -713,4 +717,13 @@ void Game::unrestrict_network_synced_effectids()
 
     write_address = (uint8_t*)Game::ds1_base + 0xA3EC8D;
     apply_byte_patch(write_address, nop_patch, 3);
+}
+
+static const uint32_t HEALTHBAR_SIZE = 0x011E89E0;
+const float new_hpbar_max = 2300;
+
+// Fix the bug where the player HP could be greater than the displayed GUI bar
+void Game::increase_gui_hpbar_max()
+{
+    apply_byte_patch((void*)HEALTHBAR_SIZE, &new_hpbar_max, 4);
 }

@@ -28,7 +28,8 @@ std::vector<std::string> Mod::authors = {
     "LordOfSandvich",
     "SuperIronBob",
     "jellybaby34",
-    "SiriusTextra"
+    "SiriusTextra",
+    "Verideth"
     // Apologies in advance to anyone I forgot, just let me know so I can add you to the list
     //     -Sean
 };

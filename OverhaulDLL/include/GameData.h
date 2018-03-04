@@ -146,6 +146,9 @@ public:
     // Allow effect IDs to be transferred between clients without bounds restrictions
     static void unrestrict_network_synced_effectids();
 
+    // Fix the bug where the player HP could be greater than the displayed GUI bar
+	static void increase_gui_hpbar_max();
+
     // Two-part patch to increase the multiplayer phantom limit:
     static void increase_phantom_limit1(); // Called from on_process_attach()
     static void increase_phantom_limit2(); // Called from initialize_plugin()
