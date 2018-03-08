@@ -8,10 +8,11 @@ Metal-Crow    -    Reverse engineering, C++
 
 #include "PhantomUnshackle.h"
 #include "DllMain.h"
+#include <atomic>
 
 static uint32_t mp_zone_changing_injection_return;
 
-static volatile int32_t vanilla_mp_zone;
+static std::atomic<int32_t> vanilla_mp_zone;
 
 static DWORD WINAPI change_mp_zone(void* unused);
 
