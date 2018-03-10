@@ -99,6 +99,12 @@
     <ClCompile Include="src\PhantomUnshackle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Testing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MoveWhileCasting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\DllMain.h">
@@ -147,6 +153,12 @@
       <Filter>Header Files\Challenge</Filter>
     </ClInclude>
     <ClInclude Include="include\PhantomUnshackle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="testing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MoveWhileCasting.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
