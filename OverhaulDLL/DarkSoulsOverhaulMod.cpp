@@ -28,9 +28,6 @@ void on_process_attach()
     Mod::startup_messages.push_back(DS1_OVERHAUL_TXT_INTRO);
     Mod::startup_messages.push_back("");
 
-    // Inject code to capture starting addresses of all Param files (removes need for AoB scans)
-    Params::patch();
-
     // Load startup preferences from settings file
     Mod::get_startup_preferences();
 
@@ -40,17 +37,26 @@ void on_process_attach()
     // Check if game version is supported
     if (!game_version_is_supported)
     {
-        // @TODO: Handle wrong game version: Show dialog box and continue loading without applying mod
+        // Placeholder handling of wrong game version
 
-        // Placeholder handling of wrong game version:
-        Mod::startup_messages.push_back(Mod::output_prefix + "WARNING: Unsupported game version detected.");
-        MessageBox(NULL, std::string("Invalid game version detected. Change to supported game version, or disable the Dark Souls Overhaul Mod.").c_str(),
-                   "ERROR: Dark Souls Overhaul Mod - Wrong game version", NULL);
-        exit(0);
+        if (Game::get_game_version() == 139) { // @TODO: Fix get_game_version() to work on different builds of DARKSOULS.exe
+            // Debug build
+            Mod::startup_messages.push_back(Mod::output_prefix + "WARNING: Debug game version detected. Disabling features...");
+            Game::set_memory_limit(Game::memory_limit);
+            return;
+        } else {
+            Mod::startup_messages.push_back(Mod::output_prefix + "WARNING: Unsupported game version detected.");
+            MessageBox(NULL, std::string("Invalid game version detected. Change to supported game version, or disable the Dark Souls Overhaul Mod.").c_str(),
+                       "ERROR: Dark Souls Overhaul Mod - Wrong game version", NULL);
+            exit(0);
+        }
     }
 
     // Apply increased memory limit patch
     Game::set_memory_limit(Game::memory_limit);
+
+    // Inject code to capture starting addresses of all Param files (removes need for AoB scans)
+    Params::patch();
 
     // Change game version number
     Files::apply_function_intercepts();
@@ -79,6 +85,10 @@ void on_process_attach()
 */
 DWORD WINAPI on_process_attach_async(LPVOID lpParam)
 {
+    if (!game_version_is_supported) {
+        return 0;
+    }
+
     // Start anti-cheat
     AntiCheat::start();
 
@@ -148,6 +158,10 @@ __declspec(dllexport) void __stdcall initialize_plugin()
     // Print startup messages
     for (std::string msg : Mod::startup_messages)
         print_console(msg.c_str());
+
+    if (!game_version_is_supported) {
+        return;
+    }
 
     // Load user preferences & keybinds from settings file
     Mod::get_user_preferences();
@@ -228,8 +242,12 @@ __declspec(dllexport) void __stdcall main_loop()
 */
 DWORD WINAPI deferred_tasks(LPVOID lpParam)
 {
+    if (!game_version_is_supported) {
+        return 0;
+    }
+
     // Sleep time (in milliseconds) between loop iterations
-    int wait_time = 500;
+    const int wait_time = 500;
 
     // Wait for event: first character loaded in this instance of the game
     int char_status = DS1_PLAYER_STATUS_LOADING;

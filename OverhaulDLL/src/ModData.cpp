@@ -42,7 +42,11 @@ bool Mod::deferred_tasks_complete = false;
 std::vector<std::string> Mod::startup_messages;
 
 // List of supported game versions
-std::vector<uint8_t> Mod::supported_game_versions = { DS1_VERSION_RELEASE };
+std::vector<uint8_t> Mod::supported_game_versions = {   DS1_VERSION_RELEASE,
+                                                        DS1_VERSION_OVERHAUL,
+                                                        DS1_VERSION_OVERHAUL_CHEATS,
+                                                        DS1_VERSION_REKINDLED,
+                                                        DS1_VERSION_REKINDLED_CHEATS };
 
 // Enable/disable mouse input
 bool Mod::mouse_input = true;

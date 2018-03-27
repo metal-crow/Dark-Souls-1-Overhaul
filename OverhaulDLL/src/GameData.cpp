@@ -156,6 +156,7 @@ void Game::on_first_character_loaded()
 // Obtains the current game version number
 uint8_t Game::get_game_version()
 {
+    // @TODO: Fix this function to work on different builds of DARKSOULS.exe
     return *((uint8_t*)Game::ds1_base + 0x7E719F);
 }
 
@@ -629,14 +630,27 @@ void Game::set_memory_limit(uint32_t mem_limit)
     uint8_t *mem_limit_bytes = (uint8_t*)&mem_limit;
     uint8_t patch[5] = { 0x68, mem_limit_bytes[0], mem_limit_bytes[1], mem_limit_bytes[2], mem_limit_bytes[3] }; // push 0x0DA0000. The constant can be increased as desired, and represents dark souls total memory pool
 
-    void *write_address = (uint8_t*)Game::ds1_base + 0xB8B7E5;
-    apply_byte_patch(write_address, patch, 5);
+    void *write_address;
+    if (Game::get_game_version() == DS1_VERSION_RELEASE) {
+        write_address = (uint8_t*)Game::ds1_base + 0xB8B7E5;
+        apply_byte_patch(write_address, patch, 5);
 
-    write_address = (uint8_t*)Game::ds1_base + 0x9E20;
-    apply_byte_patch(write_address, patch, 5);
+        write_address = (uint8_t*)Game::ds1_base + 0x9E20;
+        apply_byte_patch(write_address, patch, 5);
 
-    write_address = (uint8_t*)Game::ds1_base + 0x9E41;
-    apply_byte_patch(write_address, patch, 5);
+        write_address = (uint8_t*)Game::ds1_base + 0x9E41;
+        apply_byte_patch(write_address, patch, 5);
+    } else if (Game::get_game_version() == 139) {
+        // Debug build
+        write_address = (uint8_t*)Game::ds1_base + 0xB8F0A5;
+        apply_byte_patch(write_address, patch, 5);
+
+        write_address = (uint8_t*)Game::ds1_base + 0xA1E0;
+        apply_byte_patch(write_address, patch, 5);
+
+        write_address = (uint8_t*)Game::ds1_base + 0xA201;
+        apply_byte_patch(write_address, patch, 5);
+    }
 }
 
 
