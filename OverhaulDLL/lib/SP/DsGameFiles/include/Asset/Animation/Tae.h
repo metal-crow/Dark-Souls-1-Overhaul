@@ -490,6 +490,17 @@ public:
         }
     }
 
+    // Sets animation end time of event with index ei in event header array for animation with the specified ID
+    void set_event_end_by_id(uint32_t id, int unsigned ei, float new_start) {
+        AnimData::Header* d = get_data_by_id(id);
+        if (d != NULL && ei < d->event_count) {
+            if (from_file)
+                *(float*)(offset_base + ((Event::Header*)(offset_base + d->events_offset))[ei].end_time_offset) = new_start;
+            else
+                *(float*)&(((Event::Header*)(offset_base + d->events_offset))[ei].end_time_offset) = new_start;
+        }
+    }
+
     // Returns animation end time of event with index ei in event header array for animation at index i
     inline float get_event_end(int unsigned i, int unsigned ei) {
         AnimData::Header* d = get_data(i);
