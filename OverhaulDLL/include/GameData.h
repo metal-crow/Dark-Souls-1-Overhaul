@@ -37,7 +37,19 @@ enum DS1_PLAYER_STATUS_ENUM {
     DS1_PLAYER_STATUS_HOLLOW = 8
 };
 
-
+enum TAE_type0_param_values {
+    cancel_by_atk = 4,
+    lock_rotation = 7,
+    activate_iframes = 8,
+    cancel_by_moving = 11,
+    cancel_by_left_atk = 16,
+    cancel_by_left_block = 22,
+    cancel_by_rolling_or_backstepping = 26,
+    cancel_by_using_consumable = 31,
+    cancel_by_two_handing = 32,
+    allow_animation_cancel_events = 87,
+    cap_movement_to_walk_speed = 90,
+};
 
 
 class Game
