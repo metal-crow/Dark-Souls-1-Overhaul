@@ -182,7 +182,7 @@ static const uint32_t SetAnimationIdFunc = 0x0FDD5E0; //function which properly 
 static DWORD WINAPI CallSetAnimationIdFunc(void* delay_arg) {
     //Wait till animation is finished
     std::tuple<uint32_t, float> delay = *(std::tuple<uint32_t, float>*)delay_arg;
-    Sleep(std::get<1>(delay)*1000);
+    Sleep(650);
 
     AnimationEventStruct animation_struct;
     animation_struct.VTable = 0x1104CB0;
