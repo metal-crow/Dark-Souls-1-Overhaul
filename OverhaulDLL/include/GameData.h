@@ -63,6 +63,9 @@ public:
     // Base address of Dark Souls game process
     static void *ds1_base;
 
+    // Base address of fmodex dll Dark Souls loads
+    static void *fmodex_base;
+
     // Base address for player character data
     static void *player_char_base;
 

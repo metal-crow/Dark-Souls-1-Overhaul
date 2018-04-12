@@ -16,6 +16,9 @@ static uint32_t current_selected_bar_injection_return;
 static uint32_t control_timer_injection_return;
 static uint32_t main_rally_injection_return;
 
+//Time in ms from game start
+static uint32_t  time_ms_ptr;
+
 // Time (in milliseonds) player was last hit
 static uint32_t  beforehit_time;
 static uint32_t *beforehit_time_ptr = &beforehit_time;
@@ -36,6 +39,8 @@ void BloodborneRally::start() {
     if (!print_console("    Enabling Bloodborne Rally System...")) {
         Mod::startup_messages.push_back("    Enabling Bloodborne Rally System...");
     }
+
+    time_ms_ptr = ((uint32_t)Game::fmodex_base + 0xC42AC); //offset from Game::fmodex_base that keeps track of ms from game start
 
     // Inject function to clear rally on weapon toggle
     uint8_t *write_address = (uint8_t*)(BloodborneRally::weapon_toggle_injection_offset + ((uint32_t)Game::ds1_base));
@@ -233,7 +238,10 @@ void __declspec(naked) __stdcall BloodborneRally::control_timer_injection() {
         push eax
         mov  eax, [beforehit_time_ptr]
         add  eax, MAX_RALLY_RECOVERY_TIME_MS
-        cmp  DWORD PTR ds:0x100C42AC, eax // Compare current time to hittime+MAX RECOVERY TIME
+        push ebx
+        mov  ebx, [time_ms_ptr]
+        cmp  [ebx], eax // Compare current time to hittime+MAX RECOVERY TIME
+        pop  ebx
         pop  eax
         jge  execute_orange_drop
 
@@ -317,7 +325,10 @@ void __declspec(naked) __stdcall BloodborneRally::main_rally_injection() {
         push ebx
         mov  ebx, [eax + 0x2D4] // Player HP
         mov  [beforehit_hp_ptr], ebx
-        mov  ebx, DWORD PTR ds:0x100C42AC // Current time (ms)
+        push eax
+        mov  eax, [time_ms_ptr]
+        mov  ebx, [eax] // Current time (ms)
+        pop  eax
         mov  [beforehit_time_ptr], ebx
         inc  [gothit_ptr] // Marker for getting hit (used for UI)
         cmp  [gothit_ptr], 2
@@ -345,7 +356,10 @@ void __declspec(naked) __stdcall BloodborneRally::main_rally_injection() {
         // if (currenttime-storedtime < MAX RECOVERY TIME
         mov  eax, [beforehit_time_ptr]
         add  eax, MAX_RALLY_RECOVERY_TIME_MS
-        cmp  eax, DWORD PTR ds:0x100C42AC
+        push ebx
+        mov  ebx, [time_ms_ptr]
+        cmp  eax, [ebx]
+        pop  ebx
         jl   track_onhit_data_exit_cleanup
         // && weapon_is_occult)
         // Need to load weapon used data
@@ -466,10 +480,10 @@ void __declspec(naked) __stdcall BloodborneRally::main_rally_injection() {
 #define RALLY_CAPABLE_WEAPON_EFFECT_ID_RHAND 92001
 #define RALLY_CAPABLE_WEAPON_EFFECT_ID_LHAND 92002
 
-SpPointer rh_weapon_id = new SpPointer((void*)((uint32_t)Game::ds1_base + 0xF7D644), { 0x3c, 0x30, 0xc, 0x654, 0x1f8 });
-SpPointer lh_weapon_id = new SpPointer((void*)((uint32_t)Game::ds1_base + 0xF7D644), { 0x3c, 0x30, 0xc, 0x654, 0x1b4 });
-
 static DWORD WINAPI Apply_rally_capable_sfx_and_starting_hp(void* unused) {
+    SpPointer rh_weapon_id ((void*)((uint32_t)Game::ds1_base + 0xF7D644), { 0x3c, 0x30, 0xc, 0x654, 0x1f8 });
+    SpPointer lh_weapon_id ((void*)((uint32_t)Game::ds1_base + 0xF7D644), { 0x3c, 0x30, 0xc, 0x654, 0x1b4 });
+
     int char_status = DS1_PLAYER_STATUS_LOADING;
 
     uint32_t weaponid_R = 0;
