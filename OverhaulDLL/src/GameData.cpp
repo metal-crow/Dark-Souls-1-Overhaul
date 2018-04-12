@@ -28,6 +28,9 @@
 // Base address of Dark Souls game process
 void *Game::ds1_base = NULL;
 
+// Base address of fmodex dll Dark Souls loads
+void *Game::fmodex_base = NULL;
+
 // Base address for player character data
 void *Game::player_char_base = NULL;
 
