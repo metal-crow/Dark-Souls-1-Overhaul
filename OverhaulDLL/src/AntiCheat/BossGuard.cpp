@@ -39,6 +39,8 @@ void __declspec(naked) __stdcall asm_check()
     {
         mov ebp, [esp + 0x8]
 
+        cmp [ebp + 0x208], 0x186D20 //4 kings don't use EnableLogic
+        je returnhere
         push eax
         mov eax, [ebp + 0x28]
         mov eax, [eax + 0xC0] // Load flag info for entity

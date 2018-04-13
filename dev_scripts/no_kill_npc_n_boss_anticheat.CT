@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<CheatTable CheatEngineTableVersion="26">
+<CheatTable CheatEngineTableVersion="24">
   <CheatEntries>
     <CheatEntry>
       <ID>0</ID>
@@ -14,6 +14,8 @@ label(abort_damage)
 newmem:
 mov ebp,[esp+08]
 
+cmp [ebp+208],186D20 //4 kings don't use EnableLogic
+je returnhere
 push eax
 mov eax, [ebp+28]
 mov eax, [eax+C0] //load flag info for entity.
