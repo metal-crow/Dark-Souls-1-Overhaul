@@ -40,7 +40,7 @@ void __declspec(naked) __stdcall asm_check()
         mov ebp, [esp + 0x8]
 
         cmp [ebp + 0x208], 0x186D20 //4 kings don't use EnableLogic
-        je returnhere
+        je dont_check
         push eax
         mov eax, [ebp + 0x28]
         mov eax, [eax + 0xC0] // Load flag info for entity
@@ -49,6 +49,7 @@ void __declspec(naked) __stdcall asm_check()
         jz abort_damage // If result EnableLogic & 1 is 0, abort
 
         test byte ptr[ebp + 0x000003C4], 0x40
+        dont_check:
         jmp check_return
 
         abort_damage:
