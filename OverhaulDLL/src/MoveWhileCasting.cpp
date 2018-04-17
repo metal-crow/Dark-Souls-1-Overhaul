@@ -24,6 +24,7 @@ static const std::tuple<uint32_t, float> SPELL_AIDS_TO_ALLOW_MOVEMENT[] = {
 static uint32_t set_check2_var_to_zero_injection_return;
 static uint32_t force_animation_to_attack_category_instead_of_spattack_injection_return;
 static uint32_t return_animation_category_injection_return;
+static uint32_t bullet_genetation_notify_return;
 
 void CastingMovement::start() {
     if (!print_console("    Enabling casting while moving patch...")) {
@@ -49,6 +50,12 @@ void CastingMovement::start() {
     //Fix a write of -1 to WalkFB from happening in some cases
     write_address = (uint8_t*)(CastingMovement::walkfb_check_4 + ((uint32_t)Game::ds1_base));
     apply_byte_patch(write_address, nop_patch, 2);
+
+    //Get notified upon a bullet being generated
+    //Need to prevent glitch
+    write_address = (uint8_t*)(CastingMovement::bullet_generation + ((uint32_t)Game::ds1_base));
+    set_mem_protection(write_address, 6, MEM_PROTECT_RWX);
+    inject_jmp_5b(write_address, &bullet_genetation_notify_return, 1, &bullet_genetation_notify);
 
     //Force the casting animation to use the attack category instead of special attack category for the specified spell animation ids
     write_address = (uint8_t*)(CastingMovement::set_animation_category + ((uint32_t)Game::ds1_base));
@@ -84,6 +91,25 @@ void __declspec(naked) __stdcall CastingMovement::set_check2_var_to_zero_injecti
         mov dword ptr[ebx + 0x13C], 0
         cmp dword ptr[ebx + 0x13C], -01
         jmp set_check2_var_to_zero_injection_return
+    }
+}
+
+static uint8_t triggered_bullet = 0;
+
+void __declspec(naked) __stdcall CastingMovement::bullet_genetation_notify() {
+    //"DARKSOULS.exe" + C06178:
+    //mov eax, [ecx + 04]
+    //add esp, 04
+    //Alt: db 8B 41 04 83 C4 04
+    _asm {
+        mov eax, [ecx + 4]
+        //check if this is a PC generated bullet
+        cmp [eax], 10000
+        jne exit_bullet_genetation_notify
+        mov triggered_bullet, 1
+        exit_bullet_genetation_notify:
+        add esp, 4
+        jmp bullet_genetation_notify_return
     }
 }
 
@@ -180,10 +206,20 @@ static const uint32_t SetAnimationIdFunc = 0x0FDD5E0; //function which properly 
 
 #pragma warning( disable : 4244 )  //disable conversion from DWORD warning
 static DWORD WINAPI CallSetAnimationIdFunc(void* delay_arg) {
+    SpPointer timer ((void*)((uint32_t)Game::fmodex_base + 0xC42AC));
+    uint32_t start;
+    uint32_t cur = 0;
+    timer.read(&start);
+
     //Wait till animation is finished
     std::tuple<uint32_t, float> delay = *(std::tuple<uint32_t, float>*)delay_arg;
-    Sleep(650);
 
+    while (cur < (start+(std::get<1>(delay)*1000)) && !triggered_bullet) {
+        timer.read(&cur);
+        Sleep(1);
+    }
+    triggered_bullet = 0;
+    
     AnimationEventStruct animation_struct;
     animation_struct.VTable = 0x1104CB0;
     animation_struct.category = 1;
@@ -197,7 +233,7 @@ static DWORD WINAPI CallSetAnimationIdFunc(void* delay_arg) {
     _asm {
         push endaid_arg4 //a4: unknown comparitor
         push animation_struct_address //a3: animation structure pointer
-        mov ecx, endaid_arg1//a1: EzStateActionEvent
-        call [SetAnimationIdFunc]
+        mov  ecx, endaid_arg1//a1: EzStateActionEvent
+        call[SetAnimationIdFunc]
     }
 }
