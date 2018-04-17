@@ -25,5 +25,7 @@ private:
     static const uint32_t walkfb_check_4 = 0x9966AF;
     static const uint32_t set_animation_category = 0xBDD623;
     static void __stdcall force_animation_to_attack_category_instead_of_spattack_injection();
+    static const uint32_t bullet_generation = 0xC06178;
+    static void __stdcall bullet_genetation_notify();
 };
 #endif
