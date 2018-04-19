@@ -206,16 +206,14 @@ static const uint32_t SetAnimationIdFunc = 0x0FDD5E0; //function which properly 
 
 #pragma warning( disable : 4244 )  //disable conversion from DWORD warning
 static DWORD WINAPI CallSetAnimationIdFunc(void* delay_arg) {
-    SpPointer timer ((void*)((uint32_t)Game::fmodex_base + 0xC42AC));
-    uint32_t start;
+    uint32_t start = Game::get_game_time_ms();
     uint32_t cur = 0;
-    timer.read(&start);
 
     //Wait till animation is finished
     std::tuple<uint32_t, float> delay = *(std::tuple<uint32_t, float>*)delay_arg;
 
     while (cur < (start+(std::get<1>(delay)*1000)) && !triggered_bullet) {
-        timer.read(&cur);
+        cur = Game::get_game_time_ms();
         Sleep(1);
     }
     triggered_bullet = 0;

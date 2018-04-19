@@ -19,6 +19,7 @@
 #include "Challenge/BlackPhantomEnemies.h"
 #include "PhantomUnshackle.h"
 #include "MoveWhileCasting.h"
+#include "AnimationEdits.h"
 
 
 /*
@@ -54,12 +55,6 @@ int Game::node_count = -1;
 
 // Size of the pool of memory the game allocates for itself
 uint32_t Game::memory_limit = 0;
-
-// Gesture cancelling enabled/disabled
-bool Game::gesture_cancelling = true;
-
-// Animation IDs for the default set of gesture animations in the game
-const uint32_t Game::gesture_anim_ids[15] = { 6800, 6801, 6802, 6803, 6804, 6805, 6806, 6807, 6808, 6809, 6810, 6815, 6820, 6825, 6830 };
 
 
 // Strutures for tracking file I/O data for the game's BDT, BHD5, and SL2 files
@@ -106,12 +101,12 @@ void Game::on_first_character_loaded()
     if (Mod::disable_armor_sfx_pref)
         Game::enable_armor_sfx(false);
 
-    if (Game::gesture_cancelling) {
+    if (AnimationEdits::gesture_cancelling) {
         // Perform TAE edits to player animations to enable gesture cancelling
         void *ret_val = (void*)Game::player_tae.init_from_aob_scan("54 41 45 20 00 00 00 00 0B 00 01 00 B4 AE 09 00");
         std::string temp;
         print_console(std::string("    Found Time Action Event file for player character animations at 0x") + FileUtil::to_hex_string((int)ret_val, temp) + ". Enabling gesture cancelling...");
-        Game::enable_gesture_cancelling();
+        AnimationEdits::enable_gesture_cancelling();
     }
 
     if (!Mod::legacy_mode)
@@ -642,41 +637,6 @@ void Game::set_memory_limit(uint32_t mem_limit)
     }
 }
 
-
-// Enables gesture cancelling via rolling
-bool Game::enable_gesture_cancelling()
-{
-    int gestures_changed = 0;
-    if (Game::characters_loaded && Game::player_tae.is_initialized())
-    {
-        for (uint32_t id : gesture_anim_ids) {
-            int n_events = Game::player_tae.get_event_count_by_id(id);
-            for (int i = 0; i < n_events; i++) {
-                bool anim_updated = false;
-                if (Game::player_tae.get_event_type_by_id(id, i) == 0 &&
-                    (
-                        Game::player_tae.get_event_param_by_id(id, i, 0) == TAE_type0_param_values::allow_animation_cancel_events ||
-                        Game::player_tae.get_event_param_by_id(id, i, 0) == TAE_type0_param_values::cancel_by_rolling_or_backstepping
-                    )
-                   )
-                {
-                    Game::player_tae.set_event_start_by_id(id, i, 0.0f);
-                    //if (!print_console("Updated gesture " + std::to_string(id) + ", event " + std::to_string(i) + " to allow cancelling"))
-                    //    Mod::startup_messages.push_back("Updated gesture " + std::to_string(id) + ", event " + std::to_string(i) + " to allow cancelling");
-                    if (!anim_updated) {
-                        anim_updated = true;
-                        gestures_changed++;
-                    }
-                }
-            }
-        }
-        return (gestures_changed >= 15);
-    } else {
-        return false;
-    }
-}
-
-
 // Checks if player is currently locked onto an enemy
 bool Game::player_is_locked_on()
 {
@@ -697,6 +657,17 @@ int32_t Game::get_player_body_anim_id()
     }
 }
 
+// Return current game time in milliseconds since the game has started
+uint32_t Game::get_game_time_ms()
+{
+    SpPointer timer = SpPointer((void*)((uint32_t)Game::fmodex_base + 0xC42AC));
+    if (timer.resolve() == NULL) {
+        return 0;
+    }
+    else {
+        return *(uint32_t*)timer.resolve();
+    }
+}
 
 // Sets whether player character will automatically turn toward enemies when locked on
 bool Game::allow_rotation_when_locked_on(bool allow)

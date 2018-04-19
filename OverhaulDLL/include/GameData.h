@@ -90,12 +90,6 @@ public:
     // Size of the pool of memory the game allocates for itself
     static uint32_t memory_limit;
 
-    // Gesture cancelling enabled/disabled
-    static bool gesture_cancelling;
-
-    // Animation IDs for the default set of gesture animations in the game
-    const static uint32_t gesture_anim_ids[15];
-
 
 
     /////////////////////////////////////////
@@ -138,14 +132,14 @@ public:
     // Enables/Disables automatic game disconnection when low framerate is detected
     static void enable_low_fps_disconnect(bool enable);
 
-    // Enables gesture cancelling via rolling
-    static bool enable_gesture_cancelling();
-
     // Checks if player is currently locked onto an enemy
     static bool player_is_locked_on();
 
     // Returns current player character body animation ID (attacking, rolling, gestures, etc)
     static int32_t get_player_body_anim_id();
+
+    // Return current game time in milliseconds since the game has started
+    static uint32_t Game::get_game_time_ms();
 
     // Sets whether player character will automatically turn toward enemies when locked on
     static bool allow_rotation_when_locked_on(bool allow);
