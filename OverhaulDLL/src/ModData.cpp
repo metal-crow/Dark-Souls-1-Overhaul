@@ -11,6 +11,7 @@
 #include "Challenge/AggressiveAI.h"
 #include "Challenge/BlackPhantomEnemies.h"
 #include "Challenge/GravelordPhantoms.h"
+#include "AnimationEdits.h"
 
 #define _SP_DEFINE_VK_NAME_STRINGS_		// Must be defined to use Virtual-key code name strings from SP_IO_Strings.hpp (opt-in by default because it increases filesize by a few KB)
 
@@ -177,8 +178,8 @@ void Mod::get_user_preferences()
 
     Mod::disable_low_fps_disconnect = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DISABLE_LOW_FPS_DISCONNECT_, (int)Mod::disable_low_fps_disconnect, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
 
-    Game::gesture_cancelling = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DISABLE_GESTURE_CANCELLING_, (int)Game::gesture_cancelling, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
-    if (Game::gesture_cancelling) {
+    AnimationEdits::gesture_cancelling = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DISABLE_GESTURE_CANCELLING_, (int)AnimationEdits::gesture_cancelling, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    if (AnimationEdits::gesture_cancelling) {
         print_console(msg.append("    Gesture cancelling enabled"));
     }
 
