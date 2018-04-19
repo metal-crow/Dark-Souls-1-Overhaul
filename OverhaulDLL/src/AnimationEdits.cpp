@@ -43,12 +43,12 @@ bool AnimationEdits::enable_gesture_cancelling()
     }
 }
 
-// List of animations and their new speed ratio. Any large number (>=6) does a frame 1 skip
+// List of animations and their new speed ratio. Any large number (>10) does a frame 1 skip
 static const std::tuple<uint32_t, float> ANIMATIONS_TO_AJUST_SPEED_RATIO[] = {
-    { 6209, 999.0f }, { 6309, 999.0f }, //Firestorm startup
-    { 6409, 1.0f },   { 6509, 1.0f },   //Firestorm main animation
-    { 6215, 999.0f }, { 6315, 999.0f }, //Gravelord Sword Dance startup
-    { 6415, 1.0f },   { 6515, 1.0f },   //Gravelord Sword Dance animation
+    { 6209, 10.0f },  { 6309, 10.0f },  //Firestorm startup
+    { 6409, 1.6f },   { 6509, 1.6f },   //Firestorm main animation
+    { 6215, 10.0f },  { 6315, 10.0f },  //Gravelord Sword Dance startup
+    { 6415, 1.6f },   { 6515, 1.6f },   //Gravelord Sword Dance animation
     { 6203, 6.0f },   { 6303, 6.0f },   //Heal knealing startup
     { 6403, 1.0f },   { 6503, 1.0f },   //Heal knealing animation
     { 6220, 6.0f },   { 6320, 6.0f },   //Sunlight Heal knealing startup
