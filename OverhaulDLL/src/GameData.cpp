@@ -35,6 +35,9 @@ void *Game::fmodex_base = NULL;
 // Base address for player character data
 void *Game::player_char_base = NULL;
 
+// Base address for world character data
+void *Game::world_char_base = NULL;
+
 // Player character status (loading, human, co-op, invader, hollow)
 SpPointer Game::player_char_status;
 
@@ -71,6 +74,9 @@ void Game::init_pointers()
 
     // Obtain base address for player character data
     Game::player_char_base = (void*)((unsigned int)Game::ds1_base + 0xF7E204);
+
+    // Base addr for world character data
+    Game::world_char_base = (void*)((unsigned int)Game::ds1_base + 0xF7D644);
 
     // Player character status (loading, human, co-op, invader, hollow)
     Game::player_char_status = SpPointer(Game::player_char_base, { 0xA28 });
@@ -645,6 +651,13 @@ bool Game::player_is_locked_on()
     return !(lock_on_flag.resolve() == NULL || *((uint8_t*)lock_on_flag.resolve()) == 0);
 }
 
+// Set the current animation speed for the player character
+void Game::set_current_player_animation_speed(float speed) {
+    SpPointer speed_ptr = SpPointer(Game::world_char_base, { 0x28, 0x0, 0x28, 0x14, 0x64 });
+    if (speed_ptr.resolve() != NULL) {
+        *(float*)speed_ptr.resolve() = speed;
+    }
+}
 
 // Returns current player character body animation ID (attacking, rolling, gestures, etc)
 int32_t Game::get_player_body_anim_id()
