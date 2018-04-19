@@ -16,6 +16,14 @@ public:
 
     // Enables gesture cancelling via rolling
     static bool enable_gesture_cancelling();
+
+    static void alter_animation_speeds();
+
+private:
+    static const uint32_t read_upper_body_aid_offset = 0xA2BEB9;
+    static void __stdcall read_upper_body_aid_injection();
+    static const uint32_t read_lower_body_aid_offset = 0xA2B2CF;
+    static void __stdcall read_lower_body_aid_injection();
 };
 
 #endif

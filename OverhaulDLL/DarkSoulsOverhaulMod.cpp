@@ -14,6 +14,7 @@
 #include "Challenge/GravelordPhantoms.h"
 #include "Menu/SavedCharacters.h"
 #include "XInputUtil.h"
+#include "AnimationEdits.h"
 
 
 /*
@@ -102,6 +103,7 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
 
     if (!Mod::legacy_mode) {
         BloodborneRally::start();
+        AnimationEdits::alter_animation_speeds();
     }
 
     // Initialize XInput hook

@@ -69,6 +69,9 @@ public:
     // Base address for player character data
     static void *player_char_base;
 
+    // Base address for world character data
+    static void *world_char_base;
+
     // Player character status (loading, human, co-op, invader, hollow)
     static SpPointer player_char_status;
 
@@ -134,6 +137,9 @@ public:
 
     // Checks if player is currently locked onto an enemy
     static bool player_is_locked_on();
+
+    // Set the current animation speed for the player character
+    static void set_current_player_animation_speed(float speed);
 
     // Returns current player character body animation ID (attacking, rolling, gestures, etc)
     static int32_t get_player_body_anim_id();
