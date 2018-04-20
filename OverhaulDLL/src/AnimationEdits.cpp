@@ -44,6 +44,7 @@ bool AnimationEdits::enable_gesture_cancelling()
 }
 
 // List of animations and their new speed ratio. Any large number (>10) does a frame 1 skip
+// ALWAYS include the lower body part of the animation in this, even if it stays at 1
 static const std::tuple<uint32_t, float> ANIMATIONS_TO_AJUST_SPEED_RATIO[] = {
     { 6209, 10.0f },  { 6309, 10.0f },  //Firestorm startup
     { 6409, 1.6f },   { 6509, 1.6f },   //Firestorm main animation
@@ -74,14 +75,15 @@ void AnimationEdits::alter_animation_speeds()
     inject_jmp_5b(write_address, &read_lower_body_aid_return, 1, &read_lower_body_aid_injection);
 }
 
-static void __stdcall read_body_aid_injection_helper_function(uint32_t animation_id) {
-    //if the animation is set back to -1, undo our speed change
-    if (animation_id == -1) {
+static void __stdcall read_body_aid_injection_helper_function(uint32_t animation_id, uint32_t lowerbdy) {
+    //Set the animation speed change back when the last chain of the animation sequence we're editing finishes
+    //This assumes the last chain is always the lower body
+    if (animation_id == -1 && lowerbdy) {
         Game::set_current_player_animation_speed(1);
         return;
     }
 
-    // if this is an animation to be changed, ajust speed while we're in it
+    //If this is an animation to be changed, ajust speed while we're in it
     for (int i = 0; i < sizeof(ANIMATIONS_TO_AJUST_SPEED_RATIO) / sizeof(std::tuple<uint32_t, float>); i++) {
         std::tuple<uint32_t, float> ajust_aid = ANIMATIONS_TO_AJUST_SPEED_RATIO[i];
         if (animation_id == std::get<0>(ajust_aid)) {
@@ -101,6 +103,7 @@ void __declspec(naked) __stdcall AnimationEdits::read_upper_body_aid_injection()
         push ecx
         push edx
 
+        push 0
         push ecx //Animation id arg
         call read_body_aid_injection_helper_function
 
@@ -124,6 +127,7 @@ void __declspec(naked) __stdcall AnimationEdits::read_lower_body_aid_injection()
         push ecx
         push edx
 
+        push 1
         push ecx //Animation id arg
         call read_body_aid_injection_helper_function
 
