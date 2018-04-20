@@ -144,6 +144,10 @@ public:
     // Returns current player character body animation ID (attacking, rolling, gestures, etc)
     static int32_t get_player_body_anim_id();
 
+    static int32_t get_player_upper_body_anim_id();
+
+    static int32_t get_player_lower_body_anim_id();
+
     // Return current game time in milliseconds since the game has started
     static uint32_t Game::get_game_time_ms();
 

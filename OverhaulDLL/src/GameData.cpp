@@ -670,6 +670,28 @@ int32_t Game::get_player_body_anim_id()
     }
 }
 
+int32_t Game::get_player_upper_body_anim_id()
+{
+    SpPointer anim_id = SpPointer(Game::world_char_base, { 0x28, 0x0, 0x28, 0x2C, 0x58 });
+    if (anim_id.resolve() == NULL) {
+        return -1;
+    }
+    else {
+        return *(int32_t*)anim_id.resolve();
+    }
+}
+
+int32_t Game::get_player_lower_body_anim_id()
+{
+    SpPointer anim_id = SpPointer(Game::world_char_base, { 0x28, 0x0, 0x28, 0x2C, 0x60 });
+    if (anim_id.resolve() == NULL) {
+        return -1;
+    }
+    else {
+        return *(int32_t*)anim_id.resolve();
+    }
+}
+
 // Return current game time in milliseconds since the game has started
 uint32_t Game::get_game_time_ms()
 {

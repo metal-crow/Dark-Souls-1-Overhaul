@@ -44,7 +44,6 @@ bool AnimationEdits::enable_gesture_cancelling()
 }
 
 // List of animations and their new speed ratio. Any large number (>10) does a frame 1 skip
-// ALWAYS include the lower body part of the animation in this, even if it stays at 1
 static const std::tuple<uint32_t, float> ANIMATIONS_TO_AJUST_SPEED_RATIO[] = {
     { 6209, 10.0f },  { 6309, 10.0f },  //Firestorm startup
     { 6409, 1.6f },   { 6509, 1.6f },   //Firestorm main animation
@@ -54,6 +53,8 @@ static const std::tuple<uint32_t, float> ANIMATIONS_TO_AJUST_SPEED_RATIO[] = {
     { 6403, 1.0f },   { 6503, 1.0f },   //Heal knealing animation
     { 6220, 6.0f },   { 6320, 6.0f },   //Sunlight Heal knealing startup
     { 6420, 1.0f },   { 6520, 1.0f },   //Sunlight Heal knealing animation
+    { 6218, 1.8f },   { 6318, 1.8f },   //lightning spear starting animation
+    { 6518, 1.2f },   { 6518, 1.2f },   //lightning spear throwing animation
 };
 
 
@@ -76,9 +77,12 @@ void AnimationEdits::alter_animation_speeds()
 }
 
 static void __stdcall read_body_aid_injection_helper_function(uint32_t animation_id, uint32_t lowerbdy) {
-    //Set the animation speed change back when the last chain of the animation sequence we're editing finishes
-    //This assumes the last chain is always the lower body
-    if (animation_id == -1 && lowerbdy) {
+    //Set the animation speed change back when the animation sequence finishes (both upper and lower body are -1)
+    if (
+        (lowerbdy && animation_id == -1 && Game::get_player_upper_body_anim_id() == -1) ||
+        (!lowerbdy && animation_id == -1 && Game::get_player_lower_body_anim_id() == -1)
+        )
+    {
         Game::set_current_player_animation_speed(1);
         return;
     }
