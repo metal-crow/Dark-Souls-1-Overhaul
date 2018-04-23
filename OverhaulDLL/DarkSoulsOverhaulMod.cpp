@@ -234,6 +234,17 @@ __declspec(dllexport) void __stdcall main_loop()
 
         // Check if the player is stuck at the bonfire, and if so, automatically apply the bonfire input fix
         Game::check_bonfire_input_bug();
+
+		// Check if the character is loading, and apply actions that need to be _reapplied_ after every loading screen
+		/*int char_status;
+		Game::player_char_status.read(&char_status);
+		if (char_status == DS1_PLAYER_STATUS_LOADING) {
+			while (char_status == DS1_PLAYER_STATUS_LOADING) {
+				Game::player_char_status.read(&char_status);
+				Sleep(50);
+			}
+			Game::on_reloaded();
+		}*/
     }
 }
 
