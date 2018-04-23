@@ -77,7 +77,7 @@ void Game::init_pointers()
 
     // Base addr for world character data
     Game::world_char_base = (void*)((unsigned int)Game::ds1_base + 0xF7D644);
-
+        
     // Player character status (loading, human, co-op, invader, hollow)
     Game::player_char_status = SpPointer(Game::player_char_base, { 0xA28 });
 
@@ -140,6 +140,18 @@ void Game::on_first_character_loaded()
     if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_BP_ENEMIES_, Challenge::BlackPhantomEnemies::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
         Challenge::BlackPhantomEnemies::enable();
     }
+}
+
+// Performs tasks that must be rerun after any loading screen
+void Game::on_reloaded() {
+
+    /*//refresh the animation table pointers
+    for (int i = 0; i < sizeof(pc_animation_table) / sizeof(void**); i++) {
+        Game::pc_animation_table[i] = (AnimationEntry**)SpPointer(Game::world_char_base, { 0x28, 0x0, 0x28, 0x14, 0x4, 0x10 + (0x60 * i) }).resolve();
+        if (Game::pc_animation_table[i] == NULL) {
+            print_console("Error getting Animation Table Entry address");
+        }
+    }*/
 }
 
 

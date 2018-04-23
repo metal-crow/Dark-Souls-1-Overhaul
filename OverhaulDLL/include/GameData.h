@@ -105,6 +105,9 @@ public:
     // Runs tasks that were deferred until a character was loaded
     static void on_first_character_loaded();
 
+    // Performs tasks that must be rerun after any loading screen
+    static void on_reloaded();
+
     // Obtains the current game version number
     static uint8_t get_game_version();
 
