@@ -5,6 +5,15 @@
 
 #include <cstdint>
 
+typedef struct {
+    int32_t animation_id;
+    float duration;
+    uint8_t unknown[52];
+    float weight;
+    float speed;
+    uint32_t count;
+} AnimationEntry;
+
 class AnimationEdits
 {
 public:
@@ -20,10 +29,8 @@ public:
     static void alter_animation_speeds();
 
 private:
-    static const uint32_t read_upper_body_aid_offset = 0xA2BEB9;
-    static void __stdcall read_upper_body_aid_injection();
-    static const uint32_t read_lower_body_aid_offset = 0xA2B2CF;
-    static void __stdcall read_lower_body_aid_injection();
+    static const uint32_t animation_entry_set_offset = 0x9929B6; //Triggered when an animation entry in the table has it's speed set
+    static void __stdcall animation_entry_set_injection();
 };
 
 #endif
