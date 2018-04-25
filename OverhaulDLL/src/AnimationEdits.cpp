@@ -114,7 +114,8 @@ void AnimationEdits::disable_whiff_animations() {
         Mod::startup_messages.push_back("    Enabling remove animation whiffs...");
     }
 
+    //make jump over setting whiff unconditional
     uint8_t *write_address = (uint8_t*)(AnimationEdits::animation_whiff_set_offset + ((uint32_t)Game::ds1_base));
-    uint8_t nop_patch[3] = { 0x90, 0x90, 0x90 };
-    apply_byte_patch(write_address, nop_patch, 3);
+    uint8_t jmp_patch[2] = { 0xEB, 0x35 };
+    apply_byte_patch(write_address, jmp_patch, 2);
 }
