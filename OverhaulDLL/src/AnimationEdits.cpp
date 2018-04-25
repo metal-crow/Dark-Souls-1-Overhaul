@@ -108,3 +108,13 @@ void __declspec(naked) __stdcall AnimationEdits::animation_entry_set_injection()
         jmp animation_entry_set_return
     }
 }
+
+void AnimationEdits::disable_whiff_animations() {
+    if (!print_console("    Enabling remove animation whiffs...")) {
+        Mod::startup_messages.push_back("    Enabling remove animation whiffs...");
+    }
+
+    uint8_t *write_address = (uint8_t*)(AnimationEdits::animation_whiff_set_offset + ((uint32_t)Game::ds1_base));
+    uint8_t nop_patch[3] = { 0x90, 0x90, 0x90 };
+    apply_byte_patch(write_address, nop_patch, 3);
+}
