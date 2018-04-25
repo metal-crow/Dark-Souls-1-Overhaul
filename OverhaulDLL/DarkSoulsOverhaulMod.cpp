@@ -104,6 +104,7 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     if (!Mod::legacy_mode) {
         BloodborneRally::start();
         AnimationEdits::alter_animation_speeds();
+		AnimationEdits::disable_whiff_animations();
     }
 
     // Initialize XInput hook
