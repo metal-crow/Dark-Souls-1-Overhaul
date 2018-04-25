@@ -103,8 +103,8 @@ void __declspec(naked) __stdcall CastingMovement::bullet_genetation_notify() {
     //Alt: db 8B 41 04 83 C4 04
     _asm {
         mov eax, [ecx + 4]
-        //check if this is a PC generated bullet
-        cmp [eax], 10000
+        //check if this is a PC generated bullet (0x10044000 corresponds to [[[BaseA]+0]+4] for the player character)
+        cmp [edi+0x8C], 0x10044000
         jne exit_bullet_genetation_notify
         mov triggered_bullet, 1
         exit_bullet_genetation_notify:
