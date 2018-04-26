@@ -43,19 +43,21 @@ bool AnimationEdits::enable_gesture_cancelling()
     }
 }
 
-// List of animations and their new speed ratio. Any large number (>10) does a frame 1 skip
-static const std::unordered_map<int32_t, float> ANIMATIONS_TO_AJUST_SPEED_RATIO = {
-    { 6209, 10.0f },  { 6309, 10.0f },  //Firestorm startup
-    { 6409, 1.6f },   { 6509, 1.6f },   //Firestorm main animation
-    { 6215, 10.0f },  { 6315, 10.0f },  //Gravelord Sword Dance startup
-    { 6415, 1.6f },   { 6515, 1.6f },   //Gravelord Sword Dance animation
-    { 6203, 6.0f },   { 6303, 6.0f },   //Heal knealing startup
-    { 6403, 1.0f },   { 6503, 1.0f },   //Heal knealing animation
-    { 6220, 6.0f },   { 6320, 6.0f },   //Sunlight Heal knealing startup
-    { 6420, 1.0f },   { 6520, 1.0f },   //Sunlight Heal knealing animation
-    { 6218, 10.0f },  { 6318, 10.0f },  //lightning spear starting animation
-    { 6418, 1.2f },   { 6518, 1.2f },   //lightning spear throwing animation
-    { 9000, 1.25f },  { 9420, 1.25f },   //getting backstabbed
+
+// key - animation id
+// value - new speed ratio (Any large number ~>10 does a frame 1 skip), and point to start speed ajustment
+static const std::unordered_map<int32_t, std::tuple<float, float>> ANIMATIONS_TO_AJUST_SPEED_RATIO = {
+    { 6209, {10.0f, 0.0f}}, { 6309, {10.0f, 0.0f}},  //Firestorm startup
+    { 6409, {1.6f,  0.0f}}, { 6509, {1.6f,  0.0f}},  //Firestorm main animation
+    { 6215, {10.0f, 0.0f}}, { 6315, {10.0f, 0.0f}},  //Gravelord Sword Dance startup
+    { 6415, {1.6f,  0.0f}}, { 6515, {1.6f,  0.0f}},  //Gravelord Sword Dance animation
+    { 6203, {6.0f,  0.0f}}, { 6303, {6.0f,  0.0f}},  //Heal knealing startup
+    { 6403, {1.0f,  0.0f}}, { 6503, {1.0f,  0.0f}},  //Heal knealing animation
+    { 6220, {6.0f,  0.0f}}, { 6320, {6.0f,  0.0f}},  //Sunlight Heal knealing startup
+    { 6420, {1.0f,  0.0f}}, { 6520, {1.0f,  0.0f}},  //Sunlight Heal knealing animation
+    { 6218, {10.0f, 0.0f}}, { 6318, {10.0f, 0.0f}},  //lightning spear starting animation
+    { 6418, {1.2f,  0.0f}}, { 6518, {1.2f,  0.0f}},  //lightning spear throwing animation
+    { 9000, {1.25f, 3.0f}}, { 9420, {1.25f, 3.0f}},   //getting backstabbed (total times 5.9 and 5.766667)
 };
 
 
@@ -72,20 +74,60 @@ void AnimationEdits::alter_animation_speeds()
     inject_jmp_5b(write_address, &animation_entry_set_return, 0, &animation_entry_set_injection);
 }
 
+//Thread data = speed ratio, start time, speed ajustment ptr
+static DWORD WINAPI DelayAnimationSpeedAjustment(void* thread_data) {
+    uint32_t start = Game::get_game_time_ms();
+    uint32_t cur = start;
+
+    //Wait till animation reaches desired point
+    float adjust_time = ((float*)thread_data)[1];
+
+    while (cur < start+adjust_time*1000) {
+        cur = Game::get_game_time_ms();
+        Sleep(1);
+    }
+
+    //set speed
+    float* speed_ptr = ((float**)thread_data)[2];
+    *speed_ptr = ((float*)thread_data)[0];
+
+    free(thread_data);
+    return 0;
+}
+
 static void __stdcall read_body_aid_injection_helper_function(int32_t* animation_id, float* speed) {
     //Since we set animation speed at the table entry level, when it gets unset the speed is automatically reset. No cleanup needed
 
     //If this is an animation to be changed, ajust speed while we're in it
     auto ajust_aid = ANIMATIONS_TO_AJUST_SPEED_RATIO.find(*animation_id);
     if (ajust_aid != ANIMATIONS_TO_AJUST_SPEED_RATIO.end()) {
-        *speed = ajust_aid->second;
-        return;
+        //if this is a instant speed ajustment
+        if (std::get<1>(ajust_aid->second) == 0) {
+            *speed = std::get<0>(ajust_aid->second);
+            return;
+        }
+        //if delayed speed ajustment
+        else {
+            //need the args to be on the heap
+            void* thread_data = malloc(sizeof(float)*2+sizeof(float*));
+            ((float*)thread_data)[0] = std::get<0>(ajust_aid->second);
+            ((float*)thread_data)[1] = std::get<1>(ajust_aid->second);
+            ((float**)thread_data)[2] = speed;
+
+            CreateThread(NULL, 0, DelayAnimationSpeedAjustment, thread_data, 0, NULL);
+            return;
+        }
     }
 
     //handle backstabing detection (b/c it's a ton of diff animations)
     if (*animation_id > 200000) {
         if (*animation_id % 1000 == 400 || *animation_id % 1000 == 401) {
-            *speed = 1.25f;
+            void* thread_data = malloc(sizeof(float)*2 + sizeof(float*));
+            ((float*)thread_data)[0] = 1.25f;
+            ((float*)thread_data)[1] = 3.0f;
+            ((float**)thread_data)[2] = speed;
+
+            CreateThread(NULL, 0, DelayAnimationSpeedAjustment, thread_data, 0, NULL);
             return;
         }
     }
@@ -117,6 +159,7 @@ void __declspec(naked) __stdcall AnimationEdits::animation_entry_set_injection()
         jmp animation_entry_set_return
     }
 }
+
 
 void AnimationEdits::disable_whiff_animations() {
     if (!print_console("    Enabling remove animation whiffs...")) {
