@@ -55,6 +55,7 @@ static const std::unordered_map<int32_t, float> ANIMATIONS_TO_AJUST_SPEED_RATIO 
     { 6420, 1.0f },   { 6520, 1.0f },   //Sunlight Heal knealing animation
     { 6218, 10.0f },  { 6318, 10.0f },  //lightning spear starting animation
     { 6418, 1.2f },   { 6518, 1.2f },   //lightning spear throwing animation
+    { 9000, 1.25f },  { 9420, 1.25f },   //getting backstabbed
 };
 
 
@@ -79,6 +80,14 @@ static void __stdcall read_body_aid_injection_helper_function(int32_t* animation
     if (ajust_aid != ANIMATIONS_TO_AJUST_SPEED_RATIO.end()) {
         *speed = ajust_aid->second;
         return;
+    }
+
+    //handle backstabing detection (b/c it's a ton of diff animations)
+    if (*animation_id > 200000) {
+        if (*animation_id % 1000 == 400 || *animation_id % 1000 == 401) {
+            *speed = 1.25f;
+            return;
+        }
     }
 }
 
