@@ -1,6 +1,6 @@
-# Dark Souls Overhaul DLL Build  
+# Dark Souls Overhaul DLL Build (32-bit)  
 
-The Overhaul mod DLL is a plugin for [this Direct3D9 overlay](https://github.com/SeanPesce/Direct3D9-Overlay).  
+Dark Souls Overhaul Mod DLL build for Dark Souls: Prepare to Die Edition. Note: The compiled DLL is a plugin for [this Direct3D9 overlay](https://github.com/SeanPesce/Direct3D9-Overlay).  
 
 ## Developer Info:  
 
