@@ -12,7 +12,7 @@
 
 */
 
-#include "DllMain.h"
+#include "DllMain_Legacy.h"
 #include "AntiCheat.h"
 #include "BloodborneRallySystem.h"
 #include "Challenge/AggressiveAi.h"

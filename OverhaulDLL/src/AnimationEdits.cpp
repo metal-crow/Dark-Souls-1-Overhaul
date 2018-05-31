@@ -1,5 +1,13 @@
+/*
+    DARK SOULS OVERHAUL
+
+    Contributors to this file:
+        Metal-Crow  -  Reverse engineering, C++
+
+*/
+
 #include "AnimationEdits.h"
-#include "DllMain.h"
+#include "DllMain_Legacy.h"
 #include "GameData.h"
 #include <unordered_map>
 

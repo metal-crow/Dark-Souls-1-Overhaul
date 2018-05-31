@@ -9,7 +9,7 @@
     with keybinds at runtime.
 */
 
-#include "DllMain.h"
+#include "DllMain_Legacy.h"
 #include "AntiCheat.h"
 #include "Challenge/AggressiveAi.h"
 #include "Challenge/BlackPhantomEnemies.h"

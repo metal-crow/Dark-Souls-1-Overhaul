@@ -7,7 +7,7 @@
 */
 
 #include "BloodborneRallySystem.h"
-#include "DllMain.h"
+#include "DllMain_Legacy.h"
 
 #define DS1_BB_RALLY_SYS_OCCULT_MAT_ID 700
 

@@ -1,3 +1,10 @@
+/*
+    DARK SOULS OVERHAUL
+
+    Contributors to this file:
+        Metal-Crow  -  Reverse engineering, C++
+
+*/
 #pragma once
 
 #ifndef DS1_OVERHAUL_PHANTOM_UNSHACKLE_H_

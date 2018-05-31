@@ -5,7 +5,7 @@
         Sean Pesce        -  Reverse engineering, C++
 */
 
-#include "DllMain.h"
+#include "DllMain_Legacy.h"
 #include "Menu/SavedCharacters.h"
 
 #define DS1_MENU_SAVED_CHARS_CUSTOM_MSG_BUFF_LEN 256

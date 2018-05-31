@@ -5,7 +5,7 @@
         Sean Pesce        -  C++
 */
 
-#include "DllMain.h"
+#include "DllMain_Legacy.h"
 #include "XInputUtil.h"
 
 

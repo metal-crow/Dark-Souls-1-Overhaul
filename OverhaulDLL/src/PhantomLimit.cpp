@@ -2,13 +2,13 @@
     DARK SOULS OVERHAUL
 
     Contributors to this file:
-        Metal-Crow	-	Reverse engineering, Phantom Limit patch
-        Sean Pesce	-	C++ conversion of Phantom Limit patch
+        Metal-Crow  -  Reverse engineering, Phantom Limit patch
+        Sean Pesce  -  C++ conversion of Phantom Limit patch
 
 */
 
 #include "PhantomLimit.h"
-#include "DllMain.h"
+#include "DllMain_Legacy.h"
 
 
 // Fix for annoying SeQan library definitions
@@ -29,7 +29,7 @@ void Game::increase_phantom_limit1()
 
     // (Desired num of phantoms * 0x20)
     *max_allowed_summons32 = (uint32_t)(max_allowed_summons8 * 0x20);
-    uint8_t patch1[5] = { 0x68, max_allowed_summons32_arr[0], max_allowed_summons32_arr[1], max_allowed_summons32_arr[2], max_allowed_summons32_arr[3] }; // push 0x120	(when max_phantoms = 9)
+    uint8_t patch1[5] = { 0x68, max_allowed_summons32_arr[0], max_allowed_summons32_arr[1], max_allowed_summons32_arr[2], max_allowed_summons32_arr[3] }; // push 0x120   (when max_phantoms = 9)
     *max_allowed_summons32 = max_allowed_summons8; // Reset max_allowed_summons32 back to original value
     void *write_address = (uint8_t*)Game::ds1_base + 0xA63CA6;
     set_mem_protection(write_address, 5, MEM_PROTECT_RWX);
@@ -40,14 +40,14 @@ void Game::increase_phantom_limit1()
     memcpy_s(write_address, 5, patch1, 5);
 
 
-    uint8_t patch2[6] = { 0xC7, 0x07, max_allowed_summons8, 0x00, 0x00, 0x00 }; // mov DWORD PTR [edi],0x9		// Number of character slots
+    uint8_t patch2[6] = { 0xC7, 0x07, max_allowed_summons8, 0x00, 0x00, 0x00 }; // mov DWORD PTR [edi],0x9   // Number of character slots
     write_address = (uint8_t*)Game::ds1_base + 0xA63CC1;
     set_mem_protection(write_address, 6, MEM_PROTECT_RWX);
     memcpy_s(write_address, 6, patch2, 6);
 
 
     // One of these governs red signs, another white (Probably some other around governs dragon)
-    uint8_t patch3[2] = { 0x6A, max_allowed_summons8 }; // push 0x9		// Max number of summons before signs disappear
+    uint8_t patch3[2] = { 0x6A, max_allowed_summons8 }; // push 0x9   // Max number of summons before signs disappear
     write_address = (uint8_t*)Game::ds1_base + 0x9B51B7;
     set_mem_protection(write_address, 2, MEM_PROTECT_RWX);
     memcpy_s(write_address, 2, patch3, 2);
@@ -58,7 +58,7 @@ void Game::increase_phantom_limit1()
 
 
     // Check that sums up all phantoms
-    uint8_t patch4[3] = { 0x83, 0xFA, (uint8_t)(max_allowed_summons8 * 7) }; // cmp edx,0x3F		// This is more than number of phantoms, but not sure by how much (num * 7 ?)
+    uint8_t patch4[3] = { 0x83, 0xFA, (uint8_t)(max_allowed_summons8 * 7) }; // cmp edx,0x3F   // This is more than number of phantoms, but not sure by how much (num * 7 ?)
     write_address = (uint8_t*)Game::ds1_base + 0x9B11BE;
     set_mem_protection(write_address, 3, MEM_PROTECT_RWX);
     memcpy_s(write_address, 3, patch4, 3);
@@ -87,7 +87,7 @@ void Game::increase_phantom_limit1()
 
     // Allocation of the summon_chars_data array put in the info_about_summons struct
     *max_allowed_summons32 = (uint32_t)(16 + (max_allowed_summons8 * 1216));
-    uint8_t patch7[5] = { 0x68, max_allowed_summons32_arr[0], max_allowed_summons32_arr[1], max_allowed_summons32_arr[2], max_allowed_summons32_arr[3] }; // push 0x2AD0		// 16 + 1216*number of character slots
+    uint8_t patch7[5] = { 0x68, max_allowed_summons32_arr[0], max_allowed_summons32_arr[1], max_allowed_summons32_arr[2], max_allowed_summons32_arr[3] }; // push 0x2AD0   // 16 + 1216*number of character slots
     *max_allowed_summons32 = max_allowed_summons8; // Reset max_allowed_summons32 back to original value
     write_address = (uint8_t*)Game::ds1_base + 0x806848;
     set_mem_protection(write_address, 5, MEM_PROTECT_RWX);
@@ -101,7 +101,7 @@ void Game::increase_phantom_limit1()
     memcpy_s(write_address, 3, patch8, 3);
 
     *max_allowed_summons32 = (uint32_t)(max_allowed_summons8 * 1216);
-    uint8_t patch9[6] = { 0x81, 0xFB, max_allowed_summons32_arr[0], max_allowed_summons32_arr[1], max_allowed_summons32_arr[2], max_allowed_summons32_arr[3] }; // cmp ebx,0x2AC0		// This is not index, but byte offset. So 1216*number of character slots
+    uint8_t patch9[6] = { 0x81, 0xFB, max_allowed_summons32_arr[0], max_allowed_summons32_arr[1], max_allowed_summons32_arr[2], max_allowed_summons32_arr[3] }; // cmp ebx,0x2AC0   // This is not index, but byte offset. So 1216*number of character slots
     *max_allowed_summons32 = max_allowed_summons8; // Reset max_allowed_summons32 back to original value
     write_address = (uint8_t*)Game::ds1_base + 0x806ADE;
     set_mem_protection(write_address, 6, MEM_PROTECT_RWX);
@@ -122,7 +122,7 @@ void Game::increase_phantom_limit1()
     memcpy_s(write_address, 3, patch11, 3);
 
     *max_allowed_summons32 = (uint32_t)(max_allowed_summons8 * 1216);
-    uint8_t patch12[6] = { 0x81, 0xF9, max_allowed_summons32_arr[0], max_allowed_summons32_arr[1], max_allowed_summons32_arr[2], max_allowed_summons32_arr[3] }; // cmp ecx,0x2AC0		// 1216*number of chars
+    uint8_t patch12[6] = { 0x81, 0xF9, max_allowed_summons32_arr[0], max_allowed_summons32_arr[1], max_allowed_summons32_arr[2], max_allowed_summons32_arr[3] }; // cmp ecx,0x2AC0   // 1216*number of chars
     *max_allowed_summons32 = max_allowed_summons8; // Reset max_allowed_summons32 back to original value
     write_address = (uint8_t*)Game::ds1_base + 0x8037BF;
     set_mem_protection(write_address, 6, MEM_PROTECT_RWX);
@@ -501,7 +501,7 @@ void Game::increase_phantom_limit2()
     pop  ecx
     pop  eax
 
-    mov[sucessful_phantomfix], 1	// Success marker
+    mov[sucessful_phantomfix], 1    // Success marker
     call summon_char_types_callproc
     jmp summon_char_types_returnhere
 */
@@ -518,7 +518,7 @@ void __declspec(naked) __stdcall summon_char_types_newmem()
         mov [edx + 0x06], bl
         mov [edx + 0x07], bl
         mov [edx + 0x08], bl // Must write for each offset up until max_allowed_phantoms-1
-        mov[sucessful_phantomfix], 1	// Success marker
+        mov[sucessful_phantomfix], 1    // Success marker
         call summon_char_types_callproc
         jmp summon_char_types_returnhere
         */
@@ -539,14 +539,14 @@ void __declspec(naked) __stdcall summon_char_types_newmem()
         pop  ecx
         pop  eax
 
-        mov[sucessful_phantomfix], 1	// Success marker
+        mov[sucessful_phantomfix], 1    // Success marker
         call summon_char_types_callproc
         jmp summon_char_types_returnhere
     }
 }
 
 
-// For all offsets, do 20*(number_of_characters - 4)+orignal_offset		(original found in DISABLE script)
+// For all offsets, do 20*(number_of_characters - 4)+orignal_offset (original found in DISABLE script)
 void __declspec(naked) __stdcall players_connected_array_offsets()
 {
     __asm
@@ -644,7 +644,7 @@ void __declspec(naked) __stdcall forceshowsigns_newmem()
 
 
 
-// For all pca_off offsets, do 20*(number_of_characters - 4)+orignal_offset		(original found in DISABLE script)
+// For all pca_off offsets, do 20*(number_of_characters - 4)+orignal_offset (original found in DISABLE script)
 
 
 // Where the variables after the inline character array in the players_connected_array
@@ -659,7 +659,7 @@ void __declspec(naked) __stdcall pca_off1()
 
     __asm
     {
-        // For all pca_off offsets, do 20*(number_of_characters - 4)+orignal_offset		(original found in DISABLE script)
+        // For all pca_off offsets, do 20*(number_of_characters - 4)+orignal_offset (original found in DISABLE script)
         /*
         Original:
 

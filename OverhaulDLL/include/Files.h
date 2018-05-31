@@ -10,7 +10,7 @@
 #ifndef _DS1_OVERHAUL_GAME_FILES_H_
     #define _DS1_OVERHAUL_GAME_FILES_H_
 
-#include "DllMain.h"
+#include "DllMain_Legacy.h"
 #include "Shlobj.h"
 #include "SP_IO.hpp"
 #include "Archive/Bdt.h"

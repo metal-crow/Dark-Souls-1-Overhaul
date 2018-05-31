@@ -7,7 +7,7 @@
 
 
 #include "AntiCheat.h"
-#include "DllMain.h"
+#include "DllMain_Legacy.h"
 
 namespace AntiCheat {
 namespace DragonTriggerBlock {

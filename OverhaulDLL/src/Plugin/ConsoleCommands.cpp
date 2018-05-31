@@ -10,7 +10,7 @@
     be registered with the in-game console at runtime.
 */
 
-#include "DllMain.h"
+#include "DllMain_Legacy.h"
 #include "Plugin/ConsoleCommands.h"
 #include "AntiCheat.h"
 #include "Save/Sl2.h"

@@ -9,7 +9,7 @@
 
 
 #include "AntiCheat.h"
-#include "DllMain.h"
+#include "DllMain_Legacy.h"
 
 #define DS1_AC_NPC_GUARD_INJECTION_OFFSET 0xA6BFF0
 

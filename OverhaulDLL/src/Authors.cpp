@@ -5,7 +5,7 @@
         Sean Pesce  -  C++
 */
 
-#include "DllMain.h"
+#include "DllMain_Legacy.h"
 
 
 // List of people who directly contributed to the Dark Souls Overhaul Mod
@@ -20,6 +20,8 @@ std::vector<std::string> Mod::authors = {
     "Sean Pesce",
     "Ainsley Harriott",
     "Meowmaritus",
+    "B3LYP",
+    "Loosepolygon",
     "Wulf2k",
     "Ashley",
     "RavagerChris37",
@@ -29,6 +31,7 @@ std::vector<std::string> Mod::authors = {
     "SuperIronBob",
     "jellybaby34",
     "SiriusTextra",
+    "Hillo",
     "Verideth"
     // Apologies in advance to anyone I forgot, just let me know so I can add you to the list
     //     -Sean
