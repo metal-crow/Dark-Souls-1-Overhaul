@@ -329,4 +329,5 @@ ASALocalRun/
 .mfractor/
 ####################################
 
-
+!sp_utils_x64.pdb
+!sp_utils_dbg_x64.pdb
