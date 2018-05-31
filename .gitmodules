@@ -1,0 +1,3 @@
+[submodule "OverhaulDLL/d3d11-wrapper"]
+	path = OverhaulDLL/d3d11-wrapper
+	url = https://github.com/SeanPesce/d3d11-wrapper.git

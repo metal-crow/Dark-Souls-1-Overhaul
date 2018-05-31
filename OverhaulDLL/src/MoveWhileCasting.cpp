@@ -1,13 +1,13 @@
 /*
-DARK SOULS OVERHAUL
+    DARK SOULS OVERHAUL
 
-Contributors to this file:
-Metal-Crow    -    Reverse engineering, C++
+    Contributors to this file:
+    Metal-Crow    -    Reverse engineering, C++
 
 */
 
 #include "MoveWhileCasting.h"
-#include "DllMain.h"
+#include "DllMain_Legacy.h"
 #include "GameData.h"
 
 static uint32_t endaid_arg1;

@@ -8,7 +8,7 @@
         Xiang        -  Original CE script
 */
 
-#include "DllMain.h"
+#include "DllMain_Legacy.h"
 #include "Challenge/GravelordPhantoms.h"
 #include "SP_AoB_Scan.hpp"
 

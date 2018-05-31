@@ -7,48 +7,51 @@
     </Filter>
     <Filter Include="Header Files">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\Challenge">
-      <UniqueIdentifier>{c76d2037-38b6-4262-bcf5-355a550a432a}</UniqueIdentifier>
+    <Filter Include="Resource Files\wrapper">
+      <UniqueIdentifier>{78bc41fd-564c-44de-992b-5d71fe0e01a2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Challenge">
-      <UniqueIdentifier>{1c4d071b-5cf6-4cf8-bfcd-d42f75b3028d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Overlay Plugin">
-      <UniqueIdentifier>{27e6737a-7f8c-4b09-b3bd-d7d910df3b2c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Overlay Plugin">
-      <UniqueIdentifier>{84b0a03f-c0b2-46ca-9b77-efe5568ca6a2}</UniqueIdentifier>
+    <Filter Include="Resource Files\wrapper\d3d11">
+      <UniqueIdentifier>{daf1dec0-ad77-4675-afa2-a4adc0cb06cf}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\AntiCheat">
-      <UniqueIdentifier>{48782bfb-bc19-4cb8-b68c-e35df21fd2b6}</UniqueIdentifier>
+      <UniqueIdentifier>{abe89458-8d94-4792-abc6-7e222f067671}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Menu">
-      <UniqueIdentifier>{f3606149-6977-4712-af4e-dc039a0a8bb3}</UniqueIdentifier>
+    <Filter Include="Source Files\Challenge">
+      <UniqueIdentifier>{ea94e11e-b719-4bd6-a7f4-4332b62aa97f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Plugin">
+      <UniqueIdentifier>{f0d3ac99-2641-4356-9d86-d5667ab055ed}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Menu">
-      <UniqueIdentifier>{0fc6c7b8-8d99-400f-aedb-22aa10252148}</UniqueIdentifier>
+      <UniqueIdentifier>{784465a6-1537-45bb-9608-32c0b68c0909}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Challenge">
+      <UniqueIdentifier>{6283414b-43eb-4f80-85a2-dc1cd1b9a342}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Menu">
+      <UniqueIdentifier>{5fd92a92-021b-442b-ae97-0750a3dc61b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Plugin">
+      <UniqueIdentifier>{8306bc4f-b139-4f1d-93d5-702f7c011e49}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DarkSoulsOverhaulMod.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="d3d11-wrapper\src\d3d11\d3d11.cpp">
+      <Filter>Resource Files\wrapper\d3d11</Filter>
     </ClCompile>
-    <ClCompile Include="DllMain.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="d3d11-wrapper\src\d3d11\exports_.cpp">
+      <Filter>Resource Files\wrapper\d3d11</Filter>
     </ClCompile>
-    <ClCompile Include="src\GameData.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="d3d11-wrapper\src\dllmain.cpp">
+      <Filter>Resource Files\wrapper</Filter>
     </ClCompile>
-    <ClCompile Include="src\ModData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PhantomLimit.cpp">
+    <ClCompile Include="src\AnimationEdits.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Authors.cpp">
@@ -57,60 +60,87 @@
     <ClCompile Include="src\BloodborneRallySystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\XInputUtil.cpp">
+    <ClCompile Include="src\GameData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Challenge\BlackPhantomEnemies.cpp">
-      <Filter>Source Files\Challenge</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Plugin\ConsoleCommands.cpp">
-      <Filter>Source Files\Overlay Plugin</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Plugin\KeybindFunctions.cpp">
-      <Filter>Source Files\Overlay Plugin</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Challenge\GravelordPhantoms.cpp">
-      <Filter>Source Files\Challenge</Filter>
-    </ClCompile>
-    <ClCompile Include="src\AntiCheat\TeleBackstabProtect.cpp">
-      <Filter>Source Files\AntiCheat</Filter>
-    </ClCompile>
-    <ClCompile Include="src\AntiCheat\NpcGuard.cpp">
-      <Filter>Source Files\AntiCheat</Filter>
-    </ClCompile>
-    <ClCompile Include="src\AntiCheat\BossGuard.cpp">
-      <Filter>Source Files\AntiCheat</Filter>
-    </ClCompile>
-    <ClCompile Include="src\AntiCheat\BinocsTriggerBlock.cpp">
-      <Filter>Source Files\AntiCheat</Filter>
-    </ClCompile>
-    <ClCompile Include="src\AntiCheat\DragonTriggerBlock.cpp">
-      <Filter>Source Files\AntiCheat</Filter>
-    </ClCompile>
-    <ClCompile Include="src\AntiCheat\AntiCheat.cpp">
-      <Filter>Source Files\AntiCheat</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Menu\SavedCharacters.cpp">
-      <Filter>Source Files\Menu</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Challenge\AggressiveAI.cpp">
-      <Filter>Source Files\Challenge</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PhantomUnshackle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Testing.cpp">
+    <ClCompile Include="src\ModData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\MoveWhileCasting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\AnimationEdits.cpp">
+    <ClCompile Include="src\PhantomLimit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PhantomUnshackle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XInputUtil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AntiCheat\AntiCheat.cpp">
+      <Filter>Source Files\AntiCheat</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AntiCheat\BinocsTriggerBlock.cpp">
+      <Filter>Source Files\AntiCheat</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AntiCheat\BossGuard.cpp">
+      <Filter>Source Files\AntiCheat</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AntiCheat\DragonTriggerBlock.cpp">
+      <Filter>Source Files\AntiCheat</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AntiCheat\NpcGuard.cpp">
+      <Filter>Source Files\AntiCheat</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AntiCheat\TeleBackstabProtect.cpp">
+      <Filter>Source Files\AntiCheat</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Challenge\AggressiveAI.cpp">
+      <Filter>Source Files\Challenge</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Challenge\BlackPhantomEnemies.cpp">
+      <Filter>Source Files\Challenge</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Challenge\GravelordPhantoms.cpp">
+      <Filter>Source Files\Challenge</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Menu\SavedCharacters.cpp">
+      <Filter>Source Files\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Plugin\ConsoleCommands.cpp">
+      <Filter>Source Files\Plugin</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Plugin\KeybindFunctions.cpp">
+      <Filter>Source Files\Plugin</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DarkSoulsOverhaulMod.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="d3d11-wrapper\include\d3d11\exports.h">
+      <Filter>Resource Files\wrapper\d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="d3d11-wrapper\include\d3d11\main.h">
+      <Filter>Resource Files\wrapper\d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="d3d11-wrapper\include\dllmain.h">
+      <Filter>Resource Files\wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AnimationEdits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AntiCheat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BloodborneRallySystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\DllMain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Files.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\GameData.h">
@@ -119,35 +149,23 @@
     <ClInclude Include="include\ModData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\MoveWhileCasting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\PhantomLimit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Files.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\BloodborneRallySystem.h">
+    <ClInclude Include="include\PhantomUnshackle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\XInputUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Challenge\BlackPhantomEnemies.h">
-      <Filter>Header Files\Challenge</Filter>
-    </ClInclude>
     <ClInclude Include="include\Plugin\ConsoleCommands.h">
-      <Filter>Header Files\Overlay Plugin</Filter>
+      <Filter>Header Files\Plugin</Filter>
     </ClInclude>
     <ClInclude Include="include\Plugin\KeybindFunctions.h">
-      <Filter>Header Files\Overlay Plugin</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\PluginImports.h">
-      <Filter>Header Files\Overlay Plugin</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Challenge\GravelordPhantoms.h">
-      <Filter>Header Files\Challenge</Filter>
-    </ClInclude>
-    <ClInclude Include="include\AntiCheat.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Plugin</Filter>
     </ClInclude>
     <ClInclude Include="include\Menu\SavedCharacters.h">
       <Filter>Header Files\Menu</Filter>
@@ -155,22 +173,19 @@
     <ClInclude Include="include\Challenge\AggressiveAI.h">
       <Filter>Header Files\Challenge</Filter>
     </ClInclude>
-    <ClInclude Include="include\PhantomUnshackle.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\Challenge\BlackPhantomEnemies.h">
+      <Filter>Header Files\Challenge</Filter>
     </ClInclude>
-    <ClInclude Include="testing.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\Challenge\GravelordPhantoms.h">
+      <Filter>Header Files\Challenge</Filter>
     </ClInclude>
-    <ClInclude Include="include\MoveWhileCasting.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\AnimationEdits.h">
+    <ClInclude Include="include\DarkSoulsOverhaulMod.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Exports.def">
-      <Filter>Source Files</Filter>
+    <None Include="d3d11-wrapper\src\d3d11\exports.def">
+      <Filter>Resource Files\wrapper\d3d11</Filter>
     </None>
   </ItemGroup>
 </Project>

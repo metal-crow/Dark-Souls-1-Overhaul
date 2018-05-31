@@ -6,14 +6,14 @@
 
 */
 
-#include "DllMain.h"
+#include "DllMain_Legacy.h"
 #include "AntiCheat.h"
 #include "Challenge/AggressiveAI.h"
 #include "Challenge/BlackPhantomEnemies.h"
 #include "Challenge/GravelordPhantoms.h"
 #include "AnimationEdits.h"
 
-#define _SP_DEFINE_VK_NAME_STRINGS_		// Must be defined to use Virtual-key code name strings from SP_IO_Strings.hpp (opt-in by default because it increases filesize by a few KB)
+#define _SP_DEFINE_VK_NAME_STRINGS_  // Must be defined to use Virtual-key code name strings from SP_IO_Strings.hpp (opt-in by default because it increases filesize by a few KB)
 
 #include "SP_IO.hpp"
 #include "SP_IO_Strings.hpp"
@@ -313,7 +313,7 @@ void Mod::get_single_user_keybind(const char *keybind_name, int(*function)())
     uint8_t key;
 
     if ((key = (uint8_t)get_vk_hotkey(_DS1_OVERHAUL_SETTINGS_FILE_, _DS1_OVERHAUL_KEYBINDS_SECTION_, keybind_name)) // Obtain user's preferred key
-        && register_hotkey_function(key, function))	// Register the keybind
+        && register_hotkey_function(key, function))    // Register the keybind
     {
         // Successfully loaded and registered keybind; now print feedback to console
         std::string output = std::string("    Registered ").append(keybind_name).append(" keybind: ");

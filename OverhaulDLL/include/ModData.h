@@ -84,12 +84,12 @@
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_CM_BP_ENEMIES_ "ToggleChallengeBlackPhantomEnemies"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_CM_GL_PHANTOMS_ "ToggleChallengeGravelordPhantoms"
 
-#define _DS1_OVERHAUL_SETTINGS_STRING_BUFF_LEN_ 256		// Length of the string buffer used when obtaining user preference-related string data
+#define _DS1_OVERHAUL_SETTINGS_STRING_BUFF_LEN_ 256  // Length of the string buffer used when obtaining user preference-related string data
 
 
 
 ////////////////////////////// MOD CONSTANTS //////////////////////////////
-#define _DS1_OVERHAUL_KEYPRESS_DELAY_ 200	// Sleep time (in milliseconds) after a keybind function is called, to avoid the keypress being detected multiple times
+#define _DS1_OVERHAUL_KEYPRESS_DELAY_ 200  // Sleep time (in milliseconds) after a keybind function is called, to avoid the keypress being detected multiple times
 
 
 

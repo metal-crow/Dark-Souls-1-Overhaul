@@ -7,7 +7,7 @@
 
 
 #include "AntiCheat.h"
-#include "DllMain.h"
+#include "DllMain_Legacy.h"
 
 #define DS1_AC_BOSS_GUARD_INJECTION_OFFSET 0xA688E5
 

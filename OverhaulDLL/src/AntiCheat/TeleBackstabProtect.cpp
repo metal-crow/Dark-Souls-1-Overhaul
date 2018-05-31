@@ -9,7 +9,7 @@
 
 
 #include "AntiCheat.h"
-#include "DllMain.h"
+#include "DllMain_Legacy.h"
 
 #define DS1_AC_TBP_STORE_ANIM_INJECTION_OFFSET 0xA06A49
 #define      DS1_AC_TBP_CHECK_INJECTION_OFFSET 0xABDBB9

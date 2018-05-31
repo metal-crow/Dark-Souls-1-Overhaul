@@ -1,8 +1,8 @@
 /*
-DARK SOULS OVERHAUL
+    DARK SOULS OVERHAUL
 
-Contributors to this file:
-Metal-Crow    -    Reverse engineering, C++
+    Contributors to this file:
+    Metal-Crow    -    Reverse engineering, C++
 
 */
 
