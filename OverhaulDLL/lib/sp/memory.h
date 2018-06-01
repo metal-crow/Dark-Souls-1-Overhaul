@@ -214,7 +214,7 @@ inline void* get_page_base(void *address)
 
 
 // Apply byte-array patch
-inline bool patch_bytes(void* write_to, const uint8_t* patch, unsigned long size)
+inline bool patch_bytes(void* write_to, const uint8_t* patch, size_t size)
 {
     if (write_to == NULL || patch == NULL)
     {

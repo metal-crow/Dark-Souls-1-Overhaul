@@ -32,7 +32,7 @@ protected:
     std::vector<uint8_t> _saved_data;
 
     // Retrieve pointer to location in memory that will be patched
-    inline void* _resolve() const
+    virtual inline void* _resolve() const
     {
         return this->_write_address;
     }
@@ -75,12 +75,12 @@ public:
         this->save();
     }
 
-    inline ~byte_patch() {}
+    virtual inline ~byte_patch() {}
 
 
 
     // Retrieve pointer to location in memory that will be patched
-    inline uint8_t* resolve() const
+    virtual inline uint8_t* resolve() const
     {
         return (uint8_t*)this->_resolve();
     }
@@ -116,7 +116,7 @@ public:
     }
 
     // Apply patch data
-    inline bool apply()
+    virtual inline bool apply() const
     {
         if (!this->is_applied())
         {
@@ -126,7 +126,7 @@ public:
     }
 
     // Restore original data
-    inline bool restore() const
+    virtual inline bool restore() const
     {
         return sp::mem::patch_bytes(this->_write_address, this->_saved_data.data(), this->_saved_data.size());
     }
