@@ -81,7 +81,7 @@ public:
     // Obtains the list of filenames for files that can be extracted from .bdt files
     static int ArchiveFile::load_bdt_file_list(const char *source, const char *list_file, bool local_file)
     {
-        static const char *default_url = "https://raw.githubusercontent.com/metal-crow/Dark-Souls-1-Overhaul/master/OverhaulDLL/rsrc/bdt_file_list.txt";
+        static const char *default_url = "https://raw.githubusercontent.com/metal-crow/Dark-Souls-1-Overhaul/PtDE/OverhaulDLL/rsrc/bdt_file_list.txt";
         static const char *default_file = "bdt_files.txt";
         static const char *error_curl = "    CURL ERROR: ";
         static const char *error_opening_file_write = "    WRITE ERROR: Failed to create or open ";
