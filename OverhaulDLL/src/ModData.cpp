@@ -189,6 +189,12 @@ void Mod::get_user_preferences()
         print_console("    Ladder fix enabled (EXPERIMENTAL)");
     }
 
+    uint32_t ladder_rung = (uint32_t)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_LADDER_FIX_RUNG_INDEX_, (int)LadderFix::exit_rung(), _DS1_OVERHAUL_SETTINGS_FILE_);
+    if (ladder_rung > 0 && ladder_rung <= 5 && ladder_rung != DS1_DEFAULT_LADDER_FIX_EXIT_RUNG_) {
+        print_console("    Overriding Ladder Fix exit rung to " + std::to_string(ladder_rung));
+        LadderFix::set_exit_rung(ladder_rung);
+    }
+
     // Display multiplayer node count in text feed info header
     Mod::show_node_count = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_SHOW_NODE_COUNT_, (int)Mod::show_node_count, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
     msg = "    Display multiplayer node count = ";

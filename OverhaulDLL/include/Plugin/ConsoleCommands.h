@@ -59,6 +59,10 @@ const char *chm_ladder_fix = ccn_ladder_fix" [boolean]\n    Enables/disables the
                                                      "\n    The ladder glitch is when the player falls through the floor after sliding down certain ladders with unlocked FPS,"
                                                      "\n    generally leading to death after falling under the map.";
 
+#define ccn_ladder_fix_override "ladder_fix_override"
+const char *chm_ladder_fix_override = ccn_ladder_fix_override" [1-5 | default]\n    Overrides the default rung index at which the player will exit a ladder while sliding down,"
+                                                                   "\n    if the ladder bug fix is enabled. (See also: ladder_fix)";
+
 
 #define ccn_armor_sfx "armor_sfx"
 const char *chm_armor_sfx = ccn_armor_sfx" [boolean]\n     Enables/disables armor sound effects (1 = enabled, 0 = disabled).";

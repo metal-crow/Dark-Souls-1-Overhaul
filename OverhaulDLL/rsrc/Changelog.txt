@@ -11,6 +11,24 @@
         Fixes the issue that caused players to fall through the map when playing with the
         framerate unlocked.
 
+- New config settings:
+    - LadderFix
+	    Enables/disables ladder fix.
+    - LadderFixRungIndexOverride
+        Overrides the default rung index at which the player will exit a ladder while
+        sliding down.
+
+- New console commands:
+    - ladder_fix
+	    Enables/disables ladder fix.
+    - ladder_fix_override
+        Overrides the default rung index at which the player will exit a ladder while
+        sliding down.
+
+- New keybind:
+    - ToggleLadderFix
+	    Enables/disables ladder fix.
+
 
 
 ------------------------------------------------------------------------------------------

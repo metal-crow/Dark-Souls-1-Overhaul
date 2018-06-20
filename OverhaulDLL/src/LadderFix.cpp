@@ -12,6 +12,7 @@
 namespace LadderFix {
 
 bool enable_pref = true;
+uint32_t _exit_rung = DS1_DEFAULT_LADDER_FIX_EXIT_RUNG_; // Player will exit ladder if they are sliding on or below this rung
 
 constexpr const size_t patch_byte_count = 7;
 const static uint8_t*  injection_point  = (uint8_t*)0xD5FBE5; // DARKSOULS.exe+0x95FBE5
@@ -20,10 +21,12 @@ const static uint8_t   original_bytes[patch_byte_count] = { 0x83, 0x40, 0x04, 0x
 uint32_t return_address = 0;
 constexpr const uint32_t exit_ladder_return_address = 0xD5FBFD; // DARKSOULS.exe+0x95FBFD
 
+
 bool is_active()
 {
     return (*reinterpret_cast<const uint8_t*>(injection_point)) != original_bytes[0];
 }
+
 
 void apply()
 {
@@ -35,6 +38,7 @@ void apply()
     }
 }
 
+
 void unpatch()
 {
     if (is_active())
@@ -44,6 +48,28 @@ void unpatch()
         apply_byte_patch(const_cast<uint8_t*>(injection_point), original_bytes, patch_byte_count);
     }
 }
+
+
+// Returns the index of the ladder rung under which the player will exit the ladder when sliding
+uint32_t exit_rung()
+{
+    return _exit_rung;
+}
+
+
+// Sets the index of the ladder rung under which the player will exit the ladder when sliding
+void set_exit_rung(uint32_t index)
+{
+    if (index > 0 && index <= 5)
+    {
+        _exit_rung = index;
+    }
+    else
+    {
+        print_console("Invalid rung index; value should be between 1 and 5");
+    }
+}
+
 
 // Injected ladder glitch fix assembly function
 void __declspec(naked) __stdcall ladder_fix()
@@ -75,8 +101,12 @@ void __declspec(naked) __stdcall ladder_fix()
         jmp cleanup
 
         is_sliding:
-        // Check if player is on rung 0, 1, or 2
-        cmp edx, 2
+
+        // Get exit rung
+        mov eax, _exit_rung
+
+        // Check if player is on a rung near the bottom
+        cmp edx, eax
         jg cleanup // Not on low rung
 
         // More original code:

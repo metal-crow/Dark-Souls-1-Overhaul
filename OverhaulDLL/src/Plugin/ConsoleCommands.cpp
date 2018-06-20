@@ -657,6 +657,33 @@ int cc_ladder_fix(std::vector<std::string> args, std::string *output)
 }
 
 
+// Overrides the default rung index at which the player will exit a ladder while sliding down
+int cc_ladder_fix_override(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = ERROR_SUCCESS;
+    uint32_t new_rung = -1;
+    if (args.size() > 0) {
+        if (args.at(0) == "default") {
+            new_rung = DS1_DEFAULT_LADDER_FIX_EXIT_RUNG_;
+        } else {
+            // Index specified
+            try {
+                new_rung = std::stoi(args.at(0).c_str(), NULL);
+            } catch (std::invalid_argument) {
+                ret_val = ERROR_BAD_ARGUMENTS;
+                new_rung = -1;
+            } catch (std::out_of_range) {
+                ret_val = ERROR_RANGE_NOT_FOUND;
+                new_rung = -1;
+            }
+        }
+        LadderFix::set_exit_rung(new_rung);
+    }
+    output->append("Ladder fix exit rung = " + std::to_string(LadderFix::exit_rung()));
+    return ret_val;
+}
+
+
 // Enables/disables radial compass HUD element
 int cc_hud_compass_radial(std::vector<std::string> args, std::string *output)
 {
@@ -952,6 +979,7 @@ void Mod::register_console_commands()
     register_console_command(ccn_dim_lava, cc_dim_lava, chm_dim_lava);
     register_console_alias(cca_lava_brightness_fix, ccn_dim_lava);
     register_console_command(ccn_ladder_fix, cc_ladder_fix, chm_ladder_fix);
+    register_console_command(ccn_ladder_fix_override, cc_ladder_fix_override, chm_ladder_fix_override);
     register_console_command(ccn_fix_bonfire_input, cc_fix_bonfire_input, chm_fix_bonfire_input);
     register_console_command(ccn_text_feed_node_count, cc_text_feed_node_count, chm_text_feed_node_count);
     register_console_alias(cca_node_count, ccn_text_feed_node_count);

@@ -46,6 +46,7 @@
 #define _DS1_OVERHAUL_PREF_DISABLE_LOW_FPS_DISCONNECT_ "DisableLowFpsDisconnect"
 #define _DS1_OVERHAUL_PREF_GESTURE_CANCELLING_ "GestureCancelling"
 #define _DS1_OVERHAUL_PREF_LADDER_FIX_ "LadderFix"
+#define _DS1_OVERHAUL_PREF_LADDER_FIX_RUNG_INDEX_ "LadderFixRungIndexOverride"
 #define _DS1_OVERHAUL_PREF_CHEATS_WARNING_ "CheatsWarning"
 // HUD settings:
 #define _DS1_OVERHAUL_PREF_COMPASS_RADIAL_ "CompassRadial"
