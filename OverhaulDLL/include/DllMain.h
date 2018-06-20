@@ -24,7 +24,7 @@
 #define __DS1_OVERHAUL_MOD
 
 // Quality of Life preview build
-//#define DS1_OVERHAUL_QOL_PREVIEW
+#define DS1_OVERHAUL_QOL_PREVIEW
 
 // LordOfSandvich's Rekindled build
 //#define DS1_OVERHAUL_REKINDLED_BUILD

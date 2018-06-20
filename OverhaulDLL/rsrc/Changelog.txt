@@ -5,6 +5,29 @@
 
 
 ------------------------------------------------------------------------------------------
+06/19/2018:
+- New feature:
+    - (Experimental) Ladder fix:
+        Fixes the issue that caused players to fall through the map when playing with the
+        framerate unlocked.
+
+
+
+------------------------------------------------------------------------------------------
+04/12/2018:
+- Fixed an issue where the 4 Kings boss would sometimes become invincible if the player
+  entered the boss arena with BossGuard anti-cheat enabled and an invader present.
+
+
+
+------------------------------------------------------------------------------------------
+03/27/2018:
+- Improvement:
+    - Implement basic compatibility with Debug executable (all features disabled except
+      memory limit increase).
+
+
+------------------------------------------------------------------------------------------
 01/13/2018:
 
 - New features:
