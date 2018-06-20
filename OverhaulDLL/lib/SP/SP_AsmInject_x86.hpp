@@ -35,9 +35,9 @@ const	int		JMP_REL8_INSTR_LENGTH  = 2,		// The length of a 'JMP rel8' instructio
 // Offset from function start address when jumping to assembly code:
 // (can be changed to accomodate different compilers and/or calling conventions)
 #ifdef _MSC_VER
-	#define SP_ASM_FUNC_START_OFFSET = 0; // Using a Microsoft compiler; jump straight to the injected function
+	#define SP_ASM_FUNC_START_OFFSET 0; // Using a Microsoft compiler; jump straight to the injected function
 #else
-	#define SP_ASM_FUNC_START_OFFSET = 3; // Using non-MS compiler; GCC in-line ASM starts +3 bytes from asm_code
+	#define SP_ASM_FUNC_START_OFFSET 3; // Using non-MS compiler; GCC in-line ASM starts +3 bytes from asm_code
 #endif // _MSC_VER
 
 
@@ -57,7 +57,7 @@ const	int		JMP_REL8_INSTR_LENGTH  = 2,		// The length of a 'JMP rel8' instructio
  *  @param inject_at    The location in memory where the assembly code will be injected. A
  *                          JMP instruction will be written at this location, containing the
  *                          address of the assembly function referenced by the asm_code parameter.
- *  @param returnJumpAddr   The location in memory where the code cave should return to
+ *  @param return_jmp_addr  The location in memory where the code cave should return to
  *                          after execution. returnJumpAddr should point to a uin32_t that
  *                          is referenced in a JMP instruction at the end of the assembly
  *                          function referenced by the asm_code parameter.
@@ -67,7 +67,7 @@ const	int		JMP_REL8_INSTR_LENGTH  = 2,		// The length of a 'JMP rel8' instructio
  *                          location.
  *  @param asm_code  A pointer to an in-line assembly function (to be used as a code cave).
  */
-void inject_jmp_5b(uint8_t *inject_at, uint32_t *returnJumpAddr, int nops, void *asm_code);
+void inject_jmp_5b(uint8_t *inject_at, uint32_t *return_jmp_addr, int nops, void *asm_code);
 
 
 /* write_jmp_rel8
@@ -192,6 +192,10 @@ void write_ret_far_imm16(void *write_to, uint16_t pop_bytes, int nops);
  *	@param instr_length   The length (in bytes) of the variation of JMP instruction being used
  */
 uint32_t calculate_jmp_offset(void *from, void *to, int instr_length);
+
+
+// Removes a previous injection entry
+void forget_injection(uint32_t address);
 
 
 #endif // ASM_INJECT_X86_HPP

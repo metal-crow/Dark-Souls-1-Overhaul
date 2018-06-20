@@ -18,6 +18,7 @@
 #include "Challenge/BlackPhantomEnemies.h"
 #include "Challenge/GravelordPhantoms.h"
 #include "Menu/SavedCharacters.h"
+#include "LadderFix.h"
 
 
 ///////////////////////////////////////////////////////////
@@ -624,6 +625,38 @@ int cc_dim_lava(std::vector<std::string> args, std::string *output)
 }
 
 
+// Enables/disables ladder fix
+int cc_ladder_fix(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = CONSOLE_COMMAND_SUCCESS;
+    if (args.size() > 0)
+    {
+        switch (parse_toggle_arg(args.at(0).c_str()))
+        {
+            case 0:
+                LadderFix::unpatch();
+                break;
+            case 1:
+                LadderFix::apply();
+                break;
+            default:
+                output->append(ERROR_INVALID_BOOL_ARGUMENT + "\n");
+                ret_val = ERROR_INVALID_PARAMETER;
+                break;
+        }
+    }
+    if (LadderFix::is_active())
+    {
+        output->append("Ladder fix = enabled");
+    }
+    else
+    {
+        output->append("Ladder fix = disabled");
+    }
+    return ret_val;
+}
+
+
 // Enables/disables radial compass HUD element
 int cc_hud_compass_radial(std::vector<std::string> args, std::string *output)
 {
@@ -918,6 +951,7 @@ void Mod::register_console_commands()
     register_console_command(ccn_credits, cc_credits, chm_credits);
     register_console_command(ccn_dim_lava, cc_dim_lava, chm_dim_lava);
     register_console_alias(cca_lava_brightness_fix, ccn_dim_lava);
+    register_console_command(ccn_ladder_fix, cc_ladder_fix, chm_ladder_fix);
     register_console_command(ccn_fix_bonfire_input, cc_fix_bonfire_input, chm_fix_bonfire_input);
     register_console_command(ccn_text_feed_node_count, cc_text_feed_node_count, chm_text_feed_node_count);
     register_console_alias(cca_node_count, ccn_text_feed_node_count);

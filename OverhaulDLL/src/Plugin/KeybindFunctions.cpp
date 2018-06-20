@@ -14,6 +14,7 @@
 #include "Challenge/AggressiveAi.h"
 #include "Challenge/BlackPhantomEnemies.h"
 #include "Challenge/GravelordPhantoms.h"
+#include "LadderFix.h"
 
 
 // Toggles mouse input
@@ -83,6 +84,22 @@ int kf_toggle_dim_lava()
         print_console("Lowered brightness of lava effects");
     else
         print_console("Restored default lava effects");
+    Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
+    return ERROR_SUCCESS;
+}
+
+
+// Toggles ladder fix
+int kf_toggle_ladder_fix()
+{
+    if (LadderFix::is_active())
+    {
+        LadderFix::unpatch();
+    }
+    else
+    {
+        LadderFix::apply();
+    }
     Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
     return ERROR_SUCCESS;
 }

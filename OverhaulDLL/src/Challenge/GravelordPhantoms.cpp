@@ -55,6 +55,7 @@ void disable()
     uint8_t original_injection_address_bytes[6] = { 0x89, 0x4B, 0x30, 0x3B, 0xC6, 0x00 };
     if (active) {
         print_console("Deactivating Gravelord phantoms auto-spawning...");
+        forget_injection((uint32_t)injection_address);
         apply_byte_patch(injection_address, original_injection_address_bytes, 5);
         active = false;
         despawn_gravelord_phantoms();

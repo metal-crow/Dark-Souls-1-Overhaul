@@ -12,6 +12,7 @@
 #include "Challenge/BlackPhantomEnemies.h"
 #include "Challenge/GravelordPhantoms.h"
 #include "AnimationEdits.h"
+#include "LadderFix.h"
 
 #define _SP_DEFINE_VK_NAME_STRINGS_		// Must be defined to use Virtual-key code name strings from SP_IO_Strings.hpp (opt-in by default because it increases filesize by a few KB)
 
@@ -178,9 +179,14 @@ void Mod::get_user_preferences()
 
     Mod::disable_low_fps_disconnect = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DISABLE_LOW_FPS_DISCONNECT_, (int)Mod::disable_low_fps_disconnect, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
 
-    AnimationEdits::gesture_cancelling = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DISABLE_GESTURE_CANCELLING_, (int)AnimationEdits::gesture_cancelling, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    AnimationEdits::gesture_cancelling = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_GESTURE_CANCELLING_, (int)AnimationEdits::gesture_cancelling, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
     if (AnimationEdits::gesture_cancelling) {
         print_console(msg.append("    Gesture cancelling enabled"));
+    }
+
+    LadderFix::enable_pref = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_LADDER_FIX_, (int)LadderFix::enable_pref, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    if (LadderFix::enable_pref) {
+        print_console("    Ladder fix enabled (EXPERIMENTAL)");
     }
 
     // Display multiplayer node count in text feed info header
@@ -271,6 +277,9 @@ void Mod::get_user_keybinds()
 
     // Toggle dimmed lava visual effects
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_DIM_LAVA_, kf_toggle_dim_lava);
+
+    // Toggle ladder fix
+    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_LADDER_FIX_, kf_toggle_ladder_fix);
 
 #ifndef DS1_OVERHAUL_QOL_PREVIEW
     // Toggle armor sound effects

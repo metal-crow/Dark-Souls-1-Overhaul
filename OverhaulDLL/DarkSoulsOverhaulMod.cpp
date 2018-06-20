@@ -15,6 +15,7 @@
 #include "Menu/SavedCharacters.h"
 #include "XInputUtil.h"
 #include "AnimationEdits.h"
+#include "LadderFix.h"
 
 
 /*
@@ -107,6 +108,10 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
 		AnimationEdits::disable_whiff_animations();
     }
 
+    if (LadderFix::enable_pref) {
+        LadderFix::apply();
+    }
+
     // Initialize XInput hook
     XInput::initialize();
 
@@ -156,7 +161,7 @@ __declspec(dllexport) void __stdcall initialize_plugin()
     } else {
         set_text_feed_title("[Dark Souls Overhaul Mod]");
     }
-    print("-------------DARK SOULS OVERHAUL TEST BUILD-------------", 0, false, SP_D3D9O_TEXT_COLOR_ORANGE);
+    print("-------------DARK SOULS OVERHAUL TEST BUILD-------------", 10000, false, SP_D3D9O_TEXT_COLOR_ORANGE);
 
     // Print startup messages
     for (std::string msg : Mod::startup_messages)

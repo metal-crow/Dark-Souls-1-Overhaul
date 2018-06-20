@@ -54,6 +54,12 @@ const char *chm_dim_lava = ccn_dim_lava" [boolean]\n     Enables/disables dimmed
 #define cca_lava_brightness_fix "lava_brightness_fix"
 
 
+#define ccn_ladder_fix "ladder_fix"
+const char *chm_ladder_fix = ccn_ladder_fix" [boolean]\n    Enables/disables the ladder bug fix (1 = enabled, 0 = disabled) (EXPERIMENTAL).\n"
+                                                     "\n    The ladder glitch is when the player falls through the floor after sliding down certain ladders with unlocked FPS,"
+                                                     "\n    generally leading to death after falling under the map.";
+
+
 #define ccn_armor_sfx "armor_sfx"
 const char *chm_armor_sfx = ccn_armor_sfx" [boolean]\n     Enables/disables armor sound effects (1 = enabled, 0 = disabled).";
 #define cca_armor_sounds "armor_sounds"

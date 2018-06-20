@@ -39,6 +39,9 @@ int kf_toggle_node_count();
 // Toggles dimmed lava visual effects
 int kf_toggle_dim_lava();
 
+// Toggles ladder fix
+int kf_toggle_ladder_fix();
+
 // Toggles armor sound effects
 int kf_toggle_armor_sfx();
 

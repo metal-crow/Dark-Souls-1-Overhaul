@@ -44,7 +44,8 @@
 #define _DS1_OVERHAUL_PREF_DIM_LAVA_ "DimLava"
 #define _DS1_OVERHAUL_PREF_DISABLE_ARMOR_SFX_ "DisableArmorSounds"
 #define _DS1_OVERHAUL_PREF_DISABLE_LOW_FPS_DISCONNECT_ "DisableLowFpsDisconnect"
-#define _DS1_OVERHAUL_PREF_DISABLE_GESTURE_CANCELLING_ "GestureCancelling"
+#define _DS1_OVERHAUL_PREF_GESTURE_CANCELLING_ "GestureCancelling"
+#define _DS1_OVERHAUL_PREF_LADDER_FIX_ "LadderFix"
 #define _DS1_OVERHAUL_PREF_CHEATS_WARNING_ "CheatsWarning"
 // HUD settings:
 #define _DS1_OVERHAUL_PREF_COMPASS_RADIAL_ "CompassRadial"
@@ -71,6 +72,7 @@
 #define _DS1_OVERHAUL_HOTKEY_DESPAWN_GL_PHANTOMS_ "DespawnGravelordPhantoms"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_NODE_COUNT_ "ToggleNodeCount"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_DIM_LAVA_ "ToggleLavaBrightness"
+#define _DS1_OVERHAUL_HOTKEY_TOGGLE_LADDER_FIX_ "ToggleLadderFix"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_ARMOR_SFX_ "ToggleArmorSounds"
 #define _DS1_OVERHAUL_HOTKEY_SAVE_FILE_NEXT_ "NextSaveFile"
 #define _DS1_OVERHAUL_HOTKEY_SAVE_FILE_PREV_ "PrevSaveFile"

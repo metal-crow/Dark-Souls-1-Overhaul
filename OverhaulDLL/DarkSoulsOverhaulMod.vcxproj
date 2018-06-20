@@ -266,6 +266,7 @@
     <ClInclude Include="include\DllMain.h" />
     <ClInclude Include="include\Files.h" />
     <ClInclude Include="include\GameData.h" />
+    <ClInclude Include="include\LadderFix.h" />
     <ClInclude Include="include\Menu\SavedCharacters.h" />
     <ClInclude Include="include\ModData.h" />
     <ClInclude Include="include\MoveWhileCasting.h" />
@@ -275,7 +276,14 @@
     <ClInclude Include="include\Plugin\KeybindFunctions.h" />
     <ClInclude Include="include\XInputUtil.h" />
     <ClInclude Include="lib\PluginImports.h" />
-    <ClInclude Include="testing.h" />
+    <ClInclude Include="testing.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Build|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Build|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DarkSoulsOverhaulMod.cpp" />
@@ -312,6 +320,7 @@
     <ClCompile Include="src\Challenge\BlackPhantomEnemies.cpp" />
     <ClCompile Include="src\Challenge\GravelordPhantoms.cpp" />
     <ClCompile Include="src\GameData.cpp" />
+    <ClCompile Include="src\LadderFix.cpp" />
     <ClCompile Include="src\Menu\SavedCharacters.cpp" />
     <ClCompile Include="src\ModData.cpp" />
     <ClCompile Include="src\MoveWhileCasting.cpp" />
@@ -320,7 +329,14 @@
     <ClCompile Include="src\Plugin\ConsoleCommands.cpp" />
     <ClCompile Include="src\Plugin\KeybindFunctions.cpp" />
     <ClCompile Include="src\XInputUtil.cpp" />
-    <ClCompile Include="Testing.cpp" />
+    <ClCompile Include="Testing.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Build|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Build|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Exports.def" />
