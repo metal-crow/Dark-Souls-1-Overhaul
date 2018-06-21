@@ -129,10 +129,12 @@ void check_motd()
 
         if (fetch_data(_sources[i]+remote_file, tmp_file) == SP_NO_ERROR)
         {
-            char* motd = (char*)FileUtil::read_from_offset(tmp_file, 0, FileUtil::file_size(tmp_file), NULL, true);
+            size_t length = FileUtil::file_size(tmp_file);
+            char* motd = (char*)FileUtil::read_from_offset(tmp_file, 0, length, NULL, true);
             if (motd)
             {
-                if (strnlen_s(motd, 10000) >= 10000)
+                motd[length-1] = '\0';
+                if (length > 10000)
                 {
                     motd[10000] = '\0';
                 }
@@ -178,14 +180,16 @@ void check_latest()
 
         if (fetch_data(_sources[i] + remote_file, tmp_file) == SP_NO_ERROR)
         {
-            char* ver = (char*)FileUtil::read_from_offset(tmp_file, 0, FileUtil::file_size(tmp_file), NULL, true);
+            size_t length = FileUtil::file_size(tmp_file);
+            char* ver = (char*)FileUtil::read_from_offset(tmp_file, 0, length, NULL, true);
             if (ver)
             {
+                ver[length-1] = '\0';
                 if (Updates::valid_version_str(ver))
                 {
-                    if (strnlen_s(ver, 50) >= 50)
+                    if (length > 50)
                     {
-                        ver[49] = '\0';
+                        ver[50] = '\0';
                     }
 
                     _latest = ver;
@@ -245,18 +249,18 @@ void check_download_url()
 
         if (fetch_data(_sources[i] + remote_file, tmp_file, true) == SP_NO_ERROR)
         {
-            char* url = (char*)FileUtil::read_from_offset(tmp_file, 0, FileUtil::file_size(tmp_file), NULL, true);
+            size_t length = FileUtil::file_size(tmp_file);
+            char* url = (char*)FileUtil::read_from_offset(tmp_file, 0, length, NULL, true);
+
             if (url)
             {
-                if (strnlen_s(url, 1024) >= 1024)
+                url[length-1] = '\0';
+                if (length > 1024)
                 {
-                    url[1023] = '\0';
+                    url[1024] = '\0';
                 }
                 std::string url_str(url);
-                //while ((!url_str.empty()) && std::isspace(url_str[url_str.length() - 1]))
-                //{
-                //    url_str = url_str.substr(0, url_str.length() - 1);
-                //}
+                
                 // Clean trailing garbage data
                 size_t pos = url_str.find_first_of(" \r\n");
                 if (pos != std::string::npos)
@@ -267,7 +271,7 @@ void check_download_url()
                 // Check for valid URL
                 if (std::regex_match(url_str, std::regex("^(?:http(s)?:\\/\\/)?[\\w.-]+(?:\\.[\\w\\.-]+)+[\\w\\-\\._~:/?#[\\]@!\\$&'\\(\\)\\*\\+,;=.]+$"))) // RegEx source: https://www.regextester.com/94502
                 {
-                    _download = (char*)url;
+                    _download = (char*)url_str.c_str();
                 }
                 CoTaskMemFree((void*)url);
             }

@@ -114,6 +114,9 @@ public:
     // List of people who directly contributed to the Dark Souls Overhaul Mod
     static std::vector<std::string> authors;
 
+    // Detailed list of authors with roles
+    static std::vector<std::string> author_roles;
+
     // List of people who indirectly contributed to the mod, but had no direct involvement
     static std::vector<std::string> contributors;
 
@@ -199,6 +202,9 @@ public:
 
     // Plays the credits for the Dark Souls Overhaul Mod (displays the list of people who contributed to development)
     static DWORD WINAPI play_credits(LPVOID lpParam);
+
+    // Plays the credits for the Dark Souls Overhaul Mod (displays the list of people who contributed to development, and their roles)
+    static DWORD WINAPI Mod::play_credits_detailed(LPVOID lpParam);
 
 
 

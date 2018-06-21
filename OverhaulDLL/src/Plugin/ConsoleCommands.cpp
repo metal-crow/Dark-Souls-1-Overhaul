@@ -49,6 +49,20 @@ int cc_credits(std::vector<std::string> args, std::string *output)
 }
 
 
+// Plays the detailed mod credits (lists the people who helped create the mod, as well as their roles in development)
+int cc_credits_detailed(std::vector<std::string> args, std::string *output)
+{
+    CreateThread(NULL,				// Default security attributes
+                 0,					// Use default stack size
+                 Mod::play_credits_detailed, // Thread function name
+                 NULL,				// Argument to thread function
+                 0,					// Use default creation flags
+                 NULL);             // Returns the thread identifier
+
+    return CONSOLE_COMMAND_SUCCESS;
+}
+
+
 // Prints build title and compile time for this build of the Dark Souls Overhaul project
 int cc_build(std::vector<std::string> args, std::string *output)
 {
@@ -1050,6 +1064,7 @@ void Mod::register_console_commands()
     register_console_command(ccn_console_lock_cam, cc_console_lock_cam, chm_console_lock_cam);
     register_console_alias(cca_console_lock_cam, ccn_console_lock_cam);
     register_console_command(ccn_credits, cc_credits, chm_credits);
+    register_console_command(ccn_credits_detailed, cc_credits_detailed, chm_credits_detailed);
     register_console_command(ccn_dim_lava, cc_dim_lava, chm_dim_lava);
     register_console_alias(cca_lava_brightness_fix, ccn_dim_lava);
     register_console_command(ccn_ladder_fix, cc_ladder_fix, chm_ladder_fix);

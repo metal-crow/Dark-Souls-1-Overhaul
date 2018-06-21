@@ -166,7 +166,11 @@ const char *chm_legacy_mode = ccn_legacy_mode"\n"
 
 #define ccn_credits "overhaul_credits"
 const char *chm_credits = ccn_credits"\n"
-"    Plays the credits for the Dark Souls Overhaul Mod.";
+"    Plays the credits for the Dark Souls Overhaul Mod, listing the names of the primary contributors.";
+
+#define ccn_credits_detailed "overhaul_credits_detailed"
+const char *chm_credits_detailed = ccn_credits_detailed"\n"
+"    Plays the detailed credits for the Dark Souls Overhaul Mod (author names and roles).";
 
 #define ccn_hud_compass_radial "hud_compass_radial"
 const char *chm_hud_compass_radial = ccn_hud_compass_radial" [boolean] \n"
