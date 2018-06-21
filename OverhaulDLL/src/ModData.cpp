@@ -15,6 +15,8 @@
 #include "LadderFix.h"
 #include "Updates.h"
 
+#include <regex>
+
 #define _SP_DEFINE_VK_NAME_STRINGS_		// Must be defined to use Virtual-key code name strings from SP_IO_Strings.hpp (opt-in by default because it increases filesize by a few KB)
 
 #include "SP_IO.hpp"
@@ -164,7 +166,7 @@ void Mod::get_user_preferences()
 {
     // Buffer for reading string preferences
     char buffer[_DS1_OVERHAUL_SETTINGS_STRING_BUFF_LEN_];
-    buffer[0] = '\0';
+    memset(buffer, 0, sizeof(char)*_DS1_OVERHAUL_SETTINGS_STRING_BUFF_LEN_);
 
     // Temporary string for printing console messages
     std::string msg;
@@ -254,8 +256,30 @@ void Mod::get_user_preferences()
     Challenge::AggressiveAi::nose_distance = (uint16_t)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SETTINGS_SECTION_, _DS1_OVERHAUL_PREF_CM_AGGRO_AI_NOSE_DIST_, Challenge::AggressiveAi::DEFAULT_NOSE_DISTANCE, _DS1_OVERHAUL_SETTINGS_FILE_);
     Challenge::BlackPhantomEnemies::DRAW_TYPE = (uint8_t)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SETTINGS_SECTION_, _DS1_OVERHAUL_PREF_CM_BP_ENEMY_DRAW_TYPE_, Challenge::BlackPhantomEnemies::DRAW_TYPE_DEFAULT, _DS1_OVERHAUL_SETTINGS_FILE_);
 
+    GetPrivateProfileString(_DS1_OVERHAUL_PREFS_SECTION_,
+                            _DS1_OVERHAUL_PREF_CUSTOM_UPDATE_SOURCE_URL_,
+                            NULL,
+                            buffer,
+                            _DS1_OVERHAUL_SETTINGS_STRING_BUFF_LEN_,
+                            _DS1_OVERHAUL_SETTINGS_FILE_);
+    if (buffer[0] != '\0' && std::regex_match(buffer, std::regex("^(?:http(s)?:\\/\\/)?[\\w.-]+(?:\\.[\\w\\.-]+)+[\\w\\-\\._~:/?#[\\]@!\\$&'\\(\\)\\*\\+,;=.]+$"))) {
+        if (std::find(Updates::sources().begin(), Updates::sources().end(), buffer) == Updates::sources().end())
+        {
+            Updates::sources().push_back(buffer);
+            print_console("    Using additional custom remote host for updates: " + Updates::sources().back());
+        }
+        else
+        {
+            print_console("    Custom remote host is already being used: " + std::string(buffer));
+        }
+    }
+    buffer[0] = '\0';
+    while (Updates::skip_source.size() < Updates::sources().size())
+    {
+        Updates::skip_source.push_back(false);
+    }
 
-    for (int i = 0; i < DS1_OVERHAUL_UPDATE_SOURCE_COUNT_; i++) {
+    for (unsigned int i = 0; i < Updates::sources().size(); i++) {
         Updates::skip_source[i] = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, (_DS1_OVERHAUL_PREF_SKIP_UPDATE_SOURCE_+std::to_string(i)).c_str(), 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
     }
 

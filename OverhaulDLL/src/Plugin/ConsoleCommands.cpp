@@ -132,6 +132,27 @@ int cc_overhaul_download_url(std::vector<std::string> args, std::string *output)
 }
 
 
+
+// Prints all remote hosts being used for updates/version information/MoTD
+int cc_overhaul_remote_update_hosts(std::vector<std::string> args, std::string *output)
+{
+    if (Updates::sources().empty())
+    {
+        output->append("No remote hosts");
+    }
+    else
+    {
+        output->append(std::to_string(Updates::sources().size()) + " remote host" + (Updates::sources().size() == 1 ? std::string() : std::string("s")) + ":\n");
+    }
+
+    for (unsigned int i = 0; i < Updates::sources().size(); i++)
+    {
+        output->append("\n" + std::to_string(i) + (Updates::skip_source[i] ? ": [DISABLED] " : ":            ") + Updates::sources()[i]);
+    }
+    return CONSOLE_COMMAND_SUCCESS;
+}
+//": [DISABLED] "
+//":            "
 // Enables/disables mouse input
 int cc_mouse_input(std::vector<std::string> args, std::string *output)
 {
@@ -1060,6 +1081,7 @@ void Mod::register_console_commands()
     register_console_alias(cca_overhaul_latest, ccn_overhaul_update);
     register_console_command(ccn_overhaul_download_url, cc_overhaul_download_url, chm_overhaul_download_url);
     register_console_alias(cca_overhaul_download, ccn_overhaul_download_url);
+    register_console_command(ccn_overhaul_remote_update_hosts, cc_overhaul_remote_update_hosts, chm_overhaul_remote_update_hosts);
     register_console_command(ccn_mouse_input, cc_mouse_input, chm_mouse_input);
     register_console_command(ccn_console_lock_cam, cc_console_lock_cam, chm_console_lock_cam);
     register_console_alias(cca_console_lock_cam, ccn_console_lock_cam);

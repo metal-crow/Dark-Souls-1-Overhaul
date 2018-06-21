@@ -36,21 +36,23 @@ std::string _latest;
 std::string _download;
 
 
-const std::string _sources[DS1_OVERHAUL_UPDATE_SOURCE_COUNT_] =
-                          {
-                              "https://raw.githubusercontent.com/metal-crow/Dark-Souls-1-Overhaul/PtDE/OverhaulDLL/rsrc/Updates/",
-                              "https://bitbucket.org/SeanPesce/darksoulsoverhaulupdates/raw/master/PtDE/",
-                              "https://gitlab.com/SeanPesce/DarkSoulsOverhaulUpdates/raw/master/PtDE/"
-                          };
+std::vector<std::string> _sources = {
+                                      "https://raw.githubusercontent.com/metal-crow/Dark-Souls-1-Overhaul/PtDE/OverhaulDLL/rsrc/Updates/",
+                                      "https://bitbucket.org/SeanPesce/darksoulsoverhaulupdates/raw/master/PtDE/",
+                                      "https://gitlab.com/SeanPesce/DarkSoulsOverhaulUpdates/raw/master/PtDE/"
+                                    };
 
 // Flags to skip checking remote data sources
-bool skip_source[DS1_OVERHAUL_UPDATE_SOURCE_COUNT_] = { false, false, false };
+std::vector<bool> skip_source = { false, false, false };
 
 bool keep_temp_files = false;
 
 bool _motd_initialized         = false;
 bool _latest_initialized       = false;
 bool _download_url_initialized = false;
+
+
+std::vector<std::string>& sources() { return _sources; }
 
 
 // Returns string containing the Overhaul message of the day (MotD)
@@ -117,7 +119,7 @@ void check_motd()
 {
     static constexpr const char* tmp_file    = "DS_OVERHAUL_MOTD";
     static constexpr const char* remote_file = "MOTD";
-    for (int i = 0; i < DS1_OVERHAUL_UPDATE_SOURCE_COUNT_; i++)
+    for (unsigned int i = 0; i < _sources.size(); i++)
     {
         print_console(std::string("Attempting to obtain message of the day") + (i ? " (Host #" + std::to_string(i+1) + ")..." : "..."));
 
@@ -168,7 +170,7 @@ void check_latest()
 {
     static constexpr const char* tmp_file    = "DS_OVERHAUL_VERSION";
     static constexpr const char* remote_file = "VERSION";
-    for (int i = 0; i < DS1_OVERHAUL_UPDATE_SOURCE_COUNT_; i++)
+    for (unsigned int i = 0; i < _sources.size(); i++)
     {
         print_console(std::string("Attempting to obtain latest version info") + (i ? " (Host #" + std::to_string(i + 1) + ")..." : "..."));
 
@@ -240,7 +242,7 @@ void check_download_url()
 {
     static constexpr const char* tmp_file    = "DS_OVERHAUL_DOWNLOAD";
     static constexpr const char* remote_file = "DOWNLOAD";
-    for (int i = 0; i < DS1_OVERHAUL_UPDATE_SOURCE_COUNT_; i++)
+    for (unsigned int i = 0; i < _sources.size(); i++)
     {
         if (Updates::skip_source[i])
         {
@@ -403,125 +405,6 @@ int compare_versions()
     local  += v.substr(19, 2);
     return strcmp(remote.c_str(), local.c_str()); // Pos if remote is newer, 0 if equal, neg if remote is older
 }
-
-
-//unsigned int ver_day(const std::string& v)
-//{
-//    unsigned int d = 0;
-//    switch (v[4])
-//    {
-//        case '3':
-//            d = 30;
-//            break;
-//        case '2':
-//            d = 20;
-//            break;
-//        case '1':
-//            d = 10;
-//            break;
-//        case ' ':
-//            break;
-//        default:
-//            return 0;
-//    }
-//    d += (v[5] - '0');
-//    return (d <= 31) ? d : 0;
-//}
-//
-//unsigned int ver_year(const std::string& v)
-//{
-//    std::string year = v.substr(7, 4);
-//    unsigned int y = (year[0] - '0') * 1000;
-//    y += (year[1] - '0') * 100;
-//    y += (year[2] - '0') * 10;
-//    return y + (year[3] - '0');
-//}
-//
-//unsigned int ver_hour(const std::string& v)
-//{
-//    unsigned int h = (v[13] - '0') * 10;
-//    return h + (v[14] - '0');
-//}
-//
-//unsigned int ver_minute(const std::string& v)
-//{
-//    unsigned int m = (v[16] - '0') * 10;
-//    return m + (v[17] - '0');
-//}
-//
-//unsigned int ver_second(const std::string& v)
-//{
-//    unsigned int s = (v[19] - '0') * 10;
-//    return s + (v[20] - '0');
-//}
-//
-//
-//bool compare_versions()
-//{
-//    std::string local(Updates::VERSION);
-//    if (Updates::latest().length() >= local.length())
-//    {
-//        unsigned int latest_val = Updates::ver_year(Updates::latest());
-//        unsigned int local_val  = Updates::ver_year(local);
-//        // Year
-//        if (latest_val > local_val)
-//        {
-//            return true;
-//        }
-//        else if (latest_val == local_val)
-//        {
-//            // Month
-//            latest_val = Updates::ver_month(Updates::latest());
-//            local_val  = Updates::ver_month(local);
-//            if (latest_val > local_val)
-//            {
-//                return true;
-//            }
-//            else if (latest_val == local_val)
-//            {
-//                // Day
-//                latest_val = Updates::ver_day(Updates::latest());
-//                local_val  = Updates::ver_day(local);
-//                if (latest_val > local_val)
-//                {
-//                    return true;
-//                }
-//                else if (latest_val == local_val)
-//                {
-//                    // Hour
-//                    latest_val = Updates::ver_hour(Updates::latest());
-//                    local_val  = Updates::ver_hour(local);
-//                    if (latest_val > local_val)
-//                    {
-//                        return true;
-//                    }
-//                    else if (latest_val == local_val)
-//                    {
-//                        // Minute
-//                        latest_val = Updates::ver_minute(Updates::latest());
-//                        local_val  = Updates::ver_minute(local);
-//                        if (latest_val > local_val)
-//                        {
-//                            return true;
-//                        }
-//                        else if (latest_val == local_val)
-//                        {
-//                            // Second
-//                            latest_val = Updates::ver_second(Updates::latest());
-//                            local_val  = Updates::ver_second(local);
-//                            if (latest_val > local_val)
-//                            {
-//                                return true;
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-//    return false;
-//}
-
 
 
 } // namespace Updates

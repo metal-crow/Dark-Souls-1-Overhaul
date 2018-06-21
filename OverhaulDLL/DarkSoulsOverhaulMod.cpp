@@ -190,9 +190,21 @@ __declspec(dllexport) void __stdcall initialize_plugin()
         // Disable "Framerate insufficient for online play" error
         Game::enable_low_fps_disconnect(false);
 
-    //Updates::check_motd();
-    //Updates::check_download_url();
-    //Updates::check_latest();
+    std::string tmp;
+    if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_AUTO_MOTD_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0)
+    {
+        extern int cc_overhaul_motd(std::vector<std::string> args, std::string *output);
+        cc_overhaul_motd({""}, &tmp);
+        print_console(tmp);
+        tmp.clear();
+    }
+    if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_AUTO_UPDATE_CHECK_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0)
+    {
+        extern int cc_overhaul_update(std::vector<std::string> args, std::string *output);
+        cc_overhaul_update({""}, &tmp);
+        print_console(tmp);
+        tmp.clear();
+    }
 
     // Start thread for deferred tasks
     if (!CreateThread(NULL, 0, deferred_tasks, NULL, 0, NULL))

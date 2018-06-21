@@ -21,9 +21,11 @@ namespace Updates {
 
 constexpr const char* VERSION = __DATE__ "  " __TIME__;
 
-#define DS1_OVERHAUL_UPDATE_SOURCE_COUNT_ 3
+#define DS1_OVERHAUL_DEFAULT_UPDATE_SOURCE_COUNT_ 3
 
 #define DS1_OVERHAUL_DEFAULT_DOWNLOAD_URL_ "https://github.com/metal-crow/Dark-Souls-1-Overhaul/releases"
+
+std::vector<std::string>& sources();
 
 // Returns string containing the Overhaul message of the day (MotD)
 std::string motd();
@@ -50,7 +52,7 @@ long fetch_data(const std::string& source, const std::string& output_file, bool 
 int compare_versions();
 
 // Flags to skip checking remote data sources
-extern bool skip_source[DS1_OVERHAUL_UPDATE_SOURCE_COUNT_];
+extern std::vector<bool> skip_source;
 
 extern bool keep_temp_files;
 

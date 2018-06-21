@@ -50,6 +50,9 @@
 #define _DS1_OVERHAUL_PREF_CHEATS_WARNING_ "CheatsWarning"
 #define _DS1_OVERHAUL_PREF_SKIP_UPDATE_SOURCE_ "SkipRemoteSource"
 #define _DS1_OVERHAUL_PREF_KEEP_TEMP_UPDATE_CHECK_FILES_ "KeepTempRemoteFiles"
+#define _DS1_OVERHAUL_PREF_CUSTOM_UPDATE_SOURCE_URL_ "CustomUpdateHost"
+#define _DS1_OVERHAUL_PREF_AUTO_MOTD_ "AutoCheckMotD"
+#define _DS1_OVERHAUL_PREF_AUTO_UPDATE_CHECK_ "AutoCheckUpdates"
 // HUD settings:
 #define _DS1_OVERHAUL_PREF_COMPASS_RADIAL_ "CompassRadial"
 #define _DS1_OVERHAUL_PREF_COMPASS_BAR_ "CompassBar"
@@ -89,7 +92,7 @@
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_CM_BP_ENEMIES_ "ToggleChallengeBlackPhantomEnemies"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_CM_GL_PHANTOMS_ "ToggleChallengeGravelordPhantoms"
 
-#define _DS1_OVERHAUL_SETTINGS_STRING_BUFF_LEN_ 256		// Length of the string buffer used when obtaining user preference-related string data
+#define _DS1_OVERHAUL_SETTINGS_STRING_BUFF_LEN_ 1024		// Length of the string buffer used when obtaining user preference-related string data
 
 
 

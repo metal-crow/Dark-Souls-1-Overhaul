@@ -87,6 +87,9 @@ const char *chm_overhaul_update = ccn_overhaul_update"\n    Prints the latest kn
 const char *chm_overhaul_download_url = ccn_overhaul_download_url"\n    Prints the download URL for the latest known Dark Souls Overhaul version.";
 #define cca_overhaul_download "overhaul_download"
 
+#define ccn_overhaul_remote_update_hosts "overhaul_remote_update_hosts"
+const char *chm_overhaul_remote_update_hosts = ccn_overhaul_remote_update_hosts"\n    Prints all remote hosts that are used to obtain updated version information and/or Messages of the Day.";
+
 #define ccn_save_file_index "save_file_index"
 const char *chm_save_file_index = ccn_save_file_index" [index|next|previous]\n     Sets the current save file index (must be called while viewing saved characters menu)";
 
