@@ -13,6 +13,7 @@
 #include "Challenge/GravelordPhantoms.h"
 #include "AnimationEdits.h"
 #include "LadderFix.h"
+#include "Updates.h"
 
 #define _SP_DEFINE_VK_NAME_STRINGS_		// Must be defined to use Virtual-key code name strings from SP_IO_Strings.hpp (opt-in by default because it increases filesize by a few KB)
 
@@ -253,9 +254,14 @@ void Mod::get_user_preferences()
     Challenge::AggressiveAi::nose_distance = (uint16_t)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SETTINGS_SECTION_, _DS1_OVERHAUL_PREF_CM_AGGRO_AI_NOSE_DIST_, Challenge::AggressiveAi::DEFAULT_NOSE_DISTANCE, _DS1_OVERHAUL_SETTINGS_FILE_);
     Challenge::BlackPhantomEnemies::DRAW_TYPE = (uint8_t)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SETTINGS_SECTION_, _DS1_OVERHAUL_PREF_CM_BP_ENEMY_DRAW_TYPE_, Challenge::BlackPhantomEnemies::DRAW_TYPE_DEFAULT, _DS1_OVERHAUL_SETTINGS_FILE_);
 
+
+    for (int i = 0; i < DS1_OVERHAUL_UPDATE_SOURCE_COUNT_; i++) {
+        Updates::skip_source[i] = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, (_DS1_OVERHAUL_PREF_SKIP_UPDATE_SOURCE_+std::to_string(i)).c_str(), 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    }
+
+    Updates::keep_temp_files = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_KEEP_TEMP_UPDATE_CHECK_FILES_, Updates::keep_temp_files, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+
     // @TODO Load additional user preferences here
-
-
 
 }
 

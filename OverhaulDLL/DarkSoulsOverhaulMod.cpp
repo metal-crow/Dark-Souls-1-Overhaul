@@ -16,6 +16,7 @@
 #include "XInputUtil.h"
 #include "AnimationEdits.h"
 #include "LadderFix.h"
+#include "Updates.h"
 
 
 /*
@@ -188,6 +189,10 @@ __declspec(dllexport) void __stdcall initialize_plugin()
     if (Mod::disable_low_fps_disconnect)
         // Disable "Framerate insufficient for online play" error
         Game::enable_low_fps_disconnect(false);
+
+    //Updates::check_motd();
+    //Updates::check_download_url();
+    //Updates::check_latest();
 
     // Start thread for deferred tasks
     if (!CreateThread(NULL, 0, deferred_tasks, NULL, 0, NULL))

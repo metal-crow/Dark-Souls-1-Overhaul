@@ -5,6 +5,23 @@
 
 
 ------------------------------------------------------------------------------------------
+06/20/2018:
+- New console commands:
+    - overhaul_message_of_the_day (or overhaul_motd)
+        Prints the Dark Souls Overhaul Message of the Day (if available).
+    - overhaul_update (or overhaul_latest)
+        Prints the latest known Dark Souls Overhaul version and a link to download it (if
+        available).
+    - overhaul_download_url (or overhaul_download)
+        Prints the download URL for the latest known Dark Souls Overhaul version (if
+        available).
+    - overhaul_credits
+        This command already existed, but was non-functional. It now has basic
+        functionality, and lists the main contributors to the project.
+
+
+
+------------------------------------------------------------------------------------------
 06/19/2018:
 - New feature:
     - (Experimental) Ladder fix:

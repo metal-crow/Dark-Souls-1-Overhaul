@@ -48,6 +48,8 @@
 #define _DS1_OVERHAUL_PREF_LADDER_FIX_ "LadderFix"
 #define _DS1_OVERHAUL_PREF_LADDER_FIX_RUNG_INDEX_ "LadderFixRungIndexOverride"
 #define _DS1_OVERHAUL_PREF_CHEATS_WARNING_ "CheatsWarning"
+#define _DS1_OVERHAUL_PREF_SKIP_UPDATE_SOURCE_ "SkipRemoteSource"
+#define _DS1_OVERHAUL_PREF_KEEP_TEMP_UPDATE_CHECK_FILES_ "KeepTempRemoteFiles"
 // HUD settings:
 #define _DS1_OVERHAUL_PREF_COMPASS_RADIAL_ "CompassRadial"
 #define _DS1_OVERHAUL_PREF_COMPASS_BAR_ "CompassBar"
@@ -196,7 +198,7 @@ public:
     static void get_custom_game_files();
 
     // Plays the credits for the Dark Souls Overhaul Mod (displays the list of people who contributed to development)
-    static void play_credits();
+    static DWORD WINAPI play_credits(LPVOID lpParam);
 
 
 

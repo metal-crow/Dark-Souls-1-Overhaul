@@ -71,9 +71,21 @@ const char *chm_armor_sfx = ccn_armor_sfx" [boolean]\n     Enables/disables armo
 
 #define ccn_fix_bonfire_input "fix_bonfire_input"
 const char *chm_fix_bonfire_input = ccn_fix_bonfire_input"\n"
-"    Allows player to regain control of their character if they encounter the bonfire input glitch,\n"
-"    which is a bug that can cause the player to be stuck at the bonfire (usually after restoring\n"
-"    humanity with the framerate unlocked).";
+                                                         "    Allows player to regain control of their character if they encounter the bonfire input glitch,\n"
+                                                         "    which is a bug that can cause the player to be stuck at the bonfire (usually after restoring\n"
+                                                         "    humanity with the framerate unlocked).";
+
+#define ccn_overhaul_motd "overhaul_motd"
+const char *chm_overhaul_motd = ccn_overhaul_motd"\n    Prints the Dark Souls Overhaul Message of the Day.";
+#define cca_overhaul_message_of_the_day "overhaul_message_of_the_day"
+
+#define ccn_overhaul_update "overhaul_update"
+const char *chm_overhaul_update = ccn_overhaul_update"\n    Prints the latest known Dark Souls Overhaul version and a link to download it (if available).";
+#define cca_overhaul_latest "overhaul_latest"
+
+#define ccn_overhaul_download_url "overhaul_download_url"
+const char *chm_overhaul_download_url = ccn_overhaul_download_url"\n    Prints the download URL for the latest known Dark Souls Overhaul version.";
+#define cca_overhaul_download "overhaul_download"
 
 #define ccn_save_file_index "save_file_index"
 const char *chm_save_file_index = ccn_save_file_index" [index|next|previous]\n     Sets the current save file index (must be called while viewing saved characters menu)";
@@ -131,14 +143,14 @@ const char *chm_gravelord_phantoms_despawn = ccn_gravelord_phantoms_despawn"\n  
 
 #define ccn_text_feed_node_count "text_feed_node_count"
 const char *chm_text_feed_node_count = ccn_text_feed_node_count" [boolean]\n"
-"    Enables/disables the multiplayer node count element of the overlay info bar (1 = enabled, 0 = disabled).";
+                                                               "    Enables/disables the multiplayer node count element of the overlay info bar (1 = enabled, 0 = disabled).";
 #define cca_node_count "node_count"
 
 
 #define ccn_cheats "cheats"
 const char *chm_cheats = ccn_cheats" [boolean]\n"
-"    Enables cheats, unlocking additional console commands (1 = enable). If cheats are enabled, saving and multiplayer\n"
-"    will be disabled until the game is restarted.";
+                                   "    Enables cheats, unlocking additional console commands (1 = enable). If cheats are enabled, saving and multiplayer\n"
+                                   "    will be disabled until the game is restarted.";
 
 #define ccn_binocs_trigger_block "ac_binocs_trigger_block"
 const char *chm_binocs_trigger_block = ccn_binocs_trigger_block" [boolean]\n     Enables/disables anti-cheat protection against forced binoculars effect on hit (1 = enabled, 0 = disabled).";

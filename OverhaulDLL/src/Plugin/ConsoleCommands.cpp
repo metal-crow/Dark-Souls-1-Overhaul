@@ -19,6 +19,7 @@
 #include "Challenge/GravelordPhantoms.h"
 #include "Menu/SavedCharacters.h"
 #include "LadderFix.h"
+#include "Updates.h"
 
 
 ///////////////////////////////////////////////////////////
@@ -31,11 +32,18 @@
 int cc_credits(std::vector<std::string> args, std::string *output)
 {
     // @TODO
-    output->append("\n\n");
-    output->append("    ///////////////////////////////////////////////////////////\n");
-    output->append("    ///////////////// Dark Souls Overhaul Mod /////////////////\n");
-    output->append("    ///////////////////////////////////////////////////////////\n");
-    output->append("\n                ...credits coming eventually...\n\n");
+    //output->append("\n\n");
+    //output->append("    ///////////////////////////////////////////////////////////\n");
+    //output->append("    ///////////////// Dark Souls Overhaul Mod /////////////////\n");
+    //output->append("    ///////////////////////////////////////////////////////////\n");
+    //output->append("\n                ...credits coming eventually...\n\n");
+
+    CreateThread(NULL,				// Default security attributes
+                 0,					// Use default stack size
+                 Mod::play_credits, // Thread function name
+                 NULL,				// Argument to thread function
+                 0,					// Use default creation flags
+                 NULL);             // Returns the thread identifier
 
     return CONSOLE_COMMAND_SUCCESS;
 }
@@ -44,8 +52,68 @@ int cc_credits(std::vector<std::string> args, std::string *output)
 // Prints build title and compile time for this build of the Dark Souls Overhaul project
 int cc_build(std::vector<std::string> args, std::string *output)
 {
-    print_console(DS1_OVERHAUL_TXT_INTRO "\nCompiled:  " __DATE__ "   " __TIME__);
-    print_console("");
+    output->append(std::string(DS1_OVERHAUL_TXT_INTRO "\nCompiled:  ") + Updates::VERSION);
+    return CONSOLE_COMMAND_SUCCESS;
+}
+
+
+// Prints the Overhaul Message of the Day
+int cc_overhaul_motd(std::vector<std::string> args, std::string *output)
+{
+    if (!Updates::motd().empty())
+    {
+        output->append("MESSAGE OF THE DAY:\n\n" + Updates::motd());
+    }
+    else
+    {
+        output->append("No Message of the Day.");
+    }
+    return CONSOLE_COMMAND_SUCCESS;
+}
+
+
+// Prints the latest known Dark Souls Overhaul version and a link to download it (if available)
+int cc_overhaul_update(std::vector<std::string> args, std::string *output)
+{
+    if (!Updates::latest().empty())
+    {
+        if (Updates::latest() == std::string(Updates::VERSION))
+        {
+            output->append("    No new updates.");
+        }
+        else if (Updates::compare_versions() > 0)
+        {
+            output->append("\n    UPDATE AVAILABLE:\n    Local  build: " + std::string(Updates::VERSION) + "\n    Remote build: " + std::string(Updates::latest())
+                          + "\n\n    " + (Updates::download_url().empty() ? "Download URL unknown; try here:\n    " DS1_OVERHAUL_DEFAULT_DOWNLOAD_URL_
+                                          : ("Download the latest version here:\n    " + Updates::download_url())));
+        }
+        else
+        {
+            // Local is somehow newer than remote...
+            output->append("\n    WARNING: VERSION MISMATCH (Remote build may be older than local build)\n\n    POSSIBLE UPDATE AVAILABLE:\n    Local  build: " + std::string(Updates::VERSION) + "\n    Remote build: " + std::string(Updates::latest())
+                          + "\n\n    " + (Updates::download_url().empty() ? "Download URL unknown; try here:\n    " DS1_OVERHAUL_DEFAULT_DOWNLOAD_URL_
+                                          : ("Download the latest version here:\n    " + Updates::download_url())));
+        }
+    }
+    else
+    {
+        output->append("    No version info.");
+    }
+    return CONSOLE_COMMAND_SUCCESS;
+}
+
+
+// Prints the download URL for the latest known Dark Souls Overhaul version
+int cc_overhaul_download_url(std::vector<std::string> args, std::string *output)
+{
+    if (!Updates::download_url().empty())
+    {
+        output->append("Download the latest version here:\n    " + Updates::download_url());
+    }
+    else
+    {
+        output->append("Latest download URL unknown; try here:\n    " DS1_OVERHAUL_DEFAULT_DOWNLOAD_URL_);
+    }
     return CONSOLE_COMMAND_SUCCESS;
 }
 
@@ -972,6 +1040,12 @@ void Mod::register_console_commands()
 {
     register_console_command(ccn_developer_debug, cc_developer_debug, chm_developer_debug);
     register_console_command(ccn_overhaul_build, cc_build, chm_overhaul_build);
+    register_console_command(ccn_overhaul_motd, cc_overhaul_motd, chm_overhaul_motd);
+    register_console_alias(cca_overhaul_message_of_the_day, ccn_overhaul_motd);
+    register_console_command(ccn_overhaul_update, cc_overhaul_update, chm_overhaul_update);
+    register_console_alias(cca_overhaul_latest, ccn_overhaul_update);
+    register_console_command(ccn_overhaul_download_url, cc_overhaul_download_url, chm_overhaul_download_url);
+    register_console_alias(cca_overhaul_download, ccn_overhaul_download_url);
     register_console_command(ccn_mouse_input, cc_mouse_input, chm_mouse_input);
     register_console_command(ccn_console_lock_cam, cc_console_lock_cam, chm_console_lock_cam);
     register_console_alias(cca_console_lock_cam, ccn_console_lock_cam);
