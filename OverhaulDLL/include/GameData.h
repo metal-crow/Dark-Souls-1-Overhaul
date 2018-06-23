@@ -14,9 +14,14 @@
 
 
 
-#include "SpPointer.h"
-#include "Asset/Animation/Tae.h"
+#include <stdint.h>
 
+#include "DarkSoulsOverhaulMod.h"
+#include "ModData.h"
+#include "SP/main.h"
+#include "SP/memory.h"
+#include "SP/memory/pointer.h"
+#include "SP/memory/aob_scan.h"
 
 
 enum DS1_GAME_VERSION_ENUM {
@@ -61,22 +66,22 @@ public:
     ////////////////////////////////////////
 
     // Base address of Dark Souls game process
-    static void *ds1_base;
+    static uint64_t ds1_base;
 
-    // Base address of fmodex dll Dark Souls loads
-    static void *fmodex_base;
+    // Base address of fmod_event64 dll process
+    static uint64_t fmod_event64_base;
 
     // Base address for player character data
-    static void *player_char_base;
+    static uint64_t player_char_base;
 
     // Base address for world character data
-    static void *world_char_base;
+    static uint64_t world_char_base;
 
     // Player character status (loading, human, co-op, invader, hollow)
-    static SpPointer player_char_status;
+    static sp::mem::pointer<uint32_t> player_char_status;
 
     // Time Action Events for the player character's animations
-    static Tae player_tae;
+    static void* player_tae;
 
     // Flag to determine if any characters have been loaded since the game was launched (useful if player had a character loaded but returned to main menu)
     static bool characters_loaded;
@@ -85,13 +90,10 @@ public:
     static uint8_t *lava_luminosity;
 
     // Game saving on/off
-    static SpPointer saves_enabled;
+    static uint8_t *saves_enabled;
 
     // Multiplayer node count
     static int node_count;
-
-    // Size of the pool of memory the game allocates for itself
-    static uint32_t memory_limit;
 
 
 
@@ -99,8 +101,8 @@ public:
     /////////////// FUNCTIONS ///////////////
     /////////////////////////////////////////
 
-    // Initializes pointers that depend on the game's base address
-    static void init_pointers();
+    // Initializes pointers and base addresses required for most other functions
+    static void init();
 
     // Runs tasks that were deferred until a character was loaded
     static void on_first_character_loaded();
@@ -138,9 +140,6 @@ public:
     // Enables/Disables automatic game disconnection when low framerate is detected
     static void enable_low_fps_disconnect(bool enable);
 
-    // Checks if player is currently locked onto an enemy
-    static bool player_is_locked_on();
-
     // Set the current animation speed for the player character
     static void set_current_player_animation_speed(float speed);
 
@@ -152,10 +151,7 @@ public:
     static int32_t get_player_lower_body_anim_id();
 
     // Return current game time in milliseconds since the game has started
-    static uint32_t Game::get_game_time_ms();
-
-    // Sets whether player character will automatically turn toward enemies when locked on
-    static bool allow_rotation_when_locked_on(bool allow);
+    static uint32_t get_game_time_ms();
 
 
                     /////////////////////////////////////////
@@ -163,7 +159,7 @@ public:
                     /////////////////////////////////////////
 
     // Set available pool of memory that Dark Souls allocates for itself
-    static void set_memory_limit(uint32_t mem_limit);
+    static void set_memory_limit();
 
     // Allow effect IDs to be transferred between clients without bounds restrictions
     static void unrestrict_network_synced_effectids();

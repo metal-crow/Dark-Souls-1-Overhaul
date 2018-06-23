@@ -6,17 +6,16 @@
 
 */
 
-#include "DllMain_Legacy.h"
+#include "dllmain.h"
+#include "SP/preferences/user_setting.h"
+#include "SP/io/keybinds.h"
 #include "AntiCheat.h"
-#include "Challenge/AggressiveAI.h"
-#include "Challenge/BlackPhantomEnemies.h"
-#include "Challenge/GravelordPhantoms.h"
+//#include "Challenge/AggressiveAI.h"
+//#include "Challenge/BlackPhantomEnemies.h"
+//#include "Challenge/GravelordPhantoms.h"
 #include "AnimationEdits.h"
 
 #define _SP_DEFINE_VK_NAME_STRINGS_  // Must be defined to use Virtual-key code name strings from SP_IO_Strings.hpp (opt-in by default because it increases filesize by a few KB)
-
-#include "SP_IO.hpp"
-#include "SP_IO_Strings.hpp"
 
 #ifdef DS1_OVERHAUL_QOL_PREVIEW
     #define DS1_OVERHAUL_LEGACY_MODE_DEFAULT_VAL true
@@ -119,16 +118,12 @@ void Mod::get_startup_preferences()
     // Check for custom game files
     Mod::get_custom_game_files();
 
-    // Memory limit
-    Game::memory_limit = (uint32_t)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_MEMORY_LIMIT_, (int)Game::memory_limit, _DS1_OVERHAUL_SETTINGS_FILE_);
-
-
     // Anti-cheat
-    AntiCheat::BossGuard::active = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_ANTICHEAT_SECTION_, _DS1_OVERHAUL_PREF_AC_BOSS_GUARD_, (int)AntiCheat::BossGuard::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
-    AntiCheat::NpcGuard::active = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_ANTICHEAT_SECTION_, _DS1_OVERHAUL_PREF_AC_NPC_GUARD_, (int)AntiCheat::NpcGuard::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
-    AntiCheat::TeleBackstabProtect::active = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_ANTICHEAT_SECTION_, _DS1_OVERHAUL_PREF_AC_TELEBACKSTAB_PROT_, (int)AntiCheat::TeleBackstabProtect::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
-    AntiCheat::BinocsTriggerBlock::active = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_ANTICHEAT_SECTION_, _DS1_OVERHAUL_PREF_AC_BINOCS_TRIGGER_BLOCK_, (int)AntiCheat::BinocsTriggerBlock::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
-    AntiCheat::DragonTriggerBlock::active = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_ANTICHEAT_SECTION_, _DS1_OVERHAUL_PREF_AC_DRAGON_TRIGGER_BLOCK_, (int)AntiCheat::DragonTriggerBlock::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    //AntiCheat::BossGuard::active = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_ANTICHEAT_SECTION_, _DS1_OVERHAUL_PREF_AC_BOSS_GUARD_, (int)AntiCheat::BossGuard::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    //AntiCheat::NpcGuard::active = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_ANTICHEAT_SECTION_, _DS1_OVERHAUL_PREF_AC_NPC_GUARD_, (int)AntiCheat::NpcGuard::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    //AntiCheat::TeleBackstabProtect::active = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_ANTICHEAT_SECTION_, _DS1_OVERHAUL_PREF_AC_TELEBACKSTAB_PROT_, (int)AntiCheat::TeleBackstabProtect::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    //AntiCheat::BinocsTriggerBlock::active = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_ANTICHEAT_SECTION_, _DS1_OVERHAUL_PREF_AC_BINOCS_TRIGGER_BLOCK_, (int)AntiCheat::BinocsTriggerBlock::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    //AntiCheat::DragonTriggerBlock::active = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_ANTICHEAT_SECTION_, _DS1_OVERHAUL_PREF_AC_DRAGON_TRIGGER_BLOCK_, (int)AntiCheat::DragonTriggerBlock::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
 
 
     // Debug settings
@@ -169,7 +164,7 @@ void Mod::get_user_preferences()
 
 
     // Begin loading setting preferences
-    print_console(Mod::output_prefix + "Loading user preferences...");
+    global::cmd_out << (Mod::output_prefix + "Loading user preferences...");
 
     // Check if camera should be locked when console is open
     Mod::console_lock_camera = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_INPUT_SECTION_, _DS1_OVERHAUL_PREF_CONSOLE_LOCK_CAM_, (int)Mod::console_lock_camera, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
@@ -178,69 +173,71 @@ void Mod::get_user_preferences()
 
     Mod::disable_low_fps_disconnect = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DISABLE_LOW_FPS_DISCONNECT_, (int)Mod::disable_low_fps_disconnect, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
 
-    AnimationEdits::gesture_cancelling = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DISABLE_GESTURE_CANCELLING_, (int)AnimationEdits::gesture_cancelling, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
-    if (AnimationEdits::gesture_cancelling) {
-        print_console(msg.append("    Gesture cancelling enabled"));
-    }
+    //AnimationEdits::gesture_cancelling = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DISABLE_GESTURE_CANCELLING_, (int)AnimationEdits::gesture_cancelling, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    //if (AnimationEdits::gesture_cancelling) {
+    //    global::cmd_out << (msg.append("    Gesture cancelling enabled"));
+    //}
 
     // Display multiplayer node count in text feed info header
     Mod::show_node_count = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_SHOW_NODE_COUNT_, (int)Mod::show_node_count, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
     msg = "    Display multiplayer node count = ";
     if (Mod::show_node_count)
-        print_console(msg.append("enabled"));
+        global::cmd_out << (msg.append("enabled"));
     else
-        print_console(msg.append("disabled"));
+        global::cmd_out << (msg.append("disabled"));
 
 
     // Check whether to lower the brightness of lava effects
     Mod::dim_lava_pref = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DIM_LAVA_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
     if (Mod::dim_lava_pref)
-        print_console("    Lava visual effects will be dimmed");
+        global::cmd_out << ("    Lava visual effects will be dimmed");
 
 
     // Check whether to disable armor sound effects
 #ifndef DS1_OVERHAUL_QOL_PREVIEW
-    Mod::disable_armor_sfx_pref = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DISABLE_ARMOR_SFX_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    /*Mod::disable_armor_sfx_pref = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DISABLE_ARMOR_SFX_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
     if (Mod::disable_armor_sfx_pref)
-        print_console("    Armor sound effects will be disabled");
+        global::cmd_out << ("    Armor sound effects will be disabled");
+    */
 #endif // DS1_OVERHAUL_QOL_PREVIEW
 
 
     // Check if additional HUD elements should be displayed
-    if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_HUD_SECTION_, _DS1_OVERHAUL_PREF_COMPASS_RADIAL_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
+    /*if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_HUD_SECTION_, _DS1_OVERHAUL_PREF_COMPASS_RADIAL_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
         Hud::set_show_compass_radial(true);
-        print_console("    HUD: Radial compass enabled");
-    }
+        global::cmd_out << ("    HUD: Radial compass enabled");
+    }*/
 
-    if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_HUD_SECTION_, _DS1_OVERHAUL_PREF_COMPASS_BAR_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
+    /*if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_HUD_SECTION_, _DS1_OVERHAUL_PREF_COMPASS_BAR_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
         Hud::set_show_compass_bar(true);
-        print_console("    HUD: Bar compass enabled");
-    }
+        global::cmd_out << ("    HUD: Bar compass enabled");
+    }*/
 
-    if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_HUD_SECTION_, _DS1_OVERHAUL_PREF_ELEVATION_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
+    /*if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_HUD_SECTION_, _DS1_OVERHAUL_PREF_ELEVATION_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
         Hud::set_show_elevation_meter(true);
-        print_console("    HUD: Elevation meter enabled");
-    }
+        global::cmd_out << ("    HUD: Elevation meter enabled");
+    }*/
 
-    if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_HUD_SECTION_, _DS1_OVERHAUL_PREF_NODE_GRAPH_, Hud::get_show_node_graph(), _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
+    /*if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_HUD_SECTION_, _DS1_OVERHAUL_PREF_NODE_GRAPH_, Hud::get_show_node_graph(), _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
         Hud::set_show_node_graph(true, false);
-        print_console("    HUD: Multiplayer node graph enabled");
-    }
+        global::cmd_out << ("    HUD: Multiplayer node graph enabled");
+    }*/
 
     // Check if challenge mods should be enabled
+#if 0
     if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_AGGRO_AI_, Challenge::AggressiveAi::active(), _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
-        print_console("    Challenge: Aggressive AI will be enabled");
+        global::cmd_out << ("    Challenge: Aggressive AI will be enabled");
     }
     if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_GL_PHANTOMS_, Challenge::GravelordPhantoms::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
-        print_console("    Challenge: Auto-spawning Gravelord Phantoms will be enabled");
+        global::cmd_out << ("    Challenge: Auto-spawning Gravelord Phantoms will be enabled");
     }
     if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_BP_ENEMIES_, Challenge::BlackPhantomEnemies::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
-        print_console("    Challenge: Black Phantom Enemies will be enabled");
+        global::cmd_out << ("    Challenge: Black Phantom Enemies will be enabled");
     }
     Challenge::AggressiveAi::ear_distance  = (uint16_t)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SETTINGS_SECTION_, _DS1_OVERHAUL_PREF_CM_AGGRO_AI_EAR_DIST_,  Challenge::AggressiveAi::DEFAULT_EAR_DISTANCE,  _DS1_OVERHAUL_SETTINGS_FILE_);
     Challenge::AggressiveAi::nose_distance = (uint16_t)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SETTINGS_SECTION_, _DS1_OVERHAUL_PREF_CM_AGGRO_AI_NOSE_DIST_, Challenge::AggressiveAi::DEFAULT_NOSE_DISTANCE, _DS1_OVERHAUL_SETTINGS_FILE_);
     Challenge::BlackPhantomEnemies::DRAW_TYPE = (uint8_t)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SETTINGS_SECTION_, _DS1_OVERHAUL_PREF_CM_BP_ENEMY_DRAW_TYPE_, Challenge::BlackPhantomEnemies::DRAW_TYPE_DEFAULT, _DS1_OVERHAUL_SETTINGS_FILE_);
-
+#endif
     // @TODO Load additional user preferences here
 
 
@@ -253,51 +250,51 @@ void Mod::get_user_preferences()
 void Mod::get_user_keybinds()
 {
     // Begin loading keybinds
-    print_console(Mod::output_prefix + "Loading keybinds...");
+    global::cmd_out << (Mod::output_prefix + "Loading keybinds...");
 
 
     // Toggle mouse input keybind
-    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_MOUSE_INPUT_, kf_toggle_mouse_input);
+    //get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_MOUSE_INPUT_, kf_toggle_mouse_input);
 
     // Toggle camera lock when console is open
-    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_CONSOLE_LOCK_CAM_, kf_toggle_console_lock_cam);
+    //get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_CONSOLE_LOCK_CAM_, kf_toggle_console_lock_cam);
 
     // Bonfire input fix keybind
-    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_BONFIRE_INPUT_FIX_, kf_fix_bonfire_input);
+    //get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_BONFIRE_INPUT_FIX_, kf_fix_bonfire_input);
 
     // Toggle multiplayer node count in text feed info header
-    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_NODE_COUNT_, kf_toggle_node_count);
+    //get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_NODE_COUNT_, kf_toggle_node_count);
 
 
     // Toggle dimmed lava visual effects
-    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_DIM_LAVA_, kf_toggle_dim_lava);
+    //get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_DIM_LAVA_, kf_toggle_dim_lava);
 
 #ifndef DS1_OVERHAUL_QOL_PREVIEW
     // Toggle armor sound effects
-    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_ARMOR_SFX_, kf_toggle_armor_sfx);
+    //get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_ARMOR_SFX_, kf_toggle_armor_sfx);
 #endif // DS1_OVERHAUL_QOL_PREVIEW
 
     // De-spawn existing Gravelord phantoms
-    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_DESPAWN_GL_PHANTOMS_, kf_gravelord_phantoms_despawn);
+    //get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_DESPAWN_GL_PHANTOMS_, kf_gravelord_phantoms_despawn);
 
     // Next/previous save file
-    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_SAVE_FILE_NEXT_, kf_save_file_next);
-    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_SAVE_FILE_PREV_, kf_save_file_prev);
+    //get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_SAVE_FILE_NEXT_, kf_save_file_next);
+    //get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_SAVE_FILE_PREV_, kf_save_file_prev);
 
     // Toggle additional HUD elements
-    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_COMPASS_RADIAL_, kf_toggle_hud_compass_radial);
-    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_COMPASS_BAR_, kf_toggle_hud_compass_bar);
-    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_ELEVATION_METER_, kf_toggle_hud_elevation_meter);
-    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_NODE_GRAPH_, kf_toggle_hud_node_graph);
+    //get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_COMPASS_RADIAL_, kf_toggle_hud_compass_radial);
+    //get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_COMPASS_BAR_, kf_toggle_hud_compass_bar);
+    //get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_ELEVATION_METER_, kf_toggle_hud_elevation_meter);
+    //get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_NODE_GRAPH_, kf_toggle_hud_node_graph);
     
     // Toggle anti-cheats (not all are togglable)
-    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_AC_BINOCS_TRIG_BLOCK_, kf_toggle_ac_binocs_trigger_block);
-    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_AC_DRAGON_TRIG_BLOCK_, kf_toggle_ac_dragon_trigger_block);
+    //get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_AC_BINOCS_TRIG_BLOCK_, kf_toggle_ac_binocs_trigger_block);
+    //get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_AC_DRAGON_TRIG_BLOCK_, kf_toggle_ac_dragon_trigger_block);
 
     // Toggle challenge mods
-    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_CM_AGGRO_AI_, kf_toggle_cm_aggressive_ai);
-    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_CM_BP_ENEMIES_, kf_toggle_cm_bp_enemies);
-    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_CM_GL_PHANTOMS_, kf_toggle_cm_gravelord_phantoms);
+    //get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_CM_AGGRO_AI_, kf_toggle_cm_aggressive_ai);
+    //get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_CM_BP_ENEMIES_, kf_toggle_cm_bp_enemies);
+    //get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_CM_GL_PHANTOMS_, kf_toggle_cm_gravelord_phantoms);
 
     // @TODO Load additional keybinds here
 
@@ -312,22 +309,34 @@ void Mod::get_single_user_keybind(const char *keybind_name, int(*function)())
     // Variable that holds the Virtual-key code of the keybind when read from settings file
     uint8_t key;
 
-    if ((key = (uint8_t)get_vk_hotkey(_DS1_OVERHAUL_SETTINGS_FILE_, _DS1_OVERHAUL_KEYBINDS_SECTION_, keybind_name)) // Obtain user's preferred key
-        && register_hotkey_function(key, function))    // Register the keybind
+    if ((key = user_setting<uint8_t>(_DS1_OVERHAUL_KEYBINDS_SECTION_, keybind_name, 0).read()) // Obtain user's preferred key
+        && sp::io::keybinds::register_hotkey_function(key, function))    // Register the keybind
     {
         // Successfully loaded and registered keybind; now print feedback to console
         std::string output = std::string("    Registered ").append(keybind_name).append(" keybind: ");
-        output.append(VK_NAME[key]).append(" (0x");   // Get the key name as a string
+        // Get the key name as a string
+        CHAR keyname[512];
+        UINT scanCode = MapVirtualKeyW(key, MAPVK_VK_TO_VSC);
+        LONG lParamValue = (scanCode << 16);
+        int result = GetKeyNameText(lParamValue, keyname, 512);
+        output.append(keyname).append(" (0x");
         if (key < 0x10)
             output += '0';
         std::stringstream hex_stream;
         hex_stream << std::hex << (int)key; // Convert Virtual-key code to hex string
         output.append(hex_stream.str());
         output += ')';
-        print_console(output.c_str());
+        global::cmd_out << (output.c_str());
     }
 }
 
+
+static void string_mb_to_wide(char *in_string, std::wstring &out_string) {
+    int size_needed = MultiByteToWideChar(CP_UTF8, 0, &in_string[0], -1, NULL, 0);
+    std::wstring wstrTo(size_needed, 0);
+    MultiByteToWideChar(CP_UTF8, 0, &in_string[0], -1, &wstrTo[0], size_needed);
+    out_string.append(wstrTo);
+}
 
 
 // Get custom game files from the settings file
@@ -345,12 +354,8 @@ void Mod::get_custom_game_files()
                             _DS1_OVERHAUL_SETTINGS_FILE_);
 
     // Convert string to wide chars
-    errno_t return_error = 0;
-    if (return_error = string_mb_to_wide(custom_file_name_buff, Mod::custom_game_archive_path)) {
-        // Conversion error
-        Mod::custom_game_archive_path = L"";
-    }
-    else if (std::string(custom_file_name_buff).length() > 0)
+    string_mb_to_wide(custom_file_name_buff, Mod::custom_game_archive_path);
+    if (std::string(custom_file_name_buff).length() > 0)
     {
         Mod::startup_messages.push_back(std::string("    Found custom game archive file definition: \"").append(custom_file_name_buff).append("\""));
     }
@@ -366,12 +371,8 @@ void Mod::get_custom_game_files()
                             _DS1_OVERHAUL_SETTINGS_FILE_);
 
     // Convert string to wide chars
-    return_error = 0;
-    if (return_error = string_mb_to_wide(custom_file_name_buff, Mod::custom_save_file_path)) {
-        // Conversion error
-        Mod::custom_save_file_path = L"";
-    }
-    else if (std::string(custom_file_name_buff).length() > 0)
+    string_mb_to_wide(custom_file_name_buff, Mod::custom_save_file_path);
+    if (std::string(custom_file_name_buff).length() > 0)
     {
         Mod::startup_messages.push_back(std::string("    Found custom game save file definition: \"").append(custom_file_name_buff).append("\""));
     }
@@ -388,18 +389,14 @@ void Mod::get_custom_game_files()
                             _DS1_OVERHAUL_SETTINGS_FILE_);
 
     // Convert string to wide chars
-    return_error = 0;
-    if ((return_error = string_mb_to_wide(custom_file_name_buff, Mod::custom_config_file_path))) {
-        // Conversion error
-        Mod::custom_config_file_path = L"";
-    }
-    else if (std::string(custom_file_name_buff).length() > 0)
+    string_mb_to_wide(custom_file_name_buff, Mod::custom_config_file_path);
+    if (std::string(custom_file_name_buff).length() > 0)
     {
         Mod::startup_messages.push_back(std::string("    Found custom game config file definition: \"").append(custom_file_name_buff).append("\""));
     }
 
     // Get I/O output filter
-    Files::io_output_filter;
+    /*Files::io_output_filter;
     custom_file_name_buff[MAX_PATH] = '\0';
     GetPrivateProfileString(_DS1_OVERHAUL_DEBUG_SECTION_,
                             _DS1_OVERHAUL_PREF_IO_OUT_FILTER_,
@@ -407,6 +404,6 @@ void Mod::get_custom_game_files()
                             custom_file_name_buff,
                             MAX_PATH + 1,
                             _DS1_OVERHAUL_SETTINGS_FILE_);
-    Files::io_output_filter = std::string(custom_file_name_buff);
+    Files::io_output_filter = std::string(custom_file_name_buff);*/
 }
 

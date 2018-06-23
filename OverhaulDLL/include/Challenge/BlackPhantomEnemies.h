@@ -13,7 +13,7 @@
     #define DS1_CHALLENGE_BLACK_PHANTOM_ENEMIES_H_
 
 #include <vector>
-#include "Param/Params.h"
+//#include "Param/Params.h"
 
 namespace Challenge {
 namespace BlackPhantomEnemies {

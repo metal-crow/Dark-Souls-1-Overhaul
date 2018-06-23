@@ -15,7 +15,7 @@
 
 
 /////////////////// USER PREFERENCE & KEYBIND CONSTANTS ///////////////////
-#define _DS1_OVERHAUL_SETTINGS_FILE_ ".\\d3d9_Mod.ini"
+#define _DS1_OVERHAUL_SETTINGS_FILE_ ".\\d3d11_Mod.ini"
 #define _DS1_OVERHAUL_PREFS_SECTION_ "Dark Souls Overhaul Settings"
 #define _DS1_OVERHAUL_KEYBINDS_SECTION_ "Dark Souls Overhaul Keybinds"
 #define _DS1_OVERHAUL_INPUT_SECTION_ "Game Input"
@@ -101,6 +101,7 @@
 #define _DS1_MOD_MSG_BONFIRE_INPUT_FIX_AUTOMATIC_ "WARNING: Bonfire input glitch detected; applying input fix"
 
 
+#include <vector>
 
 class Mod
 {
