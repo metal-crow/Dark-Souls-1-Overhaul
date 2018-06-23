@@ -7,8 +7,12 @@
 
 */
 
-#include "DarkSoulsOverhaulMod.h"
+#include "SP/io/keybinds.h"
 
+#include "DarkSoulsOverhaulMod.h"
+#include "ModData.h"
+#include "GameData.h"
+#include "AntiAntiCheat.h"
 
 /*
     Called from DllMain when the plugin DLL is first loaded into memory (PROCESS_ATTACH case).
@@ -21,12 +25,52 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
 {
     global::cmd_out << DS1_OVERHAUL_TXT_INTRO "\n\n";
 
+    Game::init();
+    AntiAntiCheat::start();
+
     CreateThread(NULL,  // Default security attributes
                  0,     // Use default stack size
                  on_process_attach_async, // Thread function name
                  NULL,  // Argument to thread function
                  0,     // Use default creation flags
                  NULL); // Optionally returns the thread identifier
+
+    // Load startup preferences from settings file
+    //Mod::get_startup_preferences();
+
+    // Initialize file I/O monitoring data structs
+    //Files::init_io_monitors();
+
+    // Check if game version is supported
+    /*if (Game::get_game_version() != DS1_GAME_VERSION_ENUM::DS1_VERSION_RELEASE)
+    {
+        Mod::startup_messages.push_back(Mod::output_prefix + "WARNING: Unsupported game version detected.");
+        MessageBox(NULL, std::string("Invalid game version detected. Change to supported game version, or disable the Dark Souls Overhaul Mod.").c_str(),
+            "ERROR: Dark Souls Overhaul Mod - Wrong game version", NULL);
+        exit(0);
+    }*/
+
+    // Apply increased memory limit patch
+    Game::set_memory_limit();
+
+    // Inject code to capture starting addresses of all Param files (removes need for AoB scans)
+    //Params::patch();
+
+    // Change game version number
+    //Files::apply_function_intercepts();
+
+    // Check for existence of non-default game files
+    //Files::check_custom_archive_file_path();
+    //Files::check_custom_save_file_path();
+    //Files::check_custom_game_config_file_path();
+
+    /*if (!Mod::legacy_mode) {
+        // Change game version number
+        Game::set_game_version(DS1_GAME_VERSION_ENUM::DS1_VERSION_OVERHAUL);
+
+        // Apply first part of phantom limit patch
+        Game::increase_phantom_limit1();
+    }*/
 
     return TRUE;
 }
@@ -303,6 +347,8 @@ __declspec(dllexport) void __stdcall main_loop()
 
         // Check if the player is stuck at the bonfire, and if so, automatically apply the bonfire input fix
         Game::check_bonfire_input_bug();
+
+        sp::io::keybinds::check_hotkeys();
 
         // Check if the character is loading, and apply actions that need to be _reapplied_ after every loading screen
         /*int char_status;
