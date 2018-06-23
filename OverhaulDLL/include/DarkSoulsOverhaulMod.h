@@ -15,6 +15,16 @@
 #include "sp/sp.h"
 #include "dllmain.h"
 
+#define WIN32_LEAN_AND_MEAN   // Exclude rarely-used stuff from Windows headers
+
+// Windows Header Files:
+#include <Windows.h>
+
+// Game data/Overhaul mod data headers:
+#include "ModData.h"
+#include "GameData.h"
+#include "Plugin/KeybindFunctions.h"
+
 // Preprocessor definition utilized by the Dark Souls Game Files C++ library (DsGameFiles.lib)
 #define __DS1_OVERHAUL_MOD
 
