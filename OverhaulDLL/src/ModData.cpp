@@ -6,7 +6,7 @@
 
 */
 
-#include "dllmain.h"
+#include "DarkSoulsOverhaulMod.h"
 #include "SP/preferences/user_setting.h"
 #include "SP/io/keybinds.h"
 #include "AntiCheat.h"
