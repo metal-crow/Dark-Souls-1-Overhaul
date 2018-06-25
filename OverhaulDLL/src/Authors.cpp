@@ -42,7 +42,7 @@ std::vector<std::string> Mod::authors = {
     "TheLagWizard",
     "Undakovrist",
     "Wulf2k",
-    "Xerv.io/us",
+    "Xervious",
     // Apologies in advance to anyone I forgot, just let me know so I can add you to the list
     //     -Sean
 };
@@ -73,7 +73,7 @@ std::vector<std::string> Mod::author_roles =
     "| LordOfSandvich             | Adviser, Researcher, Tester                                                                 |",
     "| Meowmaritus                | Lead Adviser, Reverse Engineer, Utility Developer                                           |",
     "| metal-crow                 | Project Lead, Lead Reverse Engineer, Lead Programmer, Anti-Cheat Developer, Adviser, Tester |",
-    "| Not a Cleric               | Researcher                                                                                  |",
+    "| Not a Cleric               | Adviser, Researcher                                                                         |",
     "| nyxojaele                  | Adviser, Reverse Engineer, Utility Developer                                                |",
     "| Pav                        | Adviser, Researcher                                                                         |",
     "| RavagerChris37             | Reverse Engineer, Utility Developer                                                         |",
@@ -85,7 +85,7 @@ std::vector<std::string> Mod::author_roles =
     "| TheLagWizard               | Researcher, Tester                                                                          |",
     "| Undakovrist                | Adviser, Researcher, Tester                                                                 |",
     "| Wulf2k                     | Adviser, Reverse Engineer, Utility Developer                                                |",
-    "| Xerv.io/us                 | Adviser, Researcher, Tester                                                                 |",
+    "| Xervious                   | Adviser, Researcher, Tester                                                                 |",
     "+----------------------------+---------------------------------------------------------------------------------------------+"
 };
 

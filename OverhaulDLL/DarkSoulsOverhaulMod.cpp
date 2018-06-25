@@ -17,6 +17,9 @@
 #include "AnimationEdits.h"
 #include "LadderFix.h"
 #include "Updates.h"
+#include "DurabilityBars.h"
+
+#include "D3dx9math.h"
 
 
 /*
@@ -162,7 +165,7 @@ __declspec(dllexport) void __stdcall initialize_plugin()
     } else {
         set_text_feed_title("[Dark Souls Overhaul Mod]");
     }
-    print("-------------DARK SOULS OVERHAUL TEST BUILD-------------", 10000, false, SP_D3D9O_TEXT_COLOR_ORANGE);
+    print("-------------DARK SOULS OVERHAUL TEST BUILD-------------", 15000, false, SP_D3D9O_TEXT_COLOR_ORANGE);
 
     // Print startup messages
     for (std::string msg : Mod::startup_messages)
@@ -258,6 +261,18 @@ __declspec(dllexport) void __stdcall main_loop()
         // Check if the player is stuck at the bonfire, and if so, automatically apply the bonfire input fix
         Game::check_bonfire_input_bug();
 
+        // Check that a character is loaded
+        static uint32_t* pc_status = NULL;
+        pc_status = reinterpret_cast<uint32_t*>(Game::player_char_status.resolve());
+        if (pc_status && (*pc_status != DS1_PLAYER_STATUS_LOADING))
+        {
+            DurabilityBars::update_data();
+        }
+        else
+        {
+            DurabilityBars::render_data.display = false;
+        }
+
 		// Check if the character is loading, and apply actions that need to be _reapplied_ after every loading screen
 		/*int char_status;
 		Game::player_char_status.read(&char_status);
@@ -346,6 +361,15 @@ __declspec(dllexport) void __stdcall present(const RECT *pSourceRect, const RECT
         WARNING: This function is called from inside the DirectX9 Device Present() function. Keep
         code in this function as optimized as possible to avoid performance issues.
     */
+
+    // Draw weapon durability meter HUD elements
+    if (DurabilityBars::render_data.display)
+    {
+        _d3d9_dev->GetDisplayMode(0, &DurabilityBars::render_data.display_mode);
+
+        _d3d9_dev->Clear(2, DurabilityBars::render_data.backgrounds, D3DCLEAR_TARGET, D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f), 0, 0); // Black
+        _d3d9_dev->Clear(2, DurabilityBars::render_data.bars, D3DCLEAR_TARGET, D3DXCOLOR(0x00563433), 0, 0); // Red
+    }
 }
 
 /*

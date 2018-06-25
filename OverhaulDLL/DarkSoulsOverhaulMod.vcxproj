@@ -264,6 +264,7 @@
     <ClInclude Include="include\Challenge\BlackPhantomEnemies.h" />
     <ClInclude Include="include\Challenge\GravelordPhantoms.h" />
     <ClInclude Include="include\DllMain.h" />
+    <ClInclude Include="include\DurabilityBars.h" />
     <ClInclude Include="include\Files.h" />
     <ClInclude Include="include\GameData.h" />
     <ClInclude Include="include\LadderFix.h" />
@@ -320,6 +321,7 @@
     <ClCompile Include="src\Challenge\AggressiveAI.cpp" />
     <ClCompile Include="src\Challenge\BlackPhantomEnemies.cpp" />
     <ClCompile Include="src\Challenge\GravelordPhantoms.cpp" />
+    <ClCompile Include="src\DurabilityBars.cpp" />
     <ClCompile Include="src\GameData.cpp" />
     <ClCompile Include="src\LadderFix.cpp" />
     <ClCompile Include="src\Menu\SavedCharacters.cpp" />

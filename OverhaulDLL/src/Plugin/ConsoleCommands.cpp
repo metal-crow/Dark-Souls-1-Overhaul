@@ -20,6 +20,7 @@
 #include "Menu/SavedCharacters.h"
 #include "LadderFix.h"
 #include "Updates.h"
+#include "DurabilityBars.h"
 
 
 ///////////////////////////////////////////////////////////
@@ -151,8 +152,8 @@ int cc_overhaul_remote_update_hosts(std::vector<std::string> args, std::string *
     }
     return CONSOLE_COMMAND_SUCCESS;
 }
-//": [DISABLED] "
-//":            "
+
+
 // Enables/disables mouse input
 int cc_mouse_input(std::vector<std::string> args, std::string *output)
 {
@@ -698,8 +699,6 @@ int cc_dragon_trigger_block(std::vector<std::string> args, std::string *output)
 }
 
 
-
-
 // Enables/disables dim lava effects
 int cc_dim_lava(std::vector<std::string> args, std::string *output)
 {
@@ -895,6 +894,186 @@ int cc_hud_node_graph(std::vector<std::string> args, std::string *output)
     } else {
         output->append("Multiplayer node graph HUD element = disabled");
     }
+    return ret_val;
+}
+
+
+// Enables/disables weapon durability HUD elements
+int cc_hud_weapon_durability_bars(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = CONSOLE_COMMAND_SUCCESS;
+    if (args.size() > 0)
+    {
+        switch (parse_toggle_arg(args.at(0).c_str()))
+        {
+            case 0:
+                DurabilityBars::enable_pref = false;
+                break;
+            case 1:
+                DurabilityBars::enable_pref = true;
+                break;
+            default:
+                output->append(ERROR_INVALID_BOOL_ARGUMENT + "\n");
+                ret_val = ERROR_INVALID_PARAMETER;
+                break;
+        }
+    }
+    if (DurabilityBars::enable_pref)
+    {
+        output->append("Weapon durability bar HUD elements = enabled");
+    }
+    else
+    {
+        output->append("Weapon durability bar HUD elements = disabled");
+    }
+    return ret_val;
+}
+
+
+// Sets horizontal offset for left-side durability bar HUD element
+int cc_hud_weapon_durability_x_offset_l(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = ERROR_SUCCESS;
+    long new_offset = 0;
+    if (args.size() > 0)
+    {
+        if (args.at(0) == "default")
+        {
+            new_offset = 0L;
+        }
+        else
+        {
+            // Offset specified
+            try
+            {
+                new_offset = std::stoi(args.at(0).c_str(), NULL);
+            }
+            catch (const std::invalid_argument&)
+            {
+                ret_val = ERROR_BAD_ARGUMENTS;
+                new_offset = DurabilityBars::render_data.offset_left_x;
+            }
+            catch (const std::out_of_range&)
+            {
+                ret_val = ERROR_RANGE_NOT_FOUND;
+                new_offset = DurabilityBars::render_data.offset_left_x;
+            }
+        }
+        DurabilityBars::render_data.offset_left_x = new_offset;
+    }
+    output->append("Horizontal offset for left-hand weapon durability meter HUD element = " + std::to_string(DurabilityBars::render_data.offset_left_x) + " pixels");
+    return ret_val;
+}
+
+
+// Sets horizontal offset for right-side durability bar HUD element
+int cc_hud_weapon_durability_x_offset_r(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = ERROR_SUCCESS;
+    long new_offset = 0;
+    if (args.size() > 0)
+    {
+        if (args.at(0) == "default")
+        {
+            new_offset = 0L;
+        }
+        else
+        {
+            // Offset specified
+            try
+            {
+                new_offset = std::stoi(args.at(0).c_str(), NULL);
+            }
+            catch (const std::invalid_argument&)
+            {
+                ret_val = ERROR_BAD_ARGUMENTS;
+                new_offset = DurabilityBars::render_data.offset_right_x;
+            }
+            catch (const std::out_of_range&)
+            {
+                ret_val = ERROR_RANGE_NOT_FOUND;
+                new_offset = DurabilityBars::render_data.offset_right_x;
+            }
+        }
+        DurabilityBars::render_data.offset_right_x = new_offset;
+    }
+    output->append("Horizontal offset for right-hand weapon durability meter HUD element = " + std::to_string(DurabilityBars::render_data.offset_right_x) + " pixels");
+    return ret_val;
+}
+
+
+// Sets vertical offset for durability bar HUD elements
+int cc_hud_weapon_durability_y_offset(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = ERROR_SUCCESS;
+    long new_offset = 0;
+    if (args.size() > 0)
+    {
+        if (args.at(0) == "default")
+        {
+            new_offset = 0L;
+        }
+        else
+        {
+            // Offset specified
+            try
+            {
+                new_offset = std::stoi(args.at(0).c_str(), NULL);
+            }
+            catch (const std::invalid_argument&)
+            {
+                ret_val = ERROR_BAD_ARGUMENTS;
+                new_offset = DurabilityBars::render_data.offset_y;
+            }
+            catch (const std::out_of_range&)
+            {
+                ret_val = ERROR_RANGE_NOT_FOUND;
+                new_offset = DurabilityBars::render_data.offset_y;
+            }
+        }
+        DurabilityBars::render_data.offset_y = new_offset;
+    }
+    output->append("Vertical offset for weapon durability meter HUD elements = " + std::to_string(DurabilityBars::render_data.offset_y) + " pixels");
+    return ret_val;
+}
+
+
+// Sets scale of durability bar HUD elements
+int cc_hud_weapon_durability_scale(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = ERROR_SUCCESS;
+    float new_scale = 1.0f;
+    if (args.size() > 0)
+    {
+        if (args.at(0) == "default")
+        {
+            new_scale = 1.0f;
+        }
+        else
+        {
+            // Scale specified
+            try
+            {
+                new_scale = std::stof(args.at(0).c_str(), NULL);
+                if (new_scale < 0.0f)
+                {
+                    new_scale = DurabilityBars::render_data.scale;
+                }
+            }
+            catch (const std::invalid_argument&)
+            {
+                ret_val = ERROR_BAD_ARGUMENTS;
+                new_scale = DurabilityBars::render_data.scale;
+            }
+            catch (const std::out_of_range&)
+            {
+                ret_val = ERROR_RANGE_NOT_FOUND;
+                new_scale = DurabilityBars::render_data.scale;
+            }
+        }
+        DurabilityBars::render_data.scale = new_scale;
+    }
+    output->append("Scaling for weapon durability meter HUD elements = " + std::to_string(DurabilityBars::render_data.scale));
     return ret_val;
 }
 
@@ -1099,6 +1278,11 @@ void Mod::register_console_commands()
     register_console_command(ccn_hud_compass_bar, cc_hud_compass_bar, chm_hud_compass_bar);
     register_console_command(ccn_hud_elevation_meter, cc_hud_elevation_meter, chm_hud_elevation_meter);
     register_console_command(ccn_hud_node_graph, cc_hud_node_graph, chm_hud_node_graph);
+    register_console_command(ccn_hud_weapon_durability_bars, cc_hud_weapon_durability_bars, chm_hud_weapon_durability_bars);
+    register_console_command(ccn_hud_weapon_durability_x_offset_l, cc_hud_weapon_durability_x_offset_l, chm_hud_weapon_durability_x_offset_l);
+    register_console_command(ccn_hud_weapon_durability_x_offset_r, cc_hud_weapon_durability_x_offset_r, chm_hud_weapon_durability_x_offset_r);
+    register_console_command(ccn_hud_weapon_durability_y_offset, cc_hud_weapon_durability_y_offset, chm_hud_weapon_durability_y_offset);
+    register_console_command(ccn_hud_weapon_durability_scale, cc_hud_weapon_durability_scale, chm_hud_weapon_durability_scale);
     register_console_command(ccn_binocs_trigger_block, cc_binocs_trigger_block, chm_binocs_trigger_block);
     register_console_command(ccn_dragon_trigger_block, cc_dragon_trigger_block, chm_dragon_trigger_block);
     register_console_command(ccn_save_file_index, cc_save_file_index, chm_save_file_index);

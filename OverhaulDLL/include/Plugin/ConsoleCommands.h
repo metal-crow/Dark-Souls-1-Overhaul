@@ -191,6 +191,26 @@ const char *chm_hud_elevation_meter = ccn_hud_elevation_meter" [boolean] \n"
 const char *chm_hud_node_graph = ccn_hud_node_graph" [boolean] \n"
 "    Enables/disables multiplayer node graph HUD element from the Debug build.";
 
+#define ccn_hud_weapon_durability_bars "hud_weapon_durability"
+const char *chm_hud_weapon_durability_bars = ccn_hud_weapon_durability_bars" [boolean] \n"
+"    Enables/disables weapon durability meter HUD elements.";
+
+#define ccn_hud_weapon_durability_x_offset_l "hud_weapon_durability_offset_x_left_weapon"
+const char *chm_hud_weapon_durability_x_offset_l = ccn_hud_weapon_durability_x_offset_l" [long] \n"
+"    Sets the horizontal offset (in pixels) for left-hand weapon durability meter HUD element.";
+
+#define ccn_hud_weapon_durability_x_offset_r "hud_weapon_durability_offset_x_right_weapon"
+const char *chm_hud_weapon_durability_x_offset_r = ccn_hud_weapon_durability_x_offset_r" [long] \n"
+"    Sets the horizontal offset (in pixels) for right-hand weapon durability meter HUD element.";
+
+#define ccn_hud_weapon_durability_y_offset "hud_weapon_durability_offset_y"
+const char *chm_hud_weapon_durability_y_offset = ccn_hud_weapon_durability_y_offset" [long] \n"
+"    Sets the vertical offset (in pixels) for weapon durability meter HUD elements.";
+
+#define ccn_hud_weapon_durability_scale "hud_weapon_durability_scale"
+const char *chm_hud_weapon_durability_scale = ccn_hud_weapon_durability_scale" [float] \n"
+"    Sets the size scaling for weapon durability meter HUD elements.";
+
 #define ccn_multiplayer_network "multiplayer_network"
 const char *chm_multiplayer_network = ccn_multiplayer_network" \n"
 "    Prints various multiplayer network information (Steam ID, ping, etc.) for each player in the current node network.";

@@ -14,6 +14,7 @@
 #include "AnimationEdits.h"
 #include "LadderFix.h"
 #include "Updates.h"
+#include "DurabilityBars.h"
 
 #include <regex>
 
@@ -99,7 +100,6 @@ bool Mod::gesture_cancelling = true;
 bool Mod::Debug::monitor_bdt = false;
 bool Mod::Debug::monitor_bhd = false;
 bool Mod::Debug::monitor_sl2 = false;
-
 
 
 // Get user-defined startup preferences from the settings file
@@ -211,6 +211,58 @@ void Mod::get_user_preferences()
     Mod::dim_lava_pref = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DIM_LAVA_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
     if (Mod::dim_lava_pref)
         print_console("    Lava visual effects will be dimmed");
+
+    // Check whether to display weapon durability bars on HUD
+    DurabilityBars::enable_pref = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_HUD_SECTION_, _DS1_OVERHAUL_PREF_DURABILITY_BARS_, DurabilityBars::render_data.display, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    if (DurabilityBars::enable_pref)
+    {
+        DurabilityBars::apply(true);
+        print_console("    Weapon durability bars = enabled");
+    }
+    else
+    {
+        print_console("    Weapon durability bars = disabled");
+    }
+
+    // Durability bar offsets (in pixels)
+    DurabilityBars::render_data.offset_left_x = (int)GetPrivateProfileInt(_DS1_OVERHAUL_HUD_SECTION_, _DS1_OVERHAUL_PREF_DURABILITY_OFFSET_L_X_, DurabilityBars::render_data.offset_left_x,  _DS1_OVERHAUL_SETTINGS_FILE_);
+    if (DurabilityBars::render_data.offset_left_x)
+    {
+        print_console("    Horizontal offset for  left-side durability bar = " + std::to_string(DurabilityBars::render_data.offset_left_x) + " pixels");
+    }
+    DurabilityBars::render_data.offset_right_x = (int)GetPrivateProfileInt(_DS1_OVERHAUL_HUD_SECTION_, _DS1_OVERHAUL_PREF_DURABILITY_OFFSET_R_X_, DurabilityBars::render_data.offset_right_x, _DS1_OVERHAUL_SETTINGS_FILE_);
+    if (DurabilityBars::render_data.offset_right_x)
+    {
+        print_console("    Horizontal offset for right-side durability bar = " + std::to_string(DurabilityBars::render_data.offset_right_x) + " pixels");
+    }
+    DurabilityBars::render_data.offset_y = (int)GetPrivateProfileInt(_DS1_OVERHAUL_HUD_SECTION_, _DS1_OVERHAUL_PREF_DURABILITY_OFFSET_Y_,   DurabilityBars::render_data.offset_y,       _DS1_OVERHAUL_SETTINGS_FILE_);
+    if (DurabilityBars::render_data.offset_y)
+    {
+        print_console("    Vertical offset for durability bars = " + std::to_string(DurabilityBars::render_data.offset_y) + " pixels");
+    }
+
+    // Durability bar scale
+    if (GetPrivateProfileString(_DS1_OVERHAUL_HUD_SECTION_, _DS1_OVERHAUL_PREF_DURABILITY_BAR_SCALE_, NULL, buffer, _DS1_OVERHAUL_SETTINGS_STRING_BUFF_LEN_, _DS1_OVERHAUL_SETTINGS_FILE_))
+    {
+        try
+        {
+            float dur_bar_scale = std::stof(std::string(buffer));
+            if (dur_bar_scale >= 0.0f)
+            {
+                DurabilityBars::render_data.scale = dur_bar_scale;
+                print_console("    Durability bar scale = " + std::to_string(DurabilityBars::render_data.scale));
+            }
+        }
+        catch (const std::invalid_argument&)
+        {
+            print_console(std::string("    ERROR: Invalid entry was ignored for ") + _DS1_OVERHAUL_PREF_DURABILITY_BAR_SCALE_);
+        }
+        catch (const std::out_of_range&)
+        {
+            print_console(std::string("    ERROR: Invalid entry was ignored for ") + _DS1_OVERHAUL_PREF_DURABILITY_BAR_SCALE_);
+        }
+    }
+    memset(buffer, 0, sizeof(char)*_DS1_OVERHAUL_SETTINGS_STRING_BUFF_LEN_);
 
 
     // Check whether to disable armor sound effects
@@ -334,6 +386,7 @@ void Mod::get_user_keybinds()
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_COMPASS_BAR_, kf_toggle_hud_compass_bar);
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_ELEVATION_METER_, kf_toggle_hud_elevation_meter);
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_NODE_GRAPH_, kf_toggle_hud_node_graph);
+    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_DURABILITY_BARS_, kf_toggle_hud_durability);
     
     // Toggle anti-cheats (not all are togglable)
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_AC_BINOCS_TRIG_BLOCK_, kf_toggle_ac_binocs_trigger_block);

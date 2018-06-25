@@ -15,6 +15,7 @@
 #include "Challenge/BlackPhantomEnemies.h"
 #include "Challenge/GravelordPhantoms.h"
 #include "LadderFix.h"
+#include "DurabilityBars.h"
 
 
 // Toggles mouse input
@@ -195,6 +196,17 @@ int kf_toggle_hud_node_graph()
         print_console("Enabled multiplayer node graph HUD element");
     else
         print_console("Disabled multiplayer node graph HUD element");
+    Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
+    return ERROR_SUCCESS;
+}
+
+int kf_toggle_hud_durability()
+{
+    DurabilityBars::enable_pref = !DurabilityBars::enable_pref;
+    if (DurabilityBars::enable_pref)
+        print_console("Enabled weapon durability HUD elements");
+    else
+        print_console("Disabled weapon durability HUD elements");
     Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
     return ERROR_SUCCESS;
 }
