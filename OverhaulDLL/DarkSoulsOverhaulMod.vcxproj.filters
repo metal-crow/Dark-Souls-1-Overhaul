@@ -90,9 +90,6 @@
     <ClCompile Include="src\AntiCheat\DragonTriggerBlock.cpp">
       <Filter>Source Files\AntiCheat</Filter>
     </ClCompile>
-    <ClCompile Include="src\AntiCheat\NpcGuard.cpp">
-      <Filter>Source Files\AntiCheat</Filter>
-    </ClCompile>
     <ClCompile Include="src\AntiCheat\TeleBackstabProtect.cpp">
       <Filter>Source Files\AntiCheat</Filter>
     </ClCompile>
@@ -193,5 +190,10 @@
     <None Include="include\XInputUtil.h">
       <Filter>Header Files</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="src\AntiCheat\NpcGuard.asm">
+      <Filter>Source Files\AntiCheat</Filter>
+    </MASM>
   </ItemGroup>
 </Project>
