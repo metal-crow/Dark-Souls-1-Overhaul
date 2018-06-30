@@ -90,7 +90,7 @@ public:
     static uint8_t *lava_luminosity;
 
     // Game saving on/off
-    static uint8_t *saves_enabled;
+    static sp::mem::pointer<uint8_t> saves_enabled;
 
     // Multiplayer node count
     static int node_count;
@@ -102,7 +102,7 @@ public:
     /////////////////////////////////////////
 
     // Initializes pointers and base addresses required for most other functions
-    static void init();
+    static bool init();
 
     // Runs tasks that were deferred until a character was loaded
     static void on_first_character_loaded();

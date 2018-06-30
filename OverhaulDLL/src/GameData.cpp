@@ -51,7 +51,7 @@ bool Game::characters_loaded = false;
 uint8_t *Game::lava_luminosity = NULL;
 
 // Game saving on/off
-uint8_t *Game::saves_enabled;
+sp::mem::pointer<uint8_t> Game::saves_enabled;
 
 // Multiplayer node count
 int Game::node_count = -1;
@@ -60,11 +60,8 @@ int Game::node_count = -1;
 Files::IoMonitor Files::io_monitors[9];
 
 
-
-
-
 // Initializes pointers and base addreWsses required for most other functions
-void Game::init()
+bool Game::init()
 {
     global::cmd_out << "Initializing pointers...\n";
 
@@ -74,21 +71,26 @@ void Game::init()
 
     // Base addr for world character data
     void* world_char_base_sp = sp::mem::aob_scan("48 8B 05 ? ? ? ? 48 8B 48 68 48 85 C9 0F 84 ? ? ? ? 48 39 5E 10 0F 84 ? ? ? ? 48");
-    if (world_char_base_sp) {
-        Game::world_char_base = ((uint64_t)world_char_base_sp + *(uint64_t*)((uint64_t)world_char_base_sp + 3) + 7);
+    if (world_char_base_sp == NULL) {
+        return false;
     }
-    else {
-        global::cmd_out << Mod::output_prefix + "!!ERROR!! Unable to get world_char_base\n";
+
+    Game::world_char_base = ((uint64_t)world_char_base_sp + *(uint32_t*)((uint64_t)world_char_base_sp + 3) + 7);
+
+    //XXX: crappy heuristic for checking if we got a valid ptr (game main has been entered)
+    if (Game::world_char_base > Game::ds1_base*1.5) {
+        return false;
     }
 
     // Game saving on/off
     void* saves_enabled_sp = sp::mem::aob_scan("48 8B 05 xx xx xx xx 0F 28 01 66 0F 7F 80 xx xx 00 00 C6 80");
-    if (saves_enabled_sp) {
-        Game::saves_enabled = sp::mem::pointer<uint8_t>((void*)((uint64_t)saves_enabled_sp + *(uint64_t*)((uint64_t)saves_enabled_sp + 3) + 7), { 0xB70 }).resolve();
+    if (saves_enabled_sp == NULL) {
+        return false;
     }
-    else {
-        global::cmd_out << Mod::output_prefix + "!!ERROR!! Unable to get saves_enabled byte\n";
-    }
+
+    Game::saves_enabled = sp::mem::pointer<uint8_t>((void*)((uint64_t)saves_enabled_sp + *(uint32_t*)((uint64_t)saves_enabled_sp + 3) + 7), { 0xB70 });
+    
+    return true;
 }
 
 

@@ -23,18 +23,12 @@ void start();
 namespace BossGuard {
     extern bool active;
     void start();
-
-    // Injected BossGuard assembly function
-    void __stdcall asm_check();
 } // namespace BossGuard
 
 
 namespace NpcGuard {
     extern bool active;
     void start();
-
-    // Injected NpcGuard assembly function
-    void __stdcall asm_check();
 } // namespace NpcGuard
 
 

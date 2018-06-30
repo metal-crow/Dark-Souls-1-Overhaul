@@ -10,19 +10,33 @@
 
 
 #include "AntiCheat.h"
-#include "DllMain_Legacy.h"
+#include "DarkSoulsOverhaulMod.h"
+#include "SP/memory/injection/asm/x64.h"
+
+extern "C" {
+    uint64_t npc_guard_WorldChrBase;
+    uint64_t npc_guard_check_exit;
+    void npc_guard_asm_check();
+}
 
 namespace AntiCheat {
 
 void start() {
-    if (!print_console(Mod::output_prefix + "Starting anti-cheat protections:"))
-        Mod::startup_messages.push_back(Mod::output_prefix + "Starting anti-cheat protections:");
+    global::cmd_out << Mod::output_prefix + "Starting anti-cheat protections:";
+    Mod::startup_messages.push_back(Mod::output_prefix + "Starting anti-cheat protections:");
+
     // Start NpcGuard anti-cheat
-    NpcGuard::start();
+    Mod::startup_messages.push_back("    Enabling NpcGuard...");
+    uint64_t write_address = Game::ds1_base + 0x3629DFD;
+    npc_guard_WorldChrBase = Game::world_char_base;
+    sp::mem::code::x64::inject_jmp_14b((void*)write_address, &npc_guard_check_exit, 1, &npc_guard_asm_check);
+    npc_guard_check_exit = 0x14031A898; //use as the jmp we're overwriting
+
+    //NpcGuard::start();
     // Start BossGuard anti-cheat
-    BossGuard::start();
+    //BossGuard::start();
     // Start TeleBackstabProtect anti-cheat
-    TeleBackstabProtect::start();
+    //TeleBackstabProtect::start();
 }
 
 } // namespace AntiCheat

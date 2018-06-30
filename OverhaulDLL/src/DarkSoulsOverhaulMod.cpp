@@ -10,12 +10,12 @@
 #include "SP/io/keybinds.h"
 
 #include "DarkSoulsOverhaulMod.h"
-#include "ModData.h"
-#include "GameData.h"
 #include "AntiAntiCheat.h"
+#include "AntiCheat.h"
 
 /*
     Called from DllMain when the plugin DLL is first loaded into memory (PROCESS_ATTACH case).
+    This means this code will be run before _any_ Dark Souls code is.
     NOTE: This function runs in the same thread as DllMain, so code implemented here will halt
     game loading. Code in this function should be limited to tasks that absolutely MUST be
     executed before the game loads. For less delicate startup tasks, use on_process_attach_async()
@@ -84,6 +84,8 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
 */
 DWORD WINAPI on_process_attach_async(LPVOID lpParam)
 {
+    // Start anti-cheat
+    AntiCheat::start();
     return 0;
 }
 
@@ -138,9 +140,6 @@ BOOL on_thread_detach(HMODULE h_module, LPVOID lp_reserved)
 */
 void on_process_attach()
 {
-    Mod::startup_messages.push_back(DS1_OVERHAUL_TXT_INTRO);
-    Mod::startup_messages.push_back("");
-
     // Load startup preferences from settings file
     Mod::get_startup_preferences();
 
