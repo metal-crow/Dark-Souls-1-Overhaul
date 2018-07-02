@@ -20,6 +20,9 @@
 #include "PhantomUnshackle.h"
 #include "MoveWhileCasting.h"
 #include "AnimationEdits.h"
+#include "Menu/Dialog.h"
+#include "Param/Params.h"
+#include "Param/Item.h"
 
 
 /*
@@ -106,6 +109,11 @@ void Game::on_first_character_loaded()
     // Disable armor sounds if it was specified in the config file
     if (Mod::disable_armor_sfx_pref)
         Game::enable_armor_sfx(false);
+
+    // Disable automatic equipping of items on pickup
+    if (Mod::disable_auto_equip_pref) {
+        Game::set_item_auto_equip(false);
+    }
 
     if (AnimationEdits::gesture_cancelling) {
         // Perform TAE edits to player animations to enable gesture cancelling
@@ -409,6 +417,26 @@ int Game::fix_bonfire_input(bool print_to_text_feed, bool print_to_console)
     }
 
     return ERROR_BAD_ENVIRONMENT;
+}
+
+
+// Enable/disable item auto-equip
+void Game::set_item_auto_equip(bool enabled)
+{
+    if (enabled)
+    {
+        for (size_t i = 0; i < Params::Goods().param_count; i++)
+        {
+            Params::Goods().get(i)->isAutoEquip = true;
+        }
+    }
+    else
+    {
+        for (size_t i = 0; i < Params::Goods().param_count; i++)
+        {
+            Params::Goods().get(i)->isAutoEquip = false;
+        }
+    }
 }
 
 

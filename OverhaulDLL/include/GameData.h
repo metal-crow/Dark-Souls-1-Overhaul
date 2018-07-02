@@ -144,6 +144,9 @@ public:
     // Set the current animation speed for the player character
     static void set_current_player_animation_speed(float speed);
 
+    // Enable/disable item auto-equip
+    static void set_item_auto_equip(bool enabled);
+
     // Returns current player character body animation ID (attacking, rolling, gestures, etc)
     static int32_t get_player_body_anim_id();
 
