@@ -1,3 +1,6 @@
 [submodule "OverhaulDLL/d3d11-wrapper"]
 	path = OverhaulDLL/d3d11-wrapper
 	url = https://github.com/SeanPesce/d3d11-wrapper.git
+[submodule "OverhaulDLL/lib/Cpp-Utilities"]
+	path = OverhaulDLL/lib/Cpp-Utilities
+	url = https://github.com/SeanPesce/Cpp-Utilities.git
