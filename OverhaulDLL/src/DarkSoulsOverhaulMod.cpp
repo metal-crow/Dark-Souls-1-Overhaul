@@ -12,6 +12,7 @@
 #include "DarkSoulsOverhaulMod.h"
 #include "AntiAntiCheat.h"
 #include "AntiCheat.h"
+#include "BloodborneRallySystem.h"
 
 /*
     Called from DllMain when the plugin DLL is first loaded into memory (PROCESS_ATTACH case).
@@ -84,8 +85,9 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
 */
 DWORD WINAPI on_process_attach_async(LPVOID lpParam)
 {
-    // Start anti-cheat
     AntiCheat::start();
+
+    BloodborneRally::start();
     return 0;
 }
 

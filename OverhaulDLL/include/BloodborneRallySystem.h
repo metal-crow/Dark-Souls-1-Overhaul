@@ -23,14 +23,10 @@ public:
 private:
     static void set_default_weapon_faith_requirements();
     static void set_weapon_faith_requirements();
-    static const uint32_t weapon_toggle_injection_offset = 0xB37F31;
-    static void __stdcall weapon_toggle_injection();
-    static const uint32_t current_selected_bar_injection_offset = 0x386D04;
-    static void __stdcall selected_bar_injection();
-    static const uint32_t control_timer_injection_offset = 0x888CED;
-    static void __stdcall control_timer_injection();
-    static const uint32_t main_rally_injection_offset = 0xA6BFE6;
-    static void __stdcall main_rally_injection();
+    static const uint32_t weapon_toggle_injection_offset = 0x204389;
+    static const uint32_t current_selected_bar_injection_offset = 0xECED5E;
+    static const uint32_t control_timer_injection_offset = 0x65F939;
+    static const uint32_t main_rally_injection_offset = 0x31A710;
 };
 
 #endif //_DS1_OVERHAUL_BB_RALLY_SYSTEM_H_

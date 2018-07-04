@@ -89,7 +89,9 @@ bool Game::init()
     }
 
     Game::saves_enabled = sp::mem::pointer<uint8_t>((void*)((uint64_t)saves_enabled_sp + *(uint32_t*)((uint64_t)saves_enabled_sp + 3) + 7), { 0xB70 });
-    
+
+    Game::player_char_status = sp::mem::pointer<uint32_t>((void*)(Game::world_char_base), { 0x68, 0xB4 });
+
     return true;
 }
 
@@ -117,7 +119,7 @@ void Game::on_first_character_loaded()
     //if (!Mod::legacy_mode)
     {
         // Enable rally system vfx
-        //BloodborneRally::on_char_load();
+        BloodborneRally::on_char_load();
 
         // Apply phantom unshackle patch
         //PhantomUnshackle::start();
@@ -482,15 +484,25 @@ int32_t Game::get_player_lower_body_anim_id()
     }
 }
 
-// Return current game time in milliseconds since the game has started
-uint32_t Game::get_game_time_ms()
+// Return pointer to current game time in milliseconds since the game has started
+uint32_t* Game::get_game_time_ms()
 {
     sp::mem::pointer timer = sp::mem::pointer<uint32_t>((void*)((uint64_t)Game::fmod_event64_base + 0x00077278), { 0x470, 0x40, 0x8C });
     if (timer.resolve() == NULL) {
-        return 0;
+        return NULL;
     }
     else {
-        return *(uint32_t*)timer.resolve();
+        return (uint32_t*)timer.resolve();
+    }
+}
+
+uint64_t Game::get_pc_entity_pointer() {
+    sp::mem::pointer entity_ptr = sp::mem::pointer<uint64_t>((void*)(Game::world_char_base), { 0x68 });
+    if (entity_ptr.resolve() == NULL) {
+        return NULL;
+    }
+    else {
+        return (uint64_t)entity_ptr.resolve();
     }
 }
 
@@ -513,7 +525,7 @@ void Game::unrestrict_network_synced_effectids()
     }
 }
 
-const float new_hpbar_max = 2633.0;
+float Game::new_hpbar_max = 2633.0;
 
 // Fix the bug where the player HP could be greater than the displayed GUI bar
 void Game::increase_gui_hpbar_max()
@@ -529,4 +541,34 @@ void Game::increase_gui_hpbar_max()
     else {
         global::cmd_out << (Mod::output_prefix + "!!ERROR!! Fixing hp bar.\n");
     }
+}
+
+uint32_t Game::left_hand_weapon() {
+    sp::mem::pointer weapon = sp::mem::pointer<uint32_t>((void*)(Game::world_char_base), { 0x68, 0x838, 0x24 });
+    if (weapon.resolve() == NULL) {
+        return 0;
+    }
+    else {
+        return *(uint32_t*)weapon.resolve();
+    }
+}
+
+uint32_t Game::right_hand_weapon() {
+    sp::mem::pointer weapon = sp::mem::pointer<uint32_t>((void*)(Game::world_char_base), { 0x68, 0x838, 0x28 });
+    if (weapon.resolve() == NULL) {
+        return 0;
+    }
+    else {
+        return *(uint32_t*)weapon.resolve();
+    }
+}
+
+int32_t Game::get_player_char_status() {
+    if (Game::player_char_status.resolve() == NULL) {
+        return DS1_PLAYER_STATUS_LOADING;
+    }
+    else {
+        return *(int32_t*)Game::player_char_status.resolve();
+    }
+
 }

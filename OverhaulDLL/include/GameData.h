@@ -150,8 +150,10 @@ public:
 
     static int32_t get_player_lower_body_anim_id();
 
-    // Return current game time in milliseconds since the game has started
-    static uint32_t get_game_time_ms();
+    // Return pointer to current game time in milliseconds since the game has started
+    static uint32_t* get_game_time_ms();
+
+	static uint64_t get_pc_entity_pointer();
 
 
                     /////////////////////////////////////////
@@ -164,8 +166,16 @@ public:
     // Allow effect IDs to be transferred between clients without bounds restrictions
     static void unrestrict_network_synced_effectids();
 
+    static float new_hpbar_max;
+
     // Fix the bug where the player HP could be greater than the displayed GUI bar
     static void increase_gui_hpbar_max();
+
+	static uint32_t left_hand_weapon();
+
+    static uint32_t right_hand_weapon();
+
+	static int32_t get_player_char_status();
 
     // Two-part patch to increase the multiplayer phantom limit:
     static void increase_phantom_limit1(); // Called from on_process_attach()
