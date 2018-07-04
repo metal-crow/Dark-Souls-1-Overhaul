@@ -192,11 +192,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="src\AntiCheat\NpcGuard.asm">
-      <Filter>Source Files\AntiCheat</Filter>
-    </MASM>
-    <MASM Include="src\BloodborneRallySystem.asm">
+    <MASM Include="src\BloodborneRallySystemASM.asm">
       <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="src\AntiCheat\NpcGuardASM.asm">
+      <Filter>Source Files\AntiCheat</Filter>
     </MASM>
   </ItemGroup>
 </Project>
