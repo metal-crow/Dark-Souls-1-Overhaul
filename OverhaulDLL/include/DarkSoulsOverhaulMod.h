@@ -33,5 +33,9 @@
 
 DWORD WINAPI on_process_attach_async(LPVOID lpParam);
 
+void inline FATALERROR(const char* error_str) {
+    MessageBox(NULL, error_str, NULL, MB_OK);
+    exit(1);
+}
 
 #endif

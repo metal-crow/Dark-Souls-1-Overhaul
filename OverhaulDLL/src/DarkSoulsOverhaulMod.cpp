@@ -86,8 +86,19 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
 DWORD WINAPI on_process_attach_async(LPVOID lpParam)
 {
     AntiCheat::start();
-
+    Game::increase_gui_hpbar_max();
     BloodborneRally::start();
+
+    // Wait for event: first character loaded in this instance of the game
+    int char_status = DS1_PLAYER_STATUS_LOADING;
+    while (char_status == DS1_PLAYER_STATUS_LOADING) {
+        char_status = Game::get_player_char_status();
+        Sleep(500);
+    }
+
+    // Perform tasks that rely on a character being loaded
+    Game::on_first_character_loaded();
+
     return 0;
 }
 

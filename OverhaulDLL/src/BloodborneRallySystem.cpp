@@ -11,72 +11,55 @@
 #include "SP/memory/injection/asm/x64.h"
 
 #define DS1_BB_RALLY_SYS_OCCULT_MAT_ID 700
+const uint64_t MAX_RALLY_RECOVERY_TIME_MS = 5000;
+
+// HP of the player before last hit
+uint32_t  beforehit_hp = UINT16_MAX;
+
+// Tracker for the number of hits the user has received
+uint64_t  gothit = 0;
 
 extern "C" {
     // Time (in milliseonds) player was last hit
-    uint64_t  beforehit_time;
+    uint64_t  beforehit_time = 0;
 
-    // HP of the player before last hit
-    uint32_t  beforehit_hp;
-
-    // UI bar currently in focus for the game to alter
-    uint32_t  current_selected_bar;
-
-    // Tracker for the number of hits the user has received
-    uint64_t  gothit;
-
-    //helper vars
-    uint64_t rally_system_WorldChrBase;
-    uint64_t MAX_RALLY_RECOVERY_TIME_MS;
-    uint64_t time_ms_ptr;
-    uint64_t RALLY_EFFECT_ID;
-    uint64_t lua_SetEventSpecialEffect_2;
-    uint64_t RALLY_CAPABLE_WEAPON_EFFECT_ID_RHAND;
-    uint64_t RALLY_CAPABLE_WEAPON_EFFECT_ID_LHAND;
-}
-
-extern "C" {
     uint64_t weapon_toggle_injection_return;
     void weapon_toggle_injection();
-    uint64_t current_selected_bar_injection_return;
-    void selected_bar_injection();
+
     uint64_t control_timer_injection_return;
     void control_timer_injection();
+    uint64_t control_timer_function(uint64_t, uint64_t);
+
     uint64_t main_rally_injection_return;
     void main_rally_injection();
-    uint64_t main_rally_function(uint64_t, uint64_t, uint64_t, uint64_t);
+    void main_rally_function(uint64_t, uint64_t, uint64_t, uint64_t);
+
+    void set_rally_regain_sfx();
+    uint32_t RALLY_EFFECT_ID = 92000; //hp regain sfx
     void set_rally_sfx_rhand();
+    uint32_t RALLY_CAPABLE_WEAPON_EFFECT_ID_RHAND = 92001; //weapon can perform rally indicator
     void set_rally_sfx_lhand();
+    uint32_t RALLY_CAPABLE_WEAPON_EFFECT_ID_LHAND = 92002; //weapon can perform rally indicator
+
+    uint64_t lua_SetEventSpecialEffect_2 = 0x1404a6160;
 }
 
 void BloodborneRally::start() {
-    global::cmd_out << Mod::output_prefix << "    Enabling Bloodborne Rally System...\n";
-    Mod::startup_messages.push_back("    Enabling Bloodborne Rally System...");
-
-    //helper vars
-    rally_system_WorldChrBase = Game::world_char_base;
-    MAX_RALLY_RECOVERY_TIME_MS = 5000;
-    time_ms_ptr = (uint64_t)Game::get_game_time_ms();
-    RALLY_EFFECT_ID = 92000;
-    lua_SetEventSpecialEffect_2 = 0x1404a6160;
-    RALLY_CAPABLE_WEAPON_EFFECT_ID_RHAND = 92001;
-    RALLY_CAPABLE_WEAPON_EFFECT_ID_LHAND = 92002;
+    global::cmd_out << Mod::output_prefix << "Enabling Bloodborne Rally System...\n";
+    Mod::startup_messages.push_back("Enabling Bloodborne Rally System...");
 
     // Inject function to clear rally on weapon toggle
     uint8_t *write_address = (uint8_t*)(BloodborneRally::weapon_toggle_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &weapon_toggle_injection_return, 5, &weapon_toggle_injection);
 
-    // Inject function to track which ui bar is being smoothed
-    write_address = (uint8_t*)(BloodborneRally::current_selected_bar_injection_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &current_selected_bar_injection_return, 1, &selected_bar_injection);
-
     // Inject function to control the timer for the current ui bar
     write_address = (uint8_t*)(BloodborneRally::control_timer_injection_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &control_timer_injection_return, 4, &control_timer_injection);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &control_timer_injection_return, 1, &control_timer_injection);
 
     // Inject function to perform the main rally code
     write_address = (uint8_t*)(BloodborneRally::main_rally_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &main_rally_injection_return, 2, &main_rally_injection);
+    main_rally_injection_return = 0x14031A898; //use as the jmp we're overwriting
 }
 
 static DWORD WINAPI Apply_rally_capable_sfx_and_starting_hp(void*);
@@ -184,6 +167,31 @@ void BloodborneRally::set_default_weapon_faith_requirements() {
 }
 #endif
 
+uint64_t control_timer_function(uint64_t bar_id, uint64_t orange_bar) {
+    //TODO get the other bar ids
+    if (bar_id == 0x24) {
+        uint32_t curtime = *Game::get_game_time_ms();
+        //not yet time to drop orange bar
+        if (beforehit_time + MAX_RALLY_RECOVERY_TIME_MS > curtime && gothit==1) {
+            return 1;
+        }
+        //drop orange bar
+        if (beforehit_time + MAX_RALLY_RECOVERY_TIME_MS <= curtime && gothit == 1) {
+            gothit = 0;
+            *((float*)(orange_bar + 0x60)) = 0;
+            return 1;
+        }
+        //got hit before previous timer went down. partially drop orange bar
+        if (gothit == 2) {
+            gothit = 1;
+            float new_orange_bar = (float)beforehit_hp / (float)Game::get_player_char_max_hp();
+            *((float*)(orange_bar + 0x60)) = new_orange_bar;
+            return 1;
+        }
+    }
+    return 0;
+}
+
 #define DARKHAND_ID 0xDCB40
 #define PRISCILLADAGGER_ID 0x19640
 #define VELKASRAPIER_ID 0x93378
@@ -210,27 +218,31 @@ static bool isOccult(uint32_t weaponid) {
     }
 }
 
-uint64_t __stdcall main_rally_function(uint64_t attacker, uint64_t target, uint64_t attack_data, uint64_t new_hp) {
+void main_rally_function(uint64_t attacker, uint64_t target, uint64_t attack_data, uint64_t new_hp) {
+    uint64_t pc_entity_ptr = Game::get_pc_entity_pointer();
+
     //if target is host
-    if (target == Game::get_pc_entity_pointer()) {
+    if (target == pc_entity_ptr) {
         //Save current time and player HP
         uint32_t curhp = *(uint32_t*)(target + 0x3D8);
-        beforehit_hp = max(curhp, (uint32_t)Game::new_hpbar_max);
+        //This sometimes gets called multiple times for 1 hit, so check
+        if (curhp == new_hp) return;
+        beforehit_hp = curhp;
         beforehit_time = *Game::get_game_time_ms();
         //Marker for getting hit (used for UI)
         gothit++;
         if (gothit <= 2) {
-            return new_hp;
+            return;
         }
         gothit = 2;
-        return new_hp;
+        return;
     }
 
     //if attacker is host
-    if (attacker == Game::get_pc_entity_pointer()) {
+    if (attacker == pc_entity_ptr) {
         if (*Game::get_game_time_ms() - beforehit_time < MAX_RALLY_RECOVERY_TIME_MS) {
             //check what weapon is used in attack (check hand in weapon_data)
-            int32_t weapon_hand = *(int32_t*)(attack_data + 0x4AC);
+            int32_t weapon_hand = *(int32_t*)(attack_data + 0x4A4);
 
             uint32_t weaponid;
             //R hand
@@ -242,27 +254,33 @@ uint64_t __stdcall main_rally_function(uint64_t attacker, uint64_t target, uint6
                 weaponid = Game::left_hand_weapon();
             }
             else {
-                return new_hp;
+                return;
             }
 
             if (isOccult(weaponid)) {
-                uint32_t oldhp = *(uint32_t*)(attacker + 0x3D8);
+                uint32_t curhp = *(uint32_t*)(attacker + 0x3D8);
+                uint32_t maxhp = *(uint32_t*)(attacker + 0x3DC);
+                uint32_t damage = beforehit_hp - curhp;
+
                 uint32_t upgrade = weaponid % 100;
                 float scale = 0.05f + (upgrade / 10.0f);
-                uint32_t damage = oldhp - (uint32_t)new_hp;
                 uint32_t recovery = (uint32_t)((float)damage * scale);
-                uint64_t rally_post_hp = min(oldhp, new_hp + recovery);
 
-                return rally_post_hp;
+                uint64_t rally_post_hp = min(maxhp, curhp + recovery);
+                *(uint32_t*)(attacker + 0x3D8) = rally_post_hp;
+
+                set_rally_regain_sfx();
+
+                return;
             }
         }
     }
 
-    return new_hp;
+    return;
 }
 
 static DWORD WINAPI Apply_rally_capable_sfx_and_starting_hp(void* unused) {
-    int char_status = DS1_PLAYER_STATUS_LOADING;
+    int32_t char_status = DS1_PLAYER_STATUS_LOADING;
 
     uint32_t weaponid_R = 0;
     uint32_t weaponid_L = 0;
@@ -272,6 +290,7 @@ static DWORD WINAPI Apply_rally_capable_sfx_and_starting_hp(void* unused) {
         beforehit_hp = UINT16_MAX;
 
         //only apply the rally sfx if character is loaded
+        //TODO BROKEN
         char_status = Game::get_player_char_status();
 
         while (char_status != DS1_PLAYER_STATUS_LOADING) {
@@ -290,6 +309,7 @@ static DWORD WINAPI Apply_rally_capable_sfx_and_starting_hp(void* unused) {
                 set_rally_sfx_lhand();
             }
 
+            Sleep(10);
             char_status = Game::get_player_char_status();
         }
 
