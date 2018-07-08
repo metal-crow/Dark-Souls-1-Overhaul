@@ -20,9 +20,9 @@ cmp  rax, r15 ; If entityPointer for local player == attacker
 pop  rax
 je bypass_check
 
-; rbx is entityPointer of target; check if they are a non-hostile NPC
+; rcx is entityPointer of target; check if they are a non-hostile NPC
 push rax
-mov  rax, [rbx + 578h] ;Event Entity ID for the target entity
+mov  rax, [rcx + 578h] ;Event Entity ID for the target entity
 
 ;Check for event ID of a protected NPC
 cmp rax, 1798h ; Griggs of Vinheim (Undead Burg)
@@ -171,14 +171,14 @@ jmp bypass_check
 
 abort_damage:
 pop rax
-; Set damage to 0
-mov edi, 0
+; Set hp to original
+mov edx, dword ptr [rcx+3D8h]
 
 bypass_check:
-mov     edx, [rbx+3D8h]
+mov     [rsp+10h], edx
 push    rbx
-pop     rcx
-add     edx, edi
+sub     rsp, 20h
+test    byte ptr [rcx+514h], 40h
 jmp     npc_guard_check_exit
 
 npc_guard_asm_check ENDP

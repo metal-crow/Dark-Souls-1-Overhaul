@@ -61,7 +61,7 @@ Files::IoMonitor Files::io_monitors[9];
 
 
 // Initializes pointers and base addreWsses required for most other functions
-bool Game::init()
+void Game::init()
 {
     global::cmd_out << "Initializing pointers...\n";
 
@@ -72,27 +72,25 @@ bool Game::init()
     // Base addr for world character data
     void* world_char_base_sp = sp::mem::aob_scan("48 8B 05 ? ? ? ? 48 8B 48 68 48 85 C9 0F 84 ? ? ? ? 48 39 5E 10 0F 84 ? ? ? ? 48");
     if (world_char_base_sp == NULL) {
-        return false;
+        FATALERROR("world_char_base_sp is null");
     }
 
     Game::world_char_base = ((uint64_t)world_char_base_sp + *(uint32_t*)((uint64_t)world_char_base_sp + 3) + 7);
 
     //XXX: crappy heuristic for checking if we got a valid ptr (game main has been entered)
     if (Game::world_char_base > Game::ds1_base*1.5) {
-        return false;
+        FATALERROR("world_char_base_sp is an invalid pointer");
     }
 
     // Game saving on/off
     void* saves_enabled_sp = sp::mem::aob_scan("48 8B 05 xx xx xx xx 0F 28 01 66 0F 7F 80 xx xx 00 00 C6 80");
     if (saves_enabled_sp == NULL) {
-        return false;
+        FATALERROR("saves_enabled_sp is null");
     }
 
     Game::saves_enabled = sp::mem::pointer<uint8_t>((void*)((uint64_t)saves_enabled_sp + *(uint32_t*)((uint64_t)saves_enabled_sp + 3) + 7), { 0xB70 });
 
     Game::player_char_status = sp::mem::pointer<uint32_t>((void*)(Game::world_char_base), { 0x68, 0xB4 });
-
-    return true;
 }
 
 
@@ -436,7 +434,7 @@ void Game::set_memory_limit()
     success &= set_memory_limit_chunk(0x200000  , 0x800000);
 
     if (!success) {
-        Mod::startup_messages.push_back(Mod::output_prefix + "!!ERROR!! Unable to increase game memory allocation size.");
+        FATALERROR((Mod::output_prefix + "!!ERROR!! Unable to increase game memory allocation size.").c_str());
     }
     else {
         Mod::startup_messages.push_back(Mod::output_prefix + "Increasing game memory allocation size.");
@@ -484,25 +482,42 @@ int32_t Game::get_player_lower_body_anim_id()
     }
 }
 
+
+static uint32_t* time_address = NULL;
 // Return pointer to current game time in milliseconds since the game has started
 uint32_t* Game::get_game_time_ms()
 {
+    //quick resolve
+    if (time_address) {
+        return time_address;
+    }
+    //first time resolve
     sp::mem::pointer timer = sp::mem::pointer<uint32_t>((void*)((uint64_t)Game::fmod_event64_base + 0x00077278), { 0x470, 0x40, 0x8C });
     if (timer.resolve() == NULL) {
+        FATALERROR("Unable to get pointer to current time.");
         return NULL;
     }
     else {
-        return (uint32_t*)timer.resolve();
+        time_address = timer.resolve();
+        return time_address;
     }
 }
 
+static uint64_t* pc_entity_ptr = NULL;
+
 uint64_t Game::get_pc_entity_pointer() {
+    //quick resolve
+    if (pc_entity_ptr) {
+        return *pc_entity_ptr;
+    }
+
     sp::mem::pointer entity_ptr = sp::mem::pointer<uint64_t>((void*)(Game::world_char_base), { 0x68 });
     if (entity_ptr.resolve() == NULL) {
         return NULL;
     }
     else {
-        return (uint64_t)entity_ptr.resolve();
+        pc_entity_ptr = entity_ptr.resolve();
+        return *pc_entity_ptr;
     }
 }
 
@@ -521,7 +536,7 @@ void Game::unrestrict_network_synced_effectids()
         sp::mem::patch_bytes((void*)((uint64_t)write_address+0xA), nop_patch, 3);
     }
     else {
-        global::cmd_out << (Mod::output_prefix + "!!ERROR!! Unrestricting effectIDs sent over network.\n");
+        FATALERROR((Mod::output_prefix + "!!ERROR!! Unrestricting effectIDs sent over network.").c_str());
     }
 }
 
@@ -539,7 +554,7 @@ void Game::increase_gui_hpbar_max()
         sp::mem::patch_bytes((void*)((uint64_t)write_address+6), (uint8_t*)&new_hpbar_max, 4);
     }
     else {
-        global::cmd_out << (Mod::output_prefix + "!!ERROR!! Fixing hp bar.\n");
+        FATALERROR((Mod::output_prefix + "!!ERROR!! Fixing hp bar.\n").c_str());
     }
 }
 
@@ -570,5 +585,14 @@ int32_t Game::get_player_char_status() {
     else {
         return *(int32_t*)Game::player_char_status.resolve();
     }
+}
 
+uint32_t Game::get_player_char_max_hp() {
+    sp::mem::pointer maxhp = sp::mem::pointer<uint32_t>((void*)(Game::world_char_base), { 0x68, 0x3DC });
+    if (maxhp.resolve() == NULL) {
+        return 0;
+    }
+    else {
+        return *(uint32_t*)maxhp.resolve();
+    }
 }

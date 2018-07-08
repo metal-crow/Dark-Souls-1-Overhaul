@@ -27,12 +27,10 @@ void start() {
 
     // Start NpcGuard anti-cheat
     Mod::startup_messages.push_back("    Enabling NpcGuard...");
-    uint64_t write_address = Game::ds1_base + 0x3629DFD;
+    uint64_t write_address = Game::ds1_base + 0x31A710; //TODO this function is hit a billion times on load, can't hook it. too slow
     npc_guard_WorldChrBase = Game::world_char_base;
-    sp::mem::code::x64::inject_jmp_14b((void*)write_address, &npc_guard_check_exit, 1, &npc_guard_asm_check);
-    npc_guard_check_exit = 0x14031A898; //use as the jmp we're overwriting
+    //sp::mem::code::x64::inject_jmp_14b((void*)write_address, &npc_guard_check_exit, 2, &npc_guard_asm_check);
 
-    //NpcGuard::start();
     // Start BossGuard anti-cheat
     //BossGuard::start();
     // Start TeleBackstabProtect anti-cheat

@@ -102,7 +102,7 @@ public:
     /////////////////////////////////////////
 
     // Initializes pointers and base addresses required for most other functions
-    static bool init();
+    static void init();
 
     // Runs tasks that were deferred until a character was loaded
     static void on_first_character_loaded();
@@ -176,6 +176,8 @@ public:
     static uint32_t right_hand_weapon();
 
 	static int32_t get_player_char_status();
+
+	static uint32_t get_player_char_max_hp();
 
     // Two-part patch to increase the multiplayer phantom limit:
     static void increase_phantom_limit1(); // Called from on_process_attach()
