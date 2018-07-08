@@ -266,7 +266,7 @@ void main_rally_function(uint64_t attacker, uint64_t target, uint64_t attack_dat
                 float scale = 0.05f + (upgrade / 10.0f);
                 uint32_t recovery = (uint32_t)((float)damage * scale);
 
-                uint64_t rally_post_hp = min(maxhp, curhp + recovery);
+                uint32_t rally_post_hp = min(maxhp, curhp + recovery);
                 *(uint32_t*)(attacker + 0x3D8) = rally_post_hp;
 
                 set_rally_regain_sfx();
