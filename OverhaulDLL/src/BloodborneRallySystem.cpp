@@ -290,7 +290,6 @@ static DWORD WINAPI Apply_rally_capable_sfx_and_starting_hp(void* unused) {
         beforehit_hp = UINT16_MAX;
 
         //only apply the rally sfx if character is loaded
-        //TODO BROKEN
         char_status = Game::get_player_char_status();
 
         while (char_status != DS1_PLAYER_STATUS_LOADING) {
