@@ -77,6 +77,11 @@ public:
     // Base address for world character data
     static uint64_t world_char_base;
 
+    // Base address for world character data
+    static uint64_t char_class_base;
+
+    static uint64_t frpg_net_base;
+
     // Player character status (loading, human, co-op, invader, hollow)
     static sp::mem::pointer<uint32_t> player_char_status;
 

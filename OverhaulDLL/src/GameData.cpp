@@ -38,6 +38,11 @@ uint64_t Game::player_char_base = NULL;
 // Base address for world character data
 uint64_t Game::world_char_base = NULL;
 
+// Base address for character class data
+uint64_t Game::char_class_base = NULL;
+
+uint64_t Game::frpg_net_base = NULL;
+
 // Player character status (loading, human, co-op, invader, hollow)
 sp::mem::pointer<uint32_t> Game::player_char_status;
 
@@ -74,12 +79,29 @@ void Game::init()
     if (world_char_base_sp == NULL) {
         FATALERROR("world_char_base_sp is null");
     }
-
     Game::world_char_base = ((uint64_t)world_char_base_sp + *(uint32_t*)((uint64_t)world_char_base_sp + 3) + 7);
-
     //XXX: crappy heuristic for checking if we got a valid ptr (game main has been entered)
     if (Game::world_char_base > Game::ds1_base*1.5) {
         FATALERROR("world_char_base_sp is an invalid pointer");
+    }
+
+    // Base addr for character class data
+    void* char_class_base_sp = sp::mem::aob_scan("48 8B 05 ? ? ? ? 48 85 C0 ? ? F3 0F 58 80 AC 00 00 00");
+    if (char_class_base_sp == NULL) {
+        FATALERROR("char_class_base_sp is null");
+    }
+    Game::char_class_base = ((uint64_t)char_class_base_sp + *(uint32_t*)((uint64_t)char_class_base_sp + 3) + 7);
+    if (Game::char_class_base > Game::ds1_base*1.5) {
+        FATALERROR("char_class_base_sp is an invalid pointer");
+    }
+
+    void* frpg_net_base_sp = sp::mem::aob_scan("48 8B 1D ? ? ? ? 48 8D 94 24 ? ? ? ? 4C 8B F1 0F 29 7C 24 40");
+    if (char_class_base_sp == NULL) {
+        FATALERROR("frpg_net_base_sp is null");
+    }
+    Game::frpg_net_base = ((uint64_t)frpg_net_base_sp + *(uint32_t*)((uint64_t)frpg_net_base_sp + 3) + 7);
+    if (Game::frpg_net_base > Game::ds1_base*1.5) {
+        FATALERROR("frpg_net_base_sp is an invalid pointer");
     }
 
     // Game saving on/off
@@ -90,7 +112,7 @@ void Game::init()
 
     Game::saves_enabled = sp::mem::pointer<uint8_t>((void*)((uint64_t)saves_enabled_sp + *(uint32_t*)((uint64_t)saves_enabled_sp + 3) + 7), { 0xB70 });
 
-    Game::player_char_status = sp::mem::pointer<uint32_t>((void*)(Game::world_char_base), { 0x68, 0xB4 });
+    Game::player_char_status = sp::mem::pointer<uint32_t>((void*)(Game::world_char_base), { 0x68, 0xD4 });
 }
 
 
@@ -292,18 +314,16 @@ void Game::enable_armor_sfx(bool enable)
 #endif
 
 // Returns multiplayer node count as an int (or -1 if player is not online)
-#if 0
 int Game::get_node_count()
 {
-    sp::mem::pointer node_count_ptr = sp::mem::pointer<int>((uint8_t*)ds1_base + 0xF7F77C, { 0x2C, 0x778, 0x80 });
+    sp::mem::pointer node_count_ptr = sp::mem::pointer<int>((void*)Game::frpg_net_base, { 0xAF0 });
 
-    // Get node count
-    int nodes = -1;
-    node_count_ptr.copy(&nodes);
-    return nodes;
+    if (node_count_ptr.resolve() == NULL) {
+        return -1;
+    }
+
+    return *node_count_ptr.resolve();
 }
-#endif
-
 
 // Additional HUD elements
 #if 0
@@ -443,18 +463,20 @@ void Game::set_memory_limit()
 
 // Set the current animation speed for the player character
 void Game::set_current_player_animation_speed(float speed) {
-    sp::mem::pointer speed_ptr = sp::mem::pointer<float>((void*)Game::world_char_base, { 0x68, 0x48, 0x18, 0xA8 });
-    if (speed_ptr.resolve() != NULL) {
-        *(float*)speed_ptr.resolve() = speed;
+    sp::mem::pointer speed_ptr = sp::mem::pointer<float>((void*)Game::world_char_base, { 0x68, 0x68, 0x18, 0xA8 });
+    if (speed_ptr.resolve() == NULL) {
+        FATALERROR("Unable to set_current_player_animation_speed.");
     }
+
+    *(float*)speed_ptr.resolve() = speed;
 }
 
 // Returns current player character body animation ID (attacking, rolling, gestures, etc)
 int32_t Game::get_player_body_anim_id()
 {
-    sp::mem::pointer anim_id = sp::mem::pointer<int32_t>((void*)Game::world_char_base, { 0x68, 0x48, 0x48, 0x80 });
+    sp::mem::pointer anim_id = sp::mem::pointer<int32_t>((void*)Game::world_char_base, { 0x68, 0x68, 0x48, 0x80 });
     if (anim_id.resolve() == NULL) {
-        return -1;
+        FATALERROR("Unable to get_player_body_anim_id.");
     } else {
         return *(int32_t*)anim_id.resolve();
     }
@@ -464,7 +486,7 @@ int32_t Game::get_player_upper_body_anim_id()
 {
     sp::mem::pointer anim_id = sp::mem::pointer<int32_t>((void*)Game::world_char_base, { 0x68, 0x30, 0x5D0, 0x690 });
     if (anim_id.resolve() == NULL) {
-        return -1;
+        FATALERROR("Unable to get_player_upper_body_anim_id.");
     }
     else {
         return *(int32_t*)anim_id.resolve();
@@ -475,7 +497,7 @@ int32_t Game::get_player_lower_body_anim_id()
 {
     sp::mem::pointer anim_id = sp::mem::pointer<int32_t>((void*)Game::world_char_base, { 0x68, 0x30, 0x5D0, 0x13B0 });
     if (anim_id.resolve() == NULL) {
-        return -1;
+        FATALERROR("Unable to get_player_lower_body_anim_id.");
     }
     else {
         return *(int32_t*)anim_id.resolve();
@@ -513,7 +535,7 @@ uint64_t Game::get_pc_entity_pointer() {
 
     sp::mem::pointer entity_ptr = sp::mem::pointer<uint64_t>((void*)(Game::world_char_base), { 0x68 });
     if (entity_ptr.resolve() == NULL) {
-        return NULL;
+        FATALERROR("Unable to get_pc_entity_pointer.");
     }
     else {
         pc_entity_ptr = entity_ptr.resolve();
@@ -559,9 +581,9 @@ void Game::increase_gui_hpbar_max()
 }
 
 uint32_t Game::left_hand_weapon() {
-    sp::mem::pointer weapon = sp::mem::pointer<uint32_t>((void*)(Game::world_char_base), { 0x68, 0x838, 0x24 });
+    sp::mem::pointer weapon = sp::mem::pointer<uint32_t>((void*)(Game::char_class_base), { 0x10, 0x324 });
     if (weapon.resolve() == NULL) {
-        return 0;
+        FATALERROR("Unable to get left_hand_weapon.");
     }
     else {
         return *(uint32_t*)weapon.resolve();
@@ -569,9 +591,9 @@ uint32_t Game::left_hand_weapon() {
 }
 
 uint32_t Game::right_hand_weapon() {
-    sp::mem::pointer weapon = sp::mem::pointer<uint32_t>((void*)(Game::world_char_base), { 0x68, 0x838, 0x28 });
+    sp::mem::pointer weapon = sp::mem::pointer<uint32_t>((void*)(Game::char_class_base), { 0x10, 0x328 });
     if (weapon.resolve() == NULL) {
-        return 0;
+        FATALERROR("Unable to get right_hand_weapon.");
     }
     else {
         return *(uint32_t*)weapon.resolve();
@@ -588,9 +610,9 @@ int32_t Game::get_player_char_status() {
 }
 
 uint32_t Game::get_player_char_max_hp() {
-    sp::mem::pointer maxhp = sp::mem::pointer<uint32_t>((void*)(Game::world_char_base), { 0x68, 0x3DC });
+    sp::mem::pointer maxhp = sp::mem::pointer<uint32_t>((void*)(Game::world_char_base), { 0x68, 0x3EC });
     if (maxhp.resolve() == NULL) {
-        return 0;
+        FATALERROR("Unable to get_player_char_max_hp.");
     }
     else {
         return *(uint32_t*)maxhp.resolve();
