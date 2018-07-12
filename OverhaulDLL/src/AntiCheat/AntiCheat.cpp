@@ -27,9 +27,9 @@ void start() {
 
     // Start NpcGuard anti-cheat
     Mod::startup_messages.push_back("    Enabling NpcGuard...");
-    uint64_t write_address = Game::ds1_base + 0x31A710;
+    uint64_t write_address = Game::ds1_base + 0x3206C0;
     npc_guard_WorldChrBase = Game::world_char_base;
-    sp::mem::code::x64::inject_jmp_14b((void*)write_address, &npc_guard_check_exit, 2, &npc_guard_asm_check);
+    sp::mem::code::x64::inject_jmp_14b((void*)write_address, &npc_guard_check_exit, 2, &npc_guard_asm_check, true);
 
     // Start BossGuard anti-cheat
     //BossGuard::start();

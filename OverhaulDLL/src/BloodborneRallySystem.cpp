@@ -59,7 +59,7 @@ void BloodborneRally::start() {
     // Inject function to perform the main rally code
     write_address = (uint8_t*)(BloodborneRally::main_rally_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &main_rally_injection_return, 2, &main_rally_injection);
-    main_rally_injection_return = 0x14031A898; //use as the jmp we're overwriting
+    main_rally_injection_return = 0x140320848; //use as the jmp we're overwriting
 }
 
 static DWORD WINAPI Apply_rally_capable_sfx_and_starting_hp(void*);
@@ -224,7 +224,7 @@ void main_rally_function(uint64_t attacker, uint64_t target, uint64_t attack_dat
     //if target is host
     if (target == pc_entity_ptr) {
         //Save current time and player HP
-        uint32_t curhp = *(uint32_t*)(target + 0x3D8);
+        uint32_t curhp = *(uint32_t*)(target + 0x3E8);
         //This sometimes gets called multiple times for 1 hit, so check
         if (curhp == new_hp) return;
         beforehit_hp = curhp;
@@ -258,8 +258,8 @@ void main_rally_function(uint64_t attacker, uint64_t target, uint64_t attack_dat
             }
 
             if (isOccult(weaponid)) {
-                uint32_t curhp = *(uint32_t*)(attacker + 0x3D8);
-                uint32_t maxhp = *(uint32_t*)(attacker + 0x3DC);
+                uint32_t curhp = *(uint32_t*)(attacker + 0x3E8);
+                uint32_t maxhp = *(uint32_t*)(attacker + 0x3EC);
                 uint32_t damage = beforehit_hp - curhp;
 
                 uint32_t upgrade = weaponid % 100;
@@ -267,7 +267,7 @@ void main_rally_function(uint64_t attacker, uint64_t target, uint64_t attack_dat
                 uint32_t recovery = (uint32_t)((float)damage * scale);
 
                 uint32_t rally_post_hp = min(maxhp, curhp + recovery);
-                *(uint32_t*)(attacker + 0x3D8) = rally_post_hp;
+                *(uint32_t*)(attacker + 0x3E8) = rally_post_hp;
 
                 set_rally_regain_sfx();
 

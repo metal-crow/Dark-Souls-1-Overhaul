@@ -12,6 +12,7 @@ npc_guard_asm_check PROC
 
 ; r15 is entityPointer of the attacker
 ; If local player is attacking, do not protect NPCs
+;TODO not working
 push rax
 mov  rax, QWORD PTR [npc_guard_WorldChrBase]
 mov  rax, [rax]
@@ -171,14 +172,14 @@ jmp bypass_check
 
 abort_damage:
 pop rax
-; Set hp to original
-mov edx, dword ptr [rcx+3D8h]
+; Set hp to original TODO BUG: when loading a character, this means everyone is set to 1 hp
+mov edx, dword ptr [rcx+3E8h]
 
 bypass_check:
 mov     [rsp+10h], edx
 push    rbx
 sub     rsp, 20h
-test    byte ptr [rcx+514h], 40h
+test    byte ptr [rcx+524h], 40h
 jmp     npc_guard_check_exit
 
 npc_guard_asm_check ENDP

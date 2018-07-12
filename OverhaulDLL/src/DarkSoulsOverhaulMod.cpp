@@ -13,6 +13,7 @@
 #include "AntiAntiCheat.h"
 #include "AntiCheat.h"
 #include "BloodborneRallySystem.h"
+#include "DeadAngles.h"
 
 /*
     Called from DllMain when the plugin DLL is first loaded into memory (PROCESS_ATTACH case).
@@ -27,7 +28,7 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
     global::cmd_out << DS1_OVERHAUL_TXT_INTRO "\n\n";
 
     Game::init();
-    AntiAntiCheat::start();
+    //TODO AntiAntiCheat::start();
 
     CreateThread(NULL,  // Default security attributes
                  0,     // Use default stack size
@@ -88,6 +89,7 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     AntiCheat::start();
     Game::increase_gui_hpbar_max();
     BloodborneRally::start();
+    DeadAngles::start();
 
     // Wait for event: first character loaded in this instance of the game
     int char_status = DS1_PLAYER_STATUS_LOADING;
