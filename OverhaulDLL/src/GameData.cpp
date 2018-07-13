@@ -402,10 +402,8 @@ void Game::enable_low_fps_disconnect(bool enable)
     }
 }
 
-static bool set_memory_limit_chunk(uint64_t default_chunk_size, uint64_t new_chunk_size)
+static void set_memory_limit_chunk(uint64_t default_chunk_size, uint64_t new_chunk_size)
 {
-    bool success = true;
-
     //what to scan for
     uint8_t *orig_mem_limit_bytes = (uint8_t*)&default_chunk_size;
     uint8_t aob1[] = { 0xB9, orig_mem_limit_bytes[0], orig_mem_limit_bytes[1], orig_mem_limit_bytes[2], orig_mem_limit_bytes[3], 0xE8 };
@@ -418,47 +416,42 @@ static bool set_memory_limit_chunk(uint64_t default_chunk_size, uint64_t new_chu
 
     //immediate 1
     void *write_address = sp::mem::aob_scan(aob1, sizeof(aob1));
-    success &= (write_address != NULL);
+    if(write_address == NULL)
+        FATALERROR((Mod::output_prefix + "!!ERROR!! Unable to increase game memory allocation size for aob1 of size %x").c_str(), default_chunk_size);
     if (write_address)
         sp::mem::patch_bytes(write_address, patch1, sizeof(patch1));
 
     //immediate 2 and 3
     write_address = sp::mem::aob_scan(aob2, sizeof(aob2));
-    success &= (write_address != NULL);
+    if (write_address == NULL)
+        FATALERROR((Mod::output_prefix + "!!ERROR!! Unable to increase game memory allocation size for aob2 of size %x").c_str(), default_chunk_size);
     if (write_address)
         sp::mem::patch_bytes(write_address, patch2, sizeof(patch2));
 
     write_address = sp::mem::aob_scan(aob2, sizeof(aob2), 0, write_address);
-    success &= (write_address != NULL);
+    if (write_address == NULL)
+        FATALERROR((Mod::output_prefix + "!!ERROR!! Unable to increase game memory allocation size for aob2 of size %x").c_str(), default_chunk_size);
     if (write_address)
         sp::mem::patch_bytes(write_address, patch2, sizeof(patch2));
-
-    return success;
 }
 
 // Set available pool of memory that Dark Souls allocates for itself
 void Game::set_memory_limit()
 {
-    bool success = true;
-    success &= set_memory_limit_chunk(0x1C200000, 0x7C200000);
-    success &= set_memory_limit_chunk(0x500000  , 0xA00000);
-    success &= set_memory_limit_chunk(0x1800000 , 0x7800000);
-    success &= set_memory_limit_chunk(0x4000000 , 0xB000000);
-    success &= set_memory_limit_chunk(0x390000  , 0xB00000);
-    success &= set_memory_limit_chunk(0x1320000 , 0x7320000);
-    success &= set_memory_limit_chunk(0x400000  , 0xB00000);
-    success &= set_memory_limit_chunk(0x800000  , 0xF00000);
-    success &= set_memory_limit_chunk(0x380000  , 0xA80000);
-    success &= set_memory_limit_chunk(0x5280000 , 0xB280000);
-    success &= set_memory_limit_chunk(0xE0000   , 0x400000);
-    success &= set_memory_limit_chunk(0x200000  , 0x800000);
+    set_memory_limit_chunk(0x1C200000, 0x7C200000);
+    set_memory_limit_chunk(0x500000  , 0xA00000);
+    set_memory_limit_chunk(0x2000000 , 0x7800000);
+    set_memory_limit_chunk(0x4000000 , 0xB000000);
+    set_memory_limit_chunk(0x390000  , 0xB00000);
+    set_memory_limit_chunk(0x1320000 , 0x7320000);
+    set_memory_limit_chunk(0x400000  , 0xB00000);
+    set_memory_limit_chunk(0x800000  , 0xF00000);
+    set_memory_limit_chunk(0x380000  , 0xA80000);
+    set_memory_limit_chunk(0x5280000 , 0xB280000);
+    set_memory_limit_chunk(0xE0000   , 0x400000);
+    set_memory_limit_chunk(0x200000  , 0x800000);
 
-    if (!success) {
-        FATALERROR((Mod::output_prefix + "!!ERROR!! Unable to increase game memory allocation size.").c_str());
-    }
-    else {
-        Mod::startup_messages.push_back(Mod::output_prefix + "Increasing game memory allocation size.");
-    }
+    Mod::startup_messages.push_back(Mod::output_prefix + "Increasing game memory allocation size.");
 }
 
 // Set the current animation speed for the player character
