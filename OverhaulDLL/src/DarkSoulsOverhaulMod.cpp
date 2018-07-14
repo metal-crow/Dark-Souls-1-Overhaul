@@ -28,7 +28,7 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
     global::cmd_out << DS1_OVERHAUL_TXT_INTRO "\n\n";
 
     Game::init();
-    //TODO AntiAntiCheat::start();
+    AntiAntiCheat::start();
 
     CreateThread(NULL,  // Default security attributes
                  0,     // Use default stack size
