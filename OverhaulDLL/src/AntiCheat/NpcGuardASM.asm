@@ -12,7 +12,6 @@ npc_guard_asm_check PROC
 
 ; r15 is entityPointer of the attacker
 ; If local player is attacking, do not protect NPCs
-;TODO not working
 push rax
 mov  rax, QWORD PTR [npc_guard_WorldChrBase]
 mov  rax, [rax]
@@ -21,9 +20,9 @@ cmp  rax, r15 ; If entityPointer for local player == attacker
 pop  rax
 je bypass_check
 
-; rcx is entityPointer of target; check if they are a non-hostile NPC
+; rbx is entityPointer of target; check if they are a non-hostile NPC
 push rax
-mov  rax, [rcx + 578h] ;Event Entity ID for the target entity
+mov  rax, [rbx + 578h] ;Event Entity ID for the target entity
 
 ;Check for event ID of a protected NPC
 cmp rax, 1798h ; Griggs of Vinheim (Undead Burg)
@@ -172,14 +171,10 @@ jmp bypass_check
 
 abort_damage:
 pop rax
-; Set hp to original TODO BUG: when loading a character, this means everyone is set to 1 hp
-mov edx, dword ptr [rcx+3E8h]
+; Set damage to 0
+mov edi, 0
 
 bypass_check:
-mov     [rsp+10h], edx
-push    rbx
-sub     rsp, 20h
-test    byte ptr [rcx+524h], 40h
 jmp     npc_guard_check_exit
 
 npc_guard_asm_check ENDP

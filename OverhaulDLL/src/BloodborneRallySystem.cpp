@@ -58,7 +58,7 @@ void BloodborneRally::start() {
 
     // Inject function to perform the main rally code
     write_address = (uint8_t*)(BloodborneRally::main_rally_injection_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &main_rally_injection_return, 2, &main_rally_injection);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &main_rally_injection_return, 2, &main_rally_injection, true);
     main_rally_injection_return = 0x140320848; //use as the jmp we're overwriting
 }
 
