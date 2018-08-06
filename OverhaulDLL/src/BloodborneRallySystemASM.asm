@@ -29,6 +29,7 @@ PUBLIC control_timer_injection
 control_timer_injection PROC
 
 ;save temp registers
+sub     rsp, 8 ;make 16 aligned
 sub     rsp, 10h
 movdqu  [rsp], xmm0
 sub     rsp, 10h
@@ -61,6 +62,7 @@ movdqu  xmm1, [rsp]
 add     rsp, 10h
 movdqu  xmm0, [rsp]
 add     rsp, 10h
+add     rsp, 8
 
 ;original code
 movss   xmm0, dword ptr [rcx+60h]
@@ -82,6 +84,7 @@ movdqu  xmm1, [rsp]
 add     rsp, 10h
 movdqu  xmm0, [rsp]
 add     rsp, 10h
+add     rsp, 8
 
 ;set the SSE regs to the desired value
 movss   xmm2, dword ptr [rcx+60h]
