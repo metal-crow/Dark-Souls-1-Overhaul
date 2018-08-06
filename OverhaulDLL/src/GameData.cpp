@@ -611,3 +611,14 @@ uint32_t Game::get_player_char_max_hp() {
         return *(uint32_t*)maxhp.resolve();
     }
 }
+
+//Returns a value between -PI and PI
+float Game::get_entity_rotation(void* entity_ptr) {
+    sp::mem::pointer rotation = sp::mem::pointer<float>((void*)((uint64_t)entity_ptr + 0x68), { 0x28, 0x4 });
+    if (rotation.resolve() == NULL) {
+        FATALERROR("Unable to get_entity_rotation.");
+    }
+    else {
+        return *(float*)rotation.resolve();
+    }
+}

@@ -7,7 +7,7 @@
 extern "C" {
     uint64_t main_dead_angle_injection_return;
     void main_dead_angle_injection();
-    uint32_t main_dead_angle_helper(uint64_t, uint64_t);
+    uint64_t main_dead_angle_helper(uint64_t, uint64_t);
 }
 
 void DeadAngles::start() {
@@ -15,22 +15,28 @@ void DeadAngles::start() {
     Mod::startup_messages.push_back("Enabling Dead Angles...");
 
     uint8_t *write_address = (uint8_t*)(DeadAngles::main_dead_angle_injection_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &main_dead_angle_injection_return, 2, &main_dead_angle_injection, true);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &main_dead_angle_injection_return, 2, &main_dead_angle_injection);
 }
 
-static const float dead_angle_degree = 60.0;
+static const float dead_angle_radians = (float)(75.0 * (M_PI/180.0));
 
-uint32_t main_dead_angle_helper(uint64_t attacker, uint64_t target) {
-    //These are tracked as PI to -PI
-    float target_heading = *((uint64_t*)(*((uint64_t*)(*((uint64_t*)(target + 0x48)) + 0x28)) + 0x4));
-    float attacker_heading_ajusted = *((uint64_t*)(*((uint64_t*)(*((uint64_t*)(attacker + 0x48)) + 0x28)) + 0x4)) + M_PI; //Adjust by adding 180 degrees to account for faceing
-    float angle_diff = abs(attacker_heading_ajusted - target_heading);
+//char pout[200];
 
-    // If attack is < X degrees of target's heading, ignored
-    if (angle_diff < dead_angle_degree) {
+uint64_t main_dead_angle_helper(uint64_t attacker, uint64_t target) {
+    //normalize both angles from 0 to 2PI
+    float target_heading = (float)(Game::get_entity_rotation((void*)target) + M_PI);
+    float attacker_heading = (float)(Game::get_entity_rotation((void*)attacker) + M_PI);
+
+    float angle_diff = (float)abs((attacker_heading - M_PI) - target_heading);
+
+    // If attack is > X degrees of target's heading, dead angle
+    if (angle_diff > dead_angle_radians) {
+        //sprintf_s(pout, 200, "Atk=%f Tgt=%f Angle=%f\n", attacker_heading, target_heading, angle_diff);
+        //global::cmd_out << pout;
         return 0;
     }
-
-    //TODO how do i determine damage?
-    global::cmd_out << "Dead angle";
+    //tell asm not to do anything
+    else {
+        return 1;
+    }
 }
