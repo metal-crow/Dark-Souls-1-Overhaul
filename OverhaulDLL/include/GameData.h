@@ -184,6 +184,8 @@ public:
 
 	static uint32_t get_player_char_max_hp();
 
+	static float get_entity_rotation(void * entity_ptr);
+
     // Two-part patch to increase the multiplayer phantom limit:
     static void increase_phantom_limit1(); // Called from on_process_attach()
     static void increase_phantom_limit2(); // Called from initialize_plugin()
