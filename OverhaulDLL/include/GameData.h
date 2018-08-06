@@ -186,6 +186,13 @@ public:
 
 	static float get_entity_rotation(void * entity_ptr);
 
+    /*
+     * Help speedup some functions by, whenever we're loaded into an area,
+     * preload/preresolve some pointers and values so they can be much more quickly read when we need them
+     * This function should be called whenever an area is loaded (after player status changes from loading)
+    */
+	static void preload_function_caches();
+
     // Two-part patch to increase the multiplayer phantom limit:
     static void increase_phantom_limit1(); // Called from on_process_attach()
     static void increase_phantom_limit2(); // Called from initialize_plugin()

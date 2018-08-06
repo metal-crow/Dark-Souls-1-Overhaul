@@ -163,8 +163,36 @@ void Game::on_first_character_loaded()
     //}
 }
 
+
+static void resolve_current_player_animation_speed();
+
+/*
+ * Help speedup some functions by, whenever we're loaded into an area,
+ * preload/preresolve some pointers and values so they can be much more quickly read when we need them
+ * This function should be called whenever an area is loaded (after player status changes from loading)
+*/
+static bool one_time_only_caches = false; //some caches only need to be preloaded once per game start
+
+void Game::preload_function_caches() {
+
+    if (!one_time_only_caches) {
+        Game::get_pc_entity_pointer();
+        Game::get_game_time_ms();
+        one_time_only_caches = true;
+    }
+
+    Game::left_hand_weapon();
+    Game::right_hand_weapon();
+    Game::get_player_char_max_hp();
+    resolve_current_player_animation_speed();
+    Game::get_player_body_anim_id();
+    Game::get_player_upper_body_anim_id();
+    Game::get_player_lower_body_anim_id();
+}
+
 // Performs tasks that must be rerun after any loading screen
 void Game::on_reloaded() {
+    preload_function_caches();
 
     /*//refresh the animation table pointers
     for (int i = 0; i < sizeof(pc_animation_table) / sizeof(void**); i++) {
@@ -454,46 +482,78 @@ void Game::set_memory_limit()
     Mod::startup_messages.push_back(Mod::output_prefix + "Increasing game memory allocation size.");
 }
 
-// Set the current animation speed for the player character
-void Game::set_current_player_animation_speed(float speed) {
+static float* set_current_player_animation_speed_cache = NULL;
+
+static void resolve_current_player_animation_speed() {
     sp::mem::pointer speed_ptr = sp::mem::pointer<float>((void*)Game::world_char_base, { 0x68, 0x68, 0x18, 0xA8 });
     if (speed_ptr.resolve() == NULL) {
         FATALERROR("Unable to set_current_player_animation_speed.");
     }
 
-    *(float*)speed_ptr.resolve() = speed;
+    set_current_player_animation_speed_cache = (float*)speed_ptr.resolve();
+}
+
+// Set the current animation speed for the player character
+void Game::set_current_player_animation_speed(float speed) {
+    if (set_current_player_animation_speed_cache) {
+        *set_current_player_animation_speed_cache = speed;
+    }
+
+    resolve_current_player_animation_speed();
+    *set_current_player_animation_speed_cache = speed;
 }
 
 // Returns current player character body animation ID (attacking, rolling, gestures, etc)
+static int32_t* player_body_anim_id_cache = NULL;
+
 int32_t Game::get_player_body_anim_id()
 {
+    if (player_body_anim_id_cache) {
+        return *player_body_anim_id_cache;
+    }
+
     sp::mem::pointer anim_id = sp::mem::pointer<int32_t>((void*)Game::world_char_base, { 0x68, 0x68, 0x48, 0x80 });
     if (anim_id.resolve() == NULL) {
         FATALERROR("Unable to get_player_body_anim_id.");
     } else {
-        return *(int32_t*)anim_id.resolve();
+        player_body_anim_id_cache = (int32_t*)anim_id.resolve();
+        return *player_body_anim_id_cache;
     }
 }
 
+static int32_t* player_upper_body_anim_id_cache = NULL;
+
 int32_t Game::get_player_upper_body_anim_id()
 {
+    if (player_upper_body_anim_id_cache) {
+        return *player_upper_body_anim_id_cache;
+    }
+
     sp::mem::pointer anim_id = sp::mem::pointer<int32_t>((void*)Game::world_char_base, { 0x68, 0x30, 0x5D0, 0x690 });
     if (anim_id.resolve() == NULL) {
         FATALERROR("Unable to get_player_upper_body_anim_id.");
     }
     else {
-        return *(int32_t*)anim_id.resolve();
+        player_upper_body_anim_id_cache = (int32_t*)anim_id.resolve();;
+        return *player_upper_body_anim_id_cache;
     }
 }
 
+static int32_t* player_lower_body_anim_id_cache = NULL;
+
 int32_t Game::get_player_lower_body_anim_id()
 {
+    if (player_lower_body_anim_id_cache) {
+        return *player_lower_body_anim_id_cache;
+    }
+
     sp::mem::pointer anim_id = sp::mem::pointer<int32_t>((void*)Game::world_char_base, { 0x68, 0x30, 0x5D0, 0x13B0 });
     if (anim_id.resolve() == NULL) {
         FATALERROR("Unable to get_player_lower_body_anim_id.");
     }
     else {
-        return *(int32_t*)anim_id.resolve();
+        player_lower_body_anim_id_cache = (int32_t*)anim_id.resolve();
+        return *player_lower_body_anim_id_cache;
     }
 }
 
@@ -573,23 +633,37 @@ void Game::increase_gui_hpbar_max()
     }
 }
 
+static uint32_t* left_hand_weapon_ptr_cache = NULL;
+
 uint32_t Game::left_hand_weapon() {
+    if (left_hand_weapon_ptr_cache) {
+        return *left_hand_weapon_ptr_cache;
+    }
+
     sp::mem::pointer weapon = sp::mem::pointer<uint32_t>((void*)(Game::char_class_base), { 0x10, 0x324 });
     if (weapon.resolve() == NULL) {
         FATALERROR("Unable to get left_hand_weapon.");
     }
     else {
-        return *(uint32_t*)weapon.resolve();
+        left_hand_weapon_ptr_cache = (uint32_t*)weapon.resolve();
+        return *left_hand_weapon_ptr_cache;
     }
 }
 
+static uint32_t* right_hand_weapon_ptr_cache = NULL;
+
 uint32_t Game::right_hand_weapon() {
+    if (right_hand_weapon_ptr_cache) {
+        return *right_hand_weapon_ptr_cache;
+    }
+
     sp::mem::pointer weapon = sp::mem::pointer<uint32_t>((void*)(Game::char_class_base), { 0x10, 0x328 });
     if (weapon.resolve() == NULL) {
         FATALERROR("Unable to get right_hand_weapon.");
     }
     else {
-        return *(uint32_t*)weapon.resolve();
+        right_hand_weapon_ptr_cache = (uint32_t*)weapon.resolve();
+        return *right_hand_weapon_ptr_cache;
     }
 }
 
@@ -602,23 +676,30 @@ int32_t Game::get_player_char_status() {
     }
 }
 
+static uint32_t* player_char_max_hp_cache = NULL;
+
 uint32_t Game::get_player_char_max_hp() {
+    if (player_char_max_hp_cache) {
+        return *player_char_max_hp_cache;
+    }
+
     sp::mem::pointer maxhp = sp::mem::pointer<uint32_t>((void*)(Game::world_char_base), { 0x68, 0x3EC });
     if (maxhp.resolve() == NULL) {
         FATALERROR("Unable to get_player_char_max_hp.");
     }
     else {
-        return *(uint32_t*)maxhp.resolve();
+        player_char_max_hp_cache = (uint32_t*)maxhp.resolve();
+        return *player_char_max_hp_cache;
     }
 }
 
 //Returns a value between -PI and PI
 float Game::get_entity_rotation(void* entity_ptr) {
     sp::mem::pointer rotation = sp::mem::pointer<float>((void*)((uint64_t)entity_ptr + 0x68), { 0x28, 0x4 });
-    if (rotation.resolve() == NULL) {
+    if (rotation.fast_resolve() == NULL) {
         FATALERROR("Unable to get_entity_rotation.");
     }
     else {
-        return *(float*)rotation.resolve();
+        return *(float*)rotation.fast_resolve();
     }
 }
