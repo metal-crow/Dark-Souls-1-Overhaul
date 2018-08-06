@@ -101,6 +101,22 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     // Perform tasks that rely on a character being loaded
     Game::on_first_character_loaded();
 
+    //All actions finished, continue to run in background
+    while (true) {
+
+        // Check if the character is loading, and apply actions that need to be _reapplied_ after every loading screen
+        int32_t char_status = Game::get_player_char_status();
+        if (char_status == DS1_PLAYER_STATUS_LOADING) {
+            while (char_status == DS1_PLAYER_STATUS_LOADING) {
+                char_status = Game::get_player_char_status();
+                Sleep(50);
+            }
+            Game::on_reloaded();
+        }
+
+        Sleep(250);
+    }
+
     return 0;
 }
 
