@@ -164,7 +164,7 @@ void Game::on_first_character_loaded()
 }
 
 
-static void resolve_current_player_animation_speed();
+static bool resolve_current_player_animation_speed();
 
 /*
  * Help speedup some functions by, whenever we're loaded into an area,
@@ -184,10 +184,17 @@ void Game::preload_function_caches() {
     Game::left_hand_weapon();
     Game::right_hand_weapon();
     Game::get_player_char_max_hp();
-    resolve_current_player_animation_speed();
     Game::get_player_body_anim_id();
     Game::get_player_upper_body_anim_id();
     Game::get_player_lower_body_anim_id();
+    Sleep(10);
+    //this pointer is a bit late to resolve on load
+    uint_fast8_t i;
+    for(i=0;i<16;i++) {
+        if (resolve_current_player_animation_speed()) break;
+        Sleep(1);
+    }
+    if (i>=16) FATALERROR("Unable to set_current_player_animation_speed.");
 }
 
 // Performs tasks that must be rerun after any loading screen
@@ -484,13 +491,14 @@ void Game::set_memory_limit()
 
 static float* set_current_player_animation_speed_cache = NULL;
 
-static void resolve_current_player_animation_speed() {
+static bool resolve_current_player_animation_speed() {
     sp::mem::pointer speed_ptr = sp::mem::pointer<float>((void*)Game::world_char_base, { 0x68, 0x68, 0x18, 0xA8 });
     if (speed_ptr.resolve() == NULL) {
-        FATALERROR("Unable to set_current_player_animation_speed.");
+        return false;
     }
 
     set_current_player_animation_speed_cache = (float*)speed_ptr.resolve();
+    return true;
 }
 
 // Set the current animation speed for the player character
@@ -499,7 +507,9 @@ void Game::set_current_player_animation_speed(float speed) {
         *set_current_player_animation_speed_cache = speed;
     }
 
-    resolve_current_player_animation_speed();
+    if (!resolve_current_player_animation_speed()) {
+        FATALERROR("Unable to set_current_player_animation_speed.");
+    }
     *set_current_player_animation_speed_cache = speed;
 }
 
