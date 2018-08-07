@@ -667,6 +667,7 @@ uint32_t Game::right_hand_weapon() {
     }
 }
 
+// Note we can't cache this because we rely on it to check cache staleness
 int32_t Game::get_player_char_status() {
     if (Game::player_char_status.resolve() == NULL) {
         return DS1_PLAYER_STATUS_LOADING;
