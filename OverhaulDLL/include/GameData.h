@@ -83,7 +83,7 @@ public:
     static uint64_t frpg_net_base;
 
     // Player character status (loading, human, co-op, invader, hollow)
-    static sp::mem::pointer<uint32_t> player_char_status;
+    static sp::mem::pointer<int32_t> player_char_status;
 
     // Time Action Events for the player character's animations
     static void* player_tae;

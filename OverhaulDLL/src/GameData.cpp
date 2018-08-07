@@ -44,7 +44,7 @@ uint64_t Game::char_class_base = NULL;
 uint64_t Game::frpg_net_base = NULL;
 
 // Player character status (loading, human, co-op, invader, hollow)
-sp::mem::pointer<uint32_t> Game::player_char_status;
+sp::mem::pointer<int32_t> Game::player_char_status;
 
 // Time Action Events for the player character's animations
 void* Game::player_tae = NULL;
@@ -112,7 +112,7 @@ void Game::init()
 
     Game::saves_enabled = sp::mem::pointer<uint8_t>((void*)((uint64_t)saves_enabled_sp + *(uint32_t*)((uint64_t)saves_enabled_sp + 3) + 7), { 0xB70 });
 
-    Game::player_char_status = sp::mem::pointer<uint32_t>((void*)(Game::world_char_base), { 0x68, 0xD4 });
+    Game::player_char_status = sp::mem::pointer<int32_t>((void*)(Game::world_char_base), { 0x68, 0xD4 });
 }
 
 
@@ -669,11 +669,13 @@ uint32_t Game::right_hand_weapon() {
 
 // Note we can't cache this because we rely on it to check cache staleness
 int32_t Game::get_player_char_status() {
-    if (Game::player_char_status.resolve() == NULL) {
+    int32_t* char_status_ptr = Game::player_char_status.resolve();
+
+    if (char_status_ptr == NULL) {
         return DS1_PLAYER_STATUS_LOADING;
     }
     else {
-        return *(int32_t*)Game::player_char_status.resolve();
+        return *char_status_ptr;
     }
 }
 
