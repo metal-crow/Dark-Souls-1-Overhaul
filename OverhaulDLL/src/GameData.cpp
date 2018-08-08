@@ -121,6 +121,8 @@ void Game::on_first_character_loaded()
 {
     Game::characters_loaded = true;
 
+    Game::preload_function_caches();
+
     global::cmd_out << Mod::output_prefix + "Searching memory for files...\n";
     // Initialize param files
     //TODO Params::init();
