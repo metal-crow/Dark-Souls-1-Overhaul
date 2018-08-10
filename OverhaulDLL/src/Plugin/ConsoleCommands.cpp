@@ -21,6 +21,9 @@
 #include "LadderFix.h"
 #include "Updates.h"
 #include "DurabilityBars.h"
+#include "Menu/Dialog.h"
+#include "MultiTribute.h"
+#include "MultiConsume.h"
 
 
 ///////////////////////////////////////////////////////////
@@ -786,6 +789,70 @@ int cc_ladder_fix_override(std::vector<std::string> args, std::string *output)
 }
 
 
+// Enables/disables multi-tribute
+int cc_multi_tribute(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = CONSOLE_COMMAND_SUCCESS;
+    if (args.size() > 0)
+    {
+        switch (parse_toggle_arg(args.at(0).c_str()))
+        {
+            case 0:
+                MultiTribute::unpatch();
+                break;
+            case 1:
+                MultiTribute::apply();
+                break;
+            default:
+                output->append(ERROR_INVALID_BOOL_ARGUMENT + "\n");
+                ret_val = ERROR_INVALID_PARAMETER;
+                break;
+        }
+    }
+    if (MultiTribute::is_active())
+    {
+        output->append("Multi-tribute = enabled");
+    }
+    else
+    {
+        output->append("Multi-tribute = disabled");
+    }
+    return ret_val;
+}
+
+
+// Enables/disables multi-consumption
+int cc_multi_consume(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = CONSOLE_COMMAND_SUCCESS;
+    if (args.size() > 0)
+    {
+        switch (parse_toggle_arg(args.at(0).c_str()))
+        {
+            case 0:
+                MultiConsume::unpatch();
+                break;
+            case 1:
+                MultiConsume::apply();
+                break;
+            default:
+                output->append(ERROR_INVALID_BOOL_ARGUMENT + "\n");
+                ret_val = ERROR_INVALID_PARAMETER;
+                break;
+        }
+    }
+    if (MultiConsume::is_active())
+    {
+        output->append("Multi-consume = enabled");
+    }
+    else
+    {
+        output->append("Multi-consume = disabled");
+    }
+    return ret_val;
+}
+
+
 // Enables/disables radial compass HUD element
 int cc_hud_compass_radial(std::vector<std::string> args, std::string *output)
 {
@@ -1078,6 +1145,34 @@ int cc_hud_weapon_durability_scale(std::vector<std::string> args, std::string *o
 }
 
 
+// Enables/disables automatic equipping of items on pickup
+int cc_auto_equip(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = CONSOLE_COMMAND_SUCCESS;
+    if (args.size() > 0) {
+        switch (parse_toggle_arg(args.at(0).c_str()))
+        {
+            case 0:
+                Game::set_item_auto_equip(false);
+                break;
+            case 1:
+                Game::set_item_auto_equip(true);
+                break;
+            default:
+                output->append(ERROR_INVALID_BOOL_ARGUMENT + "\n");
+                ret_val = ERROR_INVALID_PARAMETER;
+                break;
+        }
+    }
+    if (Game::item_auto_equip_enabled()) {
+        output->append("Item auto-equip = enabled");
+    } else {
+        output->append("Item auto-equip = disabled");
+    }
+    return ret_val;
+}
+
+
 // Enables/disables armor sound effects
 int cc_armor_sfx(std::vector<std::string> args, std::string *output)
 {
@@ -1239,7 +1334,40 @@ int cc_text_feed_node_count(std::vector<std::string> args, std::string *output)
 */
 int cc_developer_debug(std::vector<std::string> args, std::string *output)
 {
+    //Menu::Dlg::show_number_picker(11000, 5, 6, 1, 1, 25);
 
+    //if (!args.empty())
+    //{
+    //    uint8_t menu_type = 0;
+    //    try
+    //    {
+    //        menu_type = (int)std::stoi(args.at(0).c_str(), NULL);
+    //        reinterpret_cast<ItemParam*>(Params::Item().get_by_id(500))->yesNoDialogMessageId = 10010710;
+    //    }
+    //    catch (const std::invalid_argument&)
+    //    {
+    //        output->append("ERROR: Invalid argument\n");
+    //        reinterpret_cast<ItemParam*>(Params::Item().get_by_id(500))->yesNoDialogMessageId = 0;
+    //    }
+    //    catch (const std::out_of_range&)
+    //    {
+    //        output->append("ERROR: Out of range\n");
+    //    }
+    //    reinterpret_cast<ItemParam*>(Params::Item().get_by_id(500))->opmeMenuType = menu_type;
+    //    reinterpret_cast<ItemParam*>(Params::Item().get_by_id(500))->yesNoDialogMessageId = 0;
+    //}
+    //else
+    //{
+    //    reinterpret_cast<ItemParam*>(Params::Item().get_by_id(500))->opmeMenuType = 0;
+    //    reinterpret_cast<ItemParam*>(Params::Item().get_by_id(500))->yesNoDialogMessageId = 0;
+    //    Menu::Dlg::show_number_picker(L"TEST_MSG", L"BT_L", L"BT_R", 1, 1, 25);
+    //}
+    //output->append("RefId=" + std::to_string(reinterpret_cast<ItemParam*>(Params::Item().get_by_id(500))->refId) + "  openMenuType=" + std::to_string((int)reinterpret_cast<ItemParam*>(Params::Item().get_by_id(500))->opmeMenuType));
+
+    //// ShowGenDialog(uint32_t message_id, uint32_t c, uint32_t dialog_type, bool d)
+    //typedef int (*ShowGenDialog_t)(uint32_t, uint32_t, uint32_t, uint32_t);
+    //ShowGenDialog_t ShowGenDialog = (ShowGenDialog_t)0xD5EEF0;
+    //ShowGenDialog(1200, 5, 3, 6);
     return CONSOLE_COMMAND_SUCCESS;
 }
 
@@ -1269,7 +1397,10 @@ void Mod::register_console_commands()
     register_console_command(ccn_dim_lava, cc_dim_lava, chm_dim_lava);
     register_console_alias(cca_lava_brightness_fix, ccn_dim_lava);
     register_console_command(ccn_ladder_fix, cc_ladder_fix, chm_ladder_fix);
+    register_console_command(ccn_auto_equip, cc_auto_equip, chm_auto_equip);
     register_console_command(ccn_ladder_fix_override, cc_ladder_fix_override, chm_ladder_fix_override);
+    register_console_command(ccn_multi_consume, cc_multi_consume, chm_multi_consume);
+    register_console_command(ccn_multi_tribute, cc_multi_tribute, chm_multi_tribute);
     register_console_command(ccn_fix_bonfire_input, cc_fix_bonfire_input, chm_fix_bonfire_input);
     register_console_command(ccn_text_feed_node_count, cc_text_feed_node_count, chm_text_feed_node_count);
     register_console_alias(cca_node_count, ccn_text_feed_node_count);

@@ -48,7 +48,7 @@ void on_process_attach()
         if (Game::get_game_version() == 139) { // @TODO: Fix get_game_version() to work on different builds of DARKSOULS.exe
             // Debug build
             Mod::startup_messages.push_back(Mod::output_prefix + "WARNING: Debug game version detected. Disabling features...");
-            Game::set_memory_limit(Game::memory_limit);
+            Game::run_debug_tasks();
             return;
         } else {
             Mod::startup_messages.push_back(Mod::output_prefix + "WARNING: Unsupported game version detected.");
@@ -211,7 +211,9 @@ __declspec(dllexport) void __stdcall initialize_plugin()
 
     // Start thread for deferred tasks
     if (!CreateThread(NULL, 0, deferred_tasks, NULL, 0, NULL))
-        ; // Error creating new thread
+    {
+        // Error creating new thread
+    }
 
     Mod::initialized = true; // Should be the last statement in this function
 }
@@ -300,12 +302,40 @@ DWORD WINAPI deferred_tasks(LPVOID lpParam)
     // Sleep time (in milliseconds) between loop iterations
     const int wait_time = 500;
 
+    // Wait for event: Main menu loaded
+    //SpPointer main_menu_logo(Game::ds1_base, { 0x6C });
+    //while ((!Mod::deferred_tasks_complete) && (!main_menu_logo.resolve() || !*reinterpret_cast<uint8_t*>(main_menu_logo.resolve()))) {
+    //    Sleep(wait_time);
+    //}
+    //if (Mod::deferred_tasks_complete) return 0;
+
+
+    // Wait for event: Saved characters menu opened
+    while ((!Mod::deferred_tasks_complete) && !Files::saves_menu_is_open() && !Params::all_loaded()) {
+        Sleep(wait_time);
+    }
+    if (Mod::deferred_tasks_complete) return 0;
+
+    // Obtain menu strings from FSB file
+    Menu::Dlg::menu_fsb();
+    
+
+    // Wait for event: all game parameter files loaded
+    while ((!Mod::deferred_tasks_complete) && !Params::all_loaded()) {
+        Sleep(wait_time);
+    }
+    if (Mod::deferred_tasks_complete) return 0;
+
+    // Perform tasks that rely on parameter files being loaded
+    Game::on_all_params_loaded();
+
     // Wait for event: first character loaded in this instance of the game
     int char_status = DS1_PLAYER_STATUS_LOADING;
     while ((!Mod::deferred_tasks_complete) && char_status == DS1_PLAYER_STATUS_LOADING) {
         Game::player_char_status.read(&char_status);
         Sleep(wait_time);
     }
+    if (Mod::deferred_tasks_complete) return 0;
 
     // Perform tasks that rely on a character being loaded
     Game::on_first_character_loaded();

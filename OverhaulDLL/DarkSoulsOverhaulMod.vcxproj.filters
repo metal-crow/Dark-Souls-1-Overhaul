@@ -117,6 +117,18 @@
     <ClCompile Include="src\DurabilityBars.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\L3Jump.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Menu\Dialog.cpp">
+      <Filter>Source Files\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MultiTribute.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MultiConsume.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\DllMain.h">
@@ -183,6 +195,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\DurabilityBars.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\L3Jump.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Menu\Dialog.h">
+      <Filter>Header Files\Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MultiConsume.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MultiTribute.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

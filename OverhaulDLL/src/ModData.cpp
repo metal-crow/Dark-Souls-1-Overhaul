@@ -15,6 +15,8 @@
 #include "LadderFix.h"
 #include "Updates.h"
 #include "DurabilityBars.h"
+#include "MultiTribute.h"
+#include "MultiConsume.h"
 
 #include <regex>
 
@@ -83,6 +85,9 @@ bool Mod::disable_armor_sfx_pref = false;
 
 // User preference setting; determines whether multiplayer node graph HUD element is enabled
 bool Mod::hud_node_graph_pref = false;
+
+// User preference setting; determines whether to automatically equip items on pickup
+bool Mod::disable_auto_equip_pref = true;
 
 // Custom game archive files to load instead of the vanilla game files
 std::wstring Mod::custom_game_archive_path;
@@ -185,6 +190,11 @@ void Mod::get_user_preferences()
     AnimationEdits::gesture_cancelling = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_GESTURE_CANCELLING_, (int)AnimationEdits::gesture_cancelling, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
     if (AnimationEdits::gesture_cancelling) {
         print_console(msg.append("    Gesture cancelling enabled"));
+    }
+    
+    Mod::disable_auto_equip_pref = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DISABLE_AUTO_EQUIP_, (int)Mod::disable_auto_equip_pref, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    if (Mod::disable_auto_equip_pref) {
+        print_console("    Automatic item equip disabled");
     }
 
     LadderFix::enable_pref = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_LADDER_FIX_, (int)LadderFix::enable_pref, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
@@ -337,6 +347,14 @@ void Mod::get_user_preferences()
 
     Updates::keep_temp_files = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_KEEP_TEMP_UPDATE_CHECK_FILES_, Updates::keep_temp_files, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
 
+    if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_MULTI_TRIBUTE_, 1, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
+        MultiTribute::apply("    ");
+    }
+
+    if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_MULTI_CONSUME_, 1, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
+        MultiConsume::apply("    ");
+    }
+    
     // @TODO Load additional user preferences here
 
 }
@@ -369,6 +387,9 @@ void Mod::get_user_keybinds()
     // Toggle ladder fix
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_LADDER_FIX_, kf_toggle_ladder_fix);
 
+    // Toggle item auto equip
+    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_ITEM_AUTO_EQUIP_, kf_toggle_item_auto_equip);
+
 #ifndef DS1_OVERHAUL_QOL_PREVIEW
     // Toggle armor sound effects
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_ARMOR_SFX_, kf_toggle_armor_sfx);
@@ -377,9 +398,16 @@ void Mod::get_user_keybinds()
     // De-spawn existing Gravelord phantoms
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_DESPAWN_GL_PHANTOMS_, kf_gravelord_phantoms_despawn);
 
+    // Toggle Multi-tribute
+    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_MULTI_TRIBUTE_, kf_toggle_multi_tribute);
+
+    // Toggle Multi-consumption
+    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_MULTI_CONSUME_, kf_toggle_multi_consume);
+
     // Next/previous save file
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_SAVE_FILE_NEXT_, kf_save_file_next);
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_SAVE_FILE_PREV_, kf_save_file_prev);
+    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_SAVE_FILE_CHOOSE_, kf_save_file_choose);
 
     // Toggle additional HUD elements
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_COMPASS_RADIAL_, kf_toggle_hud_compass_radial);

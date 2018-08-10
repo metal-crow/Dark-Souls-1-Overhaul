@@ -7,6 +7,7 @@
 
 #include "Updates.h"
 #include "FileUtil.h"
+#include "Menu/Dialog.h"
 
 #include <curl/curl.h>
 
@@ -113,10 +114,11 @@ bool valid_version_str(const std::string& s)
 }
 
 
-// Checks online for a new Overhaul MotD.
+// Checks online for a new Overhaul MotD and returns true if successful.
 // Data is be obtained from a remote source using CURL (default source is the Overhaul repository)
-void check_motd()
+bool check_motd()
 {
+    bool success = false;
     static constexpr const char* tmp_file    = "DS_OVERHAUL_MOTD";
     static constexpr const char* remote_file = "MOTD";
     for (unsigned int i = 0; i < _sources.size(); i++)
@@ -142,26 +144,32 @@ void check_motd()
                 }
 
                 _message_of_the_day = motd;
+                success = true;
+
                 //if (!_message_of_the_day.empty())
                 //{
                 //    print_console("\nOVERHAUL MESSAGE OF THE DAY:\n" + _message_of_the_day);
                 //    print_console("");
+                //    success = true;
                 //}
                 //else
                 //{
                 //    // MotD was empty
                 //    print_console("    No message.");
+                //    success = false;
                 //}
                 //CoTaskMemFree((void*)motd);
             }
             else
             {
                 print_console("    ERROR: Remote fetch succeeded, but failed to read local data");
+                success = false;
             }
             break;
         }
     }
     if (!Updates::keep_temp_files) std::remove(tmp_file);
+    return success;
 }
 
 
@@ -404,6 +412,27 @@ int compare_versions()
     remote += Updates::latest().substr(19, 2);
     local  += v.substr(19, 2);
     return strcmp(remote.c_str(), local.c_str()); // Pos if remote is newer, 0 if equal, neg if remote is older
+}
+
+
+// Prints MotD using in-game GUI elements
+bool show_gui_motd()
+{
+    if ((!_message_of_the_day.empty()) && Menu::Dlg::menu_fsb())
+    {
+        
+        std::wstring motd_wide;
+        if (!string_mb_to_wide(const_cast<char*>(Updates::motd().c_str()), motd_wide))
+        {
+            Menu::Dlg::show_message_large_0bt(motd_wide);
+            return true;
+        }
+        else
+        {
+            // Failed to convert MotD to wide string
+        }
+    }
+    return false;
 }
 
 

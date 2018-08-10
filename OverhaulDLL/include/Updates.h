@@ -36,8 +36,8 @@ std::string latest();
 // Returns URL to latest Overhaul DLL download
 std::string download_url();
 
-// Checks online for a new Overhaul MotD
-void check_motd();
+// Checks online for a new Overhaul MotD and returns true if successful
+bool check_motd();
 
 // Checks online for the latest Overhaul version string
 void check_latest();
@@ -51,10 +51,14 @@ long fetch_data(const std::string& source, const std::string& output_file, bool 
 // Compares the local version string to the remote version string and returns 1 if the remote version string is newer, 0 if they are the same, or -1 if local is newer
 int compare_versions();
 
+// Prints MotD using in-game GUI elements
+bool show_gui_motd();
+
 // Flags to skip checking remote data sources
 extern std::vector<bool> skip_source;
 
 extern bool keep_temp_files;
+
 
 } // namespace Updates
 

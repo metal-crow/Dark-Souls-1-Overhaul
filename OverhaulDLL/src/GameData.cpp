@@ -23,6 +23,7 @@
 #include "Menu/Dialog.h"
 #include "Param/Params.h"
 #include "Param/Item.h"
+#include "XInputUtil.h"
 
 
 /*
@@ -90,6 +91,35 @@ void Game::init_pointers()
 }
 
 
+// Performs tasks that were deferred until all game parameter files were loaded
+void Game::on_all_params_loaded()
+{
+    // Initialize param data manipulators
+    Params::init();
+    if (!print_console("[DARK SOULS] Finished loading .param files."))
+    {
+        Mod::startup_messages.push_back("[DARK SOULS] Finished loading .param files.");
+    }
+
+    // Disable armor sounds if it was specified in the config file
+    if (Mod::disable_armor_sfx_pref)
+        Game::enable_armor_sfx(false);
+
+    // Disable automatic equipping of items on pickup
+    if (Mod::disable_auto_equip_pref) {
+        Game::set_item_auto_equip(false);
+    }
+
+    // Enable challenge mods
+    if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_AGGRO_AI_, Challenge::AggressiveAi::active(), _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
+        Challenge::AggressiveAi::enable();
+    }
+    if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_BP_ENEMIES_, Challenge::BlackPhantomEnemies::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
+        Challenge::BlackPhantomEnemies::enable();
+    }
+}
+
+
 // Performs tasks that were deferred until a character was loaded
 void Game::on_first_character_loaded()
 {
@@ -103,17 +133,6 @@ void Game::on_first_character_loaded()
         Game::enable_dim_lava(true);
 
     print_console(Mod::output_prefix + "Searching memory for files...");
-    // Initialize param files
-    Params::init();
-
-    // Disable armor sounds if it was specified in the config file
-    if (Mod::disable_armor_sfx_pref)
-        Game::enable_armor_sfx(false);
-
-    // Disable automatic equipping of items on pickup
-    if (Mod::disable_auto_equip_pref) {
-        Game::set_item_auto_equip(false);
-    }
 
     if (AnimationEdits::gesture_cancelling) {
         // Perform TAE edits to player animations to enable gesture cancelling
@@ -122,6 +141,7 @@ void Game::on_first_character_loaded()
         print_console(std::string("    Found Time Action Event file for player character animations at 0x") + FileUtil::to_hex_string((int)ret_val, temp) + ". Enabling gesture cancelling...");
         AnimationEdits::enable_gesture_cancelling();
     }
+
 
     if (!Mod::legacy_mode)
     {
@@ -140,14 +160,6 @@ void Game::on_first_character_loaded()
         AntiCheat::BinocsTriggerBlock::enable();
     if (AntiCheat::DragonTriggerBlock::active)
         AntiCheat::DragonTriggerBlock::enable();
-
-    // Enable challenge mods
-    if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_AGGRO_AI_, Challenge::AggressiveAi::active(), _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
-        Challenge::AggressiveAi::enable();
-    }
-    if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_BP_ENEMIES_, Challenge::BlackPhantomEnemies::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
-        Challenge::BlackPhantomEnemies::enable();
-    }
 }
 
 // Performs tasks that must be rerun after any loading screen
@@ -420,22 +432,49 @@ int Game::fix_bonfire_input(bool print_to_text_feed, bool print_to_console)
 }
 
 
-// Enable/disable item auto-equip
-void Game::set_item_auto_equip(bool enabled)
+// Returns true if item auto-equip is currently enabled/unmodified
+bool Game::item_auto_equip_enabled()
 {
+    if (Params::all_loaded())
+    {
+        return (Params::Goods().get(0)->isAutoEquip && Params::Goods().get(1)->isAutoEquip && Params::Goods().get(2)->isAutoEquip);
+    }
+    return true;
+}
+
+// Enable/disable item auto-equip
+void Game::set_item_auto_equip(bool enabled, bool silent)
+{
+    static std::vector<uint8_t> default_values;
+    if (default_values.empty())
+    {
+        // Initialize default values container
+        for (size_t i = 0; i < Params::Goods().param_count; i++)
+        {
+            default_values.push_back(Params::Goods().get(i)->isAutoEquip);
+        }
+    }
     if (enabled)
     {
         for (size_t i = 0; i < Params::Goods().param_count; i++)
         {
-            Params::Goods().get(i)->isAutoEquip = true;
+            Params::Goods().get(i)->isAutoEquip = default_values[i];
         }
     }
     else
     {
+        // Disable auto-pickup
         for (size_t i = 0; i < Params::Goods().param_count; i++)
         {
-            Params::Goods().get(i)->isAutoEquip = false;
+            if (Params::Goods().get_id(i) < 200 || Params::Goods().get_id(i) > 215) // Don't change auto-pickup settings for Estus (IDs 200-215)
+            {
+                Params::Goods().get(i)->isAutoEquip = false;
+            }
         }
+    }
+    if (!silent)
+    {
+        print_console(std::string(enabled ? "Disabled" : "Enabled") + " item auto-equip on pickup");
     }
 }
 
@@ -775,4 +814,11 @@ const float new_hpbar_max = 2300;
 void Game::increase_gui_hpbar_max()
 {
     apply_byte_patch((void*)HEALTHBAR_SIZE, &new_hpbar_max, 4);
+}
+
+// Runs code specific to the Debug build of Dark Souls
+void Game::run_debug_tasks()
+{
+    Game::set_memory_limit(Game::memory_limit);
+    XInput::apply_function_intercepts();
 }

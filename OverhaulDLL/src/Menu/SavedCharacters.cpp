@@ -7,13 +7,18 @@
 
 #include "DllMain.h"
 #include "Menu/SavedCharacters.h"
+#include "Menu/Dialog.h"
+
+#include "FileUtil.h"
+#include "Save/Sl2.h"
+
 
 #define DS1_MENU_SAVED_CHARS_CUSTOM_MSG_BUFF_LEN 256
 #define DS1_MENU_SAVED_CHARS_CUST_STR_INJECTION_OFFSET  0x911C26
 #define DS1_MENU_SAVED_CHARS_CUST_STR_INJECTION_ADDRESS ((void*)((uint32_t)Game::ds1_base + DS1_MENU_SAVED_CHARS_CUST_STR_INJECTION_OFFSET))
 
 
-namespace Menu {
+namespace Menu  {
 namespace Saves {
 
 bool custom_strings_initialized = false;
@@ -29,6 +34,66 @@ uint32_t custom_buttons_load_alt_msg_address = (uint32_t)&custom_buttons_load_al
 uint32_t custom_header_delete_msg_address    = (uint32_t)&custom_header_delete_msg_buff[0];
 uint32_t custom_buttons_delete_msg_address   = (uint32_t)&custom_buttons_delete_msg_buff[0];
 uint32_t custom_strings_return = 0;
+
+
+
+DWORD WINAPI _open_dialog_internal(LPVOID lpParam)
+{
+    // Determine save file path
+    std::string file;
+    if (Mod::custom_save_file_path.length() <= 0)
+    {
+        if (Files::default_save_file_path.length() <= 0)
+        {
+            file = Sl2::FILE_NAME_DEFAULT;
+        } 
+        else 
+        {
+            file = Files::default_save_file_path;
+        }
+    }
+    else
+    {
+        if (string_wide_to_mb(const_cast<wchar_t*>(Mod::custom_save_file_path.c_str()), file))
+        {
+            // Conversion error
+            print_console("ERROR: Unable to open save file dialog");
+            return 0;
+        }
+    }
+
+    int count = Sl2::get_save_file_count(file.c_str());
+
+    if (count > 1)
+    {
+        Menu::Dlg::show_number_picker(L"Select a save file to load", L"OK", L"CANCEL", Files::save_file_index + 1, 1, count);
+        Sleep(100);
+        Menu::Dlg::flag(0x2CC) = 1; // Disable menu input
+        
+        while (Menu::Dlg::showing())
+        {
+            Sleep(200);
+        }
+        
+        Menu::Dlg::flag(0x2CC) = 0; // Re-enable menu input
+        if (Menu::Dlg::button_result() == static_cast<int32_t>(Menu::Dlg::dlg_button_result::left_button)
+            && (Menu::Dlg::number_picker_result-1) != Files::save_file_index)
+        {
+            Files::set_save_file_index(Menu::Dlg::number_picker_result - 1);
+        }
+    }
+    return 0;
+}
+
+
+// Opens a number picker dialog that allows the user to choose a save file by index
+void open_dialog()
+{
+    if (!CreateThread(NULL, 0, _open_dialog_internal, NULL, 0, NULL))
+    {
+        print_console("ERROR: Failed to create thread");
+    }
+}
 
 
 void init_custom_strings(std::wstring &load_header_msg,

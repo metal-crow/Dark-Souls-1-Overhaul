@@ -16,12 +16,16 @@
 
 #define DS1_MENU_SAVED_CHARS_DEFAULT_CUSTOM_LOAD_HEADER_MSG      std::wstring(L"Select data to load")
 #define DS1_MENU_SAVED_CHARS_DEFAULT_CUSTOM_LOAD_BUTTONS_MSG     std::wstring(L"<?selectUD?>:Select <?conclusion?>:Enter <?cancel?>:Back <?viewChange?>:Toggle Display <?commando?>:Delete")
-#define DS1_MENU_SAVED_CHARS_DEFAULT_CUSTOM_LOAD_BUTTONS_ALT_MSG std::wstring(L"<?conclusion?>:Enter <?cancel?>:Back <?viewChange?>:Toggle Display <?commando?>:Delete  <?categoryChangeL?>/<?categoryChangeR?>:Change save file")
+#define DS1_MENU_SAVED_CHARS_DEFAULT_CUSTOM_LOAD_BUTTONS_ALT_MSG std::wstring(L"<?conclusion?>:Enter <?cancel?>:Back <?viewChange?>:Toggle Display <?commando?>:Delete  <?categoryChangeL?>/<?categoryChangeR?>:Change save file <?slectMenuSwitch?>:Choose save file")
 #define DS1_MENU_SAVED_CHARS_DEFAULT_CUSTOM_DELETE_HEADER_MSG    std::wstring(L"Select data to delete")
 #define DS1_MENU_SAVED_CHARS_DEFAULT_CUSTOM_DELETE_BUTTONS_MSG   std::wstring(L"<?selectUD?>:Select <?conclusion?>:Enter <?cancel?>:Back <?viewChange?>:Toggle Display <?commando?>:Delete")
 
 namespace Menu {
 namespace Saves {
+
+// Opens a number picker dialog that allows the user to choose a save file by index
+void open_dialog();
+
 
 void init_custom_strings(std::wstring &load_header_msg      = DS1_MENU_SAVED_CHARS_DEFAULT_CUSTOM_LOAD_HEADER_MSG,
                          std::wstring &load_buttons_msg     = DS1_MENU_SAVED_CHARS_DEFAULT_CUSTOM_LOAD_BUTTONS_MSG,

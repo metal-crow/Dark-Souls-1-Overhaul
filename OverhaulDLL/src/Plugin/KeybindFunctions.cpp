@@ -16,6 +16,10 @@
 #include "Challenge/GravelordPhantoms.h"
 #include "LadderFix.h"
 #include "DurabilityBars.h"
+#include "Menu/Dialog.h"
+#include "Menu/SavedCharacters.h"
+#include "MultiTribute.h"
+#include "MultiConsume.h"
 
 
 // Toggles mouse input
@@ -105,6 +109,26 @@ int kf_toggle_ladder_fix()
     return ERROR_SUCCESS;
 }
 
+// Toggles item auto-equip
+int kf_toggle_item_auto_equip()
+{
+    long ret = ERROR_SUCCESS;
+    if (!Params::all_loaded())
+    {
+        ret = D2DERR_NOT_INITIALIZED;
+    }
+    else if (Game::item_auto_equip_enabled())
+    {
+        Game::set_item_auto_equip(false, false);
+    }
+    else
+    {
+        Game::set_item_auto_equip(true, false);
+    }
+    Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
+    return ret;
+}
+
 
 // Toggles armor sound effects
 int kf_toggle_armor_sfx()
@@ -137,20 +161,67 @@ int kf_gravelord_phantoms_despawn() {
 }
 
 
+// Toggles Multi-Tribute (multiple simultaneous covenant tributes patch)
+int kf_toggle_multi_tribute() {
+    if (MultiTribute::is_active())
+    {
+        MultiTribute::unpatch();
+    }
+    else
+    {
+        MultiTribute::apply();
+    }
+    Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
+    return ERROR_SUCCESS;
+}
+
+
+// Toggles Multi-Consume (multiple simultaneous item consumption)
+int kf_toggle_multi_consume() {
+    if (MultiConsume::is_active())
+    {
+        MultiConsume::unpatch();
+    }
+    else
+    {
+        MultiConsume::apply();
+    }
+    Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
+    return ERROR_SUCCESS;
+}
+
+
 // Next/previous save file
 int kf_save_file_next()
 {
-    Files::set_save_file_next(false);
-    if (GetLastError() == ERROR_SUCCESS)
-        Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
+    if (Files::saves_menu_is_open() && !Menu::Dlg::showing())
+    {
+        Files::set_save_file_next(false);
+        if (GetLastError() == ERROR_SUCCESS)
+            Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
+    }
     return ERROR_SUCCESS;
 }
 
 int kf_save_file_prev()
 {
-    Files::set_save_file_prev(false);
-    if (GetLastError() == ERROR_SUCCESS)
+    if (Files::saves_menu_is_open() && !Menu::Dlg::showing())
+    {
+        Files::set_save_file_prev(false);
+        if (GetLastError() == ERROR_SUCCESS)
+            Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
+    }
+    return ERROR_SUCCESS;
+}
+
+// Opens save file picker dialog
+int kf_save_file_choose()
+{
+    if (Files::saves_menu_is_open() && !Menu::Dlg::showing())
+    {
+        Menu::Saves::open_dialog();
         Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
+    }
     return ERROR_SUCCESS;
 }
 

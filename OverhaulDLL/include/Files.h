@@ -16,6 +16,7 @@
 #include "Archive/Bdt.h"
 #include "Archive/Bhd5.h"
 #include "Menu/SavedCharacters.h"
+#include "Menu/Dialog.h"
 #include "Save/Sl2.h"
 
 /*
@@ -175,7 +176,7 @@ HANDLE WINAPI Files::intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesired
                         L"                                            Save file "
                         + std::to_wstring(Files::save_file_index + 1)
                         + L"/" + std::to_wstring(save_file_count);
-                    std::wstring custom_buttons = L"<?conclusion?>:Enter <?cancel?>:Back <?viewChange?>:Toggle Display <?commando?>:Delete  <?categoryChangeL?>/<?categoryChangeR?>:Change save file";
+                    std::wstring custom_buttons = L"<?conclusion?>:Enter <?cancel?>:Back <?viewChange?>:Toggle Display <?commando?>:Delete  <?categoryChangeL?>/<?categoryChangeR?>:Change save file <?slectMenuSwitch?>:Choose save file";
                     Menu::Saves::set_custom_header_msgs(L"Select data to load." + custom_header, L"Select data to delete." + custom_header);
                     Menu::Saves::set_custom_buttons_msgs(L"<?selectUD?>:Select "+custom_buttons, custom_buttons, L"<?selectUD?>:Select "+custom_buttons);
                 }
@@ -631,6 +632,8 @@ void Files::set_save_file_index(int unsigned index, bool print_output)
             print_console("ERROR: Failed to set save file index (Must be viewing saved characters)");
         return;
     }
+    Menu::Dlg::show_loader(47100);
+    Sleep(300);
     saved_chars_menu_flag_ptr.write((uint8_t)0);
     Files::save_file_index = index;
     // Get full filename (with index)
@@ -660,6 +663,7 @@ void Files::set_save_file_index(int unsigned index, bool print_output)
     if (print_output)
         print_console("Save file index changed to " + std::to_string(index));
     SetLastError(ERROR_SUCCESS);
+    Menu::Dlg::hide();
 }
 
 // Changes the to the next save file (if current save file is the last one, new file is first save file)

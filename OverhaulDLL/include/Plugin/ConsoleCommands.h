@@ -69,6 +69,10 @@ const char *chm_armor_sfx = ccn_armor_sfx" [boolean]\n     Enables/disables armo
 #define cca_armor_sounds "armor_sounds"
 
 
+#define ccn_auto_equip "item_auto_equip"
+const char *chm_auto_equip = ccn_auto_equip" [boolean]\n     Enables/disables automatic equipping of items on pickup (1 = enabled, 0 = disabled).";
+
+
 #define ccn_fix_bonfire_input "fix_bonfire_input"
 const char *chm_fix_bonfire_input = ccn_fix_bonfire_input"\n"
                                                          "    Allows player to regain control of their character if they encounter the bonfire input glitch,\n"
@@ -143,6 +147,14 @@ const char *chm_gravelord_phantoms_despawn = ccn_gravelord_phantoms_despawn"\n  
                                                                              "     by a member of the Gravelord covenant, which can only happen in NG+ (NG+1) or above. To de-spawn phantoms in\n"
                                                                              "     NG+ or above, wait for 10 minutes without resting at a bonfire or triggering a loading screen (warping, death,\n"
                                                                              "     cutscenes, etc).";
+
+#define ccn_multi_tribute "multi_tribute"
+const char *chm_multi_tribute = ccn_multi_tribute" [boolean]\n"
+                                                              "    Enables/disables multiple simultaneous covenant tributes (1 = enabled, 0 = disabled).";
+
+#define ccn_multi_consume "multi_consume"
+const char *chm_multi_consume = ccn_multi_consume" [boolean]\n"
+                                                              "    Enables/disables multiple simultaneous item consumption (1 = enabled, 0 = disabled).";
 
 #define ccn_text_feed_node_count "text_feed_node_count"
 const char *chm_text_feed_node_count = ccn_text_feed_node_count" [boolean]\n"

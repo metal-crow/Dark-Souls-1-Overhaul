@@ -7,6 +7,8 @@
 
 #include "DllMain.h"
 #include "XInputUtil.h"
+#include "Menu/Dialog.h"
+#include "Menu/SavedCharacters.h"
 
 
 namespace XInput {
@@ -97,31 +99,41 @@ void handle_input(XINPUT_GAMEPAD &old, XINPUT_GAMEPAD &current, bool changed, in
     static bool reset_lock_rotation = false;
     if (changed) {
 
-        if (Button::pressed(old, current, XINPUT_GAMEPAD_DPAD_LEFT)) {
-            if (Files::saves_menu_is_open()) {
-                Files::save_file_index_pending_set_prev = true;
+        if (Files::saves_menu_is_open())
+        {
+            if (!Menu::Dlg::showing())
+            {
+                if (Button::pressed(old, current, XINPUT_GAMEPAD_DPAD_LEFT))
+                {
+                    Files::save_file_index_pending_set_prev = true;
+                }
+
+                if (Button::pressed(old, current, XINPUT_GAMEPAD_DPAD_RIGHT))
+                {
+                    Files::save_file_index_pending_set_next = true;
+                }
+
+                // Left bumper
+                if (Button::pressed(old, current, XINPUT_GAMEPAD_LEFT_SHOULDER))
+                {
+                    Files::save_file_index_pending_set_prev = true;
+                }
+
+                // Right bumper
+                if (Button::pressed(old, current, XINPUT_GAMEPAD_RIGHT_SHOULDER))
+                {
+                    Files::save_file_index_pending_set_next = true;
+                }
+
+                // Select/Options/Back button
+                if (Button::pressed(old, current, XINPUT_GAMEPAD_MENU_SECONDARY))
+                {
+                   Menu::Saves::open_dialog();
+                }
             }
         }
 
-        if (Button::pressed(old, current, XINPUT_GAMEPAD_DPAD_RIGHT)) {
-            if (Files::saves_menu_is_open()) {
-                Files::save_file_index_pending_set_next = true;
-            }
-        }
-
-        // Left bumper
-        if (Button::pressed(old, current, XINPUT_GAMEPAD_LEFT_SHOULDER)) {
-            if (Files::saves_menu_is_open()) {
-                Files::save_file_index_pending_set_prev = true;
-            }
-        }
-
-        // Right bumper
-        if (Button::pressed(old, current, XINPUT_GAMEPAD_RIGHT_SHOULDER)) {
-            if (Files::saves_menu_is_open()) {
-                Files::save_file_index_pending_set_next = true;
-            }
-        }
+        
 
         // B (Xbox) or Circle (Playstation)
         if (Button::pressed(old, current, XINPUT_GAMEPAD_B)) {
@@ -162,7 +174,12 @@ void apply_function_intercepts() {
     static uint32_t *xinput_get_state_func_ptr = &xinput_get_state_func;
     uint8_t *xinput_get_state_func_b = (uint8_t *)&xinput_get_state_func_ptr;
     uint8_t patch_xinput_get_state[4] = { xinput_get_state_func_b[0], xinput_get_state_func_b[1], xinput_get_state_func_b[2], xinput_get_state_func_b[3] };
-    void *write_address = (uint8_t*)Game::ds1_base + 0x6BA544;
+    void *write_address = (uint8_t*)Game::ds1_base + 0x6BA544; // Debug: (uint8_t*)Game::ds1_base + 0x6BB0F4 // 0xABB0F4
+    if (Game::get_game_version() == 139) // @TODO: Fix get_game_version() to work on different builds of DARKSOULS.exe
+    {
+        // Debug build
+        write_address = (uint8_t*)Game::ds1_base + 0x6BB0F4; // 0xABB0F4
+    }
     XInputGetState_original = *(XInputGetStateFunc*)*(void**)write_address;
     apply_byte_patch(write_address, patch_xinput_get_state, 4);
 }

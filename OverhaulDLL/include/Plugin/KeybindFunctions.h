@@ -42,15 +42,26 @@ int kf_toggle_dim_lava();
 // Toggles ladder fix
 int kf_toggle_ladder_fix();
 
+// Toggles item auto-equip
+int kf_toggle_item_auto_equip();
+
 // Toggles armor sound effects
 int kf_toggle_armor_sfx();
 
 // De-spawns existing Gravelord phantoms, but only if current character is in NG+0
 int kf_gravelord_phantoms_despawn();
 
+// Toggles Multi-Consume (multiple simultaneous item consumption)
+int kf_toggle_multi_consume();
+
+// Toggles Multi-Tribute (multiple simultaneous covenant tributes patch)
+int kf_toggle_multi_tribute();
+
 // Next/previous save file
 int kf_save_file_next();
 int kf_save_file_prev();
+// Opens save file picker dialog
+int kf_save_file_choose();
 
 // Toggles for additional HUD elements
 int kf_toggle_hud_compass_radial();

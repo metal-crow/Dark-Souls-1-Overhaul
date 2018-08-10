@@ -102,6 +102,9 @@ public:
     // Initializes pointers that depend on the game's base address
     static void init_pointers();
 
+    // Performs tasks that were deferred until all game parameter files were loaded
+    static void on_all_params_loaded();
+
     // Runs tasks that were deferred until a character was loaded
     static void on_first_character_loaded();
 
@@ -110,6 +113,9 @@ public:
 
     // Obtains the current game version number
     static uint8_t get_game_version();
+
+    // Runs code specific to the Debug build of Dark Souls
+    static void run_debug_tasks();
 
     // Changes the game version number to avoid compatibility issues with different game builds
     static void set_game_version(uint8_t version_number);
@@ -144,8 +150,11 @@ public:
     // Set the current animation speed for the player character
     static void set_current_player_animation_speed(float speed);
 
+    // Returns true if item auto-equip is currently enabled/unmodified
+    static bool item_auto_equip_enabled();
+
     // Enable/disable item auto-equip
-    static void set_item_auto_equip(bool enabled);
+    static void set_item_auto_equip(bool enabled, bool silent = true);
 
     // Returns current player character body animation ID (attacking, rolling, gestures, etc)
     static int32_t get_player_body_anim_id();

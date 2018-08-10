@@ -46,8 +46,11 @@
 #define _DS1_OVERHAUL_PREF_DISABLE_LOW_FPS_DISCONNECT_ "DisableLowFpsDisconnect"
 #define _DS1_OVERHAUL_PREF_GESTURE_CANCELLING_ "GestureCancelling"
 #define _DS1_OVERHAUL_PREF_LADDER_FIX_ "LadderFix"
+#define _DS1_OVERHAUL_PREF_MULTI_TRIBUTE_ "MultiTribute"
+#define _DS1_OVERHAUL_PREF_MULTI_CONSUME_ "MultiConsume"
 #define _DS1_OVERHAUL_PREF_LADDER_FIX_RUNG_INDEX_ "LadderFixRungIndexOverride"
 #define _DS1_OVERHAUL_PREF_CHEATS_WARNING_ "CheatsWarning"
+#define _DS1_OVERHAUL_PREF_DISABLE_AUTO_EQUIP_ "DisableAutoEquip"
 #define _DS1_OVERHAUL_PREF_SKIP_UPDATE_SOURCE_ "SkipRemoteSource"
 #define _DS1_OVERHAUL_PREF_KEEP_TEMP_UPDATE_CHECK_FILES_ "KeepTempRemoteFiles"
 #define _DS1_OVERHAUL_PREF_CUSTOM_UPDATE_SOURCE_URL_ "CustomUpdateHost"
@@ -81,12 +84,16 @@
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_CONSOLE_LOCK_CAM_ "ToggleConsoleLockCamera"
 #define _DS1_OVERHAUL_HOTKEY_BONFIRE_INPUT_FIX_ "BonfireInputFix"
 #define _DS1_OVERHAUL_HOTKEY_DESPAWN_GL_PHANTOMS_ "DespawnGravelordPhantoms"
+#define _DS1_OVERHAUL_HOTKEY_TOGGLE_MULTI_TRIBUTE_ "ToggleMultiTribute"
+#define _DS1_OVERHAUL_HOTKEY_TOGGLE_MULTI_CONSUME_ "ToggleMultiConsume"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_NODE_COUNT_ "ToggleNodeCount"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_DIM_LAVA_ "ToggleLavaBrightness"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_LADDER_FIX_ "ToggleLadderFix"
+#define _DS1_OVERHAUL_HOTKEY_TOGGLE_ITEM_AUTO_EQUIP_ "ToggleItemAutoEquip"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_ARMOR_SFX_ "ToggleArmorSounds"
 #define _DS1_OVERHAUL_HOTKEY_SAVE_FILE_NEXT_ "NextSaveFile"
 #define _DS1_OVERHAUL_HOTKEY_SAVE_FILE_PREV_ "PrevSaveFile"
+#define _DS1_OVERHAUL_HOTKEY_SAVE_FILE_CHOOSE_ "SelectSaveFile"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_COMPASS_RADIAL_ "ToggleHudCompassRadial"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_COMPASS_BAR_ "ToggleHudCompassBar"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_HUD_ELEVATION_METER_ "ToggleHudElevationMeter"
@@ -176,6 +183,9 @@ public:
 
     // User preference setting; determines whether multiplayer node graph HUD element will be enabled when network is loaded
     static bool hud_node_graph_pref;
+
+    // User preference setting; determines whether to automatically equip items on pickup
+    static bool disable_auto_equip_pref;
 
     // Custom game archive files to load instead of the vanilla game files
     static std::wstring custom_game_archive_path;
