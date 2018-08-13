@@ -172,25 +172,45 @@ static bool resolve_current_player_animation_speed();
  * Help speedup some functions by, whenever we're loaded into an area,
  * preload/preresolve some pointers and values so they can be much more quickly read when we need them
  * This function should be called whenever an area is loaded (after player status changes from loading)
+ * This also refreshes the cache on area load so it doesn't get stale
 */
 static bool one_time_only_caches = false; //some caches only need to be preloaded once per game start
+
+static uint64_t* pc_entity_ptr = NULL;
+static uint32_t* time_address = NULL;
+static uint32_t* left_hand_weapon_ptr_cache = NULL;
+static uint32_t* right_hand_weapon_ptr_cache = NULL;
+static uint32_t* player_char_max_hp_cache = NULL;
+static int32_t* player_body_anim_id_cache = NULL;
+static int32_t* player_upper_body_anim_id_cache = NULL;
+static int32_t* player_lower_body_anim_id_cache = NULL;
+static float* set_current_player_animation_speed_cache = NULL;
 
 void Game::preload_function_caches() {
 
     if (!one_time_only_caches) {
+        pc_entity_ptr = NULL;
         Game::get_pc_entity_pointer();
+        time_address = NULL;
         Game::get_game_time_ms();
         one_time_only_caches = true;
     }
 
+    left_hand_weapon_ptr_cache = NULL;
     Game::left_hand_weapon();
+    right_hand_weapon_ptr_cache = NULL;
     Game::right_hand_weapon();
+    player_char_max_hp_cache = NULL;
     Game::get_player_char_max_hp();
+    player_body_anim_id_cache = NULL;
     Game::get_player_body_anim_id();
+    player_upper_body_anim_id_cache = NULL;
     Game::get_player_upper_body_anim_id();
+    player_lower_body_anim_id_cache = NULL;
     Game::get_player_lower_body_anim_id();
     Sleep(10);
     //this pointer is a bit late to resolve on load
+    set_current_player_animation_speed_cache = NULL;
     uint_fast8_t i;
     for(i=0;i<16;i++) {
         if (resolve_current_player_animation_speed()) break;
@@ -491,7 +511,6 @@ void Game::set_memory_limit()
     Mod::startup_messages.push_back(Mod::output_prefix + "Increasing game memory allocation size.");
 }
 
-static float* set_current_player_animation_speed_cache = NULL;
 
 static bool resolve_current_player_animation_speed() {
     sp::mem::pointer speed_ptr = sp::mem::pointer<float>((void*)Game::world_char_base, { 0x68, 0x68, 0x18, 0xA8 });
@@ -516,8 +535,6 @@ void Game::set_current_player_animation_speed(float speed) {
 }
 
 // Returns current player character body animation ID (attacking, rolling, gestures, etc)
-static int32_t* player_body_anim_id_cache = NULL;
-
 int32_t Game::get_player_body_anim_id()
 {
     if (player_body_anim_id_cache) {
@@ -533,7 +550,6 @@ int32_t Game::get_player_body_anim_id()
     }
 }
 
-static int32_t* player_upper_body_anim_id_cache = NULL;
 
 int32_t Game::get_player_upper_body_anim_id()
 {
@@ -551,7 +567,6 @@ int32_t Game::get_player_upper_body_anim_id()
     }
 }
 
-static int32_t* player_lower_body_anim_id_cache = NULL;
 
 int32_t Game::get_player_lower_body_anim_id()
 {
@@ -570,7 +585,6 @@ int32_t Game::get_player_lower_body_anim_id()
 }
 
 
-static uint32_t* time_address = NULL;
 // Return pointer to current game time in milliseconds since the game has started
 uint32_t* Game::get_game_time_ms()
 {
@@ -589,8 +603,6 @@ uint32_t* Game::get_game_time_ms()
         return time_address;
     }
 }
-
-static uint64_t* pc_entity_ptr = NULL;
 
 uint64_t Game::get_pc_entity_pointer() {
     //quick resolve
@@ -645,7 +657,6 @@ void Game::increase_gui_hpbar_max()
     }
 }
 
-static uint32_t* left_hand_weapon_ptr_cache = NULL;
 
 uint32_t Game::left_hand_weapon() {
     if (left_hand_weapon_ptr_cache) {
@@ -662,7 +673,6 @@ uint32_t Game::left_hand_weapon() {
     }
 }
 
-static uint32_t* right_hand_weapon_ptr_cache = NULL;
 
 uint32_t Game::right_hand_weapon() {
     if (right_hand_weapon_ptr_cache) {
@@ -691,7 +701,6 @@ int32_t Game::get_player_char_status() {
     }
 }
 
-static uint32_t* player_char_max_hp_cache = NULL;
 
 uint32_t Game::get_player_char_max_hp() {
     if (player_char_max_hp_cache) {
