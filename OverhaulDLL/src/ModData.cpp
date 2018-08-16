@@ -17,6 +17,7 @@
 #include "DurabilityBars.h"
 #include "MultiTribute.h"
 #include "MultiConsume.h"
+#include "L3Jump.h"
 
 #include <regex>
 
@@ -354,6 +355,10 @@ void Mod::get_user_preferences()
     if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_MULTI_CONSUME_, 1, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
         MultiConsume::apply("    ");
     }
+
+    if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_L3_JUMP_, L3Jump::is_active(), _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
+        L3Jump::apply("    ");
+    }
     
     // @TODO Load additional user preferences here
 
@@ -403,6 +408,12 @@ void Mod::get_user_keybinds()
 
     // Toggle Multi-consumption
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_MULTI_CONSUME_, kf_toggle_multi_consume);
+
+    // Toggle omni-directional rolling
+    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_OMNI_ROLL_, kf_toggle_omni_roll);
+
+    // Toggle jumping with L3 instead of B
+    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_L3_JUMP_, kf_toggle_l3_jump);
 
     // Next/previous save file
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_SAVE_FILE_NEXT_, kf_save_file_next);

@@ -45,6 +45,9 @@ void *Game::world_char_base = NULL;
 // Player character status (loading, human, co-op, invader, hollow)
 SpPointer Game::player_char_status;
 
+// Current character name
+SpPointer Game::player_char_name(reinterpret_cast<void*>(0x1378700), { 0x8, 0xA0 });
+
 // Time Action Events for the player character's animations
 Tae Game::player_tae = Tae();
 
@@ -56,6 +59,9 @@ uint8_t *Game::lava_luminosity = NULL;
 
 // Game saving on/off
 SpPointer Game::saves_enabled;
+
+// Indicates whether any invaders are present
+uint32_t Game::invaders_present_in_world = 0;
 
 // Multiplayer node count
 int Game::node_count = -1;
@@ -654,11 +660,16 @@ void Hud::set_show_node_graph(bool enable, bool game_flag_only)
                 /////////////////////////////////////////
 
 
-// Disables automatic game disconnection when low framerate is detected
-void Game::enable_low_fps_disconnect(bool enable)
+// Toggles automatic game disconnection when low framerate is detected
+void Game::enable_low_fps_disconnect(bool enable, const std::string& output_prefix)
 {
-    uint8_t *fps_warn = NULL;
-    fps_warn = (uint8_t*)aob_scan("74 17 B9 ?? ?? ?? ?? E8 ?? ?? ?? ?? 8B"); // WARNING: this pattern returns 2 results
+    static uint8_t *fps_warn = NULL;
+    if (!fps_warn)
+    {
+        // Save address for future calls to this function
+        fps_warn = (uint8_t*)aob_scan("74 17 B9 ?? ?? ?? ?? E8 ?? ?? ?? ?? 8B"); // WARNING: this pattern returns 2 results
+    }
+    
 
     if (fps_warn)
     {
@@ -668,15 +679,19 @@ void Game::enable_low_fps_disconnect(bool enable)
 
         if (enable)
         {
-            print_console(Mod::output_prefix + "Enabling low FPS disconnect...");
+            print_console(output_prefix + "Enabling low FPS disconnect...");
             *fps_warn = 0x51; // Enable low FPS disconnect
         }
         else
         {
-            print_console(Mod::output_prefix + "Disabling low FPS disconnect...");
+            print_console(output_prefix + "Disabling low FPS disconnect...");
             *fps_warn = 0xC3; // Disable low FPS disconnect
         }
 
+    }
+    else
+    {
+        print_console(output_prefix + "Failed to " + (enable ? "enable" : "disable") + " low FPS disconnect (AoB scan returned NULL)");
     }
 }
 
@@ -741,7 +756,8 @@ void Game::set_current_player_animation_speed(float speed) {
 // Returns current player character body animation ID (attacking, rolling, gestures, etc)
 int32_t Game::get_player_body_anim_id()
 {
-    SpPointer anim_id = SpPointer((void*)((uint32_t)Game::ds1_base + 0xEE29E8), { 0x0, 0xFF0 });
+    //SpPointer anim_id = SpPointer((void*)((uint32_t)Game::ds1_base + 0xEE29E8), { 0x0, 0xFF0 });
+    SpPointer anim_id = SpPointer((void*)((uint32_t)Game::ds1_base + 0xEE29E8), { 0x10, 0x38, 0x46C, 0x60 });
     if (anim_id.resolve() == NULL) {
         return -1;
     } else {
@@ -787,10 +803,141 @@ uint32_t Game::get_game_time_ms()
 bool Game::allow_rotation_when_locked_on(bool allow)
 {
     uint8_t new_value = allow ? 0 : 1;
-    SpPointer flag = SpPointer((void*)((uint32_t)Game::ds1_base + 0xF7D6C8), { 0x48C, 0x32C, 0x56C, 0x3F0 });
-    flag.write(new_value);
+    static SpPointer flag = SpPointer((void*)((uint32_t)Game::ds1_base + 0xF7D6C8), { 0x48C, 0x32C, 0x56C, 0x3F0 });
+    uint8_t* flag_ptr = (uint8_t*)flag.resolve();
+    if (flag_ptr == NULL) {
+        return false;
+    }
+    *flag_ptr = new_value;
     // Return true if successful
-    return !(flag.resolve() == NULL);
+    return true;
+}
+
+
+// Checks if any invaders are present
+bool Game::check_invaders_present_in_world()
+{
+    static SpPointer player_char_type[3] = { SpPointer((void*)((uint32_t)0x12E29E8),{ 0x20, 0x70 }), SpPointer((void*)((uint32_t)0x12E29E8),{ 0x40, 0x70 }), SpPointer((void*)((uint32_t)0x12E29E8),{ 0x60, 0x70 }) };
+    //static SpPointer player_team_type[3] = { SpPointer((void*)((uint32_t)0x12E29E8),{ 0x20, 0x74 }), SpPointer((void*)((uint32_t)0x12E29E8),{ 0x40, 0x74 }), SpPointer((void*)((uint32_t)0x12E29E8),{ 0x60, 0x74 }) };
+    
+    // Check if player is an invader
+    uint32_t* pc_status = NULL;
+    pc_status = reinterpret_cast<uint32_t*>(Game::player_char_status.resolve());
+    if (pc_status && !(*pc_status == DS1_PLAYER_STATUS_HUMAN || *pc_status == DS1_PLAYER_STATUS_COOP || *pc_status == DS1_PLAYER_STATUS_HOLLOW))
+    {
+        Game::invaders_present_in_world = 1;
+        return true;
+    }
+
+    // Check if other players are invaders
+    for (SpPointer c : player_char_type)
+    {
+        uint32_t* char_type = (uint32_t*)c.resolve();
+        if (char_type && (*char_type != 0 && *char_type != 1)) // Player is neither host or white phantom
+        {
+            Game::invaders_present_in_world = 1;
+            return true;
+        }
+    }
+
+    Game::invaders_present_in_world = 0;
+    return false;
+}
+
+
+// Player's current world area ID
+uint32_t Game::get_online_area_id()
+{
+    static SpPointer online_area(reinterpret_cast<void*>(0x12E29E8), { 0x0, 0x284 });
+    uint32_t* area = static_cast<uint32_t*>(online_area.resolve());
+    if (area)
+    {
+        return *area;
+    }
+    return 0;
+}
+
+
+// Returns the name of the current character
+std::string Game::get_character_name()
+{
+    uint32_t* player_status = static_cast<uint32_t*>(Game::player_char_status.resolve());
+    wchar_t* name_buff = static_cast<wchar_t*>(player_char_name.resolve());
+    if (player_status && (*player_status != DS1_PLAYER_STATUS_LOADING) && name_buff)
+    {
+        name_buff[Game::player_char_name_max_len+1] = L'\0';
+        errno_t return_error = 0;
+        std::wstring w_name = name_buff;
+        std::string  name;
+        if (return_error = string_wide_to_mb(const_cast<wchar_t*>(w_name.c_str()), name))
+        {
+            // Conversion error
+            print_console("ERROR: Failed to read character name (Conversion error)");
+        }
+        else
+        {
+            return name;
+        }
+    }
+    else
+    {
+        print_console("ERROR: Failed to read character name (No character loaded)");
+    }
+    return "";
+}
+
+
+// Sets the name of the current character
+void Game::set_character_name(std::string& name)
+{
+    uint32_t* player_status = static_cast<uint32_t*>(Game::player_char_status.resolve());
+    wchar_t*  name_buff = static_cast<wchar_t*>(player_char_name.resolve());
+    if (!(player_status && (*player_status != DS1_PLAYER_STATUS_LOADING) && name_buff))
+    {
+        print_console("ERROR: Failed to write character name (No character loaded)");
+    }
+    errno_t return_error = 0;
+    std::wstring w_name;
+    if (return_error = string_mb_to_wide(const_cast<char*>(name.c_str()), w_name))
+    {
+        // Conversion error
+        print_console("ERROR: Failed to write character name (Conversion error)");
+    }
+    else if (!w_name.empty())
+    {
+        if (w_name.length() > Game::player_char_name_max_len)
+        {
+            print_console("WARNING: Name string too long (truncating)");
+            w_name = w_name.substr(0, Game::player_char_name_max_len);
+        }
+        size_t illegal_char_count = 0;
+        for (size_t i = 0; i <= w_name.length(); i++)
+        {
+            if (w_name[i] == L'#')
+            {
+                w_name[i] = L'_';
+                illegal_char_count++;
+            }
+        }
+        if (illegal_char_count)
+        {
+            print_console("WARNING: " + std::to_string(illegal_char_count)
+                          + " invalid character" + (illegal_char_count > 1 ? "s were" : " was")
+                          + " removed and replaced with exclamation point" + (illegal_char_count > 1 ? "s" : ""));
+        }
+        
+        if (name_buff)
+        {
+            name_buff[0] = w_name[0];
+            name_buff[Game::player_char_name_max_len] = L'\0';
+            memset(name_buff+1, 0, sizeof(wchar_t)*Game::player_char_name_max_len);
+            memcpy_s(name_buff, sizeof(wchar_t)*(Game::player_char_name_max_len+1), w_name.c_str(), sizeof(wchar_t)*w_name.length());
+        }
+    }
+    else
+    {
+        print_console("ERROR: Name cannot be empty");
+    }
 }
 
 

@@ -1,6 +1,28 @@
-                    #################################################
-                    ###### DARK SOULS OVERHAUL DLL CHANGELOG  #######
-                    #################################################
+                    ################################################
+                    ###### DARK SOULS OVERHAUL DLL CHANGELOG #######
+                    ################################################
+
+
+
+------------------------------------------------------------------------------------------
+08/16/2018:
+- New features (as requested by the community):
+    - (Experimental) Omni-directional rolling (Inactive during PvP)
+    - Option to use L3 (left thumbstick) for jumping ("L3Jump=1" in config, "L3_jump" in console)
+- Bug fixes & feature enhancements:
+    - Fixed large number of cases where multi-consumption of items was causing issues
+    - Fixed issue where multi-tribute dialog would appear when using the "Reverse Hollowing"
+      option at a bonfire
+    - Added basic location check for ladder fix
+
+
+
+------------------------------------------------------------------------------------------
+08/09/2018:
+- New features:
+    - (Experimental) Multiple simultaneous item consumption & covenant tributes
+    - Option to disable auto-pickup of consumable items (except Estus)
+    - Ability to choose save file by index (instead of iterating through them)
 
 
 

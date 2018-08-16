@@ -75,6 +75,12 @@ public:
     // Player character status (loading, human, co-op, invader, hollow)
     static SpPointer player_char_status;
 
+    // Current character name
+    static SpPointer player_char_name;
+
+    // Maximum allowed length (in wide chars, not including null terminator) for character name strings
+    static const size_t player_char_name_max_len = 13; // Seems like buffer should be able to hold 15 wchar_ts + null terminator, but DSPW limits to 13
+
     // Time Action Events for the player character's animations
     static Tae player_tae;
 
@@ -92,6 +98,9 @@ public:
 
     // Size of the pool of memory the game allocates for itself
     static uint32_t memory_limit;
+
+    // Indicates whether any invaders are present
+    static uint32_t invaders_present_in_world;
 
 
 
@@ -142,7 +151,7 @@ public:
     static void enable_armor_sfx(bool enable);
 
     // Enables/Disables automatic game disconnection when low framerate is detected
-    static void enable_low_fps_disconnect(bool enable);
+    static void enable_low_fps_disconnect(bool enable, const std::string& output_prefix = "");
 
     // Checks if player is currently locked onto an enemy
     static bool player_is_locked_on();
@@ -168,6 +177,18 @@ public:
 
     // Sets whether player character will automatically turn toward enemies when locked on
     static bool allow_rotation_when_locked_on(bool allow);
+
+    // Checks if any invaders are present
+    static bool check_invaders_present_in_world();
+
+    // Player's current world area ID
+    static uint32_t get_online_area_id();
+
+    // Returns the name of the current character
+    static std::string get_character_name();
+
+    // Sets the name of the current character
+    static void set_character_name(std::string& name);
 
 
                     /////////////////////////////////////////

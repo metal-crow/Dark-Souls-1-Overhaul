@@ -57,6 +57,12 @@ int kf_toggle_multi_consume();
 // Toggles Multi-Tribute (multiple simultaneous covenant tributes patch)
 int kf_toggle_multi_tribute();
 
+// Toggles omni-directional rolling
+int kf_toggle_omni_roll();
+
+// Toggles L3 jumping
+int kf_toggle_l3_jump();
+
 // Next/previous save file
 int kf_save_file_next();
 int kf_save_file_prev();

@@ -18,6 +18,8 @@
 #include "LadderFix.h"
 #include "Updates.h"
 #include "DurabilityBars.h"
+#include "MultiConsume.h"
+#include "MultiTribute.h"
 
 #include "D3dx9math.h"
 
@@ -175,6 +177,19 @@ __declspec(dllexport) void __stdcall initialize_plugin()
         return;
     }
 
+    // Apply permanent animation ID write intercept
+    AnimationEdits::apply_anim_id_write_intercept();
+
+    if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_OMNI_DIRECTIONAL_ROLL_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0)
+    {
+        AnimationEdits::omni_directional_dodge = 1;
+        print_console("    Enabling omni-directional rolling (EXPERIMENTAL)");
+    }
+    else
+    {
+        AnimationEdits::omni_directional_dodge = 0;
+    }
+
     // Load user preferences & keybinds from settings file
     Mod::get_user_preferences();
     Mod::get_user_keybinds();
@@ -190,8 +205,10 @@ __declspec(dllexport) void __stdcall initialize_plugin()
         Game::increase_phantom_limit2();
 
     if (Mod::disable_low_fps_disconnect)
+    {
         // Disable "Framerate insufficient for online play" error
-        Game::enable_low_fps_disconnect(false);
+        Game::enable_low_fps_disconnect(false, Mod::output_prefix);
+    }
 
     std::string tmp;
     if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_AUTO_MOTD_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0)
@@ -272,8 +289,34 @@ __declspec(dllexport) void __stdcall main_loop()
         }
         else
         {
+            // No character loaded
             DurabilityBars::render_data.display = false;
+
+            MultiConsume::skip_next_multiconsume_dialog = 0;
+            MultiConsume::force_consume_next_item = 0;
+            MultiConsume::last_multiconsume_item = 0;
+            MultiConsume::last_consumption_quantity = 0;
+            MultiConsume::item_quantity = 0;
+            MultiConsume::capture_next_dlg_result = 0;
+            MultiConsume::consumed_from_inventory = 0;
+
+            MultiTribute::change_next_dlg_to_number_picker = 0;
+            MultiTribute::tmp_last_talk = 0;
+            MultiTribute::adjust_tribute_dec = 0;
+            MultiTribute::sunlight_medal_count = 0;
+            MultiTribute::dragon_scale_count = 0;
+            MultiTribute::souvenir_count = 0;
+            MultiTribute::eye_of_death_count = 0;
         }
+
+        // Check if the player is invading, or if other players are invading
+        Game::check_invaders_present_in_world();
+
+        // Store current world area for ladder fix
+        LadderFix::world_area = Game::get_online_area_id();
+
+        // Check if in-game text input has focus (character creation screen)
+        Menu::Dlg::text_input_active = ((!console_is_open()) && Menu::Dlg::flags() && Menu::Dlg::flag(0x94) == 7);
 
 		// Check if the character is loading, and apply actions that need to be _reapplied_ after every loading screen
 		/*int char_status;
@@ -528,6 +571,12 @@ __declspec(dllexport) bool __stdcall get_raw_input_data(RAWINPUT *pData, PUINT p
         case RIM_TYPEKEYBOARD:
 
             // Handle keyboard input
+
+            // If in-game text input field has focus, ignore keyboard inputs
+            if (Menu::Dlg::text_input_active)
+            {
+                return false; // Allow input to reach the game
+            }
 
             // Determine type of keyboard input
             switch (pData->data.keyboard.Message)

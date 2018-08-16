@@ -88,6 +88,14 @@ void apply(const std::string& output_prefix)
     {
         print_console(output_prefix + "Enabling multi-tributes (EXPERIMENTAL)");
 
+        change_next_dlg_to_number_picker = 0;
+        tmp_last_talk = 0;
+        adjust_tribute_dec = 0;
+        sunlight_medal_count = 0;
+        dragon_scale_count = 0;
+        souvenir_count = 0;
+        eye_of_death_count = 0;
+
         set_mem_protection(const_cast<uint8_t*>(tribute_humanity_injection_point), 7, MEM_PROTECT_RWX);
         inject_jmp_5b(const_cast<uint8_t*>(tribute_humanity_injection_point), &returnhere_tribute_humanity, 2, &intercept_tribute_humanity);
 
@@ -129,6 +137,14 @@ void unpatch(const std::string& output_prefix)
     if (is_active())
     {
         print_console(output_prefix + "Disabling multi-tributes...");
+
+        change_next_dlg_to_number_picker = 0;
+        tmp_last_talk = 0;
+        adjust_tribute_dec = 0;
+        sunlight_medal_count = 0;
+        dragon_scale_count = 0;
+        souvenir_count = 0;
+        eye_of_death_count = 0;
 
         forget_injection((uint32_t)tribute_humanity_injection_point);
         apply_byte_patch(const_cast<uint8_t*>(tribute_humanity_injection_point), tribute_humanity_original_bytes, 7);
@@ -352,17 +368,17 @@ void __declspec(naked) __stdcall intercept_show_dialog()
         mov [tmp_last_talk], eax
         //pop eax
         mov eax, [dialog_msg_id]
-        cmp [eax], 0x98E568 //["DARKSOULS.exe"+0xEE33E0] // 10020200 = "Offer Sunlight Medal" Message ID
+        cmp dword ptr [eax], 0x98E568 //["DARKSOULS.exe"+0xEE33E0] // 10020200 = "Offer Sunlight Medal" Message ID
         je do_show_dialog_intercept
-        cmp [eax], 0x98E569 //["DARKSOULS.exe"+0xEE33E0] // 10020201 = "Offer humanity?" Message ID
+        cmp dword ptr [eax], 0x98E569 //["DARKSOULS.exe"+0xEE33E0] // 10020201 = "Offer humanity?" Message ID
         je do_show_dialog_intercept
-        cmp [eax], 0x98E56A //["DARKSOULS.exe"+0xEE33E0] // 10020202 = "Offer Dragon Scale?" Message ID
+        cmp dword ptr [eax], 0x98E56A //["DARKSOULS.exe"+0xEE33E0] // 10020202 = "Offer Dragon Scale?" Message ID
         je do_show_dialog_intercept
-        cmp [eax], 0x98E56B //["DARKSOULS.exe"+0xEE33E0] // 10020203 = "Offer Eye of Death?" Message ID
+        cmp dword ptr [eax], 0x98E56B //["DARKSOULS.exe"+0xEE33E0] // 10020203 = "Offer Eye of Death?" Message ID
         je do_show_dialog_intercept
-        cmp [eax], 0x98E56C //["DARKSOULS.exe"+0xEE33E0] // 10020204 = "Offer Souvenir of Reprisal?" Message ID
+        cmp dword ptr [eax], 0x98E56C //["DARKSOULS.exe"+0xEE33E0] // 10020204 = "Offer Souvenir of Reprisal?" Message ID
         je do_show_dialog_intercept
-        cmp [eax], 0x98E56D //["DARKSOULS.exe"+0xEE33E0] // 10020205 = "Offer humanity?" Message ID
+        cmp dword ptr [eax], 0x98E56D //["DARKSOULS.exe"+0xEE33E0] // 10020205 = "Offer humanity?" Message ID
         je do_show_dialog_intercept
         pop eax
         jmp originalcode_show_dialog
@@ -475,9 +491,9 @@ void __declspec(naked) __stdcall intercept_show_dialog()
         // Set number picker arguments
         mov eax, 0x13786D0 //"DARKSOULS.exe"+0x00F786D0
         mov eax, [eax]
-        mov [eax+0x208], 1   // Set min number picker value
-        mov [eax+0x20C], 1   // Set default number picker value
-        mov [eax+0x204], ecx // Set max number picker value (current soft humanity count)
+        mov dword ptr [eax+0x208], 1   // Set min number picker value
+        mov dword ptr [eax+0x20C], 1   // Set default number picker value
+        mov dword ptr [eax+0x204], ecx // Set max number picker value (current soft humanity count)
         pop ecx
         pop eax
         cmp edx, 8 // 8 = Yes/No prompt dialog type
@@ -503,7 +519,7 @@ void __declspec(naked) __stdcall intercept_inventory_item_id_read()
     __asm
     {
         // [ecx+4] = item ID
-        cmp [ecx+4], 0x177 // 375 = Sunlight Medal item ID
+        cmp dword ptr [ecx+4], 0x177 // 375 = Sunlight Medal item ID
         jne not_sunlight_medal_item_id
         push eax
         mov eax, [ecx+8] // [ecx+8] = Sunlight Medal quantity
@@ -511,7 +527,7 @@ void __declspec(naked) __stdcall intercept_inventory_item_id_read()
         pop eax
         jmp originalcode_inventory_item_id_read
         not_sunlight_medal_item_id:
-        cmp [ecx+4], 0x456 // 1110 = Dragon Scale item ID
+        cmp dword ptr [ecx+4], 0x456 // 1110 = Dragon Scale item ID
         jne not_dragon_scale_item_id
         push eax
         mov eax, [ecx+8] // [ecx+8] = Dragon Scale quantity
@@ -519,7 +535,7 @@ void __declspec(naked) __stdcall intercept_inventory_item_id_read()
         pop eax
         jmp originalcode_inventory_item_id_read
         not_dragon_scale_item_id:
-        cmp [ecx+4], 0x176 // 374 = Souvenir of Reprisal item ID
+        cmp dword ptr [ecx+4], 0x176 // 374 = Souvenir of Reprisal item ID
         jne not_souvenir_item_id
         push eax
         mov eax, [ecx+8] // [ecx+8] = Souvenir of Reprisal quantity
@@ -527,7 +543,7 @@ void __declspec(naked) __stdcall intercept_inventory_item_id_read()
         pop eax
         jmp originalcode_inventory_item_id_read
         not_souvenir_item_id:
-        cmp [ecx+4], 0x6D // 109 = Eye of Death item ID
+        cmp dword ptr [ecx+4], 0x6D // 109 = Eye of Death item ID
         jne originalcode_inventory_item_id_read
         push eax
         mov eax, [ecx+8] // [ecx+8] = Eye of Death quantity
@@ -561,7 +577,7 @@ void __declspec(naked) __stdcall intercept_darkwraith_inc()
         cmp dl, 0x64 // 100 = max devotion
         jle originalcode_darkwraith_inc
         mov dl, 0x64 // If devotion > 100, set it to 100
-        mov [esp+8], 0x64
+        mov dword ptr [esp+8], 0x64
         originalcode_darkwraith_inc:
         mov [ecx+0x000000E6], dl
         jmp returnhere_darkwraith_inc
@@ -585,7 +601,7 @@ void __declspec(naked) __stdcall intercept_chaos_servant_inc()
         cmp al, 0x64 // 100 = max devotion
         jle originalcode_chaos_servant_inc
         mov al, 0x64 // If devotion > 100, set it to 100
-        mov [esp+8], 0x64
+        mov dword ptr [esp+8], 0x64
         originalcode_chaos_servant_inc:
         mov [ecx+0x000000EB], al
         jmp returnhere_chaos_servant_inc
@@ -609,7 +625,7 @@ void __declspec(naked) __stdcall intercept_sunlight_warrior_inc()
         cmp al, 0x64 // 100 = max devotion
         jle originalcode_sunlight_warrior_inc
         mov al, 0x64 // If devotion > 100, set it to 100
-        mov [esp+8], 0x64
+        mov dword ptr [esp+8], 0x64
         originalcode_sunlight_warrior_inc:
         mov [ecx+0x000000E5], al
         jmp returnhere_sunlight_warrior_inc
@@ -633,7 +649,7 @@ void __declspec(naked) __stdcall intercept_darkmoon_inc()
         cmp dl, 0x64 // 100 = max devotion
         jle originalcode_darkmoon_inc
         mov dl, 0x64 // If devotion > 100, set it to 100
-        mov [esp+8], 0x64
+        mov dword ptr [esp+8], 0x64
         originalcode_darkmoon_inc:
         mov [ecx+0x000000EA], dl
         jmp returnhere_darkmoon_inc
@@ -657,7 +673,7 @@ void __declspec(naked) __stdcall intercept_path_of_the_dragon_inc()
         cmp al, 0x64 // 100 = max devotion
         jle originalcode_path_of_the_dragon_inc
         mov al, 0x64 // If devotion > 100, set it to 100
-        mov [esp+8], 0x64
+        mov dword ptr [esp+8], 0x64
         originalcode_path_of_the_dragon_inc:
         mov [ecx+0x000000E7], al
         jmp returnhere_path_of_the_dragon_inc
@@ -681,7 +697,7 @@ void __declspec(naked) __stdcall intercept_gravelord_inc()
         cmp dl, 0x64 // 100 = max devotion
         jle originalcode_gravelord_inc
         mov dl, 0x64 // If devotion > 100, set it to 100
-        mov [esp+8], 0x64
+        mov dword ptr [esp+8], 0x64
         originalcode_gravelord_inc:
         mov [ecx+0x000000E8], dl
         jmp returnhere_gravelord_inc

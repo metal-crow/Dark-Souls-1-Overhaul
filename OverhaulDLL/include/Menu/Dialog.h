@@ -82,6 +82,9 @@ static wchar_t msg_buffer[DS1_OVERHAUL_CUSTOM_DIALOG_MSG_MAX_LEN_];
 static wchar_t bt_l_buffer[DS1_OVERHAUL_CUSTOM_DIALOG_BT_MAX_LEN_];
 static wchar_t bt_r_buffer[DS1_OVERHAUL_CUSTOM_DIALOG_BT_MAX_LEN_];
 
+// Indicates whether character creation text box is active
+static bool text_input_active = false;
+
 // Shows a dialog box for the specified duration (in milliseconds), then closes it
 void show_async(dlg_type dialog_type, unsigned long duration);
 

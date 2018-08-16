@@ -18,6 +18,8 @@
 namespace LadderFix {
     extern bool enable_pref;
 
+    extern uint32_t world_area;
+
     void apply();
     void unpatch();
     bool is_active();

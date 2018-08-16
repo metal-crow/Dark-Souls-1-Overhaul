@@ -54,6 +54,13 @@ const char *chm_dim_lava = ccn_dim_lava" [boolean]\n     Enables/disables dimmed
 #define cca_lava_brightness_fix "lava_brightness_fix"
 
 
+#define ccn_omni_roll "omni_roll"
+const char *chm_omni_roll = ccn_omni_roll" [boolean]\n     Enables/disables omni-directional dodging (1 = enabled, 0 = disabled).";
+
+#define ccn_l3_jump "L3_jump"
+const char *chm_l3_jump = ccn_l3_jump" [boolean]\n     Enables/disables jumping with left thumbstick (1 = enabled, 0 = disabled).";
+
+
 #define ccn_ladder_fix "ladder_fix"
 const char *chm_ladder_fix = ccn_ladder_fix" [boolean]\n    Enables/disables the ladder bug fix (1 = enabled, 0 = disabled) (EXPERIMENTAL).\n"
                                                      "\n    The ladder glitch is when the player falls through the floor after sliding down certain ladders with unlocked FPS,"
@@ -71,6 +78,10 @@ const char *chm_armor_sfx = ccn_armor_sfx" [boolean]\n     Enables/disables armo
 
 #define ccn_auto_equip "item_auto_equip"
 const char *chm_auto_equip = ccn_auto_equip" [boolean]\n     Enables/disables automatic equipping of items on pickup (1 = enabled, 0 = disabled).";
+
+
+#define ccn_low_fps_disconnect "low_fps_disconnect"
+const char *chm_low_fps_disconnect = ccn_low_fps_disconnect" [boolean]\n     Enables/disables \"Framerate too low for online play\" disconnection (1 = enabled, 0 = disabled).";
 
 
 #define ccn_fix_bonfire_input "fix_bonfire_input"
@@ -110,6 +121,8 @@ const char *chm_save_file_create = ccn_save_file_create"\n     Creates a new sav
 const char *chm_save_file_copy = ccn_save_file_copy"\n     Copies the current save file (to see your current save file index, use the save_file_index console command).\n"
                                                      "     Existing save files are not modified.";
 
+#define ccn_game_character_name "game_character_name"
+const char *chm_game_character_name = ccn_game_character_name" [name]\n    Sets the character name for the currently-loaded Dark Souls save game.";
 
 #define ccn_challenge_aggressive_ai "challenge_aggressive_ai"
 const char *chm_challenge_aggressive_ai = ccn_challenge_aggressive_ai" [boolean]\n     Enables/disables Aggressive AI challenge mod (1 = enabled, 0 = disabled)";

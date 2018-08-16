@@ -14,6 +14,8 @@ namespace LadderFix {
 bool enable_pref = true;
 uint32_t _exit_rung = DS1_DEFAULT_LADDER_FIX_EXIT_RUNG_; // Player will exit ladder if they are sliding on or below this rung
 
+uint32_t world_area = 0;
+
 constexpr const size_t patch_byte_count = 7;
 const static uint8_t*  injection_point  = (uint8_t*)0xD5FBE5; // DARKSOULS.exe+0x95FBE5
 const static uint8_t   original_bytes[patch_byte_count] = { 0x83, 0x40, 0x04, 0xFF, 0x8B, 0x50, 0x04 };
@@ -78,7 +80,17 @@ void __declspec(naked) __stdcall ladder_fix()
     {
         // Original code:
         add dword ptr [eax+0x04],-0x01
-        mov edx,[eax+0x04] // Current ladder rung now stored in edx
+        mov edx, [eax+0x04] // Current ladder rung now stored in edx
+
+        // Check for valid world area
+        cmp dword ptr [world_area], 0x18A93 // 101011 = ID of Undead Burg area containing buggy ladder
+        je valid_world_area
+        cmp dword ptr [world_area], 0x18B50 // 101200 = ID of Undead Parish area containing buggy ladder
+        je valid_world_area
+        cmp dword ptr [world_area], 0x1FFB9 // 131001 = ID of Tomb of the Giants area containing buggy ladder
+        jne ladder_fix_flag_restore
+
+        valid_world_area:
 
         // Save registers
         push eax
@@ -123,6 +135,7 @@ void __declspec(naked) __stdcall ladder_fix()
         cleanup:
         // Restore registers & fix sign flag
         pop eax
+        ladder_fix_flag_restore:
         test eax, eax
 
         jmp return_address;

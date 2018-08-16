@@ -9,6 +9,7 @@
 #include "XInputUtil.h"
 #include "Menu/Dialog.h"
 #include "Menu/SavedCharacters.h"
+#include "L3Jump.h"
 
 
 namespace XInput {
@@ -96,7 +97,6 @@ DWORD WINAPI intercept_xinput_get_state(DWORD dwUserIndex, XINPUT_STATE *pState)
 
 // 
 void handle_input(XINPUT_GAMEPAD &old, XINPUT_GAMEPAD &current, bool changed, int player) {
-    static bool reset_lock_rotation = false;
     if (changed) {
 
         if (Files::saves_menu_is_open())
@@ -142,25 +142,16 @@ void handle_input(XINPUT_GAMEPAD &old, XINPUT_GAMEPAD &current, bool changed, in
                 current.wButtons &= (~XINPUT_GAMEPAD_B);
             }
         }
-        
 
-        // Test code for omni-directional rolling while locked:
-        //if (Button::pressed(old, current, XINPUT_GAMEPAD_B)) {
-        //    print_console("Player " + std::to_string(player) + " pressed B");
-        //    if (Game::player_is_locked_on()) {
-        //        print_console("Locked on? Yes");
-        //        Game::allow_rotation_when_locked_on(true);
-        //        reset_lock_rotation = true;
-        //    } else {
-        //        print_console("Locked on? No");
-        //    }
-        //}
-        //// Player dodge animation started; fix body rotation
-        //int32_t player_body_anim = Game::get_player_body_anim_id();
-        //if (reset_lock_rotation && player_body_anim >= 680 && player_body_anim <= 738) {
-        //    Game::allow_rotation_when_locked_on(false);
-        //    reset_lock_rotation = false;
-        //}
+
+        if (L3Jump::is_active()) {
+            // Left thumbstick (L3)
+            if (Button::pressed(old, current, XINPUT_GAMEPAD_L3)) {
+                L3Jump::force_jump(true);
+            } else {
+                L3Jump::force_jump(false);
+            }
+        }
         
     } // if(changed)
 }

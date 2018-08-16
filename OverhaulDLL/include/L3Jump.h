@@ -2,8 +2,7 @@
     DARK SOULS OVERHAUL
 
     Contributors to this file:
-        B3LYP       -  L3 jump technique
-        Sean Pesce  -  C++
+        Sean Pesce  -  C++, L3 jump technique
 */
 
 
@@ -13,13 +12,15 @@
     #define DS1_OVERHAUL_L3_JUMP_H_
 
 #include <cstdint>
+#include <string>
 
 
 namespace L3Jump {
 
-    void apply();
-    void unpatch();
+    void apply(const std::string& output_prefix = "");
+    void unpatch(const std::string& output_prefix = "");
     bool is_active();
+    void force_jump(bool force);
 
 } // namespace L3Jump
 

@@ -24,6 +24,8 @@
 #include "Menu/Dialog.h"
 #include "MultiTribute.h"
 #include "MultiConsume.h"
+#include "AnimationEdits.h"
+#include "L3Jump.h"
 
 
 ///////////////////////////////////////////////////////////
@@ -420,6 +422,29 @@ int cc_save_file_copy(std::vector<std::string> args, std::string *output)
     }
     output->append(out);
     return ERROR_SUCCESS;
+}
+
+// Sets the character name for the currently-loaded Dark Souls save game
+int cc_game_character_name(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = CONSOLE_COMMAND_SUCCESS;
+    uint32_t* player_status = static_cast<uint32_t*>(Game::player_char_status.resolve());
+    if (player_status && (*player_status != DS1_PLAYER_STATUS_LOADING) && Game::player_char_name.resolve()) {
+        if (!args.empty())
+        {
+            Game::set_character_name(args[0]);
+        }
+        std::string name = Game::get_character_name();
+        if (!name.empty())
+        {
+            output->append("Character name = " + name);
+        }
+    }
+    else
+    {
+        output->append("ERROR: No character loaded.");
+    }
+    return ret_val;
 }
 
 // Enables/disables "Aggressive AI" challenge mod
@@ -849,6 +874,95 @@ int cc_multi_consume(std::vector<std::string> args, std::string *output)
     {
         output->append("Multi-consume = disabled");
     }
+    return ret_val;
+}
+
+
+// Enables/disables omni-directional dodging
+int cc_omni_roll(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = CONSOLE_COMMAND_SUCCESS;
+    if (args.size() > 0)
+    {
+        switch (parse_toggle_arg(args.at(0).c_str()))
+        {
+            case 0:
+                AnimationEdits::omni_directional_dodge = 0;
+                break;
+            case 1:
+                AnimationEdits::omni_directional_dodge = 1;
+                break;
+            default:
+                output->append(ERROR_INVALID_BOOL_ARGUMENT + "\n");
+                ret_val = ERROR_INVALID_PARAMETER;
+                break;
+        }
+    }
+    if (!!AnimationEdits::omni_directional_dodge)
+    {
+        output->append("Omni-directional dodging = enabled");
+    }
+    else
+    {
+        output->append("Omni-directional dodging = disabled");
+    }
+    return ret_val;
+}
+
+
+// Enables/disables jumping with L3 instead of B
+int cc_l3_jump(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = CONSOLE_COMMAND_SUCCESS;
+    if (args.size() > 0)
+    {
+        switch (parse_toggle_arg(args.at(0).c_str()))
+        {
+            case 0:
+                L3Jump::unpatch();
+                break;
+            case 1:
+                L3Jump::apply();
+                break;
+            default:
+                output->append(ERROR_INVALID_BOOL_ARGUMENT + "\n");
+                ret_val = ERROR_INVALID_PARAMETER;
+                break;
+        }
+    }
+    if (L3Jump::is_active())
+    {
+        output->append("L3 jump = enabled");
+    }
+    else
+    {
+        output->append("L3 jump = disabled");
+    }
+    return ret_val;
+}
+
+
+// Enables/disables "Framerate too low for online play" disconnect
+int cc_low_fps_disconnect(std::vector<std::string> args, std::string *output)
+{
+    int ret_val = CONSOLE_COMMAND_SUCCESS;
+    if (args.size() > 0)
+    {
+        switch (parse_toggle_arg(args.at(0).c_str()))
+        {
+            case 0:
+                Game::enable_low_fps_disconnect(false);
+                break;
+            case 1:
+                Game::enable_low_fps_disconnect(true);
+                break;
+            default:
+                output->append(ERROR_INVALID_BOOL_ARGUMENT + "\n");
+                ret_val = ERROR_INVALID_PARAMETER;
+                break;
+        }
+    }
+    
     return ret_val;
 }
 
@@ -1334,40 +1448,8 @@ int cc_text_feed_node_count(std::vector<std::string> args, std::string *output)
 */
 int cc_developer_debug(std::vector<std::string> args, std::string *output)
 {
-    //Menu::Dlg::show_number_picker(11000, 5, 6, 1, 1, 25);
+    
 
-    //if (!args.empty())
-    //{
-    //    uint8_t menu_type = 0;
-    //    try
-    //    {
-    //        menu_type = (int)std::stoi(args.at(0).c_str(), NULL);
-    //        reinterpret_cast<ItemParam*>(Params::Item().get_by_id(500))->yesNoDialogMessageId = 10010710;
-    //    }
-    //    catch (const std::invalid_argument&)
-    //    {
-    //        output->append("ERROR: Invalid argument\n");
-    //        reinterpret_cast<ItemParam*>(Params::Item().get_by_id(500))->yesNoDialogMessageId = 0;
-    //    }
-    //    catch (const std::out_of_range&)
-    //    {
-    //        output->append("ERROR: Out of range\n");
-    //    }
-    //    reinterpret_cast<ItemParam*>(Params::Item().get_by_id(500))->opmeMenuType = menu_type;
-    //    reinterpret_cast<ItemParam*>(Params::Item().get_by_id(500))->yesNoDialogMessageId = 0;
-    //}
-    //else
-    //{
-    //    reinterpret_cast<ItemParam*>(Params::Item().get_by_id(500))->opmeMenuType = 0;
-    //    reinterpret_cast<ItemParam*>(Params::Item().get_by_id(500))->yesNoDialogMessageId = 0;
-    //    Menu::Dlg::show_number_picker(L"TEST_MSG", L"BT_L", L"BT_R", 1, 1, 25);
-    //}
-    //output->append("RefId=" + std::to_string(reinterpret_cast<ItemParam*>(Params::Item().get_by_id(500))->refId) + "  openMenuType=" + std::to_string((int)reinterpret_cast<ItemParam*>(Params::Item().get_by_id(500))->opmeMenuType));
-
-    //// ShowGenDialog(uint32_t message_id, uint32_t c, uint32_t dialog_type, bool d)
-    //typedef int (*ShowGenDialog_t)(uint32_t, uint32_t, uint32_t, uint32_t);
-    //ShowGenDialog_t ShowGenDialog = (ShowGenDialog_t)0xD5EEF0;
-    //ShowGenDialog(1200, 5, 3, 6);
     return CONSOLE_COMMAND_SUCCESS;
 }
 
@@ -1401,10 +1483,14 @@ void Mod::register_console_commands()
     register_console_command(ccn_ladder_fix_override, cc_ladder_fix_override, chm_ladder_fix_override);
     register_console_command(ccn_multi_consume, cc_multi_consume, chm_multi_consume);
     register_console_command(ccn_multi_tribute, cc_multi_tribute, chm_multi_tribute);
+    register_console_command(ccn_omni_roll, cc_omni_roll, chm_omni_roll);
+    register_console_command(ccn_l3_jump, cc_l3_jump, chm_l3_jump);
+    register_console_command(ccn_low_fps_disconnect, cc_low_fps_disconnect, chm_low_fps_disconnect);
     register_console_command(ccn_fix_bonfire_input, cc_fix_bonfire_input, chm_fix_bonfire_input);
     register_console_command(ccn_text_feed_node_count, cc_text_feed_node_count, chm_text_feed_node_count);
     register_console_alias(cca_node_count, ccn_text_feed_node_count);
     register_console_command(ccn_multiplayer_network, cc_multiplayer_network, chm_multiplayer_network);
+    register_console_command(ccn_game_character_name, cc_game_character_name, chm_game_character_name);
     register_console_command(ccn_hud_compass_radial, cc_hud_compass_radial, chm_hud_compass_radial);
     register_console_command(ccn_hud_compass_bar, cc_hud_compass_bar, chm_hud_compass_bar);
     register_console_command(ccn_hud_elevation_meter, cc_hud_elevation_meter, chm_hud_elevation_meter);

@@ -17,11 +17,20 @@ typedef struct {
 class AnimationEdits
 {
 public:
+    // Omni-directional dodging currently enabled/disabled
+    static uint32_t omni_directional_dodge;
+
     // Gesture cancelling enabled/disabled
     static bool gesture_cancelling;
 
     // Animation IDs for the default set of gesture animations in the game
     const static uint32_t gesture_anim_ids[15];
+
+    // Indicates whether next whiff animation should be played or skipped
+    static uint32_t skip_next_whiff_anim;
+
+    static void apply_anim_id_write_intercept();
+    static void remove_anim_id_write_intercept();
 
     // Enables gesture cancelling via rolling
     static bool enable_gesture_cancelling();

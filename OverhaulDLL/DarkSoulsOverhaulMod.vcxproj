@@ -263,6 +263,7 @@
     <ClInclude Include="include\Challenge\AggressiveAI.h" />
     <ClInclude Include="include\Challenge\BlackPhantomEnemies.h" />
     <ClInclude Include="include\Challenge\GravelordPhantoms.h" />
+    <ClInclude Include="include\config.h" />
     <ClInclude Include="include\DllMain.h" />
     <ClInclude Include="include\DurabilityBars.h" />
     <ClInclude Include="include\Files.h" />

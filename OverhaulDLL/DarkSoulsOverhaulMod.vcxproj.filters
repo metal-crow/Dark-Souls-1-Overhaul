@@ -209,6 +209,9 @@
     <ClInclude Include="include\MultiTribute.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Exports.def">
