@@ -315,6 +315,12 @@ __declspec(dllexport) void __stdcall main_loop()
         // Store current world area for ladder fix
         LadderFix::world_area = Game::get_online_area_id();
 
+        // Update IGT string
+        if (Mod::hud_play_time_pref)
+        {
+            Game::update_play_time_str();
+        }
+
         // Check if in-game text input has focus (character creation screen)
         Menu::Dlg::text_input_active = ((!console_is_open()) && Menu::Dlg::flags() && Menu::Dlg::flag(0x94) == 7);
 
@@ -409,12 +415,19 @@ __declspec(dllexport) void __stdcall draw_overlay(std::string *text_feed_info_he
         code in this function as optimized as possible to avoid lowering FPS.
     */
 
-    if (Mod::show_node_count) {
+    if (Mod::show_node_count)
+    {
         // Show node count in text feed info header
         if (Game::node_count > -1)
             text_feed_info_header->append("[Nodes: ").append(std::to_string(Game::node_count)).append("]  ");
         else
             text_feed_info_header->append("[Nodes: --]  ");
+    }
+
+    if (Mod::hud_play_time_pref)
+    {
+        // Show IGT in text feed info header
+        text_feed_info_header->append(Game::play_time_str.c_str());
     }
 }
 

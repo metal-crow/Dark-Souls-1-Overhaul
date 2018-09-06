@@ -41,6 +41,7 @@
 #define _DS1_OVERHAUL_PREF_AC_DRAGON_TRIGGER_BLOCK_ "DragonTriggerBlock"
 // General settings:
 #define _DS1_OVERHAUL_PREF_SHOW_NODE_COUNT_ "DisplayNodeCount"
+#define _DS1_OVERHAUL_PREF_PLAY_TIME_ "DisplayPlayTime"
 #define _DS1_OVERHAUL_PREF_DIM_LAVA_ "DimLava"
 #define _DS1_OVERHAUL_PREF_DISABLE_ARMOR_SFX_ "DisableArmorSounds"
 #define _DS1_OVERHAUL_PREF_DISABLE_LOW_FPS_DISCONNECT_ "DisableLowFpsDisconnect"
@@ -91,6 +92,7 @@
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_OMNI_ROLL_ "ToggleOmniRoll"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_L3_JUMP_ "ToggleL3Jump"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_NODE_COUNT_ "ToggleNodeCount"
+#define _DS1_OVERHAUL_HOTKEY_TOGGLE_PLAY_TIME_ "TogglePlayTime"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_DIM_LAVA_ "ToggleLavaBrightness"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_LADDER_FIX_ "ToggleLadderFix"
 #define _DS1_OVERHAUL_HOTKEY_TOGGLE_ITEM_AUTO_EQUIP_ "ToggleItemAutoEquip"
@@ -187,6 +189,9 @@ public:
 
     // User preference setting; determines whether multiplayer node graph HUD element will be enabled when network is loaded
     static bool hud_node_graph_pref;
+
+    // User preference setting; determines whether in-game time (IGT) HUD element will be shown when available
+    static bool hud_play_time_pref;
 
     // User preference setting; determines whether to automatically equip items on pickup
     static bool disable_auto_equip_pref;

@@ -87,6 +87,9 @@ bool Mod::disable_armor_sfx_pref = false;
 // User preference setting; determines whether multiplayer node graph HUD element is enabled
 bool Mod::hud_node_graph_pref = false;
 
+// User preference setting; determines whether in-game time (IGT) HUD element will be shown when available
+bool Mod::hud_play_time_pref = false;
+
 // User preference setting; determines whether to automatically equip items on pickup
 bool Mod::disable_auto_equip_pref = true;
 
@@ -213,6 +216,14 @@ void Mod::get_user_preferences()
     Mod::show_node_count = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_SHOW_NODE_COUNT_, (int)Mod::show_node_count, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
     msg = "    Display multiplayer node count = ";
     if (Mod::show_node_count)
+        print_console(msg.append("enabled"));
+    else
+        print_console(msg.append("disabled"));
+
+    // Display IGT in text feed info header
+    Mod::hud_play_time_pref = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_PLAY_TIME_, (int)Mod::hud_play_time_pref, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    msg = "    Display IGT = ";
+    if (Mod::hud_play_time_pref)
         print_console(msg.append("enabled"));
     else
         print_console(msg.append("disabled"));
@@ -384,6 +395,9 @@ void Mod::get_user_keybinds()
 
     // Toggle multiplayer node count in text feed info header
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_NODE_COUNT_, kf_toggle_node_count);
+
+    // Toggle IGT in text feed info header
+    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_PLAY_TIME_, kf_toggle_play_time);
 
 
     // Toggle dimmed lava visual effects

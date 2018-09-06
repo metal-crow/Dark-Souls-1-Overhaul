@@ -73,6 +73,21 @@ int kf_toggle_node_count()
 }
 
 
+// Toggles IGT element of overlay text feed
+int kf_toggle_play_time()
+{
+    Mod::hud_play_time_pref = !Mod::hud_play_time_pref;
+    if (Mod::hud_play_time_pref) {
+        print_console("Display IGT = enabled");
+    } else {
+        print_console("Display IGT = disabled");
+        Game::play_time_str = "[IGT: --:--:--:--]   ";
+    }
+    Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
+    return ERROR_SUCCESS;
+}
+
+
 // Toggles dimmed lava visual effects
 int kf_toggle_dim_lava()
 {

@@ -1433,6 +1433,42 @@ int cc_text_feed_node_count(std::vector<std::string> args, std::string *output)
 }
 
 
+// Enables/disables in-game time (IGT) element of overlay text feed
+int cc_text_feed_play_time(std::vector<std::string> args, std::string *output)
+{
+    int return_val = CONSOLE_COMMAND_SUCCESS;
+    if (args.size() > 0) {
+        switch (parse_toggle_arg(args.at(0).c_str()))
+        {
+            case 0:
+                Mod::hud_play_time_pref = false;
+                Game::play_time_str = "[IGT: --:--:--:--]   ";
+                break;
+            case 1:
+                Mod::hud_play_time_pref = true;
+                break;
+            default:
+                output->append("ERROR: Assigned value must be either 1 or 0 (1 = enabled, 0 = disabled)\n");
+                return_val = ERROR_INVALID_PARAMETER;
+                break;
+        }
+    } else {
+        if (Game::play_time_str.empty()) {
+            output->append("IGT is unavailable.\n");
+        } else {
+            output->append(Game::play_time_str + "\n");
+        }
+    }
+    // If no argument is specified, simply print the status
+    if (Mod::hud_play_time_pref) {
+        output->append("Display IGT = enabled");
+    } else {
+        output->append("Display IGT = disabled");
+    }
+    return return_val;
+}
+
+
 
 /*
                         /////////////////////////////
@@ -1489,6 +1525,9 @@ void Mod::register_console_commands()
     register_console_command(ccn_fix_bonfire_input, cc_fix_bonfire_input, chm_fix_bonfire_input);
     register_console_command(ccn_text_feed_node_count, cc_text_feed_node_count, chm_text_feed_node_count);
     register_console_alias(cca_node_count, ccn_text_feed_node_count);
+    register_console_command(ccn_text_feed_play_time, cc_text_feed_play_time, chm_text_feed_play_time);
+    register_console_alias(cca_play_time, ccn_text_feed_play_time);
+    register_console_alias(cca_igt, ccn_text_feed_play_time);
     register_console_command(ccn_multiplayer_network, cc_multiplayer_network, chm_multiplayer_network);
     register_console_command(ccn_game_character_name, cc_game_character_name, chm_game_character_name);
     register_console_command(ccn_hud_compass_radial, cc_hud_compass_radial, chm_hud_compass_radial);

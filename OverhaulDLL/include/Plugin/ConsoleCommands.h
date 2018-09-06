@@ -175,6 +175,13 @@ const char *chm_text_feed_node_count = ccn_text_feed_node_count" [boolean]\n"
 #define cca_node_count "node_count"
 
 
+#define ccn_text_feed_play_time "text_feed_play_time"
+const char *chm_text_feed_play_time = ccn_text_feed_play_time" [boolean]\n"
+                                                               "    Enables/disables the in-game time (IGT) element of the overlay info bar (1 = enabled, 0 = disabled).";
+#define cca_play_time "play_time"
+#define cca_igt       "igt"
+
+
 #define ccn_cheats "cheats"
 const char *chm_cheats = ccn_cheats" [boolean]\n"
                                    "    Enables cheats, unlocking additional console commands (1 = enable). If cheats are enabled, saving and multiplayer\n"

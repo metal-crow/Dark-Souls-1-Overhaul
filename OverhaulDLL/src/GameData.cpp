@@ -66,6 +66,9 @@ uint32_t Game::invaders_present_in_world = 0;
 // Multiplayer node count
 int Game::node_count = -1;
 
+// In-game time (IGT) as a printable string
+std::string Game::play_time_str = "[IGT: --:--:--:--]   ";
+
 // Size of the pool of memory the game allocates for itself
 uint32_t Game::memory_limit = 0;
 
@@ -855,6 +858,41 @@ uint32_t Game::get_online_area_id()
         return *area;
     }
     return 0;
+}
+
+
+// Updates stored IGT
+void Game::update_play_time_str()
+{
+    static SpPointer igt(reinterpret_cast<void*>(0x1378700), { 0x68 });
+    // Time stored in milliseconds
+    uint32_t* ms = static_cast<uint32_t*>(igt.resolve());
+
+    std::string tmp_time_str = "[IGT: ";
+
+    if (Mod::hud_play_time_pref && ms)
+    {
+        unsigned long millisecs = *ms;
+        // 1 hour = (1000 * 60 * 60) milliseconds
+        unsigned long hours = millisecs / 3600000;
+        millisecs -= (hours * 3600000);
+        // 1 minute = (1000 * 60) milliseconds
+        unsigned int  mins = millisecs / 60000;
+        millisecs -= (mins * 60000);
+        unsigned int  secs = millisecs / 1000;
+        millisecs -= (secs * 1000);
+        // Hundreths of seconds
+        unsigned int centisecs = millisecs / 10;
+
+        tmp_time_str += (hours < 10 ? "0" : "") + std::to_string(hours) + ":";
+        tmp_time_str += (mins < 10 ? "0" : "") + std::to_string(mins) + ":" + (secs < 10 ? "0" : "") + std::to_string(secs) + ":" + (centisecs < 10 ? "0" : "") + std::to_string(centisecs) + "]  ";
+    }
+    else
+    {
+        // No game time available
+        tmp_time_str += "--:--:--:--]  ";
+    }
+    Game::play_time_str = tmp_time_str;
 }
 
 

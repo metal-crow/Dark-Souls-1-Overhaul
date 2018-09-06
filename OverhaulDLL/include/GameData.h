@@ -96,6 +96,9 @@ public:
     // Multiplayer node count
     static int node_count;
 
+    // In-game time (IGT) as a printable string
+    static std::string play_time_str;
+
     // Size of the pool of memory the game allocates for itself
     static uint32_t memory_limit;
 
@@ -183,6 +186,9 @@ public:
 
     // Player's current world area ID
     static uint32_t get_online_area_id();
+
+    // Updates stored IGT
+    static void update_play_time_str();
 
     // Returns the name of the current character
     static std::string get_character_name();

@@ -36,6 +36,9 @@ int kf_fix_bonfire_input();
 // Toggles node count element of overlay text feed
 int kf_toggle_node_count();
 
+// Toggles IGT element of overlay text feed
+int kf_toggle_play_time();
+
 // Toggles dimmed lava visual effects
 int kf_toggle_dim_lava();
 
