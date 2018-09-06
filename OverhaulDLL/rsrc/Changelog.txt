@@ -5,6 +5,13 @@
 
 
 ------------------------------------------------------------------------------------------
+09/05/2018:
+- New feature:
+    - Option to display in-game time (IGT) in text feed info bar ("DisplayPlayTime")
+
+
+
+------------------------------------------------------------------------------------------
 08/16/2018:
 - New features (as requested by the community):
     - (Experimental) Omni-directional rolling (Inactive during PvP)
