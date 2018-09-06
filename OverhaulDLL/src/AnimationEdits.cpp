@@ -445,12 +445,12 @@ void AnimationEdits::alter_animation_speeds()
     inject_jmp_5b(write_address, &animation_entry_set_return, 0, &animation_entry_set_injection);
 }
 
-//Thread data = speed ratio, start time, speed ajustment ptr
+// Thread data = speed ratio, start time, speed ajustment ptr
 static DWORD WINAPI DelayAnimationSpeedAjustment(void* thread_data) {
     uint32_t start = Game::get_game_time_ms();
     uint32_t cur = start;
 
-    //Wait till animation reaches desired point
+    // Wait until animation reaches desired point
     float adjust_time = ((float*)thread_data)[1];
 
     while (cur < start+adjust_time*1000) {
@@ -467,9 +467,9 @@ static DWORD WINAPI DelayAnimationSpeedAjustment(void* thread_data) {
 }
 
 static void __stdcall read_body_aid_injection_helper_function(int32_t* animation_id, float* speed) {
-    //Since we set animation speed at the table entry level, when it gets unset the speed is automatically reset. No cleanup needed
+    // Since we set animation speed at the table entry level, when it gets unset the speed is automatically reset. No cleanup needed
 
-    //If this is an animation to be changed, ajust speed while we're in it
+    // If this is an animation to be changed, ajust speed while we're in it
     auto ajust_aid = ANIMATIONS_TO_AJUST_SPEED_RATIO.find(*animation_id);
     if (ajust_aid != ANIMATIONS_TO_AJUST_SPEED_RATIO.end()) {
         //if this is a instant speed ajustment
@@ -490,7 +490,7 @@ static void __stdcall read_body_aid_injection_helper_function(int32_t* animation
         }
     }
 
-    //handle backstabing detection (b/c it's a ton of diff animations)
+    // Handle backstabing detection (b/c it's a ton of diff animations)
     if (*animation_id > 200000) {
         if (*animation_id % 1000 == 400 || *animation_id % 1000 == 401) {
             void* thread_data = malloc(sizeof(float)*2 + sizeof(float*));

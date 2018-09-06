@@ -115,15 +115,15 @@ void __declspec(naked) __stdcall asm_check()
         // esi is entityPointer of the attacker
         // If local player is attacking, do not protect NPCs
         push eax
-        mov  eax, DWORD PTR ds:0x137DC70
-        mov  eax, [eax + 4] // eax is now entityPointer to local player
-        cmp[eax], esi // If entityPointer for local player == attacker
-        pop  eax
+        mov eax, dword ptr ds:0x137DC70
+        mov eax, [eax+4] // eax is now entityPointer to local player
+        cmp [eax], esi // If entityPointer for local player == attacker
+        pop eax
         je bypass_check
 
         // eax is entityPointer of ATTACKER's target; check if they are a non-hostile NPC
         push eax
-        mov  eax, [eax + 0x208] // Event Entity ID for the target entity
+        mov  eax, [eax+0x208] // Event Entity ID for the target entity
 
         // Check for event ID of a protected NPC
         cmp eax, GRIGGS_BURG
@@ -273,7 +273,7 @@ void __declspec(naked) __stdcall asm_check()
         abort_damage:
         pop eax
         // Set damage to 0
-        mov[ebx + 0x16C], -1
+        mov [ebx+0x16C], -1
 
         bypass_check:
         comiss xmm0, [ebx]
