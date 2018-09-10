@@ -22,4 +22,10 @@ void EquipmentUnlock::start() {
     //add in a later check which excludes changing weapons in animations
     write_address = (uint8_t*)(EquipmentUnlock::add_check_equipment_unlock_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &add_check_equipment_unlock_injection_return, 2, &main_equipment_unlock_injection);
+
+    //nop out the check if you can/can't remove an equipped item
+    uint8_t nop_patch[4] = { 0x90, 0x90, 0x90, 0x90 };
+    write_address = (uint8_t*)(EquipmentUnlock::disable_remove_equipment_injection_offset + Game::ds1_base);
+    sp::mem::patch_bytes(write_address, nop_patch, 4);
+
 }
