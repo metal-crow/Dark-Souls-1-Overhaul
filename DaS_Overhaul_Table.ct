@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<CheatTable CheatEngineTableVersion="26">
+<CheatTable CheatEngineTableVersion="27">
   <CheatEntries>
     <CheatEntry>
       <ID>12422</ID>
@@ -2623,6 +2623,39 @@ UnregisterSymbol(EmitForceHit)
 
 </AssemblerScript>
         </CheatEntry>
+        <CheatEntry>
+          <ID>0</ID>
+          <Description>"Reduce Backstabs"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+aobscan(backstab, 00 00 00 00 00 00 00 00 00 00 C0 3F 00 00 00 00 00 00 70 42 00 00 00 3F 66 66 26 3F 00 00 70 42 00 00 00 00 48 0D 00 00 28 23 00 00)
+backstab+8:
+	dd 3f800000 //dist (1.0)
+backstab+10:
+	dd  420c0000 //DiffAngMax (35)
+backstab+1c:
+	dd  420c0000 //diffAngMyToDef (35)
+backstab+30:
+	dd  3c000000 //sphereCastRadiusRateTop (60)
+backstab+32:
+	dd  3c000000 //sphereCastRadiusRateLow (60)
+
+aobscan(backstab_hornet, 00 00 00 00 00 00 00 00 00 00 C0 3F 00 00 00 00 00 00 70 42 00 00 00 3F 66 66 26 3F 00 00 70 42 00 00 00 00 49 0D 00 00 CC 24 00 00)
+backstab_hornet+8:
+	dd 3f800000 //dist (1.0)
+backstab_hornet+10:
+	dd  420c0000 //DiffAngMax (35)
+backstab_hornet+1c:
+	dd  420c0000 //diffAngMyToDef (35)
+backstab_hornet+30:
+	dd  3c000000 //sphereCastRadiusRateTop (60)
+backstab_hornet+32:
+	dd  3c000000 //sphereCastRadiusRateLow (60)
+
+[DISABLE]
+</AssemblerScript>
+        </CheatEntry>
       </CheatEntries>
     </CheatEntry>
     <CheatEntry>
@@ -3284,13 +3317,13 @@ function checkProccessAttached()
 end
 
 
-if AttachTimer ~= nil then
-  timer_setEnabled(AttachTimer, false); object_destroy(AttachTimer); AttachTimer = nil;
-end
-AttachTimer = createTimer(nil)
-timer_onTimer(AttachTimer, checkProccessAttached)
-timer_setInterval(AttachTimer,3000)
-timer_setEnabled(AttachTimer, true)
+--if AttachTimer ~= nil then
+--  timer_setEnabled(AttachTimer, false); object_destroy(AttachTimer); AttachTimer = nil;
+--end
+--AttachTimer = createTimer(nil)
+--timer_onTimer(AttachTimer, checkProccessAttached)
+--timer_setInterval(AttachTimer,3000)
+--timer_setEnabled(AttachTimer, true)
 
 </LuaScript>
 </CheatTable>
