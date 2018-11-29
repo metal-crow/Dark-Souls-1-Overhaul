@@ -17,15 +17,11 @@ class CastingMovement
 {
 public:
     static void start();
+    static void on_char_load();
 private:
-    static const uint32_t walkfb_check_1 = 0xBE165B;
-    static const uint32_t walkfb_check_2 = 0xA0F57E;
-    static void __stdcall set_check2_var_to_zero_injection();
-    static const uint32_t walkfb_check_3 = 0xA0F308;
-    static const uint32_t walkfb_check_4 = 0x9966AF;
-    static const uint32_t set_animation_category = 0xBDD623;
-    static void __stdcall force_animation_to_attack_category_instead_of_spattack_injection();
-    static const uint32_t bullet_generation = 0xC06178;
-    static void __stdcall bullet_genetation_notify();
+    static const uint64_t walkfb_check_1 = 0x382CD9;
+    static const uint64_t walkfb_check_2 = 0x3A6114;
+    static const uint64_t walkfb_check_3 = 0x3A5ECE;
+    static const uint64_t c0000_esd_reader = 0x1153C55;
 };
 #endif
