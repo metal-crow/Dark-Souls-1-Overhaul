@@ -147,7 +147,7 @@ void Game::on_first_character_loaded()
         //PhantomUnshackle::start();
 
         //Allow movement during spells
-        //CastingMovement::start();
+        CastingMovement::on_char_load();
     }
 
     // Enable forced binoculars/dragonification PvP protections

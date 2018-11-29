@@ -13,29 +13,53 @@
 extern "C" {
     uint64_t c0000_esd_reader_return;
     void c0000_esd_reader_injection();
-    uint64_t c0000_esd_data_buffer;
+    uint64_t c0000_esd_data_buffer = 0;
 }
 
-//each spell animation id and it's 
-static const uint32_t SPELL_AIDS_TO_ALLOW_MOVEMENT[] = {
-    6202, 6204, 6205, 6206, 6208, 6210, 6215, 6217, 6218, 6219, 6224,
-    6302, 6304, 6305, 6306, 6308, 6310, 6315, 6317, 6318, 6319, 6324,
-    6402, 6404, 6406, 6408, 6410, 6411, 6417, 6418, 6419, 6424, 6426,
-    6500, 6502, 6504, 6506, 6508, 6510, 6511, 6517, 6518, 6519, 6524, 6526
+//The spells ezstate offset's in the c0000 ezstate buffer, commented with the corresponding animation id
+static const uint64_t SPELL_OFFSETS_TO_ALLOW_MOVEMENT[] = {
+    //Spells
+    //6400/6500
+    0x29DA0,
+    //6424/6524
+    0x29e90,
+    //6401/6501
+    0x2a610,
+    //6416/6516
+    0x29620,
+    //6402/6502
+    0x2a700,
+    //6419/6519
+    0x299e0,
+    //6411/6511
+    0x29290,
+
+    //Pyro
+    //6404/6502
+    0x2a520,
+    //Do not fix 6409/6509 Firestorm
+    //0x2a070,
+    //6426/6526
+    0x29f80,
+    //Do not fix 6407/6507 Combustion
+    //0x2a250,
+    //6408/6508
+    0x2a160,
+    //6405/6505
+    0x2a430,
+    //6410/6510
+    0x29ad0,
+
+    //Miracles
+    //6418/6518
+    0x298f0,
+    //6414/6514
+    0x29bc0
 };
 
 typedef struct {
-    uint8_t function_id;
-    uint32_t function_arg;
-} Animation_Dataval_Entry_OneArg;
-
-typedef struct {
-    uint8_t function_id;
-} Animation_Dataval_Entry_NoArg;
-
-typedef struct {
-    void *function_list; //non-homogenious array of mixed Animation_Dataval_Entry_NoArg and Animation_Dataval_Entry_OneArg structs
-    uint64_t datavals_list_len;
+    uint8_t *bytecode;
+    uint64_t bytecode_len;
 } Animation_Datavalues;
 
 typedef struct {
@@ -46,8 +70,8 @@ typedef struct {
 } Animation_EzState;
 
 void CastingMovement::start() {
-    global::cmd_out << Mod::output_prefix << ("    Enabling casting while moving patch...\n");
-    Mod::startup_messages.push_back("    Enabling casting while moving patch...");
+    global::cmd_out << Mod::output_prefix << ("Enabling casting while moving patch...\n");
+    Mod::startup_messages.push_back("Enabling casting while moving patch...");
 
     //Fix one of the checks that prevents WalkFB aid from being set
     uint8_t nop_patch[] = { 0x90, 0x90 };
@@ -93,26 +117,40 @@ void CastingMovement::start() {
 void CastingMovement::on_char_load() {
     //Alter the spell animation ezstates to allow movement during
     //All the offsets are pts to Animation_EzState[2], where the 1st is of category 0x76, and the second is category 3 (no walk)
+    /*if (c0000_esd_data_buffer != 0) {
+        printf("Buffer is at %llx\n", c0000_esd_data_buffer);
+    }
+    else {
+        FATALERROR((Mod::output_prefix + "!!ERROR!! c0000 ezstate buffer not found.\n").c_str());;
+    }*/
+    for (uint64_t offset : SPELL_OFFSETS_TO_ALLOW_MOVEMENT) {
+        Animation_EzState* entry = (Animation_EzState*)((uint64_t)(c0000_esd_data_buffer + offset + sizeof(Animation_EzState)));
 
-    //Spells
-    //6400/6500, offset 0x29DA0
-    //6424/6524, offset 0x29e90
-    //6401/6501, offset 0x2a610
-    //6416/6516, offset 0x29620
-    //6402/6502, offset 0x2a700
-    //6419/6519, offset 0x299e0
-    //6411/6511, offset 0x29290
+        //change category to 1
+        entry->category = 1;
 
-    //Pyro
-    //6404/6502, offset 0x2a520
-    //Do not fix 6409/6509, offset 0x2a070. Firestorm
-    //6426/6526, offset 0x29f80
-    //Do not fix 6407/6507, offset 0x2a250. Combustion
-    //6408/6508, offset 0x2a160
-    //6405/6505, offset 0x2a430
-    //6410/6510, offset 0x29ad0
+        //swap the 0th and 1th dataval pointers
+        uint8_t* zero_ptr = entry->datavalues_list[0].bytecode;
+        uint64_t zero_len = (uint64_t)entry->datavalues_list[0].bytecode_len;
+        entry->datavalues_list[0].bytecode = entry->datavalues_list[1].bytecode;
+        entry->datavalues_list[0].bytecode_len = entry->datavalues_list[1].bytecode_len;
+        entry->datavalues_list[1].bytecode = zero_ptr;
+        entry->datavalues_list[1].bytecode_len = zero_len;
 
-    //Miracles
-    //6418/6518, offset 0x298f0
-    //6414/6514, offset 0x29bc0
+        //Set datavals 1-4 to be correct now that it's movable.
+        if (entry->list_len != 5) {
+            FATALERROR((Mod::output_prefix + "!!ERROR!! Tried to change the EzState of an animation with an unexpected structure (Not 5 datavals)."
+                                             "Occured for animation at offset 0x%x\n").c_str(), offset);
+        }
+        entry->datavalues_list[1].bytecode[0] = 64 + 5; //Change from (int 2) to (int 5)
+        //swap #2 (int 6) with #3 (double 0.1)
+        uint8_t* two_ptr = entry->datavalues_list[2].bytecode;
+        uint64_t two_len = (uint64_t)entry->datavalues_list[0].bytecode_len;
+        entry->datavalues_list[2].bytecode = entry->datavalues_list[3].bytecode;
+        entry->datavalues_list[2].bytecode_len = entry->datavalues_list[3].bytecode_len;
+        entry->datavalues_list[3].bytecode = two_ptr;
+        entry->datavalues_list[3].bytecode_len = two_len;
+        entry->datavalues_list[3].bytecode[0] = 64; //Change from (int 6) to (int 0)
+        entry->datavalues_list[4].bytecode[0] = 64 + 2; //Change from (int 0) to (int 2)
+    }
 }

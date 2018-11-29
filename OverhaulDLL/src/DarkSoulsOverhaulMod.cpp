@@ -15,6 +15,7 @@
 #include "BloodborneRallySystem.h"
 #include "DeadAngles.h"
 #include "EquipmentUnlock.h"
+#include "MoveWhileCasting.h"
 
 /*
     Called from DllMain when the plugin DLL is first loaded into memory (PROCESS_ATTACH case).
@@ -92,6 +93,7 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     BloodborneRally::start();
     DeadAngles::start();
     EquipmentUnlock::start();
+    CastingMovement::start();
 
     // Wait for event: first character loaded in this instance of the game
     int char_status = DS1_PLAYER_STATUS_LOADING;

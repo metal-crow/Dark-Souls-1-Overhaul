@@ -7,8 +7,8 @@ _TEXT SEGMENT
 extern c0000_esd_reader_return: qword
 extern c0000_esd_data_buffer: qword
 
-PUBLIC c0000_esd_reader_return
-c0000_esd_reader_return PROC
+PUBLIC c0000_esd_reader_injection
+c0000_esd_reader_injection PROC
 
 ;original code
 mov     r8d, eax
@@ -25,7 +25,7 @@ call    qword ptr [rbx+18h]
 mov     ebx, eax
 jmp     c0000_esd_reader_return
 
-c0000_esd_reader_return ENDP
+c0000_esd_reader_injection ENDP
 
 
 _TEXT    ENDS
