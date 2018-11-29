@@ -81,7 +81,7 @@
     </ClCompile>
     <ClCompile Include="src\MoveWhileCasting.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\PhantomLimit.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -219,10 +219,20 @@
     <None Include="d3d11-wrapper\src\d3d11\exports.def" />
   </ItemGroup>
   <ItemGroup>
+    <MASM Include="src\AnimationEditsASM.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </MASM>
+    <MASM Include="src\AntiCheat\BossGuardASM.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </MASM>
     <MASM Include="src\AntiCheat\NpcGuardASM.asm" />
+    <MASM Include="src\AntiCheat\TeleBackstabProtectASM.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </MASM>
     <MASM Include="src\BloodborneRallySystemASM.asm" />
     <MASM Include="src\DeadAnglesASM.asm" />
     <MASM Include="src\EquipmentUnlockASM.asm" />
+    <MASM Include="src\MoveWhileCastingASM.asm" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
