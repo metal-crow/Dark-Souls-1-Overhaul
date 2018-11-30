@@ -4,3 +4,6 @@
 [submodule "OverhaulDLL/lib/Cpp-Utilities"]
 	path = OverhaulDLL/lib/Cpp-Utilities
 	url = https://github.com/SeanPesce/Cpp-Utilities.git
+[submodule "OverhaulDLL/lib/Dark-Souls-Game-Files-Lib"]
+	path = OverhaulDLL/lib/Dark-Souls-Game-Files-Lib
+	url = https://github.com/SeanPesce/Dark-Souls-Game-Files-Lib.git
