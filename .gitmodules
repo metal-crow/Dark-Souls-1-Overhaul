@@ -7,3 +7,4 @@
 [submodule "OverhaulDLL/lib/Dark-Souls-Game-Files-Lib"]
 	path = OverhaulDLL/lib/Dark-Souls-Game-Files-Lib
 	url = https://github.com/SeanPesce/Dark-Souls-Game-Files-Lib.git
+	branch = Remaster

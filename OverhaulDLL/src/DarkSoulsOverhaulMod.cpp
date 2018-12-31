@@ -54,6 +54,8 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
         exit(0);
     }*/
 
+    CastingMovement::early_inits();
+
     // Apply increased memory limit patch
     Game::set_memory_limit();
 
@@ -88,6 +90,8 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
 */
 DWORD WINAPI on_process_attach_async(LPVOID lpParam)
 {
+    Game::init_tae();
+
     AntiCheat::start();
     Game::increase_gui_hpbar_max();
     BloodborneRally::start();

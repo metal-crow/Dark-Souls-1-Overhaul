@@ -288,7 +288,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;DARKSOULSOVERHAULMOD_EXPORTS;WRAPPER_ON_PROCESS_ATTACH=on_process_attach;WRAPPER_ON_PROCESS_DETACH=on_process_detach;WRAPPER_ON_THREAD_ATTACH=on_thread_attach;WRAPPER_ON_THREAD_DETACH=on_thread_detach;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>include;lib;d3d11-wrapper/include;d3d11-wrapper/lib;d3d11-wrapper/lib/inih;d3d11-wrapper/lib/inih/cpp;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;lib/Cpp-Utilities/include;lib/Dark-Souls-Game-Files-Lib/include;lib;d3d11-wrapper/include;d3d11-wrapper/lib;d3d11-wrapper/lib/inih;d3d11-wrapper/lib/inih/cpp</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
@@ -309,7 +309,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;DARKSOULSOVERHAULMOD_EXPORTS;WRAPPER_ON_PROCESS_ATTACH=on_process_attach;WRAPPER_ON_PROCESS_DETACH=on_process_detach;WRAPPER_ON_THREAD_ATTACH=on_thread_attach;WRAPPER_ON_THREAD_DETACH=on_thread_detach;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>include;lib/Cpp-Utilities/include;lib;d3d11-wrapper/include;d3d11-wrapper/lib;d3d11-wrapper/lib/inih;d3d11-wrapper/lib/inih/cpp</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;lib/Cpp-Utilities/include;lib/Dark-Souls-Game-Files-Lib/include;lib;d3d11-wrapper/include;d3d11-wrapper/lib;d3d11-wrapper/lib/inih;d3d11-wrapper/lib/inih/cpp</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
@@ -319,7 +319,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>lib;d3d11-wrapper/lib;</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>d3d11-wrapper/src/d3d11/exports.def</ModuleDefinitionFile>
-      <AdditionalDependencies>sp_utils_x64.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>sp_utils_x64.lib;DsGameFiles.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
