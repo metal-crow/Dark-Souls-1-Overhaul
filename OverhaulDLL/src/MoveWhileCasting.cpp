@@ -16,6 +16,41 @@ extern "C" {
     uint64_t c0000_esd_data_buffer = 0;
 }
 
+static const uint32_t SPELL_AIDS_TO_ALLOW_MOVEMENT[] = {
+    //overhead cast
+    6400, 6500,
+    //hold overhead cast
+    6424, 6524,
+    //buff rh wep
+    6401,
+    //
+    6416, 6516,
+    //wave over body
+    6402, 6502,
+    //homing soul mass type spell
+    6419, 6519,
+    //wave over body
+    6411, 6511,
+
+    //pyro ball throw
+    6404, 6502,
+    //fire whip
+    6426, 6526,
+    //pyro breath
+    6408, 6508,
+    //iron flesh
+    6405, 6505,
+    //undead rapport
+    6410, 6510,
+
+    //lighting spear
+    6418, 6518,
+    //buff weapon
+    6414, 6514,
+};
+
+
+
 //The spells ezstate offset's in the c0000 ezstate buffer, commented with the corresponding animation id
 static const uint64_t SPELL_OFFSETS_TO_ALLOW_MOVEMENT[] = {
     //Spells
@@ -23,7 +58,7 @@ static const uint64_t SPELL_OFFSETS_TO_ALLOW_MOVEMENT[] = {
     0x29DA0,
     //6424/6524
     0x29e90,
-    //6401/6501
+    //6401
     0x2a610,
     //6416/6516
     0x29620,
@@ -69,6 +104,16 @@ typedef struct {
     uint64_t list_len;
 } Animation_EzState;
 
+void CastingMovement::early_inits() {
+    global::cmd_out << Mod::output_prefix << ("Injecting ESD locator...\n");
+    Mod::startup_messages.push_back("Injecting ESD locator...");
+
+    //Hook into the function that copies the parsed c0000.esd file to the final buffer, and get the buffer addr
+    //This is hit VERY early (before splash screens), so needs to be loaded fast
+    uint8_t *write_address = (uint8_t*)(CastingMovement::c0000_esd_reader + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &c0000_esd_reader_return, 0, &c0000_esd_reader_injection);
+}
+
 void CastingMovement::start() {
     global::cmd_out << Mod::output_prefix << ("Enabling casting while moving patch...\n");
     Mod::startup_messages.push_back("Enabling casting while moving patch...");
@@ -90,39 +135,37 @@ void CastingMovement::start() {
     write_address = (uint8_t*)(CastingMovement::walkfb_check_3 + Game::ds1_base);
     sp::mem::patch_bytes(write_address, patch3, sizeof(patch3));
 
-    //Hook into the function that copies the parsed c0000.esd file to the final buffer, and get the buffer addr
-    write_address = (uint8_t*)(CastingMovement::c0000_esd_reader + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &c0000_esd_reader_return, 0, &c0000_esd_reader_injection);
-
     //Disable the TAE events for disabling rotation during spell casting
-    /*int aids_changed = 0;
-    if (Game::characters_loaded && Game::player_tae.is_initialized())
+    int aids_changed = 0;
+    if (Game::player_tae.is_initialized())
     {
-        for (int i = 0; i < sizeof(SPELL_AIDS_TO_ALLOW_MOVEMENT) / sizeof(std::tuple<uint32_t, float>); i++)
+        for (uint32_t aid : SPELL_AIDS_TO_ALLOW_MOVEMENT)
         {
-            uint32_t aid = std::get<0>(SPELL_AIDS_TO_ALLOW_MOVEMENT[i]);
-
             int n_events = Game::player_tae.get_event_count_by_id(aid);
+            //global::cmd_out << std::to_string(n_events) << " events for aid " << std::to_string(aid) << "\n";
             for (int i = 0; i < n_events; i++) {
                 if (Game::player_tae.get_event_type_by_id(aid, i) == 0 && Game::player_tae.get_event_param_by_id(aid, i, 0) == TAE_type0_param_values::lock_rotation) {
                     Game::player_tae.set_event_start_by_id(aid, i, 0.0f);
                     Game::player_tae.set_event_end_by_id(aid, i, 0.0f);
-                    //print_console("Updated gesture " + std::to_string(aid));
+                    global::cmd_out << "Updated movement animation " << std::to_string(aid) << "\n";
                 }
             }
         }
-    }*/
+    }
+    global::cmd_out << "Movement animations updated\n";
 }
 
 void CastingMovement::on_char_load() {
     //Alter the spell animation ezstates to allow movement during
     //All the offsets are pts to Animation_EzState[2], where the 1st is of category 0x76, and the second is category 3 (no walk)
-    /*if (c0000_esd_data_buffer != 0) {
-        printf("Buffer is at %llx\n", c0000_esd_data_buffer);
+    if (c0000_esd_data_buffer != 0) {
+        char buf[50];
+        snprintf(buf, sizeof(buf), "ESD data buffer is at %llx\n", c0000_esd_data_buffer);
+        global::cmd_out << buf;
     }
     else {
-        FATALERROR((Mod::output_prefix + "!!ERROR!! c0000 ezstate buffer not found.\n").c_str());;
-    }*/
+        FATALERROR((Mod::output_prefix + "!!ERROR!! c0000 ezstate buffer not found.\n").c_str());
+    }
     for (uint64_t offset : SPELL_OFFSETS_TO_ALLOW_MOVEMENT) {
         Animation_EzState* entry = (Animation_EzState*)((uint64_t)(c0000_esd_data_buffer + offset + sizeof(Animation_EzState)));
 

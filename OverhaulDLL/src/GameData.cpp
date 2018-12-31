@@ -47,7 +47,7 @@ uint64_t Game::frpg_net_base = NULL;
 sp::mem::pointer<int32_t> Game::player_char_status;
 
 // Time Action Events for the player character's animations
-void* Game::player_tae = NULL;
+Tae Game::player_tae = Tae();
 
 // Flag to determine if any characters have been loaded since the game was launched (useful if player had a character loaded but returned to main menu)
 bool Game::characters_loaded = false;
@@ -65,7 +65,7 @@ int Game::node_count = -1;
 Files::IoMonitor Files::io_monitors[9];
 
 
-// Initializes pointers and base addreWsses required for most other functions
+// Initializes pointers and base addresses required for most other functions
 void Game::init()
 {
     global::cmd_out << "Initializing pointers...\n";
@@ -115,6 +115,33 @@ void Game::init()
     Game::player_char_status = sp::mem::pointer<int32_t>((void*)(Game::world_char_base), { 0x68, 0xD4 });
 }
 
+// Initialize the pointer to the TAE struture. This isn't loaded until around the time the main menu is hit, so needs to be delayed
+void Game::init_tae()
+{
+    global::cmd_out << "Locating TAE...\n";
+
+    //Older strategy: AOB scan with "54 41 45 20 00 00 00 00 0B 00 01 00 AC AE 09 00"
+    sp::mem::pointer<TimeActionEventFile::Header> tae_header_ptr = sp::mem::pointer<TimeActionEventFile::Header>((void*)(Game::ds1_base + 0x01D1E510), { 0xF0, 0x50, 0x48, 0x58, 0x0 });
+    void* ret_val = NULL;
+    size_t tae_search_count = 0;
+
+    do {
+        if (tae_header_ptr.resolve() != NULL) {
+            ret_val = Game::player_tae.init_from_memory(tae_header_ptr.resolve());
+        }
+
+        if ((tae_header_ptr.resolve() == NULL || ret_val == NULL) && tae_search_count == 25) {
+            FATALERROR((Mod::output_prefix + "!!ERROR!! TAE structure not found.\n").c_str());
+        }
+
+        tae_search_count++;
+        Sleep(200);
+    }  while (ret_val == NULL);
+
+    char str[100];
+    snprintf(str, sizeof(str), "Found Time Action Event file for player character animations at %p\n", ret_val);
+    global::cmd_out << str;
+}
 
 // Performs tasks that were deferred until a character was loaded
 void Game::on_first_character_loaded()
@@ -131,12 +158,11 @@ void Game::on_first_character_loaded()
     //if (Mod::disable_armor_sfx_pref)
         //Game::enable_armor_sfx(false);
 
-    //if (AnimationEdits::gesture_cancelling) {
+    //if (AnimationEdits::gesture_cancelling)
+    {
         // Perform TAE edits to player animations to enable gesture cancelling
-        //TODO Game::player_tae.init_from_aob_scan("54 41 45 20 00 00 00 00 0B 00 01 00 AC AE 09 00");
-        //global::cmd_out << "    Found Time Action Event file for player character animations. Enabling gesture cancelling...\n";
         //AnimationEdits::enable_gesture_cancelling();
-    //}
+    }
 
     //if (!Mod::legacy_mode)
     {
@@ -544,6 +570,7 @@ int32_t Game::get_player_body_anim_id()
     sp::mem::pointer anim_id = sp::mem::pointer<int32_t>((void*)Game::world_char_base, { 0x68, 0x68, 0x48, 0x80 });
     if (anim_id.resolve() == NULL) {
         FATALERROR("Unable to get_player_body_anim_id.");
+        return -1;
     } else {
         player_body_anim_id_cache = (int32_t*)anim_id.resolve();
         return *player_body_anim_id_cache;
@@ -560,6 +587,7 @@ int32_t Game::get_player_upper_body_anim_id()
     sp::mem::pointer anim_id = sp::mem::pointer<int32_t>((void*)Game::world_char_base, { 0x68, 0x30, 0x5D0, 0x690 });
     if (anim_id.resolve() == NULL) {
         FATALERROR("Unable to get_player_upper_body_anim_id.");
+        return -1;
     }
     else {
         player_upper_body_anim_id_cache = (int32_t*)anim_id.resolve();;
@@ -577,6 +605,7 @@ int32_t Game::get_player_lower_body_anim_id()
     sp::mem::pointer anim_id = sp::mem::pointer<int32_t>((void*)Game::world_char_base, { 0x68, 0x30, 0x5D0, 0x13B0 });
     if (anim_id.resolve() == NULL) {
         FATALERROR("Unable to get_player_lower_body_anim_id.");
+        return -1;
     }
     else {
         player_lower_body_anim_id_cache = (int32_t*)anim_id.resolve();
@@ -613,6 +642,7 @@ uint64_t Game::get_pc_entity_pointer() {
     sp::mem::pointer entity_ptr = sp::mem::pointer<uint64_t>((void*)(Game::world_char_base), { 0x68 });
     if (entity_ptr.resolve() == NULL) {
         FATALERROR("Unable to get_pc_entity_pointer.");
+        return -1;
     }
     else {
         pc_entity_ptr = entity_ptr.resolve();
@@ -666,6 +696,7 @@ uint32_t Game::left_hand_weapon() {
     sp::mem::pointer weapon = sp::mem::pointer<uint32_t>((void*)(Game::char_class_base), { 0x10, 0x324 });
     if (weapon.resolve() == NULL) {
         FATALERROR("Unable to get left_hand_weapon.");
+        return -1;
     }
     else {
         left_hand_weapon_ptr_cache = (uint32_t*)weapon.resolve();
@@ -682,6 +713,7 @@ uint32_t Game::right_hand_weapon() {
     sp::mem::pointer weapon = sp::mem::pointer<uint32_t>((void*)(Game::char_class_base), { 0x10, 0x328 });
     if (weapon.resolve() == NULL) {
         FATALERROR("Unable to get right_hand_weapon.");
+        return -1;
     }
     else {
         right_hand_weapon_ptr_cache = (uint32_t*)weapon.resolve();
@@ -710,6 +742,7 @@ uint32_t Game::get_player_char_max_hp() {
     sp::mem::pointer maxhp = sp::mem::pointer<uint32_t>((void*)(Game::world_char_base), { 0x68, 0x3EC });
     if (maxhp.resolve() == NULL) {
         FATALERROR("Unable to get_player_char_max_hp.");
+        return -1;
     }
     else {
         player_char_max_hp_cache = (uint32_t*)maxhp.resolve();
@@ -722,6 +755,7 @@ float Game::get_entity_rotation(void* entity_ptr) {
     sp::mem::pointer rotation = sp::mem::pointer<float>((void*)((uint64_t)entity_ptr + 0x68), { 0x28, 0x4 });
     if (rotation.fast_resolve() == NULL) {
         FATALERROR("Unable to get_entity_rotation.");
+        return -1;
     }
     else {
         return *(float*)rotation.fast_resolve();

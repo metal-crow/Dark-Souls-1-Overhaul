@@ -16,7 +16,8 @@
 class CastingMovement
 {
 public:
-    static void start();
+	static void early_inits();
+	static void start();
     static void on_char_load();
 private:
     static const uint64_t walkfb_check_1 = 0x382CD9;
