@@ -16,6 +16,7 @@
 #include "DeadAngles.h"
 #include "EquipmentUnlock.h"
 #include "MoveWhileCasting.h"
+#include "AnimationEdits.h"
 
 /*
     Called from DllMain when the plugin DLL is first loaded into memory (PROCESS_ATTACH case).
@@ -98,6 +99,12 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     DeadAngles::start();
     EquipmentUnlock::start();
     CastingMovement::start();
+    AnimationEdits::alter_animation_speeds();
+    AnimationEdits::disable_whiff_animations();
+    if (AnimationEdits::gesture_cancelling) {
+        // Perform TAE edits to player animations to enable gesture cancelling
+        AnimationEdits::enable_gesture_cancelling();
+    }
 
     // Wait for event: first character loaded in this instance of the game
     int char_status = DS1_PLAYER_STATUS_LOADING;

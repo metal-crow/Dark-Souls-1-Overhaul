@@ -158,12 +158,6 @@ void Game::on_first_character_loaded()
     //if (Mod::disable_armor_sfx_pref)
         //Game::enable_armor_sfx(false);
 
-    //if (AnimationEdits::gesture_cancelling)
-    {
-        // Perform TAE edits to player animations to enable gesture cancelling
-        //AnimationEdits::enable_gesture_cancelling();
-    }
-
     //if (!Mod::legacy_mode)
     {
         // Enable rally system vfx
