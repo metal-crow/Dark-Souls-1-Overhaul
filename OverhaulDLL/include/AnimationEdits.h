@@ -31,16 +31,15 @@ public:
     const static uint32_t gesture_anim_ids[15];
 
     // Enables gesture cancelling via rolling
-    static bool enable_gesture_cancelling();
+    static void enable_gesture_cancelling();
 
     static void alter_animation_speeds();
 
     static void disable_whiff_animations();
 
 private:
-    static const uint32_t animation_entry_set_offset = 0x9929B6; //Triggered when an animation entry in the table has it's speed set
-    static void __stdcall animation_entry_set_injection();
-    static const uint32_t animation_whiff_set_offset = 0xA2B860;
+    static const uint64_t animation_entry_set_offset = 0x43E281; //Triggered when an animation entry in the table has it's speed set
+    static const uint64_t animation_whiff_set_offset = 0x386CD6;
 };
 
 #endif
