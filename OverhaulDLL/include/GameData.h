@@ -190,6 +190,10 @@ public:
 
 	static float get_entity_rotation(void * entity_ptr);
 
+	static int32_t get_area_id();
+
+    static int32_t* get_mp_id_ptr();
+
     /*
      * Help speedup some functions by, whenever we're loaded into an area,
      * preload/preresolve some pointers and values so they can be much more quickly read when we need them

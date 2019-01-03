@@ -17,6 +17,7 @@
 #include "EquipmentUnlock.h"
 #include "MoveWhileCasting.h"
 #include "AnimationEdits.h"
+#include "PhantomUnshackle.h"
 
 /*
     Called from DllMain when the plugin DLL is first loaded into memory (PROCESS_ATTACH case).
@@ -95,6 +96,7 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
 
     AntiCheat::start();
     Game::increase_gui_hpbar_max();
+    Game::unrestrict_network_synced_effectids();
     BloodborneRally::start();
     DeadAngles::start();
     EquipmentUnlock::start();
@@ -105,6 +107,7 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
         // Perform TAE edits to player animations to enable gesture cancelling
         AnimationEdits::enable_gesture_cancelling();
     }
+    PhantomUnshackle::start();
 
     // Wait for event: first character loaded in this instance of the game
     int char_status = DS1_PLAYER_STATUS_LOADING;
@@ -167,16 +170,6 @@ BOOL on_thread_detach(HMODULE h_module, LPVOID lp_reserved)
 
 #if false
 
-#include "DllMain_Legacy.h"
-#include "Files.h"
-#include "AntiCheat.h"
-#include "BloodborneRallySystem.h"
-#include "Challenge/GravelordPhantoms.h"
-#include "Menu/SavedCharacters.h"
-#include "XInputUtil.h"
-#include "AnimationEdits.h"
-
-
 /*
     Called from DllMain when the plugin DLL is first loaded into memory (PROCESS_ATTACH case).
     NOTE: This function runs in the same thread as DllMain, so code implemented here will halt
@@ -209,9 +202,6 @@ void on_process_attach()
             exit(0);
         }
     }
-
-    // Apply increased memory limit patch
-    Game::set_memory_limit(Game::memory_limit);
 
     // Inject code to capture starting addresses of all Param files (removes need for AoB scans)
     Params::patch();
@@ -247,22 +237,8 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
         return 0;
     }
 
-    // Start anti-cheat
-    AntiCheat::start();
-
     // Inject custom strings for saved characters menu
     Menu::Saves::init_custom_strings();
-
-    // Allow modded effectIDs
-    Game::unrestrict_network_synced_effectids();
-
-    Game::increase_gui_hpbar_max();
-
-    if (!Mod::legacy_mode) {
-        BloodborneRally::start();
-        AnimationEdits::alter_animation_speeds();
-        AnimationEdits::disable_whiff_animations();
-    }
 
     // Initialize XInput hook
     XInput::initialize();

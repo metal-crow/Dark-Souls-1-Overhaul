@@ -228,5 +228,8 @@
     <MASM Include="src\AntiCheat\BossGuardASM.asm">
       <Filter>Source Files\AntiCheat</Filter>
     </MASM>
+    <MASM Include="src\PhantomUnshackleASM.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
   </ItemGroup>
 </Project>
