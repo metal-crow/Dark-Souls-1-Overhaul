@@ -71,7 +71,7 @@ static const std::unordered_map<int32_t, std::tuple<float, float>> ANIMATIONS_TO
 
 
 extern "C" {
-    uint32_t animation_entry_set_return;
+    uint64_t animation_entry_set_return;
     void animation_entry_set_injection();
     void read_body_aid_injection_helper_function(int32_t*, float*);
 }

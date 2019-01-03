@@ -17,7 +17,6 @@
 #include "BloodborneRallySystem.h"
 #include "Challenge/AggressiveAi.h"
 #include "Challenge/BlackPhantomEnemies.h"
-#include "PhantomUnshackle.h"
 #include "MoveWhileCasting.h"
 #include "AnimationEdits.h"
 
@@ -163,9 +162,6 @@ void Game::on_first_character_loaded()
         // Enable rally system vfx
         BloodborneRally::on_char_load();
 
-        // Apply phantom unshackle patch
-        //PhantomUnshackle::start();
-
         //Allow movement during spells
         CastingMovement::on_char_load();
     }
@@ -205,6 +201,8 @@ static int32_t* player_body_anim_id_cache = NULL;
 static int32_t* player_upper_body_anim_id_cache = NULL;
 static int32_t* player_lower_body_anim_id_cache = NULL;
 static float* set_current_player_animation_speed_cache = NULL;
+static int32_t* area_id_cache = NULL;
+static int32_t* mp_id_cache = NULL;
 
 void Game::preload_function_caches() {
 
@@ -228,6 +226,11 @@ void Game::preload_function_caches() {
     Game::get_player_upper_body_anim_id();
     player_lower_body_anim_id_cache = NULL;
     Game::get_player_lower_body_anim_id();
+    area_id_cache = NULL;
+    Game::get_area_id();
+    mp_id_cache = NULL;
+    Game::get_mp_id_ptr();
+
     Sleep(10);
     //this pointer is a bit late to resolve on load
     set_current_player_animation_speed_cache = NULL;
@@ -753,5 +756,37 @@ float Game::get_entity_rotation(void* entity_ptr) {
     }
     else {
         return *(float*)rotation.fast_resolve();
+    }
+}
+
+int32_t Game::get_area_id() {
+    if (area_id_cache) {
+        return (*area_id_cache & 0x0000ffff);
+    }
+
+    sp::mem::pointer area_id = sp::mem::pointer<int32_t>((void*)(Game::frpg_net_base), { 0xA22 });
+    if (area_id.resolve() == NULL) {
+        FATALERROR("Unable to get_area_id.");
+        return -1;
+    }
+    else {
+        area_id_cache = area_id.resolve();
+        return (*area_id_cache & 0x0000ffff);
+    }
+}
+
+int32_t* Game::get_mp_id_ptr() {
+    if (mp_id_cache) {
+        return mp_id_cache;
+    }
+
+    sp::mem::pointer mp_id = sp::mem::pointer<int32_t>((void*)(Game::world_char_base), { 0x68, 0x354 });
+    if (mp_id.resolve() == NULL) {
+        FATALERROR("Unable to get_mp_id.");
+        return NULL;
+    }
+    else {
+        mp_id_cache = mp_id.resolve();
+        return mp_id_cache;
     }
 }
