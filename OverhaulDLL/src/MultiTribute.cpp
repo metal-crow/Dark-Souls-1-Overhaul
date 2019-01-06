@@ -237,6 +237,19 @@ void __declspec(naked) __stdcall intercept_dec_humanity()
         push eax
         push ebx
         // Check for valid game state
+        
+        // Check for valid lastTalkID
+        cmp [tmp_last_talk], 0x2737A // 160634 = Kaathe LastTalkID
+        je intercept_dec_hum_valid_last_talk
+        cmp [tmp_last_talk], 0x22547 // 140615 = Daughter of Chaos LastTalkID
+        je intercept_dec_hum_valid_last_talk
+        
+        // Invalid lastTalkID
+        pop ebx
+        pop eax
+        jmp originalcode_dec_humanity
+        intercept_dec_hum_valid_last_talk:
+
         //lea eax, dword ptr [edx*4+0xD4B29C]
         mov eax, edx
         shl eax, 2
