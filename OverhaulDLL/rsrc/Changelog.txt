@@ -5,6 +5,14 @@
 
 
 ------------------------------------------------------------------------------------------
+01/06/2019:
+- Bug fix:
+    - Fixed issue with MultiTribute that would allow the player to reverse hollowing
+      without spending a soft humanity
+
+
+
+------------------------------------------------------------------------------------------
 09/05/2018:
 - New feature:
     - Option to display in-game time (IGT) in text feed info bar ("DisplayPlayTime")
