@@ -20,16 +20,8 @@ namespace AntiCheat {
 
 void start();
 
-namespace BossGuard {
-    extern bool active;
-    void start();
-} // namespace BossGuard
-
-
-namespace NpcGuard {
-    extern bool active;
-    void start();
-} // namespace NpcGuard
+static const uint64_t NpcGuard_offset = 0x25E611;
+static const uint64_t BossGuard_offset = 0x3206C5;
 
 
 namespace TeleBackstabProtect {
