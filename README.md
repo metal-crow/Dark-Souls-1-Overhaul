@@ -14,7 +14,7 @@ https://gitlab.com/metal-crow/darksoulsremastered-ida-db
 
 ## Changelist
 
-* NPCs and Bosses can no longer be killed by hackers
+* NPCs and Bosses (kindof, WIP) can no longer be killed by hackers
 	
 * Gestures can be canceled via rolling
 
