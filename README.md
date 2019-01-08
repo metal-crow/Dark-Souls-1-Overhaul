@@ -15,6 +15,7 @@ https://gitlab.com/metal-crow/darksoulsremastered-ida-db
 ## Changelist
 
 * NPCs and Bosses (kindof, WIP) can no longer be killed by hackers
+* Backstabs will no longer teleport you if you're unreasonably far away (both anti-cheat and QOL)
 	
 * Gestures can be canceled via rolling
 
