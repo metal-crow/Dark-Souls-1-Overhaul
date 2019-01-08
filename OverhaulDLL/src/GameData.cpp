@@ -193,6 +193,7 @@ static bool resolve_current_player_animation_speed();
 static bool one_time_only_caches = false; //some caches only need to be preloaded once per game start
 
 static uint64_t* pc_entity_ptr = NULL;
+static float* pc_position_ptr = NULL;
 static uint32_t* time_address = NULL;
 static uint32_t* left_hand_weapon_ptr_cache = NULL;
 static uint32_t* right_hand_weapon_ptr_cache = NULL;
@@ -214,6 +215,8 @@ void Game::preload_function_caches() {
         one_time_only_caches = true;
     }
 
+    pc_position_ptr = NULL;
+    Game::get_pc_position();
     left_hand_weapon_ptr_cache = NULL;
     Game::left_hand_weapon();
     right_hand_weapon_ptr_cache = NULL;
@@ -644,6 +647,22 @@ uint64_t Game::get_pc_entity_pointer() {
     else {
         pc_entity_ptr = entity_ptr.resolve();
         return *pc_entity_ptr;
+    }
+}
+
+float* Game::get_pc_position() {
+    if (pc_position_ptr) {
+        return pc_position_ptr;
+    }
+
+    sp::mem::pointer position_ptr = sp::mem::pointer<float>((void*)(Game::world_char_base), { 0x68, 0x68, 0x28, 0x10 });
+    if (position_ptr.resolve() == NULL) {
+        FATALERROR("Unable to get_pc_position.");
+        return NULL;
+    }
+    else {
+        pc_position_ptr = position_ptr.resolve();
+        return pc_position_ptr;
     }
 }
 

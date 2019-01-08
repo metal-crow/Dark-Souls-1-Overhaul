@@ -164,6 +164,8 @@ public:
 
 	static uint64_t get_pc_entity_pointer();
 
+	static float * get_pc_position();
+
 
                     /////////////////////////////////////////
                     //////////////// PATCHES ////////////////
