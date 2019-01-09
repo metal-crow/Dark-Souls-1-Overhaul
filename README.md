@@ -40,7 +40,7 @@ Time to recover the hp is 5000 ms, or on weapon toggle.
 
 * The game has increased memory capacity (larger files can be loaded)
 
-* Max sized effect ids can now be sent over the network. This means any added effect ids are visable over multiplayer
+* Max sized effect ids can now be sent over the network. This means any added effect ids are visible over multiplayer
 
 * Some spell types no longer lock your movement or rotation while they are being casted  
 You can freely walk, run, and rotate as you are casting them. Also, you can roll cancel them during their windup  
