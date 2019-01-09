@@ -1,3 +1,5 @@
 # Top-level gitignore
 OverhaulDLL_PtDE/
 
+/OverhaulDLL/Testing.cpp
+/OverhaulDLL/testing.h
