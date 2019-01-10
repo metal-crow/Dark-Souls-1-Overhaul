@@ -81,12 +81,6 @@
     <ClCompile Include="src\AntiCheat\AntiCheat.cpp">
       <Filter>Source Files\AntiCheat</Filter>
     </ClCompile>
-    <ClCompile Include="src\AntiCheat\BinocsTriggerBlock.cpp">
-      <Filter>Source Files\AntiCheat</Filter>
-    </ClCompile>
-    <ClCompile Include="src\AntiCheat\DragonTriggerBlock.cpp">
-      <Filter>Source Files\AntiCheat</Filter>
-    </ClCompile>
     <ClCompile Include="src\Challenge\AggressiveAI.cpp">
       <Filter>Source Files\Challenge</Filter>
     </ClCompile>
