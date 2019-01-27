@@ -82,7 +82,6 @@ extern "C" {
 void AnimationEdits::alter_animation_speeds()
 {
     global::cmd_out << Mod::output_prefix << ("Enabling animation speed alteration injection...\n");
-    Mod::startup_messages.push_back("Enabling animation speed alteration injection...");
 
     uint8_t *write_address = (uint8_t*)(AnimationEdits::animation_entry_set_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &animation_entry_set_return, 1, &animation_entry_set_injection);
@@ -155,8 +154,7 @@ void read_body_aid_injection_helper_function(int32_t* animation_id, float* speed
 }
 
 void AnimationEdits::disable_whiff_animations() {
-    global::cmd_out << Mod::output_prefix << ("Enabling remove animation whiffs...");
-    Mod::startup_messages.push_back("Enabling remove animation whiffs...");
+    global::cmd_out << Mod::output_prefix << ("Enabling remove animation whiffs...\n");
 
     //make jump over setting whiff unconditional
     uint8_t *write_address = (uint8_t*)(AnimationEdits::animation_whiff_set_offset + Game::ds1_base);

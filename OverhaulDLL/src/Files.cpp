@@ -92,7 +92,6 @@ HANDLE WINAPI intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesiredAccess,
                     std::string free_slot_msg = Mod::output_prefix + "Found " + std::to_string(saved_char_count) + " characters in " + std::to_string(save_file_count) + " save files";
                     free_slot_msg += " (first free slot: " + std::to_string(std::get<0>(first_free)) + "," + std::to_string(std::get<1>(first_free)) + ")\n";
                     global::cmd_out << free_slot_msg;
-                    Mod::startup_messages.push_back(free_slot_msg);
 
                     // If all save files are full, generate new (empty) save file
                     if (std::get<0>(first_free) < 0 && std::get<1>(first_free) < 0) {
@@ -104,7 +103,6 @@ HANDLE WINAPI intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesiredAccess,
                             current_save_file = Files::save_file + "_" + std::to_string(save_file_count);
                         }
                         global::cmd_out << (Mod::output_prefix + "No free character slots; generating next empty save file: \"" + current_save_file + "\"\n");
-                        Mod::startup_messages.push_back(Mod::output_prefix + "No free character slots; generating next empty save file: \"" + current_save_file + "\"\n");
 
                         Sl2::generate_empty_save_file(current_save_file.c_str());
                     }
@@ -135,7 +133,6 @@ HANDLE WINAPI intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesiredAccess,
                 std::string loadfile_str(load_file.begin(), load_file.end());
                 std::string load_file_msg = "Loading custom file \"" + filename_str + "\" as \"" + loadfile_str + "\"\n";
                 global::cmd_out << load_file_msg;
-                Mod::startup_messages.push_back(load_file_msg);
             }
         }
         // Call original function
@@ -363,16 +360,14 @@ void Files::check_custom_archive_file_path()
     if ((int)Mod::custom_game_archive_path.length() == 0)
         return;
 
-    global::cmd_out << (std::string(Mod::output_prefix + "Checking if custom game archive files exist..."));
-    Mod::startup_messages.push_back(std::string(Mod::output_prefix + "Checking if custom game archive files exist..."));
+    global::cmd_out << (std::string(Mod::output_prefix + "Checking if custom game archive files exist...\n"));
 
     // Get char* strings for printing console messages
     std::string archive_name_ch = "";
     if (string_wide_to_mb((wchar_t*)Mod::custom_game_archive_path.c_str(), archive_name_ch))
     {
         // Error converting from wide char to char
-        global::cmd_out << (std::string(Mod::output_prefix + "ERROR: Unable to parse custom archive file name. Using default archive files instead."));
-        Mod::startup_messages.push_back(std::string(Mod::output_prefix + "ERROR: Unable to parse custom archive file name. Using default archive files instead."));
+        global::cmd_out << (std::string(Mod::output_prefix + "ERROR: Unable to parse custom archive file name. Using default archive files instead.\n"));
         Mod::custom_game_archive_path = L"";
         return;
     }
@@ -387,17 +382,14 @@ void Files::check_custom_archive_file_path()
         if (!FileUtil::file_exists(filepath.c_str()))
         {
             // Custom file doesn't exist
-            global::cmd_out << (std::string(Mod::output_prefix + "ERROR: The file \"").append(archive_name_ch).append(custom_file_str).append("\" could not be found. Using default files instead."));
-            Mod::startup_messages.push_back(std::string(Mod::output_prefix + "ERROR: The file \"").append(archive_name_ch).append(custom_file_str).append("\" could not be found. Using default files instead."));
+            global::cmd_out << (std::string(Mod::output_prefix + "ERROR: The file \"").append(archive_name_ch).append(custom_file_str).append("\" could not be found. Using default files instead.\n"));
             Mod::custom_game_archive_path = L"";
             return;
         }
         else
-            global::cmd_out << (std::string("    Found ").append(archive_name_ch).append(custom_file_str));
-            Mod::startup_messages.push_back(std::string("    Found ").append(archive_name_ch).append(custom_file_str));
+            global::cmd_out << (std::string("    Found ").append(archive_name_ch).append(custom_file_str).append("\n"));
     }
-    global::cmd_out << (std::string(Mod::output_prefix + "SUCCESS: Custom game archive files will be loaded (\"").append(archive_name_ch).append("\")."));
-    Mod::startup_messages.push_back(std::string(Mod::output_prefix + "SUCCESS: Custom game archive files will be loaded (\"").append(archive_name_ch).append("\")."));
+    global::cmd_out << (std::string(Mod::output_prefix + "SUCCESS: Custom game archive files will be loaded (\"").append(archive_name_ch).append("\").\n"));
 }
 
 
@@ -408,12 +400,10 @@ void Files::check_custom_save_file_path()
         return;
 
     global::cmd_out << std::string(Mod::output_prefix + "Checking if custom save file exists...");
-    Mod::startup_messages.push_back(std::string(Mod::output_prefix + "Checking if custom save file exists..."));
 
     if (FileUtil::file_exists(Files::save_file.c_str()))
     {
         global::cmd_out << (std::string(Mod::output_prefix + "SUCCESS: Custom save file will be loaded (\"").append(Files::save_file).append("\")."));
-        Mod::startup_messages.push_back(std::string(Mod::output_prefix + "SUCCESS: Custom save file will be loaded (\"").append(Files::save_file).append("\")."));
     }
     else
     {
@@ -430,7 +420,6 @@ void Files::check_custom_game_config_file_path()
         return;
 
     global::cmd_out << (std::string(Mod::output_prefix + "Checking if custom game config file exists..."));
-    Mod::startup_messages.push_back(std::string(Mod::output_prefix + "Checking if custom game config file exists..."));
 
     // Get char* strings for printing console messages
     std::string filename_ch;
@@ -443,7 +432,6 @@ void Files::check_custom_game_config_file_path()
     if (FileUtil::file_exists(Mod::custom_config_file_path.c_str()))
     {
         global::cmd_out << (std::string(Mod::output_prefix + "SUCCESS: Custom game config file will be loaded (\"").append(filename_ch).append("\")."));
-        Mod::startup_messages.push_back(std::string(Mod::output_prefix + "SUCCESS: Custom game config file will be loaded (\"").append(filename_ch).append("\")."));
     }
     else
     {
@@ -494,7 +482,6 @@ void Files::set_save_file_index(int unsigned index)
         SetLastError(ERROR_RANGE_NOT_FOUND);
         if (debug_save_print_output) {
             global::cmd_out << ("ERROR: Failed to set save file index (out of range)");
-            Mod::startup_messages.push_back("ERROR: Failed to set save file index (out of range)");
         }
         return;
     }
@@ -503,7 +490,6 @@ void Files::set_save_file_index(int unsigned index)
         SetLastError(ERROR_BAD_ENVIRONMENT);
         if (debug_save_print_output) {
             global::cmd_out << ("ERROR: Failed to set save file index (Character is loaded)");
-            Mod::startup_messages.push_back("ERROR: Failed to set save file index (Character is loaded)");
         }
         return;
     }
@@ -512,7 +498,6 @@ void Files::set_save_file_index(int unsigned index)
         SetLastError(ERROR_BAD_ENVIRONMENT);
         if (debug_save_print_output) {
             global::cmd_out << ("ERROR: Failed to set save file index (Must be viewing saved characters)");
-            Mod::startup_messages.push_back("ERROR: Failed to set save file index (Must be viewing saved characters)");
         }
         return;
     }
@@ -531,7 +516,6 @@ void Files::set_save_file_index(int unsigned index)
     if (Sl2::read_character_preview_data_from_file(save_path.c_str(), Game::get_saved_chars_preview_data()) != ERROR_SUCCESS) {
         if (debug_save_print_output) {
             global::cmd_out << ("ERROR: Failed to set save file index (I/O error)");
-            Mod::startup_messages.push_back("ERROR: Failed to set save file index (I/O error)");
         }
         *Game::get_saved_chars_menu_flag() = 3;
         return;
@@ -549,7 +533,6 @@ void Files::set_save_file_index(int unsigned index)
     *Game::get_saved_chars_menu_flag() = 3;
     if (debug_save_print_output) {
         global::cmd_out << ("Save file index changed to " + std::to_string(index));
-        Mod::startup_messages.push_back("Save file index changed to " + std::to_string(index));
     }
     SetLastError(ERROR_SUCCESS);
 }

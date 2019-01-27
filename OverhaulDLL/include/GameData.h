@@ -125,12 +125,6 @@ public:
     // Changes the game version number to avoid compatibility issues with different game builds
     static void set_game_version(uint8_t version_number);
 
-    // Checks if the player is stuck at the bonfire, and if so, automatically applies the bonfire input fix
-    static void check_bonfire_input_bug();
-
-    // Fixes input bug that causes players to be stuck at a bonfire (usually after turning human with framerate unlocked)
-    static int fix_bonfire_input(bool print_to_text_feed = false, bool print_to_console = false);
-
     // Check if dim lava mod is currently active
     static bool dim_lava_enabled();
 
@@ -140,14 +134,8 @@ public:
     // Returns multiplayer node count as an int (or -1 if player is not online)
     static int get_node_count();
 
-    // Checks if armor sound effects are enabled
-    static bool armor_sfx_enabled();
-
-    // Toggles armor sound effecs
-    static void enable_armor_sfx(bool enable);
-
     // Enables/Disables automatic game disconnection when low framerate is detected
-    static void enable_low_fps_disconnect(bool enable);
+    static void disable_low_fps_disconnect(bool enable);
 
     // Set the current animation speed for the player character
     static void set_current_player_animation_speed(float speed);

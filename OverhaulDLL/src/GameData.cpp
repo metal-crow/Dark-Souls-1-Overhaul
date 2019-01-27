@@ -150,24 +150,11 @@ void Game::on_first_character_loaded()
     // Initialize param files
     //TODO Params::init();
 
-    // Disable armor sounds if it was specified in the config file
-    //if (Mod::disable_armor_sfx_pref)
-        //Game::enable_armor_sfx(false);
+    // Enable rally system vfx
+    BloodborneRally::on_char_load();
 
-    //if (!Mod::legacy_mode)
-    {
-        // Enable rally system vfx
-        BloodborneRally::on_char_load();
-
-        //Allow movement during spells
-        CastingMovement::on_char_load();
-    }
-
-    // Enable forced binoculars/dragonification PvP protections
-    //if (AntiCheat::BinocsTriggerBlock::active)
-        //AntiCheat::BinocsTriggerBlock::enable();
-    //if (AntiCheat::DragonTriggerBlock::active)
-        //AntiCheat::DragonTriggerBlock::enable();
+    //Allow movement during spells
+    CastingMovement::on_char_load();
 
     // Enable challenge mods
     //if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_AGGRO_AI_, Challenge::AggressiveAi::active(), _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
@@ -176,6 +163,8 @@ void Game::on_first_character_loaded()
     //if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_BP_ENEMIES_, Challenge::BlackPhantomEnemies::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
         //Challenge::BlackPhantomEnemies::enable();
     //}
+
+    global::cmd_out << Mod::output_prefix + "All character loading finished!\n";
 }
 
 
@@ -281,7 +270,7 @@ void Game::set_game_version(uint8_t version_number)
     hex_stream << std::hex << (int)Game::get_game_version();
 
     if (version_number != Game::get_game_version()) {
-        Mod::startup_messages.push_back(std::string(Mod::output_prefix + "Changing game version number from 0x").append(hex_stream.str()).append(" to 0x").append(new_version_str).append("..."));
+        global::cmd_out << (std::string(Mod::output_prefix + "Changing game version number from 0x").append(hex_stream.str()).append(" to 0x").append(new_version_str).append("...\n"));
     }
 
     //TODO
@@ -341,62 +330,6 @@ void Game::enable_dim_lava(bool dim)
     }
     else if (Game::lava_luminosity == NULL)
         set_error(ERROR_FILE_NOT_FOUND);
-}
-#endif
-
-// Checks if armor sound effects are enabled
-#if 0
-bool Game::armor_sfx_enabled()
-{
-    if (Params::Armor().base == NULL)
-    {
-        print_console("ERROR: Waiting for Armor params to load");
-        return true;
-    }
-
-    ArmorParam *first_param = Params::Armor().data();
-
-    return (first_param->defenseMaterial == 59 && first_param->defenseMaterial_Weak == 29);
-}
-
-
-// Toggles armor sound effecs
-void Game::enable_armor_sfx(bool enable)
-{
-#ifndef DS1_OVERHAUL_QOL_PREVIEW
-    if (Params::Armor().base == NULL)
-    {
-        print_console("ERROR: Waiting for Armor params to load");
-        return;
-    }
-
-    // Static variable persists between function calls
-    static std::vector<std::vector<uint8_t>> default_armor_sfx_values;
-
-    // Check if default armor sound effects have been stored yet
-    bool backup_defaults = default_armor_sfx_values.empty();
-
-
-    for (int i = 0; i < (int)Params::Armor().param_count; i++)
-    {
-        // First time, store default armor sound effects
-        if (backup_defaults)
-            default_armor_sfx_values.push_back({
-                        Params::Armor().get(i)->defenseMaterial,
-                        Params::Armor().get(i)->defenseMaterial_Weak });
-
-        if (enable)
-        {
-            Params::Armor().get(i)->defenseMaterial = default_armor_sfx_values.at(i).at(0);
-            Params::Armor().get(i)->defenseMaterial_Weak = default_armor_sfx_values.at(i).at(1);
-        }
-        else
-        {
-            Params::Armor().get(i)->defenseMaterial = 0;
-            //Params::Armor().get(i)->defenseMaterial_Weak = 0;
-        }
-    }
-#endif // DS1_OVERHAUL_QOL_PREVIEW
 }
 #endif
 
@@ -461,7 +394,7 @@ void Hud::set_show_node_graph(bool enable, bool game_flag_only)
 #endif
 
 // Disables automatic game disconnection when low framerate is detected
-void Game::enable_low_fps_disconnect(bool enable)
+void Game::disable_low_fps_disconnect(bool enable)
 {
     uint8_t *fps_warn = NULL;
     fps_warn = (uint8_t *)sp::mem::aob_scan("75 0D 84 C0 74 05");
@@ -525,8 +458,7 @@ static void set_memory_limit_chunk(uint64_t default_chunk_size, uint64_t new_chu
 // Set available pool of memory that Dark Souls allocates for itself
 void Game::set_memory_limit()
 {
-    global::cmd_out << Mod::output_prefix << "Increasing game memory allocation size.";
-    Mod::startup_messages.push_back(Mod::output_prefix + "Increasing game memory allocation size.");
+    global::cmd_out << Mod::output_prefix << "Increasing game memory allocation size.\n";
 
     set_memory_limit_chunk(0x1C200000, 0x7C200000);
     set_memory_limit_chunk(0x500000  , 0xA00000);
