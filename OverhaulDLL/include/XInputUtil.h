@@ -73,23 +73,12 @@ inline Status status(XINPUT_GAMEPAD &old, XINPUT_GAMEPAD &current, uint16_t butt
 } // namespace Button
 
 
-
-typedef DWORD(WINAPI *XInputGetStateFunc)(DWORD, XINPUT_STATE*);
-
 extern void *base;
-extern XInputGetStateFunc XInputGetState_original;
 
 // Initializes pointers and other data used to monitor gamepad input
 void initialize();
 
-// Returns pointer to the gamepad state data structure
-inline XINPUT_STATE *get_state();
-
-// 
 void handle_input(XINPUT_GAMEPAD &old, XINPUT_GAMEPAD &current, bool changed, int player);
-
-// Called when the game attemps to call XInputGetState
-DWORD WINAPI intercept_xinput_get_state(DWORD dwUserIndex, XINPUT_STATE *pState);
 
 // Patches game calls to XInput API funcs, redirecting them to interceptor functions
 void apply_function_intercepts();

@@ -5,13 +5,12 @@
         Sean Pesce        -  Reverse engineering, C++
 */
 
-#include "DllMain_Legacy.h"
+#include "DarkSoulsOverhaulMod.h"
+#include "SP/memory/injection/asm/x64.h"
 #include "Menu/SavedCharacters.h"
 
 #define DS1_MENU_SAVED_CHARS_CUSTOM_MSG_BUFF_LEN 256
-#define DS1_MENU_SAVED_CHARS_CUST_STR_INJECTION_OFFSET  0x911C26
-#define DS1_MENU_SAVED_CHARS_CUST_STR_INJECTION_ADDRESS ((void*)((uint32_t)Game::ds1_base + DS1_MENU_SAVED_CHARS_CUST_STR_INJECTION_OFFSET))
-
+const uint64_t DS1_MENU_SAVED_CHARS_CUST_STR_INJECTION_OFFSET = 0x5480CE;
 
 namespace Menu {
 namespace Saves {
@@ -23,13 +22,17 @@ wchar_t custom_buttons_load_msg_buff[DS1_MENU_SAVED_CHARS_CUSTOM_MSG_BUFF_LEN];
 wchar_t custom_buttons_load_alt_msg_buff[DS1_MENU_SAVED_CHARS_CUSTOM_MSG_BUFF_LEN];
 wchar_t custom_header_delete_msg_buff[DS1_MENU_SAVED_CHARS_CUSTOM_MSG_BUFF_LEN];
 wchar_t custom_buttons_delete_msg_buff[DS1_MENU_SAVED_CHARS_CUSTOM_MSG_BUFF_LEN];
-uint32_t custom_header_load_msg_address      = (uint32_t)&custom_header_load_msg_buff[0];
-uint32_t custom_buttons_load_msg_address     = (uint32_t)&custom_buttons_load_msg_buff[0];
-uint32_t custom_buttons_load_alt_msg_address = (uint32_t)&custom_buttons_load_alt_msg_buff[0];
-uint32_t custom_header_delete_msg_address    = (uint32_t)&custom_header_delete_msg_buff[0];
-uint32_t custom_buttons_delete_msg_address   = (uint32_t)&custom_buttons_delete_msg_buff[0];
-uint32_t custom_strings_return = 0;
 
+extern "C" {
+    uint64_t custom_strings_return;
+    void custom_strings_inject();
+
+    uint64_t custom_header_load_msg_address = (uint64_t)&custom_header_load_msg_buff[0];
+    uint64_t custom_buttons_load_msg_address = (uint64_t)&custom_buttons_load_msg_buff[0];
+    uint64_t custom_buttons_load_alt_msg_address = (uint64_t)&custom_buttons_load_alt_msg_buff[0];
+    uint64_t custom_header_delete_msg_address = (uint64_t)&custom_header_delete_msg_buff[0];
+    uint64_t custom_buttons_delete_msg_address = (uint64_t)&custom_buttons_delete_msg_buff[0];
+}
 
 void init_custom_strings(std::wstring &load_header_msg,
                          std::wstring &load_buttons_msg,
@@ -42,8 +45,7 @@ void init_custom_strings(std::wstring &load_header_msg,
     custom_buttons_load_alt_msg_buff[0] = 0;
     custom_header_delete_msg_buff[0]    = 0;
     custom_buttons_delete_msg_buff[0]   = 0;
-    set_mem_protection(DS1_MENU_SAVED_CHARS_CUST_STR_INJECTION_ADDRESS, 8, MEM_PROTECT_RWX);
-    inject_jmp_5b((uint8_t*)DS1_MENU_SAVED_CHARS_CUST_STR_INJECTION_ADDRESS, &custom_strings_return, 3, asm_custom_strings);
+    sp::mem::code::x64::inject_jmp_14b((uint8_t*)Game::ds1_base + DS1_MENU_SAVED_CHARS_CUST_STR_INJECTION_OFFSET, &custom_strings_return, 2, &custom_strings_inject);
     custom_strings_initialized = true;
     set_custom_msgs(load_header_msg,
                     load_buttons_msg,
@@ -55,7 +57,7 @@ void init_custom_strings(std::wstring &load_header_msg,
 
 void set_custom_header_load_msg(std::wstring &msg)
 {
-    int load_msg_length = msg.length();
+    size_t load_msg_length = msg.length();
     SetLastError(ERROR_SUCCESS);
     memset(custom_header_load_msg_buff, 0, DS1_MENU_SAVED_CHARS_CUSTOM_MSG_BUFF_LEN);
     if (custom_strings_initialized) {
@@ -76,7 +78,7 @@ void set_custom_header_load_msg(std::wstring &msg)
 
 void set_custom_buttons_load_msg(std::wstring &msg)
 {
-    int load_msg_length = msg.length();
+    size_t load_msg_length = msg.length();
     SetLastError(ERROR_SUCCESS);
     memset(custom_buttons_load_msg_buff, 0, DS1_MENU_SAVED_CHARS_CUSTOM_MSG_BUFF_LEN);
     if (custom_strings_initialized) {
@@ -97,7 +99,7 @@ void set_custom_buttons_load_msg(std::wstring &msg)
 
 void set_custom_buttons_load_alt_msg(std::wstring &msg)
 {
-    int load_msg_length = msg.length();
+    size_t load_msg_length = msg.length();
     SetLastError(ERROR_SUCCESS);
     memset(custom_buttons_load_alt_msg_buff, 0, DS1_MENU_SAVED_CHARS_CUSTOM_MSG_BUFF_LEN);
     if (custom_strings_initialized) {
@@ -118,7 +120,7 @@ void set_custom_buttons_load_alt_msg(std::wstring &msg)
 
 void set_custom_header_delete_msg(std::wstring &msg)
 {
-    int delete_msg_length = msg.length();
+    size_t delete_msg_length = msg.length();
     SetLastError(ERROR_SUCCESS);
     memset(custom_header_delete_msg_buff, 0, DS1_MENU_SAVED_CHARS_CUSTOM_MSG_BUFF_LEN);
     if (custom_strings_initialized) {
@@ -139,7 +141,7 @@ void set_custom_header_delete_msg(std::wstring &msg)
 
 void set_custom_buttons_delete_msg(std::wstring &msg)
 {
-    int delete_msg_length = msg.length();
+    size_t delete_msg_length = msg.length();
     SetLastError(ERROR_SUCCESS);
     memset(custom_buttons_delete_msg_buff, 0, DS1_MENU_SAVED_CHARS_CUSTOM_MSG_BUFF_LEN);
     if (custom_strings_initialized) {
@@ -183,81 +185,6 @@ void set_custom_msgs(std::wstring &load_header_msg,
     set_custom_buttons_load_alt_msg(load_buttons_alt_msg);
     set_custom_header_delete_msg(delete_header_msg);
     set_custom_buttons_delete_msg(delete_buttons_msg);
-}
-
-
-void remove_custom_strings_patch()
-{
-    uint8_t original_bytes[8] = { 0x66, 0x83, 0x38, 0x00, 0x8B, 0x5C, 0x24, 0x7C };
-    apply_byte_patch(DS1_MENU_SAVED_CHARS_CUST_STR_INJECTION_ADDRESS, original_bytes, 8);
-    custom_strings_initialized = false;
-}
-
-
-// Injected assembly function that enables custom messages in place of "Select data to load" and "Select data to delete"
-void __declspec(naked) __stdcall asm_custom_strings()
-{
-    __asm
-    {
-        cmp edi, 0xA028  // 41000 = ID of "Select data to load"
-        je string_id_load
-        cmp edi, 0xA02A  // 41002 = ID of "Select data to load" (alt)
-        je string_id_load_alt
-        cmp edi, 0xA029  // 41001 = ID of "Select data to delete"
-        je string_id_delete
-        jmp original_code
-
-        string_id_load:
-        cmp byte ptr[eax], 0x3C // 0x3C == '<'; First character of buttons/dialog strings but not header string (language-independent implementation)
-        jne display_custom_load_string
-        cmp byte ptr[eax + 0x6], 0x65 // 0x65 == 'e'; Fourth character of buttons string (and not dialog string)
-        je display_custom_load_buttons_string
-        jmp original_code
-
-        string_id_load_alt:
-        cmp byte ptr[eax], 0x3C
-        jne display_custom_load_string
-        cmp byte ptr[eax + 0x6], 0x65
-        je display_custom_load_buttons_string_alt
-        jmp original_code
-
-        string_id_delete:
-        cmp byte ptr[eax], 0x3C
-        jne display_custom_delete_string
-        cmp byte ptr[eax + 0x6], 0x65
-        je display_custom_delete_buttons_string
-        jmp original_code
-
-        // Display custom message in place of "Select data to load"
-        display_custom_load_string:
-        mov eax, custom_header_load_msg_address
-        jmp original_code
-
-        // Display custom message in place of buttons string
-        display_custom_load_buttons_string:
-        mov eax, custom_buttons_load_msg_address
-        jmp original_code
-
-        // Display custom message in place of buttons string
-        display_custom_load_buttons_string_alt:
-        mov eax, custom_buttons_load_alt_msg_address
-        jmp original_code
-
-        // Display custom message in place of "Select data to delete"
-        display_custom_delete_string:
-        mov eax, custom_header_delete_msg_address
-        jmp original_code
-
-        // Display custom message in place of buttons string
-        display_custom_delete_buttons_string:
-        mov eax, custom_buttons_delete_msg_address
-
-        original_code:
-        cmp word ptr [eax], 0x00
-        mov ebx, [esp+0x7C]
-
-        jmp custom_strings_return
-    }
 }
 
 } // namespace Saves

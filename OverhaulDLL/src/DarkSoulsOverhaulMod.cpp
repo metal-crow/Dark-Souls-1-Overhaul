@@ -18,6 +18,9 @@
 #include "MoveWhileCasting.h"
 #include "AnimationEdits.h"
 #include "PhantomUnshackle.h"
+#include "Menu/SavedCharacters.h"
+#include "Files.h"
+#include "XInputUtil.h"
 
 /*
     Called from DllMain when the plugin DLL is first loaded into memory (PROCESS_ATTACH case).
@@ -30,6 +33,15 @@
 BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
 {
     global::cmd_out << DS1_OVERHAUL_TXT_INTRO "\n\n";
+
+    // Check if game version is supported
+    /*if (Game::get_game_version() != DS1_GAME_VERSION_ENUM::DS1_VERSION_RELEASE)
+    {
+    Mod::startup_messages.push_back(Mod::output_prefix + "WARNING: Unsupported game version detected.");
+    MessageBox(NULL, std::string("Invalid game version detected. Change to supported game version, or disable the Dark Souls Overhaul Mod.").c_str(),
+    "ERROR: Dark Souls Overhaul Mod - Wrong game version", NULL);
+    exit(0);
+    }*/
 
     Game::init();
     AntiAntiCheat::start();
@@ -47,30 +59,22 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
     // Initialize file I/O monitoring data structs
     //Files::init_io_monitors();
 
-    // Check if game version is supported
-    /*if (Game::get_game_version() != DS1_GAME_VERSION_ENUM::DS1_VERSION_RELEASE)
-    {
-        Mod::startup_messages.push_back(Mod::output_prefix + "WARNING: Unsupported game version detected.");
-        MessageBox(NULL, std::string("Invalid game version detected. Change to supported game version, or disable the Dark Souls Overhaul Mod.").c_str(),
-            "ERROR: Dark Souls Overhaul Mod - Wrong game version", NULL);
-        exit(0);
-    }*/
-
     CastingMovement::early_inits();
 
     // Apply increased memory limit patch
+    //TODO this causes random crashes??
     Game::set_memory_limit();
 
     // Inject code to capture starting addresses of all Param files (removes need for AoB scans)
     //Params::patch();
 
-    // Change game version number
-    //Files::apply_function_intercepts();
+    // Load alternate files
+    Files::apply_function_intercepts();
 
     // Check for existence of non-default game files
-    //Files::check_custom_archive_file_path();
-    //Files::check_custom_save_file_path();
-    //Files::check_custom_game_config_file_path();
+    Files::check_custom_archive_file_path();
+    Files::check_custom_save_file_path();
+    Files::check_custom_game_config_file_path();
 
     /*if (!Mod::legacy_mode) {
         // Change game version number
@@ -92,8 +96,12 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
 */
 DWORD WINAPI on_process_attach_async(LPVOID lpParam)
 {
-    Game::init_tae();
+    // Initialize XInput hook
+    XInput::initialize();
 
+    Game::init_tae();
+    // Inject custom strings for saved characters menu
+    Menu::Saves::init_custom_strings();
     AntiCheat::start();
     Game::increase_gui_hpbar_max();
     Game::unrestrict_network_synced_effectids();
@@ -108,7 +116,49 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
         AnimationEdits::enable_gesture_cancelling();
     }
     PhantomUnshackle::start();
+    /*if (Mod::disable_low_fps_disconnect)
+        // Disable "Framerate insufficient for online play" error
+        Game::enable_low_fps_disconnect(false);*/
 
+    CreateThread(NULL, 0, wait_for_first_char_load, NULL, 0, NULL);
+
+    //All actions finished, this now serves as a Main Loop which continues to run in background
+    while (true)
+    {
+        // Check for pending save file index changes
+        if (Files::save_file_index_pending_set_next) {
+            if (Files::saves_menu_is_open()) {
+                Files::set_save_file_next();
+            }
+            Files::save_file_index_pending_set_next = false;
+        }
+        if (Files::save_file_index_pending_set_prev) {
+            if (Files::saves_menu_is_open()) {
+                Files::set_save_file_prev();
+            }
+            Files::save_file_index_pending_set_prev = false;
+        }
+        if (Files::save_file_index_make_new) {
+            if (Files::saves_menu_is_open()) {
+                Files::create_new_save_file();
+            }
+            Files::save_file_index_make_new = false;
+        }
+
+        // Check if the character is loading, and apply actions that need to be _reapplied_ after every loading screen
+        int32_t char_status = Game::get_player_char_status();
+        if (char_status != DS1_PLAYER_STATUS_LOADING) {
+            Game::on_reloaded();
+        }
+
+        Sleep(150);
+    }
+
+    return 0;
+}
+
+
+DWORD WINAPI wait_for_first_char_load(LPVOID lpParam) {
     // Wait for event: first character loaded in this instance of the game
     int char_status = DS1_PLAYER_STATUS_LOADING;
     while (char_status == DS1_PLAYER_STATUS_LOADING) {
@@ -119,25 +169,8 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     // Perform tasks that rely on a character being loaded
     Game::on_first_character_loaded();
 
-    //All actions finished, continue to run in background
-    while (true) {
-
-        // Check if the character is loading, and apply actions that need to be _reapplied_ after every loading screen
-        int32_t char_status = Game::get_player_char_status();
-        if (char_status == DS1_PLAYER_STATUS_LOADING) {
-            while (char_status == DS1_PLAYER_STATUS_LOADING) {
-                char_status = Game::get_player_char_status();
-                Sleep(50);
-            }
-            Game::on_reloaded();
-        }
-
-        Sleep(250);
-    }
-
     return 0;
 }
-
 
 // Called from DllMain when the plugin DLL is unloaded (PROCESS_DETACH case)
 BOOL on_process_detach(HMODULE h_module, LPVOID lp_reserved)
@@ -172,77 +205,12 @@ BOOL on_thread_detach(HMODULE h_module, LPVOID lp_reserved)
 
 /*
     Called from DllMain when the plugin DLL is first loaded into memory (PROCESS_ATTACH case).
-    NOTE: This function runs in the same thread as DllMain, so code implemented here will halt
-    game loading. Code in this function should be limited to tasks that absolutely MUST be
-    executed before the game loads. For less delicate startup tasks, use on_process_attach_async()
-    or initialize_plugin().
-*/
-void on_process_attach()
-{
-    // Load startup preferences from settings file
-    Mod::get_startup_preferences();
-
-    // Initialize file I/O monitoring data structs
-    Files::init_io_monitors();
-
-    // Check if game version is supported
-    if (!game_version_is_supported)
-    {
-        // Placeholder handling of wrong game version
-
-        if (Game::get_game_version() == 139) { // @TODO: Fix get_game_version() to work on different builds of DARKSOULS.exe
-            // Debug build
-            Mod::startup_messages.push_back(Mod::output_prefix + "WARNING: Debug game version detected. Disabling features...");
-            Game::set_memory_limit(Game::memory_limit);
-            return;
-        } else {
-            Mod::startup_messages.push_back(Mod::output_prefix + "WARNING: Unsupported game version detected.");
-            MessageBox(NULL, std::string("Invalid game version detected. Change to supported game version, or disable the Dark Souls Overhaul Mod.").c_str(),
-                       "ERROR: Dark Souls Overhaul Mod - Wrong game version", NULL);
-            exit(0);
-        }
-    }
-
-    // Inject code to capture starting addresses of all Param files (removes need for AoB scans)
-    Params::patch();
-
-    // Change game version number
-    Files::apply_function_intercepts();
-
-    // Check for existence of non-default game files
-    Files::check_custom_archive_file_path();
-    Files::check_custom_save_file_path();
-    Files::check_custom_game_config_file_path();
-
-    if (!Mod::legacy_mode) {
-        // Change game version number
-        Game::set_game_version(DS1_OVERHAUL_GAME_VER_NUM);
-
-        // Apply first part of phantom limit patch
-        Game::increase_phantom_limit1();
-    } else {
-        Game::set_game_version(DS1_OVERHAUL_LEGACY_GAME_VER_NUM);
-    }
-}
-
-/*
-    Called from DllMain when the plugin DLL is first loaded into memory (PROCESS_ATTACH case).
     This function runs in a separate thread from DllMain, so code implemented here does NOT
     pause game loading. Code that must be executed before the game loads should be implemented
     in on_process_attach() instead of this function.
 */
 DWORD WINAPI on_process_attach_async(LPVOID lpParam)
 {
-    if (!game_version_is_supported) {
-        return 0;
-    }
-
-    // Inject custom strings for saved characters menu
-    Menu::Saves::init_custom_strings();
-
-    // Initialize XInput hook
-    XInput::initialize();
-
     if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_GL_PHANTOMS_,
                                   Challenge::GravelordPhantoms::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
         // Enable auto-spawning Gravelord Phantoms challenge mod
@@ -295,10 +263,6 @@ __declspec(dllexport) void __stdcall initialize_plugin()
     for (std::string msg : Mod::startup_messages)
         print_console(msg.c_str());
 
-    if (!game_version_is_supported) {
-        return;
-    }
-
     // Load user preferences & keybinds from settings file
     Mod::get_user_preferences();
     Mod::get_user_keybinds();
@@ -306,16 +270,9 @@ __declspec(dllexport) void __stdcall initialize_plugin()
     // Register console commands
     Mod::register_console_commands();
 
-    // Initialize pointers
-    Game::init_pointers();
-
     if (!Mod::legacy_mode)
         // Apply secondary phantom limit patch
         Game::increase_phantom_limit2();
-
-    if (Mod::disable_low_fps_disconnect)
-        // Disable "Framerate insufficient for online play" error
-        Game::enable_low_fps_disconnect(false);
 
     // Start thread for deferred tasks
     if (!CreateThread(NULL, 0, deferred_tasks, NULL, 0, NULL))
@@ -333,20 +290,6 @@ __declspec(dllexport) void __stdcall main_loop()
 
     if (Mod::initialized)
     {
-        // Check for pending save file index changes
-        if (Files::save_file_index_pending_set_next) {
-            if (Files::saves_menu_is_open()) {
-                Files::set_save_file_next();
-            }
-            Files::save_file_index_pending_set_next = false;
-        }
-        if (Files::save_file_index_pending_set_prev) {
-            if (Files::saves_menu_is_open()) {
-                Files::set_save_file_prev();
-            }
-            Files::save_file_index_pending_set_prev = false;
-        }
-
         // Update multiplayer node graph HUD element display status
         Hud::set_show_node_graph(Hud::get_show_node_graph());
 
@@ -366,21 +309,7 @@ __declspec(dllexport) void __stdcall main_loop()
             // @TODO: Check that multiplayer is disabled? (first figure out how to disable it)
         }
 
-        // Check if the player is stuck at the bonfire, and if so, automatically apply the bonfire input fix
-        Game::check_bonfire_input_bug();
-
         sp::io::keybinds::check_hotkeys();
-
-        // Check if the character is loading, and apply actions that need to be _reapplied_ after every loading screen
-        /*int char_status;
-        Game::player_char_status.read(&char_status);
-        if (char_status == DS1_PLAYER_STATUS_LOADING) {
-            while (char_status == DS1_PLAYER_STATUS_LOADING) {
-                Game::player_char_status.read(&char_status);
-                Sleep(50);
-            }
-            Game::on_reloaded();
-        }*/
     }
 }
 
@@ -391,25 +320,6 @@ __declspec(dllexport) void __stdcall main_loop()
 */
 DWORD WINAPI deferred_tasks(LPVOID lpParam)
 {
-    if (!game_version_is_supported) {
-        return 0;
-    }
-
-    // Sleep time (in milliseconds) between loop iterations
-    const int wait_time = 500;
-
-    // Wait for event: first character loaded in this instance of the game
-    int char_status = DS1_PLAYER_STATUS_LOADING;
-    while ((!Mod::deferred_tasks_complete) && char_status == DS1_PLAYER_STATUS_LOADING) {
-        Game::player_char_status.read(&char_status);
-        Sleep(wait_time);
-    }
-
-    // Perform tasks that rely on a character being loaded
-    Game::on_first_character_loaded();
-
-    ////////// Implement additional wait conditions here //////////
-
     // Finished deferred tasks
     Mod::deferred_tasks_complete = true;
     return 0;
