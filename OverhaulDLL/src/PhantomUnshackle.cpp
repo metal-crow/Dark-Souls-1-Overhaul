@@ -21,8 +21,7 @@ extern "C" {
 static DWORD WINAPI change_mp_zone(void* unused);
 
 void PhantomUnshackle::start() {
-    global::cmd_out << Mod::output_prefix << "Enabling Phantom Unshackle patch...";
-    Mod::startup_messages.push_back("Enabling Phantom Unshackle patch...");
+    global::cmd_out << Mod::output_prefix << "Enabling Phantom Unshackle patch...\n";
 
     world_char_base_asm = Game::world_char_base;
 

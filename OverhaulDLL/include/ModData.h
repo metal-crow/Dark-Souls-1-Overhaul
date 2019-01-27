@@ -125,9 +125,6 @@ public:
     // Set to true after deferred_tasks() has executed (or this boolean can be set to true to cancel unfinished deferred tasks)
     static bool deferred_tasks_complete;
 
-    // Console messages from events that took place before the in-game console was loaded
-    static std::vector<std::string> startup_messages;
-
     // List of supported game versions
     static std::vector<uint8_t> supported_game_versions;
 
@@ -155,9 +152,6 @@ public:
     // User preference setting; determines whether the brightness of lava visual effects should be lowered
     static bool dim_lava_pref;
 
-    // User preference setting; determines whether armor sound effects will be disabled
-    static bool disable_armor_sfx_pref;
-
     // User preference setting; determines whether multiplayer node graph HUD element will be enabled when network is loaded
     static bool hud_node_graph_pref;
 
@@ -167,42 +161,24 @@ public:
     // Custom game configuration file to load instead of the vanilla file
     static std::wstring custom_config_file_path;
 
-    // Determines whether gesture cancelling is enabled
-    static bool gesture_cancelling;
-
-
     // Registers all commands in ConsoleCommands.cpp for use with the in-game console
     static void register_console_commands();
 
-
     // Get user-defined startup preferences from the settings file
-    static void get_startup_preferences();
-
-    // Get user-defined settings preferences from the settings file
-    static void get_user_preferences();
+    static void get_init_preferences();
 
     // Get all user-defined keybinds from the settings file
     static void get_user_keybinds();
 
+    // Plays the credits for the Dark Souls Overhaul Mod (displays the list of people who contributed to development)
+    static void play_credits();
+
+private:
     // Helper function for get_user_keybinds() that loads the specified keybind from the config file and binds it to the specified function
     static void get_single_user_keybind(const char *keybind_name, int(*function)());
 
     // Get custom game files from the settings file
     static void get_custom_game_files();
-
-    // Plays the credits for the Dark Souls Overhaul Mod (displays the list of people who contributed to development)
-    static void play_credits();
-
-
-
-    class Debug {
-    public:
-        // Configurable flags for monitoring game file I/O
-        static bool monitor_bdt;
-        static bool monitor_bhd;
-        static bool monitor_sl2;
-    };
-
 };
 
 

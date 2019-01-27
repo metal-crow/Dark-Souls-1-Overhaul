@@ -35,29 +35,28 @@ extern "C" {
 namespace AntiCheat {
 
 void start() {
-    global::cmd_out << Mod::output_prefix + "Starting anti-cheat protections:";
-    Mod::startup_messages.push_back(Mod::output_prefix + "Starting anti-cheat protections:");
+    global::cmd_out << Mod::output_prefix + "Starting anti-cheat protections:\n";
 
     // Start NpcGuard anti-cheat
-    global::cmd_out << "    Enabling NpcGuard...";
+    global::cmd_out << "    Enabling NpcGuard...\n";
     uint64_t write_address = Game::ds1_base + NpcGuard_offset;
     npc_guard_WorldChrBase = Game::world_char_base;
     sp::mem::code::x64::inject_jmp_14b((void*)write_address, &npc_guard_check_exit, 2, &npc_guard_asm_check, true);
 
     // Start BossGuard anti-cheat
-    global::cmd_out << "    Enabling BossGuard...";
+    global::cmd_out << "    Enabling BossGuard...\n";
     write_address = Game::ds1_base + BossGuard_offset;
     sp::mem::code::x64::inject_jmp_14b((void*)write_address, &boss_guard_return, 0, &boss_guard_asm_check);
 
     // Start TeleBackstabProtect anti-cheat
-    global::cmd_out << "    Enabling TeleBackstabProtect...";
+    global::cmd_out << "    Enabling TeleBackstabProtect...\n";
     write_address = Game::ds1_base + TeleBackstab_getBSAnimation_offset;
     sp::mem::code::x64::inject_jmp_14b((void*)write_address, &TeleBackstabProtect_store_AnimationId_return, 0, &TeleBackstabProtect_store_AnimationId);
     write_address = Game::ds1_base + TeleBackstab_setPlayerLocation_offset;
     sp::mem::code::x64::inject_jmp_14b((void*)write_address, &TeleBackstabProtect_setPosition_return, 5, &TeleBackstabProtect_setPosition_check);
 
     // Start BinocsTriggerBlock anti-cheat
-    global::cmd_out << "    Enabling BinocsTriggerBlock...";
+    global::cmd_out << "    Enabling BinocsTriggerBlock...\n";
     void* bino_params = sp::mem::aob_scan("00 0F 00 00 00 00 FF 00 7F");
     if (bino_params == NULL) {
         FATALERROR("Unable to activate BinocsTriggerBlock");
@@ -66,7 +65,7 @@ void start() {
     sp::mem::patch_bytes((void*)((uint64_t)bino_params + 8), bino_params_patched_bytes, 1);
 
     // Start DragonTriggerBlock anti-cheat
-    global::cmd_out << "    Enabling DragonTriggerBlock...";
+    global::cmd_out << "    Enabling DragonTriggerBlock...\n";
     uint8_t dragon_params_patched_bytes[1] = { 0x79 };
     void* dragon_head_params = sp::mem::aob_scan("60 00 00 00 00 FF 00 7F");
     void* dragon_body_params = sp::mem::aob_scan("A7 00 00 00 00 FF 00 7F");

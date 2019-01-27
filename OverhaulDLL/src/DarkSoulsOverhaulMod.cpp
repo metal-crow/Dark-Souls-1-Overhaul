@@ -53,11 +53,9 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
                  0,     // Use default creation flags
                  NULL); // Optionally returns the thread identifier
 
-    // Load startup preferences from settings file
-    //Mod::get_startup_preferences();
-
-    // Initialize file I/O monitoring data structs
-    //Files::init_io_monitors();
+    // Load user preferences & keybinds from settings file
+    Mod::get_init_preferences();
+    Mod::get_user_keybinds();
 
     CastingMovement::early_inits();
 
@@ -116,10 +114,13 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
         AnimationEdits::enable_gesture_cancelling();
     }
     PhantomUnshackle::start();
-    /*if (Mod::disable_low_fps_disconnect)
-        // Disable "Framerate insufficient for online play" error
-        Game::enable_low_fps_disconnect(false);*/
+    if (Mod::disable_low_fps_disconnect) {
+        Game::disable_low_fps_disconnect(true);
+    }
 
+    global::cmd_out << (Mod::output_prefix + "All initial loading finished!\n");
+
+    // Start dedicated thread for first character loading injections
     CreateThread(NULL, 0, wait_for_first_char_load, NULL, 0, NULL);
 
     //All actions finished, this now serves as a Main Loop which continues to run in background
@@ -267,10 +268,6 @@ __declspec(dllexport) void __stdcall initialize_plugin()
     // Print startup messages
     for (std::string msg : Mod::startup_messages)
         print_console(msg.c_str());
-
-    // Load user preferences & keybinds from settings file
-    Mod::get_user_preferences();
-    Mod::get_user_keybinds();
 
     // Register console commands
     Mod::register_console_commands();

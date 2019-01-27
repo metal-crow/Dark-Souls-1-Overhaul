@@ -39,9 +39,6 @@ bool Mod::initialized = false;
 // Set to true after deferred_tasks() has executed (or can be set to true to cancel unfinished deferred tasks)
 bool Mod::deferred_tasks_complete = false;
 
-// Console messages from events that took place before the in-game console was loaded
-std::vector<std::string> Mod::startup_messages;
-
 // List of supported game versions
 std::vector<uint8_t> Mod::supported_game_versions = {   DS1_VERSION_RELEASE,
                                                         DS1_VERSION_OVERHAUL,
@@ -65,16 +62,13 @@ bool Mod::cheats = false;
 bool Mod::cheats_warning = true;
 
 // Determines to disable the game's "Low framerate detected" disconnection
-bool Mod::disable_low_fps_disconnect = true;
+bool Mod::disable_low_fps_disconnect = false;
 
 // Determines whether node count is displayed on the overlay text feed info header
 bool Mod::show_node_count = true;
 
 // User preference setting; determines whether the brightness of lava visual effects should be lowered
 bool Mod::dim_lava_pref = false;
-
-// User preference setting; determines whether armor sound effects will be disabled
-bool Mod::disable_armor_sfx_pref = false;
 
 // User preference setting; determines whether multiplayer node graph HUD element is enabled
 bool Mod::hud_node_graph_pref = false;
@@ -85,52 +79,9 @@ std::wstring Mod::custom_game_archive_path;
 // Custom game configuration file to load instead of the vanilla file
 std::wstring Mod::custom_config_file_path;
 
-// Determines whether gesture cancelling is enabled
-bool Mod::gesture_cancelling = true;
-
-// Configurable flags for monitoring game file I/O
-bool Mod::Debug::monitor_bdt = false;
-bool Mod::Debug::monitor_bhd = false;
-bool Mod::Debug::monitor_sl2 = false;
-
-
 
 // Get user-defined startup preferences from the settings file
-void Mod::get_startup_preferences()
-{
-    // Begin loading startup preferences
-    Mod::startup_messages.push_back(Mod::output_prefix + "Loading startup preferences...");
-
-    // Check if mouse input should be disabled
-    Mod::mouse_input = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_INPUT_SECTION_, _DS1_OVERHAUL_PREF_MOUSE_INPUT_, (int)Mod::mouse_input, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
-    if (!Mod::mouse_input)
-        Mod::startup_messages.push_back("    Mouse input disabled.");
-
-#ifndef DS1_OVERHAUL_QOL_PREVIEW
-    // Check if legacy mode is enabled
-    Mod::legacy_mode = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_LEGACY_MODE_, (int)Mod::legacy_mode, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
-    if (Mod::legacy_mode)
-        Mod::startup_messages.push_back("    Legacy mode enabled. Gameplay changes will not be applied.");
-#endif // DS1_OVERHAUL_QOL_PREVIEW
-
-    // Check for custom game files
-    Mod::get_custom_game_files();
-
-    // Anti-cheat
-    //AntiCheat::BossGuard::active = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_ANTICHEAT_SECTION_, _DS1_OVERHAUL_PREF_AC_BOSS_GUARD_, (int)AntiCheat::BossGuard::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
-    //AntiCheat::NpcGuard::active = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_ANTICHEAT_SECTION_, _DS1_OVERHAUL_PREF_AC_NPC_GUARD_, (int)AntiCheat::NpcGuard::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
-    //AntiCheat::TeleBackstabProtect::active = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_ANTICHEAT_SECTION_, _DS1_OVERHAUL_PREF_AC_TELEBACKSTAB_PROT_, (int)AntiCheat::TeleBackstabProtect::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
-    //AntiCheat::BinocsTriggerBlock::active = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_ANTICHEAT_SECTION_, _DS1_OVERHAUL_PREF_AC_BINOCS_TRIGGER_BLOCK_, (int)AntiCheat::BinocsTriggerBlock::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
-    //AntiCheat::DragonTriggerBlock::active = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_ANTICHEAT_SECTION_, _DS1_OVERHAUL_PREF_AC_DRAGON_TRIGGER_BLOCK_, (int)AntiCheat::DragonTriggerBlock::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
-
-    // @TODO Load additional startup preferences here
-
-}
-
-
-
-// Get user-defined settings preferences from the settings file
-void Mod::get_user_preferences()
+void Mod::get_init_preferences()
 {
     // Buffer for reading string preferences
     char buffer[_DS1_OVERHAUL_SETTINGS_STRING_BUFF_LEN_];
@@ -139,9 +90,21 @@ void Mod::get_user_preferences()
     // Temporary string for printing console messages
     std::string msg;
 
+    // Begin loading startup preferences
+    global::cmd_out << (Mod::output_prefix + "Loading settings preferences...\n");
 
-    // Begin loading setting preferences
-    global::cmd_out << (Mod::output_prefix + "Loading user preferences...");
+    // Check if mouse input should be disabled
+    Mod::mouse_input = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_INPUT_SECTION_, _DS1_OVERHAUL_PREF_MOUSE_INPUT_, (int)Mod::mouse_input, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    if (!Mod::mouse_input)
+        global::cmd_out << ("    Mouse input disabled.\n");
+
+    // Check if legacy mode is enabled
+    Mod::legacy_mode = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_LEGACY_MODE_, (int)Mod::legacy_mode, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    if (Mod::legacy_mode)
+        global::cmd_out << ("    Legacy mode enabled. Gameplay changes will not be applied.\n");
+
+    // Check for custom game files
+    Mod::get_custom_game_files();
 
     // Check if camera should be locked when console is open
     Mod::console_lock_camera = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_INPUT_SECTION_, _DS1_OVERHAUL_PREF_CONSOLE_LOCK_CAM_, (int)Mod::console_lock_camera, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
@@ -150,18 +113,13 @@ void Mod::get_user_preferences()
 
     Mod::disable_low_fps_disconnect = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DISABLE_LOW_FPS_DISCONNECT_, (int)Mod::disable_low_fps_disconnect, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
 
-    //AnimationEdits::gesture_cancelling = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DISABLE_GESTURE_CANCELLING_, (int)AnimationEdits::gesture_cancelling, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
-    //if (AnimationEdits::gesture_cancelling) {
-    //    global::cmd_out << (msg.append("    Gesture cancelling enabled"));
-    //}
-
     // Display multiplayer node count in text feed info header
     Mod::show_node_count = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_SHOW_NODE_COUNT_, (int)Mod::show_node_count, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
     msg = "    Display multiplayer node count = ";
     if (Mod::show_node_count)
-        global::cmd_out << (msg.append("enabled"));
+        global::cmd_out << (msg.append("enabled\n"));
     else
-        global::cmd_out << (msg.append("disabled"));
+        global::cmd_out << (msg.append("disabled\n"));
 
 
     // Check whether to lower the brightness of lava effects
@@ -169,35 +127,25 @@ void Mod::get_user_preferences()
     if (Mod::dim_lava_pref)
         global::cmd_out << ("    Lava visual effects will be dimmed");
 
-
-    // Check whether to disable armor sound effects
-#ifndef DS1_OVERHAUL_QOL_PREVIEW
-    /*Mod::disable_armor_sfx_pref = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DISABLE_ARMOR_SFX_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
-    if (Mod::disable_armor_sfx_pref)
-        global::cmd_out << ("    Armor sound effects will be disabled");
-    */
-#endif // DS1_OVERHAUL_QOL_PREVIEW
-
-
     // Check if additional HUD elements should be displayed
     /*if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_HUD_SECTION_, _DS1_OVERHAUL_PREF_COMPASS_RADIAL_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
-        Hud::set_show_compass_radial(true);
-        global::cmd_out << ("    HUD: Radial compass enabled");
+    Hud::set_show_compass_radial(true);
+    global::cmd_out << ("    HUD: Radial compass enabled");
     }*/
 
     /*if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_HUD_SECTION_, _DS1_OVERHAUL_PREF_COMPASS_BAR_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
-        Hud::set_show_compass_bar(true);
-        global::cmd_out << ("    HUD: Bar compass enabled");
+    Hud::set_show_compass_bar(true);
+    global::cmd_out << ("    HUD: Bar compass enabled");
     }*/
 
     /*if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_HUD_SECTION_, _DS1_OVERHAUL_PREF_ELEVATION_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
-        Hud::set_show_elevation_meter(true);
-        global::cmd_out << ("    HUD: Elevation meter enabled");
+    Hud::set_show_elevation_meter(true);
+    global::cmd_out << ("    HUD: Elevation meter enabled");
     }*/
 
     /*if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_HUD_SECTION_, _DS1_OVERHAUL_PREF_NODE_GRAPH_, Hud::get_show_node_graph(), _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
-        Hud::set_show_node_graph(true, false);
-        global::cmd_out << ("    HUD: Multiplayer node graph enabled");
+    Hud::set_show_node_graph(true, false);
+    global::cmd_out << ("    HUD: Multiplayer node graph enabled");
     }*/
 
     // Check if challenge mods should be enabled
@@ -211,23 +159,17 @@ void Mod::get_user_preferences()
     if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_BP_ENEMIES_, Challenge::BlackPhantomEnemies::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
         global::cmd_out << ("    Challenge: Black Phantom Enemies will be enabled");
     }
-    Challenge::AggressiveAi::ear_distance  = (uint16_t)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SETTINGS_SECTION_, _DS1_OVERHAUL_PREF_CM_AGGRO_AI_EAR_DIST_,  Challenge::AggressiveAi::DEFAULT_EAR_DISTANCE,  _DS1_OVERHAUL_SETTINGS_FILE_);
+    Challenge::AggressiveAi::ear_distance = (uint16_t)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SETTINGS_SECTION_, _DS1_OVERHAUL_PREF_CM_AGGRO_AI_EAR_DIST_, Challenge::AggressiveAi::DEFAULT_EAR_DISTANCE, _DS1_OVERHAUL_SETTINGS_FILE_);
     Challenge::AggressiveAi::nose_distance = (uint16_t)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SETTINGS_SECTION_, _DS1_OVERHAUL_PREF_CM_AGGRO_AI_NOSE_DIST_, Challenge::AggressiveAi::DEFAULT_NOSE_DISTANCE, _DS1_OVERHAUL_SETTINGS_FILE_);
     Challenge::BlackPhantomEnemies::DRAW_TYPE = (uint8_t)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SETTINGS_SECTION_, _DS1_OVERHAUL_PREF_CM_BP_ENEMY_DRAW_TYPE_, Challenge::BlackPhantomEnemies::DRAW_TYPE_DEFAULT, _DS1_OVERHAUL_SETTINGS_FILE_);
 #endif
-    // @TODO Load additional user preferences here
-
-
-
 }
-
-
 
 // Get user-defined keybinds from the settings file
 void Mod::get_user_keybinds()
 {
     // Begin loading keybinds
-    global::cmd_out << (Mod::output_prefix + "Loading keybinds...");
+    global::cmd_out << (Mod::output_prefix + "Loading keybinds...\n");
 
 
     // Toggle mouse input keybind
@@ -325,7 +267,7 @@ void Mod::get_custom_game_files()
     Files::string_mb_to_wide(custom_file_name_buff, Mod::custom_game_archive_path);
     if (std::string(custom_file_name_buff).length() > 0)
     {
-        Mod::startup_messages.push_back(std::string("    Found custom game archive file definition: \"").append(custom_file_name_buff).append("\""));
+        global::cmd_out << (std::string("    Found custom game archive file definition: \"").append(custom_file_name_buff).append("\"\n"));
     }
 
 
@@ -342,7 +284,7 @@ void Mod::get_custom_game_files()
     Files::save_file = custom_file_name_buff;
     if (std::string(custom_file_name_buff).length() > 0)
     {
-        Mod::startup_messages.push_back(std::string("    Found custom game save file definition: \"").append(custom_file_name_buff).append("\""));
+        global::cmd_out << (std::string("    Found custom game save file definition: \"").append(custom_file_name_buff).append("\"\n"));
     }
 
 
@@ -360,18 +302,7 @@ void Mod::get_custom_game_files()
     Files::string_mb_to_wide(custom_file_name_buff, Mod::custom_config_file_path);
     if (std::string(custom_file_name_buff).length() > 0)
     {
-        Mod::startup_messages.push_back(std::string("    Found custom game config file definition: \"").append(custom_file_name_buff).append("\""));
+        global::cmd_out << (std::string("    Found custom game config file definition: \"").append(custom_file_name_buff).append("\"\n"));
     }
-
-    // Get I/O output filter
-    /*Files::io_output_filter;
-    custom_file_name_buff[MAX_PATH] = '\0';
-    GetPrivateProfileString(_DS1_OVERHAUL_DEBUG_SECTION_,
-                            _DS1_OVERHAUL_PREF_IO_OUT_FILTER_,
-                            NULL,
-                            custom_file_name_buff,
-                            MAX_PATH + 1,
-                            _DS1_OVERHAUL_SETTINGS_FILE_);
-    Files::io_output_filter = std::string(custom_file_name_buff);*/
 }
 

@@ -108,7 +108,6 @@ typedef struct {
 
 void CastingMovement::early_inits() {
     global::cmd_out << Mod::output_prefix << ("Injecting ESD locator...\n");
-    Mod::startup_messages.push_back("Injecting ESD locator...");
 
     //Hook into the function that copies the parsed c0000.esd file to the final buffer, and get the buffer addr
     //This is hit VERY early (before splash screens), so needs to be loaded fast
@@ -118,7 +117,6 @@ void CastingMovement::early_inits() {
 
 void CastingMovement::start() {
     global::cmd_out << Mod::output_prefix << ("Enabling casting while moving patch...\n");
-    Mod::startup_messages.push_back("Enabling casting while moving patch...");
 
     //Fix one of the checks that prevents WalkFB aid from being set
     uint8_t nop_patch[] = { 0x90, 0x90 };

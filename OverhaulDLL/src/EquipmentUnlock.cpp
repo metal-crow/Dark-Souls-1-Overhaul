@@ -9,7 +9,6 @@ extern "C" {
 
 void EquipmentUnlock::start() {
     global::cmd_out << Mod::output_prefix << "Enabling Equipment Change Unlock...\n";
-    Mod::startup_messages.push_back("Enabling Equipment Change Unlock...");
 
     //nop out the check which says if the menu is enterable or not
     //save the result for later though

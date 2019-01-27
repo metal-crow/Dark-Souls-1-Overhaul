@@ -12,7 +12,6 @@ extern "C" {
 
 void DeadAngles::start() {
     global::cmd_out << Mod::output_prefix << "Enabling Dead Angles...\n";
-    Mod::startup_messages.push_back("Enabling Dead Angles...");
 
     uint8_t *write_address = (uint8_t*)(DeadAngles::main_dead_angle_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &main_dead_angle_injection_return, 2, &main_dead_angle_injection);

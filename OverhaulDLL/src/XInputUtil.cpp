@@ -50,7 +50,6 @@ void *base = NULL;
 // Initializes pointers and other data used to monitor gamepad input
 void initialize() {
     global::cmd_out << (Mod::output_prefix + "Initializing XInput hook...\n");
-    Mod::startup_messages.push_back(Mod::output_prefix + "Initializing XInput hook...");
 
     base = GetModuleHandle("XINPUT1_3.dll");
     while (base == NULL) {
