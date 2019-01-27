@@ -14,6 +14,7 @@
 //#include "Challenge/BlackPhantomEnemies.h"
 //#include "Challenge/GravelordPhantoms.h"
 #include "AnimationEdits.h"
+#include "Files.h"
 
 #define _SP_DEFINE_VK_NAME_STRINGS_  // Must be defined to use Virtual-key code name strings from SP_IO_Strings.hpp (opt-in by default because it increases filesize by a few KB)
 
@@ -81,9 +82,6 @@ bool Mod::hud_node_graph_pref = false;
 // Custom game archive files to load instead of the vanilla game files
 std::wstring Mod::custom_game_archive_path;
 
-// Custom character save file to load instead of the vanilla file
-std::wstring Mod::custom_save_file_path;
-
 // Custom game configuration file to load instead of the vanilla file
 std::wstring Mod::custom_config_file_path;
 
@@ -124,27 +122,6 @@ void Mod::get_startup_preferences()
     //AntiCheat::TeleBackstabProtect::active = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_ANTICHEAT_SECTION_, _DS1_OVERHAUL_PREF_AC_TELEBACKSTAB_PROT_, (int)AntiCheat::TeleBackstabProtect::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
     //AntiCheat::BinocsTriggerBlock::active = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_ANTICHEAT_SECTION_, _DS1_OVERHAUL_PREF_AC_BINOCS_TRIGGER_BLOCK_, (int)AntiCheat::BinocsTriggerBlock::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
     //AntiCheat::DragonTriggerBlock::active = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_ANTICHEAT_SECTION_, _DS1_OVERHAUL_PREF_AC_DRAGON_TRIGGER_BLOCK_, (int)AntiCheat::DragonTriggerBlock::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
-
-
-    // Debug settings
-    Mod::Debug::monitor_bdt = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_DEBUG_SECTION_, _DS1_OVERHAUL_PREF_MONITOR_BDT_, (int)Mod::Debug::monitor_bdt, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
-    if (Mod::Debug::monitor_bdt) {
-        Files::io_monitors[Files::BDT0].monitor = true;
-        Files::io_monitors[Files::BDT1].monitor = true;
-        Files::io_monitors[Files::BDT2].monitor = true;
-        Files::io_monitors[Files::BDT3].monitor = true;
-    }
-    Mod::Debug::monitor_bhd = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_DEBUG_SECTION_, _DS1_OVERHAUL_PREF_MONITOR_BHD_, (int)Mod::Debug::monitor_bhd, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
-    if (Mod::Debug::monitor_bhd) {
-        Files::io_monitors[Files::BHD0].monitor = true;
-        Files::io_monitors[Files::BHD1].monitor = true;
-        Files::io_monitors[Files::BHD2].monitor = true;
-        Files::io_monitors[Files::BHD3].monitor = true;
-    }
-    Mod::Debug::monitor_sl2 = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_DEBUG_SECTION_, _DS1_OVERHAUL_PREF_MONITOR_SL2_, (int)Mod::Debug::monitor_sl2, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
-    if (Mod::Debug::monitor_sl2) {
-        Files::io_monitors[Files::SL2].monitor = true;
-    }
 
     // @TODO Load additional startup preferences here
 
@@ -330,15 +307,6 @@ void Mod::get_single_user_keybind(const char *keybind_name, int(*function)())
     }
 }
 
-
-static void string_mb_to_wide(char *in_string, std::wstring &out_string) {
-    int size_needed = MultiByteToWideChar(CP_UTF8, 0, &in_string[0], -1, NULL, 0);
-    std::wstring wstrTo(size_needed, 0);
-    MultiByteToWideChar(CP_UTF8, 0, &in_string[0], -1, &wstrTo[0], size_needed);
-    out_string.append(wstrTo);
-}
-
-
 // Get custom game files from the settings file
 void Mod::get_custom_game_files()
 {
@@ -354,7 +322,7 @@ void Mod::get_custom_game_files()
                             _DS1_OVERHAUL_SETTINGS_FILE_);
 
     // Convert string to wide chars
-    string_mb_to_wide(custom_file_name_buff, Mod::custom_game_archive_path);
+    Files::string_mb_to_wide(custom_file_name_buff, Mod::custom_game_archive_path);
     if (std::string(custom_file_name_buff).length() > 0)
     {
         Mod::startup_messages.push_back(std::string("    Found custom game archive file definition: \"").append(custom_file_name_buff).append("\""));
@@ -371,7 +339,7 @@ void Mod::get_custom_game_files()
                             _DS1_OVERHAUL_SETTINGS_FILE_);
 
     // Convert string to wide chars
-    string_mb_to_wide(custom_file_name_buff, Mod::custom_save_file_path);
+    Files::save_file = custom_file_name_buff;
     if (std::string(custom_file_name_buff).length() > 0)
     {
         Mod::startup_messages.push_back(std::string("    Found custom game save file definition: \"").append(custom_file_name_buff).append("\""));
@@ -389,7 +357,7 @@ void Mod::get_custom_game_files()
                             _DS1_OVERHAUL_SETTINGS_FILE_);
 
     // Convert string to wide chars
-    string_mb_to_wide(custom_file_name_buff, Mod::custom_config_file_path);
+    Files::string_mb_to_wide(custom_file_name_buff, Mod::custom_config_file_path);
     if (std::string(custom_file_name_buff).length() > 0)
     {
         Mod::startup_messages.push_back(std::string("    Found custom game config file definition: \"").append(custom_file_name_buff).append("\""));

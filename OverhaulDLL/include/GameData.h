@@ -196,6 +196,10 @@ public:
 
     static int32_t* get_mp_id_ptr();
 
+    static int32_t* get_saved_chars_menu_flag();
+
+    static uint8_t* get_saved_chars_preview_data();
+
     /*
      * Help speedup some functions by, whenever we're loaded into an area,
      * preload/preresolve some pointers and values so they can be much more quickly read when we need them
@@ -233,115 +237,7 @@ public:
                     /////////////////////////////////////////
                     ////////////// FILE-RELATED /////////////
                     /////////////////////////////////////////
-    class Files {
-    public:
-
-        enum IoMonitorIndex {
-            BHD0 = 0,
-            BHD1 = 1,
-            BHD2 = 2,
-            BHD3 = 3,
-            BDT0 = 4,
-            BDT1 = 5,
-            BDT2 = 6,
-            BDT3 = 7,
-            SL2 = 8
-        };
-
-        // Structure for managing game file I/O
-        struct IoMonitor {
-            HANDLE handle = NULL;
-            uint32_t io_pos = 0;
-            bool monitor = false;
-            std::string  default_filename;
-            std::wstring default_filename_w;
-            // @TODO: Fill in custom filename (if a custom file path was specified)
-            std::string  custom_filename;
-            std::wstring custom_filename_w;
-        };
-
-        // Strutures for tracking file I/O data for the game's BDT, BHD5, and SL2 files
-        static IoMonitor io_monitors[9];
-
-        // Filter for I/O monitoring output; only strings containing this string will be printed
-        static std::string io_output_filter;
-
-        // Default save file path used by the game
-        static std::string default_save_file_path;
-
-        // Index of the save file currently being read/written by the game
-        static int save_file_index;
-
-        // Pending save file index changes
-        static bool save_file_index_pending_set_next;
-        static bool save_file_index_pending_set_prev;
-
-
-        // Returns the address of the file I/O monitoring struct corresponding to the specified file handle
-        static IoMonitor *io_monitor_from_handle(HANDLE handle);
-
-        // Initializes game file I/O monitor structs
-        static void init_io_monitors();
-
-        // Patches game calls to Win32 API file I/O funcs, redirecting them to interceptor functions
-        static void apply_function_intercepts();
-
-        // Checks if custom archive files exist (.bdt/.bhd5)
-        static void check_custom_archive_file_path();
-
-        // Checks if custom save file exists (.sl2)
-        static void check_custom_save_file_path();
-
-        // Checks if custom game config file exists (.ini)
-        static void check_custom_game_config_file_path();
-
-        // Returns the full file path of the current save file (with index)
-        static const wchar_t *get_save_file_path(std::wstring &buffer);
-
-        // Changes the current save file index (and writes all corresponding data)
-        static void set_save_file_index(int unsigned index, bool print_output = true);
-
-        // Changes the to the next save file (if current save file is the last one, new file is first save file)
-        static void set_save_file_next(bool print_output = true);
-
-        // Changes the to the previous save file (if current save file is the first one, new file is last save file)
-        static void set_save_file_prev(bool print_output = true);
-
-        // Checks if the saved characters menu is currently open
-        static bool saves_menu_is_open();
-
-        
-
-                                            
-                                            //////////////////////////////////////////////////////////
-                                            ////////////// Win32 API File I/O Intercepts /////////////
-                                            //////////////////////////////////////////////////////////
-
-        // Called when the game attempts to call CreateFileW
-        static HANDLE WINAPI intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
-                                                     LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition,
-                                                     DWORD dwFlagsAndAttributes, HANDLE hTemplateFile);
-
-        // Called when the game attempts to call GetPrivateProfileIntW
-        static UINT WINAPI intercept_get_private_profile_int_w(LPCWSTR lpAppName, LPCWSTR lpKeyName, INT nDefault, LPCWSTR lpFileName);
-
-        // Called when the game attempts to call WritePrivatePrivateProfileW
-        static BOOL WINAPI intercept_write_private_profile_section_w(LPCWSTR lpAppName, LPCWSTR lpString, LPCWSTR lpFileName);
-
-        // Called when the game attempts to call ReadFile
-        static BOOL WINAPI intercept_read_file(HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead, LPDWORD lpNumberOfBytesRead, LPOVERLAPPED lpOverlapped);
-
-        // Called when the game attempts to call WriteFile
-        static BOOL WINAPI intercept_write_file(HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite, LPDWORD lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped);
-
-        // Called when the game attempts to call CloseHandle
-        static BOOL WINAPI intercept_close_handle(HANDLE hObject);
-
-        // Called when the game attempted to call SetFilePointer
-        static DWORD WINAPI intercept_set_file_pointer(HANDLE hFile, LONG lDistanceToMove, PLONG lpDistanceToMoveHigh, DWORD dwMoveMethod);
-    };
 };
-typedef Game::Files Files;
 typedef Game::Hud Hud;
 
 

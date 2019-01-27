@@ -32,6 +32,7 @@
 
 
 DWORD WINAPI on_process_attach_async(LPVOID lpParam);
+DWORD WINAPI wait_for_first_char_load(LPVOID lpParam);
 
 void inline FATALERROR(const char* error_str, ...) {
     char dest[1024];

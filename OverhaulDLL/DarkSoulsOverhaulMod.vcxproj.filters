@@ -111,6 +111,9 @@
     <ClCompile Include="src\EquipmentUnlock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Files.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3d11-wrapper\include\d3d11\exports.h">
@@ -148,15 +151,6 @@
     <None Include="include\BloodborneRallySystem.h">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="include\Challenge\AggressiveAI.h">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="include\Challenge\BlackPhantomEnemies.h">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="include\Challenge\GravelordPhantoms.h">
-      <Filter>Header Files</Filter>
-    </None>
     <None Include="include\DllMain_Legacy.h">
       <Filter>Header Files</Filter>
     </None>
@@ -164,9 +158,6 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="include\GameData.h">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="include\Menu\SavedCharacters.h">
       <Filter>Header Files</Filter>
     </None>
     <None Include="include\ModData.h">
@@ -181,14 +172,26 @@
     <None Include="include\PhantomUnshackle.h">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="include\Plugin\ConsoleCommands.h">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="include\Plugin\KeybindFunctions.h">
-      <Filter>Header Files</Filter>
-    </None>
     <None Include="include\XInputUtil.h">
       <Filter>Header Files</Filter>
+    </None>
+    <None Include="include\Challenge\AggressiveAI.h">
+      <Filter>Header Files\Challenge</Filter>
+    </None>
+    <None Include="include\Challenge\GravelordPhantoms.h">
+      <Filter>Header Files\Challenge</Filter>
+    </None>
+    <None Include="include\Challenge\BlackPhantomEnemies.h">
+      <Filter>Header Files\Challenge</Filter>
+    </None>
+    <None Include="include\Menu\SavedCharacters.h">
+      <Filter>Header Files\Menu</Filter>
+    </None>
+    <None Include="include\Plugin\KeybindFunctions.h">
+      <Filter>Header Files\Plugin</Filter>
+    </None>
+    <None Include="include\Plugin\ConsoleCommands.h">
+      <Filter>Header Files\Plugin</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -217,6 +220,15 @@
       <Filter>Source Files\AntiCheat</Filter>
     </MASM>
     <MASM Include="src\PhantomUnshackleASM.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="src\FilesASM.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="src\Menu\SavedCharactersASM.asm">
+      <Filter>Source Files\Menu</Filter>
+    </MASM>
+    <MASM Include="src\XInputUtilASM.asm">
       <Filter>Source Files</Filter>
     </MASM>
   </ItemGroup>

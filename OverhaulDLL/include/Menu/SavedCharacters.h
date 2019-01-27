@@ -14,11 +14,11 @@
 #include <cstdint>
 #include <string>
 
-#define DS1_MENU_SAVED_CHARS_DEFAULT_CUSTOM_LOAD_HEADER_MSG      std::wstring(L"Select data to load")
-#define DS1_MENU_SAVED_CHARS_DEFAULT_CUSTOM_LOAD_BUTTONS_MSG     std::wstring(L"<?selectUD?>:Select <?conclusion?>:Enter <?cancel?>:Back <?viewChange?>:Toggle Display <?commando?>:Delete")
-#define DS1_MENU_SAVED_CHARS_DEFAULT_CUSTOM_LOAD_BUTTONS_ALT_MSG std::wstring(L"<?conclusion?>:Enter <?cancel?>:Back <?viewChange?>:Toggle Display <?commando?>:Delete  <?categoryChangeL?>/<?categoryChangeR?>:Change save file")
-#define DS1_MENU_SAVED_CHARS_DEFAULT_CUSTOM_DELETE_HEADER_MSG    std::wstring(L"Select data to delete")
-#define DS1_MENU_SAVED_CHARS_DEFAULT_CUSTOM_DELETE_BUTTONS_MSG   std::wstring(L"<?selectUD?>:Select <?conclusion?>:Enter <?cancel?>:Back <?viewChange?>:Toggle Display <?commando?>:Delete")
+static std::wstring DS1_MENU_SAVED_CHARS_DEFAULT_CUSTOM_LOAD_HEADER_MSG = std::wstring(L"Select data to load");
+static std::wstring DS1_MENU_SAVED_CHARS_DEFAULT_CUSTOM_LOAD_BUTTONS_MSG = std::wstring(L"<?selectUD?>:Select <?conclusion?>:Enter <?cancel?>:Back <?viewChange?>:Toggle Display <?commando?>:Delete");
+static std::wstring DS1_MENU_SAVED_CHARS_DEFAULT_CUSTOM_LOAD_BUTTONS_ALT_MSG = std::wstring(L"<?conclusion?>:Enter <?cancel?>:Back <?viewChange?>:Toggle Display <?commando?>:Delete  <?categoryChangeL?>/<?categoryChangeR?>:Change save file  <?startMenuSwitch?>Create New Save File");
+static std::wstring DS1_MENU_SAVED_CHARS_DEFAULT_CUSTOM_DELETE_HEADER_MSG = std::wstring(L"Select data to delete");
+static std::wstring DS1_MENU_SAVED_CHARS_DEFAULT_CUSTOM_DELETE_BUTTONS_MSG = std::wstring(L"<?selectUD?>:Select <?conclusion?>:Enter <?cancel?>:Back <?viewChange?>:Toggle Display <?commando?>:Delete");
 
 namespace Menu {
 namespace Saves {
@@ -40,12 +40,6 @@ void set_custom_msgs(std::wstring &load_header_msg,
                      std::wstring &load_buttons_alt_msg,
                      std::wstring &delete_header_msg,
                      std::wstring &delete_buttons_msg);
-void remove_custom_strings_patch();
-
-// Injected assembly function that enables custom messages in place of "Select data to load" and "Select data to delete"
-void __stdcall asm_custom_strings();
-
-
 } // namespace Saves
 } // namespace Menu
 

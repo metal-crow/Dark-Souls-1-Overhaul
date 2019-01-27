@@ -10,6 +10,8 @@
 #include "GameData.h"
 #include "SP/memory/injection/asm/x64.h"
 
+bool move_casting_print_debug = false;
+
 extern "C" {
     uint64_t c0000_esd_reader_return;
     void c0000_esd_reader_injection();
@@ -147,7 +149,8 @@ void CastingMovement::start() {
                 if (Game::player_tae.get_event_type_by_id(aid, i) == 0 && Game::player_tae.get_event_param_by_id(aid, i, 0) == TAE_type0_param_values::lock_rotation) {
                     Game::player_tae.set_event_start_by_id(aid, i, 0.0f);
                     Game::player_tae.set_event_end_by_id(aid, i, 0.0f);
-                    global::cmd_out << "Updated movement animation " << std::to_string(aid) << "\n";
+                    if (move_casting_print_debug)
+                        global::cmd_out << "Updated movement animation " << std::to_string(aid) << "\n";
                 }
             }
         }

@@ -17,6 +17,8 @@ const uint32_t AnimationEdits::gesture_anim_ids[15] = { 6800, 6801, 6802, 6803, 
 // Gesture cancelling enabled/disabled
 bool AnimationEdits::gesture_cancelling = true;
 
+bool animation_edits_print_debug = false;
+
 // Enables gesture cancelling via rolling
 void AnimationEdits::enable_gesture_cancelling()
 {
@@ -35,7 +37,8 @@ void AnimationEdits::enable_gesture_cancelling()
                     )
                 {
                     Game::player_tae.set_event_start_by_id(id, i, 0.0f);
-                    global::cmd_out << "Updated gesture " << std::to_string(id) << ", event " << std::to_string(i) << " to allow cancelling\n";
+                    if (animation_edits_print_debug)
+                        global::cmd_out << "Updated gesture " << std::to_string(id) << ", event " << std::to_string(i) << " to allow cancelling\n";
                     if (!anim_updated) {
                         anim_updated = true;
                         gestures_changed++;

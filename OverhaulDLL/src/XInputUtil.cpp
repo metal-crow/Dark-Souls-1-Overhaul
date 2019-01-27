@@ -5,9 +5,10 @@
         Sean Pesce        -  C++
 */
 
-#include "DllMain_Legacy.h"
+#include "DarkSoulsOverhaulMod.h"
 #include "XInputUtil.h"
-
+#include "Files.h"
+#include "sp/memory/injection/asm/x64.h"
 
 namespace XInput {
 
@@ -45,28 +46,24 @@ inline Status status(XINPUT_GAMEPAD &old, XINPUT_GAMEPAD &current, uint16_t butt
 
 
 void *base = NULL;
-XInputGetStateFunc XInputGetState_original = NULL;
 
 // Initializes pointers and other data used to monitor gamepad input
 void initialize() {
-    base = NULL;
+    base = GetModuleHandle("XINPUT1_3.dll");
     while (base == NULL) {
         // Wait for XInput DLL to load, then save base address
         base = GetModuleHandle("XINPUT1_3.dll");
         Sleep(500);
     }
-    if (!print_console(Mod::output_prefix + "Initializing XInput hook..."))
-        Mod::startup_messages.push_back(Mod::output_prefix + "Initializing XInput hook...");
+    global::cmd_out << (Mod::output_prefix + "Initializing XInput hook...\n");
+    Mod::startup_messages.push_back(Mod::output_prefix + "Initializing XInput hook...");
+
     apply_function_intercepts();
 }
 
-
-// Returns pointer to the gamepad state data structure
-inline XINPUT_STATE *get_state() {
-    SpPointer state = SpPointer((void*)((uint32_t)base + 0x10C44), { 0x0, 0x24 });
-    return (XINPUT_STATE*)state.resolve();
+extern "C" {
+    DWORD WINAPI intercept_xinput_get_state(DWORD, XINPUT_STATE *);
 }
-
 
 // Called when the game attemps to call XInputGetState
 DWORD WINAPI intercept_xinput_get_state(DWORD dwUserIndex, XINPUT_STATE *pState) {
@@ -74,7 +71,7 @@ DWORD WINAPI intercept_xinput_get_state(DWORD dwUserIndex, XINPUT_STATE *pState)
     static uint32_t packet_number[4] = { 0, 0, 0, 0 };
     static XINPUT_GAMEPAD old_state[4];
     // Call original function
-    DWORD result = XInputGetState_original(dwUserIndex, pState);
+    DWORD result = XInputGetState(dwUserIndex, pState);
     switch (result) {
         case ERROR_SUCCESS:
             handle_input(old_state[dwUserIndex], pState->Gamepad, (packet_number[dwUserIndex] != pState->dwPacketNumber), dwUserIndex);
@@ -92,7 +89,6 @@ DWORD WINAPI intercept_xinput_get_state(DWORD dwUserIndex, XINPUT_STATE *pState)
 }
 
 
-// 
 void handle_input(XINPUT_GAMEPAD &old, XINPUT_GAMEPAD &current, bool changed, int player) {
     static bool reset_lock_rotation = false;
     if (changed) {
@@ -123,48 +119,35 @@ void handle_input(XINPUT_GAMEPAD &old, XINPUT_GAMEPAD &current, bool changed, in
             }
         }
 
+        // Start
+        if (Button::pressed(old, current, XINPUT_GAMEPAD_START)) {
+            if (Files::saves_menu_is_open()) {
+                Files::save_file_index_make_new = true;
+            }
+        }
+
         // B (Xbox) or Circle (Playstation)
-        if (Button::pressed(old, current, XINPUT_GAMEPAD_B)) {
+        /*if (Button::pressed(old, current, XINPUT_GAMEPAD_B)) {
             if (console_is_open()) {
                 execute_console_command("close");
                 current.wButtons &= (~XINPUT_GAMEPAD_B);
             }
-        }
-        
-
-        // Test code for omni-directional rolling while locked:
-        //if (Button::pressed(old, current, XINPUT_GAMEPAD_B)) {
-        //    print_console("Player " + std::to_string(player) + " pressed B");
-        //    if (Game::player_is_locked_on()) {
-        //        print_console("Locked on? Yes");
-        //        Game::allow_rotation_when_locked_on(true);
-        //        reset_lock_rotation = true;
-        //    } else {
-        //        print_console("Locked on? No");
-        //    }
-        //}
-        //// Player dodge animation started; fix body rotation
-        //int32_t player_body_anim = Game::get_player_body_anim_id();
-        //if (reset_lock_rotation && player_body_anim >= 680 && player_body_anim <= 738) {
-        //    Game::allow_rotation_when_locked_on(false);
-        //    reset_lock_rotation = false;
-        //}
-        
-    } // if(changed)
+        }*/
+    }
 }
 
+static const uint64_t XInput_Get_State_offset = 0x82AE70;
+extern "C" {
+    uint64_t XInput_Get_State_inject_return;
+    void XInput_Get_State_inject();
+}
 
 // Patches game calls to XInput API funcs, redirecting them to interceptor functions
 void apply_function_intercepts() {
     // XInputGetState
     //    Docs: https://msdn.microsoft.com/en-us/library/windows/desktop/microsoft.directx_sdk.reference.xinputgetstate(v=vs.85).aspx
-    static uint32_t xinput_get_state_func = (uint32_t)&intercept_xinput_get_state;
-    static uint32_t *xinput_get_state_func_ptr = &xinput_get_state_func;
-    uint8_t *xinput_get_state_func_b = (uint8_t *)&xinput_get_state_func_ptr;
-    uint8_t patch_xinput_get_state[4] = { xinput_get_state_func_b[0], xinput_get_state_func_b[1], xinput_get_state_func_b[2], xinput_get_state_func_b[3] };
-    void *write_address = (uint8_t*)Game::ds1_base + 0x6BA544;
-    XInputGetState_original = *(XInputGetStateFunc*)*(void**)write_address;
-    apply_byte_patch(write_address, patch_xinput_get_state, 4);
+    void *write_address = (uint8_t*)Game::ds1_base + XInput_Get_State_offset;
+    sp::mem::code::x64::inject_jmp_14b(write_address, &XInput_Get_State_inject_return, 0, &XInput_Get_State_inject);
 }
 
 

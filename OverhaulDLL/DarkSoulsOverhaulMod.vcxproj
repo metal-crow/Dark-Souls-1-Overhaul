@@ -50,17 +50,16 @@
     </ClCompile>
     <ClCompile Include="src\DeadAngles.cpp" />
     <ClCompile Include="src\EquipmentUnlock.cpp" />
+    <ClCompile Include="src\Files.cpp" />
     <ClCompile Include="src\GameData.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\Menu\SavedCharacters.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\ModData.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\MoveWhileCasting.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -83,7 +82,6 @@
     </ClCompile>
     <ClCompile Include="src\XInputUtil.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -138,8 +136,6 @@
     </None>
     <None Include="include\Files.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </ExcludedFromBuild>
     </None>
     <None Include="include\GameData.h">
@@ -208,8 +204,11 @@
     <MASM Include="src\BloodborneRallySystemASM.asm" />
     <MASM Include="src\DeadAnglesASM.asm" />
     <MASM Include="src\EquipmentUnlockASM.asm" />
+    <MASM Include="src\FilesASM.asm" />
+    <MASM Include="src\Menu\SavedCharactersASM.asm" />
     <MASM Include="src\MoveWhileCastingASM.asm" />
     <MASM Include="src\PhantomUnshackleASM.asm" />
+    <MASM Include="src\XInputUtilASM.asm" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -296,7 +295,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>lib;d3d11-wrapper/lib;</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>d3d11-wrapper/src/d3d11/exports.def</ModuleDefinitionFile>
-      <AdditionalDependencies>sp_utils_x64.lib;DsGameFiles.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>sp_utils_x64.lib;XInput.lib;DsGameFiles.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

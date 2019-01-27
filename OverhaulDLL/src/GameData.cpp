@@ -60,9 +60,6 @@ sp::mem::pointer<uint8_t> Game::saves_enabled;
 // Multiplayer node count
 int Game::node_count = -1;
 
-// Strutures for tracking file I/O data for the game's BDT, BHD5, and SL2 files
-Files::IoMonitor Files::io_monitors[9];
-
 
 // Initializes pointers and base addresses required for most other functions
 void Game::init()
@@ -129,7 +126,7 @@ void Game::init_tae()
             ret_val = Game::player_tae.init_from_memory(tae_header_ptr.resolve());
         }
 
-        if ((tae_header_ptr.resolve() == NULL || ret_val == NULL) && tae_search_count == 25) {
+        if ((tae_header_ptr.resolve() == NULL || ret_val == NULL) && tae_search_count == 35) {
             FATALERROR((Mod::output_prefix + "!!ERROR!! TAE structure not found.\n").c_str());
         }
 
@@ -204,6 +201,8 @@ static int32_t* player_lower_body_anim_id_cache = NULL;
 static float* set_current_player_animation_speed_cache = NULL;
 static int32_t* area_id_cache = NULL;
 static int32_t* mp_id_cache = NULL;
+static int32_t* saved_chars_menu_flag_cache = NULL;
+static uint8_t* saved_chars_preview_data_cache = NULL;
 
 void Game::preload_function_caches() {
 
@@ -233,6 +232,10 @@ void Game::preload_function_caches() {
     Game::get_area_id();
     mp_id_cache = NULL;
     Game::get_mp_id_ptr();
+    saved_chars_menu_flag_cache = NULL;
+    Game::get_saved_chars_menu_flag();
+    saved_chars_preview_data_cache = NULL;
+    Game::get_saved_chars_preview_data();
 
     Sleep(10);
     //this pointer is a bit late to resolve on load
@@ -461,7 +464,7 @@ void Game::enable_low_fps_disconnect(bool enable)
 {
     uint8_t *fps_warn = NULL;
     fps_warn = (uint8_t *)sp::mem::aob_scan("75 0D 84 C0 74 05");
-
+    
     if (fps_warn)
     {
         // AoB Scan was successful
@@ -521,6 +524,9 @@ static void set_memory_limit_chunk(uint64_t default_chunk_size, uint64_t new_chu
 // Set available pool of memory that Dark Souls allocates for itself
 void Game::set_memory_limit()
 {
+    global::cmd_out << Mod::output_prefix << "Increasing game memory allocation size.";
+    Mod::startup_messages.push_back(Mod::output_prefix + "Increasing game memory allocation size.");
+
     set_memory_limit_chunk(0x1C200000, 0x7C200000);
     set_memory_limit_chunk(0x500000  , 0xA00000);
     set_memory_limit_chunk(0x2000000 , 0x7800000);
@@ -533,8 +539,6 @@ void Game::set_memory_limit()
     set_memory_limit_chunk(0x5280000 , 0xB280000);
     set_memory_limit_chunk(0xE0000   , 0x400000);
     set_memory_limit_chunk(0x200000  , 0x800000);
-
-    Mod::startup_messages.push_back(Mod::output_prefix + "Increasing game memory allocation size.");
 }
 
 
@@ -807,5 +811,37 @@ int32_t* Game::get_mp_id_ptr() {
     else {
         mp_id_cache = mp_id.resolve();
         return mp_id_cache;
+    }
+}
+
+int32_t* Game::get_saved_chars_menu_flag() {
+    if (saved_chars_menu_flag_cache) {
+        return saved_chars_menu_flag_cache;
+    }
+
+    sp::mem::pointer saved_chars_menu_flag = sp::mem::pointer<int32_t>((void*)(Game::ds1_base + 0x1D26168), { 0xA4 });
+    if (saved_chars_menu_flag.resolve() == NULL) {
+        FATALERROR("Unable to get_saved_chars_menu_flag.");
+        return NULL;
+    }
+    else {
+        saved_chars_menu_flag_cache = saved_chars_menu_flag.resolve();
+        return saved_chars_menu_flag_cache;
+    }
+}
+
+uint8_t* Game::get_saved_chars_preview_data() {
+    if (saved_chars_preview_data_cache) {
+        return saved_chars_preview_data_cache;
+    }
+
+    sp::mem::pointer saved_chars_preview_data = sp::mem::pointer<uint8_t>((void*)(Game::ds1_base + 0x1D278F0), { 0x60, 0x10 });
+    if (saved_chars_preview_data.resolve() == NULL) {
+        FATALERROR("Unable to get_saved_chars_preview_data.");
+        return NULL;
+    }
+    else {
+        saved_chars_preview_data_cache = saved_chars_preview_data.resolve();
+        return saved_chars_preview_data_cache;
     }
 }

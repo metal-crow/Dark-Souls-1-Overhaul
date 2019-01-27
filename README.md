@@ -15,6 +15,7 @@ https://gitlab.com/metal-crow/darksoulsremastered-ida-db
 ## Changelist
 
 * NPCs and Bosses (kindof, WIP) can no longer be killed by hackers
+* Hackers can no longer force you into Binoculars or Dragon form
 * Backstabs will no longer teleport you if you're unreasonably far away (both anti-cheat and QOL)
 	
 * Gestures can be canceled via rolling
@@ -29,7 +30,7 @@ https://gitlab.com/metal-crow/darksoulsremastered-ida-db
 * All whiff animations on weapons have been removed (they always have the on-hit animation instead)
 
 * BloodBorne rally system has been implemented as a replacement for the Occult upgrade path  
-HP recovery is equal to (0.05 + (upgrade level of weapon / 10.0)) * damage given  
+HP recovery is equal to `(0.05 + (upgrade level of weapon / 10.0)) * damage given`  
 Time to recover the hp is 5000 ms, or on weapon toggle.  
 
 * Dead Angles and Ghost Hits are back
@@ -48,3 +49,5 @@ These include everything EXCEPT: Combustions, Firestorms, and all miracles but L
 
 * You can now invade or summon phantoms __anywhere__, and can still do so after bosses are killed  
 This solution is imperfect, as areas where you could not do multiplayer before but are right next to areas you could (I.E Undead Burg bonfire), are treated as seperate multiplayer areas.
+
+* Support for unlimited save slots
