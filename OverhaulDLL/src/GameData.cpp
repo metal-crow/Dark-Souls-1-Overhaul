@@ -205,6 +205,7 @@ static int32_t* saved_chars_menu_flag_cache = NULL;
 static uint8_t* saved_chars_preview_data_cache = NULL;
 
 void Game::preload_function_caches() {
+    global::cmd_out << "Cache loading\n";
 
     if (!one_time_only_caches) {
         pc_entity_ptr = NULL;

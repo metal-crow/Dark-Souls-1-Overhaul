@@ -544,7 +544,7 @@ void Files::set_save_file_index(int unsigned index)
     std::wstring custom_header1 = L"Select data to load." + custom_header;
     std::wstring custom_header2 = L"Select data to delete." + custom_header;
     Menu::Saves::set_custom_header_msgs(custom_header1, custom_header2);
-    Sleep(500);
+
     // Re-load saved characters menu
     *Game::get_saved_chars_menu_flag() = 3;
     if (debug_save_print_output) {

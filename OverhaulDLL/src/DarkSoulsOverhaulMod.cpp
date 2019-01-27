@@ -123,6 +123,7 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     CreateThread(NULL, 0, wait_for_first_char_load, NULL, 0, NULL);
 
     //All actions finished, this now serves as a Main Loop which continues to run in background
+    bool waiting_for_load = false;
     while (true)
     {
         // Check for pending save file index changes
@@ -147,8 +148,12 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
 
         // Check if the character is loading, and apply actions that need to be _reapplied_ after every loading screen
         int32_t char_status = Game::get_player_char_status();
-        if (char_status != DS1_PLAYER_STATUS_LOADING) {
+        if (char_status == DS1_PLAYER_STATUS_LOADING) {
+            waiting_for_load = true;
+        }
+        if (waiting_for_load == true && char_status != DS1_PLAYER_STATUS_LOADING) {
             Game::on_reloaded();
+            waiting_for_load = false;
         }
 
         Sleep(150);
