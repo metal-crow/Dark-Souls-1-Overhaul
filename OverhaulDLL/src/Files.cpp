@@ -70,7 +70,7 @@ HANDLE WINAPI intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesiredAccess,
         {
             size_t backslash_i = load_file.find_last_of(L"\\");
             if (backslash_i != -1)
-                filename = load_file.substr(backslash_i, load_file.length());
+                filename = load_file.substr(backslash_i+1, load_file.length());
 
             // Intercept save file load (.sl2)
             if (load_file.substr(load_file.length() - 4) == SaveFile::FILE_EXT_W)
