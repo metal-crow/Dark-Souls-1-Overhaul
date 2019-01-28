@@ -13,10 +13,16 @@ c0000_esd_reader_injection PROC
 ;original code
 mov     r8d, eax
 mov     rdx, rsi
-;WARNING! WARNING! I DON'T KNOW WHY THIS IS A GOOD INDICATOR OF c0000.esd
-;Hi future me, this will probably suck
-;For some reason, R9==1 is only when it's c0000.esd
-cmp     R9, 1
+;Check that the src pointer we're copying from (R15) contains the "c0000" string
+cmp     word ptr [R15+0D0h], 63h ; 'c'
+jne     not_c0000
+cmp     word ptr [R15+0D2h], 30h ; '0'
+jne     not_c0000
+cmp     word ptr [R15+0D4h], 30h ; '0'
+jne     not_c0000
+cmp     word ptr [R15+0D6h], 30h ; '0'
+jne     not_c0000
+cmp     word ptr [R15+0D8h], 30h ; '0'
 jne     not_c0000
 mov     qword ptr [c0000_esd_data_buffer], rdx ;save this address
 not_c0000:

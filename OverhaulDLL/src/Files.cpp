@@ -12,8 +12,10 @@ bool Files::save_file_index_make_new = false;
 bool first_save_load = true;
 std::string Files::save_file;
 
+//Make sure this is lowercase
 std::set<std::wstring> Files::files_to_intercept_loading = {
     L"frpg_sfxbnd_commoneffects.ffxbnd.dcx",
+    L"gameparam.parambnd.dcx"
 };
 
 int Files::string_wide_to_mb(wchar_t *in_string, std::string &out_string)
