@@ -166,6 +166,7 @@ pop     r8
 pop     rdx
 pop     rcx
 pop     rax
+ret
 
 set_rally_regain_sfx ENDP
 
@@ -194,6 +195,7 @@ pop     r8
 pop     rdx
 pop     rcx
 pop     rax
+ret
 
 set_rally_sfx_rhand endp
 
@@ -222,6 +224,7 @@ pop     r8
 pop     rdx
 pop     rcx
 pop     rax
+ret
 
 set_rally_sfx_lhand endp
 
