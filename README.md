@@ -12,6 +12,9 @@ https://docs.google.com/document/d/1qlg4kQDUq45ufqmX8PreXchwibFwJJ3ZzK0khrHGNTY/
 ### Collaborative IDA database (using https://github.com/DGA-MI-SSI/YaCo v2.6):  
 https://gitlab.com/metal-crow/darksoulsremastered-ida-db
 
+### Custom Archive files (new SFX, Effects, etc):
+https://gitlab.com/metal-crow/darksoulsremastered-overhaul-archives
+
 ## Changelist
 
 * NPCs and Bosses (kindof, WIP) can no longer be killed by hackers
