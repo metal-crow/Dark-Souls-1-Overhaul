@@ -176,7 +176,6 @@ static bool resolve_current_player_animation_speed();
  * This function should be called whenever an area is loaded (after player status changes from loading)
  * This also refreshes the cache on area load so it doesn't get stale
 */
-static bool one_time_only_caches = false; //some caches only need to be preloaded once per game start
 
 static uint64_t* pc_entity_ptr = NULL;
 static float* pc_position_ptr = NULL;
@@ -196,14 +195,10 @@ static uint8_t* saved_chars_preview_data_cache = NULL;
 void Game::preload_function_caches() {
     global::cmd_out << "Cache loading\n";
 
-    if (!one_time_only_caches) {
-        pc_entity_ptr = NULL;
-        Game::get_pc_entity_pointer();
-        time_address = NULL;
-        Game::get_game_time_ms();
-        one_time_only_caches = true;
-    }
-
+    pc_entity_ptr = NULL;
+    Game::get_pc_entity_pointer();
+    time_address = NULL;
+    Game::get_game_time_ms();
     pc_position_ptr = NULL;
     Game::get_pc_position();
     left_hand_weapon_ptr_cache = NULL;
