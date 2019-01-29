@@ -155,9 +155,11 @@ push    r9
 push    r10
 push    r11
 
-mov     edx, RALLY_EFFECT_ID
-mov     r8d, 10000
+mov     r8d, RALLY_EFFECT_ID
+mov     edx, 10000
+sub     rsp, 8
 call    [lua_SetEventSpecialEffect_2]
+add     rsp, 8
 
 pop     r11
 pop     r10
@@ -184,8 +186,8 @@ push    r9
 push    r10
 push    r11
 
-mov     edx, RALLY_CAPABLE_WEAPON_EFFECT_ID_RHAND
-mov     r8d, 10000
+mov     r8d, RALLY_CAPABLE_WEAPON_EFFECT_ID_RHAND
+mov     edx, 10000
 call    [lua_SetEventSpecialEffect_2]
 
 pop     r11
@@ -213,8 +215,8 @@ push    r9
 push    r10
 push    r11
 
-mov     edx, RALLY_CAPABLE_WEAPON_EFFECT_ID_LHAND
-mov     r8d, 10000
+mov     r8d, RALLY_CAPABLE_WEAPON_EFFECT_ID_LHAND
+mov     edx, 10000
 call    [lua_SetEventSpecialEffect_2]
 
 pop     r11

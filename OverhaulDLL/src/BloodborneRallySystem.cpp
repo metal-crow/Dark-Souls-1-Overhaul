@@ -41,7 +41,7 @@ extern "C" {
     void set_rally_sfx_lhand();
     uint32_t RALLY_CAPABLE_WEAPON_EFFECT_ID_LHAND = 92002; //weapon can perform rally indicator
 
-    uint64_t lua_SetEventSpecialEffect_2 = 0x1404a6160;
+    uint64_t lua_SetEventSpecialEffect_2 = 0x1404ACE60;
 }
 
 void BloodborneRally::start() {
