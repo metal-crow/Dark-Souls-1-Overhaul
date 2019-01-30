@@ -86,6 +86,9 @@ public:
     // Player character status (loading, human, co-op, invader, hollow)
     static sp::mem::pointer<int32_t> player_char_status;
 
+    // Marker for if we're currently in a loading screen
+    static sp::mem::pointer<int32_t> is_loading;
+
     // Time Action Events for the player character's animations
     static Tae player_tae;
 
@@ -170,8 +173,10 @@ public:
     // Fix the bug where the player HP could be greater than the displayed GUI bar
     static void increase_gui_hpbar_max();
 
+    // Gets currently equipped L hand weapon
 	static uint32_t left_hand_weapon();
 
+    // Gets currently equipped R hand weapon
     static uint32_t right_hand_weapon();
 
 	static int32_t get_player_char_status();
