@@ -60,6 +60,7 @@ nop [rax+00]
     <CheatEntry>
       <ID>5</ID>
       <Description>"Ezstate Base (set value to an entry from the list)"</Description>
+      <LastState Value="000000000D0C3AF0" RealAddress="3BF80000"/>
       <ShowAsHex>1</ShowAsHex>
       <VariableType>8 Bytes</VariableType>
       <Address>ezstate_base</Address>
@@ -73,6 +74,7 @@ nop [rax+00]
     <CheatEntry>
       <ID>6</ID>
       <Description>"Category"</Description>
+      <LastState Value="1" RealAddress="0D0C3AF4"/>
       <VariableType>4 Bytes</VariableType>
       <Address>ezstate_base</Address>
       <Offsets>
@@ -82,6 +84,7 @@ nop [rax+00]
     <CheatEntry>
       <ID>7</ID>
       <Description>"Number of subanimations"</Description>
+      <LastState Value="5" RealAddress="0D0C3B00"/>
       <VariableType>4 Bytes</VariableType>
       <Address>ezstate_base</Address>
       <Offsets>
@@ -97,6 +100,7 @@ nop [rax+00]
     <CheatEntry>
       <ID>25</ID>
       <Description>"Subanimations[0]"</Description>
+      <LastState Value="3F A1 45 A1 40 A1 40 A1 41 A1 40 A1 41 A1 82 AC 18 00 00 A1" RealAddress="0D0FAD4B"/>
       <ShowAsHex>1</ShowAsHex>
       <VariableType>Array of byte</VariableType>
       <ByteLength>20</ByteLength>
@@ -110,6 +114,7 @@ nop [rax+00]
     <CheatEntry>
       <ID>26</ID>
       <Description>"Subanimations[0] len"</Description>
+      <LastState Value="2" RealAddress="0D0D8498"/>
       <VariableType>8 Bytes</VariableType>
       <Address>ezstate_base</Address>
       <Offsets>
@@ -120,6 +125,7 @@ nop [rax+00]
     <CheatEntry>
       <ID>23</ID>
       <Description>"Subanimations[1]"</Description>
+      <LastState Value="45 A1 40 A1 40 A1 41 A1 40 A1 41 A1 82 AC 18 00 00 A1 45 A1" RealAddress="0D0FAD4D"/>
       <ShowAsHex>1</ShowAsHex>
       <VariableType>Array of byte</VariableType>
       <ByteLength>20</ByteLength>
@@ -133,6 +139,7 @@ nop [rax+00]
     <CheatEntry>
       <ID>24</ID>
       <Description>"Subanimations[1] len"</Description>
+      <LastState Value="2" RealAddress="0D0D84A8"/>
       <VariableType>8 Bytes</VariableType>
       <Address>ezstate_base</Address>
       <Offsets>
@@ -143,6 +150,7 @@ nop [rax+00]
     <CheatEntry>
       <ID>21</ID>
       <Description>"Subanimations[2]"</Description>
+      <LastState Value="40 A1 40 A1 41 A1 40 A1 41 A1 82 AC 18 00 00 A1 45 A1 81 9A" RealAddress="0D0FAD4F"/>
       <ShowAsHex>1</ShowAsHex>
       <VariableType>Array of byte</VariableType>
       <ByteLength>20</ByteLength>
@@ -156,6 +164,7 @@ nop [rax+00]
     <CheatEntry>
       <ID>22</ID>
       <Description>"Subanimations[2] len"</Description>
+      <LastState Value="2" RealAddress="0D0D84B8"/>
       <VariableType>8 Bytes</VariableType>
       <Address>ezstate_base</Address>
       <Offsets>
@@ -166,6 +175,7 @@ nop [rax+00]
     <CheatEntry>
       <ID>19</ID>
       <Description>"Subanimations[3]"</Description>
+      <LastState Value="40 A1 41 A1 40 A1 41 A1 82 AC 18 00 00 A1 45 A1 81 9A 99 99" RealAddress="0D0FAD51"/>
       <ShowAsHex>1</ShowAsHex>
       <VariableType>Array of byte</VariableType>
       <ByteLength>20</ByteLength>
@@ -179,6 +189,7 @@ nop [rax+00]
     <CheatEntry>
       <ID>20</ID>
       <Description>"Subanimations[3] len"</Description>
+      <LastState Value="2" RealAddress="0D0D84C8"/>
       <VariableType>8 Bytes</VariableType>
       <Address>ezstate_base</Address>
       <Offsets>
@@ -189,19 +200,21 @@ nop [rax+00]
     <CheatEntry>
       <ID>17</ID>
       <Description>"Subanimations[4]"</Description>
+      <LastState Value="41 A1 40 A1 41 A1 82 AC 18 00 00 A1 45 A1 81 9A 99 99 99 99" RealAddress="0D0FAD53"/>
       <ShowAsHex>1</ShowAsHex>
       <VariableType>Array of byte</VariableType>
       <ByteLength>20</ByteLength>
       <Address>ezstate_base</Address>
       <Offsets>
-        <Offset>40</Offset>
         <Offset>0</Offset>
+        <Offset>40</Offset>
         <Offset>8</Offset>
       </Offsets>
     </CheatEntry>
     <CheatEntry>
       <ID>18</ID>
       <Description>"Subanimations[4] len"</Description>
+      <LastState Value="2" RealAddress="0D0D84D8"/>
       <VariableType>8 Bytes</VariableType>
       <Address>ezstate_base</Address>
       <Offsets>
@@ -212,6 +225,7 @@ nop [rax+00]
     <CheatEntry>
       <ID>15</ID>
       <Description>"Subanimations[5]"</Description>
+      <LastState Value="40 A1 41 A1 82 AC 18 00 00 A1 45 A1 81 9A 99 99 99 99 99 B9" RealAddress="0D0FAD55"/>
       <ShowAsHex>1</ShowAsHex>
       <VariableType>Array of byte</VariableType>
       <ByteLength>20</ByteLength>
@@ -225,6 +239,7 @@ nop [rax+00]
     <CheatEntry>
       <ID>16</ID>
       <Description>"Subanimations[5] len"</Description>
+      <LastState Value="2" RealAddress="0D0D84E8"/>
       <VariableType>8 Bytes</VariableType>
       <Address>ezstate_base</Address>
       <Offsets>
@@ -235,6 +250,7 @@ nop [rax+00]
     <CheatEntry>
       <ID>13</ID>
       <Description>"Subanimations[6]"</Description>
+      <LastState Value="41 A1 82 AC 18 00 00 A1 45 A1 81 9A 99 99 99 99 99 B9 3F A1" RealAddress="0D0FAD57"/>
       <ShowAsHex>1</ShowAsHex>
       <VariableType>Array of byte</VariableType>
       <ByteLength>20</ByteLength>
@@ -248,6 +264,7 @@ nop [rax+00]
     <CheatEntry>
       <ID>14</ID>
       <Description>"Subanimations[6] len"</Description>
+      <LastState Value="2" RealAddress="0D0D84F8"/>
       <VariableType>8 Bytes</VariableType>
       <Address>ezstate_base</Address>
       <Offsets>
@@ -258,6 +275,7 @@ nop [rax+00]
     <CheatEntry>
       <ID>11</ID>
       <Description>"Subanimations[7]"</Description>
+      <LastState Value="82 AC 18 00 00 A1 45 A1 81 9A 99 99 99 99 99 B9 3F A1 40 A1" RealAddress="0D0FAD59"/>
       <ShowAsHex>1</ShowAsHex>
       <VariableType>Array of byte</VariableType>
       <ByteLength>20</ByteLength>
@@ -271,6 +289,7 @@ nop [rax+00]
     <CheatEntry>
       <ID>12</ID>
       <Description>"Subanimations[7] len"</Description>
+      <LastState Value="6" RealAddress="0D0D8508"/>
       <VariableType>8 Bytes</VariableType>
       <Address>ezstate_base</Address>
       <Offsets>
@@ -281,6 +300,7 @@ nop [rax+00]
     <CheatEntry>
       <ID>27</ID>
       <Description>"Subanimations[8]"</Description>
+      <LastState Value="45 A1 81 9A 99 99 99 99 99 B9 3F A1 40 A1 42 A1 3F A1 45 A1" RealAddress="0D0FAD5F"/>
       <ShowAsHex>1</ShowAsHex>
       <VariableType>Array of byte</VariableType>
       <ByteLength>20</ByteLength>
@@ -294,6 +314,7 @@ nop [rax+00]
     <CheatEntry>
       <ID>28</ID>
       <Description>"Subanimations[8] len"</Description>
+      <LastState Value="2" RealAddress="0D0D8518"/>
       <VariableType>8 Bytes</VariableType>
       <Address>ezstate_base</Address>
       <Offsets>
@@ -313,7 +334,7 @@ nop [rax+00]
     </SymbolEntry>
     <SymbolEntry>
       <Name>ezstate_base</Name>
-      <Address>006A0020</Address>
+      <Address>3BF80000</Address>
     </SymbolEntry>
     <SymbolEntry>
       <Name>ezstate_bases</Name>
@@ -321,11 +342,11 @@ nop [rax+00]
     </SymbolEntry>
     <SymbolEntry>
       <Name>number_of_ezstates_saved</Name>
-      <Address>006A0350</Address>
+      <Address>3BF80330</Address>
     </SymbolEntry>
     <SymbolEntry>
       <Name>ezstate_base_list</Name>
-      <Address>006A0360</Address>
+      <Address>3BF80010</Address>
     </SymbolEntry>
   </UserdefinedSymbols>
 </CheatTable>
