@@ -45,6 +45,9 @@ uint64_t Game::frpg_net_base = NULL;
 // Player character status (loading, human, co-op, invader, hollow)
 sp::mem::pointer<int32_t> Game::player_char_status;
 
+// Marker for if we're currently in a loading screen
+sp::mem::pointer<int32_t> Game::is_loading;
+
 // Time Action Events for the player character's animations
 Tae Game::player_tae = Tae();
 
@@ -109,6 +112,9 @@ void Game::init()
     Game::saves_enabled = sp::mem::pointer<uint8_t>((void*)((uint64_t)saves_enabled_sp + *(uint32_t*)((uint64_t)saves_enabled_sp + 3) + 7), { 0xB70 });
 
     Game::player_char_status = sp::mem::pointer<int32_t>((void*)(Game::world_char_base), { 0x68, 0xD4 });
+
+    // Note this is not actually the real pointer to the loading screen byte. Just a best guess
+    Game::is_loading = sp::mem::pointer<int32_t>((void*)(Game::ds1_base+0x1ACD758), { 0x28, 0x250, 0x2F8 });
 }
 
 // Initialize the pointer to the TAE struture. This isn't loaded until around the time the main menu is hit, so needs to be delayed
@@ -641,7 +647,7 @@ uint32_t Game::left_hand_weapon() {
         return *left_hand_weapon_ptr_cache;
     }
 
-    sp::mem::pointer weapon = sp::mem::pointer<uint32_t>((void*)(Game::char_class_base), { 0x10, 0x324 });
+    sp::mem::pointer weapon = sp::mem::pointer<uint32_t>((void*)(Game::ds1_base + 0x1ACD758), { 0x28, 0x250, 0x2F8, 0x18, 0x0 });
     if (weapon.resolve() == NULL) {
         FATALERROR("Unable to get left_hand_weapon.");
         return -1;
@@ -658,7 +664,7 @@ uint32_t Game::right_hand_weapon() {
         return *right_hand_weapon_ptr_cache;
     }
 
-    sp::mem::pointer weapon = sp::mem::pointer<uint32_t>((void*)(Game::char_class_base), { 0x10, 0x328 });
+    sp::mem::pointer weapon = sp::mem::pointer<uint32_t>((void*)(Game::ds1_base+0x1ACD758), { 0x28, 0x250, 0x2F8, 0x18, 0x4 });
     if (weapon.resolve() == NULL) {
         FATALERROR("Unable to get right_hand_weapon.");
         return -1;
@@ -672,8 +678,9 @@ uint32_t Game::right_hand_weapon() {
 // Note we can't cache this because we rely on it to check cache staleness
 int32_t Game::get_player_char_status() {
     int32_t* char_status_ptr = Game::player_char_status.resolve();
+    int32_t* is_loading = Game::is_loading.resolve();
 
-    if (char_status_ptr == NULL) {
+    if (char_status_ptr == NULL || is_loading == NULL) {
         return DS1_PLAYER_STATUS_LOADING;
     }
     else {
