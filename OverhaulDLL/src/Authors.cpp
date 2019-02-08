@@ -5,13 +5,13 @@
         Sean Pesce  -  C++
 */
 
-#include "DllMain_Legacy.h"
+#include "DarkSoulsOverhaulMod.h"
 
 
 // List of people who directly contributed to the Dark Souls Overhaul Mod
 std::vector<std::string> Mod::authors = {
     // @TODO: Get everyone's preferred name to be credited with
-    "Metal-crow",
+    "metal-crow",
     "Kali",
     "hzpe",
     "Kushisushi",
