@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="28">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>0</ID>
+      <Description>"Enable/Disable to Start/Stop listening for PC StateIds"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+globalalloc(cur_stateid_list,800)
+globalalloc(cur_stateid_count,4)
+alloc(newmem,2048,"DarkSoulsRemastered.exe"+E9D440) 
+label(returnhere)
+label(originalcode)
+label(nosave)
+label(exit)
+
+newmem:
+push rax
+mov rcx, qword ptr [rbp] //get stateid
+mov rax, [cur_stateid_count] //get array count
+
+//don't save if already last entry in list
+cmp rcx, [cur_stateid-8+rax*8]
+je nosave
+
+mov [cur_stateid+rax*8], rcx //add stateid to array
+add [cur_stateid_count], 1 //increment index
+//prevent overflow
+cmp [cur_stateid_count], 800
+jl nosave
+mov [cur_stateid_count], 0
+
+nosave:
+pop rax
+
+originalcode:
+mov rcx,[rbp+08]
+mov r8,r14
+
+exit:
+jmp returnhere
+
+"DarkSoulsRemastered.exe"+E9D440:
+jmp newmem
+nop
+nop
+returnhere:
+
+
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem)
+{$lua}
+print("Your list of recorded EzState Ids:")
+count = readInteger("cur_stateid_count")-1
+base_list_addr = getAddress("cur_stateid")
+for i=0,count do
+    print(string.format("\t%d", readQword(base_list_addr)))
+    base_list_addr = base_list_addr + 8
+end
+writeInteger("cur_stateid_count",0)
+{$asm}
+"DarkSoulsRemastered.exe"+E9D440:
+mov rcx,[rbp+08]
+mov r8,r14
+//Alt: db 48 8B 4D 08 4D 8B C6
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>4</ID>
+          <Description>"EzState Count"</Description>
+          <LastState Value="0" RealAddress="3BFF0330"/>
+          <VariableType>4 Bytes</VariableType>
+          <Address>cur_stateid_count</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1</ID>
+          <Description>"EzStateId List"</Description>
+          <LastState Value="0" RealAddress="3BFF0010"/>
+          <VariableType>8 Bytes</VariableType>
+          <Address>cur_stateid_list</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>2</ID>
+      <Description>"Get EZState address"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+globalalloc(esd_data_buffer, 8)
+alloc(newmem,2048,"DarkSoulsRemastered.exe"+1153C55) 
+label(returnhere)
+label(not_c0000)
+
+newmem:
+mov r8d,eax
+mov rdx,rsi
+
+cmp     word ptr [R15+0D0], 63
+jne     not_c0000
+cmp     word ptr [R15+0D2], 30
+jne     not_c0000
+cmp     word ptr [R15+0D4], 30
+jne     not_c0000
+cmp     word ptr [R15+0D6], 30
+jne     not_c0000
+cmp     word ptr [R15+0D8], 30
+jne     not_c0000
+mov     qword ptr [esd_data_buffer], rdx
+
+not_c0000:
+jmp returnhere
+
+"DarkSoulsRemastered.exe"+1153C55:
+jmp newmem
+nop
+returnhere:
+
+
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem)
+"DarkSoulsRemastered.exe"+1153C55:
+mov r8d,eax
+mov rdx,rsi
+//Alt: db 44 8B C0 48 8B D6
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>3</ID>
+          <Description>"ESD Data Buffer"</Description>
+          <LastState Value="0000000000000000" RealAddress="3BFF0000"/>
+          <ShowAsHex>1</ShowAsHex>
+          <VariableType>8 Bytes</VariableType>
+          <Address>esd_data_buffer</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>cur_stateid</Name>
+      <Address>2E530010</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>esd_data_buffer</Name>
+      <Address>3BFF0000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>cur_stateid_list</Name>
+      <Address>3BFF0010</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>cur_stateid_count</Name>
+      <Address>3BFF0330</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+  <LuaScript>aalist=getAutoAttachList()
+--stringlist_add(aalist,"DarkSoulsRemastered.exe");
+
+function onOpenProcess(processId)
+ if getProcessIDFromProcessName("DarkSoulsRemastered.exe") == processId then
+   reinitializeSymbolhandler()
+  getAddressList().getMemoryRecordByDescription("Get EZState address").Active=true;
+ end
+end
+
+</LuaScript>
+</CheatTable>
