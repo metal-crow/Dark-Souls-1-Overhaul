@@ -9,8 +9,11 @@ https://trello.com/b/hay0mA7U/general-todo
 ### Balance Changes and Suggestions:  
 https://docs.google.com/document/d/1qlg4kQDUq45ufqmX8PreXchwibFwJJ3ZzK0khrHGNTY/  
     
-### Collaborative IDA database (using https://github.com/DGA-MI-SSI/YaCo v2.6):  
+### Old (archived) Collaborative IDA database (using https://github.com/DGA-MI-SSI/YaCo v2.6):  
 https://gitlab.com/metal-crow/darksoulsremastered-ida-db
+
+### New (active) Collaborative Ghidra database
+https://github.com/soulsmods/Soulsborne-Modding-Wiki/wiki/Ghidra-Shared-Repo
 
 ### Custom Archive files (new SFX, Effects, etc):
 https://gitlab.com/metal-crow/darksoulsremastered-overhaul-archives
