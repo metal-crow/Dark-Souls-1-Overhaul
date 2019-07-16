@@ -24,6 +24,7 @@ static const uint64_t NpcGuard_offset = 0x25E611;
 static const uint64_t BossGuard_offset = 0x3206C5;
 static const uint64_t TeleBackstab_getBSAnimation_offset = 0x3AD0E3;
 static const uint64_t TeleBackstab_setPlayerLocation_offset = 0x2B9A6A;
+static const uint64_t NameCrash_prevention_offset = 0x75E101;
 
 namespace TeleBackstabProtect {
     extern bool active;

@@ -30,6 +30,10 @@ extern "C" {
     void TeleBackstabProtect_setPosition_check();
     alignas(64) float new_player_position[4];
     void TeleBackstabProtect_helper_check(float* old_position);
+
+    uint64_t NameCrash_prevent_return;
+    void NameCrash_prevent();
+    void NameCrash_prevent_helper(wchar_t* name);
 }
 
 namespace AntiCheat {
@@ -74,6 +78,11 @@ void start() {
     }
     sp::mem::patch_bytes((void*)((uint64_t)dragon_head_params + 7), dragon_params_patched_bytes, 1);
     sp::mem::patch_bytes((void*)((uint64_t)dragon_body_params + 7), dragon_params_patched_bytes, 1);
+
+    // Start Namecrash prevention anti-cheat
+    global::cmd_out << "    Enabling NameCrash prevention...\n";
+    write_address = Game::ds1_base + NameCrash_prevention_offset;
+    sp::mem::code::x64::inject_jmp_14b((void*)write_address, &NameCrash_prevent_return, 0, &NameCrash_prevent);
 }
 
 } // namespace AntiCheat
@@ -96,5 +105,23 @@ void TeleBackstabProtect_helper_check(float* old_position) {
         old_position[1] = new_player_position[1];
         old_position[2] = new_player_position[2];
         old_position[3] = new_player_position[3];
+    }
+}
+
+void NameCrash_prevent_helper(wchar_t* name) {
+    size_t i = 0;
+    wchar_t cur_char = name[i];
+    while (cur_char != L'\0')
+    {
+        //if we locate the starting or ending tokens "<?" or "?>", then replace the </> to nullify it
+        if (cur_char == L'<' && name[i + 1] == L'?') {
+            name[i] = L'(';
+        }
+        else if (cur_char == L'?' && name[i + 1] == L'>') {
+            name[i + 1] = L')';
+        }
+
+        i++;
+        cur_char = name[i];
     }
 }

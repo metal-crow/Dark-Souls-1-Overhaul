@@ -198,6 +198,7 @@
   <ItemGroup>
     <MASM Include="src\AnimationEditsASM.asm" />
     <MASM Include="src\AntiCheat\BossGuardASM.asm" />
+    <MASM Include="src\AntiCheat\NameCrashPreventASM.asm" />
     <MASM Include="src\AntiCheat\NpcGuardASM.asm" />
     <MASM Include="src\AntiCheat\TeleBackstabProtectASM.asm" />
     <MASM Include="src\BloodborneRallySystemASM.asm" />
