@@ -1,0 +1,583 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="28">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>0</ID>
+      <Description>"Auto Assemble script"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+alloc(newmem,2048,"DarkSoulsRemastered.exe"+3790E2)
+globalalloc(animMediatorBase, 8)
+globalalloc(stateI,8)
+label(fail)
+label(returnhere)
+
+newmem:
+push rbx
+mov rbx, [rdi+10] //playerIns
+mov ebx, [rbx+570] //playerNum
+cmp ebx, 0
+jne fail
+mov [animMediatorBase], rax
+fail:
+pop rbx
+
+mov [rdi+20],rax
+mov rcx,rdi
+jmp returnhere
+
+"DarkSoulsRemastered.exe"+3790E2:
+jmp newmem
+nop
+nop
+returnhere:
+
+
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem)
+"DarkSoulsRemastered.exe"+3790E2:
+mov [rdi+20],rax
+mov rcx,rdi
+//Alt: db 48 89 47 20 48 8B CF
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>1</ID>
+      <Description>"animMediatorBase"</Description>
+      <LastState Value="000000000DEA20E0" RealAddress="3BE50000"/>
+      <ShowAsHex>1</ShowAsHex>
+      <VariableType>8 Bytes</VariableType>
+      <Address>animMediatorBase</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>4</ID>
+      <Description>"select state"</Description>
+      <DropDownList ReadOnly="1" DisplayValueAsItem="1">0:Upper Wait
+1:Upper SpWait
+2:Upper WalkLR
+3:Upper WalkFB
+4:Upper Turn
+5:Upper Guard
+6:Upper Attack
+7:Upper SpecialAttack
+8:Upper Action
+9:Upper Damage S
+10:Upper Event
+11:Upper Damage L
+12:Upper ThrowAnim
+13:Upper Event_HiPrio
+14:None
+15:Lower Wait
+16:Lower SpWait
+17:Lower Guard
+18:Lower Attack
+19:Lower Damage S
+20:Lower WalkLR
+21:Lower WalkFB
+22:Lower Turn
+23:Lower SpecialAttack
+24:Lower Action
+25:Lower Event
+26:Lower Damage L
+27:Lower ExtraAnim
+28:Lower TaeExtraAnim
+29:Lower ThrowAnim
+30:Lower Event_HiPrio
+</DropDownList>
+      <LastState Value="5" RealAddress="3BE50010"/>
+      <VariableType>4 Bytes</VariableType>
+      <Address>stateI</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>2</ID>
+      <Description>"state"</Description>
+      <LastState Value="00000001" RealAddress="0DEA2428"/>
+      <ShowAsHex>1</ShowAsHex>
+      <VariableType>4 Bytes</VariableType>
+      <Address>[animMediatorBase]+a8*[stateI]</Address>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>3</ID>
+          <Description>"animationId"</Description>
+          <LastState Value="1" RealAddress="0DEA2428"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>+0</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>5</ID>
+          <Description>"+0x4"</Description>
+          <LastState Value="4456450" RealAddress="0DEA242C"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>+4</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>6</ID>
+          <Description>"+0x8"</Description>
+          <LastState Value="-1" RealAddress="0DEA2430"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>+8</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>7</ID>
+          <Description>"+0xc"</Description>
+          <LastState Value="-1" RealAddress="0DEA2434"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>+c</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>8</ID>
+          <Description>"+0x10"</Description>
+          <LastState Value="-1" RealAddress="0DEA2438"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>+10</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>9</ID>
+          <Description>"+0x14"</Description>
+          <LastState Value="-1" RealAddress="0DEA243C"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>+14</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>10</ID>
+          <Description>"field_0x18"</Description>
+          <LastState Value="-1" RealAddress="0DEA2440"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>+18</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>11</ID>
+          <Description>"field_0x1c"</Description>
+          <LastState Value="-1" RealAddress="0DEA2444"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>+1c</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>12</ID>
+          <Description>"field_0x20"</Description>
+          <LastState Value="-1" RealAddress="0DEA2448"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>+20</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>13</ID>
+          <Description>"field_0x24"</Description>
+          <LastState Value="-1" RealAddress="0DEA2449"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>+21</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>14</ID>
+          <Description>"field_0x25"</Description>
+          <LastState Value="-1" RealAddress="0DEA244A"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>+22</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>15</ID>
+          <Description>"field_0x26"</Description>
+          <LastState Value="-1" RealAddress="0DEA244B"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>+23</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>16</ID>
+          <Description>"field_0x27"</Description>
+          <LastState Value="1" RealAddress="0DEA244C"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>+24</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>17</ID>
+          <Description>"field_0x28"</Description>
+          <LastState Value="0.1333333403" RealAddress="0DEA2450"/>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>+28</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>18</ID>
+          <Description>"field_0x2c"</Description>
+          <LastState Value="-1" RealAddress="0DEA2454"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>+2c</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>19</ID>
+          <Description>"field_0x30"</Description>
+          <LastState Value="-1" RealAddress="0DEA2458"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>+30</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>20</ID>
+          <Description>"field_0x34"</Description>
+          <LastState Value="-1" RealAddress="0DEA245C"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>+34</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>21</ID>
+          <Description>"field_0x38"</Description>
+          <LastState Value="2" RealAddress="0DEA2460"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>+38</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>22</ID>
+          <Description>"field_0x3c"</Description>
+          <LastState Value="2" RealAddress="0DEA2464"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>+3c</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>23</ID>
+          <Description>"field_0x40"</Description>
+          <LastState Value="2" RealAddress="0DEA2468"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>+40</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>24</ID>
+          <Description>"field_0x44"</Description>
+          <LastState Value="2" RealAddress="0DEA246C"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>+44</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>25</ID>
+          <Description>"field_0x48"</Description>
+          <LastState Value="-1" RealAddress="0DEA2470"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>+48</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>26</ID>
+          <Description>"field_0x4c"</Description>
+          <LastState Value="-1" RealAddress="0DEA2474"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>+4c</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>27</ID>
+          <Description>"field_0x50"</Description>
+          <LastState Value="-1" RealAddress="0DEA2478"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>+50</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>28</ID>
+          <Description>"field_0x54"</Description>
+          <LastState Value="-1" RealAddress="0DEA247C"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>+54</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>29</ID>
+          <Description>"field_0x58"</Description>
+          <LastState Value="-1" RealAddress="0DEA2480"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>+58</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>30</ID>
+          <Description>"field_0x5c"</Description>
+          <LastState Value="-1082130432" RealAddress="0DEA2484"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>+5c</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>31</ID>
+          <Description>"field_0x60"</Description>
+          <LastState Value="-1" RealAddress="0DEA2488"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>+60</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>32</ID>
+          <Description>"field_0x64"</Description>
+          <LastState Value="-1" RealAddress="0DEA248C"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>+64</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>33</ID>
+          <Description>"field_0x68"</Description>
+          <LastState Value="-1" RealAddress="0DEA2490"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>+68</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>34</ID>
+          <Description>"field_0x6c"</Description>
+          <LastState Value="-1.333333015" RealAddress="0DEA2494"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>+6c</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>35</ID>
+          <Description>"field_0x70"</Description>
+          <LastState Value="-1" RealAddress="0DEA2498"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>+70</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>36</ID>
+          <Description>"field_0x74"</Description>
+          <LastState Value="-1" RealAddress="0DEA249C"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>+74</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>37</ID>
+          <Description>"field_0x78"</Description>
+          <LastState Value="-1" RealAddress="0DEA24A0"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>+78</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>38</ID>
+          <Description>"field_0x7c"</Description>
+          <LastState Value="0" RealAddress="0DEA24A1"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>+79</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>39</ID>
+          <Description>"field_0x7d"</Description>
+          <LastState Value="-128" RealAddress="0DEA24A2"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>+7a</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>40</ID>
+          <Description>"field_0x7e"</Description>
+          <LastState Value="-65" RealAddress="0DEA24A3"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>+7b</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>41</ID>
+          <Description>"field_0x7f"</Description>
+          <LastState Value="0" RealAddress="0DEA24A4"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>+7c</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>42</ID>
+          <Description>"field_0x80"</Description>
+          <LastState Value="0" RealAddress="0DEA24A5"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>+7d</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>43</ID>
+          <Description>"field_0x81"</Description>
+          <LastState Value="0" RealAddress="0DEA24A6"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>+7e</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>44</ID>
+          <Description>"field_0x82"</Description>
+          <LastState Value="0" RealAddress="0DEA24A7"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>+7f</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>45</ID>
+          <Description>"field_0x83"</Description>
+          <LastState Value="0" RealAddress="0DEA24A8"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>+80</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>46</ID>
+          <Description>"field_0x84"</Description>
+          <LastState Value="-1" RealAddress="0DEA24AC"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>+84</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>47</ID>
+          <Description>"field_0x88"</Description>
+          <LastState Value="-1" RealAddress="0DEA24AE"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>2 Bytes</VariableType>
+          <Address>+86</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>48</ID>
+          <Description>"field_0x8a"</Description>
+          <LastState Value="-1" RealAddress="0DEA24AF"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>+87</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>49</ID>
+          <Description>"field_0x8b"</Description>
+          <LastState Value="0" RealAddress="0DEA24B0"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>+88</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>50</ID>
+          <Description>"field_0x8c"</Description>
+          <LastState Value="1" RealAddress="0DEA24B1"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>+89</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>51</ID>
+          <Description>"field_0x8d"</Description>
+          <LastState Value="32" RealAddress="0DEA24B2"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>+8a</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>52</ID>
+          <Description>"field_0x8e"</Description>
+          <LastState Value="0" RealAddress="0DEA24B3"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>+8b</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>53</ID>
+          <Description>"field_0x8f"</Description>
+          <LastState Value="78" RealAddress="0DEA24B4"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>+8c</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>54</ID>
+          <Description>"linked_animation1"</Description>
+          <LastState Value="0000000000000000" RealAddress="0DEA24BC"/>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>8 Bytes</VariableType>
+          <Address>+94</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>55</ID>
+          <Description>"linked_animation2"</Description>
+          <LastState Value="001E000100000000" RealAddress="0DEA24C4"/>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>8 Bytes</VariableType>
+          <Address>+9c</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>56</ID>
+          <Description>"field_0xa0"</Description>
+          <LastState Value="0" RealAddress="0DEA24C5"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>+9d</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>57</ID>
+          <Description>"field_0xa1"</Description>
+          <LastState Value="0" RealAddress="0DEA24C6"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>+9e</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>58</ID>
+          <Description>"field_0xa2"</Description>
+          <LastState Value="0" RealAddress="0DEA24C7"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>+9f</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>59</ID>
+          <Description>"field_0xa3"</Description>
+          <LastState Value="1" RealAddress="0DEA24C8"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>+a0</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>60</ID>
+          <Description>"field_0xa4"</Description>
+          <LastState Value="1.299962282" RealAddress="0DEA24CC"/>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>+a4</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>animMediatorBases</Name>
+      <Address>3BE60000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>mediatorsLen</Name>
+      <Address>3BE600F0</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>animMediatorBase</Name>
+      <Address>3BE50000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>stateI</Name>
+      <Address>3BE50010</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+</CheatTable>
