@@ -23,6 +23,8 @@ https://gitlab.com/metal-crow/darksoulsremastered-overhaul-archives
 * NPCs and Bosses (kindof, WIP) can no longer be killed by hackers
 * Hackers can no longer force you into Binoculars or Dragon form
 * Backstabs will no longer teleport you if you're unreasonably far away (both anti-cheat and QOL)
+  
+* Bug fix for invisible attacks after backstabs
 	
 * Gestures can be canceled via rolling
 

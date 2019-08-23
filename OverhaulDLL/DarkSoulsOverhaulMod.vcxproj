@@ -93,6 +93,7 @@
     <ClInclude Include="include\DeadAngles.h" />
     <ClInclude Include="include\EquipmentUnlock.h" />
     <ClInclude Include="include\InvisibleBackstabAttackFix.h" />
+    <None Include="..\README.md" />
     <None Include="include\AnimationEdits.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ExcludedFromBuild>
