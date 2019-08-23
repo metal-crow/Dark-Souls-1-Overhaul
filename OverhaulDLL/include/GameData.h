@@ -57,6 +57,40 @@ enum TAE_type0_param_values {
     cap_movement_to_walk_speed = 90,
 };
 
+enum AnimationStateTypesEnum {
+    Invalid = 31,
+    Lower_Action = 24,
+    Lower_Attack = 18,
+    Lower_Damage_L = 26,
+    Lower_Damage_S = 19,
+    Lower_Event = 25,
+    Lower_Event_HiPrio = 30,
+    Lower_ExtraAnim = 27,
+    Lower_Guard = 17,
+    Lower_SpWait = 16,
+    Lower_SpecialAttack = 23,
+    Lower_TaeExtraAnim = 28,
+    Lower_ThrowAnim = 29,
+    Lower_Turn = 22,
+    Lower_Wait = 15,
+    Lower_WalkFB = 21,
+    Lower_WalkLR = 20,
+    None = 14,
+    Upper_Action = 8,
+    Upper_Attack = 6,
+    Upper_Damage_L = 11,
+    Upper_Damage_S = 9,
+    Upper_Event = 10,
+    Upper_Event_HiPrio = 13,
+    Upper_Guard = 5,
+    Upper_SpWait = 1,
+    Upper_SpecialAttack = 7,
+    Upper_ThrowAnim = 12,
+    Upper_Turn = 4,
+    Upper_Wait = 0,
+    Upper_WalkFB = 3,
+    Upper_WalkLR = 2
+};
 
 class Game
 {
@@ -149,6 +183,8 @@ public:
     static int32_t get_player_upper_body_anim_id();
 
     static int32_t get_player_lower_body_anim_id();
+
+    static void set_animation_mediator_state_entry(void* animationMediator, AnimationStateTypesEnum state_id, int32_t new_aid, float new_progressTime);
 
     // Return pointer to current game time in milliseconds since the game has started
     static uint32_t* get_game_time_ms();

@@ -18,6 +18,7 @@
 #include "MoveWhileCasting.h"
 #include "AnimationEdits.h"
 #include "PhantomUnshackle.h"
+#include "InvisibleBackstabAttackFix.h"
 #include "Menu/SavedCharacters.h"
 #include "Files.h"
 #include "XInputUtil.h"
@@ -106,6 +107,7 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     BloodborneRally::start();
     DeadAngles::start();
     EquipmentUnlock::start();
+    InvisBackstabFix::start();
     CastingMovement::start();
     AnimationEdits::alter_animation_speeds();
     AnimationEdits::disable_whiff_animations();
