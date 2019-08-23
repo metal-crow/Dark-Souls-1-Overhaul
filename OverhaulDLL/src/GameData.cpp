@@ -132,7 +132,7 @@ void Game::init_tae()
             ret_val = Game::player_tae.init_from_memory(tae_header_ptr.resolve());
         }
 
-        if ((tae_header_ptr.resolve() == NULL || ret_val == NULL) && tae_search_count == 35) {
+        if ((tae_header_ptr.resolve() == NULL || ret_val == NULL) && tae_search_count == 55) {
             FATALERROR((Mod::output_prefix + "!!ERROR!! TAE structure not found.\n").c_str());
         }
 
@@ -551,6 +551,12 @@ int32_t Game::get_player_lower_body_anim_id()
     }
 }
 
+
+void Game::set_animation_mediator_state_entry(void* animationMediator, AnimationStateTypesEnum state_id, int32_t new_aid, float new_progressTime) {
+    void* state_entry = (void*)((uint64_t)animationMediator + 168 * state_id);
+    *(int32_t*)((uint64_t)state_entry + 0) = new_aid;
+    *(float*)((uint64_t)state_entry + 0xa4) = new_progressTime;
+}
 
 // Return pointer to current game time in milliseconds since the game has started
 uint32_t* Game::get_game_time_ms()

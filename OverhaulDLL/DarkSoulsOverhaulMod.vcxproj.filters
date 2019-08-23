@@ -114,6 +114,9 @@
     <ClCompile Include="src\Files.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\InvisibleBackstabAttackFix.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3d11-wrapper\include\d3d11\exports.h">
@@ -135,6 +138,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\EquipmentUnlock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\InvisibleBackstabAttackFix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -233,6 +239,9 @@
     </MASM>
     <MASM Include="src\AntiCheat\NameCrashPreventASM.asm">
       <Filter>Source Files\AntiCheat</Filter>
+    </MASM>
+    <MASM Include="src\InvisibleBackstabAttackFixASM.asm">
+      <Filter>Source Files</Filter>
     </MASM>
   </ItemGroup>
 </Project>
