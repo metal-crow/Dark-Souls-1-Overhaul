@@ -199,6 +199,7 @@
     <None Include="include\Plugin\ConsoleCommands.h">
       <Filter>Header Files\Plugin</Filter>
     </None>
+    <None Include="..\README.md" />
   </ItemGroup>
   <ItemGroup>
     <MASM Include="src\BloodborneRallySystemASM.asm">
