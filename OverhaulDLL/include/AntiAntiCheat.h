@@ -21,6 +21,7 @@ public:
 private:
     static const uint64_t game_hash_compare_checks[];
     static const std::tuple<uint64_t, uint8_t> game_runtime_hash_checks[];
+    static const uint64_t game_send_playerdata_to_server_injection_offset = 0xBD0577;
 };
 
 #endif

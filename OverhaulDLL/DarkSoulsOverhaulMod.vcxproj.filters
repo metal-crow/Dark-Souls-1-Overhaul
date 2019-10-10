@@ -244,5 +244,8 @@
     <MASM Include="src\InvisibleBackstabAttackFixASM.asm">
       <Filter>Source Files</Filter>
     </MASM>
+    <MASM Include="src\AntiAntiCheatASM.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
   </ItemGroup>
 </Project>
