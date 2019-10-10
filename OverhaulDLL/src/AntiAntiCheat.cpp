@@ -8,6 +8,17 @@
 
 #include "AntiAntiCheat.h"
 #include "GameData.h"
+#include "SP/memory/injection/asm/x64.h"
+#include <string.h>
+
+const uint32_t known_good_hash_vals_array_x64[] = { 0x0, 0x37A, 0x3DE, 0x0AF0, 0x0E74, 0x29D6, 0x13C5E, 0x1895C, 0x4C4EBA, 0x0F1EB4, 1, 0x317, 0xa8f, 0x3e7 };
+const uint32_t known_good_hash_vals_array_x63[] = { 0x18A88, 0x18A92, 0x18B50, 0x18B55, 0x18B5A, 0x18AEC, 0x18AED, 0x186A1, 0x186AA, 0x186AB, 0x18A93 };
+
+extern "C" {
+    uint64_t game_send_playerdata_to_server_injection_return;
+    void game_send_playerdata_to_server_injection();
+    void game_send_playerdata_to_server_helper(uint64_t);
+}
 
 const std::tuple<uint64_t, uint8_t> AntiAntiCheat::game_runtime_hash_checks[] = {
 {0x1400e3a70,6},{0x142faf485,4},{0x140325c58,4},{0x14032ca5e,4},{0x142d6e989,6},{0x1430f9a22,4},{0x14210df08,4},{0x1420c4012,4},{0x1420c5671,4},{0x1420c74ca,4},
@@ -339,4 +350,41 @@ void AntiAntiCheat::start() {
         bool res = sp::mem::patch_bytes((void*)std::get<0>(patch_loc), patch_nop, std::get<1>(patch_loc));
         if (!res) FATALERROR("Unable to disable jmp anti-cheat for addr %x", std::get<0>(patch_loc));
     }
+
+    //Before sending to the server make sure the data is correct
+    uint8_t *write_address = (uint8_t*)(AntiAntiCheat::game_send_playerdata_to_server_injection_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &game_send_playerdata_to_server_injection_return, 4, &game_send_playerdata_to_server_injection);
+}
+
+static void copy_knowngood_ban_consts(uint32_t* start, uint32_t* end, const uint32_t* good, size_t good_len) {
+    if (start != NULL && start != end) {
+        uint64_t len = end - start;
+
+        //if we can't correctly fill this out, abort
+        if (len > good_len) {
+            char* errormsg = (char*)malloc(100 + 8 * len);
+            strcpy_s(errormsg, 100 + 8 * len, "Ban detection array is larger than seen previously, unsure how to fill in to be safe. Array = ");
+            for (size_t i_e = 0; i_e < len; i_e++) {
+                char val[10];
+                snprintf(val, 10, "0x%x, ", start[i_e]);
+                strcat_s(errormsg, 100 + 8 * len, val);
+            }
+            FATALERROR(errormsg);
+        }
+
+        for (size_t i = 0; i < len; i++) {
+            start[i] = good[i];
+        }
+    }
+}
+
+void game_send_playerdata_to_server_helper(uint64_t network_struct) {
+    //set the ban detection arrays to known good values
+    uint32_t* array_x64_start = *(uint32_t**)(network_struct + 0x200);
+    uint32_t* array_x64_end = *(uint32_t**)(network_struct + 0x208);
+    copy_knowngood_ban_consts(array_x64_start, array_x64_end, known_good_hash_vals_array_x64, sizeof(known_good_hash_vals_array_x64)/sizeof(uint32_t));
+
+    uint32_t* array_x63_start = *(uint32_t**)(network_struct + 0x1E8);
+    uint32_t* array_x63_end = *(uint32_t**)(network_struct + 0x1F0);
+    copy_knowngood_ban_consts(array_x63_start, array_x63_end, known_good_hash_vals_array_x63, sizeof(known_good_hash_vals_array_x63) / sizeof(uint32_t));
 }
