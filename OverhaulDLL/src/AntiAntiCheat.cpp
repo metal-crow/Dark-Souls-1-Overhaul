@@ -12,7 +12,6 @@
 #include <string.h>
 
 const uint32_t known_good_hash_vals_array_x64[] = { 0x0, 0x37A, 0x3DE, 0x0AF0, 0x0E74, 0x29D6, 0x13C5E, 0x1895C, 0x4C4EBA, 0x0F1EB4, 1, 0x317, 0xa8f, 0x3e7 };
-const uint32_t known_good_hash_vals_array_x63[] = { 0x18A88, 0x18A92, 0x18B50, 0x18B55, 0x18B5A, 0x18AEC, 0x18AED, 0x186A1, 0x186AA, 0x186AB, 0x18A93 };
 
 extern "C" {
     uint64_t game_send_playerdata_to_server_injection_return;
@@ -356,22 +355,18 @@ void AntiAntiCheat::start() {
     sp::mem::code::x64::inject_jmp_14b(write_address, &game_send_playerdata_to_server_injection_return, 4, &game_send_playerdata_to_server_injection);
 }
 
-static void copy_knowngood_ban_consts(uint32_t* start, uint32_t* end, const uint32_t* good, size_t good_len) {
-    if (start != NULL && start != end) {
-        uint64_t len = end - start;
+static void copy_knowngood_ban_consts(uint32_t* start, uint32_t** end_ptr, const uint32_t* good, size_t good_len) {
+    if (start != NULL && start != *end_ptr) {
+        uint64_t len = *end_ptr - start;
 
-        //if we can't correctly fill this out, abort
+        //if larger than normal, truncate
+        //never seen > good len on unmodded play
         if (len > good_len) {
-            char* errormsg = (char*)malloc(100 + 8 * len);
-            strcpy_s(errormsg, 100 + 8 * len, "Ban detection array is larger than seen previously, unsure how to fill in to be safe. Array = ");
-            for (size_t i_e = 0; i_e < len; i_e++) {
-                char val[10];
-                snprintf(val, 10, "0x%x, ", start[i_e]);
-                strcat_s(errormsg, 100 + 8 * len, val);
-            }
-            FATALERROR(errormsg);
+            *end_ptr = (uint32_t*)((uint64_t)start + (good_len * sizeof(good[0])));
+            len = good_len;
         }
 
+        //copy over the good vals
         for (size_t i = 0; i < len; i++) {
             start[i] = good[i];
         }
@@ -381,10 +376,6 @@ static void copy_knowngood_ban_consts(uint32_t* start, uint32_t* end, const uint
 void game_send_playerdata_to_server_helper(uint64_t network_struct) {
     //set the ban detection arrays to known good values
     uint32_t* array_x64_start = *(uint32_t**)(network_struct + 0x200);
-    uint32_t* array_x64_end = *(uint32_t**)(network_struct + 0x208);
-    copy_knowngood_ban_consts(array_x64_start, array_x64_end, known_good_hash_vals_array_x64, sizeof(known_good_hash_vals_array_x64)/sizeof(uint32_t));
-
-    uint32_t* array_x63_start = *(uint32_t**)(network_struct + 0x1E8);
-    uint32_t* array_x63_end = *(uint32_t**)(network_struct + 0x1F0);
-    copy_knowngood_ban_consts(array_x63_start, array_x63_end, known_good_hash_vals_array_x63, sizeof(known_good_hash_vals_array_x63) / sizeof(uint32_t));
+    uint32_t** array_x64_end_ptr = (uint32_t**)(network_struct + 0x208);
+    copy_knowngood_ban_consts(array_x64_start, array_x64_end_ptr, known_good_hash_vals_array_x64, sizeof(known_good_hash_vals_array_x64)/sizeof(known_good_hash_vals_array_x64[0]));
 }
