@@ -75,9 +75,6 @@
     <ClCompile Include="src\PhantomUnshackle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\XInputUtil.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\AntiCheat\AntiCheat.cpp">
       <Filter>Source Files\AntiCheat</Filter>
     </ClCompile>
@@ -115,6 +112,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\InvisibleBackstabAttackFix.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\InputUtil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -178,9 +178,6 @@
     <None Include="include\PhantomUnshackle.h">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="include\XInputUtil.h">
-      <Filter>Header Files</Filter>
-    </None>
     <None Include="include\Challenge\AggressiveAI.h">
       <Filter>Header Files\Challenge</Filter>
     </None>
@@ -200,6 +197,9 @@
       <Filter>Header Files\Plugin</Filter>
     </None>
     <None Include="..\README.md" />
+    <None Include="include\InputUtil.h">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <MASM Include="src\BloodborneRallySystemASM.asm">
@@ -235,9 +235,6 @@
     <MASM Include="src\Menu\SavedCharactersASM.asm">
       <Filter>Source Files\Menu</Filter>
     </MASM>
-    <MASM Include="src\XInputUtilASM.asm">
-      <Filter>Source Files</Filter>
-    </MASM>
     <MASM Include="src\AntiCheat\NameCrashPreventASM.asm">
       <Filter>Source Files\AntiCheat</Filter>
     </MASM>
@@ -245,6 +242,9 @@
       <Filter>Source Files</Filter>
     </MASM>
     <MASM Include="src\AntiAntiCheatASM.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="src\InputUtilASM.asm">
       <Filter>Source Files</Filter>
     </MASM>
   </ItemGroup>

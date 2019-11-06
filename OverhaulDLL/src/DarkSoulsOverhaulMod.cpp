@@ -21,7 +21,7 @@
 #include "InvisibleBackstabAttackFix.h"
 #include "Menu/SavedCharacters.h"
 #include "Files.h"
-#include "XInputUtil.h"
+#include "InputUtil.h"
 
 /*
     Called from DllMain when the plugin DLL is first loaded into memory (PROCESS_ATTACH case).
@@ -57,6 +57,9 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
     // Load user preferences & keybinds from settings file
     Mod::get_init_preferences();
     Mod::get_user_keybinds();
+
+    // Initialize XInput hook
+    Input::initialize();
 
     CastingMovement::early_inits();
 
@@ -95,9 +98,6 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
 */
 DWORD WINAPI on_process_attach_async(LPVOID lpParam)
 {
-    // Initialize XInput hook
-    XInput::initialize();
-
     Game::init_tae();
     // Inject custom strings for saved characters menu
     Menu::Saves::init_custom_strings();
