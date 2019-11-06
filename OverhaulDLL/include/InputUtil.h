@@ -8,10 +8,12 @@
 
 #pragma once
 
-#ifndef DS1_OVERHAUL_X_INPUT_H_
-    #define DS1_OVERHAUL_X_INPUT_H_
+#ifndef DS1_OVERHAUL_INPUT_H_
+    #define DS1_OVERHAUL_INPUT_H_
 
 #include "XInput.h"
+#define DIRECTINPUT_VERSION 0x800
+#include <dinput.h>
 
 
 //// ADDITIONAL BUTTON MACROS ////
@@ -46,8 +48,26 @@
 #define XINPUT_GAMEPAD_SQUARE XINPUT_GAMEPAD_X
 #define XINPUT_GAMEPAD_TRIANGLE XINPUT_GAMEPAD_Y
 
+//// DIRECTINPUT BUTTON MAPPINGS ////
+#define DINPUT_GAMEPAD_START        9
+#define DINPUT_GAMEPAD_SELECT       8
+#define DINPUT_GAMEPAD_TOUCH_BUTTON 13
+#define DINPUT_GAMEPAD_L3           10
+#define DINPUT_GAMEPAD_R3           11
+#define DINPUT_GAMEPAD_L1           4
+#define DINPUT_GAMEPAD_R1           5
+#define DINPUT_GAMEPAD_CROSS        1
+#define DINPUT_GAMEPAD_CIRCLE       2
+#define DINPUT_GAMEPAD_SQUARE       0
+#define DINPUT_GAMEPAD_TRIANGLE     3
+#define DINPUT_GAMEPAD_L2           6
+#define DINPUT_GAMEPAD_R2           7
+#define DINPUT_GAMEPAD_DPAD_LEFT    27000
+#define DINPUT_GAMEPAD_DPAD_RIGHT   9000
+#define DINPUT_GAMEPAD_DPAD_UP      0
+#define DINPUT_GAMEPAD_DPAD_DOWN    18000
 
-namespace XInput {
+namespace Input {
 
 
 namespace Button {
@@ -59,17 +79,26 @@ enum Status {
     BUTTON_RELEASED = 3
 };
 
+// Keyboard DirectInput check
+inline bool pressed(uint8_t *old, uint8_t *current, uint16_t button);
+
+// Joystick DirectInput check
+inline bool pressed(DIJOYSTATE2 *old, DIJOYSTATE2 *current, uint16_t button);
+
+// Joystick DirectInput check (POV specific)
+inline bool POVpressed(DIJOYSTATE2 *old, DIJOYSTATE2 *current, uint16_t button);
+
 // True if button was pressed between gamepad states
-inline bool pressed(XINPUT_GAMEPAD &old, XINPUT_GAMEPAD &current, uint16_t button);
+inline bool pressed(XINPUT_GAMEPAD *old, XINPUT_GAMEPAD *current, uint16_t button);
 
 // True if button was released between gamepad states
-inline bool released(XINPUT_GAMEPAD &old, XINPUT_GAMEPAD &current, uint16_t button);
+inline bool released(XINPUT_GAMEPAD *old, XINPUT_GAMEPAD *current, uint16_t button);
 
 // True if button is currently down
-inline bool down(XINPUT_GAMEPAD &current, uint16_t button);
+inline bool down(XINPUT_GAMEPAD *current, uint16_t button);
 
 // Current status of button
-inline Status status(XINPUT_GAMEPAD &old, XINPUT_GAMEPAD &current, uint16_t button);
+inline Status status(XINPUT_GAMEPAD *old, XINPUT_GAMEPAD *current, uint16_t button);
 } // namespace Button
 
 
@@ -78,13 +107,13 @@ extern void *base;
 // Initializes pointers and other data used to monitor gamepad input
 void initialize();
 
-void handle_input(XINPUT_GAMEPAD &old, XINPUT_GAMEPAD &current, bool changed, int player);
+void handle_input(XINPUT_GAMEPAD* xold, XINPUT_GAMEPAD* xcurrent, DIJOYSTATE2* djold, DIJOYSTATE2* djcurrent, uint8_t* kbold, uint8_t* kbcurrent, bool changed, int player);
 
 // Patches game calls to XInput API funcs, redirecting them to interceptor functions
 void apply_function_intercepts();
 
 
-} // namespace XInput
+} // namespace Input
 
 
-#endif // DS1_OVERHAUL_X_INPUT_H_
+#endif // DS1_OVERHAUL_INPUT_H_

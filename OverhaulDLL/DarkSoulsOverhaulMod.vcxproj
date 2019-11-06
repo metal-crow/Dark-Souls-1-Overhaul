@@ -80,7 +80,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="src\XInputUtil.cpp">
+    <ClCompile Include="src\InputUtil.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
   </ItemGroup>
@@ -188,7 +188,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </ExcludedFromBuild>
     </None>
-    <None Include="include\XInputUtil.h">
+    <None Include="include\InputUtil.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -213,7 +213,7 @@
     <MASM Include="src\Menu\SavedCharactersASM.asm" />
     <MASM Include="src\MoveWhileCastingASM.asm" />
     <MASM Include="src\PhantomUnshackleASM.asm" />
-    <MASM Include="src\XInputUtilASM.asm" />
+    <MASM Include="src\InputUtilASM.asm" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
