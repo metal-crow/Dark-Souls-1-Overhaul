@@ -82,13 +82,43 @@ extern intercept_IDirectInputDevice8GetDeviceState: proc
 public intercept_IDirectInputDevice8GetDeviceState_inject
 intercept_IDirectInputDevice8GetDeviceState_inject PROC
 
+sub     rsp, 8
+sub     rsp, 10h
+movdqu  [rsp], xmm0
+sub     rsp, 10h
+movdqu  [rsp], xmm1
+sub     rsp, 10h
+movdqu  [rsp], xmm2
+sub     rsp, 10h
+movdqu  [rsp], xmm3
+push    rax
 push    rcx
 push    rdx
+push    r8
+push    r9
+push    r10
+push    r11
+
 mov     rcx, rbp
 mov     rdx, rsi
 call    intercept_IDirectInputDevice8GetDeviceState
+
+pop     r11
+pop     r10
+pop     r9
+pop     r8
 pop     rdx
 pop     rcx
+pop     rax
+movdqu  xmm3, [rsp]
+add     rsp, 10h
+movdqu  xmm2, [rsp]
+add     rsp, 10h
+movdqu  xmm1, [rsp]
+add     rsp, 10h
+movdqu  xmm0, [rsp]
+add     rsp, 10h
+add     rsp, 8
 
 ;original code
 mov     rdi, [rsp+48h]
