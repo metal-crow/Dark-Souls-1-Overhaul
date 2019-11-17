@@ -209,9 +209,6 @@ extern "C" {
 
 uint64_t move_check_helper(void* animation_mediator) {
     int32_t cur_anim = Game::get_animation_mediator_state_animation(animation_mediator, Upper_Attack);
-    char buf[100];
-    snprintf(buf, 100, "%d\n", cur_anim);
-    global::cmd_out << buf;
     return SPELL_AIDS_TO_ALLOW_MOVEMENT.count(cur_anim); //return 1 if present, 0 if not
 }
 
