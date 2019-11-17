@@ -66,9 +66,6 @@
     <ClCompile Include="src\ModData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\MoveWhileCasting.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\PhantomLimit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -169,9 +166,6 @@
     <None Include="include\ModData.h">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="include\MoveWhileCasting.h">
-      <Filter>Header Files</Filter>
-    </None>
     <None Include="include\PhantomLimit.h">
       <Filter>Header Files</Filter>
     </None>
@@ -214,9 +208,6 @@
     <MASM Include="src\EquipmentUnlockASM.asm">
       <Filter>Source Files</Filter>
     </MASM>
-    <MASM Include="src\MoveWhileCastingASM.asm">
-      <Filter>Source Files</Filter>
-    </MASM>
     <MASM Include="src\AnimationEditsASM.asm">
       <Filter>Source Files</Filter>
     </MASM>
@@ -245,6 +236,12 @@
       <Filter>Source Files</Filter>
     </MASM>
     <MASM Include="src\InputUtilASM.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="src\AnimationEditsMoveWhileCastingASM.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="src\GameDataASM.asm">
       <Filter>Source Files</Filter>
     </MASM>
   </ItemGroup>
