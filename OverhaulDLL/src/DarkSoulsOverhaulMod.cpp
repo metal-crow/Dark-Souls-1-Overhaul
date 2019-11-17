@@ -15,7 +15,6 @@
 #include "BloodborneRallySystem.h"
 #include "DeadAngles.h"
 #include "EquipmentUnlock.h"
-#include "MoveWhileCasting.h"
 #include "AnimationEdits.h"
 #include "PhantomUnshackle.h"
 #include "InvisibleBackstabAttackFix.h"
@@ -60,8 +59,6 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
 
     // Initialize XInput hook
     Input::initialize();
-
-    CastingMovement::early_inits();
 
     // Apply increased memory limit patch
     //TODO this causes random crashes??
@@ -108,7 +105,7 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     DeadAngles::start();
     EquipmentUnlock::start();
     InvisBackstabFix::start();
-    CastingMovement::start();
+    AnimationEdits::enable_cast_and_move();
     AnimationEdits::alter_animation_speeds();
     AnimationEdits::disable_whiff_animations();
     if (AnimationEdits::gesture_cancelling) {

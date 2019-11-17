@@ -10,6 +10,7 @@
 #include "DarkSoulsOverhaulMod.h"
 #include "SP/memory/injection/asm/x64.h"
 #include <unordered_map>
+#include <set>
 
 // Animation IDs for the default set of gesture animations in the game
 const uint32_t AnimationEdits::gesture_anim_ids[15] = { 6800, 6801, 6802, 6803, 6804, 6805, 6806, 6807, 6808, 6809, 6810, 6815, 6820, 6825, 6830 };
@@ -160,4 +161,90 @@ void AnimationEdits::disable_whiff_animations() {
     uint8_t *write_address = (uint8_t*)(AnimationEdits::animation_whiff_set_offset + Game::ds1_base);
     uint8_t jmp_patch[2] = { 0xEB, 0x54 };
     sp::mem::patch_bytes(write_address, jmp_patch, 2);
+}
+
+static const std::set<uint32_t> SPELL_AIDS_TO_ALLOW_MOVEMENT = {
+    //overhead cast
+    6400, 6500,
+    //hold overhead cast
+    6424, 6524,
+    //buff rh wep
+    6401,
+    //
+    6416, 6516,
+    //wave over body
+    6402, 6502,
+    //homing soul mass type spell
+    6419, 6519,
+    //wave over body
+    6411, 6511,
+
+    //pyro ball throw
+    6404, 6502,
+    //fire whip
+    6426, 6526,
+    //pyro breath
+    6408, 6508,
+    //iron flesh
+    6405, 6505,
+    //undead rapport
+    6410, 6510,
+
+    //lighting spear
+    6418, 6518,
+    //buff weapon
+    6414, 6514,
+};
+
+extern "C" {
+    uint64_t move_check_1_injection_return;
+    void move_check_1_injection();
+    uint64_t move_check_2_injection_return;
+    void move_check_2_injection();
+    uint64_t move_check_3_injection_return;
+    void move_check_3_injection();
+
+    uint64_t move_check_helper(void*);
+}
+
+uint64_t move_check_helper(void* animation_mediator) {
+    int32_t cur_anim = Game::get_animation_mediator_state_animation(animation_mediator, Upper_Attack);
+    char buf[100];
+    snprintf(buf, 100, "%d\n", cur_anim);
+    global::cmd_out << buf;
+    return SPELL_AIDS_TO_ALLOW_MOVEMENT.count(cur_anim); //return 1 if present, 0 if not
+}
+
+void AnimationEdits::enable_cast_and_move() {
+    global::cmd_out << Mod::output_prefix << ("Enabling casting while moving patch...\n");
+
+    //Fix the checks that prevents WalkFB aid from being set
+    uint8_t *write_address = (uint8_t*)(AnimationEdits::walkfb_check_1 + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &move_check_1_injection_return, 4, &move_check_1_injection);
+
+    write_address = (uint8_t*)(AnimationEdits::walkfb_check_2 + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &move_check_2_injection_return, 1, &move_check_2_injection);
+
+    write_address = (uint8_t*)(AnimationEdits::walkfb_check_3 + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &move_check_3_injection_return, 0, &move_check_3_injection);
+
+    //Disable the TAE events for disabling rotation during spell casting
+    int aids_changed = 0;
+    if (Game::player_tae.is_initialized())
+    {
+        for (uint32_t aid : SPELL_AIDS_TO_ALLOW_MOVEMENT)
+        {
+            int n_events = Game::player_tae.get_event_count_by_id(aid);
+            //global::cmd_out << std::to_string(n_events) << " events for aid " << std::to_string(aid) << "\n";
+            for (int i = 0; i < n_events; i++) {
+                if (Game::player_tae.get_event_type_by_id(aid, i) == 0 && Game::player_tae.get_event_param_by_id(aid, i, 0) == TAE_type0_param_values::lock_rotation) {
+                    Game::player_tae.set_event_start_by_id(aid, i, 0.0f);
+                    Game::player_tae.set_event_end_by_id(aid, i, 0.0f);
+                    if (false)
+                        global::cmd_out << "Updated movement animation " << std::to_string(aid) << "\n";
+                }
+            }
+        }
+    }
+    global::cmd_out << "Movement animations updated\n";
 }

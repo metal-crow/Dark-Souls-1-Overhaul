@@ -61,10 +61,6 @@
     <ClCompile Include="src\ModData.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="src\MoveWhileCasting.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="src\PhantomLimit.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -158,12 +154,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </ExcludedFromBuild>
     </None>
-    <None Include="include\MoveWhileCasting.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </ExcludedFromBuild>
-    </None>
     <None Include="include\PhantomLimit.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ExcludedFromBuild>
@@ -209,9 +199,10 @@
     <MASM Include="src\DeadAnglesASM.asm" />
     <MASM Include="src\EquipmentUnlockASM.asm" />
     <MASM Include="src\FilesASM.asm" />
+    <MASM Include="src\GameDataASM.asm" />
     <MASM Include="src\InvisibleBackstabAttackFixASM.asm" />
     <MASM Include="src\Menu\SavedCharactersASM.asm" />
-    <MASM Include="src\MoveWhileCastingASM.asm" />
+    <MASM Include="src\AnimationEditsMoveWhileCastingASM.asm" />
     <MASM Include="src\PhantomUnshackleASM.asm" />
     <MASM Include="src\InputUtilASM.asm" />
   </ItemGroup>
