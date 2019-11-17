@@ -15,7 +15,8 @@ std::string Files::save_file;
 //Make sure this is lowercase
 std::set<std::wstring> Files::files_to_intercept_loading = {
     L"frpg_sfxbnd_commoneffects.ffxbnd.dcx",
-    L"gameparam.parambnd.dcx"
+    L"gameparam.parambnd.dcx",
+    L"c0000.esd.dcx"
 };
 
 int Files::string_wide_to_mb(wchar_t *in_string, std::string &out_string)
