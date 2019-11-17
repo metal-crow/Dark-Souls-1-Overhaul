@@ -117,6 +117,10 @@ public:
 
     static uint64_t frpg_net_base;
 
+    static const uint64_t player_animation_mediator_loading = 0x3790E2;
+
+    static uint64_t player_animation_mediator;
+
     // Player character status (loading, human, co-op, invader, hollow)
     static sp::mem::pointer<int32_t> player_char_status;
 
@@ -183,6 +187,8 @@ public:
     static int32_t get_player_upper_body_anim_id();
 
     static int32_t get_player_lower_body_anim_id();
+
+    static int32_t get_animation_mediator_state_animation(void* animationMediator, AnimationStateTypesEnum state_id);
 
     static void set_animation_mediator_state_entry(void* animationMediator, AnimationStateTypesEnum state_id, int32_t new_aid, float new_progressTime);
 
