@@ -17,8 +17,8 @@
 #include "BloodborneRallySystem.h"
 #include "Challenge/AggressiveAi.h"
 #include "Challenge/BlackPhantomEnemies.h"
-#include "MoveWhileCasting.h"
 #include "AnimationEdits.h"
+#include "SP/memory/injection/asm/x64.h"
 
 
 /*
@@ -47,6 +47,14 @@ sp::mem::pointer<int32_t> Game::player_char_status;
 
 // Marker for if we're currently in a loading screen
 sp::mem::pointer<int32_t> Game::is_loading;
+
+uint64_t Game::player_animation_mediator = NULL;
+
+extern "C" {
+    uint64_t* player_animation_mediator_cptr;
+    uint64_t player_animation_mediator_loading_injection_return;
+    void player_animation_mediator_loading_injection();
+}
 
 // Time Action Events for the player character's animations
 Tae Game::player_tae = Tae();
@@ -115,6 +123,11 @@ void Game::init()
 
     // Note this is not actually the real pointer to the loading screen byte. Just a best guess
     Game::is_loading = sp::mem::pointer<int32_t>((void*)(Game::ds1_base+0x1ACD758), { 0x28, 0x250, 0x2F8 });
+
+    //hook the code that init's the player's animation mediator so we know it's location later
+    player_animation_mediator_cptr = &Game::player_animation_mediator;
+    //uint8_t* write_address = (uint8_t*)(Game::player_animation_mediator_loading + Game::ds1_base);
+    //sp::mem::code::x64::inject_jmp_14b(write_address, &player_animation_mediator_loading_injection_return, 1, &player_animation_mediator_loading_injection);
 }
 
 // Initialize the pointer to the TAE struture. This isn't loaded until around the time the main menu is hit, so needs to be delayed
@@ -158,9 +171,6 @@ void Game::on_first_character_loaded()
 
     // Enable rally system vfx
     BloodborneRally::on_char_load();
-
-    //Allow movement during spells
-    CastingMovement::on_char_load();
 
     // Enable challenge mods
     //if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_AGGRO_AI_, Challenge::AggressiveAi::active(), _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
@@ -551,6 +561,11 @@ int32_t Game::get_player_lower_body_anim_id()
     }
 }
 
+
+int32_t Game::get_animation_mediator_state_animation(void* animationMediator, AnimationStateTypesEnum state_id) {
+    void* state_entry = (void*)((uint64_t)animationMediator + 168 * state_id);
+    return *(int32_t*)((uint64_t)state_entry + 0);
+}
 
 void Game::set_animation_mediator_state_entry(void* animationMediator, AnimationStateTypesEnum state_id, int32_t new_aid, float new_progressTime) {
     void* state_entry = (void*)((uint64_t)animationMediator + 168 * state_id);
