@@ -105,7 +105,6 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     DeadAngles::start();
     EquipmentUnlock::start();
     InvisBackstabFix::start();
-    AnimationEdits::enable_cast_and_move();
     AnimationEdits::alter_animation_speeds();
     AnimationEdits::disable_whiff_animations();
     if (AnimationEdits::gesture_cancelling) {

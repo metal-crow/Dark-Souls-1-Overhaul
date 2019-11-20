@@ -202,7 +202,6 @@
     <MASM Include="src\GameDataASM.asm" />
     <MASM Include="src\InvisibleBackstabAttackFixASM.asm" />
     <MASM Include="src\Menu\SavedCharactersASM.asm" />
-    <MASM Include="src\AnimationEditsMoveWhileCastingASM.asm" />
     <MASM Include="src\PhantomUnshackleASM.asm" />
     <MASM Include="src\InputUtilASM.asm" />
   </ItemGroup>
