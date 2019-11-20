@@ -238,9 +238,6 @@
     <MASM Include="src\InputUtilASM.asm">
       <Filter>Source Files</Filter>
     </MASM>
-    <MASM Include="src\AnimationEditsMoveWhileCastingASM.asm">
-      <Filter>Source Files</Filter>
-    </MASM>
     <MASM Include="src\GameDataASM.asm">
       <Filter>Source Files</Filter>
     </MASM>

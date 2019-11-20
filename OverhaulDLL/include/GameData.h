@@ -55,6 +55,8 @@ enum TAE_type0_param_values {
     cancel_by_two_handing = 32,
     allow_animation_cancel_events = 87,
     cap_movement_to_walk_speed = 90,
+    disable_sprinting = 91,
+    stop_all_movement = 89,
 };
 
 enum AnimationStateTypesEnum {
