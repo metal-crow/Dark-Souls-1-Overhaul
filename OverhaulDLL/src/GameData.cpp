@@ -404,32 +404,26 @@ void Hud::set_show_node_graph(bool enable, bool game_flag_only)
 }
 #endif
 
+static const uint64_t disable_low_fps_disconnect_offset = 0x778B29;
+
 // Disables automatic game disconnection when low framerate is detected
 void Game::disable_low_fps_disconnect(bool enable)
 {
-    uint8_t *fps_warn = NULL;
-    fps_warn = (uint8_t *)sp::mem::aob_scan("75 0D 84 C0 74 05");
-    
-    if (fps_warn)
-    {
-        // AoB Scan was successful
-        sp::mem::set_protection(fps_warn, 1, MEM_PROTECT_RWX);
+    uint8_t *fps_warn = (uint8_t *)(Game::ds1_base + disable_low_fps_disconnect_offset);
 
-        if (enable)
-        {
-            global::cmd_out << Mod::output_prefix + "Enabling low FPS disconnect...\n";
-            *fps_warn = 0xEB;
-            *(fps_warn+1) = 0x5;
-        }
-        else
-        {
-            global::cmd_out << Mod::output_prefix + "Disabling low FPS disconnect...\n";
-            *fps_warn = 0x75;
-            *(fps_warn + 1) = 0xD;
-        }
+    sp::mem::set_protection(fps_warn, 1, MEM_PROTECT_RWX);
+
+    if (enable)
+    {
+        global::cmd_out << Mod::output_prefix + "Enabling low FPS disconnect...\n";
+        *fps_warn = 0xEB;
+        *(fps_warn+1) = 0x5;
     }
-    else {
-        global::cmd_out << Mod::output_prefix + "!!ERROR!! Enabling low FPS disconnect...\n";
+    else
+    {
+        global::cmd_out << Mod::output_prefix + "Disabling low FPS disconnect...\n";
+        *fps_warn = 0x75;
+        *(fps_warn + 1) = 0xD;
     }
 }
 
@@ -625,41 +619,33 @@ float* Game::get_pc_position() {
     }
 }
 
+static const uint64_t unrestrict_network_synced_effectids_offset = 0x36FBDD;
+
 // Allow effect IDs to be transferred between clients without bounds restrictions
 void Game::unrestrict_network_synced_effectids()
 {
+    global::cmd_out << (Mod::output_prefix + "Unrestricting effectIDs sent over network.\n");
+
     uint8_t nop_patch[3] = { 0x90, 0x90, 0x90 };
 
     //Instructions that shift left and right to limit effect id range
-    void *write_address = sp::mem::aob_scan("c1 e2 0f 41 81 e0 ff ff ff 3f c1 fa 0f");
+    void *write_address = (void*)(Game::ds1_base + unrestrict_network_synced_effectids_offset);
 
-    if(write_address){
-        global::cmd_out << (Mod::output_prefix + "Unrestricting effectIDs sent over network.\n");
-
-        sp::mem::patch_bytes(write_address, nop_patch, 3);
-        sp::mem::patch_bytes((void*)((uint64_t)write_address+0xA), nop_patch, 3);
-    }
-    else {
-        FATALERROR((Mod::output_prefix + "!!ERROR!! Unrestricting effectIDs sent over network.").c_str());
-    }
+    sp::mem::patch_bytes(write_address, nop_patch, 3);
+    sp::mem::patch_bytes((void*)((uint64_t)write_address+0xA), nop_patch, 3);
 }
 
 float Game::new_hpbar_max = 2633.0;
+static const uint64_t gui_hpbar_value_offset = 0x676ECD;
 
 // Fix the bug where the player HP could be greater than the displayed GUI bar
 void Game::increase_gui_hpbar_max()
 {
+    global::cmd_out << (Mod::output_prefix + "Fixing hp bar.\n");
+
     //Instruction that loads the immediate float (+6 for immediate location in opcode)
-    void *write_address = sp::mem::aob_scan("c7 83 04 05 00 00 00 80 ed 44 c7 83 08 05 00 00 00 00 22 44");
-
-    if (write_address) {
-        global::cmd_out << (Mod::output_prefix + "Fixing hp bar.\n");
-
-        sp::mem::patch_bytes((void*)((uint64_t)write_address+6), (uint8_t*)&new_hpbar_max, 4);
-    }
-    else {
-        FATALERROR((Mod::output_prefix + "!!ERROR!! Fixing hp bar.\n").c_str());
-    }
+    void *write_address = (void*)(Game::ds1_base + gui_hpbar_value_offset);
+    sp::mem::patch_bytes((void*)((uint64_t)write_address+6), (uint8_t*)&new_hpbar_max, 4);
 }
 
 
