@@ -96,8 +96,7 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
 DWORD WINAPI on_process_attach_async(LPVOID lpParam)
 {
     Game::init_tae();
-    // Inject custom strings for saved characters menu
-    Menu::Saves::init_custom_strings();
+    Menu::Saves::init_custom_saves();
     AntiCheat::start();
     Game::increase_gui_hpbar_max();
     Game::unrestrict_network_synced_effectids();
