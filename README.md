@@ -52,7 +52,7 @@ Time to recover the hp is 5000 ms, or on weapon toggle.
 * Max sized effect ids can now be sent over the network. This means any added effect ids are visible over multiplayer
 
 * Some spell types no longer lock your movement or rotation while they are being casted  
-You can freely walk, run, and rotate as you are casting them. Also, you can roll cancel them during their windup  
+You can freely walk, run, and rotate as you are casting them, and pivot cancels work as normal    
 These include everything EXCEPT: Combustions, Firestorms, and all miracles but Lighting Spear and Darkmoon Blade/Sunlight Blade  
 
 * You can now invade or summon phantoms __anywhere__, and can still do so after bosses are killed  
