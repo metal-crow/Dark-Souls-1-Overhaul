@@ -34,12 +34,13 @@ extern "C" {
     uint64_t custom_buttons_delete_msg_address = (uint64_t)&custom_buttons_delete_msg_buff[0];
 }
 
-void init_custom_strings(std::wstring &load_header_msg,
+void init_custom_saves(std::wstring &load_header_msg,
                          std::wstring &load_buttons_msg,
                          std::wstring &load_buttons_alt_msg,
                          std::wstring &delete_header_msg,
                          std::wstring &delete_buttons_msg)
 {
+    // Inject custom strings
     custom_header_load_msg_buff[0]      = 0;
     custom_buttons_load_msg_buff[0]     = 0;
     custom_buttons_load_alt_msg_buff[0] = 0;
@@ -53,9 +54,16 @@ void init_custom_strings(std::wstring &load_header_msg,
                     delete_header_msg,
                     delete_buttons_msg);
 
+    //Prevents the "Load Game" menu button from disappearring
     uint8_t nop_patch[] = { 0x90, 0x90 };
     uint8_t *write_address = (uint8_t*)(disable_load_save_button_check + Game::ds1_base);
     sp::mem::patch_bytes(write_address, nop_patch, sizeof(nop_patch));
+
+    //Remove the check during "Load Game" button press which throws an error if the save file has 0 entries
+    //Replaces the conditional with const jump
+    uint8_t jmp_patch[] = { 0xEB, 0x3F };
+    write_address = (uint8_t*)(disable_load_save_entry_count_check + Game::ds1_base);
+    sp::mem::patch_bytes(write_address, jmp_patch, sizeof(jmp_patch));
 }
 
 

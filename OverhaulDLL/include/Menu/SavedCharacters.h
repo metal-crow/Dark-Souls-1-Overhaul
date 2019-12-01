@@ -23,7 +23,7 @@ static std::wstring DS1_MENU_SAVED_CHARS_DEFAULT_CUSTOM_DELETE_BUTTONS_MSG = std
 namespace Menu {
 namespace Saves {
 
-void init_custom_strings(std::wstring &load_header_msg      = DS1_MENU_SAVED_CHARS_DEFAULT_CUSTOM_LOAD_HEADER_MSG,
+void init_custom_saves(std::wstring &load_header_msg      = DS1_MENU_SAVED_CHARS_DEFAULT_CUSTOM_LOAD_HEADER_MSG,
                          std::wstring &load_buttons_msg     = DS1_MENU_SAVED_CHARS_DEFAULT_CUSTOM_LOAD_BUTTONS_MSG,
                          std::wstring &load_buttons_alt_msg = DS1_MENU_SAVED_CHARS_DEFAULT_CUSTOM_LOAD_BUTTONS_ALT_MSG,
                          std::wstring &delete_header_msg    = DS1_MENU_SAVED_CHARS_DEFAULT_CUSTOM_DELETE_HEADER_MSG,
@@ -42,6 +42,7 @@ void set_custom_msgs(std::wstring &load_header_msg,
                      std::wstring &delete_buttons_msg);
 
 static const uint64_t disable_load_save_button_check = 0x6918BA;
+static const uint64_t disable_load_save_entry_count_check = 0x27E859;
 } // namespace Saves
 } // namespace Menu
 
