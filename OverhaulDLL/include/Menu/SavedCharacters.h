@@ -40,6 +40,8 @@ void set_custom_msgs(std::wstring &load_header_msg,
                      std::wstring &load_buttons_alt_msg,
                      std::wstring &delete_header_msg,
                      std::wstring &delete_buttons_msg);
+
+static const uint64_t disable_load_save_button_check = 0x6918BA;
 } // namespace Saves
 } // namespace Menu
 

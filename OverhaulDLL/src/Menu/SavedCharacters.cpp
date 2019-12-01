@@ -52,6 +52,10 @@ void init_custom_strings(std::wstring &load_header_msg,
                     load_buttons_alt_msg,
                     delete_header_msg,
                     delete_buttons_msg);
+
+    uint8_t nop_patch[] = { 0x90, 0x90 };
+    uint8_t *write_address = (uint8_t*)(disable_load_save_button_check + Game::ds1_base);
+    sp::mem::patch_bytes(write_address, nop_patch, sizeof(nop_patch));
 }
 
 
