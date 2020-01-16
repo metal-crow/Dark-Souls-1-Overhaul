@@ -42,6 +42,8 @@ uint64_t Game::char_class_base = NULL;
 
 uint64_t Game::frpg_net_base = NULL;
 
+uint64_t Game::game_data_man = NULL;
+
 // Player character status (loading, human, co-op, invader, hollow)
 sp::mem::pointer<int32_t> Game::player_char_status;
 
@@ -128,6 +130,8 @@ void Game::init()
     player_animation_mediator_cptr = &Game::player_animation_mediator;
     //uint8_t* write_address = (uint8_t*)(Game::player_animation_mediator_loading + Game::ds1_base);
     //sp::mem::code::x64::inject_jmp_14b(write_address, &player_animation_mediator_loading_injection_return, 1, &player_animation_mediator_loading_injection);
+
+    Game::game_data_man = Game::ds1_base + 0x1D278F0;
 }
 
 // Initialize the pointer to the TAE struture. This isn't loaded until around the time the main menu is hit, so needs to be delayed
@@ -260,31 +264,6 @@ void Game::on_reloaded() {
             print_console("Error getting Animation Table Entry address");
         }
     }*/
-}
-
-
-// Obtains the current game version number
-uint8_t Game::get_game_version()
-{
-    //TODO
-    return 0;
-}
-
-
-// Changes the game version number to avoid compatibility issues with different game builds
-void Game::set_game_version(uint8_t version_number)
-{
-    std::stringstream hex_stream;
-    hex_stream << std::hex << (int)version_number;
-    std::string new_version_str = hex_stream.str();
-    hex_stream.str(""); // Clear string stream
-    hex_stream << std::hex << (int)Game::get_game_version();
-
-    if (version_number != Game::get_game_version()) {
-        global::cmd_out << (std::string(Mod::output_prefix + "Changing game version number from 0x").append(hex_stream.str()).append(" to 0x").append(new_version_str).append("...\n"));
-    }
-
-    //TODO
 }
 
 // Check if dim lava mod is currently active
@@ -532,7 +511,7 @@ int32_t Game::get_player_upper_body_anim_id()
         return -1;
     }
     else {
-        player_upper_body_anim_id_cache = (int32_t*)anim_id.resolve();;
+        player_upper_body_anim_id_cache = (int32_t*)anim_id.resolve();
         return *player_upper_body_anim_id_cache;
     }
 }

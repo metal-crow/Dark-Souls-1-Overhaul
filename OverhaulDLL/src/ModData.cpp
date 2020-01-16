@@ -39,13 +39,6 @@ bool Mod::initialized = false;
 // Set to true after deferred_tasks() has executed (or can be set to true to cancel unfinished deferred tasks)
 bool Mod::deferred_tasks_complete = false;
 
-// List of supported game versions
-std::vector<uint8_t> Mod::supported_game_versions = {   DS1_VERSION_RELEASE,
-                                                        DS1_VERSION_OVERHAUL,
-                                                        DS1_VERSION_OVERHAUL_CHEATS,
-                                                        DS1_VERSION_REKINDLED,
-                                                        DS1_VERSION_REKINDLED_CHEATS };
-
 // Enable/disable mouse input
 bool Mod::mouse_input = true;
 
