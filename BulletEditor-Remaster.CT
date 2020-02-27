@@ -1,0 +1,1594 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="28">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>90767</ID>
+      <Description>"BulletParam"</Description>
+      <LastState RealAddress="1D0829BC"/>
+      <VariableType>String</VariableType>
+      <Length>32</Length>
+      <Unicode>0</Unicode>
+      <CodePage>0</CodePage>
+      <ZeroTerminate>1</ZeroTerminate>
+      <Address>1D0829BC</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>89915</ID>
+      <Description>"Open"</Description>
+      <Options moHideChildren="1"/>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+globalalloc(selected_attack,4)
+globalalloc(selected_attack_var_name,100)
+
+[DISABLE]
+dealloc(selected_attack_var_name)
+dealloc(selected_attack)
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>89917</ID>
+          <Description>"Set the value to the effect name, and check the box"</Description>
+          <LastState Value="" RealAddress="00000000"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>89916</ID>
+              <Description>"Generate CE Code"</Description>
+              <LastState RealAddress="006B0010"/>
+              <VariableType>String</VariableType>
+              <Length>100</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>selected_attack_var_name</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>10322</ID>
+          <Description>"Select effect and check the box"</Description>
+          <DropDownList DisplayValueAsItem="1">0:Test
+1:Magic test
+2:Funnel test
+3:Hiryu breath test
+5:Evil eye and [ throw ]
+6:Evil Eye [ landing ]
+9:Genki ball LV1_ test [ throw ]
+10:Genki ball LV2_ test [ throw ]
+11:Genki ball LV3_ test [ throw ]
+12:Genki ball LV1_ test [ landing ]
+13:Genki ball LV2_ test [ landing ]
+14:Genki ball LV3_ test [ landing ]
+50:Bonfire recovery effect
+100:Throwing knives
+101:Throwing knives poison
+110:Molotov cocktail [ parent ]
+111:Molotov cocktail [ child ]
+115:Black Molotov cocktail [ parent ]
+116:Black Molotov cocktail [ child ]
+120:Matatabi A [ parent ]
+121:Matatabi A [ child ]
+122:Matatabi B [ parent ]
+123:Matatabi B [ child ]
+130:Convenient stone [ parent ]
+131:Convenient stone [ child ]
+132:Convenient stone [ grandson ]
+140:Sleep ball [ parent ]
+141:Sleep ball [ child ]
+150:Shit dumpling [ parent ]
+151:Shit dumpling [ child ]
+160:Est disabled [ parent ]
+161:Est disabled child [ ]
+170:Bleeding treatment [ state ] recovery
+171:Bleeding treatment -resistant [ recovery ]
+180:Poison treatment [ state ] recovery
+181:Poison treatment -resistant [ recovery ]
+190:Deadly poison treatment [ state ] recovery
+191:Deadly poison treatment -resistant [ recovery ]
+200:Universal treatment [ state ] recovery
+201:Universal treatment -resistant bleeding [ recovery ]
+202:Universal treatment [ poison -resistant recovery ]
+203:Universal treatment [ deadly poison resistant recovery ]
+210:Resurrection Resurrection Stone [ effect ]
+211:Resurrection Stone [ humanity ] recovery effect
+220:Elixir [ state ] recovery
+221:Elixir [ bleeding ] tolerance recovery
+222:Elixir [ poison -resistant recovery ]
+223:Elixir [ deadly poison resistant recovery ]
+226:Elixir [ HP ] recovery
+230:Dragon transformation _ Breath
+231:Dragon transformation _ Breath _LV1
+232:Dragon transformation _ Breath _LV2
+233:Dragon transformation _ Breath _LV3
+240:Dragon transformation _ [ lower ] Baikiruto
+241:Dragon transformation _ lower _LV1 Baikiruto [ ]
+242:Dragon transformation _ lower _LV2 Baikiruto [ ]
+243:Dragon transformation _ lower _LV3 Baikiruto [ ]
+250:Dragon transformation _ lower the [ blow ]
+251:Dragon transformation _ lower the [ blow ]
+252:Dragon transformation _ lower the [ blow ]
+253:Dragon transformation _ lower the [ blow ]
+260:A stone that [ DLC ] speak to [ fly ]
+261:A stone that [ DLC ] speak to [ speak ]
+265:Stone B, [ DLC ] speak to [ fly ]
+266:Stone B, [ DLC ] speak [ I speak ]
+270:Stone C, [ DLC ] speak to [ fly ]
+271:Stone C, [ DLC ] speak to [ speak ]
+275:Stone that D [ DLC ] I speak [ fly ]
+276:Stone that D [ DLC ] I speak [ speak ]
+280:Stone that E [ DLC ] speak to [ fly ]
+281:Stone that E [ DLC ] speak to [ speak ]
+300:[ DLC ] Dark Force
+500:Arrow ordinary
+501:Large arrow
+502:Feather arrows
+503:Flaming arrow
+504:Arrow Kuroki
+505:Gekkoya
+506:Arrow of the tree
+507:Oya of dragon hunting
+508:Oya of [ DLC ] go
+600:Light bolt
+601:Heavy bolt
+602:Sniper bolt
+603:Wood bolt
+604:Lightning Bolt
+1000:Straight sword of [ 58 ] old dragon
+1001:Straight sword of [ 58 ] old dragon [ 1 ] land
+1002:Straight sword of [ 58 ] old dragon [ 2 ] landing
+1003:Straight sword of [ 58 ] old dragon [ 3 ] landing
+1004:Straight sword of [ 58 ] old dragon [ 4 ] landing
+1005:Straight sword of [ 58 ] old dragon [ 5 ] landing
+1006:Straight sword of [ 58 ] old dragon [ 6 ] landed
+1007:Straight sword of [ 58 ] old dragon [ 7 ] impact
+1008:Straight sword of [ 58 ] old dragon [ 8 ] landing
+1009:Straight sword of [ 58 ] old dragon [ 9 ] landing
+1010:Straight sword of [ 58 ] [ 10 old dragon landed ]
+1011:Straight sword of [ 58 ] [ 11 old dragon landed ]
+1012:Straight sword of [ 58 ] [ 12 old dragon landed ]
+1013:Straight sword of [ 58 ] [ 13 old dragon landed ]
+1014:Straight sword of [ 58 ] [ 14 old dragon landed ]
+1015:Straight sword of [ 58 ] [ 15 old dragon landed ]
+1030:Sword of [ 77 ] stone [ Gravity ]
+1040:[ 79 ] Moonlight _ one hand lightwave [ ]
+1050:[ 79 ] Moonlight _ both hands ] [ lightwave
+1051:[ 79 ] Moonlight _ both hands landed [ explosion ]
+1060:Large shield of [ 94 ] rock [ flick ]
+1061:Large shield of [ 94 ] rock [ SA ] strengthening
+1070:[ 104 ] Iron Axe [ shock wave ]
+1080:[ Shock wave slams large ax ] [ 106 ] of the Dragon King
+1090:St. hammer of judgment [ 62 ] method [ range ] Damage
+1100:Magic spear [ 65 ] of the first six [ others ] Baikiruto
+1110:Spear of [ 68 ] dragon hunt
+1111:Spear of [ 68 ] dragon hunting [ 1 ] land
+1112:Spear of [ 68 ] [ 2 dragon hunting lands ]
+1113:Spear of [ 68 ] dragon hunting [ 3 ] landing
+1114:Spear of [ 68 ] [ 4 dragon hunting land ]
+1115:Spear of [ 68 ] dragon hunt [ 5 ] landing
+1120:Small shield of [ 92 ] [ crystal ring shock wave ]
+1130:Sword of [ 98 ] old dragon
+1131:Sword of [ 98 ] old dragon [ 1 ] land
+1132:Sword of [ 98 ] old dragon [ 2 ] landing
+1133:Sword of [ 98 ] old dragon [ 3 ] landing
+1134:Sword of [ 98 ] old dragon [ 4 ] landing
+1135:Sword of [ 98 ] old dragon [ 5 ] landing
+1136:Sword of [ 98 ] old dragon [ 6 ] landed
+1137:Sword of [ 98 ] old dragon [ 7 ] impact
+1138:Sword of [ 98 ] old dragon [ 8 ] landing
+1139:Sword of [ 98 ] old dragon [ 9 ] landing
+1140:Sword of [ 98 ] [ 10 old dragon landed ]
+1141:Sword of [ 98 ] [ 11 old dragon landed ]
+1142:Sword of [ 98 ] [ 12 old dragon landed ]
+1143:Sword of [ 98 ] [ 13 old dragon landed ]
+1144:Sword of [ 98 ] [ 14 old dragon landed ]
+1145:Sword of [ 98 ] [ 15 old dragon landed ]
+1160:RyuKen ( step attack )
+1170:[ Shock wave slams ] sword of [ 135 ] Black Dragon
+2000:Fascination
+2100:Body of iron - repelling amount of damage change ]
+2110:Body movement of iron [ change ]
+2120:Body of iron [ change ] Anime damage
+2200:Sound and [ throw ]
+2210:Sound [ landing ]
+2300:[ I applied to the user ] anti- magic area
+2310:[ I put effects to the user ] anti- magic area
+2320:[ I applied to the character of the circumference] anti- magic area
+2400:Gravity [ user ] for
+2410:Gravity [ enemy ] for
+2500:Poison cloud [ throw ]
+2510:Poison cloud [ landing ] _ poison
+2600:Death cloud [ throw ]
+2610:Death Cloud [ _ landed plague ]
+2700:Mimicry mimicry [ effect ]
+2710:Mimicry [ change ] move
+2800:Poison treatment [ state ] recovery
+2810:Poison treatment -resistant [ recovery ]
+2900:Universal treatment [ state ] recovery
+2910:Universal treatment -resistant bleeding [ recovery ]
+2920:Universal treatment [ poison -resistant recovery ]
+2930:Universal treatment -resistant plague [ recovery ]
+3000:A bullet EN
+3010:EN bullet A2
+3020:EN bullet B
+3030:EN bullet B2
+3040:EN bullet C [ floating ]
+3050:EN bullet C [ bullet ]
+3060:EN bullet C2 [ floating ]
+3070:EN bullet C [ bullet ]
+3080:EN bullet D
+3090:EN bullet D2
+3100:4 recovery
+3101:Recovery 4_ resonance LV1
+3102:Recovery 4_ resonance LV2
+3103:Recovery 4_ resonance LV3
+3104:Recovery 4_ resonance LV4
+3200:Great regen
+3201:Great regen _ resonance LV1
+3202:Great regen _ resonance LV2
+3203:Great regen _ resonance LV3
+3204:Great regen _ resonance LV4
+3300:Corrosion cloud [ throw ]
+3310:Corrosion cloud [ landing ]
+6000:Fireball [ bullet ]
+6010:Fireball [ landing ]
+6100:Fireball 2 [ bullet ]
+6110:Fire ball landed 2 ]
+6200:Fireball 3 [ bullet ]
+6210:Fireball [ 3 ] landing
+6300:Chaos _ Fireball [ bullet ]
+6310:Chaos _ Fireball [ landing ]
+6320:[ Distance determination or give lava chaos _ Fireball
+6330:[ Wall decision or give lava chaos _ Fireball
+6340:Chaos _ Fireball [ lava ]
+6400:The [ 1 ] throw summons
+6401:The [ throw ] 1_LV1 summons
+6402:The [ throw ] 1_LV2 summons
+6403:The [ throw ] 1_LV3 summons
+6410:Summon [ landing ]
+6411:Summons 1_LV1 [ landing ]
+6412:Summons 1_LV2 [ landing ]
+6413:Summons 1_LV3 [ landing ]
+6500:The [ throw ] 2 summons
+6501:The [ throw ] 2_LV1 summons
+6502:The [ throw ] 2_LV2 summons
+6503:The [ throw ] 2_LV3 summons
+6510:Summon 2 landing ]
+6511:Summons 2_LV1 [ landing ]
+6512:Summons 2_LV2 [ landing ]
+6513:Summons 2_LV3 [ landing ]
+7000:Firing [ bullet ]
+7010:Firing [ landing ]
+7100:Firing two bullets [ ]
+7110:Ignition [ 2 ] landing
+7200:Firing 3 bullets ]
+7210:Ignition [ 3 ] landing
+8000:Firestorm and [ throw ]
+8010:Firestorm [ landing ]
+8100:Fire Storm 2 [ throw ]
+8110:Fire Storm 2 landed ]
+8200:Chaos _ Firestorm and [ throw ]
+8210:Chaos _ Firestorm [ landing ]
+8220:Chaos _ Firestorm [ lava ]
+9000:Thunder 1 [ parent ]
+9010:Thunder [ 1 child ]
+9020:Thunder 1 grandson ]
+9030:Thunder [ 1 ] great-grandson
+9040:Thunder [ 1 ] great-great-grandchild
+9050:Thunder [ 1 ] Raimago
+9100:Thunder 2 [ parent ]
+9110:Thunder 2 [ child ]
+9120:Thunder 2 grandchildren ]
+9130:Thunder 2 great-grandson ]
+9140:Thunder 2 great-great-grandchild ]
+9150:Thunder [ 2 ] Raimago
+9200:Lightning 3 [ parent ]
+9210:Lightning 3 [ child ]
+9220:Thunder 3 grandchildren ]
+9230:Thunder [ 3 ] great-grandson
+9240:Thunder [ 3 ] great-great-grandchild
+9250:Thunder [ 3 ] Raimago
+10000:Force
+10001:Force _ resonance LV1
+10002:Force _ resonance LV2
+10003:Force _ resonance LV3
+10004:Force _ resonance LV4
+10100:Force 2
+10101:Force 2_ resonance LV1
+10102:Force 2_ resonance LV2
+10103:Force 2_ resonance LV3
+10104:Force 2_ resonance LV4
+10200:Force 3 [ throw ]
+10201:The [ throw ] Force 3 _ resonance LV1
+10202:The [ throw ] Force 3 _ resonance LV2
+10203:The [ throw ] Force 3 _ resonance LV3
+10204:The [ throw ] Force 3 _ resonance LV4
+10210:Force landed 3 ]
+10211:Force 3 [ landing ] _ resonance LV1
+10212:Force 3 [ landing ] _ resonance LV2
+10213:Force 3 [ landing ] _ resonance LV3
+10214:Force 3 [ landing ] _ resonance LV4
+11000:Dragon transformation _ systemic [ head ]
+11010:Dragon transformation _ whole body [ body ]
+11200:Flame radiation
+11300:Whip of flame
+11400:Whip of chaos _ flame
+11410:Whip of flame chaos _ [ lava ]
+11500:Crystal beam
+11510:Crystal beam [ 1 ] land
+11520:Crystal beam [ 2 ] landing
+11530:Crystal beam [ 3 ] landing
+11540:Crystal beam [ 4 ] landing
+11550:Crystal beam [ 5 ] landing
+11560:Crystal beam [ 6 ] landed
+11570:Crystal beam [ 7 ] impact
+11580:Crystal beam [ 8 ] landing
+11590:Crystal beam [ 9 ] landing
+11600:Crystal beam [ 10 ] landing
+11610:Crystal beam [ 11 ] landing
+11620:Crystal beam [ 12 ] landing
+11630:Crystal beam [ 13 ] landing
+11640:Crystal beam [ 14 ] landing
+11650:Crystal beam [ 15 ] landing
+12000:Retributive justice and [ throw ]
+12010:Retributive justice [ landing ]
+13000:Seoul drain 1
+13100:Seoul drain 2
+14000:Balls of [ DLC ] darkness
+14100:Splash of [ DLC ] darkness
+14200:Fog of [ DLC ] darkness [ throw ]
+14210:Fog of darkness [ DLC ] [ landing ]
+14300:[ DLC ] _ dummy those who follow
+14310:[ DLC ] body _ those who follow
+14400:[ DLC ] black flames and [ throw ]
+14410:[ DLC ] [ black flames landing ]
+19901:Resuscitation and [ throw ]
+19902:Resuscitation [ impact ]
+19905:Others recovery
+19906:Black ghost to scare off [ throw ]
+19907:Black ghost lands [ landing ]
+19908:Corrosion cloud [ throw ]
+19909:Corrosion cloud [ landing ] _ corrosion
+19910:Fire bolt
+20600:× I throw c2060_ Ghoul _ Namakubi
+22300:c2230_ fat daemon _ forward magic [ throw ]
+22301:c2230_ fat daemon _ front magic [ landing ]
+22305:c2230_ fat daemon _ self-centered magic [ throw ]
+22306:c2230_ fat daemon _ self-centered magic [ landing ]
+22310:c2231_ Snow daemon _ forward magic [ throw ]
+22311:c2231_ Snow daemon _ front magic [ landing ]
+22312:c2231_ Snow daemon _ self-centered magic [ throw ]
+22313:c2231_ Snow daemon _ self-centered magic [ landing ]
+22600:1 c2260_ throw spear spear daemon _
+23000:c2300_ loitering daemon _ lightning magic
+23200:vacuum wave from c2320_ Iron Golem _ ax
+23600:thunder explosion ( thunder ) _ Hip attack c2360_ four horsemen C
+23700:c2370_ four horsemen D_ magic fire 1
+23701:c2370_ four horsemen D_ magic fire 2 ( long )
+23702:Heave ho 's four horsemen D_ magic c2370_ ( for friend )
+23703:Heave ho × 's four horsemen D_ magic c2370_ ( Private )
+23800:c2380_ figurine knight _ gravity
+24000:c2400_ _ Assassin's throwing knife
+24100:c2410_ White Knight _ longbow fire
+24300:stone statue _ breath moving c2430_ ( front -and long- Me )
+24301:stone statue _ breath moving c2430_ ( swing )
+25000:c2500_ immortality who _ bow shooting
+25200:c2520_ immortality people throwing knives ( Thieves ) _
+25300:c2530_ immortal person ( Bagworm ) _ blowguns
+25400:I throw c2540_ immortality who the ( warrior ) _ bottle
+25401:× filler bullet from the " throw the bottle " ( warrior ) _ c2540_ immortal people
+25402:The flame spread c2540_ immortal person ( warrior ) _ from the " filler bullet "
+25500:c2550_ immortal person (heavy fighter ) _ Crossbow shooting
+25600:c2560_ immortal person ( light knight ) _ Crossbow shooting
+25900:× minister of c2590_ King ( sniper ) _ shooting
+26500:The fire magic c2650_ 's immortality from ( grave keeper ) _ Skeleton
+26501:× I sow c2650_ immortality 's a ( grave keeper ) _ ash
+26700:× c2670_ Dead man _ magic fire
+26800:I shove c2680_ Dead baby girl _
+27000:I spit c2700_ snake 's venom B_
+27001:c2700_ snake who B_ magic fire
+27100:I hit the guard _ Crystal c2710_ ground
+27101:hit the c2710_ Crystal guard _ ground ( derived 1)
+27102:hit the c2710_ Crystal guard _ ground ( derived 2 )
+27103:you hit c2710_ Crystal guard _ ground ( derived 3)
+27104:hit the c2710_ Crystal guard _ ground ( derived 4)
+27105:hit the c2710_ Crystal guard _ the ground (a derivative 5)
+27106:hit the c2710_ Crystal guard _ the ground (a derivative 6)
+27107:you hit c2710_ Crystal guard _ the ground (a derivative 7 )
+27110:I hit the ( amber ) _ ground c2711_ Crystal guard
+27111:hit the ( amber ) _ ground c2711_ Crystal guard [ child ]
+27112:hit the ( amber ) _ ground c2711_ Crystal guard [ grandson ]
+27113:hit the ( amber ) _ ground c2711_ Crystal guard [ great-grandson ]
+27114:hit the ( amber ) _ ground c2711_ Crystal guard [ ] great-great-grandchild
+27300:c2730_ heroine _ breath ( feet )
+27301:( swing a little ) c2730_ heroine _ Breath
+28000:c2800_ immortal person ( crystal ) _ bow shooting
+28110:I throw a rock c2811_
+28300:c2830_ immortality who Phalanx _ javelin
+28400:I spit poison fog c2840_ immortality people ( congestion ) _ blood
+28401:× blood poisoning mass ejection c2840_ immortality people ( congestion ) _ the time of death
+28402:c2840_ immortal person ( congestion ) _ magic 1
+28403:c2840_ immortal person ( congestion ) _ magic 2
+28600:c2860_ giant slave _ throwing one
+28601:c2860_ giant slave _ throwing two
+28602:c2860_ giant slave _ throwing three
+28607:× of c2860_ giant slave _ flame pot for [ middle ]
+28608:of c2860_ giant slave _ flame pot [filler ]
+28609:of c2860_ giant slave _ flame pot [ landing ]
+28610:c2860_ giant slave _ throwing events 1
+28611:c2860_ giant slave _ throwing events 2
+28612:c2860_ giant slave _ throwing three events
+28613:c2860_ giant slave _ throwing events 4
+28614:c2860_ giant slave _ throwing events 5
+28615:c2860_ giant slave _ throwing events 6
+28700:anger c2870_ giant guards ( superset ) _ miracle - God
+29000:c2900_ skeleton _ bow and arrow
+29010:c2901_ skeleton ( large ) _ large bow and arrow
+30900:c3090_ die casting _ blood poisoning jet
+32000:drop falling carrion _ drip-drip Nagging c3200_
+32200:I put the liquid _ c3220_ parasite
+32300:spear of c3230_ ephemera _ magic dragon
+32301:spear of c3230_ ephemera _ magic dragon ( for effect )
+32302:spear of c3230_ ephemera _ magic dragon ( for effect and 2 )
+32310:spear of c3230_ ephemera _ magic dragon ( large )
+32320:spear of c3230_ ephemera _ magic dragon ( extra large )
+32321:spear of c3230_ ephemera _ magic dragon (Giant ) [ landing ]
+32330:c3230_ ephemera dragon _ range explosion
+32400:c3240_ Izarisu _ digestive juice
+32401:c3240_ Izarisu _ digestive juice ( long distance )
+32700:c3270_ Basilisk _ petrified breath
+32701:c3270_ Basilisk _ jump &amp; breath
+32702:c3270_ Basilisk _ jump and landing SFX for breath
+32703:c3270_ Basilisk _ jump and land damage for breath
+33200:c3320_ three people cape _ A magic square
+33201:c3320_ three people _ cape magic square A ( upside down )
+33202:c3320_ three people cape _ rear step &amp; A magic square
+33203:c3320_ three people cape _ rear step &amp; magic square A ( upside down )
+33300:I spit c3330_ Bishacha _ Sumi
+33410:I spit fire dog _ flame of c3341_ minister
+33800:c3380_ large Hill _ mucus
+33900:I spit the liquid to c3390_ burrowing maggots _ short distance
+33901:I spit the liquid to c3390_ burrowing maggots _ long distance
+33902:spit the liquid to c3390_ burrowing maggots _ root ( the ground)
+33903:spit the liquid to c3390_ burrowing maggots _ far ( the ground)
+33904:spit c3390_ burrowing maggots _ mucus ( wall )
+33906:c3390_ burrowing maggots _ mucus - before ( ceiling )
+33907:c3390_ burrowing maggots _ mucus and right ( ceiling )
+33908:c3390_ burrowing maggots mucus _ Left ( ceiling )
+33909:c3390_ burrowing maggots _ mucus - post filtration ( ceiling )
+34000:magma from c3400_ Kuragusupaida-ko _ umbilical cord
+34001:from c3400_ Kuragusupaida-ko _ umbilical cord magma [ landing ]
+34100:c3410_ Kaeruei _ mucus
+34101:c3410_ Kaeruei _ mucus ( when jumping )
+34200:c3420_ Dragon zombie ash de breath
+34201:c3420_ Dragon zombie ash de breath ( for right )
+34202:c3420_ Dragon zombie ash de breath ( for left )
+34203:c3420_ Dragon zombie front breath
+34204:c3420_ zombie dragon breath wide angle
+34205:The breath beneath with c3420_ Dragon zombie floating
+34206:by c3420_ Dragon zombie floating beneath breath ( bomblets )
+34207:The dragon breath c3420_ zombies (m16) right direction
+34208:The dragon breath c3420_ zombies (m16) front
+34209:The dragon breath c3420_ zombies (m16) left direction
+34300:c3430_ Hellkite _A point one breath
+34301:c3430_ Hellkite _A point → B point move
+34302:c3430_ Hellkite _B point one breath
+34303:c3430_ Hellkite _B point breath 2
+34304:Breath 1 flew c3430_ Hellkite _B point
+34305:Breath 2 flew c3430_ Hellkite _B point
+34700:I cause the wind c3470_ gold chimera (formerly ) _ Tsubasa
+34701:c3470_ Fri chimera ( old) _ Breath 1
+34710:I cause the wind c3471_ Fri chimera wing _
+34711:c3471_ Fri chimeric breath _ 1 dummy
+34712:c3471_ Fri chimeric breath _ 2 dummy
+34713:c3471_ Fri chimeric _ air breath 1
+34714:c3471_ Fri chimeric _ air breath 2R
+34715:c3471_ Fri chimeric _ air breath 2L
+34716:c3471_ Fri chimeric _ air breath (child)
+34717:c3471_ Fri chimeric _ air breath ( grandson )
+34718:c3471_ Fri chimeric _ air breath ( great-grandson )
+34719:c3471_ Fri chimeric _ air breath ( great-great-grandchild )
+34720:c3471_ Fri chimeric _ air breath ( Raimago )
+34721:breath turned around c3471_ Fri chimeric _ step
+34722:c3471_ Fri chimeric breath _ 1
+34723:c3471_ Fri chimeric _ Breath 2
+34724:c3471_ Fri chimeric _ Breath 1 ( passage ) dummy
+34725:c3471_ Fri chimeric breath _ 2 ( passage ) dummy
+34726:c3471_ Fri chimeric _ Breath 1 ( passage )
+34727:c3471_ Fri chimeric breath _ 2 ( passage )
+34728:c3471_ Fri chimeric _ air breath 2R ( near)
+34729:c3471_ Fri chimeric _ air breath 2L ( near)
+34910:there is the (in ) _ _ splinter splinter fire damage level c3491_ drift items
+34911:Yes ( right ) _ Damage Level ( evil ) _ splinter splinter fire c3491_ drift items
+34912:Yes ( left ) _ Damage Level ( evil ) _ splinter splinter fire c3491_ drift items
+35000:c3500_ big jelly _ slime bullets ( near)
+35001:c3500_ big jelly _ slime bullets and (far )
+35010:c3501_ U~ipusu _ suicide and [ throw ]
+35011:c3501_ U~ipusu _ suicide [ landing ]
+35200:c3520_ _ Wyvern breath up and down
+35201:c3520_ Wyvern _ breath left and right ( near)
+35202:c3520_ Wyvern _ breath left and right (medium )
+35203:c3520_ Wyvern _ breath left and right and (far )
+35204:c3520_ Wyvern _ dive breath
+35205:c3520_ _ Wyvern breath landing
+35206:c3520_ Wyvern _ front breath ( above ground )
+35207:c3520_ Wyvern _ swing breath ( above ground )
+35208:c3520_ _ Wyvern breath and step back ( ground )
+35209:flew c3520_ _ Wyvern breath ( above ground )
+35210:flew c3520_ Wyvern breath _ ( forward movement )
+35211:The sneak breath flew right c3520_ Wyvern _
+35212:c3520_ _ Wyvern rise and glide &amp; breath
+35213:jump over c3520_ _ Wyvern rise breath &amp;
+35300:c3530_ Mizuumi-juu _A point → B point move _ Breath
+35301:c3530_ Mizuumi-juu _B point → C point move _ Breath
+35303:The breath neck _ 1 _ c3530_ Mizuumi-juu near
+35304:The breath neck _ 2 _ c3530_ Mizuumi-juu near
+35305:The breath neck _ 3 _ c3530_ Mizuumi-juu near
+35306:The breath neck _ 4 _ near c3530_ Mizuumi-juu
+35307:The breath neck _ 5 _ c3530_ Mizuumi-juu near
+35308:The breath neck _ 6 _ c3530_ Mizuumi-juu near
+35309:The breath neck _ 7 _ c3530_ Mizuumi-juu near
+35310:The breath neck _ 1 _ far c3530_ Mizuumi-juu
+35311:The breath neck _ 2 _ far c3530_ Mizuumi-juu
+35312:The breath neck _ 3 _ far c3530_ Mizuumi-juu
+35313:The breath neck _ 4 _ c3530_ Mizuumi-juu far
+35314:The breath neck _ 5 _ c3530_ Mizuumi-juu far
+35315:The breath neck _ 6 _ c3530_ Mizuumi-juu far
+35316:The breath neck _ 7 _ c3530_ Mizuumi-juu far
+35330:c3530_ Mizuumi-juu _A point → B point move _ breath _ neck 1
+35331:c3530_ Mizuumi-juu _A point → B point move _ breath _ neck 2
+35332:c3530_ Mizuumi-juu _A point → B point move _ breath _ neck 3
+35333:c3530_ Mizuumi-juu _A point → B point move _ breath _ neck 4
+35334:c3530_ Mizuumi-juu _A point → B point move _ breath _ neck 5
+35335:c3530_ Mizuumi-juu _A point → B point move _ breath _ neck 6
+35336:c3530_ Mizuumi-juu _A point → B point move _ breath _ neck 7
+35350:c3530_ Mizuumi-juu _B point → A point move _ breath _ neck 1
+35351:c3530_ Mizuumi-juu _B point → A point move _ breath _ neck 2
+35352:c3530_ Mizuumi-juu _B point → A point move _ breath _ neck 3
+35353:c3530_ Mizuumi-juu _B point → A point move _ breath _ neck 4
+35354:c3530_ Mizuumi-juu _B point → A point move _ breath _ neck 5
+35355:c3530_ Mizuumi-juu _B point → A point move _ breath _ neck 6
+35356:c3530_ Mizuumi-juu _B point → A point move _ breath _ neck 7
+35360:c3530_ Mizuumi-juu _ breath [ landing (child) ]
+35361:c3530_ Mizuumi-juu _ move breath [ landing (child) ]
+35363:The breath neck 2_ 1 to c3530_ Mizuumi-juu _ far
+35364:The breath neck 2_ 2 c3530_ Mizuumi-juu _ far
+35365:2_ breath neck 3 c3530_ Mizuumi-juu _ far
+35366:Breath 2_ neck 4 c3530_ Mizuumi-juu _ far
+35367:2_ breath neck 5 c3530_ Mizuumi-juu _ far
+35368:2_ breath neck 6 c3530_ Mizuumi-juu _ far
+35369:Breath 2_ neck 7 to c3530_ Mizuumi-juu _ far
+35370:c3530_ Mizuumi-juu _ sand cloud SFX generation _ neck 1
+35371:c3530_ Mizuumi-juu _ sand cloud SFX generation _ neck 2
+35372:c3530_ Mizuumi-juu _ sand cloud SFX generation _ neck 3
+35373:c3530_ Mizuumi-juu _ sand cloud SFX generation _ neck 4
+35374:c3530_ Mizuumi-juu _ sand cloud SFX generation _ neck 5
+35375:c3530_ Mizuumi-juu _ sand cloud SFX generation _ neck 6
+35376:c3530_ Mizuumi-juu _ sand cloud SFX generation _ neck 7
+35377:c3530_ Mizuumi-juu _ sand cloud SFX generation [ landing ]
+40900:c4090_ sniper arrow A_
+40901:c4090_ sniper A_ rose
+41500:c4100_ Arutoriusu _ left tackle [the main body]
+41501:c4100_ Arutoriusu _ left tackle [ landing ]
+41510:c4100_ Arutoriusu _ self-reinforcement
+41600:c4160_ abyss who Magician _ Magic 1
+41610:c4160_ abyss who Magician _ Magic 2 [ throw ]
+41611:c4160_ abyss people magician magic _ 2 _ landed poison ]
+41620:c4160_ abyss who Magician _ Magic 3
+41621:c4160_ abyss who Magician _ Magic 3 (top)
+41622:c4160_ abyss who Magician _ Magic 3 (bottom)
+41700:c4170_ humanity ( large )
+41710:c4171_ humanity (medium )
+41720:c4172_ humanity ( small)
+45000:_ 1_ main magic dummy one of c4500_ abyss
+45009:_ 1_ magic main body of c4500_ abyss
+45010:_ two main magic of c4500_ abyss
+45011:_ 2_ main magic bullet final c4500_ abyss
+45020:main magic _ 3_ dummy of c4500_ abyss
+45021:_ 3_ main body of magic c4500_ abyss
+45100:c4510_ black dragon breath _ straight line
+45101:_1 shot eyes c4510_ black dragon breath _ straight line
+45102:_2 shot eyes c4510_ black dragon breath _ straight line
+45103:_3 shot eyes c4510_ black dragon breath _ straight line
+45110:c4510_ Black Dragon _ fan-shaped breath
+45120:c4510_ black dragon breath rising _
+45121:c4510_ black dragon breath _ rising land
+45130:c4510_ black dragon breath _180 _ turning
+45140:c4510_ black dragon attack _ events (far ) breath
+45141:c4510_ black dragon attack _ events (far ) breath landing
+45160:c4510_ Black Dragon _ events attack ( near) breath
+45161:c4510_ Black Dragon _ events attack ( near) breath landing
+45170:c4510_ black dragon breath _ just below
+45171:c4510_ black dragon breath _ just below the landing occurs
+45172:c4510_ black dragon breath _ just below the landing
+45180:c4510_ Black Dragon Breath cliff _ 1
+45181:c4510_ Black Dragon Breath Breath cliff _ one landing
+45190:c4510_ black dragon breath _ cliff 2
+45191:c4510_ black dragon breath breath _ cliff 2 landed
+45200:impact across the c4510_ black dragon bridge _
+51400:Kin _ ​​breath bullet c5140 (DS2 proto ) _ Wyvern
+52000:c5200_ giant centipede _ fireball first
+52001:c5200_ giant centipede _ fireball second
+52002:c5200_ giant centipede _ throw a huge fireball and [ throw ]
+52003:c5200_ giant centipede _ throw a huge fireball [ landing ]
+52200:c5220_ Haka-o _ self-centered explosion [ throw ]
+52201:c5220_ Haka-o _ self-centered explosion [ landing ]
+52310:c5231_ Kinguizarisu ( third form) _ landing for bullets
+52311:c5231_ Kinguizarisu ( third form) _ Breath landing
+52600:c5260_ phagocytosis Dragon _ Gero and [ throw ]
+52601:c5260_ phagocytosis Dragon _ Gero [ landing ]
+52700:The throw by generating c5270_ Griffith _ lightning
+52701:c5270_ Griffith _ one hand , thunder fire
+52710:I throw by generating a ( large ) _ lightning c5271_ Griffith
+52711:c5271_ huge old knight Griffith _ hip attack _ thunder explosion
+52712:c5271_ huge old knight Griffith _ one hand , thunder fire
+52800:c5280_ crag _ magma breath
+52801:c5280_ crag _ magma breath ( right )
+52802:c5280_ crag _ magma breath ( left )
+52803:c5280_ crag _ magma [ landing ]
+52804:Breath strength c5280_ crag _
+52805:c5280_ crag _ self-centered explosion [ throw ]
+52806:c5280_ crag _ self-centered explosion [ landing ]
+52807:c5280_ crag _ buttocks flame
+52808:Breath magma generation landing strength c5280_ crag _
+52809:c5280_ crag _ jump forward breath
+52810:c5280_ crag _ jump forward landing Breath magma generation
+52900:c5290_ Hakuryu sheath _ breath and ( Cleave short distance )
+52901:c5290_ Hakuryu sheath _ breath and ( Cleave close range ) [ landing ]
+52902:c5290_ Hakuryu sheath _ breath and ( Cleave long distance )
+52903:c5290_ Hakuryu sheath _ breath and ( Cleave long distance ) [ landing ]
+52904:c5290_ Hakuryu sheath breath _ ( front )
+52905:c5290_ Hakuryu sheath breath _ ( front ) [ landing ]
+52906:ver slow on the way : c5290_ white dragon breath sheath _ ( front ) .
+52907:c5290_ Hakuryu sheath _ breath and ( Cleave long distance )
+52908:c5290_ Hakuryu sheath _ self-centered explosion
+52909:c5290_ Hakuryu sheath _ self-centered explosion [ grandson ]
+52910:c5290_ Hakuryu sheath _ self-centered explosion ( damage continued use) [ parent ]
+52911:c5290_ Hakuryu sheath _ self-centered explosion ( damage for continuation )
+52912:c5290_ Hakuryu sheath _ self-centered explosion _ bomblets 1
+52913:c5290_ Hakuryu sheath _ self-centered explosion _ bomblets 2
+52914:c5290_ Hakuryu sheath _ self-centered explosion _ bomblets 3
+52915:c5290_ Hakuryu sheath _ self-centered explosion _ bomblets 4
+52916:c5290_ Hakuryu sheath _ self-centered explosion _ bomblets 5
+52917:c5290_ Hakuryu sheath _ self-centered explosion _ bomblets 6
+52920:c5290_ Hakuryu sheath _ breath and ( Cleave very short distance )
+52921:( Cleave very short distance ) c5290_ Hakuryu sheath _ breath [ landing ]
+52922:c5290_ Hakuryu sheath _ self-centered explosion _ first match for
+52923:c5290_ Hakuryu sheath _ self-centered explosion ( damage continue and for the first round )
+53000:c5300_ immortality King Ja = eel _ Seoul energy explosion
+53200:c5320_ Sumeragihahaimoto _ bow
+53210:c5320_ Sumeragihahaimoto _ induction
+53211:c5320_ Sumeragihahaimoto _ induction 2
+53220:c5320_ Sumeragihahaimoto _ thick
+53500:c5350_ gargoyle _ swinging breath
+53501:breath from c5350_ gargoyle _ air
+53510:c5351_ Gargoyle ( different colors ) _ swing breath
+53511:c5351_ gargoyle breath from ( different colors ) _ air
+53900:c5390_ Jairu daemon _ self-centered explosion
+53901:bullet c5390_ Jairu daemon _ darkness
+53902:The launch of the aura c5390_ Jairu daemon _ huge darkness
+54000:throw flames c5400_ Bosuizarisu _ right hand ( right direction )
+54001:throw flames c5400_ Bosuizarisu _ right (to the left )
+54002:c5400_ Bosuizarisu _ self-centered flame
+54003:c5400_ Bosuizarisu _ magma for bullet
+54004:magma remaining c5400_ Bosuizarisu _
+54005:Throw c5400_ Bosuizarisu _ flame [ landing ]
+54010:storm _ decision point bullets c5400_ Bosuizarisu _ flame
+54011:storm _ parent of c5401_ Bosuizarisu _ flame
+54012:storm _ child of c5402_ Bosuizarisu _ flame
+54013:c5400_ Bosuizarisu _ magma for bullet 2
+1020:Arrow fly out Ojo 1
+1021:Gargoyle image to wipe one fire Ojo
+</DropDownList>
+          <LastState Value="3070" RealAddress="006B0000"/>
+          <VariableType>4 Bytes</VariableType>
+          <Address>selected_attack</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>89788</ID>
+          <Description>"Bullet Base"</Description>
+          <LastState RealAddress="1D08AFE0"/>
+          <VariableType>String</VariableType>
+          <Length>0</Length>
+          <Unicode>0</Unicode>
+          <CodePage>0</CodePage>
+          <ZeroTerminate>1</ZeroTerminate>
+          <Address>1d08afe0</Address>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>90820</ID>
+              <Description>"atkId_Bullet"</Description>
+              <LastState Value="10070" RealAddress="1D08AFE0"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+0</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90821</ID>
+              <Description>"sfxId_Bullet"</Description>
+              <LastState Value="20197" RealAddress="1D08AFE4"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+4</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90822</ID>
+              <Description>"sfxId_Hit"</Description>
+              <LastState Value="20297" RealAddress="1D08AFE8"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+8</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90823</ID>
+              <Description>"sfxId_Flick"</Description>
+              <LastState Value="-1" RealAddress="1D08AFEC"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90824</ID>
+              <Description>"life"</Description>
+              <LastState Value="1.100000024" RealAddress="1D08AFF0"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+10</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90825</ID>
+              <Description>"dist"</Description>
+              <LastState Value="10" RealAddress="1D08AFF4"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+14</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90826</ID>
+              <Description>"shootInterval"</Description>
+              <LastState Value="0" RealAddress="1D08AFF8"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+18</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90827</ID>
+              <Description>"gravityInRange"</Description>
+              <LastState Value="0" RealAddress="1D08AFFC"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+1c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90828</ID>
+              <Description>"gravityOutRange"</Description>
+              <LastState Value="0" RealAddress="1D08B000"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+20</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90829</ID>
+              <Description>"hormingStopRange"</Description>
+              <LastState Value="1" RealAddress="1D08B004"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+24</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90830</ID>
+              <Description>"initVellocity"</Description>
+              <LastState Value="4" RealAddress="1D08B008"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+28</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90831</ID>
+              <Description>"accelInRange"</Description>
+              <LastState Value="40" RealAddress="1D08B00C"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+2c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90832</ID>
+              <Description>"accelOutRange"</Description>
+              <LastState Value="40" RealAddress="1D08B010"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+30</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90833</ID>
+              <Description>"maxVellocity"</Description>
+              <LastState Value="10" RealAddress="1D08B014"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+34</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90834</ID>
+              <Description>"minVellocity"</Description>
+              <LastState Value="4" RealAddress="1D08B018"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+38</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90835</ID>
+              <Description>"accelTime"</Description>
+              <LastState Value="0.3199999928" RealAddress="1D08B01C"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+3c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90836</ID>
+              <Description>"homingBeginDist"</Description>
+              <LastState Value="1" RealAddress="1D08B020"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+40</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90837</ID>
+              <Description>"hitRadius"</Description>
+              <LastState Value="0.1000000015" RealAddress="1D08B024"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+44</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90838</ID>
+              <Description>"hitRadiusMax"</Description>
+              <LastState Value="-1" RealAddress="1D08B028"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+48</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90839</ID>
+              <Description>"spreadTime"</Description>
+              <LastState Value="0" RealAddress="1D08B02C"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+4c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90840</ID>
+              <Description>"expDelay"</Description>
+              <LastState Value="0" RealAddress="1D08B030"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+50</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90841</ID>
+              <Description>"hormingOffsetRange"</Description>
+              <LastState Value="0" RealAddress="1D08B034"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+54</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90842</ID>
+              <Description>"dmgHitRecordLifeTime"</Description>
+              <LastState Value="0" RealAddress="1D08B038"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+58</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90843</ID>
+              <Description>"externalForce"</Description>
+              <LastState Value="0" RealAddress="1D08B03C"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+5c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90844</ID>
+              <Description>"spEffectIDForShooter"</Description>
+              <LastState Value="0" RealAddress="1D08B040"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+60</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90845</ID>
+              <Description>"autoSearchNPCThinkID"</Description>
+              <LastState Value="0" RealAddress="1D08B044"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+64</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90846</ID>
+              <Description>"HitBulletID"</Description>
+              <LastState Value="-1" RealAddress="1D08B048"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+68</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90847</ID>
+              <Description>"spEffectId0"</Description>
+              <LastState Value="0" RealAddress="1D08B04C"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+6c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90848</ID>
+              <Description>"spEffectId1"</Description>
+              <LastState Value="0" RealAddress="1D08B050"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+70</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90849</ID>
+              <Description>"spEffectId2"</Description>
+              <LastState Value="0" RealAddress="1D08B054"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+74</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90850</ID>
+              <Description>"spEffectId3"</Description>
+              <LastState Value="0" RealAddress="1D08B058"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+78</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90851</ID>
+              <Description>"spEffectId4"</Description>
+              <LastState Value="0" RealAddress="1D08B05C"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+7c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90852</ID>
+              <Description>"numShoot"</Description>
+              <LastState Value="1" RealAddress="1D08B060"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+80</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90853</ID>
+              <Description>"homingAngle"</Description>
+              <LastState Value="20" RealAddress="1D08B062"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+82</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90854</ID>
+              <Description>"shootAngle"</Description>
+              <LastState Value="0" RealAddress="1D08B064"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+84</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90855</ID>
+              <Description>"shootAngleInterval"</Description>
+              <LastState Value="0" RealAddress="1D08B066"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+86</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90856</ID>
+              <Description>"shootAngleXInterval"</Description>
+              <LastState Value="0" RealAddress="1D08B068"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>+88</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90857</ID>
+              <Description>"damageDamp"</Description>
+              <LastState Value="0" RealAddress="1D08B06A"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>+8a</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90858</ID>
+              <Description>"spelDamageDamp"</Description>
+              <LastState Value="0" RealAddress="1D08B06B"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>+8b</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90859</ID>
+              <Description>"fireDamageDamp"</Description>
+              <LastState Value="0" RealAddress="1D08B06C"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>+8c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90860</ID>
+              <Description>"thunderDamageDamp"</Description>
+              <LastState Value="0" RealAddress="1D08B06D"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>+8d</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90861</ID>
+              <Description>"staminaDamp"</Description>
+              <LastState Value="0" RealAddress="1D08B06E"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>+8e</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90862</ID>
+              <Description>"knockbackDamp"</Description>
+              <LastState Value="0" RealAddress="1D08B06F"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>+8f</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90863</ID>
+              <Description>"shootAngleXZ"</Description>
+              <LastState Value="0" RealAddress="1D08B070"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>+90</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90864</ID>
+              <Description>"lockShootLimitAng"</Description>
+              <LastState Value="30" RealAddress="1D08B071"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>+91</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90865</ID>
+              <Description>"isPenetrate"</Description>
+              <LastState Value="0" RealAddress="1D08B072"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>+92</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90866</ID>
+              <Description>"prevVelocityDirRate"</Description>
+              <LastState Value="0" RealAddress="1D08B073"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>+93</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90867</ID>
+              <Description>"atkAttribute"</Description>
+              <LastState Value="4" RealAddress="1D08B074"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>+94</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90868</ID>
+              <Description>"spAttribute"</Description>
+              <LastState Value="3" RealAddress="1D08B075"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>+95</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90869</ID>
+              <Description>"Material_AttackType"</Description>
+              <LastState Value="0" RealAddress="1D08B076"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>+96</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90870</ID>
+              <Description>"Material_AttackMaterial"</Description>
+              <LastState Value="5" RealAddress="1D08B077"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>+97</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90871</ID>
+              <Description>"Material_Size"</Description>
+              <LastState Value="0" RealAddress="1D08B078"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>+98</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90872</ID>
+              <Description>"launchConditionType"</Description>
+              <LastState Value="0" RealAddress="1D08B079"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>+99</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90873</ID>
+              <Description>"FollowType"</Description>
+              <LastState Value="0" RealAddress="1D08B07A"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Binary</VariableType>
+              <BitStart>0</BitStart>
+              <BitLength>3</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+9a</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90874</ID>
+              <Description>"EmittePosType"</Description>
+              <LastState Value="0" RealAddress="1D08B07A"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Binary</VariableType>
+              <BitStart>3</BitStart>
+              <BitLength>3</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+9a</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90875</ID>
+              <Description>"isAttackSFX"</Description>
+              <LastState Value="0" RealAddress="1D08B07A"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Binary</VariableType>
+              <BitStart>6</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+9a</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90876</ID>
+              <Description>"isEndlessHit"</Description>
+              <LastState Value="0" RealAddress="1D08B07A"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Binary</VariableType>
+              <BitStart>7</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+9a</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90877</ID>
+              <Description>"isPenetrateMap"</Description>
+              <LastState Value="0" RealAddress="1D08B07B"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Binary</VariableType>
+              <BitStart>0</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+9b</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90878</ID>
+              <Description>"isHitBothTeam"</Description>
+              <LastState Value="0" RealAddress="1D08B07B"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Binary</VariableType>
+              <BitStart>1</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+9b</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90879</ID>
+              <Description>"isUseSharedHitList"</Description>
+              <LastState Value="0" RealAddress="1D08B07B"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Binary</VariableType>
+              <BitStart>2</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+9b</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90880</ID>
+              <Description>"isUseMultiDmyPolyIfPlace"</Description>
+              <LastState Value="0" RealAddress="1D08B07B"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Binary</VariableType>
+              <BitStart>3</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+9b</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90881</ID>
+              <Description>"attachEffectType"</Description>
+              <LastState Value="0" RealAddress="1D08B07B"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Binary</VariableType>
+              <BitStart>4</BitStart>
+              <BitLength>2</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+9b</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90882</ID>
+              <Description>"isHitForceMagic"</Description>
+              <LastState Value="0" RealAddress="1D08B07B"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Binary</VariableType>
+              <BitStart>6</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+9b</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90883</ID>
+              <Description>"isIgnoreSfxIfHitWater"</Description>
+              <LastState Value="0" RealAddress="1D08B07B"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Binary</VariableType>
+              <BitStart>7</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+9b</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90884</ID>
+              <Description>"isIgnoreMoveStateIfHitWater"</Description>
+              <LastState Value="0" RealAddress="1D08B07C"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Binary</VariableType>
+              <BitStart>0</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+9c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90885</ID>
+              <Description>"isHitDarkForceMagic"</Description>
+              <LastState Value="0" RealAddress="1D08B07C"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>Binary</VariableType>
+              <BitStart>1</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>+9c</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>SpEffectOffset</Name>
+      <Address>006F0030</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>ArmorOffset</Name>
+      <Address>026A0000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>SpellOffset</Name>
+      <Address>00690000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>VectorAoB</Name>
+      <Address>00670010</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>TestCode</Name>
+      <Address>0040F578</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseF</Name>
+      <Address>0137A620</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>mypointer</Name>
+      <Address>0CB20188</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>newmem2</Name>
+      <Address>18EF0000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>newmem1</Name>
+      <Address>18B80020</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>newmem9</Name>
+      <Address>19400000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>AttackAddr</Name>
+      <Address>19400000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>addressG</Name>
+      <Address>18B80000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>GoodsStructure</Name>
+      <Address>05ABD570</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>addressE</Name>
+      <Address>18B80000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>address</Name>
+      <Address>18B80020</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>EscapeAddressToUse</Name>
+      <Address>18EF0000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Effect</Name>
+      <Address>00DBE5C0</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Goods</Name>
+      <Address>004F6097</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Bullet</Name>
+      <Address>01006196</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Attack</Name>
+      <Address>00E485DD</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>World</Name>
+      <Address>00D38CF3</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Move0</Name>
+      <Address>00FCAD71</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Move</Name>
+      <Address>00FCAD76</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>ChrIni</Name>
+      <Address>00D1F982</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Anim</Name>
+      <Address>007403B0</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>lastdroppeditem</Name>
+      <Address>00DC4AAA</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL</Name>
+      <Address>013784D2</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL2</Name>
+      <Address>013784D3</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL3</Name>
+      <Address>013784E9</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL4</Name>
+      <Address>013784EA</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL5</Name>
+      <Address>013784EB</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL6</Name>
+      <Address>013784EC</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL7</Name>
+      <Address>013784ED</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL8</Name>
+      <Address>013784EE</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL9</Name>
+      <Address>013784E4</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL0</Name>
+      <Address>013784E5</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL11</Name>
+      <Address>013784E6</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL12</Name>
+      <Address>01376EE7</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL13</Name>
+      <Address>013784E7</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>CHRDBGALL14</Name>
+      <Address>013784E8</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>GameFlagData</Name>
+      <Address>1532001D</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>GameFlagAOB</Name>
+      <Address>00D38C43</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseA</Name>
+      <Address>012E29E8</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseB</Name>
+      <Address>01378700</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseC</Name>
+      <Address>013784A0</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseD</Name>
+      <Address>0137855C</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseE</Name>
+      <Address>0137E204</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseX</Name>
+      <Address>0137D644</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseZ</Name>
+      <Address>0137D648</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BaseL</Name>
+      <Address>0137D6C8</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>NewKnockBackMode</Name>
+      <Address>0137D648</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>selected_weapon</Name>
+      <Address>1BE90000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>selected_weapon_var_name</Name>
+      <Address>1BE90030</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>selected_attack</Name>
+      <Address>006B0000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>selected_attack_var_name</Name>
+      <Address>006B0010</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+  <LuaScript>AddressList = getAddressList()
+attack_base_entry = AddressList.getMemoryRecordByDescription('Bullet Base')
+
+AddressList.getMemoryRecordByDescription('Open').OnActivate = function(record, before, currentstate)
+  vfxbase_aob = AOBScan("42 55 4C 4C 45 54 5F 50 41 52 41 4D 5F 53 54")
+  AddressList.getMemoryRecordByDescription('BulletParam').setAddress(vfxbase_aob[0])
+  attack_param_pc_indicies_addr = tonumber(vfxbase_aob[0], 16)+0x24
+  return true
+end
+
+attack_paramentry_offset_hex = 0
+attack_name = "UNKNOWNNAME"
+
+--on attack selection, get address from aob, and save default atribs
+selected_attack = AddressList.getMemoryRecordByDescription('Select effect and check the box')
+selected_attack.OnActivate = function(record, before, currentstate)
+  --get id from selected attack dropdown
+  weapon_id = readInteger(selected_attack.getCurrentAddress())
+  if weapon_id ~= nil then
+    --find in PARAM index array
+    for id_i=0,632 do
+      if readInteger(attack_param_pc_indicies_addr+id_i*12) == weapon_id then
+        attack_paramentry_offset = readInteger(attack_param_pc_indicies_addr+id_i*12+4)-0x30
+        break
+      end
+    end
+    --use offset to get entry
+    attack_paramentry_address = attack_param_pc_indicies_addr+attack_paramentry_offset
+    --set Attack Base address
+    attack_base_entry.setAddress(string.format("%x",attack_paramentry_address))
+    --save attack paramentry offset for use in CE
+    attack_paramentry_offset_hex = string.format("%x",attack_paramentry_offset)
+    --save the current (original) stats for the attack
+    table_string_disable = GenerateStringForAttack()
+  end
+
+  return false
+end
+
+
+
+table_string_disable = ""
+
+function GenerateStringForAttack()
+  local table_string = "{$lua}\n" .. "AddressList = getAddressList()\n" .. "bullet_param_pcbase_addr = AddressList.getMemoryRecordByDescription('BulletParam').getCurrentAddress()+0x24\n"
+
+  --iterate through all children of the attack base (all variables in the struct)
+  --genreate lua because its really the only way for code that required dynamic param bases
+  for i=0,52 do
+
+    --handle the type cases
+    if attack_base_entry[i].Type == vtSingle then
+      local read_bytes = readFloat(attack_base_entry[i].CurrentAddress)
+      table_string = table_string .. "writeFloat(bullet_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[i].Address,2),16)) .. ","
+      table_string = table_string .. string.format("%f) --%s\n", read_bytes, attack_base_entry[i].Description)
+    elseif attack_base_entry[i].Type == vtDword then
+      local read_bytes = readInteger(attack_base_entry[i].CurrentAddress)
+      table_string = table_string .. "writeInteger(bullet_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[i].Address,2),16)) .. ","
+      table_string = table_string .. string.format("%d) --%s\n", read_bytes, attack_base_entry[i].Description)
+    elseif attack_base_entry[i].Type == vtWord then
+      local read_bytes = readSmallInteger(attack_base_entry[i].CurrentAddress)
+      table_string = table_string .. "writeSmallInteger(bullet_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[i].Address,2),16)) .. ","
+      table_string = table_string .. string.format("%d) --%s\n", read_bytes, attack_base_entry[i].Description)
+    elseif attack_base_entry[i].Type == vtByte then
+      local read_bytes = readBytes(attack_base_entry[i].CurrentAddress, 1, true)
+      table_string = table_string .. "writeBytes(bullet_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[i].Address,2),16)) .. ","
+      table_string = table_string .. string.format("%d) --%s\n", read_bytes[1], attack_base_entry[i].Description)
+    else
+      print("WARNING unknown type at i="..i)
+    end
+  end
+
+  --count the flags bytes as a single 3 byte chunk
+  table_string = table_string .. "writeBytes(bullet_param_pcbase_addr+0x"..string.format("%x",tonumber(attack_paramentry_offset_hex,16)+tonumber(string.sub(attack_base_entry[53].Address,2),16)) .. ","
+  local flag_bytes = readBytes(attack_base_entry[53].CurrentAddress, 3, true)
+  table_string = table_string .. string.format("%d, %d, %d) --flags\n", flag_bytes[1], flag_bytes[2], flag_bytes[3])
+
+  table_string = table_string .. "{$asm}\n"
+
+  return table_string
+end
+
+
+--after attack weapon atribs, user triggers the generation of the CE script generation for the changes
+generate_code_entry = AddressList.getMemoryRecordByDescription('Generate CE Code')
+generate_code_entry.OnActivate = function(record, before, currentstate)
+  local table_string = "[ENABLE]\n"..
+                       GenerateStringForAttack() .. "\n" ..
+                       "[DISABLE]\n" ..
+                       table_string_disable
+
+  --get varable name for attack and fix up
+  local variable_name = readString(generate_code_entry.getCurrentAddress(), 100, false)
+  variable_name = variable_name:gsub(" ","_"):lower()
+  --insert variable name into table
+  table_string = table_string:gsub(attack_name,variable_name)
+
+  print(table_string)
+  return false
+end
+</LuaScript>
+</CheatTable>
