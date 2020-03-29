@@ -21,6 +21,7 @@
 #include "Menu/SavedCharacters.h"
 #include "Files.h"
 #include "InputUtil.h"
+#include "SpellDesyncFixes.h"
 
 /*
     Called from DllMain when the plugin DLL is first loaded into memory (PROCESS_ATTACH case).
@@ -106,6 +107,7 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     InvisBackstabFix::start();
     AnimationEdits::alter_animation_speeds();
     AnimationEdits::disable_whiff_animations();
+    SpellDesync::start();
     if (AnimationEdits::gesture_cancelling) {
         // Perform TAE edits to player animations to enable gesture cancelling
         AnimationEdits::enable_gesture_cancelling();

@@ -79,6 +79,7 @@
     <ClCompile Include="src\InputUtil.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="src\SpellDesyncFixes.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3d11-wrapper\include\d3d11\exports.h" />
@@ -89,6 +90,7 @@
     <ClInclude Include="include\DeadAngles.h" />
     <ClInclude Include="include\EquipmentUnlock.h" />
     <ClInclude Include="include\InvisibleBackstabAttackFix.h" />
+    <ClInclude Include="include\SpellDesyncFixes.h" />
     <None Include="..\README.md" />
     <None Include="include\AnimationEdits.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -204,6 +206,7 @@
     <MASM Include="src\Menu\SavedCharactersASM.asm" />
     <MASM Include="src\PhantomUnshackleASM.asm" />
     <MASM Include="src\InputUtilASM.asm" />
+    <MASM Include="src\SpellDesyncFixesASM.asm" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

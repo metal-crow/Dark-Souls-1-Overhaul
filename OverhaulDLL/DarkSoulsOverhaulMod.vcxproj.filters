@@ -114,6 +114,9 @@
     <ClCompile Include="src\InputUtil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\SpellDesyncFixes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3d11-wrapper\include\d3d11\exports.h">
@@ -138,6 +141,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\InvisibleBackstabAttackFix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SpellDesyncFixes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -239,6 +245,9 @@
       <Filter>Source Files</Filter>
     </MASM>
     <MASM Include="src\GameDataASM.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="src\SpellDesyncFixesASM.asm">
       <Filter>Source Files</Filter>
     </MASM>
   </ItemGroup>
