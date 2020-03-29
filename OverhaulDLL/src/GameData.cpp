@@ -34,9 +34,6 @@ uint64_t Game::fmod_event64_base = NULL;
 // Base address for player character data
 uint64_t Game::player_char_base = NULL;
 
-// Base address for world character data
-uint64_t Game::world_char_base = NULL;
-
 // Base address for character class data
 uint64_t Game::char_class_base = NULL;
 
@@ -82,17 +79,6 @@ void Game::init()
     Game::ds1_base = (uint64_t)sp::mem::get_process_base();
 
     Game::fmod_event64_base = (uint64_t)GetModuleHandle("fmod_event64.dll");
-
-    // Base addr for world character data
-    void* world_char_base_sp = sp::mem::aob_scan("48 8B 05 ? ? ? ? 48 8B 48 68 48 85 C9 0F 84 ? ? ? ? 48 39 5E 10 0F 84 ? ? ? ? 48");
-    if (world_char_base_sp == NULL) {
-        FATALERROR("world_char_base_sp is null");
-    }
-    Game::world_char_base = ((uint64_t)world_char_base_sp + *(uint32_t*)((uint64_t)world_char_base_sp + 3) + 7);
-    //XXX: crappy heuristic for checking if we got a valid ptr (game main has been entered)
-    if (Game::world_char_base > Game::ds1_base*1.5) {
-        FATALERROR("world_char_base_sp is an invalid pointer");
-    }
 
     // Base addr for character class data
     void* char_class_base_sp = sp::mem::aob_scan("48 8B 05 ? ? ? ? 48 85 C0 ? ? F3 0F 58 80 AC 00 00 00");

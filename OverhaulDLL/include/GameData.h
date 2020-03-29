@@ -103,7 +103,7 @@ public:
     static uint64_t player_char_base;
 
     // Base address for world character data
-    static uint64_t world_char_base;
+    static const uint64_t world_char_base = 0x141d151b0;
 
     // Base address for world character data
     static uint64_t char_class_base;
