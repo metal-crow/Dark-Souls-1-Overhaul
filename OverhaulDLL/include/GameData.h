@@ -112,6 +112,8 @@ public:
 
     static uint64_t game_data_man;
 
+    static uint64_t world_chr_man_imp;
+
     static const uint64_t player_animation_mediator_loading = 0x3790E2;
 
     static uint64_t player_animation_mediator;
@@ -223,6 +225,14 @@ public:
     static int32_t* get_saved_chars_menu_flag();
 
     static uint8_t* get_saved_chars_preview_data();
+
+    static uint32_t get_pc_playernum();
+
+    static uint64_t get_connected_player(uint32_t i);
+
+    static int32_t convert_handle_to_playernum(uint32_t handle);
+
+    static uint32_t convert_playernum_to_handle(uint32_t playernum);
 
     /*
      * Help speedup some functions by, whenever we're loaded into an area,
