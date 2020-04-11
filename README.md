@@ -62,3 +62,5 @@ This solution is imperfect, as areas where you could not do multiplayer before b
 
 * Support for custom  archive file loading  
 Specify folder location + filenames to use, and the alternate path will be used to load them
+
+* Fix to prevent homing spells from desyncing

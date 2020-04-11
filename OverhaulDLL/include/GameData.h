@@ -139,7 +139,8 @@ public:
     // Multiplayer node count
     static int node_count;
 
-
+    //Const handle for the PC
+    static const uint32_t PC_Handle = 0x10044000;
 
     /////////////////////////////////////////
     /////////////// FUNCTIONS ///////////////

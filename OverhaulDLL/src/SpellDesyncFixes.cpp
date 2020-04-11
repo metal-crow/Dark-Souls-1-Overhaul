@@ -76,10 +76,6 @@ void homing_spell_trigger_injection_helper_function(uint32_t target, uint8_t bul
 
     //Send the custom packet
     sendType1NetMessage(&homingPkt);
-
-    char buf[150];
-    snprintf(buf, 150, "Homing bullet fired. Sending spell pkt. Owner No=%d Target handle=%x Target No=%d Number=%d\n", homingPkt.owner, target, homingPkt.target, bulletNum);
-    global::cmd_out << buf;
 }
 
 
@@ -109,10 +105,6 @@ void type1_p2pPacket_parse_injection_helper_function(CustomSpellPacketData* bull
 
         BulletNetworkInfo_Array[received_SpellData_count].number = (uint8_t)bullet_packet->bullet_number;
         received_SpellData_count++;
-
-        char buf[100];
-        snprintf(buf, 100, "Got spell pkt. Owner=%x Target=%x Number=%d\n", bullet_packet->owner, bullet_packet->target, bullet_packet->bullet_number);
-        global::cmd_out  << buf;
     }
 }
 
@@ -120,23 +112,21 @@ void type1_p2pPacket_parse_injection_helper_function(CustomSpellPacketData* bull
 // Check if the current bullet being checked to fire has been received as a network packet
 void homing_spell_checkIfTriggered_injection_helper_function(uint8_t* bullet, uint32_t* bulletParamEntry)
 {
-    char buf[100];
-    if (received_SpellData_count > 0) {
-        snprintf(buf, 100, "Comparing bullet. Owner: %x Number: %d\n", *(uint32_t*)(bullet + 0x9C), *(uint8_t*)(bullet + 0x8));
-        global::cmd_out << buf;
+    uint32_t bullet_owner = *(uint32_t*)(bullet + 0x9C);
+    uint8_t bullet_num = *(uint8_t*)(bullet + 0x8);
+
+    //always allow if the owner is the PC
+    if (bullet_owner == Game::PC_Handle) {
+        return;
     }
 
+    //check if this bullet was received as a packet
     for (uint32_t i = 0; i < received_SpellData_count; i++) {
         //if the owner and bullet number match
-        if (*(uint32_t*)(bullet + 0x9C) == BulletNetworkInfo_Array[i].owner_id &&
-            *(uint8_t*)(bullet + 0x8) == BulletNetworkInfo_Array[i].number
-            )
+        if (bullet_owner == BulletNetworkInfo_Array[i].owner_id && bullet_num == BulletNetworkInfo_Array[i].number)
         {
             //set the target
             *bulletParamEntry = BulletNetworkInfo_Array[i].target_id;
-
-            snprintf(buf, 100, "Fire packet bullet. Target=%x\n", BulletNetworkInfo_Array[i].target_id);
-            global::cmd_out << buf;
 
             //remove from the list and shift the rest to fill in spot
             for (uint32_t j = i; j < received_SpellData_count - 1; j++)
@@ -146,5 +136,11 @@ void homing_spell_checkIfTriggered_injection_helper_function(uint8_t* bullet, ui
             received_SpellData_count--;
             return;
         }
+    }
+
+    //deny any homing bullet from another player that we don't get a packet for
+    if (bullet_owner > Game::PC_Handle && bullet_owner < Game::PC_Handle + 10) {
+        *bulletParamEntry = -1;
+        return;
     }
 }

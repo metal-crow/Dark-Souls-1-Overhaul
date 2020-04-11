@@ -797,7 +797,7 @@ uint64_t Game::get_connected_player(uint32_t i) {
 
 int32_t Game::convert_handle_to_playernum(uint32_t handle) {
     //PC specific handle
-    if (handle == 0x10044000) {
+    if (handle == PC_Handle) {
         return Game::get_pc_playernum();
     }
     else {
@@ -817,7 +817,7 @@ int32_t Game::convert_handle_to_playernum(uint32_t handle) {
 
 uint32_t Game::convert_playernum_to_handle(uint32_t playernum) {
     if (playernum == Game::get_pc_playernum()) {
-        return 0x10044000; //const handle for PC
+        return PC_Handle; //const handle for PC
     }
     else {
         //loop through the conncted players and look for matching playernum
