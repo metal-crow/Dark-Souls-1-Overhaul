@@ -41,6 +41,8 @@ uint64_t Game::frpg_net_base = NULL;
 
 uint64_t Game::game_data_man = NULL;
 
+uint64_t Game::world_chr_man_imp = NULL;
+
 // Player character status (loading, human, co-op, invader, hollow)
 sp::mem::pointer<int32_t> Game::player_char_status;
 
@@ -118,6 +120,8 @@ void Game::init()
     //sp::mem::code::x64::inject_jmp_14b(write_address, &player_animation_mediator_loading_injection_return, 1, &player_animation_mediator_loading_injection);
 
     Game::game_data_man = Game::ds1_base + 0x1D278F0;
+
+    Game::world_chr_man_imp = Game::ds1_base + 0x1d151b0;
 }
 
 // Initialize the pointer to the TAE struture. This isn't loaded until around the time the main menu is hit, so needs to be delayed
@@ -197,6 +201,8 @@ static int32_t* area_id_cache = NULL;
 static int32_t* mp_id_cache = NULL;
 static int32_t* saved_chars_menu_flag_cache = NULL;
 static uint8_t* saved_chars_preview_data_cache = NULL;
+static uint32_t* pc_playernum_cache = NULL;
+static uint64_t connected_players_array_cache = NULL;
 
 void Game::preload_function_caches() {
     global::cmd_out << "Cache loading\n";
@@ -227,6 +233,10 @@ void Game::preload_function_caches() {
     Game::get_saved_chars_menu_flag();
     saved_chars_preview_data_cache = NULL;
     Game::get_saved_chars_preview_data();
+    pc_playernum_cache = NULL;
+    Game::get_pc_playernum();
+    connected_players_array_cache = NULL;
+    Game::get_connected_player(0);
 
     Sleep(10);
     //this pointer is a bit late to resolve on load
@@ -750,5 +760,76 @@ uint8_t* Game::get_saved_chars_preview_data() {
     else {
         saved_chars_preview_data_cache = saved_chars_preview_data.resolve();
         return saved_chars_preview_data_cache;
+    }
+}
+
+uint32_t Game::get_pc_playernum() {
+    if (pc_playernum_cache) {
+        return *pc_playernum_cache;
+    }
+
+    sp::mem::pointer pc_playernum = sp::mem::pointer<uint32_t>((void*)(Game::game_data_man), { 0x10, 0x10 });
+    if (pc_playernum.resolve() == NULL) {
+        FATALERROR("Unable to pc_playernum.");
+        return NULL;
+    }
+    else {
+        pc_playernum_cache = pc_playernum.resolve();
+        return *pc_playernum_cache;
+    }
+}
+
+uint64_t Game::get_connected_player(uint32_t i) {
+    if (connected_players_array_cache) {
+        return *(uint64_t*)(connected_players_array_cache + (0x38 * (i + 1)));
+    }
+
+    sp::mem::pointer connected_players_array = sp::mem::pointer<uint64_t>((void*)(Game::world_chr_man_imp), { 0x68, 0x18 });
+    if (connected_players_array.resolve() == NULL) {
+        FATALERROR("Unable to connected_players_array.");
+        return NULL;
+    }
+    else {
+        connected_players_array_cache = *(uint64_t*)connected_players_array.resolve();
+        return *(uint64_t*)(connected_players_array_cache + (0x38 * (i + 1)));
+    }
+}
+
+int32_t Game::convert_handle_to_playernum(uint32_t handle) {
+    //PC specific handle
+    if (handle == 0x10044000) {
+        return Game::get_pc_playernum();
+    }
+    else {
+        //loop through the conncted players and look for matching handle
+        for (int i = 0; i < 5; i++) {
+            uint64_t guest = Game::get_connected_player(i);
+            if (guest != NULL) {
+                uint32_t guestHandle = *(uint32_t*)(guest + 8);
+                if (guestHandle == handle) {
+                    return *(uint32_t*)((*(uint64_t*)(guest + 0x578)) + 0x10);
+                }
+            }
+        }
+        return -1;
+    }
+}
+
+uint32_t Game::convert_playernum_to_handle(uint32_t playernum) {
+    if (playernum == Game::get_pc_playernum()) {
+        return 0x10044000; //const handle for PC
+    }
+    else {
+        //loop through the conncted players and look for matching playernum
+        for (int i = 0; i < 5; i++) {
+            uint64_t guest = Game::get_connected_player(i);
+            if (guest != NULL) {
+                uint32_t guestNo = *(uint32_t*)((*(uint64_t*)(guest + 0x578)) + 0x10);
+                if (guestNo == playernum) {
+                    return *(uint32_t*)(guest + 8);
+                }
+            }
+        }
+        return 0;
     }
 }
