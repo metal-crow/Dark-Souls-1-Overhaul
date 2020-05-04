@@ -12,6 +12,17 @@
 #include <unordered_map>
 #include <set>
 
+void AnimationEdits::start()
+{
+    AnimationEdits::alter_animation_speeds();
+    AnimationEdits::disable_whiff_animations();
+    AnimationEdits::fix_curvedsword_infinites();
+    if (AnimationEdits::gesture_cancelling) {
+        // Perform TAE edits to player animations to enable gesture cancelling
+        AnimationEdits::enable_gesture_cancelling();
+    }
+}
+
 // Animation IDs for the default set of gesture animations in the game
 const uint32_t AnimationEdits::gesture_anim_ids[15] = { 6800, 6801, 6802, 6803, 6804, 6805, 6806, 6807, 6808, 6809, 6810, 6815, 6820, 6825, 6830 };
 
@@ -161,4 +172,29 @@ void AnimationEdits::disable_whiff_animations() {
     uint8_t *write_address = (uint8_t*)(AnimationEdits::animation_whiff_set_offset + Game::ds1_base);
     uint8_t jmp_patch[2] = { 0xEB, 0x54 };
     sp::mem::patch_bytes(write_address, jmp_patch, 2);
+}
+
+extern "C" {
+    uint64_t TAE_GetDamageRate_StunLen_finish_return;
+    void TAE_GetDamageRate_StunLen_finish_injection();
+    float TAE_GetDamageRate_StunLen_finish_helper_function(float);
+}
+
+void AnimationEdits::fix_curvedsword_infinites() {
+    global::cmd_out << Mod::output_prefix << ("Fix curved swords stun time...\n");
+
+    uint8_t *write_address = (uint8_t*)(AnimationEdits::TAE_GetDamageRate_StunLen_finish_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &TAE_GetDamageRate_StunLen_finish_return, 0, &TAE_GetDamageRate_StunLen_finish_injection);
+}
+
+//increase the stun length so that the knockback is increased
+float TAE_GetDamageRate_StunLen_finish_helper_function(float current_stun)
+{
+    uint32_t weaponid = Game::get_last_attack_weapon_id();
+
+    //if this is a curved sword (-QFS)
+    if ((weaponid >= 400000 && weaponid < 406000) || weaponid == 9010000) {
+        return (current_stun + 0.1f);
+    }
+    return current_stun;
 }
