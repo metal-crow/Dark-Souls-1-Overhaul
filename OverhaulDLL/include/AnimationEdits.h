@@ -30,6 +30,9 @@ public:
     // Animation IDs for the default set of gesture animations in the game
     const static uint32_t gesture_anim_ids[15];
 
+    static void start();
+
+private:
     // Enables gesture cancelling via rolling
     static void enable_gesture_cancelling();
 
@@ -37,9 +40,12 @@ public:
 
     static void disable_whiff_animations();
 
+    static void fix_curvedsword_infinites();
+
 private:
     static const uint64_t animation_entry_set_offset = 0x43E281; //Triggered when an animation entry in the table has it's speed set
     static const uint64_t animation_whiff_set_offset = 0x386CD6;
+    static const uint64_t TAE_GetDamageRate_StunLen_finish_offset = 0x2dd71f;
 };
 
 #endif

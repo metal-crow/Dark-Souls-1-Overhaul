@@ -116,6 +116,8 @@ public:
 
     static const uint64_t player_animation_mediator_loading = 0x3790E2;
 
+    static const uint64_t calculate_attack_damage_offset = 0x2a8ead6;
+
     static uint64_t player_animation_mediator;
 
     // Player character status (loading, human, co-op, invader, hollow)
@@ -234,6 +236,8 @@ public:
     static int32_t convert_handle_to_playernum(uint32_t handle);
 
     static uint32_t convert_playernum_to_handle(uint32_t playernum);
+
+    static uint32_t get_last_attack_weapon_id();
 
     /*
      * Help speedup some functions by, whenever we're loaded into an area,

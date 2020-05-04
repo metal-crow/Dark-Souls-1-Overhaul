@@ -105,13 +105,8 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     DeadAngles::start();
     EquipmentUnlock::start();
     InvisBackstabFix::start();
-    AnimationEdits::alter_animation_speeds();
-    AnimationEdits::disable_whiff_animations();
+    AnimationEdits::start();
     SpellDesync::start();
-    if (AnimationEdits::gesture_cancelling) {
-        // Perform TAE edits to player animations to enable gesture cancelling
-        AnimationEdits::enable_gesture_cancelling();
-    }
     PhantomUnshackle::start();
     if (Mod::disable_low_fps_disconnect) {
         Game::disable_low_fps_disconnect(true);

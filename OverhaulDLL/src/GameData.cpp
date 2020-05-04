@@ -55,6 +55,10 @@ extern "C" {
     uint64_t* player_animation_mediator_cptr;
     uint64_t player_animation_mediator_loading_injection_return;
     void player_animation_mediator_loading_injection();
+
+    uint32_t last_attack_weaponid;
+    uint64_t calculate_attack_damage_injection_return;
+    void calculate_attack_damage_injection();
 }
 
 // Time Action Events for the player character's animations
@@ -122,6 +126,11 @@ void Game::init()
     Game::game_data_man = Game::ds1_base + 0x1D278F0;
 
     Game::world_chr_man_imp = Game::ds1_base + 0x1d151b0;
+
+    //hook the code that calculates attack damage and save off the weapon id used for the attack
+    last_attack_weaponid = -1;
+    uint8_t* write_address = (uint8_t*)(Game::calculate_attack_damage_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &calculate_attack_damage_injection_return, 1, &calculate_attack_damage_injection);
 }
 
 // Initialize the pointer to the TAE struture. This isn't loaded until around the time the main menu is hit, so needs to be delayed
@@ -832,4 +841,8 @@ uint32_t Game::convert_playernum_to_handle(uint32_t playernum) {
         }
         return 0;
     }
+}
+
+uint32_t Game::get_last_attack_weapon_id() {
+    return last_attack_weaponid;
 }
