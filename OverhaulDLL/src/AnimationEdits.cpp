@@ -187,14 +187,14 @@ void AnimationEdits::fix_curvedsword_infinites() {
     sp::mem::code::x64::inject_jmp_14b(write_address, &TAE_GetDamageRate_StunLen_finish_return, 0, &TAE_GetDamageRate_StunLen_finish_injection);
 }
 
-//increase the stun length so that the knockback is increased
+//decrease the stun length so that defender can roll escape
 float TAE_GetDamageRate_StunLen_finish_helper_function(float current_stun)
 {
     uint32_t weaponid = Game::get_last_attack_weapon_id();
 
-    //if this is a curved sword (-QFS)
+    //if this is a curved sword (except QFS)
     if ((weaponid >= 400000 && weaponid < 406000) || weaponid == 9010000) {
-        return (current_stun + 0.1f);
+        return (current_stun - 0.15f);
     }
     return current_stun;
 }
