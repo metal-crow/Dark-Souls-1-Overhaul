@@ -99,6 +99,58 @@ ret
 
 TAE_GetDamageRate_StunLen_finish_injection endp
 
+
+extern Calculate_movement_delta_helper_function: proc
+extern Calculate_movement_delta_return: qword
+
+PUBLIC Calculate_movement_delta_injection
+Calculate_movement_delta_injection proc
+
+;original code
+mov     rax, [rbx]
+lea     rdi, [rbx+140h]
+mov     rdx, rdi
+mov     rcx, rbx
+
+sub     rsp, 10h
+movdqu  [rsp], xmm0
+sub     rsp, 10h
+movdqu  [rsp], xmm1
+sub     rsp, 10h
+movdqu  [rsp], xmm2
+sub     rsp, 10h
+movdqu  [rsp], xmm3
+push    rax
+push    rcx
+push    rdx
+push    r8
+push    r9
+push    r10
+push    r11
+
+;args already set up for us
+call    Calculate_movement_delta_helper_function
+
+pop     r11
+pop     r10
+pop     r9
+pop     r8
+pop     rdx
+pop     rcx
+pop     rax
+movdqu  xmm3, [rsp]
+add     rsp, 10h
+movdqu  xmm2, [rsp]
+add     rsp, 10h
+movdqu  xmm1, [rsp]
+add     rsp, 10h
+movdqu  xmm0, [rsp]
+add     rsp, 10h
+
+jmp     Calculate_movement_delta_return
+
+Calculate_movement_delta_injection endp
+
 _TEXT    ENDS
 
 END

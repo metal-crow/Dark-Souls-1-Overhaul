@@ -17,6 +17,7 @@ void AnimationEdits::start()
     AnimationEdits::alter_animation_speeds();
     AnimationEdits::disable_whiff_animations();
     AnimationEdits::fix_curvedsword_infinites();
+    //AnimationEdits::fix_roll_distance();
     if (AnimationEdits::gesture_cancelling) {
         // Perform TAE edits to player animations to enable gesture cancelling
         AnimationEdits::enable_gesture_cancelling();
@@ -197,4 +198,43 @@ float TAE_GetDamageRate_StunLen_finish_helper_function(float current_stun)
         return (current_stun - 0.15f);
     }
     return current_stun;
+}
+
+extern "C" {
+    uint64_t Calculate_movement_delta_return;
+    void Calculate_movement_delta_injection();
+    void Calculate_movement_delta_helper_function(uint64_t, float*);
+}
+
+void AnimationEdits::fix_roll_distance() {
+    global::cmd_out << Mod::output_prefix << ("Correct roll distance...\n");
+
+    uint8_t *write_address = (uint8_t*)(AnimationEdits::Calculate_movement_delta_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &Calculate_movement_delta_return, 2, &Calculate_movement_delta_injection);
+}
+
+static const std::unordered_map<int32_t, const std::vector<float>> hka_reference_frames_distances = {
+    {700, {}}, //Roll forward(fast)
+    {701, {}}, //Roll backward(fast)
+    {702, {}}, //Roll left(fast)
+    {703, {}}, //Roll right(fast)
+
+    {710, {}}, //Roll forward(mid)
+    {711, {}}, //Roll backward(mid)
+    {712, {}}, //Roll left(mid)
+    {713, {}}, //Roll right(mid)
+
+    {720, {}}, //Roll forward(fat / slow)
+    {721, {}}, //Roll backward(fat / slow)
+    {722, {}}, //Roll left(fat / slow)
+    {723, {}}, //Roll right(fat / slow)
+
+    {735, {}}, //Roll forward(fast, Dark Wood Grain Ring)
+    {736, {}}, //Roll backward(fast, Dark Wood Grain Ring)
+    {737, {}}, //Roll left(fast, Dark Wood Grain Ring)
+    {738, {}}, //Roll right(fast, Dark Wood Grain Ring)
+};
+
+void Calculate_movement_delta_helper_function(uint64_t playerCtrl, float* movement_delta)
+{
 }
