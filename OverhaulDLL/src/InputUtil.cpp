@@ -91,22 +91,13 @@ extern "C" {
 void gather_DirectInput8GetDeviceState_helper(uint64_t arg) {
     uint64_t GetDeviceState_func = *(uint64_t*)(*(uint64_t*)(*(uint64_t*)(arg + 8) + 0) + 0x48);
     //inject it at the end of the func
-    sp::mem::code::x64::inject_jmp_14b((void*)(GetDeviceState_func+0x129), &intercept_IDirectInputDevice8GetDeviceState_inject_return, 1, &intercept_IDirectInputDevice8GetDeviceState_inject);
+    sp::mem::code::x64::inject_jmp_14b((void*)(GetDeviceState_func+0x141), &intercept_IDirectInputDevice8GetDeviceState_inject_return, 1, &intercept_IDirectInputDevice8GetDeviceState_inject);
 }
 
-
-void *xbase = NULL;
 
 // Initializes pointers and other data used to monitor gamepad input
 void initialize() {
     global::cmd_out << (Mod::output_prefix + "Initializing Input hooks...\n");
-
-    xbase = GetModuleHandle("XINPUT1_3.dll");
-    while (xbase == NULL) {
-        // Wait for XInput DLL to load, then save base address
-        xbase = GetModuleHandle("XINPUT1_3.dll");
-        Sleep(500);
-    }
 
     apply_function_intercepts();
 }
