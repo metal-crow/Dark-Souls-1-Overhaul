@@ -8,15 +8,15 @@ https://trello.com/b/hay0mA7U/general-todo
    
 ### Balance Changes and Suggestions:  
 https://docs.google.com/document/d/1qlg4kQDUq45ufqmX8PreXchwibFwJJ3ZzK0khrHGNTY/  
-    
-### Old (archived) Collaborative IDA database (using https://github.com/DGA-MI-SSI/YaCo v2.6):  
-https://gitlab.com/metal-crow/darksoulsremastered-ida-db
 
-### New (active) Collaborative Ghidra database
+### Collaborative Ghidra database
 https://github.com/soulsmods/Soulsborne-Modding-Wiki/wiki/Ghidra-Shared-Repo
 
 ### Custom Archive files (new SFX, Effects, etc):
 https://gitlab.com/metal-crow/darksoulsremastered-overhaul-archives
+
+### Requirments
+This requires the [Microsoft Visual C++ Redistributable for Visual Studio 2015-2019 ](https://aka.ms/vs/16/release/vc_redist.x64.exe)
 
 ## Changelist
 
@@ -64,3 +64,5 @@ This solution is imperfect, as areas where you could not do multiplayer before b
 Specify folder location + filenames to use, and the alternate path will be used to load them
 
 * Fix to prevent homing spells from desyncing
+
+* Fix to prevent curved swords from stunlocking
