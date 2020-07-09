@@ -11,7 +11,7 @@
 #ifndef DS1_OVERHAUL_INPUT_H_
     #define DS1_OVERHAUL_INPUT_H_
 
-#include "XInput.h"
+#include "Xinput_1_3.h"
 #define DIRECTINPUT_VERSION 0x800
 #include <dinput.h>
 
