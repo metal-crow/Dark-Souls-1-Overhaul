@@ -91,6 +91,7 @@
     <ClInclude Include="include\EquipmentUnlock.h" />
     <ClInclude Include="include\InvisibleBackstabAttackFix.h" />
     <ClInclude Include="include\SpellDesyncFixes.h" />
+    <ClInclude Include="include\Xinput_1_3.h" />
     <None Include="..\README.md" />
     <None Include="include\AnimationEdits.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
