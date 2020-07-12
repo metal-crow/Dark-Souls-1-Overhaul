@@ -18,54 +18,6 @@ void AnimationEdits::start()
     AnimationEdits::disable_whiff_animations();
     AnimationEdits::fix_curvedsword_infinites();
     //AnimationEdits::fix_roll_distance();
-    if (AnimationEdits::gesture_cancelling) {
-        // Perform TAE edits to player animations to enable gesture cancelling
-        AnimationEdits::enable_gesture_cancelling();
-    }
-}
-
-// Animation IDs for the default set of gesture animations in the game
-const uint32_t AnimationEdits::gesture_anim_ids[15] = { 6800, 6801, 6802, 6803, 6804, 6805, 6806, 6807, 6808, 6809, 6810, 6815, 6820, 6825, 6830 };
-
-// Gesture cancelling enabled/disabled
-bool AnimationEdits::gesture_cancelling = true;
-
-bool animation_edits_print_debug = false;
-
-// Enables gesture cancelling via rolling
-void AnimationEdits::enable_gesture_cancelling()
-{
-    int gestures_changed = 0;
-    if (Game::player_tae.is_initialized())
-    {
-        for (uint32_t id : gesture_anim_ids) {
-            int n_events = Game::player_tae.get_event_count_by_id(id);
-            for (int i = 0; i < n_events; i++) {
-                bool anim_updated = false;
-                if (Game::player_tae.get_event_type_by_id(id, i) == 0 &&
-                    (
-                        Game::player_tae.get_event_param_by_id(id, i, 0) == TAE_type0_param_values::allow_animation_cancel_events ||
-                        Game::player_tae.get_event_param_by_id(id, i, 0) == TAE_type0_param_values::cancel_by_rolling_or_backstepping
-                        )
-                    )
-                {
-                    Game::player_tae.set_event_start_by_id(id, i, 0.0f);
-                    if (animation_edits_print_debug)
-                        global::cmd_out << "Updated gesture " << std::to_string(id) << ", event " << std::to_string(i) << " to allow cancelling\n";
-                    if (!anim_updated) {
-                        anim_updated = true;
-                        gestures_changed++;
-                    }
-                }
-            }
-        }
-        if (gestures_changed < (sizeof(gesture_anim_ids) / sizeof(uint32_t))) {
-            FATALERROR("ERROR: Unable to enable gesture cancelling for some animations");
-        }
-    }
-    else {
-        FATALERROR("TAE not found: Unable to enable gesture cancelling");
-    }
 }
 
 
