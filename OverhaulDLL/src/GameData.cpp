@@ -61,9 +61,6 @@ extern "C" {
     void calculate_attack_damage_injection();
 }
 
-// Time Action Events for the player character's animations
-Tae Game::player_tae = Tae();
-
 // Flag to determine if any characters have been loaded since the game was launched (useful if player had a character loaded but returned to main menu)
 bool Game::characters_loaded = false;
 
@@ -131,34 +128,6 @@ void Game::init()
     last_attack_weaponid = -1;
     uint8_t* write_address = (uint8_t*)(Game::calculate_attack_damage_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &calculate_attack_damage_injection_return, 1, &calculate_attack_damage_injection);
-}
-
-// Initialize the pointer to the TAE struture. This isn't loaded until around the time the main menu is hit, so needs to be delayed
-void Game::init_tae()
-{
-    global::cmd_out << "Locating TAE...\n";
-
-    //Older strategy: AOB scan with "54 41 45 20 00 00 00 00 0B 00 01 00 AC AE 09 00"
-    sp::mem::pointer<TimeActionEventFile::Header> tae_header_ptr = sp::mem::pointer<TimeActionEventFile::Header>((void*)(Game::ds1_base + 0x01D1E510), { 0xF0, 0x50, 0x48, 0x58, 0x0 });
-    void* ret_val = NULL;
-    size_t tae_search_count = 0;
-
-    do {
-        if (tae_header_ptr.resolve() != NULL) {
-            ret_val = Game::player_tae.init_from_memory(tae_header_ptr.resolve());
-        }
-
-        if ((tae_header_ptr.resolve() == NULL || ret_val == NULL) && tae_search_count == 55) {
-            FATALERROR((Mod::output_prefix + "!!ERROR!! TAE structure not found.\n").c_str());
-        }
-
-        tae_search_count++;
-        Sleep(200);
-    }  while (ret_val == NULL);
-
-    char str[100];
-    snprintf(str, sizeof(str), "Found Time Action Event file for player character animations at %p\n", ret_val);
-    global::cmd_out << str;
 }
 
 // Performs tasks that were deferred until a character was loaded

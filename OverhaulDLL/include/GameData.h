@@ -126,9 +126,6 @@ public:
     // Marker for if we're currently in a loading screen
     static sp::mem::pointer<int32_t> is_loading;
 
-    // Time Action Events for the player character's animations
-    static Tae player_tae;
-
     // Flag to determine if any characters have been loaded since the game was launched (useful if player had a character loaded but returned to main menu)
     static bool characters_loaded;
 
@@ -150,9 +147,6 @@ public:
 
     // Initializes pointers and base addresses required for most other functions
     static void init();
-
-    // Initialize the pointer to the TAE struture. This isn't loaded until around the time the main menu is hit, so needs to be delayed
-    static void init_tae();
 
     // Runs tasks that were deferred until a character was loaded
     static void on_first_character_loaded();
