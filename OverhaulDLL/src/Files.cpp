@@ -445,7 +445,7 @@ void Files::check_custom_game_config_file_path()
 }
 
 // Returns the full file path of the current save file (with index)
-const wchar_t *Files::get_save_file_path()
+std::wstring Files::get_save_file_path()
 {
     // Set base file path/name
     std::string cur_save_file = Files::save_file;
@@ -464,7 +464,7 @@ const wchar_t *Files::get_save_file_path()
     if (string_mb_to_wide((char*)cur_save_file.c_str(), buffer))
         FATALERROR("Unable to convert save file %s into wstring.", cur_save_file.c_str());
 
-    return buffer.c_str();
+    return buffer;
 }
 
 static const bool debug_save_print_output = true;
