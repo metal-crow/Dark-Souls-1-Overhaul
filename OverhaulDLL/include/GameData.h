@@ -233,6 +233,10 @@ public:
 
     static uint32_t get_last_attack_weapon_id();
 
+	static void* get_pc_EzStateMachineImpl();
+
+	static uint64_t get_EzStateMachineImpl_curstate_id(void * EzStateMachineImpl);
+
     /*
      * Help speedup some functions by, whenever we're loaded into an area,
      * preload/preresolve some pointers and values so they can be much more quickly read when we need them

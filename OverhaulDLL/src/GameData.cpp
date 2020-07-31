@@ -181,6 +181,7 @@ static int32_t* saved_chars_menu_flag_cache = NULL;
 static uint8_t* saved_chars_preview_data_cache = NULL;
 static uint32_t* pc_playernum_cache = NULL;
 static uint64_t connected_players_array_cache = NULL;
+static void** pc_EzStateMachineImpl_cache = NULL;
 
 void Game::preload_function_caches() {
     global::cmd_out << "Cache loading\n";
@@ -215,6 +216,9 @@ void Game::preload_function_caches() {
     Game::get_pc_playernum();
     connected_players_array_cache = NULL;
     Game::get_connected_player(0);
+    pc_EzStateMachineImpl_cache = NULL;
+    Game::get_pc_EzStateMachineImpl();
+
 
     Sleep(10);
     //this pointer is a bit late to resolve on load
@@ -814,4 +818,26 @@ uint32_t Game::convert_playernum_to_handle(uint32_t playernum) {
 
 uint32_t Game::get_last_attack_weapon_id() {
     return last_attack_weaponid;
+}
+
+void* Game::get_pc_EzStateMachineImpl() {
+    if (pc_EzStateMachineImpl_cache) {
+        return *pc_EzStateMachineImpl_cache;
+    }
+
+    //WorldChrManImp -> PlayerIns -> ChrIns -> PlayerCtrl -> ChrCtrl -> ActionCtrl -> field_0x30[1] -> EzStateMachineImpl
+    sp::mem::pointer pc_EzStateMachineImpl = sp::mem::pointer<void*>((void*)(Game::world_chr_man_imp), { 0x68, 8+0x60, 0x48, 0x30+(0x20*1) });
+    if (pc_EzStateMachineImpl.resolve() == NULL) {
+        FATALERROR("Unable to get pc_EzStateMachineImpl.");
+        return NULL;
+    }
+    else {
+        pc_EzStateMachineImpl_cache = pc_EzStateMachineImpl.resolve();
+        return *pc_EzStateMachineImpl_cache;
+    }
+}
+
+uint64_t Game::get_EzStateMachineImpl_curstate_id(void* EzStateMachineImpl) {
+    void* ezstate_state = *(void**)((uint64_t)EzStateMachineImpl + 0x20);
+    return *(uint64_t*)((uint64_t)ezstate_state + 0);
 }
