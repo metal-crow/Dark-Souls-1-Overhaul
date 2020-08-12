@@ -117,6 +117,9 @@
     <ClCompile Include="src\SpellDesyncFixes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\FixAnkles.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3d11-wrapper\include\d3d11\exports.h">
@@ -147,6 +150,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Xinput_1_3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FixAnkles.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -251,6 +257,9 @@
       <Filter>Source Files</Filter>
     </MASM>
     <MASM Include="src\SpellDesyncFixesASM.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="src\FixAnklesASM.asm">
       <Filter>Source Files</Filter>
     </MASM>
   </ItemGroup>

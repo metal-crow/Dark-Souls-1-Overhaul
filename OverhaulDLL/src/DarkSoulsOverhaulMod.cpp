@@ -22,6 +22,7 @@
 #include "Files.h"
 #include "InputUtil.h"
 #include "SpellDesyncFixes.h"
+#include "FixAnkles.h"
 
 /*
     Called from DllMain when the plugin DLL is first loaded into memory (PROCESS_ATTACH case).
@@ -107,6 +108,7 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     AnimationEdits::start();
     SpellDesync::start();
     PhantomUnshackle::start();
+    FixAnkles::start();
     if (Mod::disable_low_fps_disconnect) {
         Game::disable_low_fps_disconnect(true);
     }
