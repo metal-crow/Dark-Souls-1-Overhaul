@@ -66,3 +66,5 @@ Specify folder location + filenames to use, and the alternate path will be used 
 * Fix to prevent homing spells from desyncing
 
 * Fix to prevent curved swords from stunlocking
+
+* Fix the "broken ankles" bug when rolling
