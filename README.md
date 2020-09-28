@@ -18,6 +18,8 @@ https://gitlab.com/metal-crow/darksoulsremastered-overhaul-archives
 ### Requirments
 This requires the [Microsoft Visual C++ Redistributable for Visual Studio 2015-2019 ](https://aka.ms/vs/16/release/vc_redist.x64.exe)
 
+Building from source requires Visual Studio 2017, and access to some private repos (ask metalcrow or SeanP)
+
 ## Changelist
 
 * NPCs and Bosses (kindof, WIP) can no longer be killed by hackers
