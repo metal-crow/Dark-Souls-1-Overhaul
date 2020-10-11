@@ -74,3 +74,5 @@ Specify folder location + filenames to use, and the alternate path will be used 
 * Fix the "broken ankles" bug when rolling
 
 * A Legacy Mode which disables all non-original gameplay changes
+
+* (Tentatively) compatable with [DSR Watchdog](https://www.nexusmods.com/darksoulsremastered/mods/160). Rename the d3d11.dll file given by watchdog to watchdog.dll, put it in the same folder as DarkSoulsRemastered.exe, and in this mod's d3d11_mod.ini, set `d3d11Chain=watchdog.dll`
