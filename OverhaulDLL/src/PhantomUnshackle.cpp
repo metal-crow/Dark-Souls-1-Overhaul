@@ -21,23 +21,25 @@ extern "C" {
 static DWORD WINAPI change_mp_zone(void* unused);
 
 void PhantomUnshackle::start() {
-    global::cmd_out << Mod::output_prefix << "Enabling Phantom Unshackle patch...\n";
+    if (!Mod::legacy_mode) {
+        global::cmd_out << Mod::output_prefix << "Enabling Phantom Unshackle patch...\n";
 
-    world_char_base_asm = Game::world_char_base;
+        world_char_base_asm = Game::world_char_base;
 
-    // Injection to prevent MP zone ID from being changed
-    uint8_t *write_address = (uint8_t*)(PhantomUnshackle::mp_zone_changing_injection_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &mp_zone_changing_injection_return, 4, &mp_zone_changing_injection);
+        // Injection to prevent MP zone ID from being changed
+        uint8_t *write_address = (uint8_t*)(PhantomUnshackle::mp_zone_changing_injection_offset + Game::ds1_base);
+        sp::mem::code::x64::inject_jmp_14b(write_address, &mp_zone_changing_injection_return, 4, &mp_zone_changing_injection);
 
-    // Injection to prevent MP zone ID from being set to -2
-    uint8_t nop_patch[10] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
-    write_address = (uint8_t*)(PhantomUnshackle::mp_zone_neg2_force_offset + Game::ds1_base);
-    sp::mem::patch_bytes(write_address, nop_patch, 10);
-    write_address = (uint8_t*)(PhantomUnshackle::mp_zone_neg2_force_offset_part2 + Game::ds1_base);
-    sp::mem::patch_bytes(write_address, nop_patch, 10);
+        // Injection to prevent MP zone ID from being set to -2
+        uint8_t nop_patch[10] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
+        write_address = (uint8_t*)(PhantomUnshackle::mp_zone_neg2_force_offset + Game::ds1_base);
+        sp::mem::patch_bytes(write_address, nop_patch, 10);
+        write_address = (uint8_t*)(PhantomUnshackle::mp_zone_neg2_force_offset_part2 + Game::ds1_base);
+        sp::mem::patch_bytes(write_address, nop_patch, 10);
 
-    // Start thread for controlling mp zone
-    CreateThread(NULL, 0, change_mp_zone, NULL, 0, NULL);
+        // Start thread for controlling mp zone
+        CreateThread(NULL, 0, change_mp_zone, NULL, 0, NULL);
+    }
 }
 
 /*

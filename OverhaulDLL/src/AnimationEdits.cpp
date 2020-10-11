@@ -14,10 +14,11 @@
 
 void AnimationEdits::start()
 {
-    AnimationEdits::alter_animation_speeds();
-    AnimationEdits::disable_whiff_animations();
-    AnimationEdits::fix_curvedsword_infinites();
-    //AnimationEdits::fix_roll_distance();
+    if (!Mod::legacy_mode) {
+        AnimationEdits::alter_animation_speeds();
+        AnimationEdits::disable_whiff_animations();
+        AnimationEdits::fix_curvedsword_infinites();
+    }
 }
 
 
@@ -152,6 +153,7 @@ float TAE_GetDamageRate_StunLen_finish_helper_function(float current_stun)
     return current_stun;
 }
 
+#if 0
 extern "C" {
     uint64_t Calculate_movement_delta_return;
     void Calculate_movement_delta_injection();
@@ -190,3 +192,4 @@ static const std::unordered_map<int32_t, const std::vector<float>> hka_reference
 void Calculate_movement_delta_helper_function(uint64_t playerCtrl, float* movement_delta)
 {
 }
+#endif

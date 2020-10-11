@@ -99,7 +99,7 @@ ret
 
 TAE_GetDamageRate_StunLen_finish_injection endp
 
-
+COMMENT @
 extern Calculate_movement_delta_helper_function: proc
 extern Calculate_movement_delta_return: qword
 
@@ -150,6 +150,7 @@ add     rsp, 10h
 jmp     Calculate_movement_delta_return
 
 Calculate_movement_delta_injection endp
+@
 
 _TEXT    ENDS
 

@@ -45,28 +45,31 @@ extern "C" {
 }
 
 void BloodborneRally::start() {
-    global::cmd_out << Mod::output_prefix << "Enabling Bloodborne Rally System...\n";
+    if (!Mod::legacy_mode) {
+        global::cmd_out << Mod::output_prefix << "Enabling Bloodborne Rally System...\n";
 
-    // Inject function to clear rally on weapon toggle
-    uint8_t *write_address = (uint8_t*)(BloodborneRally::weapon_toggle_injection_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &weapon_toggle_injection_return, 5, &weapon_toggle_injection);
+        // Inject function to clear rally on weapon toggle
+        uint8_t *write_address = (uint8_t*)(BloodborneRally::weapon_toggle_injection_offset + Game::ds1_base);
+        sp::mem::code::x64::inject_jmp_14b(write_address, &weapon_toggle_injection_return, 5, &weapon_toggle_injection);
 
-    // Inject function to control the timer for the current ui bar
-    write_address = (uint8_t*)(BloodborneRally::control_timer_injection_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &control_timer_injection_return, 1, &control_timer_injection);
+        // Inject function to control the timer for the current ui bar
+        write_address = (uint8_t*)(BloodborneRally::control_timer_injection_offset + Game::ds1_base);
+        sp::mem::code::x64::inject_jmp_14b(write_address, &control_timer_injection_return, 1, &control_timer_injection);
 
-    // Inject function to perform the main rally code
-    write_address = (uint8_t*)(BloodborneRally::main_rally_injection_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &main_rally_injection_return, 2, &main_rally_injection, true);
-    main_rally_injection_return = 0x140320848; //use as the jmp we're overwriting
+        // Inject function to perform the main rally code
+        write_address = (uint8_t*)(BloodborneRally::main_rally_injection_offset + Game::ds1_base);
+        sp::mem::code::x64::inject_jmp_14b(write_address, &main_rally_injection_return, 2, &main_rally_injection, true);
+        main_rally_injection_return = 0x140320848; //use as the jmp we're overwriting
+    }
 }
 
 static DWORD WINAPI Apply_rally_capable_sfx_and_starting_hp(void*);
 
 void BloodborneRally::on_char_load() {
-    // Start new thread dedicated to applying rally-capable weapon sfx and setting the starting HP
-    CreateThread(NULL, 0, Apply_rally_capable_sfx_and_starting_hp, NULL, 0, NULL);
-    //BloodborneRally::set_weapon_faith_requirements();
+    if (!Mod::legacy_mode) {
+        // Start new thread dedicated to applying rally-capable weapon sfx and setting the starting HP
+        CreateThread(NULL, 0, Apply_rally_capable_sfx_and_starting_hp, NULL, 0, NULL);
+    }
 }
 
 uint64_t control_timer_function(uint64_t bar_id, uint64_t orange_bar) {
