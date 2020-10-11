@@ -138,19 +138,9 @@ void Game::on_first_character_loaded()
     Game::preload_function_caches();
 
     global::cmd_out << Mod::output_prefix + "Searching memory for files...\n";
-    // Initialize param files
-    //TODO Params::init();
 
     // Enable rally system vfx
     BloodborneRally::on_char_load();
-
-    // Enable challenge mods
-    //if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_AGGRO_AI_, Challenge::AggressiveAi::active(), _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
-        //Challenge::AggressiveAi::enable();
-    //}
-    //if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_CHALLENGE_SECTION_, _DS1_OVERHAUL_PREF_CM_BP_ENEMIES_, Challenge::BlackPhantomEnemies::active, _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
-        //Challenge::BlackPhantomEnemies::enable();
-    //}
 
     global::cmd_out << Mod::output_prefix + "All character loading finished!\n";
 }

@@ -130,7 +130,7 @@ HANDLE WINAPI intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesiredAccess,
                 load_file = Files::get_save_file_path();
             }
 
-            else if (Files::files_to_intercept_loading.count(filename) && Mod::custom_game_archive_path.length() > 0) {
+            else if (Files::files_to_intercept_loading.count(filename) && Mod::custom_game_archive_path.length() > 0 && !Mod::legacy_mode) {
                 load_file = Mod::custom_game_archive_path + filename;
 
                 std::string filename_str(filename.begin(), filename.end());
