@@ -72,3 +72,5 @@ Specify folder location + filenames to use, and the alternate path will be used 
 * Fix to prevent curved swords from stunlocking
 
 * Fix the "broken ankles" bug when rolling
+
+* A Legacy Mode which disables all non-original gameplay changes
