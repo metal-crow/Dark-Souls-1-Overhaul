@@ -233,7 +233,7 @@ public:
 
     static uint32_t get_last_attack_weapon_id();
 
-	static void* get_pc_EzStateMachineImpl();
+	static void* get_pc_ActiveState_EzStateMachineImpl();
 
 	static uint64_t get_EzStateMachineImpl_curstate_id(void * EzStateMachineImpl);
 

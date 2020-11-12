@@ -207,7 +207,7 @@ void Game::preload_function_caches() {
     connected_players_array_cache = NULL;
     Game::get_connected_player(0);
     pc_EzStateMachineImpl_cache = NULL;
-    Game::get_pc_EzStateMachineImpl();
+    Game::get_pc_ActiveState_EzStateMachineImpl();
 
 
     Sleep(10);
@@ -810,12 +810,12 @@ uint32_t Game::get_last_attack_weapon_id() {
     return last_attack_weaponid;
 }
 
-void* Game::get_pc_EzStateMachineImpl() {
+void* Game::get_pc_ActiveState_EzStateMachineImpl() {
     if (pc_EzStateMachineImpl_cache) {
         return *pc_EzStateMachineImpl_cache;
     }
 
-    //WorldChrManImp -> PlayerIns -> ChrIns -> PlayerCtrl -> ChrCtrl -> ActionCtrl -> field_0x30[1] -> EzStateMachineImpl
+    //WorldChrManImp -> PlayerIns -> ChrIns -> PlayerCtrl -> ChrCtrl -> ActionCtrl -> ActiveState -> EzStateMachineImpl
     sp::mem::pointer pc_EzStateMachineImpl = sp::mem::pointer<void*>((void*)(Game::world_chr_man_imp), { 0x68, 8+0x60, 0x48, 0x30+(0x20*1) });
     if (pc_EzStateMachineImpl.resolve() == NULL) {
         FATALERROR("Unable to get pc_EzStateMachineImpl.");
