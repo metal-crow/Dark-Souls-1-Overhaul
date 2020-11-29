@@ -8,31 +8,43 @@
       <VariableType>Auto Assembler Script</VariableType>
       <AssemblerScript>[ENABLE]
 //code from here to '[DISABLE]' will be used to enable the cheat
-globalalloc(cur_stateid_list,800)
-globalalloc(cur_stateid_count,4)
+globalalloc(cur_stateid_list,50000) //array of time, id.
+globalalloc(cur_stateid_count,8)
 alloc(newmem,2048,"DarkSoulsRemastered.exe"+E9D440) 
 label(returnhere)
 label(originalcode)
 label(nosave)
 label(exit)
+{$lua}
+writeQword("cur_stateid_count",0)
+{$asm}
 
 newmem:
 push rax
+push rbx
+
+//prevent overflow
+cmp qword ptr [cur_stateid_count], 1000
+jg nosave
+
+mov rax, qword ptr [cur_stateid_count] //get array count
+mov rbx, rax
+imul rbx, c //get array offset
 mov rcx, qword ptr [rbp] //get stateid
-mov rax, [cur_stateid_count] //get array count
 
 //don't save if already last entry in list
-cmp rcx, [cur_stateid-8+rax*8]
+cmp rcx, qword ptr [cur_stateid_list-8+rbx]
 je nosave
 
-mov [cur_stateid+rax*8], rcx //add stateid to array
-add [cur_stateid_count], 1 //increment index
-//prevent overflow
-cmp [cur_stateid_count], 800
-jl nosave
-mov [cur_stateid_count], 0
+mov qword ptr [cur_stateid_list+4+rbx], rcx //add stateid to array
+mov rcx, qword ptr [141d278f0]
+mov ecx, dword ptr [rcx+a4]
+mov dword ptr [cur_stateid_list+0+rbx], ecx //add time to array
+
+add qword ptr [cur_stateid_count], 1 //increment index
 
 nosave:
+pop rbx
 pop rax
 
 originalcode:
@@ -53,34 +65,35 @@ returnhere:
  
 [DISABLE]
 //code from here till the end of the code will be used to disable the cheat
-dealloc(newmem)
-{$lua}
-print("Your list of recorded EzState Ids:")
-count = readInteger("cur_stateid_count")-1
-base_list_addr = getAddress("cur_stateid")
-for i=0,count do
-    print(string.format("\t%d", readQword(base_list_addr)))
-    base_list_addr = base_list_addr + 8
-end
-writeInteger("cur_stateid_count",0)
-{$asm}
 "DarkSoulsRemastered.exe"+E9D440:
 mov rcx,[rbp+08]
 mov r8,r14
+//dealloc(newmem)
+{$lua}
+print("Your list of recorded EzState Ids:")
+count = readQword("cur_stateid_count")-1
+print(count)
+base_list_addr = getAddress("cur_stateid_list")
+for i=0,count do
+    print(string.format("\t%d: %d", readInteger(base_list_addr), readQword(base_list_addr+4)))
+    base_list_addr = base_list_addr + 12
+end
+writeQword("cur_stateid_count",0)
+{$asm}
 //Alt: db 48 8B 4D 08 4D 8B C6
 </AssemblerScript>
       <CheatEntries>
         <CheatEntry>
           <ID>4</ID>
           <Description>"EzState Count"</Description>
-          <LastState Value="0" RealAddress="3BFF0330"/>
-          <VariableType>4 Bytes</VariableType>
+          <LastState Value="0" RealAddress="3D522EF0"/>
+          <VariableType>8 Bytes</VariableType>
           <Address>cur_stateid_count</Address>
         </CheatEntry>
         <CheatEntry>
           <ID>1</ID>
           <Description>"EzStateId List"</Description>
-          <LastState Value="0" RealAddress="3BFF0010"/>
+          <LastState Value="927790652224" RealAddress="3D520010"/>
           <VariableType>8 Bytes</VariableType>
           <Address>cur_stateid_list</Address>
         </CheatEntry>
@@ -89,7 +102,7 @@ mov r8,r14
     <CheatEntry>
       <ID>2</ID>
       <Description>"Get EZState address"</Description>
-      <LastState/>
+      <LastState Activated="1"/>
       <VariableType>Auto Assembler Script</VariableType>
       <AssemblerScript>[ENABLE]
 //code from here to '[DISABLE]' will be used to enable the cheat
@@ -137,12 +150,22 @@ mov rdx,rsi
         <CheatEntry>
           <ID>3</ID>
           <Description>"ESD Data Buffer"</Description>
-          <LastState Value="0000000000000000" RealAddress="3BFF0000"/>
+          <LastState Value="0000000000000000" RealAddress="3D520000"/>
           <ShowAsHex>1</ShowAsHex>
           <VariableType>8 Bytes</VariableType>
           <Address>esd_data_buffer</Address>
         </CheatEntry>
       </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>5</ID>
+      <Description>"Time"</Description>
+      <LastState Value="77803424" RealAddress="0B01F9A4"/>
+      <VariableType>4 Bytes</VariableType>
+      <Address>141d278f0</Address>
+      <Offsets>
+        <Offset>a4</Offset>
+      </Offsets>
     </CheatEntry>
   </CheatEntries>
   <UserdefinedSymbols>
@@ -152,15 +175,15 @@ mov rdx,rsi
     </SymbolEntry>
     <SymbolEntry>
       <Name>esd_data_buffer</Name>
-      <Address>3BFF0000</Address>
+      <Address>3D520000</Address>
     </SymbolEntry>
     <SymbolEntry>
       <Name>cur_stateid_list</Name>
-      <Address>3BFF0010</Address>
+      <Address>3D520010</Address>
     </SymbolEntry>
     <SymbolEntry>
       <Name>cur_stateid_count</Name>
-      <Address>3BFF0330</Address>
+      <Address>3D522EF0</Address>
     </SymbolEntry>
   </UserdefinedSymbols>
   <LuaScript>aalist=getAutoAttachList()
