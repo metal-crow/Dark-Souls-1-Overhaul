@@ -1,4 +1,4 @@
-# Dark Souls 1 Overhaul  
+# Dark Souls 1 PvP Fixes and Overhaul  
   
 ### Info Google doc (notes and RE'd knowledge goes here):  
 https://drive.google.com/drive/folders/0BzSQv5PaltE-ci1LaDh5MDRId2M  
@@ -22,6 +22,14 @@ Building from source requires Visual Studio 2017, and access to some private rep
 Also build with the release build, debug build is broken atm
 
 
+## Description
+The mod is completely backwards compatible with vanilla dark souls 1 by default. In legacy mode, it includes a number of significant but fully backwards compatible bugfixes, quality-of-life improvements, visual glitch fixes, and functional anti-cheat measures.  
+It also unlocks a number of in-engine limitations and fixes other engine problems (including disabling the terrible built-in anti-cheat), making it perfect to extend further with other mods.  
+
+If you so wish, you can enable overhaul mode at any time to get the full suite of improvements this mod gives.  
+This will not! separate you from vanilla players. A player will have the option of deciding if they want to enable overhaul mode once they receive a connection request from a player with it enabled, and visa-versa. Preferred defaults and auto-allow/decline options can be configured.  
+Enabling Overhaul mode by default is highly recommended, since it dramatically improves pvp experience on a number of metrics (weapon viability, magic use, and more) while still keeping the fundamental dark souls 1 pvp experience intact.  
+  
 ## Changelist
 
 * NPCs and Bosses (kindof, WIP) can no longer be killed by hackers
@@ -72,8 +80,6 @@ Specify folder location + filenames to use, and the alternate path will be used 
 * Fix to prevent curved swords from stunlocking
 
 * Fix the "broken ankles" bug when rolling
-
-* A Legacy Mode which disables all non-original gameplay changes
 
 * Fix for the halberd instant running attack glitch in mud and pvp
 
