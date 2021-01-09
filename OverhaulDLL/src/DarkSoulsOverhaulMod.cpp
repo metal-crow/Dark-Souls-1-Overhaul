@@ -24,6 +24,8 @@
 #include "SpellDesyncFixes.h"
 #include "FixAnkles.h"
 
+HMODULE d3d11_module;
+
 /*
     Called from DllMain when the plugin DLL is first loaded into memory (PROCESS_ATTACH case).
     This means this code will be run before _any_ Dark Souls code is.
@@ -35,6 +37,7 @@
 BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
 {
     global::cmd_out << DS1_OVERHAUL_TXT_INTRO "\n\n";
+    d3d11_module = h_module;
 
     // Check if game version is supported
     /*if (Game::get_game_version() != DS1_GAME_VERSION_ENUM::DS1_VERSION_RELEASE)
@@ -85,6 +88,8 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
 */
 DWORD WINAPI on_process_attach_async(LPVOID lpParam)
 {
+    set_crash_handlers();
+
     Menu::Saves::init_custom_saves();
     AntiCheat::start();
     Game::increase_gui_hpbar_max();

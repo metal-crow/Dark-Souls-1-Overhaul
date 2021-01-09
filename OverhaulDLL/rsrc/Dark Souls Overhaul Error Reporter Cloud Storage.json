@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "dark-souls-crash-reporter",
+  "private_key_id": "ebb6b7707d5e10e8aaf73fef91da7e895a79a74e",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCcvhtUquh5JvmY\nBTE6kpsH1cBsDTHqWXyXDp60ANuKf9nQyMgZAKU+0FNIjPRvVyv3NLXO81MgQg8f\nDtncCys5ofC9GraOqgsNvXQP4eO5+GTyf/yAbMq2ZLfP+slDVM2wDq8AA9/GK4yk\n2ePsjW/Foe7LV3lm6Uige9qyTlGt/xkjdJfLA2ugyGyVnRbiFv3xPCe98HQZC0xB\naq595HZxTxAVnGrc0GSZhcPBsKR1waR0GWz5y7erTJP4ysHU+8haD6Fwim/ipxq5\nd9fvkzAKX1Obvv7ldgkBtCgvQprM4ioj9dS2aR7u9Rvr29aTromsoyqS2PC7I8IH\nYfoDrwKlAgMBAAECggEASACWen7mOt06E+jys9br6533/krTbrV748JeCg9Iyqcv\njlblgILI5gF5+J5znP/83Nr0V6R0P6HI43oFfy0MRrXK6nuud/vKBx5MBg28+E2Q\nRcugWPhg6Id83sf0E3+N2z3riwS8k4Km4YWMS7qvKSjZksRUqv8oEzzB+l267MPF\n8Iw0mEAHetIfzGM/AWY24lwlKkfEPuMannN2NzbPtSD2upvBmSJQ04TDBlJFsdJ8\nYPFNDW7Na0bSK8oUxWoQhClDODAozehywv2xES0D3flrUrBT6pEBt375OLnJcT1s\nS1n4oo7XllAMmAl00UUe5qHcORRdJImeKihsshbNcwKBgQDR/9f6rXve8NpR5Sr6\nxgMD5cQwJwa6qX1dazWecMv2Z6q+XL4yXpJo4WQA/zoDsS421YTNux8o8Zvp0upp\nEGgkwoXxzB57tW+VPT/G/vjp6rvQjpYvV0+S2Pupnpwp3QVxZmVt4Gfihe5iH0rv\nZOPCNIBufGWVW0BKlBd/QTtVTwKBgQC/E8bzexZhNMqCBMCrbfORWH8m/yt8Q9kb\ng2eJos13b9wyTA7sHKysOfLgctoMylb1Zx+4oCVWVY06H3IT+I4p1WtPAWYziPzt\nVo/dFBy8x9EuanUwC2o3/qX58In8vMQnqlb9rH3EeOns6q41BXDBlBjUVwmlCDhg\nOaMNcHqTywKBgFUkIKH+8mj6R9nKSzmvTIuo/Xj0abMGgtB8Zhnd66P0dfKGUYrE\ncyHYuB37XL8gd/c9bIGo60JDaw5LOETupPq6b2oQcw9/CUV9trzspWjZhdpR5Sw+\nfwGvvaEQsIn8lXdbp6X7xMK/wF3CCDS1N+6GMMga4WjDvXY/QqOShAbbAoGBAJCk\n3Qd11wQw3Ve9V0iujCIr1t1jbry7877zI066kkVmxU7B6s3sCv65Q1WLO+tQxLEy\npn2xpXIMg0NLiKT7lEqwx3HgQkii26yiyXb3AaYasQwtBJchHQBUYbqpzxsmnmrU\ndNPFXtN7IMH7CXMTsj6n6H/df2yRo3OcTgUfb3svAoGACAIODP3sUEZqhDawV6HB\nq6g/RaaqorwBq1oN+MDkz2h6Y0QpB0QFSUqe9ATaQGusRcdG6xEyP8LF/8/+QXgI\nW8QowbYDQdnMTjeCtVV2BHVkm6E8vDiZnXKxl6iEGN92uY5KXVpswGkF6krDQlz7\nBIzDQvAbRl5q9svQaJ9BYro=\n-----END PRIVATE KEY-----\n",
+  "client_email": "error-reporter@dark-souls-crash-reporter.iam.gserviceaccount.com",
+  "client_id": "118001851585082581273",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/error-reporter%40dark-souls-crash-reporter.iam.gserviceaccount.com"
+}

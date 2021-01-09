@@ -14,6 +14,7 @@
 
 #include "sp/sp.h"
 #include "dllmain.h"
+#include "CrashHandler.h"
 
 #define WIN32_LEAN_AND_MEAN   // Exclude rarely-used stuff from Windows headers
 
@@ -30,6 +31,7 @@
 
 #define DS1_OVERHAUL_TXT_INTRO "\n+-------------------------------+\n|      Dark Souls Overhaul      |\n+-------------------------------+"
 
+extern HMODULE d3d11_module;
 
 DWORD WINAPI on_process_attach_async(LPVOID lpParam);
 DWORD WINAPI wait_for_first_char_load(LPVOID lpParam);
@@ -41,8 +43,7 @@ void inline FATALERROR(const char* error_str, ...) {
     vsnprintf(dest, 1024, error_str, argptr);
     va_end(argptr);
 
-    MessageBox(NULL, dest, NULL, MB_OK);
-    exit(1);
+    crash_handler(dest);
 }
 
 #endif

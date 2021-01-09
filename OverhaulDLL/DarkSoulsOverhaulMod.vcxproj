@@ -41,6 +41,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="src\CrashHandler.cpp" />
     <ClCompile Include="src\DarkSoulsOverhaulMod.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ExcludedFromBuild>
@@ -87,6 +88,7 @@
     <ClInclude Include="d3d11-wrapper\include\d3d11\main.h" />
     <ClInclude Include="d3d11-wrapper\include\dllmain.h" />
     <ClInclude Include="include\AntiAntiCheat.h" />
+    <ClInclude Include="include\CrashHandler.h" />
     <ClInclude Include="include\DarkSoulsOverhaulMod.h" />
     <ClInclude Include="include\DeadAngles.h" />
     <ClInclude Include="include\EquipmentUnlock.h" />
@@ -94,6 +96,7 @@
     <ClInclude Include="include\InvisibleBackstabAttackFix.h" />
     <ClInclude Include="include\SpellDesyncFixes.h" />
     <ClInclude Include="include\Xinput_1_3.h" />
+    <ClInclude Include="ui\crash_hander_ui_resource.h" />
     <None Include="..\README.md" />
     <None Include="include\AnimationEdits.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -201,6 +204,7 @@
     <MASM Include="src\AntiCheat\NpcGuardASM.asm" />
     <MASM Include="src\AntiCheat\TeleBackstabProtectASM.asm" />
     <MASM Include="src\BloodborneRallySystemASM.asm" />
+    <MASM Include="src\CrashHandlerASM.asm" />
     <MASM Include="src\DeadAnglesASM.asm" />
     <MASM Include="src\EquipmentUnlockASM.asm" />
     <MASM Include="src\FilesASM.asm" />
@@ -211,6 +215,9 @@
     <MASM Include="src\PhantomUnshackleASM.asm" />
     <MASM Include="src\InputUtilASM.asm" />
     <MASM Include="src\SpellDesyncFixesASM.asm" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ui\CrashHandler_UI.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -287,7 +294,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;DARKSOULSOVERHAULMOD_EXPORTS;WRAPPER_ON_PROCESS_ATTACH=on_process_attach;WRAPPER_ON_PROCESS_DETACH=on_process_detach;WRAPPER_ON_THREAD_ATTACH=on_thread_attach;WRAPPER_ON_THREAD_DETACH=on_thread_detach;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>include;lib/Cpp-Utilities/include;lib/Dark-Souls-Game-Files-Lib/include;lib;d3d11-wrapper/include;d3d11-wrapper/lib;d3d11-wrapper/lib/inih;d3d11-wrapper/lib/inih/cpp</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;lib/Cpp-Utilities/include;lib/Dark-Souls-Game-Files-Lib/include;lib;d3d11-wrapper/include;d3d11-wrapper/lib;d3d11-wrapper/lib/inih;d3d11-wrapper/lib/inih/cpp;lib/StackWalker/include;ui;lib/Google-Cloud-Cpp/include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
@@ -295,9 +302,9 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>lib;d3d11-wrapper/lib;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>lib;d3d11-wrapper/lib;lib/StackWalker/lib;lib/Google-Cloud-Cpp/lib</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>d3d11-wrapper/src/d3d11/exports.def</ModuleDefinitionFile>
-      <AdditionalDependencies>sp_utils_x64.lib;XInput.lib;DsGameFiles.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>normaliz.lib;ws2_32.lib;wsock32.lib;crypt32.lib;crc32c/crc32c.lib;zlib/zlib.lib;boringssl/crypto.lib;boringssl/ssl.lib;absl/numeric/int128.lib;absl/time/internal/cctz/time_zone.lib;absl/time/internal/cctz/civil_time.lib;absl/time/time.lib;absl/base/throw_delegate.lib;absl/base/raw_logging_internal.lib;absl/strings/str_format_internal.lib;absl/strings/internal.lib;absl/strings/strings.lib;absl/types/bad_optional_access.lib;curl.lib;storage_client.lib;google_cloud_cpp_common.lib;quickstart.lib;StackWalker.lib;sp_utils_x64.lib;XInput.lib;DsGameFiles.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
