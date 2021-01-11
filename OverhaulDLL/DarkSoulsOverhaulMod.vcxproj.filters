@@ -22,23 +22,11 @@
     <Filter Include="Source Files\AntiCheat">
       <UniqueIdentifier>{abe89458-8d94-4792-abc6-7e222f067671}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Challenge">
-      <UniqueIdentifier>{ea94e11e-b719-4bd6-a7f4-4332b62aa97f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Plugin">
-      <UniqueIdentifier>{f0d3ac99-2641-4356-9d86-d5667ab055ed}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Menu">
       <UniqueIdentifier>{784465a6-1537-45bb-9608-32c0b68c0909}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Challenge">
-      <UniqueIdentifier>{6283414b-43eb-4f80-85a2-dc1cd1b9a342}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Menu">
       <UniqueIdentifier>{5fd92a92-021b-442b-ae97-0750a3dc61b0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Plugin">
-      <UniqueIdentifier>{8306bc4f-b139-4f1d-93d5-702f7c011e49}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -66,32 +54,14 @@
     <ClCompile Include="src\ModData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\PhantomLimit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\PhantomUnshackle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\AntiCheat\AntiCheat.cpp">
       <Filter>Source Files\AntiCheat</Filter>
     </ClCompile>
-    <ClCompile Include="src\Challenge\AggressiveAI.cpp">
-      <Filter>Source Files\Challenge</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Challenge\BlackPhantomEnemies.cpp">
-      <Filter>Source Files\Challenge</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Challenge\GravelordPhantoms.cpp">
-      <Filter>Source Files\Challenge</Filter>
-    </ClCompile>
     <ClCompile Include="src\Menu\SavedCharacters.cpp">
       <Filter>Source Files\Menu</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Plugin\ConsoleCommands.cpp">
-      <Filter>Source Files\Plugin</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Plugin\KeybindFunctions.cpp">
-      <Filter>Source Files\Plugin</Filter>
     </ClCompile>
     <ClCompile Include="src\DarkSoulsOverhaulMod.cpp">
       <Filter>Source Files</Filter>
@@ -178,9 +148,6 @@
     <None Include="include\BloodborneRallySystem.h">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="include\DllMain_Legacy.h">
-      <Filter>Header Files</Filter>
-    </None>
     <None Include="include\Files.h">
       <Filter>Header Files</Filter>
     </None>
@@ -190,29 +157,11 @@
     <None Include="include\ModData.h">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="include\PhantomLimit.h">
-      <Filter>Header Files</Filter>
-    </None>
     <None Include="include\PhantomUnshackle.h">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="include\Challenge\AggressiveAI.h">
-      <Filter>Header Files\Challenge</Filter>
-    </None>
-    <None Include="include\Challenge\GravelordPhantoms.h">
-      <Filter>Header Files\Challenge</Filter>
-    </None>
-    <None Include="include\Challenge\BlackPhantomEnemies.h">
-      <Filter>Header Files\Challenge</Filter>
-    </None>
     <None Include="include\Menu\SavedCharacters.h">
       <Filter>Header Files\Menu</Filter>
-    </None>
-    <None Include="include\Plugin\KeybindFunctions.h">
-      <Filter>Header Files\Plugin</Filter>
-    </None>
-    <None Include="include\Plugin\ConsoleCommands.h">
-      <Filter>Header Files\Plugin</Filter>
     </None>
     <None Include="..\README.md" />
     <None Include="include\InputUtil.h">

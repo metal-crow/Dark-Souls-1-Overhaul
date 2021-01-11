@@ -24,7 +24,6 @@
 // Game data/Overhaul mod data headers:
 #include "ModData.h"
 #include "GameData.h"
-#include "Plugin/KeybindFunctions.h"
 
 // Preprocessor definition utilized by the Dark Souls Game Files C++ library (DsGameFiles.lib)
 #define __DS1_OVERHAUL_MOD

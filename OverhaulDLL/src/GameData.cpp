@@ -15,8 +15,6 @@
 #include "GameData.h"
 #include "AntiCheat.h"
 #include "BloodborneRallySystem.h"
-#include "Challenge/AggressiveAi.h"
-#include "Challenge/BlackPhantomEnemies.h"
 #include "AnimationEdits.h"
 #include "SP/memory/injection/asm/x64.h"
 
