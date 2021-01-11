@@ -135,8 +135,6 @@ void Game::on_first_character_loaded()
 
     Game::preload_function_caches();
 
-    global::cmd_out << Mod::output_prefix + "Searching memory for files...\n";
-
     // Enable rally system vfx
     BloodborneRally::on_char_load();
 

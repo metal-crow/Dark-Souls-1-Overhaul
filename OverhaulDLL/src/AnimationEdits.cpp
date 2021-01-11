@@ -14,11 +14,9 @@
 
 void AnimationEdits::start()
 {
-    if (!Mod::legacy_mode) {
-        AnimationEdits::alter_animation_speeds();
-        AnimationEdits::disable_whiff_animations();
-        AnimationEdits::fix_curvedsword_infinites();
-    }
+    AnimationEdits::alter_animation_speeds();
+    AnimationEdits::disable_whiff_animations();
+    AnimationEdits::fix_curvedsword_infinites();
 }
 
 
@@ -82,6 +80,11 @@ static DWORD WINAPI DelayAnimationSpeedAjustment(void* thread_data_arg) {
 }
 
 void read_body_aid_injection_helper_function(int32_t* animation_id, float* speed) {
+    //If feature disabled, don't do anything
+    if (Mod::legacy_mode) {
+        return;
+    }
+
     //Since we set animation speed at the table entry level, when it gets unset the speed is automatically reset. No cleanup needed
 
     //If this is an animation to be changed, ajust speed while we're in it
@@ -119,13 +122,27 @@ void read_body_aid_injection_helper_function(int32_t* animation_id, float* speed
     }
 }
 
+extern "C" {
+    uint64_t disable_whiff_animations_injection_return;
+    void disable_whiff_animations_injection();
+    uint8_t disable_whiff_animations_injection_helper();
+}
+
 void AnimationEdits::disable_whiff_animations() {
     global::cmd_out << Mod::output_prefix << ("Enabling remove animation whiffs...\n");
 
     //make jump over setting whiff unconditional
     uint8_t *write_address = (uint8_t*)(AnimationEdits::animation_whiff_set_offset + Game::ds1_base);
-    uint8_t jmp_patch[2] = { 0xEB, 0x54 };
-    sp::mem::patch_bytes(write_address, jmp_patch, 2);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &disable_whiff_animations_injection_return, 2, &disable_whiff_animations_injection);
+}
+
+uint8_t disable_whiff_animations_injection_helper() {
+    //Disable feature
+    if (Mod::legacy_mode) {
+        return 1;
+    }
+
+    return 0; //disable whiff
 }
 
 extern "C" {
@@ -144,6 +161,11 @@ void AnimationEdits::fix_curvedsword_infinites() {
 //decrease the stun length so that defender can roll escape
 float TAE_GetDamageRate_StunLen_finish_helper_function(float current_stun)
 {
+    //If feature disabled, don't do anything
+    if (Mod::legacy_mode) {
+        return current_stun;
+    }
+
     uint32_t weaponid = Game::get_last_attack_weapon_id();
 
     //if this is a curved sword (except QFS)

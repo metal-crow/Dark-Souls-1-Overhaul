@@ -62,7 +62,7 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
     Mod::get_init_preferences();
     Mod::get_user_keybinds();
 
-    // Initialize XInput hook
+    // Initialize XInput hook (used for intercepting button to change save files)
     Input::initialize();
 
     // Apply increased memory limit patch

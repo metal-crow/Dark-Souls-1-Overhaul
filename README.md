@@ -67,8 +67,9 @@ Time to recover the hp is 5000 ms, or on weapon toggle.
 You can freely walk, run, and rotate as you are casting them, and pivot cancels work as normal    
 These include everything EXCEPT: Combustions, Firestorms, and all miracles but Lighting Spear and Darkmoon Blade/Sunlight Blade  
 
-* You can now invade or summon phantoms __anywhere__, and can still do so after bosses are killed  
-This solution is imperfect, as areas where you could not do multiplayer before but are right next to areas you could (I.E Undead Burg bonfire), are treated as seperate multiplayer areas.
+* You can now invade or summon phantoms __anywhere__.  
+This solution is imperfect, as areas where you could not do multiplayer before but are right next to areas you could (I.E Undead Burg bonfire), are treated as seperate multiplayer areas.  
+(Note that DSR allows summons even with the boss dead).  
 
 * Support for unlimited save slots
 

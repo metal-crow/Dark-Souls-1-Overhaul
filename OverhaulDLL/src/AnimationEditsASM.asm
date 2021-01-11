@@ -1,5 +1,10 @@
-_TEXT    SEGMENT
+_DATA SEGMENT
 
+sub_1404358C0   dq  1404358C0h
+
+_DATA ENDS
+
+_TEXT    SEGMENT
 
 EXTERN read_body_aid_injection_helper_function: PROC
 EXTERN animation_entry_set_return: qword
@@ -52,6 +57,54 @@ jmp animation_entry_set_return
 
 animation_entry_set_injection ENDP
 
+EXTERN disable_whiff_animations_injection_helper: PROC
+EXTERN disable_whiff_animations_injection_return: qword
+
+PUBLIC disable_whiff_animations_injection
+disable_whiff_animations_injection PROC
+
+;original code
+mov     esi, [rdi+80h]
+add     esi, 28h
+mov     edx, esi
+call    qword ptr [sub_1404358C0]
+
+;don't save/restore rax since it's the return val
+sub     rsp, 10h
+movdqu  [rsp], xmm0
+sub     rsp, 10h
+movdqu  [rsp], xmm1
+sub     rsp, 10h
+movdqu  [rsp], xmm2
+sub     rsp, 10h
+movdqu  [rsp], xmm3
+push    rcx
+push    rdx
+push    r8
+push    r9
+push    r10
+push    r11
+
+call    disable_whiff_animations_injection_helper
+
+pop     r11
+pop     r10
+pop     r9
+pop     r8
+pop     rdx
+pop     rcx
+movdqu  xmm3, [rsp]
+add     rsp, 10h
+movdqu  xmm2, [rsp]
+add     rsp, 10h
+movdqu  xmm1, [rsp]
+add     rsp, 10h
+movdqu  xmm0, [rsp]
+add     rsp, 10h
+
+jmp     disable_whiff_animations_injection_return
+
+disable_whiff_animations_injection ENDP
 
 extern TAE_GetDamageRate_StunLen_finish_helper_function: proc
 extern TAE_GetDamageRate_StunLen_finish_return: qword

@@ -13,6 +13,8 @@ PUBLIC weapon_toggle_injection
 weapon_toggle_injection PROC
 
 mov  qword ptr [beforehit_time], 0 ; Fake we got hit infinite time ago, to drop rally
+
+;original code
 mov  r9, 140193F80h
 mov  edx, 1
 mov  rcx, 141D068F8h
