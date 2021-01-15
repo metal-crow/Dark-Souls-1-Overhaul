@@ -430,8 +430,22 @@ LONG WINAPI top_level_exception_filter(EXCEPTION_POINTERS * ExceptionInfo)
 
 LONG WINAPI vectored_exception_handler(EXCEPTION_POINTERS * ExceptionInfo)
 {
-    // Benign exceptions raised and handled by Dark Souls. Ignore
+    /* Notes:
+     * The game, on startup, raises and handles some custom exceptions as part of the boot process.
+     * These can't be caught since they're required to be caught by the game
+     * -0x406d1388
+     * -0xe06d7363
+     */
     if (ExceptionInfo->ExceptionRecord->ExceptionCode == 0x406d1388 || ExceptionInfo->ExceptionRecord->ExceptionCode == 0xe06d7363) {
+        return EXCEPTION_CONTINUE_SEARCH;
+    }
+
+    /* Notes:
+     * I have also encountered other standard windows exceptions being raised for unclear reasons.
+     * https://stackoverflow.com/questions/12298406/how-to-treat-0x40010006-exception-in-vectored-exception-handler specifies that some of these are expected to be ignored.
+     * To error on the side of safety, only catch exceptions starting with 0xC0
+     */
+    if ((ExceptionInfo->ExceptionRecord->ExceptionCode & 0xFF000000) != 0xC0000000) {
         return EXCEPTION_CONTINUE_SEARCH;
     }
 
