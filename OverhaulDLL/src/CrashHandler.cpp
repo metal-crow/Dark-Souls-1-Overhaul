@@ -307,7 +307,7 @@ DWORD WINAPI crash_handler_dump_process(LPVOID output_dir)
 /* ------------------ Handlers ------------------ */
 
 std::string const bucket_name = "dark_souls_overhaul_bug_reports";
-std::string const key_path = "./Dark Souls Overhaul Error Reporter Cloud Storage.json";
+std::string const key_path = "./error_reporter_creds.json";
 bool triggered_crash_handler = false;
 
 void crash_handler(char* message_str)
