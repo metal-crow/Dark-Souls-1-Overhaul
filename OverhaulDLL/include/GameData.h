@@ -23,8 +23,8 @@ enum DS1_GAME_VERSION_ENUM {
     DS1_VERSION_DEBUG = 0x2C,           // 44
     DS1_VERSION_STEAM_BETA = 0x2D,      // 45
     DS1_VERSION_RELEASE = 0x2E,         // 46
-    DS1_VERSION_OVERHAUL = 0x3C,        // 60
-    DS1_VERSION_OVERHAUL_CHEATS = 0x3D, // 61     // Multiplayer network for Overhaul players that have cheats enabled
+    DS1_VERSION_OVERHAUL = 90,
+    DS1_VERSION_OVERHAUL_CHEATS = 91,
     DS1_VERSION_REKINDLED = 0x55,       // 85
     DS1_VERSION_REKINDLED_CHEATS = 0x56 // 86     // Multiplayer network for Rekindled players that have cheats enabled
 };

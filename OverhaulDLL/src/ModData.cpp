@@ -60,6 +60,8 @@ std::vector<uint8_t> Mod::supported_game_versions = {   DS1_VERSION_RELEASE,
 // Enable/disable mouse input
 bool Mod::mouse_input = true;
 
+int Mod::enable_overhaul = IDYES;
+
 // Lock camera when console is open
 bool Mod::console_lock_camera = true;
 
@@ -92,6 +94,8 @@ bool Mod::hud_play_time_pref = false;
 
 // User preference setting; determines whether to automatically equip items on pickup
 bool Mod::disable_auto_equip_pref = true;
+
+bool Mod::enable_multiphantom = true;
 
 // Custom game archive files to load instead of the vanilla game files
 std::wstring Mod::custom_game_archive_path;
@@ -199,6 +203,11 @@ void Mod::get_user_preferences()
     Mod::disable_auto_equip_pref = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DISABLE_AUTO_EQUIP_, (int)Mod::disable_auto_equip_pref, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
     if (Mod::disable_auto_equip_pref) {
         print_console("    Automatic item equip disabled");
+    }
+
+    Mod::enable_multiphantom = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_ENABLE_MULTIPHANTOM_, (int)Mod::enable_multiphantom, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    if (Mod::enable_multiphantom) {
+        print_console("    Multiphantom patch enabled");
     }
 
     LadderFix::enable_pref = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_LADDER_FIX_, (int)LadderFix::enable_pref, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);

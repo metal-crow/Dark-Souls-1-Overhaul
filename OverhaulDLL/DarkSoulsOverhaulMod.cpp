@@ -33,6 +33,20 @@
 */
 void on_process_attach()
 {
+    Mod::enable_overhaul = MessageBox(
+        NULL,
+        std::string("Enable DS Overhaul : Extended Player Limit?\n\
+            Hitting yes will increase the player limit to 18, but will disable cooperative play entirely!The player limit increase only applies to red summon signs.\n\
+            If you are planning to PvP in the Arena + area then you want this on.").c_str(),
+        std::string("Overhaul").c_str(),
+        MB_YESNO
+    );
+
+    if (Mod::enable_overhaul == IDNO) {
+        Game::set_game_version(DS1_VERSION_OVERHAUL_CHEATS);
+        return;
+    }
+
     Mod::startup_messages.push_back(DS1_OVERHAUL_TXT_INTRO);
     Mod::startup_messages.push_back("");
 
@@ -66,7 +80,6 @@ void on_process_attach()
     // Inject code to capture starting addresses of all Param files (removes need for AoB scans)
     Params::patch();
 
-    // Change game version number
     Files::apply_function_intercepts();
 
     // Check for existence of non-default game files
@@ -74,15 +87,22 @@ void on_process_attach()
     Files::check_custom_save_file_path();
     Files::check_custom_game_config_file_path();
 
+    if (Mod::enable_multiphantom) {
+        Game::increase_phantom_limit1();
+    }
+
+    Game::set_game_version(DS1_OVERHAUL_GAME_VER_NUM);
+
+#if 0
     if (!Mod::legacy_mode) {
         // Change game version number
         Game::set_game_version(DS1_OVERHAUL_GAME_VER_NUM);
 
         // Apply first part of phantom limit patch
-        Game::increase_phantom_limit1();
     } else {
         Game::set_game_version(DS1_OVERHAUL_LEGACY_GAME_VER_NUM);
     }
+#endif
 }
 
 /*
@@ -94,6 +114,9 @@ void on_process_attach()
 DWORD WINAPI on_process_attach_async(LPVOID lpParam)
 {
     if (!game_version_is_supported) {
+        return 0;
+    }
+    if (Mod::enable_overhaul == IDNO) {
         return 0;
     }
 
@@ -176,6 +199,9 @@ __declspec(dllexport) void __stdcall initialize_plugin()
     if (!game_version_is_supported) {
         return;
     }
+    if (Mod::enable_overhaul == IDNO) {
+        return;
+    }
 
     // Apply permanent animation ID write intercept
     AnimationEdits::apply_anim_id_write_intercept();
@@ -200,9 +226,10 @@ __declspec(dllexport) void __stdcall initialize_plugin()
     // Initialize pointers
     Game::init_pointers();
 
-    if (!Mod::legacy_mode)
-        // Apply secondary phantom limit patch
+    // Apply secondary phantom limit patch
+    if (Mod::enable_multiphantom) {
         Game::increase_phantom_limit2();
+    }
 
     if (Mod::disable_low_fps_disconnect)
     {

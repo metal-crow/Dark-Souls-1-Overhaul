@@ -53,6 +53,7 @@
 #define _DS1_OVERHAUL_PREF_LADDER_FIX_RUNG_INDEX_ "LadderFixRungIndexOverride"
 #define _DS1_OVERHAUL_PREF_CHEATS_WARNING_ "CheatsWarning"
 #define _DS1_OVERHAUL_PREF_DISABLE_AUTO_EQUIP_ "DisableAutoEquip"
+#define _DS1_OVERHAUL_PREF_ENABLE_MULTIPHANTOM_ "EnableMultiphantom"
 #define _DS1_OVERHAUL_PREF_OMNI_DIRECTIONAL_ROLL_ "OmniRoll"
 #define _DS1_OVERHAUL_PREF_SKIP_UPDATE_SOURCE_ "SkipRemoteSource"
 #define _DS1_OVERHAUL_PREF_KEEP_TEMP_UPDATE_CHECK_FILES_ "KeepTempRemoteFiles"
@@ -163,6 +164,8 @@ public:
     // Enable/disable mouse input
     static bool mouse_input;
 
+    static int enable_overhaul;
+
     // Lock camera when console is open
     static bool console_lock_camera;
 
@@ -195,6 +198,8 @@ public:
 
     // User preference setting; determines whether to automatically equip items on pickup
     static bool disable_auto_equip_pref;
+
+    static bool enable_multiphantom;
 
     // Custom game archive files to load instead of the vanilla game files
     static std::wstring custom_game_archive_path;
