@@ -36,8 +36,8 @@ void on_process_attach()
     Mod::enable_overhaul = MessageBox(
         NULL,
         std::string("Enable DS Overhaul : Extended Player Limit?\n\
-            Hitting yes will increase the player limit to 18, but will disable cooperative play entirely!The player limit increase only applies to red summon signs.\n\
-            If you are planning to PvP in the Arena + area then you want this on.").c_str(),
+Hitting yes will increase the player limit to 18, but will disable cooperative play entirely! The player limit increase only applies to red summon signs.\n\
+If you are planning to PvP in the Arena+ area then you want this on.").c_str(),
         std::string("Overhaul").c_str(),
         MB_YESNO
     );
