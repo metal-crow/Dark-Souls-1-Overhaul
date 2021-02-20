@@ -164,8 +164,6 @@ public:
     // Enable/disable mouse input
     static bool mouse_input;
 
-    static int enable_overhaul;
-
     // Lock camera when console is open
     static bool console_lock_camera;
 

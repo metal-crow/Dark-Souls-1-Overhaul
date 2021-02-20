@@ -33,18 +33,18 @@
 */
 void on_process_attach()
 {
-    Mod::enable_overhaul = MessageBox(
-        NULL,
+    if (MessageBox(NULL,
         std::string("Enable DS Overhaul : Extended Player Limit?\n\
 Hitting yes will increase the player limit to 18, but will disable cooperative play entirely! The player limit increase only applies to red summon signs.\n\
 If you are planning to PvP in the Arena+ area then you want this on.").c_str(),
         std::string("Overhaul").c_str(),
-        MB_YESNO
-    );
-
-    if (Mod::enable_overhaul == IDNO) {
-        Game::set_game_version(DS1_VERSION_OVERHAUL_CHEATS);
-        return;
+        MB_YESNO)
+        == IDYES)
+    {
+        Mod::enable_multiphantom = true;
+    }
+    else {
+        Mod::enable_multiphantom = false;
     }
 
     Mod::startup_messages.push_back(DS1_OVERHAUL_TXT_INTRO);
@@ -89,20 +89,11 @@ If you are planning to PvP in the Arena+ area then you want this on.").c_str(),
 
     if (Mod::enable_multiphantom) {
         Game::increase_phantom_limit1();
-    }
-
-    Game::set_game_version(DS1_OVERHAUL_GAME_VER_NUM);
-
-#if 0
-    if (!Mod::legacy_mode) {
-        // Change game version number
         Game::set_game_version(DS1_OVERHAUL_GAME_VER_NUM);
-
-        // Apply first part of phantom limit patch
-    } else {
-        Game::set_game_version(DS1_OVERHAUL_LEGACY_GAME_VER_NUM);
     }
-#endif
+    else {
+        Game::set_game_version(DS1_VERSION_OVERHAUL_CHEATS);
+    }
 }
 
 /*
@@ -114,9 +105,6 @@ If you are planning to PvP in the Arena+ area then you want this on.").c_str(),
 DWORD WINAPI on_process_attach_async(LPVOID lpParam)
 {
     if (!game_version_is_supported) {
-        return 0;
-    }
-    if (Mod::enable_overhaul == IDNO) {
         return 0;
     }
 
@@ -199,22 +187,9 @@ __declspec(dllexport) void __stdcall initialize_plugin()
     if (!game_version_is_supported) {
         return;
     }
-    if (Mod::enable_overhaul == IDNO) {
-        return;
-    }
 
     // Apply permanent animation ID write intercept
     AnimationEdits::apply_anim_id_write_intercept();
-
-    if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_OMNI_DIRECTIONAL_ROLL_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0)
-    {
-        AnimationEdits::omni_directional_dodge = 1;
-        print_console("    Enabling omni-directional rolling (EXPERIMENTAL)");
-    }
-    else
-    {
-        AnimationEdits::omni_directional_dodge = 0;
-    }
 
     // Load user preferences & keybinds from settings file
     Mod::get_user_preferences();
