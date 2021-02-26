@@ -340,7 +340,7 @@ __declspec(dllexport) void __stdcall main_loop()
         // Check if the player character has the special force-cooperation speffect applied, and force the invasion type
         // This is automatically reset back to -3 (SESSION_FORCEJOIN) on invasion, so no need to worry about resetting it
         bool found_forcewhite_speffect = false;
-        uint32_t forcewhite_speffect = 6910;
+        uint32_t forcewhite_speffect = 9513;
 
         //hunt through the currently applied speffects
         //this is a linked list
