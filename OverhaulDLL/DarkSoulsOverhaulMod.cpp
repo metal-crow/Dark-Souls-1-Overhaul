@@ -336,6 +336,37 @@ __declspec(dllexport) void __stdcall main_loop()
 			}
 			Game::on_reloaded();
 		}*/
+
+        // Check if the player character has the special force-cooperation speffect applied, and force the invasion type
+        // This is automatically reset back to -3 (SESSION_FORCEJOIN) on invasion, so no need to worry about resetting it
+        bool found_forcewhite_speffect = false;
+        uint32_t forcewhite_speffect = 6910;
+
+        //hunt through the currently applied speffects
+        //this is a linked list
+        SpPointer speffect_cur = SpPointer(Game::world_char_base, { 0x28, 0x10, 0x4, 0x28 });
+        while (!found_forcewhite_speffect && speffect_cur.resolve() != NULL)
+        {
+            uint32_t speffect_id = *(uint32_t*)speffect_cur.resolve();
+            if (speffect_id == forcewhite_speffect)
+            {
+                found_forcewhite_speffect = true;
+            }
+            else
+            {
+                uint32_t next_speffect_addr = *(uint32_t*)((uint32_t)speffect_cur.resolve()+8);
+                speffect_cur = SpPointer((void*)(next_speffect_addr+0x28));
+            }
+        }
+
+        if (found_forcewhite_speffect)
+        {
+            SpPointer invasionTypeSPP = SpPointer((void *)0x13784A0, { 0xBE4 });
+            if (invasionTypeSPP.resolve() != NULL)
+            {
+                *(uint32_t*)invasionTypeSPP.resolve() = -1; //SESSION_WHITE
+            }
+        }
     }
 }
 
