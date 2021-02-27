@@ -345,16 +345,17 @@ __declspec(dllexport) void __stdcall main_loop()
         //hunt through the currently applied speffects
         //this is a linked list
         SpPointer speffect_cur = SpPointer(Game::world_char_base, { 0x28, 0x10, 0x4, 0x28 });
-        while (!found_forcewhite_speffect && speffect_cur.resolve() != NULL)
+        uint32_t* speffect_cur_addr = NULL;
+        while (!found_forcewhite_speffect && (speffect_cur_addr = (uint32_t*)speffect_cur.resolve()) != NULL)
         {
-            uint32_t speffect_id = *(uint32_t*)speffect_cur.resolve();
+            uint32_t speffect_id = *speffect_cur_addr;
             if (speffect_id == forcewhite_speffect)
             {
                 found_forcewhite_speffect = true;
             }
             else
             {
-                uint32_t next_speffect_addr = *(uint32_t*)((uint32_t)speffect_cur.resolve()+8);
+                uint32_t next_speffect_addr = *(uint32_t*)((uint32_t)speffect_cur_addr+8);
                 speffect_cur = SpPointer((void*)(next_speffect_addr+0x28));
             }
         }
