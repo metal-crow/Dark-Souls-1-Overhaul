@@ -105,9 +105,6 @@
     <ClCompile Include="src\MoveWhileCasting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\AnimationEdits.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\LadderFix.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -183,9 +180,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\MoveWhileCasting.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\AnimationEdits.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\LadderFix.h">

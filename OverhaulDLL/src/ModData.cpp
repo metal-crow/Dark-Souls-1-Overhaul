@@ -11,7 +11,6 @@
 #include "Challenge/AggressiveAI.h"
 #include "Challenge/BlackPhantomEnemies.h"
 #include "Challenge/GravelordPhantoms.h"
-#include "AnimationEdits.h"
 #include "LadderFix.h"
 #include "Updates.h"
 #include "DurabilityBars.h"
@@ -192,11 +191,6 @@ void Mod::get_user_preferences()
     Mod::cheats_warning = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_CHEATS_WARNING_, (int)Mod::cheats_warning, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
 
     Mod::disable_low_fps_disconnect = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DISABLE_LOW_FPS_DISCONNECT_, (int)Mod::disable_low_fps_disconnect, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
-
-    AnimationEdits::gesture_cancelling = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_GESTURE_CANCELLING_, (int)AnimationEdits::gesture_cancelling, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
-    if (AnimationEdits::gesture_cancelling) {
-        print_console(msg.append("    Gesture cancelling enabled"));
-    }
     
     Mod::disable_auto_equip_pref = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DISABLE_AUTO_EQUIP_, (int)Mod::disable_auto_equip_pref, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
     if (Mod::disable_auto_equip_pref) {
@@ -429,9 +423,6 @@ void Mod::get_user_keybinds()
 
     // Toggle Multi-consumption
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_MULTI_CONSUME_, kf_toggle_multi_consume);
-
-    // Toggle omni-directional rolling
-    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_OMNI_ROLL_, kf_toggle_omni_roll);
 
     // Toggle jumping with L3 instead of B
     get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_L3_JUMP_, kf_toggle_l3_jump);

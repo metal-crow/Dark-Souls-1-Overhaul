@@ -257,7 +257,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\AnimationEdits.h" />
     <ClInclude Include="include\AntiCheat.h" />
     <ClInclude Include="include\BloodborneRallySystem.h" />
     <ClInclude Include="include\Challenge\AggressiveAI.h" />
@@ -314,7 +313,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Build|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\AnimationEdits.cpp" />
     <ClCompile Include="src\AntiCheat\AntiCheat.cpp" />
     <ClCompile Include="src\AntiCheat\BinocsTriggerBlock.cpp" />
     <ClCompile Include="src\AntiCheat\BossGuard.cpp" />

@@ -14,7 +14,6 @@
 #include "Challenge/GravelordPhantoms.h"
 #include "Menu/SavedCharacters.h"
 #include "XInputUtil.h"
-#include "AnimationEdits.h"
 #include "LadderFix.h"
 #include "Updates.h"
 #include "DurabilityBars.h"
@@ -119,12 +118,6 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
 
     Game::increase_gui_hpbar_max();
 
-    if (!Mod::legacy_mode) {
-        BloodborneRally::start();
-        AnimationEdits::alter_animation_speeds();
-		AnimationEdits::disable_whiff_animations();
-    }
-
     if (LadderFix::enable_pref) {
         LadderFix::apply();
     }
@@ -187,9 +180,6 @@ __declspec(dllexport) void __stdcall initialize_plugin()
     if (!game_version_is_supported) {
         return;
     }
-
-    // Apply permanent animation ID write intercept
-    AnimationEdits::apply_anim_id_write_intercept();
 
     // Load user preferences & keybinds from settings file
     Mod::get_user_preferences();

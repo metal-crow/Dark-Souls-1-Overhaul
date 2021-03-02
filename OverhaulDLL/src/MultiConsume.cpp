@@ -7,7 +7,6 @@
 
 
 #include "MultiConsume.h"
-#include "AnimationEdits.h"
 #include "DllMain.h"
 
 
@@ -120,7 +119,6 @@ void apply(const std::string& output_prefix)
 
         //set_mem_protection(const_cast<uint8_t*>(intercept_whiff_anim_injection_point), 6, MEM_PROTECT_RWX);
         //inject_jmp_5b(const_cast<uint8_t*>(intercept_whiff_anim_injection_point), &returnhere_disable_cant_use_anim, 1, &intercept_whiff_anim);
-        AnimationEdits::skip_next_whiff_anim = 0;
 
         set_mem_protection(const_cast<uint8_t*>(force_item_consumption_injection_point), 6, MEM_PROTECT_RWX);
         inject_jmp_5b(const_cast<uint8_t*>(force_item_consumption_injection_point), &returnhere_force_item_consumption, 1, &force_item_consumption);
@@ -171,7 +169,6 @@ void unpatch(const std::string& output_prefix)
 
         //forget_injection((uint32_t)intercept_whiff_anim_injection_point);
         //apply_byte_patch(const_cast<uint8_t*>(intercept_whiff_anim_injection_point), intercept_whiff_anim_original_bytes, 6);
-        AnimationEdits::skip_next_whiff_anim = 0;
 
         forget_injection((uint32_t)force_item_consumption_injection_point);
         apply_byte_patch(const_cast<uint8_t*>(force_item_consumption_injection_point), force_item_consumption_original_bytes, 6);
@@ -262,8 +259,6 @@ void __declspec(naked) __stdcall intercept_item_consumption()
         je skip_multiconsume_dialog
         // Delay use of item until quantity is determined via numberpicker dialog
         mov dword ptr [esp+0x14], 0
-        // Skip next whiff animation (caused by item-use delay)
-        mov [AnimationEdits::skip_next_whiff_anim], 1
         jmp show_multiconsume_dialog
 
 
@@ -672,7 +667,6 @@ void __declspec(naked) __stdcall intercept_dlg_result()
         exit_dlg_result:
         // Don't capture next dialog result
         mov [capture_next_dlg_result], 0
-        mov [AnimationEdits::skip_next_whiff_anim], 0
         jmp returnhere_dlg_result
     }
 }
@@ -687,7 +681,6 @@ void __declspec(naked) __stdcall intercept_dlg_no_result()
         mov [skip_next_multiconsume_dialog], 0
         mov [force_consume_next_item], 0
         mov [capture_next_dlg_result], 0
-        mov [AnimationEdits::skip_next_whiff_anim], 0
         mov [consumed_from_inventory], 0
         mov [last_multiconsume_item], 0
         mov [last_consumption_quantity], 0

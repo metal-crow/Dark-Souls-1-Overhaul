@@ -19,7 +19,6 @@
 #include "Challenge/BlackPhantomEnemies.h"
 #include "PhantomUnshackle.h"
 #include "MoveWhileCasting.h"
-#include "AnimationEdits.h"
 #include "Menu/Dialog.h"
 #include "Param/Params.h"
 #include "Param/Item.h"
@@ -140,29 +139,6 @@ void Game::on_first_character_loaded()
 
     if (Mod::dim_lava_pref)
         Game::enable_dim_lava(true);
-
-    print_console(Mod::output_prefix + "Searching memory for files...");
-
-    if (AnimationEdits::gesture_cancelling) {
-        // Perform TAE edits to player animations to enable gesture cancelling
-        void *ret_val = (void*)Game::player_tae.init_from_aob_scan("54 41 45 20 00 00 00 00 0B 00 01 00 B4 AE 09 00");
-        std::string temp;
-        print_console(std::string("    Found Time Action Event file for player character animations at 0x") + FileUtil::to_hex_string((int)ret_val, temp) + ". Enabling gesture cancelling...");
-        AnimationEdits::enable_gesture_cancelling();
-    }
-
-
-    if (!Mod::legacy_mode)
-    {
-        // Enable rally system vfx
-        BloodborneRally::on_char_load();
-
-        // Apply phantom unshackle patch
-        PhantomUnshackle::start();
-
-        //Allow movement during spells
-        CastingMovement::start();
-    }
 
     // Enable forced binoculars/dragonification PvP protections
     if (AntiCheat::BinocsTriggerBlock::active)

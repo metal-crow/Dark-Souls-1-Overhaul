@@ -24,7 +24,6 @@
 #include "Menu/Dialog.h"
 #include "MultiTribute.h"
 #include "MultiConsume.h"
-#include "AnimationEdits.h"
 #include "L3Jump.h"
 
 
@@ -877,39 +876,6 @@ int cc_multi_consume(std::vector<std::string> args, std::string *output)
     return ret_val;
 }
 
-
-// Enables/disables omni-directional dodging
-int cc_omni_roll(std::vector<std::string> args, std::string *output)
-{
-    int ret_val = CONSOLE_COMMAND_SUCCESS;
-    if (args.size() > 0)
-    {
-        switch (parse_toggle_arg(args.at(0).c_str()))
-        {
-            case 0:
-                AnimationEdits::omni_directional_dodge = 0;
-                break;
-            case 1:
-                AnimationEdits::omni_directional_dodge = 1;
-                break;
-            default:
-                output->append(ERROR_INVALID_BOOL_ARGUMENT + "\n");
-                ret_val = ERROR_INVALID_PARAMETER;
-                break;
-        }
-    }
-    if (!!AnimationEdits::omni_directional_dodge)
-    {
-        output->append("Omni-directional dodging = enabled");
-    }
-    else
-    {
-        output->append("Omni-directional dodging = disabled");
-    }
-    return ret_val;
-}
-
-
 // Enables/disables jumping with L3 instead of B
 int cc_l3_jump(std::vector<std::string> args, std::string *output)
 {
@@ -1519,7 +1485,6 @@ void Mod::register_console_commands()
     register_console_command(ccn_ladder_fix_override, cc_ladder_fix_override, chm_ladder_fix_override);
     register_console_command(ccn_multi_consume, cc_multi_consume, chm_multi_consume);
     register_console_command(ccn_multi_tribute, cc_multi_tribute, chm_multi_tribute);
-    register_console_command(ccn_omni_roll, cc_omni_roll, chm_omni_roll);
     register_console_command(ccn_l3_jump, cc_l3_jump, chm_l3_jump);
     register_console_command(ccn_low_fps_disconnect, cc_low_fps_disconnect, chm_low_fps_disconnect);
     register_console_command(ccn_fix_bonfire_input, cc_fix_bonfire_input, chm_fix_bonfire_input);

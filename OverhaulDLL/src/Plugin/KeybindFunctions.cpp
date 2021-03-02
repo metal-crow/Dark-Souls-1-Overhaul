@@ -20,7 +20,6 @@
 #include "Menu/SavedCharacters.h"
 #include "MultiTribute.h"
 #include "MultiConsume.h"
-#include "AnimationEdits.h"
 #include "L3Jump.h"
 
 
@@ -202,24 +201,6 @@ int kf_toggle_multi_consume() {
     else
     {
         MultiConsume::apply();
-    }
-    Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
-    return ERROR_SUCCESS;
-}
-
-
-// Toggles omni-directional rolling
-int kf_toggle_omni_roll()
-{
-    if (!!AnimationEdits::omni_directional_dodge)
-    {
-        AnimationEdits::omni_directional_dodge = 0;
-        print_console("Omni-directional dodging = disabled");
-    }
-    else
-    {
-        AnimationEdits::omni_directional_dodge = 1;
-        print_console("Omni-directional dodging = enabled");
     }
     Sleep(_DS1_OVERHAUL_KEYPRESS_DELAY_);
     return ERROR_SUCCESS;
