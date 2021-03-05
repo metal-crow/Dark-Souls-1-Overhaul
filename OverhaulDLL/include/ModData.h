@@ -68,6 +68,8 @@ public:
     // Plays the credits for the Dark Souls Overhaul Mod (displays the list of people who contributed to development)
     static void play_credits();
 
+    static void set_legacy_mode(bool);
+
 private:
     // Helper function for get_user_keybinds() that loads the specified keybind from the config file and binds it to the specified function
     static void get_single_user_keybind(const char *keybind_name, int(*function)());

@@ -12,6 +12,7 @@
 #include "AntiCheat.h"
 #include "AnimationEdits.h"
 #include "Files.h"
+#include "FileReloading.h"
 
 #define _SP_DEFINE_VK_NAME_STRINGS_  // Must be defined to use Virtual-key code name strings from SP_IO_Strings.hpp (opt-in by default because it increases filesize by a few KB)
 
@@ -155,3 +156,10 @@ void Mod::get_custom_game_files()
     }
 }
 
+// Change the legacy mode, and also reload the files that we modify now that we're using the original/new ones
+void Mod::set_legacy_mode(bool legacy)
+{
+    legacy_mode = legacy;
+    FileReloading::ReloadGameParam();
+    FileReloading::ReloadPlayer();
+}

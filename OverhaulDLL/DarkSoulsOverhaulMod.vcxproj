@@ -37,6 +37,7 @@
       </ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\DeadAngles.cpp" />
+    <ClCompile Include="src\FileReloading.cpp" />
     <ClCompile Include="src\EquipmentUnlock.cpp" />
     <ClCompile Include="src\Files.cpp" />
     <ClCompile Include="src\FixAnkles.cpp" />
@@ -67,6 +68,7 @@
     <ClInclude Include="include\CrashHandler.h" />
     <ClInclude Include="include\DarkSoulsOverhaulMod.h" />
     <ClInclude Include="include\DeadAngles.h" />
+    <ClInclude Include="include\FileReloading.h" />
     <ClInclude Include="include\EquipmentUnlock.h" />
     <ClInclude Include="include\FixAnkles.h" />
     <ClInclude Include="include\InvisibleBackstabAttackFix.h" />

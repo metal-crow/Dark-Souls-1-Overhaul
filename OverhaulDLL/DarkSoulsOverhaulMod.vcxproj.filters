@@ -93,6 +93,9 @@
     <ClCompile Include="src\CrashHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\FileReloading.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3d11-wrapper\include\d3d11\exports.h">
@@ -132,6 +135,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ui\crash_hander_ui_resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FileReloading.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

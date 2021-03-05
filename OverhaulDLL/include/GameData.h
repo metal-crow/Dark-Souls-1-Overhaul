@@ -114,6 +114,12 @@ public:
 
     static uint64_t world_chr_man_imp;
 
+    static uint64_t param_man;
+
+    static uint64_t solo_param_man;
+
+    static uint64_t file_man;
+
     static const uint64_t player_animation_mediator_loading = 0x3790E2;
 
     static const uint64_t calculate_attack_damage_offset = 0x2a8ead6;

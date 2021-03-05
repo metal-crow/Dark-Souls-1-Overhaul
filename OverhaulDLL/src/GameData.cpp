@@ -41,6 +41,12 @@ uint64_t Game::game_data_man = NULL;
 
 uint64_t Game::world_chr_man_imp = NULL;
 
+uint64_t Game::param_man = NULL;
+
+uint64_t Game::solo_param_man = NULL;
+
+uint64_t Game::file_man = NULL;
+
 // Player character status (loading, human, co-op, invader, hollow)
 sp::mem::pointer<int32_t> Game::player_char_status;
 
@@ -121,6 +127,12 @@ void Game::init()
     Game::game_data_man = Game::ds1_base + 0x1D278F0;
 
     Game::world_chr_man_imp = Game::ds1_base + 0x1d151b0;
+
+    Game::param_man = Game::ds1_base + 0x1d1b098;
+
+    Game::solo_param_man = Game::ds1_base + 0x1d1b360;
+
+    Game::file_man = Game::ds1_base + 0x1d1e4f8;
 
     //hook the code that calculates attack damage and save off the weapon id used for the attack
     last_attack_weaponid = -1;
