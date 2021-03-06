@@ -23,6 +23,7 @@
 #include "InputUtil.h"
 #include "SpellDesyncFixes.h"
 #include "FixAnkles.h"
+#include "ModNetworking.h"
 
 HMODULE d3d11_module;
 
@@ -102,6 +103,7 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     SpellDesync::start();
     PhantomUnshackle::start();
     FixAnkles::start();
+    ModNetworking::start();
     if (Mod::disable_low_fps_disconnect) {
         Game::disable_low_fps_disconnect(true);
     }

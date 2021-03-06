@@ -52,6 +52,7 @@
     <ClCompile Include="src\ModData.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="src\ModNetworking.cpp" />
     <ClCompile Include="src\PhantomUnshackle.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -72,6 +73,7 @@
     <ClInclude Include="include\EquipmentUnlock.h" />
     <ClInclude Include="include\FixAnkles.h" />
     <ClInclude Include="include\InvisibleBackstabAttackFix.h" />
+    <ClInclude Include="include\ModNetworking.h" />
     <ClInclude Include="include\SpellDesyncFixes.h" />
     <ClInclude Include="include\Xinput_1_3.h" />
     <ClInclude Include="ui\crash_hander_ui_resource.h" />
@@ -148,6 +150,7 @@
     <MASM Include="src\GameDataASM.asm" />
     <MASM Include="src\InvisibleBackstabAttackFixASM.asm" />
     <MASM Include="src\Menu\SavedCharactersASM.asm" />
+    <MASM Include="src\ModNetworking_ASM.asm" />
     <MASM Include="src\PhantomUnshackleASM.asm" />
     <MASM Include="src\InputUtilASM.asm" />
     <MASM Include="src\SpellDesyncFixesASM.asm" />
