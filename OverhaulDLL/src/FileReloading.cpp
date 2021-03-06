@@ -103,7 +103,8 @@ void FileReloading::ReloadPlayer()
 
 void FileReloading::ReloadGameParam()
 {
-    UnloadIndividualSoloParams({EquipParamWeapon,
+    UnloadIndividualSoloParams({
+                                EquipParamWeapon,
                                 EquipParamProtector,
                                 EquipParamAccessory,
                                 EquipParamGoods,
@@ -121,7 +122,7 @@ void FileReloading::ReloadGameParam()
                                 SpEffectParam,
                                 SpEffectVfxParam,
                                 TalkParam,
-                                MenuColorTableParam,
+                                //MenuColorTableParam, crash on reload
                                 ItemLotParam,
                                 MoveParam,
                                 CharaInitParam,
@@ -133,14 +134,15 @@ void FileReloading::ReloadGameParam()
                                 QwcJudge,
                                 GameAreaParam,
                                 SkeletonParam,
-                                CalcCorrectGraph,
+                                //CalcCorrectGraph, crash on reload
                                 LockCamParam,
                                 ObjActParam,
                                 HitMtrlParam,
                                 KnockBackParam,
                                 LevelSyncParam,
                                 CoolTimeParam,
-                                WhiteCoolTimeParam});
+                                WhiteCoolTimeParam
+                                });
 
     ReloadParamFile(GameParam);
 }
