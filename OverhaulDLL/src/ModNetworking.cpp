@@ -2,10 +2,19 @@
 #include "SP/memory/injection/asm/x64.h"
 #include "DarkSoulsOverhaulMod.h"
 
+bool ModNetworking::allow_connect_with_non_mod_host = false;
+bool ModNetworking::allow_connect_with_legacy_mod_host = false;
+bool ModNetworking::allow_connect_with_overhaul_mod_host = false;
+bool ModNetworking::allow_connect_with_non_mod_guest = false;
+
 bool ModNetworking::host_mod_installed = false;
 bool ModNetworking::host_legacy_enabled = false;
 bool ModNetworking::guest_mod_installed = false;
 bool ModNetworking::guest_legacy_enabled = false;
+
+const uint32_t MOD_ENABLED = 0x80000000; //it's encoded that the mod is active in the most significant bit
+const uint32_t LEGACY_ENABLED = 0x40000000; //it's encoded that the mod is in legacy mode in the 2nd most significant bit
+const uint32_t REMOVE_FLAGS = ~(MOD_ENABLED | LEGACY_ENABLED);
 
 extern "C" {
     uint64_t sendPacket_injection_return;
@@ -35,7 +44,7 @@ void ModNetworking::start()
 void getNetMessage_injection_helper(uint8_t* data, uint32_t size, uint32_t type)
 {
     //ignore types we don't care about/empty packets
-    if (!(type == 7 || type == 5) || size == 0)
+    if (!(type == 10 || type == 5) || size == 0)
     {
         return;
     }
@@ -45,8 +54,7 @@ void getNetMessage_injection_helper(uint8_t* data, uint32_t size, uint32_t type)
     {
         uint32_t value = *(uint32_t*)data;
 
-        //it's encoded that the mod is active in the most significant bit
-        if ((value & 0x80000000) != 0)
+        if ((value & MOD_ENABLED) != 0)
         {
             ModNetworking::host_mod_installed = true;
         }
@@ -55,8 +63,7 @@ void getNetMessage_injection_helper(uint8_t* data, uint32_t size, uint32_t type)
             ModNetworking::host_mod_installed = false;
         }
 
-        //it's encoded that the mod is in legacy mode in the 2nd most significant bit
-        if ((value & 0x40000000) != 0)
+        if ((value & LEGACY_ENABLED) != 0)
         {
             ModNetworking::host_legacy_enabled = true;
         }
@@ -65,18 +72,39 @@ void getNetMessage_injection_helper(uint8_t* data, uint32_t size, uint32_t type)
             ModNetworking::host_legacy_enabled = false;
         }
 
+        // Parse the received data
+        // As the guest, we must change our settings to match the host (based on how we've configured our options), or else disconnect.
+        if (ModNetworking::host_mod_installed == false && ModNetworking::allow_connect_with_non_mod_host == true)
+        {
+            //connecting to non-mod
+            Mod::set_mode(true, ModNetworking::host_mod_installed);
+        }
+        else if (ModNetworking::host_mod_installed == true && ModNetworking::host_legacy_enabled == false && ModNetworking::allow_connect_with_overhaul_mod_host == true)
+        {
+            //connecting to non-legacy
+            Mod::set_mode(ModNetworking::host_legacy_enabled, ModNetworking::host_mod_installed);
+        }
+        else if (ModNetworking::host_mod_installed == true && ModNetworking::host_legacy_enabled == true && ModNetworking::allow_connect_with_legacy_mod_host == true)
+        {
+            //connecting to legacy
+            Mod::set_mode(ModNetworking::host_legacy_enabled, ModNetworking::host_mod_installed);
+        }
+        else
+        {
+            //disconnect
+        }
+
         //remove these flags before the game parses it
-        *(uint32_t*)data = value & 0x3FFFFFFF;
+        *(uint32_t*)data = value & REMOVE_FLAGS;
         return;
     }
 
-    // If we recieve a type7, we're the host
-    if (type == 7)
+    // If we recieve a type10 AND we're the host (we created the session)
+    if (type == 10 && Game::get_SessionManagerImp_session_action_result() == CreateSessionSuccess)
     {
-        uint8_t value = *data;
+        uint32_t value = *(uint32_t*)data;
 
-        //it's encoded that the mod is active in the most significant bit
-        if ((value & 0b10000000) != 0)
+        if ((value & MOD_ENABLED) != 0)
         {
             ModNetworking::guest_mod_installed = true;
         }
@@ -85,8 +113,7 @@ void getNetMessage_injection_helper(uint8_t* data, uint32_t size, uint32_t type)
             ModNetworking::guest_mod_installed = false;
         }
 
-        //it's encoded that the mod is in legacy mode in the 2nd most significant bit
-        if ((value & 0b01000000) != 0)
+        if ((value & LEGACY_ENABLED) != 0)
         {
             ModNetworking::guest_legacy_enabled = true;
         }
@@ -95,7 +122,28 @@ void getNetMessage_injection_helper(uint8_t* data, uint32_t size, uint32_t type)
             ModNetworking::guest_legacy_enabled = false;
         }
 
-        *data = 0; //just to be safe
+        // Parse the received data
+        // As the host, we only change our settings if the connecting user is non-mod, and we allow non-mod connections, and we don't have any other phantoms in here
+        // (Playernum is 1 for host, 2+ is the 1st connected guest)
+        if (ModNetworking::guest_mod_installed == false && ModNetworking::allow_connect_with_non_mod_guest == true && (value & REMOVE_FLAGS) == 2)
+        {
+            Mod::set_mode(true, ModNetworking::guest_mod_installed);
+        }
+        // If specified in options, we must disconnect the non-mod player, since they won't on their own
+        else if (ModNetworking::guest_mod_installed == false && ModNetworking::allow_connect_with_non_mod_guest == false)
+        {
+            //disconnect
+        }
+        // At this point, we've already sent our info packet (type5)
+        // If the guest hasn't already updated to it and this packet doesn't reflect our configs, somethign is wrong, so DC them
+        else if (ModNetworking::guest_mod_installed == true && ModNetworking::guest_legacy_enabled != Mod::legacy_mode)
+        {
+            //disconnect
+        }
+        // Otherwise we're good to go, the configs match!
+
+        //remove these flags before the game parses it
+        *(uint32_t*)data = value & REMOVE_FLAGS;
         return;
     }
 }
@@ -103,7 +151,7 @@ void getNetMessage_injection_helper(uint8_t* data, uint32_t size, uint32_t type)
 void sendPacket_injection_helper(uint8_t* data, uint32_t size, uint32_t type)
 {
     //ignore types we don't care about/empty packets
-    if (!(type == 7 || type == 5) || size == 0)
+    if (!(type == 10 || type == 5) || size == 0)
     {
         return;
     }
@@ -114,33 +162,33 @@ void sendPacket_injection_helper(uint8_t* data, uint32_t size, uint32_t type)
     {
         uint32_t value = *(uint32_t*)data;
 
-        //encode that the mod is active in the most significant bit (always gonna be true, since we're running the mod)
-        value |= 0x80000000;
+        //the mod is active (always true, since we're running the mod)
+        value |= MOD_ENABLED;
 
-        //encode that the mod is in legacy mode in the 2nd most significant bit
         if (Mod::legacy_mode)
         {
-            value |= 0x40000000;
+            value |= LEGACY_ENABLED;
         }
 
         *(uint32_t*)data = value;
         return;
     }
 
-    // If we're sending a type7, we're the guest
-    // This is always 1 byte of 0, which isn't read (other than getting checked that it's received)
-    if (type == 7)
+    // If we're sending a type10 AND we're the guest (check the player num in the type10 packet we're sending. 1 is host, 2+ is guest)
+    // This also contains the player number value, so same as above
+    if (type == 10 && *(uint32_t*)data > 1)
     {
-        //encode that the mod is active in the most significant bit (always gonna be true, since we're running the mod)
-        uint8_t value = 0b10000000;
+        uint32_t value = *(uint32_t*)data;
 
-        //encode that the mod is in legacy mode in the 2nd most significant bit
+        //the mod is active (always true, since we're running the mod)
+        value |= MOD_ENABLED;
+
         if (Mod::legacy_mode)
         {
-            value |= 0b01000000;
+            value |= LEGACY_ENABLED;
         }
 
-        *data = value;
+        *(uint32_t*)data = value;
         return;
     }
 }

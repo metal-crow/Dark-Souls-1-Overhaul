@@ -47,7 +47,10 @@ public:
     // Used in console messages to inform users that a message is being printed by the Overhaul mod
     static const std::string output_prefix;
 
-    // Determines whether to start in legacy mode (only applies fixes/anti-cheat/QoL changes, no gameplay modifications)
+    // Determines if we want to be in legacy mode or not
+    static bool prefer_legacy_mode;
+
+    // Determines whether we are in legacy mode (only applies fixes, no gameplay changes)
     static bool legacy_mode;
 
     // Determines to disable the game's "Framerate insufficient for online play" disconnection
@@ -68,7 +71,7 @@ public:
     // Plays the credits for the Dark Souls Overhaul Mod (displays the list of people who contributed to development)
     static void play_credits();
 
-    static void set_legacy_mode(bool);
+    static void set_mode(bool, bool);
 
 private:
     // Helper function for get_user_keybinds() that loads the specified keybind from the config file and binds it to the specified function

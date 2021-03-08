@@ -13,6 +13,7 @@
 #include "AnimationEdits.h"
 #include "Files.h"
 #include "FileReloading.h"
+#include "SpellDesyncFixes.h"
 
 #define _SP_DEFINE_VK_NAME_STRINGS_  // Must be defined to use Virtual-key code name strings from SP_IO_Strings.hpp (opt-in by default because it increases filesize by a few KB)
 
@@ -24,7 +25,10 @@
 // Used in console messages to inform users that a message is being printed by the Overhaul mod
 const std::string Mod::output_prefix = "[Overhaul Mod] ";
 
-// Determines whether to start in legacy mode (only applies fixes, no gameplay changes)
+// Determines if we want to be in legacy mode or not
+bool Mod::prefer_legacy_mode = false;
+
+// Determines whether we are in legacy mode (only applies fixes, no gameplay changes)
 bool Mod::legacy_mode = false;
 
 // Determines to disable the game's "Low framerate detected" disconnection
@@ -157,9 +161,15 @@ void Mod::get_custom_game_files()
 }
 
 // Change the legacy mode, and also reload the files that we modify now that we're using the original/new ones
-void Mod::set_legacy_mode(bool legacy)
+// Also update any specific settings required to be compatable with non-mod users
+void Mod::set_mode(bool legacy, bool mod_installed)
 {
+    if (!mod_installed)
+    {
+        legacy = true;
+    }
     legacy_mode = legacy;
+    SpellDesync::enabled = mod_installed; //since this requires reciving custom packets to work, not compatable with non-mod
     FileReloading::ReloadGameParam();
     FileReloading::ReloadPlayer();
 }

@@ -85,6 +85,17 @@ enum AnimationStateTypesEnum {
     Upper_WalkLR = 2
 };
 
+enum SessionActionResultEnum
+{
+    NoSession = 0,
+    TryToCreateSession = 1,
+    FailedToCreateSession = 2,
+    CreateSessionSuccess = 3,
+    TryToJoinSession = 4,
+    FailedToJoinSession = 5,
+    JoinSessionSuccess = 6
+};
+
 class Game
 {
 public:
@@ -119,6 +130,8 @@ public:
     static uint64_t solo_param_man;
 
     static uint64_t file_man;
+
+    static uint64_t session_man_imp;
 
     static const uint64_t player_animation_mediator_loading = 0x3790E2;
 
@@ -242,6 +255,8 @@ public:
 	static void* get_pc_ActiveState_EzStateMachineImpl();
 
 	static uint64_t get_EzStateMachineImpl_curstate_id(void * EzStateMachineImpl);
+
+    static SessionActionResultEnum get_SessionManagerImp_session_action_result();
 
     /*
      * Help speedup some functions by, whenever we're loaded into an area,

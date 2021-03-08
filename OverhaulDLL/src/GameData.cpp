@@ -47,6 +47,8 @@ uint64_t Game::solo_param_man = NULL;
 
 uint64_t Game::file_man = NULL;
 
+uint64_t Game::session_man_imp = NULL;
+
 // Player character status (loading, human, co-op, invader, hollow)
 sp::mem::pointer<int32_t> Game::player_char_status;
 
@@ -133,6 +135,8 @@ void Game::init()
     Game::solo_param_man = Game::ds1_base + 0x1d1b360;
 
     Game::file_man = Game::ds1_base + 0x1d1e4f8;
+
+    Game::session_man_imp = Game::ds1_base + 0x1d1a370;
 
     //hook the code that calculates attack damage and save off the weapon id used for the attack
     last_attack_weaponid = -1;
@@ -838,4 +842,9 @@ void* Game::get_pc_ActiveState_EzStateMachineImpl() {
 uint64_t Game::get_EzStateMachineImpl_curstate_id(void* EzStateMachineImpl) {
     void* ezstate_state = *(void**)((uint64_t)EzStateMachineImpl + 0x20);
     return *(uint64_t*)((uint64_t)ezstate_state + 0);
+}
+
+SessionActionResultEnum Game::get_SessionManagerImp_session_action_result()
+{
+    return static_cast<SessionActionResultEnum>(*(*(uint32_t**)Game::session_man_imp) + 0xf8);
 }

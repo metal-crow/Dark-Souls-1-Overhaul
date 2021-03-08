@@ -10,6 +10,13 @@ class ModNetworking
 public:
     static void start();
 
+    //configuration options for who can connect if you're host/how to change settings if you're guest
+    static bool allow_connect_with_non_mod_host;
+    static bool allow_connect_with_legacy_mod_host;
+    static bool allow_connect_with_overhaul_mod_host;
+    static bool allow_connect_with_non_mod_guest;
+
+    //info about the current host/guest
     static bool host_mod_installed;
     static bool host_legacy_enabled;
     static bool guest_mod_installed;
