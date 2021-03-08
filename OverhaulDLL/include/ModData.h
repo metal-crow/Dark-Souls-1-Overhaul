@@ -31,6 +31,13 @@
 
 #include <vector>
 
+enum ModMode
+{
+    Overhaul,
+    Legacy,
+    Compatability
+};
+
 class Mod
 {
 public:
@@ -72,6 +79,8 @@ public:
     static void play_credits();
 
     static void set_mode(bool, bool);
+
+    static ModMode get_mode();
 
 private:
     // Helper function for get_user_keybinds() that loads the specified keybind from the config file and binds it to the specified function

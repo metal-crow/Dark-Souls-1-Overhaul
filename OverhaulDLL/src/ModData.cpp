@@ -173,3 +173,19 @@ void Mod::set_mode(bool legacy, bool mod_installed)
     FileReloading::ReloadGameParam();
     FileReloading::ReloadPlayer();
 }
+
+ModMode Mod::get_mode()
+{
+    if (Mod::legacy_mode && !SpellDesync::enabled)
+    {
+        return Compatability;
+    }
+    else if (Mod::legacy_mode && SpellDesync::enabled)
+    {
+        return Legacy;
+    }
+    else if (!Mod::legacy_mode)
+    {
+        return Overhaul;
+    }
+}
