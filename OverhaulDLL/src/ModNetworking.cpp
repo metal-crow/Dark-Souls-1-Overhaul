@@ -123,11 +123,28 @@ void getNetMessage_injection_helper(uint8_t* data, uint32_t size, uint32_t type)
         }
 
         // Parse the received data
-        // As the host, we only change our settings if the connecting user is non-mod, and we allow non-mod connections, and we don't have any other phantoms in here
+        // As the host, we only change our settings if the connecting user is non-mod, and we allow non-mod connections, and we don't have any other non-mod phantoms in here
         // (Playernum is 1 for host, 2+ is the 1st connected guest)
-        if (ModNetworking::guest_mod_installed == false && ModNetworking::allow_connect_with_non_mod_guest == true && (value & REMOVE_FLAGS) == 2)
+        if (ModNetworking::guest_mod_installed == false && ModNetworking::allow_connect_with_non_mod_guest == true)
         {
-            Mod::set_mode(true, ModNetworking::guest_mod_installed);
+            // first non-mod user, change settings
+            if ((value & REMOVE_FLAGS) == 2)
+            {
+                Mod::set_mode(true, ModNetworking::guest_mod_installed);
+            }
+            // not first non-mod user
+            else if ((value & REMOVE_FLAGS) > 2)
+            {
+                // If this new guest is a non-mod user but we already have a mod user connected
+                if (Mod::get_mode() != Compatability)
+                {
+                    //disconnect
+                }
+                else
+                {
+                    //no change needed, we're already in compatability mode
+                }
+            }
         }
         // If specified in options, we must disconnect the non-mod player, since they won't on their own
         else if (ModNetworking::guest_mod_installed == false && ModNetworking::allow_connect_with_non_mod_guest == false)
@@ -135,7 +152,7 @@ void getNetMessage_injection_helper(uint8_t* data, uint32_t size, uint32_t type)
             //disconnect
         }
         // At this point, we've already sent our info packet (type5)
-        // If the guest hasn't already updated to it and this packet doesn't reflect our configs, somethign is wrong, so DC them
+        // If the guest hasn't already updated to it and this packet doesn't reflect our configs, something is wrong, so DC them
         else if (ModNetworking::guest_mod_installed == true && ModNetworking::guest_legacy_enabled != Mod::legacy_mode)
         {
             //disconnect
