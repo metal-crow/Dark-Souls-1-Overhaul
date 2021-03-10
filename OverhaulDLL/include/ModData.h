@@ -33,7 +33,7 @@
 
 enum ModMode
 {
-    None,
+    ModeNone,
     Overhaul,
     Legacy,
     Compatability
