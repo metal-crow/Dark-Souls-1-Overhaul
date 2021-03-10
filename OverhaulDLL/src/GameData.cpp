@@ -450,19 +450,20 @@ static bool resolve_current_player_animation_speed() {
 }
 
 // Set the current animation speed for the player character
-void Game::set_current_player_animation_speed(float speed) {
+bool Game::set_current_player_animation_speed(float speed) {
     if (set_current_player_animation_speed_cache) {
         *set_current_player_animation_speed_cache = speed;
     }
 
     if (!resolve_current_player_animation_speed()) {
-        FATALERROR("Unable to set_current_player_animation_speed.");
+        return false;
     }
     *set_current_player_animation_speed_cache = speed;
+    return true;
 }
 
 // Returns current player character body animation ID (attacking, rolling, gestures, etc)
-int32_t Game::get_player_body_anim_id()
+std::optional<int32_t> Game::get_player_body_anim_id()
 {
     if (player_body_anim_id_cache) {
         return *player_body_anim_id_cache;
@@ -470,8 +471,7 @@ int32_t Game::get_player_body_anim_id()
 
     sp::mem::pointer anim_id = sp::mem::pointer<int32_t>((void*)Game::world_char_base, { 0x68, 0x68, 0x48, 0x80 });
     if (anim_id.resolve() == NULL) {
-        FATALERROR("Unable to get_player_body_anim_id.");
-        return -1;
+        return std::nullopt;
     } else {
         player_body_anim_id_cache = (int32_t*)anim_id.resolve();
         return *player_body_anim_id_cache;
@@ -479,7 +479,7 @@ int32_t Game::get_player_body_anim_id()
 }
 
 
-int32_t Game::get_player_upper_body_anim_id()
+std::optional<int32_t> Game::get_player_upper_body_anim_id()
 {
     if (player_upper_body_anim_id_cache) {
         return *player_upper_body_anim_id_cache;
@@ -487,8 +487,7 @@ int32_t Game::get_player_upper_body_anim_id()
 
     sp::mem::pointer anim_id = sp::mem::pointer<int32_t>((void*)Game::world_char_base, { 0x68, 0x30, 0x5D0, 0x690 });
     if (anim_id.resolve() == NULL) {
-        FATALERROR("Unable to get_player_upper_body_anim_id.");
-        return -1;
+        return std::nullopt;
     }
     else {
         player_upper_body_anim_id_cache = (int32_t*)anim_id.resolve();
@@ -497,7 +496,7 @@ int32_t Game::get_player_upper_body_anim_id()
 }
 
 
-int32_t Game::get_player_lower_body_anim_id()
+std::optional<int32_t> Game::get_player_lower_body_anim_id()
 {
     if (player_lower_body_anim_id_cache) {
         return *player_lower_body_anim_id_cache;
@@ -505,8 +504,7 @@ int32_t Game::get_player_lower_body_anim_id()
 
     sp::mem::pointer anim_id = sp::mem::pointer<int32_t>((void*)Game::world_char_base, { 0x68, 0x30, 0x5D0, 0x13B0 });
     if (anim_id.resolve() == NULL) {
-        FATALERROR("Unable to get_player_lower_body_anim_id.");
-        return -1;
+        return std::nullopt;
     }
     else {
         player_lower_body_anim_id_cache = (int32_t*)anim_id.resolve();
@@ -515,7 +513,7 @@ int32_t Game::get_player_lower_body_anim_id()
 }
 
 
-int32_t Game::get_animation_mediator_state_animation(void* animationMediator, AnimationStateTypesEnum state_id) {
+std::optional<int32_t> Game::get_animation_mediator_state_animation(void* animationMediator, AnimationStateTypesEnum state_id) {
     void* state_entry = (void*)((uint64_t)animationMediator + 168 * state_id);
     return *(int32_t*)((uint64_t)state_entry + 0);
 }
@@ -527,7 +525,7 @@ void Game::set_animation_mediator_state_entry(void* animationMediator, Animation
 }
 
 // Return pointer to current game time in milliseconds since the game has started
-uint32_t* Game::get_game_time_ms()
+std::optional<uint32_t*> Game::get_game_time_ms()
 {
     //quick resolve
     if (time_address) {
@@ -536,8 +534,7 @@ uint32_t* Game::get_game_time_ms()
     //first time resolve
     sp::mem::pointer timer = sp::mem::pointer<uint32_t>((void*)((uint64_t)Game::fmod_event64_base + 0x00077278), { 0x470, 0x40, 0x8C });
     if (timer.resolve() == NULL) {
-        FATALERROR("Unable to get pointer to current time.");
-        return NULL;
+        return std::nullopt;
     }
     else {
         time_address = timer.resolve();
@@ -545,7 +542,7 @@ uint32_t* Game::get_game_time_ms()
     }
 }
 
-uint64_t Game::get_pc_entity_pointer() {
+std::optional<uint64_t> Game::get_pc_entity_pointer() {
     //quick resolve
     if (pc_entity_ptr) {
         return *pc_entity_ptr;
@@ -553,8 +550,7 @@ uint64_t Game::get_pc_entity_pointer() {
 
     sp::mem::pointer entity_ptr = sp::mem::pointer<uint64_t>((void*)(Game::world_char_base), { 0x68 });
     if (entity_ptr.resolve() == NULL) {
-        FATALERROR("Unable to get_pc_entity_pointer.");
-        return -1;
+        return std::nullopt;
     }
     else {
         pc_entity_ptr = entity_ptr.resolve();
@@ -562,15 +558,14 @@ uint64_t Game::get_pc_entity_pointer() {
     }
 }
 
-float* Game::get_pc_position() {
+std::optional<float*> Game::get_pc_position() {
     if (pc_position_ptr) {
         return pc_position_ptr;
     }
 
     sp::mem::pointer position_ptr = sp::mem::pointer<float>((void*)(Game::world_char_base), { 0x68, 0x68, 0x28, 0x10 });
     if (position_ptr.resolve() == NULL) {
-        FATALERROR("Unable to get_pc_position.");
-        return NULL;
+        return std::nullopt;
     }
     else {
         pc_position_ptr = position_ptr.resolve();
@@ -608,15 +603,14 @@ void Game::increase_gui_hpbar_max()
 }
 
 
-uint32_t Game::left_hand_weapon() {
+std::optional<uint32_t> Game::left_hand_weapon() {
     if (left_hand_weapon_ptr_cache) {
         return *left_hand_weapon_ptr_cache;
     }
 
     sp::mem::pointer weapon = sp::mem::pointer<uint32_t>((void*)(Game::ds1_base + 0x1ACD758), { 0x28, 0x250, 0x2F8, 0x18, 0x0 });
     if (weapon.resolve() == NULL) {
-        FATALERROR("Unable to get left_hand_weapon.");
-        return -1;
+        return std::nullopt;
     }
     else {
         left_hand_weapon_ptr_cache = (uint32_t*)weapon.resolve();
@@ -625,15 +619,14 @@ uint32_t Game::left_hand_weapon() {
 }
 
 
-uint32_t Game::right_hand_weapon() {
+std::optional<uint32_t> Game::right_hand_weapon() {
     if (right_hand_weapon_ptr_cache) {
         return *right_hand_weapon_ptr_cache;
     }
 
     sp::mem::pointer weapon = sp::mem::pointer<uint32_t>((void*)(Game::ds1_base+0x1ACD758), { 0x28, 0x250, 0x2F8, 0x18, 0x4 });
     if (weapon.resolve() == NULL) {
-        FATALERROR("Unable to get right_hand_weapon.");
-        return -1;
+        return std::nullopt;
     }
     else {
         right_hand_weapon_ptr_cache = (uint32_t*)weapon.resolve();
@@ -655,15 +648,14 @@ int32_t Game::get_player_char_status() {
 }
 
 
-uint32_t Game::get_player_char_max_hp() {
+std::optional<uint32_t> Game::get_player_char_max_hp() {
     if (player_char_max_hp_cache) {
         return *player_char_max_hp_cache;
     }
 
     sp::mem::pointer maxhp = sp::mem::pointer<uint32_t>((void*)(Game::world_char_base), { 0x68, 0x3EC });
     if (maxhp.resolve() == NULL) {
-        FATALERROR("Unable to get_player_char_max_hp.");
-        return -1;
+        return std::nullopt;
     }
     else {
         player_char_max_hp_cache = (uint32_t*)maxhp.resolve();
@@ -672,26 +664,24 @@ uint32_t Game::get_player_char_max_hp() {
 }
 
 //Returns a value between -PI and PI
-float Game::get_entity_rotation(void* entity_ptr) {
+std::optional<float> Game::get_entity_rotation(void* entity_ptr) {
     sp::mem::pointer rotation = sp::mem::pointer<float>((void*)((uint64_t)entity_ptr + 0x68), { 0x28, 0x4 });
     if (rotation.fast_resolve() == NULL) {
-        FATALERROR("Unable to get_entity_rotation.");
-        return -1;
+        return std::nullopt;
     }
     else {
         return *(float*)rotation.fast_resolve();
     }
 }
 
-int32_t Game::get_area_id() {
+std::optional<int32_t> Game::get_area_id() {
     if (area_id_cache) {
         return (*area_id_cache & 0x0000ffff);
     }
 
     sp::mem::pointer area_id = sp::mem::pointer<int32_t>((void*)(Game::frpg_net_base), { 0xA22 });
     if (area_id.resolve() == NULL) {
-        FATALERROR("Unable to get_area_id.");
-        return -1;
+        return std::nullopt;
     }
     else {
         area_id_cache = area_id.resolve();
@@ -699,15 +689,14 @@ int32_t Game::get_area_id() {
     }
 }
 
-int32_t* Game::get_mp_id_ptr() {
+std::optional<int32_t*> Game::get_mp_id_ptr() {
     if (mp_id_cache) {
         return mp_id_cache;
     }
 
     sp::mem::pointer mp_id = sp::mem::pointer<int32_t>((void*)(Game::world_char_base), { 0x68, 0x354 });
     if (mp_id.resolve() == NULL) {
-        FATALERROR("Unable to get_mp_id.");
-        return NULL;
+        return std::nullopt;
     }
     else {
         mp_id_cache = mp_id.resolve();
@@ -715,15 +704,14 @@ int32_t* Game::get_mp_id_ptr() {
     }
 }
 
-int32_t* Game::get_saved_chars_menu_flag() {
+std::optional<int32_t*> Game::get_saved_chars_menu_flag() {
     if (saved_chars_menu_flag_cache) {
         return saved_chars_menu_flag_cache;
     }
 
     sp::mem::pointer saved_chars_menu_flag = sp::mem::pointer<int32_t>((void*)(Game::ds1_base + 0x1D26168), { 0xA4 });
     if (saved_chars_menu_flag.resolve() == NULL) {
-        FATALERROR("Unable to get_saved_chars_menu_flag.");
-        return NULL;
+        return std::nullopt;
     }
     else {
         saved_chars_menu_flag_cache = saved_chars_menu_flag.resolve();
@@ -731,15 +719,14 @@ int32_t* Game::get_saved_chars_menu_flag() {
     }
 }
 
-uint8_t* Game::get_saved_chars_preview_data() {
+std::optional<uint8_t*> Game::get_saved_chars_preview_data() {
     if (saved_chars_preview_data_cache) {
         return saved_chars_preview_data_cache;
     }
 
     sp::mem::pointer saved_chars_preview_data = sp::mem::pointer<uint8_t>((void*)(Game::ds1_base + 0x1D278F0), { 0x60, 0x10 });
     if (saved_chars_preview_data.resolve() == NULL) {
-        FATALERROR("Unable to get_saved_chars_preview_data.");
-        return NULL;
+        return std::nullopt;
     }
     else {
         saved_chars_preview_data_cache = saved_chars_preview_data.resolve();
@@ -747,15 +734,14 @@ uint8_t* Game::get_saved_chars_preview_data() {
     }
 }
 
-uint32_t Game::get_pc_playernum() {
+std::optional<uint32_t> Game::get_pc_playernum() {
     if (pc_playernum_cache) {
         return *pc_playernum_cache;
     }
 
     sp::mem::pointer pc_playernum = sp::mem::pointer<uint32_t>((void*)(Game::game_data_man), { 0x10, 0x10 });
     if (pc_playernum.resolve() == NULL) {
-        FATALERROR("Unable to pc_playernum.");
-        return NULL;
+        return std::nullopt;
     }
     else {
         pc_playernum_cache = pc_playernum.resolve();
@@ -763,15 +749,14 @@ uint32_t Game::get_pc_playernum() {
     }
 }
 
-uint64_t Game::get_connected_player(uint32_t i) {
+std::optional<uint64_t> Game::get_connected_player(uint32_t i) {
     if (connected_players_array_cache) {
         return *(uint64_t*)(connected_players_array_cache + (0x38 * (i + 1)));
     }
 
     sp::mem::pointer connected_players_array = sp::mem::pointer<uint64_t>((void*)(Game::world_chr_man_imp), { 0x68, 0x18 });
     if (connected_players_array.resolve() == NULL) {
-        FATALERROR("Unable to connected_players_array.");
-        return NULL;
+        return std::nullopt;
     }
     else {
         connected_players_array_cache = *(uint64_t*)connected_players_array.resolve();
@@ -779,7 +764,7 @@ uint64_t Game::get_connected_player(uint32_t i) {
     }
 }
 
-int32_t Game::convert_handle_to_playernum(uint32_t handle) {
+std::optional<int32_t> Game::convert_handle_to_playernum(uint32_t handle) {
     //PC specific handle
     if (handle == PC_Handle) {
         return Game::get_pc_playernum();
@@ -787,31 +772,41 @@ int32_t Game::convert_handle_to_playernum(uint32_t handle) {
     else {
         //loop through the conncted players and look for matching handle
         for (int i = 0; i < 5; i++) {
-            uint64_t guest = Game::get_connected_player(i);
-            if (guest != NULL) {
+            std::optional<uint64_t> guest_o = Game::get_connected_player(i);
+            if (guest_o.has_value()) {
+                uint64_t guest = guest_o.value();
                 uint32_t guestHandle = *(uint32_t*)(guest + 8);
                 if (guestHandle == handle) {
                     return *(uint32_t*)((*(uint64_t*)(guest + 0x578)) + 0x10);
                 }
+            }
+            else
+            {
+                return std::nullopt;
             }
         }
         return -1;
     }
 }
 
-uint32_t Game::convert_playernum_to_handle(uint32_t playernum) {
+std::optional<uint32_t> Game::convert_playernum_to_handle(uint32_t playernum) {
     if (playernum == Game::get_pc_playernum()) {
         return PC_Handle; //const handle for PC
     }
     else {
         //loop through the conncted players and look for matching playernum
         for (int i = 0; i < 5; i++) {
-            uint64_t guest = Game::get_connected_player(i);
-            if (guest != NULL) {
+            std::optional<uint64_t> guest_o = Game::get_connected_player(i);
+            if (guest_o.has_value()) {
+                uint64_t guest = guest_o.value();
                 uint32_t guestNo = *(uint32_t*)((*(uint64_t*)(guest + 0x578)) + 0x10);
                 if (guestNo == playernum) {
                     return *(uint32_t*)(guest + 8);
                 }
+            }
+            else
+            {
+                return std::nullopt;
             }
         }
         return 0;
@@ -822,7 +817,7 @@ uint32_t Game::get_last_attack_weapon_id() {
     return last_attack_weaponid;
 }
 
-void* Game::get_pc_ActiveState_EzStateMachineImpl() {
+std::optional<void*> Game::get_pc_ActiveState_EzStateMachineImpl() {
     if (pc_EzStateMachineImpl_cache) {
         return *pc_EzStateMachineImpl_cache;
     }
@@ -830,8 +825,7 @@ void* Game::get_pc_ActiveState_EzStateMachineImpl() {
     //WorldChrManImp -> PlayerIns -> ChrIns -> PlayerCtrl -> ChrCtrl -> ActionCtrl -> ActiveState -> EzStateMachineImpl
     sp::mem::pointer pc_EzStateMachineImpl = sp::mem::pointer<void*>((void*)(Game::world_chr_man_imp), { 0x68, 8+0x60, 0x48, 0x30+(0x20*1) });
     if (pc_EzStateMachineImpl.resolve() == NULL) {
-        FATALERROR("Unable to get pc_EzStateMachineImpl.");
-        return NULL;
+        return std::nullopt;
     }
     else {
         pc_EzStateMachineImpl_cache = pc_EzStateMachineImpl.resolve();
@@ -839,12 +833,12 @@ void* Game::get_pc_ActiveState_EzStateMachineImpl() {
     }
 }
 
-uint64_t Game::get_EzStateMachineImpl_curstate_id(void* EzStateMachineImpl) {
+std::optional<uint64_t> Game::get_EzStateMachineImpl_curstate_id(void* EzStateMachineImpl) {
     void* ezstate_state = *(void**)((uint64_t)EzStateMachineImpl + 0x20);
     return *(uint64_t*)((uint64_t)ezstate_state + 0);
 }
 
-SessionActionResultEnum Game::get_SessionManagerImp_session_action_result()
+std::optional<SessionActionResultEnum> Game::get_SessionManagerImp_session_action_result()
 {
     return static_cast<SessionActionResultEnum>(*(*(uint32_t**)Game::session_man_imp) + 0xf8);
 }

@@ -500,14 +500,21 @@ void Files::set_save_file_index(int unsigned index)
         return;
     }
     // Check if viewing saves menu
-    if (*Game::get_saved_chars_menu_flag() != 4 && *Game::get_saved_chars_menu_flag() != 3) {
+    if (!Game::get_saved_chars_menu_flag().has_value() || (*Game::get_saved_chars_menu_flag().value() != 4 && *Game::get_saved_chars_menu_flag().value() != 3)) {
         SetLastError(ERROR_BAD_ENVIRONMENT);
         if (debug_save_print_output) {
             global::cmd_out << ("ERROR: Failed to set save file index (Must be viewing saved characters)");
         }
         return;
     }
-    *Game::get_saved_chars_menu_flag() = 0;
+    if (!Game::get_saved_chars_menu_flag().has_value())
+    {
+        global::cmd_out << ("ERROR: Failed to set get_saved_chars_menu_flag to 0");
+    }
+    else
+    {
+        *Game::get_saved_chars_menu_flag().value() = 0;
+    }
     Files::save_file_index = index;
     // Get full filename (with index)
     if (Files::save_file_index > 0) {
@@ -519,11 +526,18 @@ void Files::set_save_file_index(int unsigned index)
         }
     }
     // Overwrite character preview data
-    if (Sl2::read_character_preview_data_from_file(save_path.c_str(), Game::get_saved_chars_preview_data()) != ERROR_SUCCESS) {
+    if (Sl2::read_character_preview_data_from_file(save_path.c_str(), Game::get_saved_chars_preview_data().value_or((uint8_t*)NULL)) != ERROR_SUCCESS) {
         if (debug_save_print_output) {
             global::cmd_out << ("ERROR: Failed to set save file index (I/O error)");
         }
-        *Game::get_saved_chars_menu_flag() = 3;
+        if (!Game::get_saved_chars_menu_flag().has_value())
+        {
+            global::cmd_out << ("ERROR: Failed to get_saved_chars_menu_flag");
+        }
+        else
+        {
+            *Game::get_saved_chars_menu_flag().value() = 3;
+        }
         return;
     }
     // Update menu text
@@ -536,7 +550,14 @@ void Files::set_save_file_index(int unsigned index)
     Menu::Saves::set_custom_header_msgs(custom_header1, custom_header2);
 
     // Re-load saved characters menu
-    *Game::get_saved_chars_menu_flag() = 3;
+    if (!Game::get_saved_chars_menu_flag().has_value())
+    {
+        global::cmd_out << ("ERROR: Failed to reload due to get_saved_chars_menu_flag");
+    }
+    else
+    {
+        *Game::get_saved_chars_menu_flag().value() = 3;
+    }
     if (debug_save_print_output) {
         global::cmd_out << ("Save file index changed to " + std::to_string(index));
     }
@@ -573,7 +594,13 @@ void Files::set_save_file_prev()
 // Checks if the saved characters menu is currently open
 bool Files::saves_menu_is_open()
 {
-    uint8_t flag_value = *Game::get_saved_chars_menu_flag();
+    if (!Game::get_saved_chars_menu_flag().has_value())
+    {
+        global::cmd_out << ("ERROR: Failed to get_saved_chars_menu_flag in saves_menu_is_open");
+        return false;
+    }
+
+    uint8_t flag_value = *Game::get_saved_chars_menu_flag().value();
     // Check if viewing saves menu
     if (flag_value != 4 && flag_value != 3) {
         return false;

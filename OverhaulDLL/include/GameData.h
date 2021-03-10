@@ -15,6 +15,7 @@
 
 
 #include <stdint.h>
+#include <optional>
 
 #include "DarkSoulsOverhaulMod.h"
 #include "ModData.h"
@@ -186,25 +187,25 @@ public:
     static void disable_low_fps_disconnect(bool enable);
 
     // Set the current animation speed for the player character
-    static void set_current_player_animation_speed(float speed);
+    static bool set_current_player_animation_speed(float speed);
 
     // Returns current player character body animation ID (attacking, rolling, gestures, etc)
-    static int32_t get_player_body_anim_id();
+    static std::optional<int32_t> get_player_body_anim_id();
 
-    static int32_t get_player_upper_body_anim_id();
+    static std::optional<int32_t> get_player_upper_body_anim_id();
 
-    static int32_t get_player_lower_body_anim_id();
+    static std::optional<int32_t> get_player_lower_body_anim_id();
 
-    static int32_t get_animation_mediator_state_animation(void* animationMediator, AnimationStateTypesEnum state_id);
+    static std::optional<int32_t> get_animation_mediator_state_animation(void* animationMediator, AnimationStateTypesEnum state_id);
 
     static void set_animation_mediator_state_entry(void* animationMediator, AnimationStateTypesEnum state_id, int32_t new_aid, float new_progressTime);
 
     // Return pointer to current game time in milliseconds since the game has started
-    static uint32_t* get_game_time_ms();
+    static std::optional<uint32_t*> get_game_time_ms();
 
-	static uint64_t get_pc_entity_pointer();
+	static std::optional<uint64_t> get_pc_entity_pointer();
 
-	static float * get_pc_position();
+	static std::optional<float*> get_pc_position();
 
 
                     /////////////////////////////////////////
@@ -223,40 +224,40 @@ public:
     static void increase_gui_hpbar_max();
 
     // Gets currently equipped L hand weapon
-	static uint32_t left_hand_weapon();
+	static std::optional<uint32_t> left_hand_weapon();
 
     // Gets currently equipped R hand weapon
-    static uint32_t right_hand_weapon();
+    static std::optional<uint32_t> right_hand_weapon();
 
 	static int32_t get_player_char_status();
 
-	static uint32_t get_player_char_max_hp();
+	static std::optional<uint32_t> get_player_char_max_hp();
 
-	static float get_entity_rotation(void * entity_ptr);
+	static std::optional<float> get_entity_rotation(void * entity_ptr);
 
-	static int32_t get_area_id();
+	static std::optional<int32_t> get_area_id();
 
-    static int32_t* get_mp_id_ptr();
+    static std::optional<int32_t*> get_mp_id_ptr();
 
-    static int32_t* get_saved_chars_menu_flag();
+    static std::optional<int32_t*> get_saved_chars_menu_flag();
 
-    static uint8_t* get_saved_chars_preview_data();
+    static std::optional<uint8_t*> get_saved_chars_preview_data();
 
-    static uint32_t get_pc_playernum();
+    static std::optional<uint32_t> get_pc_playernum();
 
-    static uint64_t get_connected_player(uint32_t i);
+    static std::optional<uint64_t> get_connected_player(uint32_t i);
 
-    static int32_t convert_handle_to_playernum(uint32_t handle);
+    static std::optional<int32_t> convert_handle_to_playernum(uint32_t handle);
 
-    static uint32_t convert_playernum_to_handle(uint32_t playernum);
+    static std::optional<uint32_t> convert_playernum_to_handle(uint32_t playernum);
 
     static uint32_t get_last_attack_weapon_id();
 
-	static void* get_pc_ActiveState_EzStateMachineImpl();
+	static std::optional<void*> get_pc_ActiveState_EzStateMachineImpl();
 
-	static uint64_t get_EzStateMachineImpl_curstate_id(void * EzStateMachineImpl);
+	static std::optional<uint64_t> get_EzStateMachineImpl_curstate_id(void * EzStateMachineImpl);
 
-    static SessionActionResultEnum get_SessionManagerImp_session_action_result();
+    static std::optional<SessionActionResultEnum> get_SessionManagerImp_session_action_result();
 
     /*
      * Help speedup some functions by, whenever we're loaded into an area,

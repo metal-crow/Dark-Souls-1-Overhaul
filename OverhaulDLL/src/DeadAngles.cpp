@@ -22,10 +22,19 @@ void DeadAngles::start() {
 //Bring it down a little
 static const float dead_angle_radians = (float)(80.0 * (M_PI/180.0));
 
-uint64_t main_dead_angle_helper(uint64_t attacker, uint64_t target) {
+uint64_t main_dead_angle_helper(uint64_t attacker, uint64_t target)
+{
+    auto target_rotation = Game::get_entity_rotation((void*)target);
+    auto attacker_rotation = Game::get_entity_rotation((void*)attacker);
+    if (!target_rotation.has_value() ||! attacker_rotation.has_value())
+    {
+        global::cmd_out << "WARNING: Unable to get players rotation values\n";
+        return 1;
+    }
+
     //normalize both angles from 0 to 2PI
-    float target_heading = (float)(Game::get_entity_rotation((void*)target) + M_PI);
-    float attacker_heading = (float)(Game::get_entity_rotation((void*)attacker) + M_PI);
+    float target_heading = (float)(target_rotation.value() + M_PI);
+    float attacker_heading = (float)(attacker_rotation.value() + M_PI);
 
     float angle_diff;
     //Compute the angle difference between the two char headings.

@@ -69,10 +69,14 @@ void BloodborneRally::on_char_load() {
 }
 
 uint64_t control_timer_function(uint64_t bar_id, uint64_t orange_bar) {
-    //0x24 is the orange bar hidden behind the HP bar. TODO get the other bar ids
+    //0x24 is the orange bar hidden behind the HP bar.
     //Only adjust the bar when feature enabled.
     if (bar_id == 0x24 && !Mod::legacy_mode) {
-        uint32_t curtime = *Game::get_game_time_ms();
+        uint32_t curtime = 0;
+        if (Game::get_game_time_ms().has_value())
+        {
+            curtime = *Game::get_game_time_ms().value();
+        }
         //not yet time to drop orange bar
         if (beforehit_time + MAX_RALLY_RECOVERY_TIME_MS > curtime && gothit==1) {
             return 1;
@@ -86,7 +90,7 @@ uint64_t control_timer_function(uint64_t bar_id, uint64_t orange_bar) {
         //got hit before previous timer went down. partially drop orange bar
         if (gothit == 2) {
             gothit = 1;
-            float new_orange_bar = (float)beforehit_hp / (float)Game::get_player_char_max_hp();
+            float new_orange_bar = (float)beforehit_hp / (float)Game::get_player_char_max_hp().value_or(Game::new_hpbar_max);
             *((float*)(orange_bar + 0x60)) = new_orange_bar;
             return 1;
         }
@@ -126,7 +130,12 @@ void main_rally_function(uint64_t attacker, uint64_t target, uint64_t attack_dat
         return;
     }
 
-    uint64_t pc_entity_ptr = Game::get_pc_entity_pointer();
+    uint64_t pc_entity_ptr = Game::get_pc_entity_pointer().value_or(NULL);
+    uint32_t game_time = 0;
+    if (Game::get_game_time_ms().has_value())
+    {
+        game_time = *Game::get_game_time_ms().value();
+    }
 
     //if target is host
     if (target == pc_entity_ptr) {
@@ -135,7 +144,7 @@ void main_rally_function(uint64_t attacker, uint64_t target, uint64_t attack_dat
         //This sometimes gets called multiple times for 1 hit, so check
         if (curhp == new_hp) return;
         beforehit_hp = curhp;
-        beforehit_time = *Game::get_game_time_ms();
+        beforehit_time = game_time;
         //Marker for getting hit (used for UI)
         gothit++;
         if (gothit <= 2) {
@@ -147,18 +156,18 @@ void main_rally_function(uint64_t attacker, uint64_t target, uint64_t attack_dat
 
     //if attacker is host
     if (attacker == pc_entity_ptr) {
-        if (*Game::get_game_time_ms() - beforehit_time < MAX_RALLY_RECOVERY_TIME_MS) {
+        if (game_time - beforehit_time < MAX_RALLY_RECOVERY_TIME_MS) {
             //check what weapon is used in attack (check hand in weapon_data)
             int32_t weapon_hand = *(int32_t*)(attack_data + 0x4A4);
 
             uint32_t weaponid;
             //R hand
             if (weapon_hand == -1) {
-                weaponid = Game::right_hand_weapon();
+                weaponid = Game::right_hand_weapon().value_or(-1);
             }
             //L hand
             else if (weapon_hand == -2) {
-                weaponid = Game::left_hand_weapon();
+                weaponid = Game::left_hand_weapon().value_or(-1);
             }
             else {
                 return;
@@ -201,8 +210,8 @@ static DWORD WINAPI Apply_rally_capable_sfx_and_starting_hp(void* unused) {
 
         //don't apply sfx if feature disabled
         while (char_status != DS1_PLAYER_STATUS_LOADING && !Mod::legacy_mode) {
-            weaponid_R = Game::right_hand_weapon();
-            weaponid_L = Game::left_hand_weapon();
+            weaponid_R = Game::right_hand_weapon().value_or(-1);
+            weaponid_L = Game::left_hand_weapon().value_or(-1);
 
             //There appears to be some bug here where both the effects cannot be applied simultaneously
             //But it just alternates which is applied, so it works ok

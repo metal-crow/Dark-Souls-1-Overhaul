@@ -60,14 +60,14 @@ typedef struct SpeedAlterStruct_ {
 //Thread data = speed ratio, start time, speed ajustment ptr
 static DWORD WINAPI DelayAnimationSpeedAjustment(void* thread_data_arg) {
     SpeedAlterStruct* thread_data = (SpeedAlterStruct*)thread_data_arg;
-    uint32_t start = *Game::get_game_time_ms();
+    uint32_t start = *Game::get_game_time_ms().value_or((uint32_t*)NULL); //Temporary till we move to non-threaded
     uint32_t cur = start;
 
     //Wait till animation reaches desired point
     float adjust_time = thread_data->time_to_adjust_speed_at;
 
     while (cur < start+adjust_time*1000) {
-        cur = *Game::get_game_time_ms();
+        cur = *Game::get_game_time_ms().value_or((uint32_t*)NULL);
         Sleep(1);
     }
 
