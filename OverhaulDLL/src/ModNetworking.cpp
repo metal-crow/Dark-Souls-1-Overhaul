@@ -12,8 +12,9 @@ bool ModNetworking::host_legacy_enabled = false;
 bool ModNetworking::guest_mod_installed = false;
 bool ModNetworking::guest_legacy_enabled = false;
 
-const uint32_t MOD_ENABLED = 0x80000000; //it's encoded that the mod is active in the most significant bit
-const uint32_t LEGACY_ENABLED = 0x40000000; //it's encoded that the mod is in legacy mode in the 2nd most significant bit
+//don't encode anything in most significant bit since -1 is a reserved value in dark souls player nums
+const uint32_t MOD_ENABLED = 0x40000000; //it's encoded that the mod is active in the 2nd most significant bit
+const uint32_t LEGACY_ENABLED = 0x20000000; //it's encoded that the mod is in legacy mode in the 3nd most significant bit
 const uint32_t REMOVE_FLAGS = ~(MOD_ENABLED | LEGACY_ENABLED);
 
 extern "C" {
