@@ -188,4 +188,5 @@ ModMode Mod::get_mode()
     {
         return Overhaul;
     }
+    return ModMode::None;
 }
