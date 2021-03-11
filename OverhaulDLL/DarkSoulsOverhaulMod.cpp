@@ -19,6 +19,7 @@
 #include "DurabilityBars.h"
 #include "MultiConsume.h"
 #include "MultiTribute.h"
+#include "CrashHandler.h"
 
 #include "D3dx9math.h"
 
@@ -48,6 +49,8 @@ If you are planning to PvP in the Arena+ area then you want this on.").c_str(),
 
     Mod::startup_messages.push_back(DS1_OVERHAUL_TXT_INTRO);
     Mod::startup_messages.push_back("");
+
+    set_crash_handlers();
 
     // Load startup preferences from settings file
     Mod::get_startup_preferences();

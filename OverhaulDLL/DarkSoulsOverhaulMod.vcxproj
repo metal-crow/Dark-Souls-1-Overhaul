@@ -179,7 +179,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;DARKSOULSOVERHAULMOD_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>lib;lib\SP;lib\DirectX\Include;lib\D3DFont;lib\curl-7.56.1\include;lib\zlib-1.2.11;lib\zlib-1.2.11\src;lib\SP\DsGameFiles\include;include;lib\Detours;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files\Microsoft DirectX SDK (June 2010)\Include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>lib;lib\SP;lib\DirectX\Include;lib\D3DFont;lib\curl-7.56.1\include;lib\zlib-1.2.11;lib\zlib-1.2.11\src;lib\SP\DsGameFiles\include;include;lib\Detours;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files\Microsoft DirectX SDK (June 2010)\Include;lib\StackWalker\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4503</DisableSpecificWarnings>
     </ClCompile>
@@ -188,7 +188,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>lib;lib\SP;lib\DirectX\Lib\x86_;lib\D3DFont;lib\zlib-1.2.11;lib\SP\DsGameFiles;lib\curl-7.56.1\lib;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>lib;lib\SP;lib\DirectX\Lib\x86_;lib\D3DFont;lib\zlib-1.2.11;lib\SP\DsGameFiles;lib\curl-7.56.1\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>d3d9_sp_overlay.lib;DsGameFiles.lib;SpPointer.lib;SP_IO.lib;SP_AoBScan.lib;SP_AsmInjectx86.lib;SP_SysUtils.lib;XInput.lib;libcurl_a.lib;zlib.lib;lib\Detours\Detours.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>Exports.def</ModuleDefinitionFile>
     </Link>
@@ -224,7 +224,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;DARKSOULSOVERHAULMOD_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>lib;lib\SP;lib\DirectX\Include;lib\D3DFont;lib\curl-7.56.1\include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files\Microsoft DirectX SDK (June 2010)\Include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>lib;lib\SP;lib\DirectX\Include;lib\D3DFont;lib\curl-7.56.1\include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files\Microsoft DirectX SDK (June 2010)\Include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4503</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -232,7 +232,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>lib;lib\SP;lib\DirectX\Lib;lib\D3DFont;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>lib;lib\SP;lib\DirectX\Lib;lib\D3DFont</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>Exports.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
@@ -263,6 +263,7 @@
     <ClInclude Include="include\Challenge\BlackPhantomEnemies.h" />
     <ClInclude Include="include\Challenge\GravelordPhantoms.h" />
     <ClInclude Include="include\config.h" />
+    <ClInclude Include="include\CrashHandler.h" />
     <ClInclude Include="include\DllMain.h" />
     <ClInclude Include="include\DurabilityBars.h" />
     <ClInclude Include="include\Files.h" />
@@ -313,6 +314,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Build|x64'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="lib\StackWalker\StackWalker.cpp" />
     <ClCompile Include="src\AntiCheat\AntiCheat.cpp" />
     <ClCompile Include="src\AntiCheat\BinocsTriggerBlock.cpp" />
     <ClCompile Include="src\AntiCheat\BossGuard.cpp" />
@@ -324,6 +326,7 @@
     <ClCompile Include="src\Challenge\AggressiveAI.cpp" />
     <ClCompile Include="src\Challenge\BlackPhantomEnemies.cpp" />
     <ClCompile Include="src\Challenge\GravelordPhantoms.cpp" />
+    <ClCompile Include="src\CrashHandler.cpp" />
     <ClCompile Include="src\DurabilityBars.cpp" />
     <ClCompile Include="src\GameData.cpp" />
     <ClCompile Include="src\L3Jump.cpp" />
