@@ -65,8 +65,8 @@ static DWORD WINAPI change_mp_zone(void* unused) {
                 //area normally without a zone (anywhere without multiplayer)
                 else
                 {
-                    //set mp id to area id
-                    *Game::get_mp_id_ptr().value() = Game::get_area_id().value_or(0);
+                    //set mp id to area id + 100000 (since the server apparently validates it or something?)
+                    *Game::get_mp_id_ptr().value() = Game::get_area_id().value_or(0) + 100000;
                 }
             }
 
