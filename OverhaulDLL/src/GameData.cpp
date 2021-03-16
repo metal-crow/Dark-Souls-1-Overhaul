@@ -184,6 +184,7 @@ static uint8_t* saved_chars_preview_data_cache = NULL;
 static uint32_t* pc_playernum_cache = NULL;
 static uint64_t connected_players_array_cache = NULL;
 static void** pc_EzStateMachineImpl_cache = NULL;
+static void** SteamSessionLight_cache = NULL;
 
 void Game::preload_function_caches() {
     global::cmd_out << "Cache loading\n";
@@ -220,6 +221,8 @@ void Game::preload_function_caches() {
     Game::get_connected_player(0);
     pc_EzStateMachineImpl_cache = NULL;
     Game::get_pc_ActiveState_EzStateMachineImpl();
+    SteamSessionLight_cache = NULL;
+    Game::get_SessionManagerImp_SteamSessionLight();
 
 
     Sleep(10);
@@ -841,4 +844,23 @@ std::optional<uint64_t> Game::get_EzStateMachineImpl_curstate_id(void* EzStateMa
 std::optional<SessionActionResultEnum> Game::get_SessionManagerImp_session_action_result()
 {
     return static_cast<SessionActionResultEnum>(*(*(uint32_t**)Game::session_man_imp) + 0xf8);
+}
+
+std::optional<void*> Game::get_SessionManagerImp_SteamSessionLight()
+{
+    if (SteamSessionLight_cache)
+    {
+        return *SteamSessionLight_cache;
+    }
+
+    sp::mem::pointer SteamSessionLight = sp::mem::pointer<void*>((void*)(Game::session_man_imp), { 0x08 });
+    if (SteamSessionLight.resolve() == NULL)
+    {
+        return std::nullopt;
+    }
+    else
+    {
+        SteamSessionLight_cache = SteamSessionLight.resolve();
+        return *SteamSessionLight_cache;
+    }
 }
