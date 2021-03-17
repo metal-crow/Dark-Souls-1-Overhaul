@@ -845,7 +845,15 @@ std::optional<uint64_t> Game::get_EzStateMachineImpl_curstate_id(void* EzStateMa
 
 std::optional<SessionActionResultEnum> Game::get_SessionManagerImp_session_action_result()
 {
-    return static_cast<SessionActionResultEnum>(*(*(uint32_t**)Game::session_man_imp) + 0xf8);
+    sp::mem::pointer session_action_result = sp::mem::pointer<uint32_t>((void*)(Game::session_man_imp), { 0xf8 });
+    if (session_action_result.resolve() == NULL)
+    {
+        return std::nullopt;
+    }
+    else
+    {
+        return static_cast<SessionActionResultEnum>(*session_action_result.resolve());
+    }
 }
 
 std::optional<void*> Game::get_SessionManagerImp_SteamSessionLight()
