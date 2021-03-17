@@ -83,13 +83,14 @@ void GetSteamData_Packet_injection_helper(void* data, uint32_t type)
     if (type == 36 && (session_action_result == TryToCreateSession || session_action_result == CreateSessionSuccess))
     {
         //if we don't have the extra flags byte at the end of the packet, non-mod user
-        if (!(data_remaining > 4))
+        //handle the the that the dword at the end is optional
+        if (data_remaining != 5 && data_remaining != 1)
         {
             ModNetworking::guest_mod_installed = false;
         }
         else
         {
-            uint8_t value = *(data_buf+4); //ignore the dword of normal data at the end
+            uint8_t value = *(data_buf+(data_remaining-1)); //ignore the dword of normal data at the end if it exists
 
             char info[128];
             snprintf(info, 128, "Host Read custom type36=%x\n", value);
