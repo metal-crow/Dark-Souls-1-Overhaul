@@ -185,6 +185,7 @@ static uint32_t* pc_playernum_cache = NULL;
 static uint64_t connected_players_array_cache = NULL;
 static void** pc_EzStateMachineImpl_cache = NULL;
 static void** SteamSessionLight_cache = NULL;
+static uint32_t* NextPlayerNum_cache = NULL;
 
 void Game::preload_function_caches() {
     global::cmd_out << "Cache loading\n";
@@ -223,7 +224,8 @@ void Game::preload_function_caches() {
     Game::get_pc_ActiveState_EzStateMachineImpl();
     SteamSessionLight_cache = NULL;
     Game::get_SessionManagerImp_SteamSessionLight();
-
+    NextPlayerNum_cache = NULL;
+    Game::get_SessionManagerImp_Next_Player_Num();
 
     Sleep(10);
     //this pointer is a bit late to resolve on load
@@ -862,5 +864,24 @@ std::optional<void*> Game::get_SessionManagerImp_SteamSessionLight()
     {
         SteamSessionLight_cache = SteamSessionLight.resolve();
         return *SteamSessionLight_cache;
+    }
+}
+
+std::optional<uint32_t> Game::get_SessionManagerImp_Next_Player_Num()
+{
+    if (NextPlayerNum_cache)
+    {
+        return *NextPlayerNum_cache;
+    }
+
+    sp::mem::pointer NextPlayerNum = sp::mem::pointer<uint32_t>((void*)(Game::session_man_imp), { 0x108 });
+    if (NextPlayerNum.resolve() == NULL)
+    {
+        return std::nullopt;
+    }
+    else
+    {
+        NextPlayerNum_cache = NextPlayerNum.resolve();
+        return *NextPlayerNum_cache;
     }
 }

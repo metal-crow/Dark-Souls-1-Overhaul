@@ -261,6 +261,8 @@ public:
 
     static std::optional<void*> get_SessionManagerImp_SteamSessionLight();
 
+    static std::optional<uint32_t> get_SessionManagerImp_Next_Player_Num();
+
     /*
      * Help speedup some functions by, whenever we're loaded into an area,
      * preload/preresolve some pointers and values so they can be much more quickly read when we need them
