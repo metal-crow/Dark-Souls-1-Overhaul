@@ -755,10 +755,12 @@ std::optional<uint32_t> Game::get_pc_playernum() {
 }
 
 std::optional<uint64_t> Game::get_connected_player(uint32_t i) {
+    //go to the given index in the connectedPlayers_ChrSlotArray, grab the first value (pointer to PlayerIns) and return it
     if (connected_players_array_cache) {
         return *(uint64_t*)(connected_players_array_cache + (0x38 * (i + 1)));
     }
 
+    //gets a pointer to the connectedPlayers_ChrSlotArray stored in the player's PlayerIns
     sp::mem::pointer connected_players_array = sp::mem::pointer<uint64_t>((void*)(Game::world_chr_man_imp), { 0x68, 0x18 });
     if (connected_players_array.resolve() == NULL) {
         return std::nullopt;
