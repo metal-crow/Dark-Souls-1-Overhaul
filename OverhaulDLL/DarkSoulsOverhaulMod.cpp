@@ -514,6 +514,7 @@ __declspec(dllexport) void __stdcall end_scene()
     @return     True if the given input message should be cancelled before being sent to
                 the game, thereby disabling game input. Otherwise, returns false.
 */
+#if 0
 __declspec(dllexport) bool __stdcall get_raw_input_data(RAWINPUT *pData, PUINT pcbSize)
 {
     // Mouse cursor position
@@ -668,3 +669,4 @@ __declspec(dllexport) bool __stdcall get_raw_input_data(RAWINPUT *pData, PUINT p
     // False = don't disable game input (allow this input to reach the game)
     return false;
 }
+#endif

@@ -5,6 +5,5 @@ EXPORTS
 	initialize_plugin @1
 	main_loop @2
 	draw_overlay @3
-	get_raw_input_data @4
 	present @5
 	end_scene @6
