@@ -61,9 +61,46 @@ void ModNetworking::start()
     sp::mem::code::x64::inject_jmp_14b(write_address, &SendRawP2PPacket_injection_return, 0, &SendRawP2PPacket_injection);
 }
 
-void SendDisconnectPacket()
-{
+typedef bool sendType46SteamMessage_FUNC(void* SteamSessionLight, void* ConnectedPlayerData,uint32_t packetData);
+sendType46SteamMessage_FUNC* sendType46SteamMessage = (sendType46SteamMessage_FUNC*)0x141088e90;
 
+void DisconnectSession()
+{
+    auto steamsessionlight_o = Game::get_SessionManagerImp_SteamSessionLight();
+    if (!steamsessionlight_o.has_value())
+    {
+        global::cmd_out << "Unable to disconnect player: unable to get SteamSessionLight\n";
+        return;
+    }
+    void* steamsessionlight = steamsessionlight_o.value();
+
+    auto nextplayernum_o = Game::get_SessionManagerImp_Next_Player_Num();
+    if (!nextplayernum_o.has_value())
+    {
+        global::cmd_out << "Unable to disconnect player: unable to get nextplayernum\n";
+        return;
+    }
+
+    //The nextplayernum value isn't incremented till after this, when summoning is finished
+    // Subtract 1 since we are indexed from 1
+    // Subtract another 1 since the getter function auto-excludes the host by adding 1
+    // ex: the lowest we can be at this point is 2, and we'd want to get connected player 0.
+    uint32_t summoningplayerindex = nextplayernum_o.value() - 2;
+
+    auto connected_player_o = Game::get_connected_player(summoningplayerindex);
+    if (!connected_player_o.has_value())
+    {
+        global::cmd_out << "Unable to disconnect player: unable to get connectedplayer\n";
+        return;
+    }
+    uint64_t connected_player = connected_player_o.value();
+    void* connected_player_data = (void*)(connected_player + 0x590);
+
+    bool success = sendType46SteamMessage(steamsessionlight, connected_player_data, 0xff000019);
+    if (!success)
+    {
+        global::cmd_out << "Unable to disconnect player: error return val from sendType46SteamMessage\n";
+    }
 }
 
 void GetSteamData_Packet_injection_helper(void* data, uint32_t type)
@@ -130,7 +167,7 @@ void GetSteamData_Packet_injection_helper(void* data, uint32_t type)
                 // If this new guest is a non-mod user but we already have a mod user connected
                 if (Mod::get_mode() != Compatability)
                 {
-                    //disconnect
+                    DisconnectSession();
                 }
                 else
                 {
@@ -140,19 +177,19 @@ void GetSteamData_Packet_injection_helper(void* data, uint32_t type)
             // unknown playernum state
             else
             {
-                //disconnect
+                DisconnectSession();
             }
         }
         // If specified in options, we must disconnect the non-mod player, since they won't on their own
         else if (ModNetworking::guest_mod_installed == false && ModNetworking::allow_connect_with_non_mod_guest == false)
         {
-            //disconnect
+            DisconnectSession();
         }
-        // At this point, we've already sent our info packet (type5)
+        // At this point, we've already sent our info packet
         // If the guest hasn't already updated to it and this packet doesn't reflect our configs, something is wrong, so DC them
         else if (ModNetworking::guest_mod_installed == true && ModNetworking::guest_legacy_enabled != Mod::legacy_mode)
         {
-            //disconnect
+            DisconnectSession();
         }
         // Otherwise we're good to go, the configs match!
 
@@ -204,7 +241,7 @@ void GetSteamData_Packet_injection_helper(void* data, uint32_t type)
         }
         else if (ModNetworking::host_mod_installed == true && ModNetworking::host_legacy_enabled == false && ModNetworking::allow_connect_with_overhaul_mod_host == true)
         {
-            //connecting to non-legacy
+            //connecting to overhaul
             Mod::set_mode(ModNetworking::host_legacy_enabled, ModNetworking::host_mod_installed);
         }
         else if (ModNetworking::host_mod_installed == true && ModNetworking::host_legacy_enabled == true && ModNetworking::allow_connect_with_legacy_mod_host == true)
@@ -214,7 +251,7 @@ void GetSteamData_Packet_injection_helper(void* data, uint32_t type)
         }
         else
         {
-            //disconnect
+            DisconnectSession();
         }
 
         //game doesn't parse this byte
