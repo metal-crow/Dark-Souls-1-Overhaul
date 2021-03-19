@@ -23,7 +23,7 @@ extern "C" {
 
     uint64_t GetSteamData_Packet_injection_return;
     void GetSteamData_Packet_injection();
-    uint32_t GetSteamData_Packet_injection_helper(void* data, uint32_t type);
+    uint32_t GetSteamData_Packet_injection_helper(void* data, uint32_t type, void* SteamSessionMemberLight);
 
     uint64_t getNetMessage_injection_return;
     void getNetMessage_injection();
@@ -61,51 +61,50 @@ void ModNetworking::start()
     sp::mem::code::x64::inject_jmp_14b(write_address, &SendRawP2PPacket_injection_return, 0, &SendRawP2PPacket_injection);
 }
 
-typedef bool sendType46SteamMessage_FUNC(void* SteamSessionLight, void* ConnectedPlayerData,uint32_t packetData);
-sendType46SteamMessage_FUNC* sendType46SteamMessage = (sendType46SteamMessage_FUNC*)0x141088e90;
+
+typedef void* SteamInternal_ContextInit_FUNC(uint64_t Init_SteamInternal_FUNCPTR);
+SteamInternal_ContextInit_FUNC** SteamInternal_ContextInit = (SteamInternal_ContextInit_FUNC**)0x1420B6738; //the address of the location for the imported function address
+
+uint64_t Init_SteamInternal_FUNCPTR = 0x141AC1020;
+
+typedef void* SteamInternal_SteamNetworkingSend_FUNC(void* SteamNetworking, uint64_t steamid, uint8_t* packet_data, uint32_t packet_len);
 
 // Only call as Host, since this assumes session is connected and you can D/C other player
-void DisconnectSession()
+void HostForceDisconnectSession(void* SteamSessionMemberLight)
 {
-    auto steamsessionlight_o = Game::get_SessionManagerImp_SteamSessionLight();
-    if (!steamsessionlight_o.has_value())
-    {
-        global::cmd_out << "Unable to disconnect player: unable to get SteamSessionLight\n";
-        return;
-    }
-    void* steamsessionlight = steamsessionlight_o.value();
+    *(uint64_t*)0 = 1;
 
-    auto nextplayernum_o = Game::get_SessionManagerImp_Next_Player_Num();
-    if (!nextplayernum_o.has_value() || nextplayernum_o.value() < 2)
+    void* SteamInternal = (*SteamInternal_ContextInit)(Init_SteamInternal_FUNCPTR);
+
+    if (SteamInternal == NULL)
     {
-        global::cmd_out << "Unable to disconnect player: unable to get nextplayernum\n";
+        global::cmd_out << "Unable to disconnect player: unable to create SteamInternal\n";
         return;
     }
 
-    //The nextplayernum value isn't incremented till after this, when summoning is finished
-    // Subtract 1 since we are indexed from 1
-    // Subtract another 1 since the getter function auto-excludes the host by adding 1
-    // ex: the lowest we can be at this point is 2, and we'd want to get connected player 0.
-    uint32_t summoningplayerindex = nextplayernum_o.value() - 2;
+    uint64_t SteamNetworking = *(uint64_t*)((uint64_t)SteamInternal + 0x40);
+    SteamInternal_SteamNetworkingSend_FUNC* SteamNetworkingSend = (SteamInternal_SteamNetworkingSend_FUNC*)**(uint64_t**)SteamNetworking;
 
-    auto connected_player_o = Game::get_connected_player(summoningplayerindex);
-    if (!connected_player_o.has_value())
-    {
-        global::cmd_out << "Unable to disconnect player: unable to get connectedplayer\n";
-        return;
-    }
-    uint64_t connected_player = connected_player_o.value();
-    void* connected_player_data = (void*)(connected_player + 0x590);
+    uint8_t data_buf[] = {
+        1, //p2p packet type
+        78, 88, 82, 86, //magic
+        5, 132, //header
+        46, //type KickOutTask
+        255, 0, 0, 25 }; //data (const 0xff000019)
 
-    bool success = sendType46SteamMessage(steamsessionlight, connected_player_data, 0xff000019);
+    uint64_t steamid = *(uint64_t*)((uint64_t)SteamSessionMemberLight + 0xc8);
+
+    bool success = SteamNetworkingSend((void*)SteamNetworking, steamid, data_buf, sizeof(data_buf));
     if (!success)
     {
-        global::cmd_out << "Unable to disconnect player: error return val from sendType46SteamMessage\n";
+        global::cmd_out << "Unable to disconnect player: error return val from SteamNetworkingSend\n";
     }
+
+    //TODO also set variables in this SessionMember struct to disable the connection locally
 }
 
 //returns the type of the intercepted packet
-uint32_t GetSteamData_Packet_injection_helper(void* data, uint32_t type)
+uint32_t GetSteamData_Packet_injection_helper(void* data, uint32_t type, void* SteamSessionMemberLight)
 {
     int64_t* data_offset_ptr = (int64_t*)(((uint64_t)data) + 0x18);
     int64_t data_offset = *data_offset_ptr;
@@ -171,7 +170,7 @@ uint32_t GetSteamData_Packet_injection_helper(void* data, uint32_t type)
                 // If this new guest is a non-mod user but we already have a mod user connected
                 if (Mod::get_mode() != Compatability)
                 {
-                    DisconnectSession();
+                    HostForceDisconnectSession(SteamSessionMemberLight);
                 }
                 else
                 {
@@ -181,19 +180,19 @@ uint32_t GetSteamData_Packet_injection_helper(void* data, uint32_t type)
             // unknown playernum state
             else
             {
-                DisconnectSession();
+                HostForceDisconnectSession(SteamSessionMemberLight);
             }
         }
         // If specified in options, we must disconnect the non-mod player, since they won't on their own
         else if (ModNetworking::guest_mod_installed == false && ModNetworking::allow_connect_with_non_mod_guest == false)
         {
-            DisconnectSession();
+            HostForceDisconnectSession(SteamSessionMemberLight);
         }
         // At this point, we've already sent our info packet
         // If the guest hasn't already updated to it and this packet doesn't reflect our configs, something is wrong, so DC them
         else if (ModNetworking::guest_mod_installed == true && ModNetworking::guest_legacy_enabled != Mod::legacy_mode)
         {
-            DisconnectSession();
+            HostForceDisconnectSession(SteamSessionMemberLight);
         }
         // Otherwise we're good to go, the configs match!
 

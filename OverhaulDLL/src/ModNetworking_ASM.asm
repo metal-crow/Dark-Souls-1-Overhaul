@@ -91,6 +91,7 @@ push    r9
 push    r10
 push    r11
 
+mov     r8, rdi ;SteamSessionMemberLight
 mov     edx, eax ;the packet type
 lea     rcx, [rsp + 28h + 40h + 8*7] ;the data struct
 call    GetSteamData_Packet_injection_helper
