@@ -23,7 +23,7 @@ extern "C" {
 
     uint64_t GetSteamData_Packet_injection_return;
     void GetSteamData_Packet_injection();
-    void GetSteamData_Packet_injection_helper(void* data, uint32_t type);
+    uint32_t GetSteamData_Packet_injection_helper(void* data, uint32_t type);
 
     uint64_t getNetMessage_injection_return;
     void getNetMessage_injection();
@@ -64,6 +64,7 @@ void ModNetworking::start()
 typedef bool sendType46SteamMessage_FUNC(void* SteamSessionLight, void* ConnectedPlayerData,uint32_t packetData);
 sendType46SteamMessage_FUNC* sendType46SteamMessage = (sendType46SteamMessage_FUNC*)0x141088e90;
 
+// Only call as Host, since this assumes session is connected and you can D/C other player
 void DisconnectSession()
 {
     auto steamsessionlight_o = Game::get_SessionManagerImp_SteamSessionLight();
@@ -75,7 +76,7 @@ void DisconnectSession()
     void* steamsessionlight = steamsessionlight_o.value();
 
     auto nextplayernum_o = Game::get_SessionManagerImp_Next_Player_Num();
-    if (!nextplayernum_o.has_value())
+    if (!nextplayernum_o.has_value() || nextplayernum_o.value() < 2)
     {
         global::cmd_out << "Unable to disconnect player: unable to get nextplayernum\n";
         return;
@@ -103,16 +104,19 @@ void DisconnectSession()
     }
 }
 
-void GetSteamData_Packet_injection_helper(void* data, uint32_t type)
+//returns the type of the intercepted packet
+uint32_t GetSteamData_Packet_injection_helper(void* data, uint32_t type)
 {
-    int64_t data_offset = *(int64_t*)(((uint64_t)data) + 0x18);
-    int64_t data_size = *(int64_t*)(((uint64_t)data) + 0x8);
+    int64_t* data_offset_ptr = (int64_t*)(((uint64_t)data) + 0x18);
+    int64_t data_offset = *data_offset_ptr;
+    int64_t* data_size_ptr = (int64_t*)(((uint64_t)data) + 0x8);
+    int64_t data_size = *data_size_ptr;
     uint8_t* data_buf = (uint8_t*)(*(uint64_t*)((uint64_t)data + 0x10) + data_offset);
     int64_t data_remaining = data_size - data_offset;
 
     if (!Game::get_SessionManagerImp_session_action_result().has_value())
     {
-        return;
+        return type;
     }
     SessionActionResultEnum session_action_result = Game::get_SessionManagerImp_session_action_result().value();
 
@@ -193,8 +197,8 @@ void GetSteamData_Packet_injection_helper(void* data, uint32_t type)
         }
         // Otherwise we're good to go, the configs match!
 
-        //game doesn't parse this byte
-        return;
+        //game doesn't parse this extra byte in the packet, no need to remove
+        return type;
     }
 
     // 2. If we recieve a type12 AND we're the guest (we joined the session)
@@ -251,12 +255,17 @@ void GetSteamData_Packet_injection_helper(void* data, uint32_t type)
         }
         else
         {
-            DisconnectSession();
+            //we can't kick out the other player since we're not the host. So pretend we received the kickout packet
+            *data_size_ptr += 4;
+            ((uint32_t*)data_buf)[0] = 0xff000019;
+            return 46;
         }
 
-        //game doesn't parse this byte
-        return;
+        //game doesn't parse this extra byte in the packet, no need to remove
+        return type;
     }
+
+    return type;
 }
 
 uint64_t SendRawP2PPacket_injection_helper(uint8_t* data, uint64_t size, uint32_t type)

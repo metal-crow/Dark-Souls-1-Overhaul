@@ -82,7 +82,8 @@ sub     rsp, 10h
 movdqu  [rsp], xmm2
 sub     rsp, 10h
 movdqu  [rsp], xmm3
-push    rax
+;push    rax ;used as return
+sub     rsp, 8
 push    rcx
 push    rdx
 push    r8
@@ -100,7 +101,8 @@ pop     r9
 pop     r8
 pop     rdx
 pop     rcx
-pop     rax
+;pop     rax
+add     rsp, 8
 movdqu  xmm3, [rsp]
 add     rsp, 10h
 movdqu  xmm2, [rsp]
