@@ -9,6 +9,7 @@
 #include "InputUtil.h"
 #include "Files.h"
 #include "sp/memory/injection/asm/x64.h"
+#include "ModNetworking.h"
 
 namespace Input {
 
@@ -211,6 +212,35 @@ void handle_input(XINPUT_GAMEPAD* xold, XINPUT_GAMEPAD* xcurrent, DIJOYSTATE2* d
             if (Files::saves_menu_is_open()) {
                 Files::save_file_index_make_new = true;
             }
+        }
+
+        // --------------------------
+        // TEMP: change the game mode and connection settings via button press
+        // --------------------------
+        if (Button::pressed(kbold, kbcurrent, DIK_F1))
+        {
+            ModNetworking::allow_connect_with_non_mod_host = !ModNetworking::allow_connect_with_non_mod_host;
+            ConsoleWrite("Set allow_connect_with_non_mod_host=", ModNetworking::allow_connect_with_non_mod_host);
+        }
+        if (Button::pressed(kbold, kbcurrent, DIK_F2))
+        {
+            ModNetworking::allow_connect_with_legacy_mod_host = !ModNetworking::allow_connect_with_legacy_mod_host;
+            ConsoleWrite("Set allow_connect_with_legacy_mod_host=", ModNetworking::allow_connect_with_legacy_mod_host);
+        }
+        if (Button::pressed(kbold, kbcurrent, DIK_F3))
+        {
+            ModNetworking::allow_connect_with_overhaul_mod_host = !ModNetworking::allow_connect_with_overhaul_mod_host;
+            ConsoleWrite("Set allow_connect_with_overhaul_mod_host=", ModNetworking::allow_connect_with_overhaul_mod_host);
+        }
+        if (Button::pressed(kbold, kbcurrent, DIK_F4))
+        {
+            ModNetworking::allow_connect_with_non_mod_guest = !ModNetworking::allow_connect_with_non_mod_guest;
+            ConsoleWrite("Set allow_connect_with_non_mod_guest=", ModNetworking::allow_connect_with_non_mod_guest);
+        }
+        if (Button::pressed(kbold, kbcurrent, DIK_F5))
+        {
+            Mod::prefer_legacy_mode = !Mod::prefer_legacy_mode;
+            ConsoleWrite("Set legacy_mode=", Mod::prefer_legacy_mode);
         }
     }
 }
