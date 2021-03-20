@@ -67,13 +67,18 @@ SteamInternal_ContextInit_FUNC** SteamInternal_ContextInit = (SteamInternal_Cont
 
 uint64_t Init_SteamInternal_FUNCPTR = 0x141AC1020;
 
-typedef void* SteamInternal_SteamNetworkingSend_FUNC(void* SteamNetworking, uint64_t steamid, uint8_t* packet_data, uint32_t packet_len);
+typedef void* SteamInternal_SteamNetworkingSend_FUNC(void* SteamNetworking, uint64_t steamid, const uint8_t* packet_data, uint32_t packet_len, uint32_t eP2PSendType, uint32_t nChannel);
+
+const uint8_t data_buf[] = {
+    (1 | (1 << 4)), //p2p packet type
+    78, 88, 82, 86, //magic
+    5, 132, //header
+    46, //type KickOutTask
+    255, 0, 0, 25 }; //data (const 0xff000019)
 
 // Only call as Host, since this assumes session is connected and you can D/C other player
 void HostForceDisconnectSession(void* SteamSessionMemberLight)
 {
-    *(uint64_t*)0 = 1;
-
     void* SteamInternal = (*SteamInternal_ContextInit)(Init_SteamInternal_FUNCPTR);
 
     if (SteamInternal == NULL)
@@ -85,16 +90,10 @@ void HostForceDisconnectSession(void* SteamSessionMemberLight)
     uint64_t SteamNetworking = *(uint64_t*)((uint64_t)SteamInternal + 0x40);
     SteamInternal_SteamNetworkingSend_FUNC* SteamNetworkingSend = (SteamInternal_SteamNetworkingSend_FUNC*)**(uint64_t**)SteamNetworking;
 
-    uint8_t data_buf[] = {
-        1, //p2p packet type
-        78, 88, 82, 86, //magic
-        5, 132, //header
-        46, //type KickOutTask
-        255, 0, 0, 25 }; //data (const 0xff000019)
-
     uint64_t steamid = *(uint64_t*)((uint64_t)SteamSessionMemberLight + 0xc8);
 
-    bool success = SteamNetworkingSend((void*)SteamNetworking, steamid, data_buf, sizeof(data_buf));
+    //eP2PSendType = k_EP2PSendReliable
+    bool success = SteamNetworkingSend((void*)SteamNetworking, steamid, data_buf, sizeof(data_buf), 2, 0);
     if (!success)
     {
         global::cmd_out << "Unable to disconnect player: error return val from SteamNetworkingSend\n";
@@ -132,9 +131,9 @@ uint32_t GetSteamData_Packet_injection_helper(void* data, uint32_t type, void* S
         {
             uint8_t value = *(data_buf+(data_remaining-1)); //ignore the dword of normal data at the end if it exists
 
-            char info[128];
-            snprintf(info, 128, "Host Read custom type36=%x\n", value);
-            global::cmd_out << info;
+            //char info[128];
+            //snprintf(info, 128, "Host Read custom type36=%x\n", value);
+            //global::cmd_out << info;
 
             if ((value & MOD_ENABLED) != 0)
             {
@@ -212,9 +211,9 @@ uint32_t GetSteamData_Packet_injection_helper(void* data, uint32_t type, void* S
         {
             uint8_t value = *data_buf;
 
-            char info[128];
-            snprintf(info, 128, "Guest Read custom type12=%x\n", value);
-            global::cmd_out << info;
+            //char info[128];
+            //snprintf(info, 128, "Guest Read custom type12=%x\n", value);
+            //global::cmd_out << info;
 
             if ((value & MOD_ENABLED) != 0)
             {
@@ -286,9 +285,10 @@ uint64_t SendRawP2PPacket_injection_helper(uint8_t* data, uint64_t size, uint32_
         return size;
     }
     SessionActionResultEnum session_action_result = Game::get_SessionManagerImp_session_action_result().value();
-    char info[128];
-    snprintf(info, 128, "SendRawP2PPacket_injection_helper session_action=%x\n", session_action_result);
-    global::cmd_out << info;
+
+    //char info[128];
+    //snprintf(info, 128, "SendRawP2PPacket_injection_helper session_action=%x\n", session_action_result);
+    //global::cmd_out << info;
 
     uint8_t packet_type = data[6];
 
@@ -296,7 +296,7 @@ uint64_t SendRawP2PPacket_injection_helper(uint8_t* data, uint64_t size, uint32_
     // It's ok to increase the length since the underlying buffer is 128 bytes long
     if (packet_type == 12 && (session_action_result == TryToCreateSession || session_action_result == CreateSessionSuccess))
     {
-        global::cmd_out << "Host Send custom type12\n";
+        //global::cmd_out << "Host Send custom type12\n";
         //the mod is active (always true, since we're running the mod)
         uint8_t value = MOD_ENABLED;
 
@@ -313,7 +313,7 @@ uint64_t SendRawP2PPacket_injection_helper(uint8_t* data, uint64_t size, uint32_
     // It's ok to increase the length since the underlying buffer is 128 bytes long
     if (packet_type == 36 && (session_action_result == TryToJoinSession || session_action_result == JoinSessionSuccess))
     {
-        global::cmd_out << "Guest Send custom type36\n";
+        //global::cmd_out << "Guest Send custom type36\n";
         //the mod is active (always true, since we're running the mod)
         uint8_t value = MOD_ENABLED;
 

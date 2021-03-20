@@ -22,6 +22,7 @@ mov     edx, ebx
 mov     rcx, r10
 call    qword ptr [sub_140514EF0]
 
+sub     rsp, 8h ;stack align
 sub     rsp, 10h
 movdqu  [rsp], xmm0
 sub     rsp, 10h
@@ -58,6 +59,7 @@ movdqu  xmm1, [rsp]
 add     rsp, 10h
 movdqu  xmm0, [rsp]
 add     rsp, 10h
+add     rsp, 8h
 
 jmp     getNetMessage_injection_return
 
@@ -74,6 +76,7 @@ GetSteamData_Packet_injection PROC
 lea     rcx, [rsp+28h]
 call    qword ptr [sub_141078C90]
 
+sub     rsp, 8h ;stack align
 sub     rsp, 10h
 movdqu  [rsp], xmm0
 sub     rsp, 10h
@@ -93,7 +96,7 @@ push    r11
 
 mov     r8, rdi ;SteamSessionMemberLight
 mov     edx, eax ;the packet type
-lea     rcx, [rsp + 28h + 40h + 8*7] ;the data struct
+lea     rcx, [rsp + 28h + 40h + 8*8] ;the data struct
 call    GetSteamData_Packet_injection_helper
 
 pop     r11
@@ -112,6 +115,7 @@ movdqu  xmm1, [rsp]
 add     rsp, 10h
 movdqu  xmm0, [rsp]
 add     rsp, 10h
+add     rsp, 8h
 
 ;original code
 add     eax, 0FFFFFFFCh
@@ -132,6 +136,7 @@ sendPacket_injection PROC
 sub     rsp, 80h
 mov     qword ptr [rax-78h], 0FFFFFFFFFFFFFFFEh
 
+sub     rsp, 8h ;stack align
 sub     rsp, 10h
 movdqu  [rsp], xmm0
 sub     rsp, 10h
@@ -148,7 +153,7 @@ push    r9
 push    r10
 push    r11
 
-mov     edx, dword ptr [rsp+0D0h+40h+8*7]
+mov     edx, dword ptr [rsp+0D0h+40h+8*8]
 mov     rcx, r9
 call    sendPacket_injection_helper
 
@@ -167,6 +172,7 @@ movdqu  xmm1, [rsp]
 add     rsp, 10h
 movdqu  xmm0, [rsp]
 add     rsp, 10h
+add     rsp, 8h
 
 jmp     sendPacket_injection_return
 
@@ -184,6 +190,7 @@ xor     rax, rsp
 mov     [rsp+510h], rax
 mov     rbx, r8
 
+sub     rsp, 8h ;stack align
 sub     rsp, 10h
 movdqu  [rsp], xmm0
 sub     rsp, 10h
@@ -203,7 +210,7 @@ push    r11
 
 mov     rcx, r8 ;data
 mov     rdx, r9 ;data_len
-mov     r8d, dword ptr [rsp+590h+40h+8*7] ;type
+mov     r8d, dword ptr [rsp+590h+40h+8*8] ;type
 call    SendRawP2PPacket_injection_helper
 
 pop     r11
@@ -222,6 +229,7 @@ movdqu  xmm1, [rsp]
 add     rsp, 10h
 movdqu  xmm0, [rsp]
 add     rsp, 10h
+add     rsp, 8h
 
 mov     r9, rax ;use return as data_len
 
