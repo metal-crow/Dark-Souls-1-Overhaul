@@ -27,7 +27,7 @@ The mod is completely backwards compatible with vanilla dark souls 1 by default.
 It also unlocks a number of in-engine limitations and fixes other engine problems (including disabling the terrible built-in anti-cheat), making it perfect to extend further with other mods.  
 
 If you so wish, you can enable overhaul mode at any time to get the full suite of improvements this mod gives.  
-This will not! separate you from vanilla players. A player will have the option of deciding if they want to enable overhaul mode once they receive a connection request from a player with it enabled, and visa-versa. Preferred defaults and auto-allow/decline options can be configured.  
+This will __not__ separate you from vanilla players. A player will have the option of deciding if they want to enable overhaul mode once they receive a connection request from a player with it enabled, and visa-versa. Preferred defaults and auto-allow/decline options can be configured.  
 Enabling Overhaul mode by default is highly recommended, since it dramatically improves pvp experience on a number of metrics (weapon viability, magic use, and more) while still keeping the fundamental dark souls 1 pvp experience intact.  
   
 ## Changelist
@@ -89,3 +89,7 @@ Specify folder location + filenames to use, and the alternate path will be used 
 * Crash handler and reporter
 
 * Backstab distance and angle has been reduced. (60 degrees to 45, 1.5 distance to 1)
+
+* Communication between mod and non-mod users, to support crossplay
+
+* Mod file hot-swapping, so features of this mod can be dynamically turned off and on as needed.
