@@ -220,27 +220,27 @@ void handle_input(XINPUT_GAMEPAD* xold, XINPUT_GAMEPAD* xcurrent, DIJOYSTATE2* d
         if (Button::pressed(kbold, kbcurrent, DIK_F1))
         {
             ModNetworking::allow_connect_with_non_mod_host = !ModNetworking::allow_connect_with_non_mod_host;
-            ConsoleWrite("Set allow_connect_with_non_mod_host=", ModNetworking::allow_connect_with_non_mod_host);
+            ConsoleWrite("Set allow_connect_with_non_mod_host=%d", ModNetworking::allow_connect_with_non_mod_host);
         }
         if (Button::pressed(kbold, kbcurrent, DIK_F2))
         {
             ModNetworking::allow_connect_with_legacy_mod_host = !ModNetworking::allow_connect_with_legacy_mod_host;
-            ConsoleWrite("Set allow_connect_with_legacy_mod_host=", ModNetworking::allow_connect_with_legacy_mod_host);
+            ConsoleWrite("Set allow_connect_with_legacy_mod_host=%d", ModNetworking::allow_connect_with_legacy_mod_host);
         }
         if (Button::pressed(kbold, kbcurrent, DIK_F3))
         {
             ModNetworking::allow_connect_with_overhaul_mod_host = !ModNetworking::allow_connect_with_overhaul_mod_host;
-            ConsoleWrite("Set allow_connect_with_overhaul_mod_host=", ModNetworking::allow_connect_with_overhaul_mod_host);
+            ConsoleWrite("Set allow_connect_with_overhaul_mod_host=%d", ModNetworking::allow_connect_with_overhaul_mod_host);
         }
         if (Button::pressed(kbold, kbcurrent, DIK_F4))
         {
             ModNetworking::allow_connect_with_non_mod_guest = !ModNetworking::allow_connect_with_non_mod_guest;
-            ConsoleWrite("Set allow_connect_with_non_mod_guest=", ModNetworking::allow_connect_with_non_mod_guest);
+            ConsoleWrite("Set allow_connect_with_non_mod_guest=%d", ModNetworking::allow_connect_with_non_mod_guest);
         }
         if (Button::pressed(kbold, kbcurrent, DIK_F5))
         {
             Mod::prefer_legacy_mode = !Mod::prefer_legacy_mode;
-            ConsoleWrite("Set legacy_mode=", Mod::prefer_legacy_mode);
+            ConsoleWrite("Set legacy_mode=%d", Mod::prefer_legacy_mode);
         }
     }
 }
