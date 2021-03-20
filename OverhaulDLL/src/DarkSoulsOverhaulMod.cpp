@@ -147,6 +147,16 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
             waiting_for_load = false;
         }
 
+        // Check if we are not in any multiplayer setting, so that the user's preferred legacy mode setting can be applied
+        auto session_action_result = Game::get_SessionManagerImp_session_action_result();
+        if (session_action_result.has_value() && session_action_result.value() == NoSession)
+        {
+            if (Mod::legacy_mode != Mod::prefer_legacy_mode)
+            {
+                Mod::set_mode(Mod::prefer_legacy_mode, true);
+            }
+        }
+
         Sleep(150);
     }
 

@@ -55,7 +55,8 @@ void Mod::get_init_preferences()
     global::cmd_out << (Mod::output_prefix + "Loading settings preferences...\n");
 
     // Check if legacy mode is enabled
-    Mod::legacy_mode = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_LEGACY_MODE_, (int)Mod::legacy_mode, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    Mod::prefer_legacy_mode = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_LEGACY_MODE_, (int)Mod::prefer_legacy_mode, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    Mod::legacy_mode = Mod::prefer_legacy_mode;
     if (Mod::legacy_mode)
         global::cmd_out << ("    Legacy mode enabled. Gameplay changes will not be applied.\n");
 
