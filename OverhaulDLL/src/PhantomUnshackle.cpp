@@ -55,18 +55,19 @@ static DWORD WINAPI change_mp_zone(void* unused) {
         char_status = Game::get_player_char_status();
 
         while (char_status != DS1_PLAYER_STATUS_LOADING) {
-            if (Game::get_mp_id_ptr().has_value())
+            if (Game::get_online_area_id_ptr().has_value())
             {
                 // normal zone id (don't alter, we want to connect with vanilla players)
                 if (vanilla_mp_zone > 0)
                 {
-                    *Game::get_mp_id_ptr().value() = vanilla_mp_zone;
+                    *Game::get_online_area_id_ptr().value() = vanilla_mp_zone;
                 }
                 //area normally without a zone (anywhere without multiplayer)
                 else
                 {
-                    //set mp id to area id + 100000 (since the server apparently validates it or something?)
-                    *Game::get_mp_id_ptr().value() = Game::get_area_id().value_or(0) + 100000;
+                    //apparently this value can't be set to whatever, the server may validate it or something
+                    //a value of 100XXX seems to work reliably
+                    *Game::get_online_area_id_ptr().value() = 100000 + Game::get_area_number().value_or(0)*100 + Game::get_world_number().value_or(0);
                 }
             }
 

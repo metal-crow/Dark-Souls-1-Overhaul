@@ -177,7 +177,8 @@ static int32_t* player_body_anim_id_cache = NULL;
 static int32_t* player_upper_body_anim_id_cache = NULL;
 static int32_t* player_lower_body_anim_id_cache = NULL;
 static float* set_current_player_animation_speed_cache = NULL;
-static int32_t* area_id_cache = NULL;
+static uint8_t* area_num_cache = NULL;
+static uint8_t* world_num_cache = NULL;
 static int32_t* mp_id_cache = NULL;
 static int32_t* saved_chars_menu_flag_cache = NULL;
 static uint8_t* saved_chars_preview_data_cache = NULL;
@@ -208,10 +209,12 @@ void Game::preload_function_caches() {
     Game::get_player_upper_body_anim_id();
     player_lower_body_anim_id_cache = NULL;
     Game::get_player_lower_body_anim_id();
-    area_id_cache = NULL;
-    Game::get_area_id();
+    area_num_cache = NULL;
+    Game::get_area_number();
+    world_num_cache = NULL;
+    Game::get_world_number();
     mp_id_cache = NULL;
-    Game::get_mp_id_ptr();
+    Game::get_online_area_id_ptr();
     saved_chars_menu_flag_cache = NULL;
     Game::get_saved_chars_menu_flag();
     saved_chars_preview_data_cache = NULL;
@@ -679,22 +682,41 @@ std::optional<float> Game::get_entity_rotation(void* entity_ptr) {
     }
 }
 
-std::optional<int32_t> Game::get_area_id() {
-    if (area_id_cache) {
-        return (*area_id_cache & 0x0000ffff);
+std::optional<uint8_t> Game::get_area_number() {
+    if (area_num_cache) {
+        return *area_num_cache;
     }
 
-    sp::mem::pointer area_id = sp::mem::pointer<int32_t>((void*)(Game::frpg_net_base), { 0xA22 });
-    if (area_id.resolve() == NULL) {
+    sp::mem::pointer area_num = sp::mem::pointer<uint8_t>((void*)(Game::frpg_net_base), { 0xA22 });
+    if (area_num.resolve() == NULL) {
         return std::nullopt;
     }
     else {
-        area_id_cache = area_id.resolve();
-        return (*area_id_cache & 0x0000ffff);
+        area_num_cache = area_num.resolve();
+        return *area_num_cache;
     }
 }
 
-std::optional<int32_t*> Game::get_mp_id_ptr() {
+std::optional<uint8_t> Game::get_world_number()
+{
+    if (world_num_cache)
+    {
+        return *world_num_cache;
+    }
+
+    sp::mem::pointer world_num = sp::mem::pointer<uint8_t>((void*)(Game::frpg_net_base), { 0xA23 });
+    if (world_num.resolve() == NULL)
+    {
+        return std::nullopt;
+    }
+    else
+    {
+        world_num_cache = world_num.resolve();
+        return *world_num_cache;
+    }
+}
+
+std::optional<int32_t*> Game::get_online_area_id_ptr() {
     if (mp_id_cache) {
         return mp_id_cache;
     }
