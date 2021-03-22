@@ -118,6 +118,8 @@ uint32_t GetSteamData_Packet_injection_helper(void* data, uint32_t type, void* S
     }
     SessionActionResultEnum session_action_result = Game::get_SessionManagerImp_session_action_result().value();
 
+    //ConsoleWrite("GetSteamData_Packet_injection_helper session_action=%x type=%d\n", session_action_result, type);
+
     // 4. If we recieve a type36 AND we're the host (we created the session)
     if (type == 36 && (session_action_result == TryToCreateSession || session_action_result == CreateSessionSuccess))
     {
@@ -131,9 +133,7 @@ uint32_t GetSteamData_Packet_injection_helper(void* data, uint32_t type, void* S
         {
             uint8_t value = *(data_buf+(data_remaining-1)); //ignore the dword of normal data at the end if it exists
 
-            //char info[128];
-            //snprintf(info, 128, "Host Read custom type36=%x\n", value);
-            //global::cmd_out << info;
+            //ConsoleWrite("Host Read custom type36=%x\n", value);
 
             if ((value & MOD_ENABLED) != 0)
             {
@@ -211,9 +211,7 @@ uint32_t GetSteamData_Packet_injection_helper(void* data, uint32_t type, void* S
         {
             uint8_t value = *data_buf;
 
-            //char info[128];
-            //snprintf(info, 128, "Guest Read custom type12=%x\n", value);
-            //global::cmd_out << info;
+            //ConsoleWrite("Guest Read custom type12=%x\n", value);
 
             if ((value & MOD_ENABLED) != 0)
             {
@@ -286,17 +284,15 @@ uint64_t SendRawP2PPacket_injection_helper(uint8_t* data, uint64_t size, uint32_
     }
     SessionActionResultEnum session_action_result = Game::get_SessionManagerImp_session_action_result().value();
 
-    //char info[128];
-    //snprintf(info, 128, "SendRawP2PPacket_injection_helper session_action=%x\n", session_action_result);
-    //global::cmd_out << info;
-
     uint8_t packet_type = data[6];
+
+    //ConsoleWrite("SendRawP2PPacket_injection_helper session_action=%x type=%d\n", session_action_result, packet_type);
 
     // 1. If we send a type12 AND we're the host (we created the session)
     // It's ok to increase the length since the underlying buffer is 128 bytes long
     if (packet_type == 12 && (session_action_result == TryToCreateSession || session_action_result == CreateSessionSuccess))
     {
-        //global::cmd_out << "Host Send custom type12\n";
+        //ConsoleWrite("Host Send custom type12\n");
         //the mod is active (always true, since we're running the mod)
         uint8_t value = MOD_ENABLED;
 
@@ -313,7 +309,7 @@ uint64_t SendRawP2PPacket_injection_helper(uint8_t* data, uint64_t size, uint32_
     // It's ok to increase the length since the underlying buffer is 128 bytes long
     if (packet_type == 36 && (session_action_result == TryToJoinSession || session_action_result == JoinSessionSuccess))
     {
-        //global::cmd_out << "Guest Send custom type36\n";
+        //ConsoleWrite("Guest Send custom type36\n");
         //the mod is active (always true, since we're running the mod)
         uint8_t value = MOD_ENABLED;
 
