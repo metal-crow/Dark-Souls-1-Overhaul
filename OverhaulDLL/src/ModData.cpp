@@ -14,6 +14,7 @@
 #include "Files.h"
 #include "FileReloading.h"
 #include "SpellDesyncFixes.h"
+#include "ModNetworking.h"
 
 #define _SP_DEFINE_VK_NAME_STRINGS_  // Must be defined to use Virtual-key code name strings from SP_IO_Strings.hpp (opt-in by default because it increases filesize by a few KB)
 
@@ -58,7 +59,15 @@ void Mod::get_init_preferences()
     Mod::prefer_legacy_mode = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_LEGACY_MODE_, (int)Mod::prefer_legacy_mode, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
     Mod::legacy_mode = Mod::prefer_legacy_mode;
     if (Mod::legacy_mode)
+    {
         global::cmd_out << ("    Legacy mode enabled. Gameplay changes will not be applied.\n");
+        ModNetworking::allow_connect_with_legacy_mod_host = true;
+    }
+    else
+    {
+        global::cmd_out << ("    Overhaul mode enabled. Gameplay changes will be applied.\n");
+        ModNetworking::allow_connect_with_overhaul_mod_host = true;
+    }
 
     // Check for custom game files
     Mod::get_custom_game_files();
