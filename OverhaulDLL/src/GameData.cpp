@@ -52,13 +52,7 @@ sp::mem::pointer<int32_t> Game::player_char_status;
 // Marker for if we're currently in a loading screen
 sp::mem::pointer<int32_t> Game::is_loading;
 
-uint64_t Game::player_animation_mediator = NULL;
-
 extern "C" {
-    uint64_t* player_animation_mediator_cptr;
-    uint64_t player_animation_mediator_loading_injection_return;
-    void player_animation_mediator_loading_injection();
-
     uint32_t last_attack_weaponid;
     uint64_t calculate_attack_damage_injection_return;
     void calculate_attack_damage_injection();
@@ -119,11 +113,6 @@ void Game::init()
 
     // Note this is not actually the real pointer to the loading screen byte. Just a best guess
     Game::is_loading = sp::mem::pointer<int32_t>((void*)(Game::ds1_base+0x1ACD758), { 0x28, 0x250, 0x2F8 });
-
-    //hook the code that init's the player's animation mediator so we know it's location later
-    player_animation_mediator_cptr = &Game::player_animation_mediator;
-    write_address = (uint8_t*)(Game::player_animation_mediator_loading + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &player_animation_mediator_loading_injection_return, 1, &player_animation_mediator_loading_injection);
 
     Game::game_data_man = Game::ds1_base + 0x1D278F0;
 
@@ -187,6 +176,7 @@ static void** pc_EzStateMachineImpl_cache = NULL;
 static void** SteamSessionLight_cache = NULL;
 static uint32_t* NextPlayerNum_cache = NULL;
 static void** PlayerIns_cache = NULL;
+static void** player_animationMediator_cache = NULL;
 
 void Game::preload_function_caches() {
     global::cmd_out << "Cache loading\n";
@@ -231,6 +221,8 @@ void Game::preload_function_caches() {
     Game::get_SessionManagerImp_Next_Player_Num();
     PlayerIns_cache = NULL;
     Game::get_PlayerIns();
+    player_animationMediator_cache = NULL;
+    Game::get_player_animationMediator();
 
     Sleep(10);
     //this pointer is a bit late to resolve on load
@@ -522,6 +514,24 @@ std::optional<int32_t> Game::get_player_lower_body_anim_id()
     }
 }
 
+std::optional<void*> Game::get_player_animationMediator()
+{
+    if (player_animationMediator_cache)
+    {
+        return *player_animationMediator_cache;
+    }
+
+    sp::mem::pointer animationMediator = sp::mem::pointer<void*>((void*)Game::world_chr_man_imp, { 0x68, 0x68, 0x20 });
+    if (animationMediator.resolve() == NULL)
+    {
+        return std::nullopt;
+    }
+    else
+    {
+        player_animationMediator_cache = animationMediator.resolve();
+        return *player_animationMediator_cache;
+    }
+}
 
 std::optional<int32_t> Game::get_animation_mediator_state_animation(void* animationMediator, AnimationStateTypesEnum state_id) {
     void* state_entry = (void*)((uint64_t)animationMediator + 168 * state_id);

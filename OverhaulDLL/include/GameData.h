@@ -131,11 +131,7 @@ public:
 
     static uint64_t session_man_imp;
 
-    static const uint64_t player_animation_mediator_loading = 0x3790E2;
-
     static const uint64_t calculate_attack_damage_offset = 0x2a8ead6;
-
-    static uint64_t player_animation_mediator;
 
     // Player character status (loading, human, co-op, invader, hollow)
     static sp::mem::pointer<int32_t> player_char_status;
@@ -192,6 +188,8 @@ public:
     static std::optional<int32_t> get_player_upper_body_anim_id();
 
     static std::optional<int32_t> get_player_lower_body_anim_id();
+
+    static std::optional<void*> get_player_animationMediator();
 
     static std::optional<int32_t> get_animation_mediator_state_animation(void* animationMediator, AnimationStateTypesEnum state_id);
 
