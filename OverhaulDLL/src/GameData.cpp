@@ -29,9 +29,6 @@ uint64_t Game::ds1_base = NULL;
 // Base address of fmod_event64 dll process
 uint64_t Game::fmod_event64_base = NULL;
 
-// Base address for player character data
-uint64_t Game::player_char_base = NULL;
-
 // Base address for character class data
 uint64_t Game::char_class_base = NULL;
 
@@ -83,6 +80,8 @@ int Game::node_count = -1;
 // Initializes pointers and base addresses required for most other functions
 void Game::init()
 {
+    uint8_t* write_address;
+
     global::cmd_out << "Initializing pointers...\n";
 
     Game::ds1_base = (uint64_t)sp::mem::get_process_base();
@@ -123,8 +122,8 @@ void Game::init()
 
     //hook the code that init's the player's animation mediator so we know it's location later
     player_animation_mediator_cptr = &Game::player_animation_mediator;
-    //uint8_t* write_address = (uint8_t*)(Game::player_animation_mediator_loading + Game::ds1_base);
-    //sp::mem::code::x64::inject_jmp_14b(write_address, &player_animation_mediator_loading_injection_return, 1, &player_animation_mediator_loading_injection);
+    write_address = (uint8_t*)(Game::player_animation_mediator_loading + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &player_animation_mediator_loading_injection_return, 1, &player_animation_mediator_loading_injection);
 
     Game::game_data_man = Game::ds1_base + 0x1D278F0;
 
@@ -140,7 +139,7 @@ void Game::init()
 
     //hook the code that calculates attack damage and save off the weapon id used for the attack
     last_attack_weaponid = -1;
-    uint8_t* write_address = (uint8_t*)(Game::calculate_attack_damage_offset + Game::ds1_base);
+    write_address = (uint8_t*)(Game::calculate_attack_damage_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &calculate_attack_damage_injection_return, 1, &calculate_attack_damage_injection);
 }
 
@@ -187,6 +186,7 @@ static uint64_t connected_players_array_cache = NULL;
 static void** pc_EzStateMachineImpl_cache = NULL;
 static void** SteamSessionLight_cache = NULL;
 static uint32_t* NextPlayerNum_cache = NULL;
+static void** PlayerIns_cache = NULL;
 
 void Game::preload_function_caches() {
     global::cmd_out << "Cache loading\n";
@@ -229,6 +229,8 @@ void Game::preload_function_caches() {
     Game::get_SessionManagerImp_SteamSessionLight();
     NextPlayerNum_cache = NULL;
     Game::get_SessionManagerImp_Next_Player_Num();
+    PlayerIns_cache = NULL;
+    Game::get_PlayerIns();
 
     Sleep(10);
     //this pointer is a bit late to resolve on load
@@ -915,5 +917,24 @@ std::optional<uint32_t> Game::get_SessionManagerImp_Next_Player_Num()
     {
         NextPlayerNum_cache = NextPlayerNum.resolve();
         return *NextPlayerNum_cache;
+    }
+}
+
+std::optional<void*> Game::get_PlayerIns()
+{
+    if (PlayerIns_cache)
+    {
+        return *PlayerIns_cache;
+    }
+
+    sp::mem::pointer playerIns = sp::mem::pointer<void*>((void*)(Game::world_chr_man_imp), { 0x68 });
+    if (playerIns.resolve() == NULL)
+    {
+        return std::nullopt;
+    }
+    else
+    {
+        PlayerIns_cache = playerIns.resolve();
+        return *PlayerIns_cache;
     }
 }

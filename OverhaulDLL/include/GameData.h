@@ -111,9 +111,6 @@ public:
     // Base address of fmod_event64 dll process
     static uint64_t fmod_event64_base;
 
-    // Base address for player character data
-    static uint64_t player_char_base;
-
     // Base address for world character data
     static const uint64_t world_char_base = 0x141d151b0;
 
@@ -264,6 +261,8 @@ public:
     static std::optional<void*> get_SessionManagerImp_SteamSessionLight();
 
     static std::optional<uint32_t> get_SessionManagerImp_Next_Player_Num();
+
+    static std::optional<void*> get_PlayerIns();
 
     /*
      * Help speedup some functions by, whenever we're loaded into an area,
