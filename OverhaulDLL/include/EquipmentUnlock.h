@@ -10,9 +10,9 @@ class EquipmentUnlock
 public:
     static void start();
 private:
-    static const uint64_t disable_equipment_unlock_injection_offset = 0x62E437;
-    static const uint64_t add_check_equipment_unlock_injection_offset = 0x62E4F1;
-    static const uint64_t disable_remove_equipment_injection_offset = 0x62E389;
+    static const uint64_t menu_entry_allowed_check_injection_offset = 0x62E437;
+    static const uint64_t disable_remove_equipment_check_injection_offset = 0x62E389;
+    static const uint64_t equipment_change_unlock_injection_offset = 0x62E4F1;
 };
 
 #endif
