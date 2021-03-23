@@ -98,6 +98,34 @@ If you are planning to PvP in the Arena+ area then you want this on.").c_str(),
     }
 }
 
+static uint32_t bow_cam_change_return;
+void __declspec(naked) __stdcall bow_cam_change_injection()
+{
+    __asm {
+        mov dword ptr[esi + 0x58], 0x3e4ccccd //0.2f
+        mov dword ptr[esi + 0x134], 0x3f48f5c3 //0.785f
+        mov dword ptr[esi + 0x130], 0x3d8f5c29 //0.07f
+        mov dword ptr[esi + 0x140], 0x3d4ccccd //0.05f
+        mov dword ptr[esi + 0xB0], 0x3e800000 //0.25f
+        mov dword ptr[esi + 0xB4], 0x3fb0a3d7 //1.38f
+        mov dword ptr[esi + 0xB8], 0x3f000000 //0.5f
+        mov dword ptr[esi + 0xBC], 0x00000000 //0.0f
+        mov dword ptr[esi + 0xC0], 0x3e800000 //0.25f
+        mov dword ptr[esi + 0xC4], 0x3fb0a3d7 //1.38f
+        mov dword ptr[esi + 0xC8], 0x3ec7ae14 //0.39f
+        mov dword ptr[esi + 0xCC], 0x00000000 //0.0f
+        mov dword ptr[esi + 0xF0], 0x42700000 //60.0f
+        mov dword ptr[esi + 0xF4], 0xc2820000 //-65.0f
+        mov dword ptr[esi + 0x104], 0x3f066666 //0.525f
+        mov dword ptr[esi + 0x108], 0x3f066666 //0.525f
+
+        //original code
+        mov    eax, esi
+        mov    esp, ebp
+        pop    ebp
+        ret
+    }
+}
 /*
     Called from DllMain when the plugin DLL is first loaded into memory (PROCESS_ATTACH case).
     This function runs in a separate thread from DllMain, so code implemented here does NOT
@@ -133,6 +161,11 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
         // Enable auto-spawning Gravelord Phantoms challenge mod
         Challenge::GravelordPhantoms::enable();
     }
+
+    //Write the bow changes to the game
+    uint8_t *write_address = (uint8_t*)(0xf18857);
+    set_mem_protection(write_address, 5, MEM_PROTECT_RWX);
+    inject_jmp_5b(write_address, &bow_cam_change_return, 0, &bow_cam_change_injection);
 
     return 0;
 }
