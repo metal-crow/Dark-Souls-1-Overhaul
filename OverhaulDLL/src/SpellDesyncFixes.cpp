@@ -25,6 +25,10 @@ extern "C" {
     uint64_t homing_spell_checkIfTriggered_injection_return;
     void homing_spell_checkIfTriggered_injection();
     void homing_spell_checkIfTriggered_injection_helper_function(uint8_t*, uint32_t*);
+
+    uint64_t check_all_bullets_finished_injection_return;
+    void check_all_bullets_finished_injection();
+    void check_all_bullets_finished_injection_helper_function();
 }
 
 uint32_t received_SpellData_count = 0;
@@ -51,13 +55,17 @@ void SpellDesync::start() {
     //inject into the function that determines if the homing bullet should be fired, and sets the target id to fire it
     write_address = (uint8_t*)(SpellDesync::homing_spell_checkIfTriggered_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &homing_spell_checkIfTriggered_injection_return, 2, &homing_spell_checkIfTriggered_injection);
+
+    //inject into the end of the function that loops over all the bullets
+    write_address = (uint8_t*)(SpellDesync::check_all_bullets_finished_injection_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &check_all_bullets_finished_injection_return, 0, &check_all_bullets_finished_injection);
 }
 
 
 typedef bool sendType1NetMessage_Typedef(CustomSpellPacketData* data);
 sendType1NetMessage_Typedef* sendType1NetMessage = (sendType1NetMessage_Typedef*)0x1405031f0;
 
-// Send out the custom packet which says a homing bullet has been fired.
+// Send out the custom packet which says a homing bullet has been fired (i.e the actual HSM orb has left the caster and is mid-air).
 // By entering this function we know the owner of the bullet is the PC and the target is another player entity
 void homing_spell_trigger_injection_helper_function(uint32_t target, uint8_t bulletNum)
 {
@@ -168,4 +176,12 @@ void homing_spell_checkIfTriggered_injection_helper_function(uint8_t* bullet, ui
         *bulletParamEntry = -1;
         return;
     }
+}
+
+void check_all_bullets_finished_injection_helper_function()
+{
+    //remove all bullets
+    //we've checked every existing bullet against our gotten bullets, since this is the end of the check loop
+    //this is done so stale bullet packets don't stick around and acidentally trigger new bullets
+    received_SpellData_count = 0;
 }

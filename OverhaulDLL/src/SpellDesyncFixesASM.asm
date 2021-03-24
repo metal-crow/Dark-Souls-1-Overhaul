@@ -164,6 +164,58 @@ jmp     homing_spell_checkIfTriggered_injection_return
 
 homing_spell_checkIfTriggered_injection ENDP
 
+
+EXTERN check_all_bullets_finished_injection_return: qword
+extern check_all_bullets_finished_injection_helper_function: PROC
+
+PUBLIC check_all_bullets_finished_injection
+check_all_bullets_finished_injection PROC
+
+;original code
+cmp     byte ptr [rsi+68h], 0
+mov     r15, [rsp+30h]
+mov     rdi, [rsp+60h]
+
+sub     rsp, 8
+sub     rsp, 10h
+movdqu  [rsp], xmm0
+sub     rsp, 10h
+movdqu  [rsp], xmm1
+sub     rsp, 10h
+movdqu  [rsp], xmm2
+sub     rsp, 10h
+movdqu  [rsp], xmm3
+push    rax
+push    rcx
+push    rdx
+push    r8
+push    r9
+push    r10
+push    r11
+
+call    check_all_bullets_finished_injection_helper_function
+
+pop     r11
+pop     r10
+pop     r9
+pop     r8
+pop     rdx
+pop     rcx
+pop     rax
+movdqu  xmm3, [rsp]
+add     rsp, 10h
+movdqu  xmm2, [rsp]
+add     rsp, 10h
+movdqu  xmm1, [rsp]
+add     rsp, 10h
+movdqu  xmm0, [rsp]
+add     rsp, 10h
+add     rsp, 8
+
+jmp     check_all_bullets_finished_injection_return
+
+check_all_bullets_finished_injection ENDP
+
 _TEXT    ENDS
 
 END
