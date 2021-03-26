@@ -49,8 +49,12 @@ push    r8
 push    r9
 push    r10
 push    r11
+sub     rsp, 20h
+
 call    gather_DirectInput8GetDeviceState_helper
 mov     byte ptr[GetDeviceStateInjected], 1
+
+add     rsp, 20h
 pop     r11
 pop     r10
 pop     r9
@@ -98,11 +102,13 @@ push    r8
 push    r9
 push    r10
 push    r11
+sub     rsp, 20h
 
 mov     rcx, rbp
 mov     rdx, rsi
 call    intercept_IDirectInputDevice8GetDeviceState
 
+add     rsp, 20h
 pop     r11
 pop     r10
 pop     r9

@@ -42,11 +42,13 @@ push    r8
 push    r9
 push    r10
 push    r11
+sub     rsp, 20h
 
-mov     ecx, dword ptr [rsp + 20h + 80h] ;get the bullet target entity id
+mov     ecx, dword ptr [rsp + 20h + 80h + 20h] ;get the bullet target entity id
 mov     dl, byte ptr [rbx+08h] ;get the bullet number
 call    homing_spell_trigger_injection_helper_function
 
+add     rsp, 20h
 pop     r11
 pop     r10
 pop     r9
@@ -138,11 +140,13 @@ push    r8
 push    r9
 push    r10
 push    r11
+sub     rsp, 20h
 
 mov     rcx, rbx ;bulletIns
-lea     rdx, dword ptr [rsp + 20h + 80h]; bulletParamEntry.target_id
+lea     rdx, dword ptr [rsp + 20h + 80h + 20h]; bulletParamEntry.target_id
 call    homing_spell_checkIfTriggered_injection_helper_function
 
+add     rsp, 20h
 pop     r11
 pop     r10
 pop     r9
@@ -192,9 +196,11 @@ push    r8
 push    r9
 push    r10
 push    r11
+sub     rsp, 20h
 
 call    check_all_bullets_finished_injection_helper_function
 
+add     rsp, 20h
 pop     r11
 pop     r10
 pop     r9

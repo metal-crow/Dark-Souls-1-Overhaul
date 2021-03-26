@@ -43,6 +43,7 @@ push    r8
 push    r9
 push    r10
 push    r11
+sub     rsp, 20h
 
 ;call helper function
 mov     rdx, rcx ;orange_bar
@@ -53,6 +54,7 @@ je      control_bar_exit
 
 normal_exit:
 ;restore tmp
+add     rsp, 20h
 pop     r11
 pop     r10
 pop     r9
@@ -75,6 +77,7 @@ jmp     control_timer_injection_return
 
 control_bar_exit:
 ;restore tmp
+add     rsp, 20h
 pop     r11
 pop     r10
 pop     r9
@@ -122,15 +125,17 @@ push    r8
 push    r9
 push    r10
 push    r11
+sub     rsp, 20h
 
 ;call helper c code
 mov     r9, rdx ;new_hp
-mov     r8, rsp ;attack_data
+lea     r8, [rsp+20h] ;attack_data
 add     r8, 8*7 ;account for saved tmp registers
 mov     rdx, rcx ;target
 mov     rcx, r15 ;attacker
 call    main_rally_function
 
+add     rsp, 20h
 pop     r11
 pop     r10
 pop     r9
@@ -156,13 +161,15 @@ push    r8
 push    r9
 push    r10
 push    r11
+sub     rsp, 8h
+sub     rsp, 20h
 
 mov     r8d, RALLY_EFFECT_ID
 mov     edx, 10000
-sub     rsp, 8
 call    [lua_SetEventSpecialEffect_2]
-add     rsp, 8
 
+add     rsp, 20h
+add     rsp, 8h
 pop     r11
 pop     r10
 pop     r9
@@ -187,11 +194,13 @@ push    r8
 push    r9
 push    r10
 push    r11
+sub     rsp, 20h
 
 mov     r8d, RALLY_CAPABLE_WEAPON_EFFECT_ID_RHAND
 mov     edx, 10000
 call    [lua_SetEventSpecialEffect_2]
 
+add     rsp, 20h
 pop     r11
 pop     r10
 pop     r9
@@ -216,11 +225,13 @@ push    r8
 push    r9
 push    r10
 push    r11
+sub     rsp, 20h
 
 mov     r8d, RALLY_CAPABLE_WEAPON_EFFECT_ID_LHAND
 mov     edx, 10000
 call    [lua_SetEventSpecialEffect_2]
 
+add     rsp, 20h
 pop     r11
 pop     r10
 pop     r9

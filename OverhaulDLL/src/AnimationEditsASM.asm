@@ -32,12 +32,14 @@ push    r8
 push    r9
 push    r10
 push    r11
+sub     rsp, 20h
 
 add     rax, 5Ch
 mov     rdx, rax ;Animation entry speed ptr
 mov     rcx, rdi ;Animation aid ptr
-call read_body_aid_injection_helper_function
+call    read_body_aid_injection_helper_function
 
+add     rsp, 20h
 pop     r11
 pop     r10
 pop     r9
@@ -84,9 +86,11 @@ push    r8
 push    r9
 push    r10
 push    r11
+sub     rsp, 20h
 
 call    disable_whiff_animations_injection_helper
 
+add     rsp, 20h
 pop     r11
 pop     r10
 pop     r9
@@ -130,9 +134,11 @@ push    r8
 push    r9
 push    r10
 push    r11
+sub     rsp, 20h
 
 call    TAE_GetDamageRate_StunLen_finish_helper_function
 
+add     rsp, 20h
 pop     r11
 pop     r10
 pop     r9
@@ -180,10 +186,12 @@ push    r8
 push    r9
 push    r10
 push    r11
+sub     rsp, 20h
 
 ;args already set up for us
 call    Calculate_movement_delta_helper_function
 
+add     rsp, 20h
 pop     r11
 pop     r10
 pop     r9

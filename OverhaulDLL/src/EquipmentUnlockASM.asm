@@ -27,10 +27,12 @@ push    r8
 push    r9
 push    r10
 push    r11
+sub     rsp, 20h
 
 mov     ecx, esi ;the menu slot user wants to change
 call    equipment_change_unlock_injection_helper
 
+add     rsp, 20h
 pop     r11
 pop     r10
 pop     r9

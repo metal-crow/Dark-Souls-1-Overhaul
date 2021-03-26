@@ -14,7 +14,7 @@ PUBLIC main_dead_angle_injection
 main_dead_angle_injection PROC
 
 ;save temp registers
-sub     rsp, 8 ;stack not 16 bit aligned?!?!?!?
+sub     rsp, 8
 sub     rsp, 10h
 movdqu  [rsp], xmm0
 sub     rsp, 10h
@@ -30,6 +30,7 @@ push    r8
 push    r9
 push    r10
 push    r11
+sub     rsp, 20h
 
 mov     rdx, r12 ;attacker
 mov     rcx, r14 ;target
@@ -37,10 +38,11 @@ call    main_dead_angle_helper
 cmp     eax, 0
 jne     exit
 ;alter the test codes
-mov     byte ptr [rsp+70h+56+64+8], 0 ;account for our register saves in stack offset
+mov     byte ptr [rsp+70h+56+64+8+20h], 0 ;account for our register saves in stack offset
 mov     bl, 0
 
 exit:
+add     rsp, 20h
 pop     r11
 pop     r10
 pop     r9
