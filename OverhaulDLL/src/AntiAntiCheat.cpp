@@ -11,12 +11,10 @@
 #include "SP/memory/injection/asm/x64.h"
 #include <string.h>
 
-const uint32_t known_good_hash_vals_array_x64[] = { 0x0, 0x37A, 0x3DE, 0x0AF0, 0x0E74, 0x29D6, 0x13C5E, 0x1895C, 0x4C4EBA, 0x0F1EB4, 1, 0x317, 0xa8f, 0x3e7 };
-
 extern "C" {
-    uint64_t game_send_playerdata_to_server_injection_return;
-    void game_send_playerdata_to_server_injection();
-    void game_send_playerdata_to_server_helper(uint64_t);
+    uint64_t game_write_playerdata_to_flatbuffer_injection_return;
+    void game_write_playerdata_to_flatbuffer_injection();
+    uint64_t game_write_playerdata_to_flatbuffer_injection_helper(uint32_t*, uint64_t);
 }
 
 const std::tuple<uint64_t, uint8_t> AntiAntiCheat::game_runtime_hash_checks[] = {
@@ -335,6 +333,7 @@ const uint64_t AntiAntiCheat::game_hash_compare_checks[] = {
 
 void AntiAntiCheat::start() {
     global::cmd_out << Mod::output_prefix << "Disabling built in AntiCheat...\n";
+    uint8_t *write_address;
 
     //patch out the hash comparison checks (compare with input to always be true)
     uint8_t patch[] = { 0x39, 0xC0 };
@@ -351,31 +350,40 @@ void AntiAntiCheat::start() {
     }
 
     //Before sending to the server make sure the data is correct
-    uint8_t *write_address = (uint8_t*)(AntiAntiCheat::game_send_playerdata_to_server_injection_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &game_send_playerdata_to_server_injection_return, 4, &game_send_playerdata_to_server_injection);
+    write_address = (uint8_t*)(AntiAntiCheat::game_write_playerdata_to_flatbuffer_injection_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &game_write_playerdata_to_flatbuffer_injection_return, 0, &game_write_playerdata_to_flatbuffer_injection);
 }
 
-static void copy_knowngood_ban_consts(uint32_t* start, uint32_t** end_ptr, const uint32_t* good, size_t good_len) {
-    if (start != NULL && start != *end_ptr) {
-        uint64_t len = *end_ptr - start;
+const uint32_t hackerFlag = 0x1770;
+const uint32_t known_good_hash_vals_array_x64[] = { 0x0, 0x37A, 0x3DE, 0x0AF0, 0x0E74, 0x29D6, 0x13C5E, 0x1895C, 0x4C4EBA, 0x0F1EB4, 1, 0x317, 0xa8f, 0x3e7 };
 
-        //if larger than normal, truncate
-        //never seen > good len on unmodded play
-        if (len > good_len) {
-            *end_ptr = (uint32_t*)((uint64_t)start + (good_len * sizeof(good[0])));
-            len = good_len;
+// we want to edit this at the latest point possible, so we don't mess up any other parts of the game
+// this changes only the value that's in the flatbuffer
+uint64_t game_write_playerdata_to_flatbuffer_injection_helper(uint32_t* array_start, uint64_t array_len)
+{
+    size_t i = 0;
+
+    while (i < array_len)
+    {
+        if (array_start[i] == hackerFlag)
+        {
+            //remove this element
+            for (size_t j = i; j < array_len; j++)
+            {
+                array_start[j] = array_start[j + 1];
+            }
+            array_len -= 1;
+            continue;
         }
 
-        //copy over the good vals
-        for (size_t i = 0; i < len; i++) {
-            start[i] = good[i];
+        if (array_start[i] != known_good_hash_vals_array_x64[i])
+        {
+            ConsoleWrite("Unknown element in flags array: %d=%x", i, array_start[i]);
+            FATALERROR("Unknown element in flags array: %d=%x", i, array_start[i]);
         }
+
+        i++;
     }
-}
 
-void game_send_playerdata_to_server_helper(uint64_t network_struct) {
-    //set the ban detection arrays to known good values
-    uint32_t* array_x64_start = *(uint32_t**)(network_struct + 0x200);
-    uint32_t** array_x64_end_ptr = (uint32_t**)(network_struct + 0x208);
-    copy_knowngood_ban_consts(array_x64_start, array_x64_end_ptr, known_good_hash_vals_array_x64, sizeof(known_good_hash_vals_array_x64)/sizeof(known_good_hash_vals_array_x64[0]));
+    return array_len;
 }

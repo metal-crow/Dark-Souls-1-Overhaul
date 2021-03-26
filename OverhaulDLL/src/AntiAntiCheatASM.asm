@@ -1,19 +1,18 @@
 _DATA SEGMENT
 
-sub_140BCFEC0   dq  140BCFEC0h
+sub_140BCEDB0   dq  140BCEDB0h
 
 _DATA ENDS
 
 _TEXT SEGMENT
 
-extern game_send_playerdata_to_server_helper: PROC
-extern game_send_playerdata_to_server_injection_return: qword
+extern game_write_playerdata_to_flatbuffer_injection_helper: PROC
+extern game_write_playerdata_to_flatbuffer_injection_return: qword
 
-PUBLIC game_send_playerdata_to_server_injection
-game_send_playerdata_to_server_injection PROC
+PUBLIC game_write_playerdata_to_flatbuffer_injection
+game_write_playerdata_to_flatbuffer_injection PROC
 
 ;save temp registers
-sub     rsp, 8 ;stack not 16 bit aligned?!?!?!?
 sub     rsp, 10h
 movdqu  [rsp], xmm0
 sub     rsp, 10h
@@ -26,16 +25,20 @@ push    rax
 push    rcx
 push    rdx
 push    r8
-push    r9
+;push    r9
 push    r10
 push    r11
+sub     rsp, 20h
 
-mov     rcx, rdi
-call    game_send_playerdata_to_server_helper
+mov     rdx, r9 ;array length
+mov     rcx, r8 ;array start
+call    game_write_playerdata_to_flatbuffer_injection_helper
+mov     r9, rax ;save over the length
 
+add     rsp, 20h
 pop     r11
 pop     r10
-pop     r9
+;pop     r9
 pop     r8
 pop     rdx
 pop     rcx
@@ -48,17 +51,15 @@ movdqu  xmm1, [rsp]
 add     rsp, 10h
 movdqu  xmm0, [rsp]
 add     rsp, 10h
-add     rsp, 8
 
 ;original code
-mov     r9d, eax
-mov     r8d, r12d
-mov     rdx, rbx
-lea     rcx, [rbp+52h]
-call    qword ptr [sub_140BCFEC0]
-jmp     game_send_playerdata_to_server_injection_return
+lea     rdx, [rsp+24h]
+mov     rcx, rbx
+call    qword ptr [sub_140BCEDB0]
 
-game_send_playerdata_to_server_injection ENDP
+jmp     game_write_playerdata_to_flatbuffer_injection_return
+
+game_write_playerdata_to_flatbuffer_injection ENDP
 
 _TEXT    ENDS
 
