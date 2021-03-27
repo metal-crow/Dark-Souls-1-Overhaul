@@ -88,6 +88,7 @@ push    r10
 push    r11
 sub     rsp, 20h
 
+mov     cl, al ;pass in the value that determines if we whiff as the arg
 call    disable_whiff_animations_injection_helper
 
 add     rsp, 20h
