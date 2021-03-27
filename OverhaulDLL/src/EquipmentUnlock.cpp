@@ -92,13 +92,6 @@ bool equipment_change_unlock_injection_helper(InventorySlots menu_slot)
     }
     auto playerIns = playerIns_o.value();
 
-    //normally, allow all swaps (except weapons if the game would normally restrict all inventory edits)
-    if (menu_slot > RightHand2 || ok_to_enter_equipment_menu(playerIns))
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    //normally, allow all swaps (including weapon swaps because they are "sick")
+    return true;
 }
