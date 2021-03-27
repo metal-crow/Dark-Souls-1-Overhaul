@@ -23,21 +23,56 @@ Also build with the release build, debug build is broken atm
 
 
 ## Description
-The mod is completely backwards compatible with vanilla dark souls 1 by default. In legacy mode, it includes a number of significant but fully backwards compatible bugfixes, quality-of-life improvements, visual glitch fixes, and functional anti-cheat measures.  
+The mod is completely backwards compatible with vanilla dark souls 1 by default. In __legacy__ mode, it includes a number of significant but fully backwards compatible bugfixes, quality-of-life improvements, visual glitch fixes, and functional anti-cheat measures.  
 It also unlocks a number of in-engine limitations and fixes other engine problems (including disabling the terrible built-in anti-cheat), making it perfect to extend further with other mods.  
 
-If you so wish, you can enable overhaul mode at any time to get the full suite of improvements this mod gives.  
+If you so wish, you can enable __overhaul__ mode at any time to get the full suite of improvements this mod gives.  
 This will __not__ separate you from vanilla players. A player will have the option of deciding if they want to enable overhaul mode once they receive a connection request from a player with it enabled, and visa-versa. Preferred defaults and auto-allow/decline options can be configured.  
 Enabling Overhaul mode by default is highly recommended, since it dramatically improves pvp experience on a number of metrics (weapon viability, magic use, and more) while still keeping the fundamental dark souls 1 pvp experience intact.  
   
 ## Changelist
+	
+### Legacy
 
-* NPCs and Bosses (kindof, WIP) can no longer be killed by hackers
+* NPCs and Bosses can no longer be killed by hackers
+
 * Hackers can no longer force you into Binoculars or Dragon form
+
 * Backstabs will no longer teleport you if you're unreasonably far away (both anti-cheat and QOL)
   
 * Bug fix for invisible attacks after backstabs
-	
+
+* Dead Angles and Ghost Hits are back
+
+* Equipment can again be changed while in any animation
+
+* Bug with HP bar not reflecting the correct amount of health has been fixed
+
+* The game has increased memory capacity (larger files can be loaded)
+
+* Max sized effect ids can now be sent over the network. This means any added effect ids are visible over multiplayer
+
+* You can now invade or summon phantoms __anywhere__.  
+This solution is imperfect, as areas where you could not do multiplayer before but are right next to areas you could (I.E Undead Burg bonfire), are treated as seperate multiplayer areas.  
+(Note that DSR allows summons even with the boss dead).  
+
+* Support for unlimited save slots
+
+* Support for custom  archive file loading  
+Specify folder location + filenames to use, and the alternate path will be used to load them
+
+* Fix to prevent homing spells from desyncing
+
+* Fix the "broken ankles" bug when rolling
+
+* (Tentatively) compatable with [DSR Watchdog](https://www.nexusmods.com/darksoulsremastered/mods/160). Rename the d3d11.dll file given by watchdog to watchdog.dll, put it in the same folder as DarkSoulsRemastered.exe, and in this mod's d3d11_mod.ini, set `d3d11Chain=watchdog.dll`
+This will be obsolete eventually.
+
+* Crash handler and reporter
+Hope to obsolete this when i make compatable with ModEngine2.
+
+### Overhaul
+
 * Gestures can be canceled via rolling
 
 * Animations:
@@ -53,43 +88,12 @@ Enabling Overhaul mode by default is highly recommended, since it dramatically i
 HP recovery is equal to `(0.05 + (upgrade level of weapon / 10.0)) * damage given`  
 Time to recover the hp is 5000 ms, or on weapon toggle.  
 
-* Dead Angles and Ghost Hits are back
-
-* Equipment (armor and rings, but not weapons) can again be changed while in any animation
-
-* Bug with HP bar not reflecting the correct amount of health has been fixed
-
-* The game has increased memory capacity (larger files can be loaded)
-
-* Max sized effect ids can now be sent over the network. This means any added effect ids are visible over multiplayer
-
 * Some spell types no longer lock your movement or rotation while they are being casted  
 You can freely walk, run, and rotate as you are casting them, and pivot cancels work as normal    
 These include everything EXCEPT: Combustions, Firestorms, and all miracles but Lighting Spear and Darkmoon Blade/Sunlight Blade  
 
-* You can now invade or summon phantoms __anywhere__.  
-This solution is imperfect, as areas where you could not do multiplayer before but are right next to areas you could (I.E Undead Burg bonfire), are treated as seperate multiplayer areas.  
-(Note that DSR allows summons even with the boss dead).  
-
-* Support for unlimited save slots
-
-* Support for custom  archive file loading  
-Specify folder location + filenames to use, and the alternate path will be used to load them
-
-* Fix to prevent homing spells from desyncing
-
 * Fix to prevent curved swords from stunlocking
-
-* Fix the "broken ankles" bug when rolling
 
 * Fix for the halberd instant running attack glitch in mud and pvp
 
-* (Tentatively) compatable with [DSR Watchdog](https://www.nexusmods.com/darksoulsremastered/mods/160). Rename the d3d11.dll file given by watchdog to watchdog.dll, put it in the same folder as DarkSoulsRemastered.exe, and in this mod's d3d11_mod.ini, set `d3d11Chain=watchdog.dll`
-
-* Crash handler and reporter
-
 * Backstab distance and angle has been reduced. (60 degrees to 45, 1.5 distance to 1)
-
-* Communication between mod and non-mod users, to support crossplay
-
-* Mod file hot-swapping, so features of this mod can be dynamically turned off and on as needed.
