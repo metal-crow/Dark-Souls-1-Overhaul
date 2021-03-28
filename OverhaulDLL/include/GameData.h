@@ -198,6 +198,8 @@ public:
     // Return pointer to current game time in milliseconds since the game has started
     static std::optional<uint32_t*> get_game_time_ms();
 
+	static uint32_t get_frame_count();
+
 	static std::optional<uint64_t> get_pc_entity_pointer();
 
 	static std::optional<float*> get_pc_position();

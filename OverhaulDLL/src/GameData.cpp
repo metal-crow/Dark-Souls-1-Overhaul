@@ -562,6 +562,12 @@ std::optional<uint32_t*> Game::get_game_time_ms()
     }
 }
 
+uint32_t Game::get_frame_count()
+{
+    uint32_t* frame_count = (uint32_t*)(Game::ds1_base + 0xAC3778);
+    return *frame_count;
+}
+
 std::optional<uint64_t> Game::get_pc_entity_pointer() {
     //quick resolve
     if (pc_entity_ptr) {
