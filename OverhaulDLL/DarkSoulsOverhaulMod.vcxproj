@@ -46,6 +46,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\InvisibleBackstabAttackFix.cpp" />
+    <ClCompile Include="src\MainLoop.cpp" />
     <ClCompile Include="src\Menu\SavedCharacters.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -73,6 +74,7 @@
     <ClInclude Include="include\EquipmentUnlock.h" />
     <ClInclude Include="include\FixAnkles.h" />
     <ClInclude Include="include\InvisibleBackstabAttackFix.h" />
+    <ClInclude Include="include\MainLoop.h" />
     <ClInclude Include="include\ModNetworking.h" />
     <ClInclude Include="include\SpellDesyncFixes.h" />
     <ClInclude Include="include\Xinput_1_3.h" />
@@ -149,6 +151,7 @@
     <MASM Include="src\FixAnklesASM.asm" />
     <MASM Include="src\GameDataASM.asm" />
     <MASM Include="src\InvisibleBackstabAttackFixASM.asm" />
+    <MASM Include="src\MainLoopASM.asm" />
     <MASM Include="src\Menu\SavedCharactersASM.asm" />
     <MASM Include="src\ModNetworking_ASM.asm" />
     <MASM Include="src\PhantomUnshackleASM.asm" />

@@ -99,6 +99,9 @@
     <ClCompile Include="src\ModNetworking.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\MainLoop.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3d11-wrapper\include\d3d11\exports.h">
@@ -144,6 +147,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ModNetworking.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MainLoop.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -236,6 +242,9 @@
       <Filter>Source Files</Filter>
     </MASM>
     <MASM Include="src\ModNetworking_ASM.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="src\MainLoopASM.asm">
       <Filter>Source Files</Filter>
     </MASM>
   </ItemGroup>
