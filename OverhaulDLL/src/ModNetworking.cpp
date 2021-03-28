@@ -118,7 +118,7 @@ uint32_t GetSteamData_Packet_injection_helper(void* data, uint32_t type, void* S
     }
     SessionActionResultEnum session_action_result = Game::get_SessionManagerImp_session_action_result().value();
 
-    //ConsoleWrite("GetSteamData_Packet_injection_helper session_action=%x type=%d\n", session_action_result, type);
+    //ConsoleWrite("GetSteamData_Packet_injection_helper session_action=%x type=%d from=%x", session_action_result, type, *(uint64_t*)((uint64_t)SteamSessionMemberLight + 0xc8));
 
     // 4. If we recieve a type36 AND we're the host (we created the session)
     if (type == 36 && (session_action_result == TryToCreateSession || session_action_result == CreateSessionSuccess))
@@ -133,7 +133,7 @@ uint32_t GetSteamData_Packet_injection_helper(void* data, uint32_t type, void* S
         {
             uint8_t value = *(data_buf+(data_remaining-1)); //ignore the dword of normal data at the end if it exists
 
-            //ConsoleWrite("Host Read custom type36=%x\n", value);
+            //ConsoleWrite("Host Read custom type36=%x from=%x", value, *(uint64_t*)((uint64_t)SteamSessionMemberLight + 0xc8));
 
             if ((value & MOD_ENABLED) != 0)
             {
@@ -194,13 +194,14 @@ uint32_t GetSteamData_Packet_injection_helper(void* data, uint32_t type, void* S
             HostForceDisconnectSession(SteamSessionMemberLight);
         }
         // Otherwise we're good to go, the configs match!
+        //ConsoleWrite("Host Config match!");
 
         //game doesn't parse this extra byte in the packet, no need to remove
         return type;
     }
 
-    // 2. If we recieve a type12 AND we're the guest (we joined the session)
-    if (type == 12 && (session_action_result == TryToJoinSession || session_action_result == JoinSessionSuccess))
+    // 2. If we recieve a type12 AND we're the new guest (we're joining the session)
+    if (type == 12 && (session_action_result == TryToJoinSession))
     {
         //if we don't have the extra flags byte at the end of the packet, non-mod user
         if (!(data_remaining > 0))
@@ -211,7 +212,7 @@ uint32_t GetSteamData_Packet_injection_helper(void* data, uint32_t type, void* S
         {
             uint8_t value = *data_buf;
 
-            //ConsoleWrite("Guest Read custom type12=%x\n", value);
+            //ConsoleWrite("Guest Read custom type12=%x from=%x", value, *(uint64_t*)((uint64_t)SteamSessionMemberLight + 0xc8));
 
             if ((value & MOD_ENABLED) != 0)
             {
@@ -252,6 +253,7 @@ uint32_t GetSteamData_Packet_injection_helper(void* data, uint32_t type, void* S
         else
         {
             //we can't kick out the other player since we're not the host. So pretend we received the kickout packet
+            //ConsoleWrite("Guest Self-disconnect");
             *data_size_ptr += 4;
             ((uint32_t*)data_buf)[0] = 0xff000019;
             return 46;
@@ -286,13 +288,14 @@ uint64_t SendRawP2PPacket_injection_helper(uint8_t* data, uint64_t size, uint32_
 
     uint8_t packet_type = data[6];
 
-    //ConsoleWrite("SendRawP2PPacket_injection_helper session_action=%x type=%d\n", session_action_result, packet_type);
+    //ConsoleWrite("SendRawP2PPacket_injection_helper session_action=%x type=%d", session_action_result, packet_type);
 
-    // 1. If we send a type12 AND we're the host (we created the session)
+    // 1. If we send a type12 AND we're the host (we created the session) OR a current guest
+    // existing guest phantoms also send the type12 packet to the new phantom, so we need to account for that
     // It's ok to increase the length since the underlying buffer is 128 bytes long
-    if (packet_type == 12 && (session_action_result == TryToCreateSession || session_action_result == CreateSessionSuccess))
+    if (packet_type == 12 && (session_action_result == TryToCreateSession || session_action_result == CreateSessionSuccess || session_action_result == JoinSessionSuccess))
     {
-        //ConsoleWrite("Host Send custom type12\n");
+        //ConsoleWrite("Send custom type12");
         //the mod is active (always true, since we're running the mod)
         uint8_t value = MOD_ENABLED;
 
@@ -305,11 +308,11 @@ uint64_t SendRawP2PPacket_injection_helper(uint8_t* data, uint64_t size, uint32_
         return size+1;
     }
 
-    // 3. If we send a type36 AND we're the guest (we joined the session)
+    // 3. If we send a type36 AND we're the new guest (we're joining the session)
     // It's ok to increase the length since the underlying buffer is 128 bytes long
-    if (packet_type == 36 && (session_action_result == TryToJoinSession || session_action_result == JoinSessionSuccess))
+    if (packet_type == 36 && (session_action_result == TryToJoinSession))
     {
-        //ConsoleWrite("Guest Send custom type36\n");
+        //ConsoleWrite("Guest Send custom type36");
         //the mod is active (always true, since we're running the mod)
         uint8_t value = MOD_ENABLED;
 
