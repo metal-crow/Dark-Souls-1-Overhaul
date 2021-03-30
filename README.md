@@ -19,7 +19,6 @@ https://gitlab.com/metal-crow/darksoulsremastered-overhaul-archives
 This requires the [Microsoft Visual C++ Redistributable for Visual Studio 2015-2019 ](https://aka.ms/vs/16/release/vc_redist.x64.exe)
 
 Building from source requires Visual Studio 2017, and access to some private repos (ask metalcrow or SeanP)  
-Also build with the release build, debug build is broken atm
 
 
 ## Description
@@ -42,7 +41,7 @@ Enabling Overhaul mode by default is highly recommended, since it dramatically i
   
 * Bug fix for invisible attacks after backstabs
 
-* Dead Angles and Ghost Hits are back
+* Dead Angles and Ghost Hits are back, and made slighly more consistent  
 
 * Equipment can again be changed while in any animation
 
@@ -65,10 +64,10 @@ Specify folder location + filenames to use, and the alternate path will be used 
 
 * Fix the "broken ankles" bug when rolling
 
-* (Tentatively) compatable with [DSR Watchdog](https://www.nexusmods.com/darksoulsremastered/mods/160). Rename the d3d11.dll file given by watchdog to watchdog.dll, put it in the same folder as DarkSoulsRemastered.exe, and in this mod's d3d11_mod.ini, set `d3d11Chain=watchdog.dll`
+* (Tentatively) compatable with [DSR Watchdog](https://www.nexusmods.com/darksoulsremastered/mods/160). Rename the d3d11.dll file given by watchdog to watchdog.dll, put it in the same folder as DarkSoulsRemastered.exe, and in this mod's d3d11_mod.ini, set `d3d11Chain=watchdog.dll`  
 This will be obsolete eventually.
 
-* Crash handler and reporter
+* Crash handler and reporter  
 Hope to obsolete this when i make compatable with ModEngine2.
 
 ### Overhaul

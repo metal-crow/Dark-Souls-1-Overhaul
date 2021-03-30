@@ -7,15 +7,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DarkSoulsOverhaulMod", "Dar
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|x64 = Debug|x64
-		Debug|x86 = Debug|x86
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3CE2AEC1-20A5-4E92-B760-98829781F1FF}.Debug|x64.ActiveCfg = Debug|x64
-		{3CE2AEC1-20A5-4E92-B760-98829781F1FF}.Debug|x64.Build.0 = Debug|x64
-		{3CE2AEC1-20A5-4E92-B760-98829781F1FF}.Debug|x86.ActiveCfg = Debug|x64
 		{3CE2AEC1-20A5-4E92-B760-98829781F1FF}.Release|x64.ActiveCfg = Release|x64
 		{3CE2AEC1-20A5-4E92-B760-98829781F1FF}.Release|x64.Build.0 = Release|x64
 		{3CE2AEC1-20A5-4E92-B760-98829781F1FF}.Release|x86.ActiveCfg = Release|x64
