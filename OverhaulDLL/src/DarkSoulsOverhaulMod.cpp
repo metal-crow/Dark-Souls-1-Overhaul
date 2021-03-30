@@ -24,6 +24,7 @@
 #include "SpellDesyncFixes.h"
 #include "FixAnkles.h"
 #include "ModNetworking.h"
+#include "MainLoop.h"
 
 HMODULE d3d11_module;
 
@@ -37,17 +38,8 @@ HMODULE d3d11_module;
 */
 BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
 {
-    global::cmd_out << DS1_OVERHAUL_TXT_INTRO "\n\n";
+    ConsoleWrite("%s\n\n",DS1_OVERHAUL_TXT_INTRO);
     d3d11_module = h_module;
-
-    // Check if game version is supported
-    /*if (Game::get_game_version() != DS1_GAME_VERSION_ENUM::DS1_VERSION_RELEASE)
-    {
-    Mod::startup_messages.push_back(Mod::output_prefix + "WARNING: Unsupported game version detected.");
-    MessageBox(NULL, std::string("Invalid game version detected. Change to supported game version, or disable the Dark Souls Overhaul Mod.").c_str(),
-    "ERROR: Dark Souls Overhaul Mod - Wrong game version", NULL);
-    exit(0);
-    }*/
 
     Game::init();
     AntiAntiCheat::start();
@@ -77,9 +69,11 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
     Files::check_custom_save_file_path();
     Files::check_custom_game_config_file_path();
 
+    // start callback handler
+    MainLoop::start();
+
     return TRUE;
 }
-
 
 /*
     Called from on_process_attach when the DLL is first loaded into memory (PROCESS_ATTACH case).
@@ -108,72 +102,13 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
         Game::disable_low_fps_disconnect(true);
     }
 
-    global::cmd_out << (Mod::output_prefix + "All initial loading finished!\n");
+    ConsoleWrite("%s All initial loading finished!", Mod::output_prefix);
 
-    // Start dedicated thread for first character loading injections
-    CreateThread(NULL, 0, wait_for_first_char_load, NULL, 0, NULL);
+    // Start callback for first character loading injections
+    MainLoop::setup_mainloop_callback(Game::on_character_load, NULL, "on_character_load");
 
-    //All actions finished, this now serves as a Main Loop which continues to run in background
-    bool waiting_for_load = false;
-    while (true)
-    {
-        // Check for pending save file index changes
-        if (Files::save_file_index_pending_set_next) {
-            if (Files::saves_menu_is_open()) {
-                Files::set_save_file_next();
-            }
-            Files::save_file_index_pending_set_next = false;
-        }
-        if (Files::save_file_index_pending_set_prev) {
-            if (Files::saves_menu_is_open()) {
-                Files::set_save_file_prev();
-            }
-            Files::save_file_index_pending_set_prev = false;
-        }
-        if (Files::save_file_index_make_new) {
-            if (Files::saves_menu_is_open()) {
-                Files::create_new_save_file();
-            }
-            Files::save_file_index_make_new = false;
-        }
-
-        // Check if the character is loading, and apply actions that need to be _reapplied_ after every loading screen
-        int32_t char_status = Game::get_player_char_status();
-        if (char_status == DS1_PLAYER_STATUS_LOADING) {
-            waiting_for_load = true;
-        }
-        if (waiting_for_load == true && char_status != DS1_PLAYER_STATUS_LOADING) {
-            Game::on_reloaded();
-            waiting_for_load = false;
-        }
-
-        // Check if we are not in any multiplayer setting, so that the user's preferred legacy mode setting can be applied
-        auto session_action_result = Game::get_SessionManagerImp_session_action_result();
-        if (session_action_result.has_value() && session_action_result.value() == NoSession)
-        {
-            if (Mod::legacy_mode != Mod::prefer_legacy_mode)
-            {
-                Mod::set_mode(Mod::prefer_legacy_mode, true);
-            }
-        }
-
-        Sleep(150);
-    }
-
-    return 0;
-}
-
-
-DWORD WINAPI wait_for_first_char_load(LPVOID lpParam) {
-    // Wait for event: first character loaded in this instance of the game
-    int char_status = DS1_PLAYER_STATUS_LOADING;
-    while (char_status == DS1_PLAYER_STATUS_LOADING) {
-        char_status = Game::get_player_char_status();
-        Sleep(500);
-    }
-
-    // Perform tasks that rely on a character being loaded
-    Game::on_first_character_loaded();
+    //start callback for setting the preferred mode
+    MainLoop::setup_mainloop_callback(Mod::set_preferred_mode, NULL, "set_preferred_mode");
 
     return 0;
 }

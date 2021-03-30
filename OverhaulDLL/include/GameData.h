@@ -28,7 +28,6 @@
 
 
 enum DS1_PLAYER_STATUS_ENUM {
-    DS1_PLAYER_STATUS_LOADING = -1,
     DS1_PLAYER_STATUS_HUMAN = 0,
     DS1_PLAYER_STATUS_COOP = 1,
     DS1_PLAYER_STATUS_INVADER = 2,
@@ -112,9 +111,6 @@ public:
     static uint64_t fmod_event64_base;
 
     // Base address for world character data
-    static const uint64_t world_char_base = 0x141d151b0;
-
-    // Base address for world character data
     static uint64_t char_class_base;
 
     static uint64_t frpg_net_base;
@@ -133,11 +129,11 @@ public:
 
     static const uint64_t calculate_attack_damage_offset = 0x2a8ead6;
 
+    static const uint64_t char_loaded_injection_offset = 0x24D8D0;
+    static const uint64_t char_loading_injection_offset = 0x278FC0;
+
     // Player character status (loading, human, co-op, invader, hollow)
     static sp::mem::pointer<int32_t> player_char_status;
-
-    // Marker for if we're currently in a loading screen
-    static sp::mem::pointer<int32_t> is_loading;
 
     // Flag to determine if any characters have been loaded since the game was launched (useful if player had a character loaded but returned to main menu)
     static bool characters_loaded;
@@ -162,10 +158,7 @@ public:
     static void init();
 
     // Runs tasks that were deferred until a character was loaded
-    static void on_first_character_loaded();
-
-    // Performs tasks that must be rerun after any loading screen
-    static void on_reloaded();
+    static bool on_character_load(void*);
 
     // Check if dim lava mod is currently active
     static bool dim_lava_enabled();
@@ -226,7 +219,7 @@ public:
     // Gets currently equipped R hand weapon
     static std::optional<uint32_t> right_hand_weapon();
 
-	static int32_t get_player_char_status();
+	static bool playerchar_is_loaded();
 
 	static std::optional<uint32_t> get_player_char_max_hp();
 

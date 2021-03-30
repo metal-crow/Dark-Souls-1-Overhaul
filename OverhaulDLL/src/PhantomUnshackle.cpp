@@ -9,6 +9,7 @@
 #include "PhantomUnshackle.h"
 #include "DarkSoulsOverhaulMod.h"
 #include "SP/memory/injection/asm/x64.h"
+#include "MainLoop.h"
 
 extern "C" {
     uint64_t mp_zone_changing_injection_return;
@@ -18,12 +19,12 @@ extern "C" {
 }
 
 
-static DWORD WINAPI change_mp_zone(void* unused);
+bool change_mp_zone(void* unused);
 
 void PhantomUnshackle::start() {
     global::cmd_out << Mod::output_prefix << "Enabling Phantom Unshackle patch...\n";
 
-    world_char_base_asm = Game::world_char_base;
+    world_char_base_asm = Game::world_chr_man_imp;
 
     // Injection to prevent MP zone ID from being changed by the game, and to grab the expected zone ID
     uint8_t *write_address = (uint8_t*)(PhantomUnshackle::mp_zone_changing_injection_offset + Game::ds1_base);
@@ -36,8 +37,8 @@ void PhantomUnshackle::start() {
     write_address = (uint8_t*)(PhantomUnshackle::mp_zone_neg2_force_offset_part2 + Game::ds1_base);
     sp::mem::patch_bytes(write_address, nop_patch, 10);
 
-    // Start thread for controlling mp zone
-    CreateThread(NULL, 0, change_mp_zone, NULL, 0, NULL);
+    // Start callback for controlling mp zone
+    MainLoop::setup_mainloop_callback(change_mp_zone, NULL, "change_mp_zone");
 }
 
 /*
@@ -47,36 +48,30 @@ void PhantomUnshackle::start() {
 // It sticks you in an "extra" mp zone for that area
 // This isn't super pretty, as it could be annoying if two "extra" chunks are far apart in the same map
 */
-static DWORD WINAPI change_mp_zone(void* unused) {
-    int32_t char_status = DS1_PLAYER_STATUS_LOADING;
+bool change_mp_zone(void* unused) {
+    //only alter the mp zone if character is loaded
+    bool loaded = Game::playerchar_is_loaded();
 
-    while (true) {
-        //only alter the mp zone if character is loaded
-        char_status = Game::get_player_char_status();
-
-        while (char_status != DS1_PLAYER_STATUS_LOADING) {
-            if (Game::get_online_area_id_ptr().has_value())
+    if (loaded)
+    {
+        auto get_online_area_id_ptr_o = Game::get_online_area_id_ptr();
+        if (get_online_area_id_ptr_o.has_value())
+        {
+            auto get_online_area_id_ptr = get_online_area_id_ptr_o.value();
+            // normal zone id (don't alter, we want to connect with vanilla players)
+            if (vanilla_mp_zone > 0)
             {
-                // normal zone id (don't alter, we want to connect with vanilla players)
-                if (vanilla_mp_zone > 0)
-                {
-                    *Game::get_online_area_id_ptr().value() = vanilla_mp_zone;
-                }
-                //area normally without a zone (anywhere without multiplayer)
-                else
-                {
-                    //apparently this value can't be set to whatever, the server may validate it or something
-                    //a value of 100XXX seems to work reliably
-                    *Game::get_online_area_id_ptr().value() = 100000 + Game::get_area_number().value_or(0)*100 + Game::get_world_number().value_or(0);
-                }
+                *get_online_area_id_ptr = vanilla_mp_zone;
             }
-
-            Sleep(25);
-            char_status = Game::get_player_char_status();
+            //area normally without a zone (anywhere without multiplayer)
+            else
+            {
+                //apparently this value can't be set to whatever, the server may validate it or something
+                //a value of 100XXX seems to work reliably
+                *get_online_area_id_ptr = 100000 + Game::get_area_number().value_or(0)*100 + Game::get_world_number().value_or(0);
+            }
         }
-
-        Sleep(500);
     }
 
-    return 0;
+    return true;
 }

@@ -49,13 +49,16 @@ uint64_t Game::session_man_imp = NULL;
 // Player character status (loading, human, co-op, invader, hollow)
 sp::mem::pointer<int32_t> Game::player_char_status;
 
-// Marker for if we're currently in a loading screen
-sp::mem::pointer<int32_t> Game::is_loading;
-
 extern "C" {
     uint32_t last_attack_weaponid;
     uint64_t calculate_attack_damage_injection_return;
     void calculate_attack_damage_injection();
+
+    bool char_loaded;
+    uint64_t char_loaded_injection_return;
+    void char_loaded_injection();
+    uint64_t char_loading_injection_return;
+    void char_loading_injection();
 }
 
 // Flag to determine if any characters have been loaded since the game was launched (useful if player had a character loaded but returned to main menu)
@@ -76,7 +79,7 @@ void Game::init()
 {
     uint8_t* write_address;
 
-    global::cmd_out << "Initializing pointers...\n";
+    ConsoleWrite("Initializing pointers...");
 
     Game::ds1_base = (uint64_t)sp::mem::get_process_base();
 
@@ -109,14 +112,11 @@ void Game::init()
 
     Game::saves_enabled = sp::mem::pointer<uint8_t>((void*)((uint64_t)saves_enabled_sp + *(uint32_t*)((uint64_t)saves_enabled_sp + 3) + 7), { 0xB70 });
 
-    Game::player_char_status = sp::mem::pointer<int32_t>((void*)(Game::world_char_base), { 0x68, 0xD4 });
-
-    // Note this is not actually the real pointer to the loading screen byte. Just a best guess
-    Game::is_loading = sp::mem::pointer<int32_t>((void*)(Game::ds1_base+0x1ACD758), { 0x28, 0x250, 0x2F8 });
-
     Game::game_data_man = Game::ds1_base + 0x1D278F0;
 
     Game::world_chr_man_imp = Game::ds1_base + 0x1d151b0;
+
+    Game::player_char_status = sp::mem::pointer<int32_t>((void*)(Game::world_chr_man_imp), { 0x68, 0xD4 });
 
     Game::param_man = Game::ds1_base + 0x1d1b098;
 
@@ -130,19 +130,58 @@ void Game::init()
     last_attack_weaponid = -1;
     write_address = (uint8_t*)(Game::calculate_attack_damage_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &calculate_attack_damage_injection_return, 1, &calculate_attack_damage_injection);
+
+    //inject the code that detects if the character is loaded in or not
+    char_loaded = false;
+    write_address = (uint8_t*)(Game::char_loaded_injection_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &char_loaded_injection_return, 6, &char_loaded_injection);
+    write_address = (uint8_t*)(Game::char_loading_injection_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &char_loading_injection_return, 1, &char_loading_injection);
 }
 
-// Performs tasks that were deferred until a character was loaded
-void Game::on_first_character_loaded()
+static bool character_reload_run = false;
+
+// Performs tasks that were deferred until a character was loaded/reloaded
+bool Game::on_character_load(void* unused)
 {
-    Game::characters_loaded = true;
+    // Wait for event: first character loaded in this instance of the game
+    if (Game::characters_loaded == false && Game::playerchar_is_loaded())
+    {
+        Game::characters_loaded = true;
 
-    Game::preload_function_caches();
+        Game::preload_function_caches();
 
-    // Enable rally system vfx
-    BloodborneRally::on_char_load();
+        character_reload_run = true;
 
-    global::cmd_out << Mod::output_prefix + "All character loading finished!\n";
+        ConsoleWrite("%s All character loading finished!", Mod::output_prefix);
+
+        return true;
+    }
+
+    if (character_reload_run == false && Game::playerchar_is_loaded())
+    {
+        Game::preload_function_caches();
+
+        /*//refresh the animation table pointers
+        for (int i = 0; i < sizeof(pc_animation_table) / sizeof(void**); i++) {
+            Game::pc_animation_table[i] = (AnimationEntry**)SpPointer(Game::world_char_base, { 0x28, 0x0, 0x28, 0x14, 0x4, 0x10 + (0x60 * i) }).resolve();
+            if (Game::pc_animation_table[i] == NULL) {
+                print_console("Error getting Animation Table Entry address");
+            }
+        }*/
+
+        character_reload_run = true;
+
+        return true;
+    }
+
+    if (character_reload_run == true && !Game::playerchar_is_loaded())
+    {
+        character_reload_run = false;
+        return true;
+    }
+
+    return true;
 }
 
 
@@ -173,6 +212,7 @@ static uint8_t* saved_chars_preview_data_cache = NULL;
 static uint32_t* pc_playernum_cache = NULL;
 static uint64_t connected_players_array_cache = NULL;
 static void** pc_EzStateMachineImpl_cache = NULL;
+static uint32_t* SessionManagerImp_session_action_result_cache = NULL;
 static void** SteamSessionLight_cache = NULL;
 static uint32_t* NextPlayerNum_cache = NULL;
 static void** PlayerIns_cache = NULL;
@@ -215,6 +255,8 @@ void Game::preload_function_caches() {
     Game::get_connected_player(0);
     pc_EzStateMachineImpl_cache = NULL;
     Game::get_pc_ActiveState_EzStateMachineImpl();
+    SessionManagerImp_session_action_result_cache = NULL;
+    Game::get_SessionManagerImp_session_action_result();
     SteamSessionLight_cache = NULL;
     Game::get_SessionManagerImp_SteamSessionLight();
     NextPlayerNum_cache = NULL;
@@ -233,19 +275,6 @@ void Game::preload_function_caches() {
         Sleep(1);
     }
     if (i>=16) FATALERROR("Unable to set_current_player_animation_speed.");
-}
-
-// Performs tasks that must be rerun after any loading screen
-void Game::on_reloaded() {
-    preload_function_caches();
-
-    /*//refresh the animation table pointers
-    for (int i = 0; i < sizeof(pc_animation_table) / sizeof(void**); i++) {
-        Game::pc_animation_table[i] = (AnimationEntry**)SpPointer(Game::world_char_base, { 0x28, 0x0, 0x28, 0x14, 0x4, 0x10 + (0x60 * i) }).resolve();
-        if (Game::pc_animation_table[i] == NULL) {
-            print_console("Error getting Animation Table Entry address");
-        }
-    }*/
 }
 
 // Check if dim lava mod is currently active
@@ -442,7 +471,7 @@ void Game::set_memory_limit()
 
 
 static bool resolve_current_player_animation_speed() {
-    sp::mem::pointer speed_ptr = sp::mem::pointer<float>((void*)Game::world_char_base, { 0x68, 0x68, 0x18, 0xA8 });
+    sp::mem::pointer speed_ptr = sp::mem::pointer<float>((void*)Game::world_chr_man_imp, { 0x68, 0x68, 0x18, 0xA8 });
     if (speed_ptr.resolve() == NULL) {
         return false;
     }
@@ -471,7 +500,7 @@ std::optional<int32_t> Game::get_player_body_anim_id()
         return *player_body_anim_id_cache;
     }
 
-    sp::mem::pointer anim_id = sp::mem::pointer<int32_t>((void*)Game::world_char_base, { 0x68, 0x68, 0x48, 0x80 });
+    sp::mem::pointer anim_id = sp::mem::pointer<int32_t>((void*)Game::world_chr_man_imp, { 0x68, 0x68, 0x48, 0x80 });
     if (anim_id.resolve() == NULL) {
         return std::nullopt;
     } else {
@@ -487,7 +516,7 @@ std::optional<int32_t> Game::get_player_upper_body_anim_id()
         return *player_upper_body_anim_id_cache;
     }
 
-    sp::mem::pointer anim_id = sp::mem::pointer<int32_t>((void*)Game::world_char_base, { 0x68, 0x30, 0x5D0, 0x690 });
+    sp::mem::pointer anim_id = sp::mem::pointer<int32_t>((void*)Game::world_chr_man_imp, { 0x68, 0x30, 0x5D0, 0x690 });
     if (anim_id.resolve() == NULL) {
         return std::nullopt;
     }
@@ -504,7 +533,7 @@ std::optional<int32_t> Game::get_player_lower_body_anim_id()
         return *player_lower_body_anim_id_cache;
     }
 
-    sp::mem::pointer anim_id = sp::mem::pointer<int32_t>((void*)Game::world_char_base, { 0x68, 0x30, 0x5D0, 0x13B0 });
+    sp::mem::pointer anim_id = sp::mem::pointer<int32_t>((void*)Game::world_chr_man_imp, { 0x68, 0x30, 0x5D0, 0x13B0 });
     if (anim_id.resolve() == NULL) {
         return std::nullopt;
     }
@@ -564,8 +593,8 @@ std::optional<uint32_t*> Game::get_game_time_ms()
 
 uint32_t Game::get_frame_count()
 {
-    uint32_t* frame_count = (uint32_t*)(Game::ds1_base + 0xAC3778);
-    return *frame_count;
+    uint32_t frame_count = *(uint32_t*)((*(uint64_t*)Game::file_man) + 0x88);
+    return frame_count;
 }
 
 std::optional<uint64_t> Game::get_pc_entity_pointer() {
@@ -574,7 +603,7 @@ std::optional<uint64_t> Game::get_pc_entity_pointer() {
         return *pc_entity_ptr;
     }
 
-    sp::mem::pointer entity_ptr = sp::mem::pointer<uint64_t>((void*)(Game::world_char_base), { 0x68 });
+    sp::mem::pointer entity_ptr = sp::mem::pointer<uint64_t>((void*)(Game::world_chr_man_imp), { 0x68 });
     if (entity_ptr.resolve() == NULL) {
         return std::nullopt;
     }
@@ -589,7 +618,7 @@ std::optional<float*> Game::get_pc_position() {
         return pc_position_ptr;
     }
 
-    sp::mem::pointer position_ptr = sp::mem::pointer<float>((void*)(Game::world_char_base), { 0x68, 0x68, 0x28, 0x10 });
+    sp::mem::pointer position_ptr = sp::mem::pointer<float>((void*)(Game::world_chr_man_imp), { 0x68, 0x68, 0x28, 0x10 });
     if (position_ptr.resolve() == NULL) {
         return std::nullopt;
     }
@@ -661,25 +690,18 @@ std::optional<uint32_t> Game::right_hand_weapon() {
 }
 
 // Note we can't cache this because we rely on it to check cache staleness
-int32_t Game::get_player_char_status() {
-    int32_t* char_status_ptr = Game::player_char_status.resolve();
-    int32_t* is_loading = Game::is_loading.resolve();
-
-    if (char_status_ptr == NULL || is_loading == NULL) {
-        return DS1_PLAYER_STATUS_LOADING;
-    }
-    else {
-        return *char_status_ptr;
-    }
+// And it must be done as an injection since otherwise mem derefs are too slow for how much we use this
+bool Game::playerchar_is_loaded()
+{
+    return char_loaded;
 }
-
 
 std::optional<uint32_t> Game::get_player_char_max_hp() {
     if (player_char_max_hp_cache) {
         return *player_char_max_hp_cache;
     }
 
-    sp::mem::pointer maxhp = sp::mem::pointer<uint32_t>((void*)(Game::world_char_base), { 0x68, 0x3EC });
+    sp::mem::pointer maxhp = sp::mem::pointer<uint32_t>((void*)(Game::world_chr_man_imp), { 0x68, 0x3EC });
     if (maxhp.resolve() == NULL) {
         return std::nullopt;
     }
@@ -739,7 +761,7 @@ std::optional<int32_t*> Game::get_online_area_id_ptr() {
         return mp_id_cache;
     }
 
-    sp::mem::pointer mp_id = sp::mem::pointer<int32_t>((void*)(Game::world_char_base), { 0x68, 0x354 });
+    sp::mem::pointer mp_id = sp::mem::pointer<int32_t>((void*)(Game::world_chr_man_imp), { 0x68, 0x354 });
     if (mp_id.resolve() == NULL) {
         return std::nullopt;
     }
@@ -887,6 +909,11 @@ std::optional<uint64_t> Game::get_EzStateMachineImpl_curstate_id(void* EzStateMa
 
 std::optional<SessionActionResultEnum> Game::get_SessionManagerImp_session_action_result()
 {
+    if (SessionManagerImp_session_action_result_cache)
+    {
+        return static_cast<SessionActionResultEnum>(*SessionManagerImp_session_action_result_cache);
+    }
+
     sp::mem::pointer session_action_result = sp::mem::pointer<uint32_t>((void*)(Game::session_man_imp), { 0xf8 });
     if (session_action_result.resolve() == NULL)
     {
@@ -894,7 +921,8 @@ std::optional<SessionActionResultEnum> Game::get_SessionManagerImp_session_actio
     }
     else
     {
-        return static_cast<SessionActionResultEnum>(*session_action_result.resolve());
+        SessionManagerImp_session_action_result_cache = session_action_result.resolve();
+        return static_cast<SessionActionResultEnum>(*SessionManagerImp_session_action_result_cache);
     }
 }
 

@@ -8,6 +8,8 @@
 #include "DarkSoulsOverhaulMod.h"
 #include "SP/memory/injection/asm/x64.h"
 #include "Menu/SavedCharacters.h"
+#include "Files.h"
+#include "MainLoop.h"
 
 #define DS1_MENU_SAVED_CHARS_CUSTOM_MSG_BUFF_LEN 256
 const uint64_t DS1_MENU_SAVED_CHARS_CUST_STR_INJECTION_OFFSET = 0x5480CE;
@@ -33,6 +35,8 @@ extern "C" {
     uint64_t custom_header_delete_msg_address = (uint64_t)&custom_header_delete_msg_buff[0];
     uint64_t custom_buttons_delete_msg_address = (uint64_t)&custom_buttons_delete_msg_buff[0];
 }
+
+bool ui_save_file_index_changes(void* unused);
 
 void init_custom_saves(std::wstring &load_header_msg,
                          std::wstring &load_buttons_msg,
@@ -64,8 +68,41 @@ void init_custom_saves(std::wstring &load_header_msg,
     uint8_t jmp_patch[] = { 0xEB, 0x3F };
     write_address = (uint8_t*)(disable_load_save_entry_count_check + Game::ds1_base);
     sp::mem::patch_bytes(write_address, jmp_patch, sizeof(jmp_patch));
+
+    //start the callback for listening for UI changes/button presses to change the save file
+    MainLoop::setup_mainloop_callback(ui_save_file_index_changes, NULL, "ui_save_file_index_changes");
 }
 
+bool ui_save_file_index_changes(void* unused)
+{
+    // Check for pending save file index changes
+    if (Files::save_file_index_pending_set_next)
+    {
+        if (Files::saves_menu_is_open())
+        {
+            Files::set_save_file_next();
+        }
+        Files::save_file_index_pending_set_next = false;
+    }
+    if (Files::save_file_index_pending_set_prev)
+    {
+        if (Files::saves_menu_is_open())
+        {
+            Files::set_save_file_prev();
+        }
+        Files::save_file_index_pending_set_prev = false;
+    }
+    if (Files::save_file_index_make_new)
+    {
+        if (Files::saves_menu_is_open())
+        {
+            Files::create_new_save_file();
+        }
+        Files::save_file_index_make_new = false;
+    }
+
+    return true;
+}
 
 void set_custom_header_load_msg(std::wstring &msg)
 {

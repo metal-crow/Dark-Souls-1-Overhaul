@@ -23,6 +23,45 @@ jmp     calculate_attack_damage_injection_return
 
 calculate_attack_damage_injection ENDP
 
+extern char_loaded: byte
+
+extern char_loaded_injection_return: qword
+
+PUBLIC char_loaded_injection
+char_loaded_injection PROC
+
+;write out to our global that we're loaded
+mov     char_loaded, 1
+
+;original code
+mov     [rsp+20h], rbx
+push    rsi
+push    rdi
+push    r14
+sub     rsp, 60h
+mov     rax, qword ptr [141B47800h]
+
+jmp     char_loaded_injection_return
+
+char_loaded_injection ENDP
+
+extern char_loading_injection_return: qword
+
+PUBLIC char_loading_injection
+char_loading_injection PROC
+
+;write out to our global that we're loading
+mov     char_loaded, 0
+
+;original code
+push    rdi
+sub     rsp, 30h
+mov     qword ptr [rsp+20h], -2
+
+jmp     char_loading_injection_return
+
+char_loading_injection ENDP
+
 _TEXT    ENDS
 
 END

@@ -178,10 +178,15 @@ void Mod::set_mode(bool legacy, bool mod_installed)
     {
         legacy = true;
     }
-    legacy_mode = legacy;
     SpellDesync::enabled = mod_installed; //since this requires reciving custom packets to work, not compatable with non-mod
-    FileReloading::ReloadGameParam();
-    FileReloading::ReloadPlayer();
+
+    //only change if we're not already in the mode
+    if (Mod::legacy_mode != legacy)
+    {
+        legacy_mode = legacy;
+        FileReloading::ReloadGameParam();
+        FileReloading::ReloadPlayer();
+    }
 }
 
 ModMode Mod::get_mode()
@@ -199,4 +204,22 @@ ModMode Mod::get_mode()
         return Overhaul;
     }
     return ModeNone;
+}
+
+bool Mod::set_preferred_mode(void* unused)
+{
+    if (Game::playerchar_is_loaded())
+    {
+        // Check if we are not in any multiplayer setting, so that the user's preferred legacy mode setting can be applied
+        auto session_action_result = Game::get_SessionManagerImp_session_action_result();
+        if (session_action_result.has_value() && session_action_result.value() == NoSession)
+        {
+            if (Mod::legacy_mode != Mod::prefer_legacy_mode)
+            {
+                Mod::set_mode(Mod::prefer_legacy_mode, true);
+            }
+        }
+    }
+
+    return true;
 }

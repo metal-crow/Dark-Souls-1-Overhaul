@@ -83,6 +83,8 @@ public:
 
     static ModMode get_mode();
 
+	static bool set_preferred_mode(void * unused);
+
 private:
     // Helper function for get_user_keybinds() that loads the specified keybind from the config file and binds it to the specified function
     static void get_single_user_keybind(const char *keybind_name, int(*function)());

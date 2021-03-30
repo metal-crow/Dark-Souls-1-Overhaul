@@ -9,6 +9,7 @@
 #include "BloodborneRallySystem.h"
 #include "DarkSoulsOverhaulMod.h"
 #include "SP/memory/injection/asm/x64.h"
+#include "MainLoop.h"
 
 #define DS1_BB_RALLY_SYS_OCCULT_MAT_ID 700
 const uint64_t MAX_RALLY_RECOVERY_TIME_MS = 5000;
@@ -44,6 +45,8 @@ extern "C" {
     uint64_t lua_SetEventSpecialEffect_2 = 0x1404ACE60;
 }
 
+bool Apply_rally_capable_sfx_and_starting_hp(void*);
+
 void BloodborneRally::start() {
     global::cmd_out << Mod::output_prefix << "Setting up Bloodborne Rally System...\n";
 
@@ -59,13 +62,9 @@ void BloodborneRally::start() {
     write_address = (uint8_t*)(BloodborneRally::main_rally_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &main_rally_injection_return, 2, &main_rally_injection, true);
     main_rally_injection_return = 0x140320848; //use as the jmp we're overwriting
-}
 
-static DWORD WINAPI Apply_rally_capable_sfx_and_starting_hp(void*);
-
-void BloodborneRally::on_char_load() {
-    // Start new thread dedicated to applying rally-capable weapon sfx and setting the starting HP
-    CreateThread(NULL, 0, Apply_rally_capable_sfx_and_starting_hp, NULL, 0, NULL);
+    // Start new callback dedicated to applying rally-capable weapon sfx and setting the starting HP
+    MainLoop::setup_mainloop_callback(Apply_rally_capable_sfx_and_starting_hp, NULL, "Apply_rally_capable_sfx_and_starting_hp");
 }
 
 uint64_t control_timer_function(uint64_t bar_id, uint64_t orange_bar) {
@@ -195,44 +194,35 @@ void main_rally_function(uint64_t attacker, uint64_t target, uint64_t attack_dat
     return;
 }
 
-static DWORD WINAPI Apply_rally_capable_sfx_and_starting_hp(void* unused) {
-    int32_t char_status = DS1_PLAYER_STATUS_LOADING;
+bool Apply_rally_capable_sfx_and_starting_hp(void* unused) {
+    //only apply the rally sfx if character is loaded
+    bool loaded = Game::playerchar_is_loaded();
 
-    uint32_t weaponid_R = 0;
-    uint32_t weaponid_L = 0;
-
-    while (true) {
+    if (!loaded)
+    {
         //prevent first hit having a beforehit hp of zero
         beforehit_hp = UINT16_MAX;
-
-        //only apply the rally sfx if character is loaded
-        char_status = Game::get_player_char_status();
-
-        //don't apply sfx if feature disabled
-        while (char_status != DS1_PLAYER_STATUS_LOADING && !Mod::legacy_mode) {
-            weaponid_R = Game::right_hand_weapon().value_or(-1);
-            weaponid_L = Game::left_hand_weapon().value_or(-1);
-
-            //There appears to be some bug here where both the effects cannot be applied simultaneously
-            //But it just alternates which is applied, so it works ok
-            if (isOccult(weaponid_R))
-            {
-                set_rally_sfx_rhand();
-            }
-
-            if (isOccult(weaponid_L))
-            {
-                set_rally_sfx_lhand();
-            }
-
-            Sleep(10);
-            char_status = Game::get_player_char_status();
-        }
-
-        Sleep(500);
     }
 
-    return 0;
+    //don't apply sfx if feature disabled
+    if (loaded && !Mod::legacy_mode) {
+        uint32_t weaponid_R = Game::right_hand_weapon().value_or(-1);
+        uint32_t weaponid_L = Game::left_hand_weapon().value_or(-1);
+
+        //There appears to be some bug here where both the effects cannot be applied simultaneously
+        //But it just alternates which is applied, so it works ok
+        if (isOccult(weaponid_R))
+        {
+            set_rally_sfx_rhand();
+        }
+
+        if (isOccult(weaponid_L))
+        {
+            set_rally_sfx_lhand();
+        }
+    }
+
+    return true;
 }
 
 #undef DS1_BB_RALLY_SYS_OCCULT_MAT_ID

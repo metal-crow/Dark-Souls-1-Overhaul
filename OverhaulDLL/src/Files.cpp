@@ -492,7 +492,7 @@ void Files::set_save_file_index(int unsigned index)
         return;
     }
     // Check if character is loaded
-    if (Game::get_player_char_status() != DS1_PLAYER_STATUS_LOADING) {
+    if (Game::playerchar_is_loaded()) {
         SetLastError(ERROR_BAD_ENVIRONMENT);
         if (debug_save_print_output) {
             global::cmd_out << ("ERROR: Failed to set save file index (Character is loaded)");
@@ -606,7 +606,7 @@ bool Files::saves_menu_is_open()
         return false;
     }
     // Check if character is loaded
-    return Game::get_player_char_status() == DS1_PLAYER_STATUS_LOADING;
+    return !Game::playerchar_is_loaded();
 }
 
 void Files::create_new_save_file()

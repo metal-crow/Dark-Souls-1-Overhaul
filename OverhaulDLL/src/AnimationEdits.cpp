@@ -11,6 +11,7 @@
 #include "SP/memory/injection/asm/x64.h"
 #include <unordered_map>
 #include <set>
+#include "MainLoop.h"
 
 void AnimationEdits::start()
 {
@@ -21,7 +22,7 @@ void AnimationEdits::start()
 
 
 // key - animation id
-// value - new speed ratio (Any large number ~>10 does a frame 1 skip), and point to start speed ajustment
+// value - new speed ratio (Any large number ~>10 does a frame 1 skip), and point to start speed ajustment in seconds
 static const std::unordered_map<int32_t, std::tuple<float, float>> ANIMATIONS_TO_AJUST_SPEED_RATIO = {
     { 6209, {10.0f, 0.0f}}, { 6309, {10.0f, 0.0f}},  //Firestorm startup
     { 6409, {1.6f,  0.0f}}, { 6509, {1.6f,  0.0f}},  //Firestorm main animation
@@ -57,26 +58,32 @@ typedef struct SpeedAlterStruct_ {
     float* animation_entry_speed_ptr;
 } SpeedAlterStruct;
 
-//Thread data = speed ratio, start time, speed ajustment ptr
-static DWORD WINAPI DelayAnimationSpeedAjustment(void* thread_data_arg) {
+//data = speed ratio, start time (absolute, not relative), speed ajustment ptr
+bool DelayAnimationSpeedAjustment(void* thread_data_arg) {
     SpeedAlterStruct* thread_data = (SpeedAlterStruct*)thread_data_arg;
-    uint32_t start = *Game::get_game_time_ms().value_or((uint32_t*)NULL); //Temporary till we move to non-threaded
-    uint32_t cur = start;
+    auto cur_time_o = Game::get_game_time_ms();
+    if (!cur_time_o.has_value())
+    {
+        ConsoleWrite("Unable to get_game_time_ms for cur_time in %s", __FUNCTION__);
+        return true;
+    }
+    uint32_t cur_time = *cur_time_o.value();
 
     //Wait till animation reaches desired point
     float adjust_time = thread_data->time_to_adjust_speed_at;
+    if (cur_time >= adjust_time)
+    {
+        //set speed
+        float* speed_ptr = thread_data->animation_entry_speed_ptr;
+        *speed_ptr = thread_data->time_to_adjust_speed_at;
 
-    while (cur < start+adjust_time*1000) {
-        cur = *Game::get_game_time_ms().value_or((uint32_t*)NULL);
-        Sleep(1);
+        free(thread_data);
+
+        return false;
     }
 
-    //set speed
-    float* speed_ptr = thread_data->animation_entry_speed_ptr;
-    *speed_ptr = thread_data->time_to_adjust_speed_at;
-
-    free(thread_data);
-    return 0;
+    //time to adjust not yet reached
+    return true;
 }
 
 void read_body_aid_injection_helper_function(int32_t* animation_id, float* speed) {
@@ -86,8 +93,6 @@ void read_body_aid_injection_helper_function(int32_t* animation_id, float* speed
     }
 
     //Since we set animation speed at the table entry level, when it gets unset the speed is automatically reset. No cleanup needed
-
-    //If this is an animation to be changed, ajust speed while we're in it
     auto ajust_aid = ANIMATIONS_TO_AJUST_SPEED_RATIO.find(*animation_id);
     if (ajust_aid != ANIMATIONS_TO_AJUST_SPEED_RATIO.end()) {
         //if this is a instant speed ajustment
@@ -97,26 +102,49 @@ void read_body_aid_injection_helper_function(int32_t* animation_id, float* speed
         }
         //if delayed speed ajustment
         else {
-            //need the args to be on the heap
+            //need the args to be on the heap. It will get cleaned up by the using function
             SpeedAlterStruct* thread_data = (SpeedAlterStruct*)malloc(sizeof(SpeedAlterStruct));
+
             thread_data->new_animation_speed = std::get<0>(ajust_aid->second);
-            thread_data->time_to_adjust_speed_at = std::get<1>(ajust_aid->second);
+
+            //compute the absolute time this anim should be changed at. cur_time + offset_time_to_adjust
+            auto cur_time_o = Game::get_game_time_ms();
+            if (!cur_time_o.has_value())
+            {
+                ConsoleWrite("Unable to get_game_time_ms for start_time in %s", __FUNCTION__);
+                free(thread_data);
+                return;
+            }
+            thread_data->time_to_adjust_speed_at = std::get<1>(ajust_aid->second)*1000 + *cur_time_o.value();
+
             thread_data->animation_entry_speed_ptr = speed;
 
-            CreateThread(NULL, 0, DelayAnimationSpeedAjustment, thread_data, 0, NULL);
+            MainLoop::setup_mainloop_callback(DelayAnimationSpeedAjustment, thread_data, "DelayAnimationSpeedAjustment");
             return;
         }
     }
 
     //handle backstabING detection (b/c it's a ton of diff animations)
-    if (*animation_id > 200000) {
-        if (*animation_id % 1000 == 400 || *animation_id % 1000 == 401) {
+    if (*animation_id > 200000)
+    {
+        if (*animation_id % 1000 == 400 || *animation_id % 1000 == 401)
+        {
             SpeedAlterStruct* thread_data = (SpeedAlterStruct*)malloc(sizeof(SpeedAlterStruct));
             thread_data->new_animation_speed = 1.25f;
-            thread_data->time_to_adjust_speed_at = 3.0f;
+
+            //compute the absolute time this anim should be changed at. cur_time + offset_time_to_adjust
+            auto cur_time_o = Game::get_game_time_ms();
+            if (!cur_time_o.has_value())
+            {
+                ConsoleWrite("Unable to get_game_time_ms for start_time in %s", __FUNCTION__);
+                free(thread_data);
+                return;
+            }
+            thread_data->time_to_adjust_speed_at = 3.0f * 1000 + *cur_time_o.value();
+
             thread_data->animation_entry_speed_ptr = speed;
 
-            CreateThread(NULL, 0, DelayAnimationSpeedAjustment, thread_data, 0, NULL);
+            MainLoop::setup_mainloop_callback(DelayAnimationSpeedAjustment, thread_data, "DelayAnimationSpeedAjustment");
             return;
         }
     }
