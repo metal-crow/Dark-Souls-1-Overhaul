@@ -29,31 +29,6 @@ static const uint64_t ReadParseType18_packet_offset = 0x6e066b;
 static const uint64_t ReadParseType34_packet_offset = 0x0506920;
 static const uint64_t ReadParseType35_packet_offset = 0x0221de33;
 
-namespace TeleBackstabProtect {
-    extern bool active;
-    void start();
-
-    // Injected TeleBackstabProtect assembly functions
-    void __stdcall asm_check();
-    void __stdcall asm_store_new_animation_id();
-} // namespace TeleBackstabProtect
-
-
-namespace BinocsTriggerBlock {
-    extern bool active;
-    void enable();
-    void disable();
-    void toggle();
-} // namespace BinocsTriggerBlock
-
-
-namespace DragonTriggerBlock {
-    extern bool active;
-    void enable();
-    void disable();
-    void toggle();
-} // namespace DragonTriggerBlock
-
 } // namespace AntiCheat
 
 #endif // DS1_OVERHAUL_ANTI_CHEAT_MAIN_H_
