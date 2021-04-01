@@ -35,7 +35,7 @@ Enabling Overhaul mode by default is highly recommended, since it dramatically i
 
 * NPCs and Bosses can no longer be killed by hackers
 
-* Hackers can no longer force you into Binoculars or Dragon form
+* Hackers can no longer force you into Binoculars or Dragon form, or apply other bad effects to you
 
 * Backstabs will no longer teleport you if you're unreasonably far away (both anti-cheat and QOL)
   

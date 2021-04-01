@@ -99,6 +99,7 @@
   <ItemGroup>
     <MASM Include="src\AnimationEditsASM.asm" />
     <MASM Include="src\AntiAntiCheatASM.asm" />
+    <MASM Include="src\AntiCheat\BadSpeffectProtectASM.asm" />
     <MASM Include="src\AntiCheat\BossGuardASM.asm" />
     <MASM Include="src\AntiCheat\NameCrashPreventASM.asm" />
     <MASM Include="src\AntiCheat\NpcGuardASM.asm" />

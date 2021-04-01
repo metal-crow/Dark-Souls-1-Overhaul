@@ -21,12 +21,12 @@ push    r8
 push    r9
 push    r10
 push    r11
-sub     rsp, 8 ;stack align?
+sub     rsp, 28h
 
 lea     rcx, [rsi+98h] ;ptr to loaded name string
 call    NameCrash_prevent_helper
 
-add     rsp, 8
+add     rsp, 28h
 pop     r11
 pop     r10
 pop     r9

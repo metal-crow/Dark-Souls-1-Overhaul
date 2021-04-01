@@ -13,6 +13,7 @@
 #include "DarkSoulsOverhaulMod.h"
 #include "SP/memory/injection/asm/x64.h"
 #include <cmath>
+#include <unordered_set>
 
 extern "C" {
     uint64_t npc_guard_WorldChrBase;
@@ -34,35 +35,58 @@ extern "C" {
     uint64_t NameCrash_prevent_return;
     void NameCrash_prevent();
     void NameCrash_prevent_helper(wchar_t* name);
+
+    uint64_t ReadParseType18_packet_return;
+    void ReadParseType18_packet_injection();
+    void ReadParseType18_packet_injection_helper(uint64_t packet);
+
+    uint64_t ReadParseType34_packet_return;
+    void ReadParseType34_packet_injection();
+    void ReadParseType34_packet_injection_helper(uint64_t packet);
+
+    uint64_t ReadParseType35_packet_return;
+    void ReadParseType35_packet_injection();
+    void ReadParseType35_packet_injection_helper(uint64_t packet);
 }
 
 namespace AntiCheat {
 
 void start() {
-    global::cmd_out << Mod::output_prefix + "Starting anti-cheat protections:\n";
+    ConsoleWrite("%sStarting anti-cheat protections:", Mod::output_prefix);
 
     // Start NpcGuard anti-cheat
-    global::cmd_out << "    Enabling NpcGuard...\n";
+    ConsoleWrite("    Enabling NpcGuard...");
     uint64_t write_address = Game::ds1_base + NpcGuard_offset;
     npc_guard_WorldChrBase = Game::world_chr_man_imp;
     sp::mem::code::x64::inject_jmp_14b((void*)write_address, &npc_guard_check_exit, 2, &npc_guard_asm_check, true);
 
     // Start BossGuard anti-cheat
-    global::cmd_out << "    Enabling BossGuard...\n";
+    ConsoleWrite("    Enabling BossGuard...");
     write_address = Game::ds1_base + BossGuard_offset;
     sp::mem::code::x64::inject_jmp_14b((void*)write_address, &boss_guard_return, 0, &boss_guard_asm_check);
 
     // Start TeleBackstabProtect anti-cheat
-    global::cmd_out << "    Enabling TeleBackstabProtect...\n";
+    ConsoleWrite("    Enabling TeleBackstabProtect...");
     write_address = Game::ds1_base + TeleBackstab_getBSAnimation_offset;
     sp::mem::code::x64::inject_jmp_14b((void*)write_address, &TeleBackstabProtect_store_AnimationId_return, 0, &TeleBackstabProtect_store_AnimationId);
     write_address = Game::ds1_base + TeleBackstab_setPlayerLocation_offset;
     sp::mem::code::x64::inject_jmp_14b((void*)write_address, &TeleBackstabProtect_setPosition_return, 5, &TeleBackstabProtect_setPosition_check);
 
     // Start Namecrash prevention anti-cheat
-    global::cmd_out << "    Enabling NameCrash prevention...\n";
+    ConsoleWrite("    Enabling NameCrash prevention...");
     write_address = Game::ds1_base + NameCrash_prevention_offset;
     sp::mem::code::x64::inject_jmp_14b((void*)write_address, &NameCrash_prevent_return, 0, &NameCrash_prevent);
+
+    // Starting bad-speffect packet anti-cheat
+    ConsoleWrite("    Enabling Bad Speffect Packet prevention...");
+    write_address = Game::ds1_base + ReadParseType18_packet_offset;
+    sp::mem::code::x64::inject_jmp_14b((void*)write_address, &ReadParseType18_packet_return, 7, &ReadParseType18_packet_injection);
+
+    write_address = Game::ds1_base + ReadParseType34_packet_offset;
+    sp::mem::code::x64::inject_jmp_14b((void*)write_address, &ReadParseType34_packet_return, 2, &ReadParseType34_packet_injection);
+
+    write_address = Game::ds1_base + ReadParseType35_packet_offset;
+    sp::mem::code::x64::inject_jmp_14b((void*)write_address, &ReadParseType35_packet_return, 0, &ReadParseType35_packet_injection);
 }
 
 } // namespace AntiCheat
@@ -104,4 +128,50 @@ void NameCrash_prevent_helper(wchar_t* name) {
         i++;
         cur_char = name[i];
     }
+}
+
+static const std::unordered_set<uint32_t> badSpeffectsList = {
+    6, 7, 13, 33, 34, 71, 72, 73, 74, 80, 1520, 1530, 3220, 3240, 3250, 5210, 5211, 5212, 5213,
+    5214, 5295, 5296, 5221, 5222, 5280, 5290, 5220, 5281, 5291, 5282, 5292, 5283, 5293, 5284, 5294
+};
+
+// Check if we receive a packet with a known bad speffect, and remove it if it contains it
+void ReadParseType18_packet_injection_helper(uint64_t packet)
+{
+    uint32_t* spell_speffect = (uint32_t*)(packet + 0x28);
+    uint32_t* weapon_speffect = (uint32_t*)(packet + 0x3c);
+
+    if (badSpeffectsList.count(*spell_speffect))
+    {
+        *spell_speffect = -1;
+    }
+
+    if (badSpeffectsList.count(*weapon_speffect))
+    {
+        *weapon_speffect = -1;
+    }
+
+    return;
+}
+
+void ReadParseType34_packet_injection_helper(uint64_t packet)
+{
+    uint32_t* speffect = (uint32_t*)(packet + 0x8);
+    if (badSpeffectsList.count(*speffect))
+    {
+        *speffect = -1;
+    }
+
+    return;
+}
+
+void ReadParseType35_packet_injection_helper(uint64_t packet)
+{
+    uint32_t* speffect = (uint32_t*)(packet);
+    if (badSpeffectsList.count(*speffect))
+    {
+        *speffect = -1;
+    }
+
+    return;
 }

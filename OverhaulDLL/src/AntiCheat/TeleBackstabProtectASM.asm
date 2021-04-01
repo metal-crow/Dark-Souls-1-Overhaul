@@ -31,13 +31,13 @@ push    r8
 push    r9
 push    r10
 push    r11
-sub     rsp, 8 ;stack align?
+sub     rsp, 28h
 
 movaps  xmmword ptr [new_player_position], xmm3 ;save the new player position to compare with
 lea     rcx, [rbx+10h] ;ptr to _old_ position (b4 being changed)
 call    TeleBackstabProtect_helper_check ;this will set the new PC position if needed
 
-add     rsp, 8
+add     rsp, 28h
 pop     r11
 pop     r10
 pop     r9
