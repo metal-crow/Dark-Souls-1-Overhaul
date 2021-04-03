@@ -2,29 +2,6 @@
 #include "DarkSoulsOverhaulMod.h"
 #include "SP/memory/injection/asm/x64.h"
 
-enum InventorySlots
-{
-    LeftHand1 = 0x0,
-    RightHand1 = 0x1,
-    LeftHand2 = 0x2,
-    RightHand2 = 0x3,
-    Arrow1 = 0x4,
-    Bolt1 = 0x5,
-    Arrow2 = 0x6,
-    Bolt2 = 0x7,
-    ArmorHead = 0x8,
-    ArmorBody = 0x9,
-    ArmorArms = 0xa,
-    ArmorLegs = 0xb,
-    Ring1 = 0xd,
-    Ring2 = 0xe,
-    Quickbar1 = 0xf,
-    Quickbar2 = 0x10,
-    Quickbar3 = 0x11,
-    Quickbar4 = 0x12,
-    Quickbar5 = 0x13
-};
-
 extern "C" {
     uint64_t equipment_change_unlock_injection_return;
     void equipment_change_unlock_injection();

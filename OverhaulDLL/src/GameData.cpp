@@ -982,3 +982,12 @@ std::optional<void*> Game::get_PlayerIns()
         return *PlayerIns_cache;
     }
 }
+
+uint32_t Game::get_equipped_inventory(uint64_t playerins, InventorySlots index)
+{
+    uint64_t playerGameData = *(uint64_t*)(playerins + 0x578);
+    uint64_t equipGameData = (uint64_t)(playerGameData + 0x280);
+    uint64_t charAsm = (uint64_t)(equipGameData + 0x80);
+    uint32_t* equip_items = (uint32_t*)(charAsm + 0x24);
+    return equip_items[index];
+}
