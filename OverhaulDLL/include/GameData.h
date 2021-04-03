@@ -281,6 +281,8 @@ public:
 
 	static uint32_t get_equipped_inventory(uint64_t playerins, InventorySlots index);
 
+    static InventorySlots get_equipped_right_weapon_inhand(uint64_t playerins);
+
     /*
      * Help speedup some functions by, whenever we're loaded into an area,
      * preload/preresolve some pointers and values so they can be much more quickly read when we need them

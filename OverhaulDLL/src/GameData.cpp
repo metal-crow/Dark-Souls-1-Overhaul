@@ -991,3 +991,19 @@ uint32_t Game::get_equipped_inventory(uint64_t playerins, InventorySlots index)
     uint32_t* equip_items = (uint32_t*)(charAsm + 0x24);
     return equip_items[index];
 }
+
+InventorySlots Game::get_equipped_right_weapon_inhand(uint64_t playerins)
+{
+    uint64_t playerGameData = *(uint64_t*)(playerins + 0x578);
+    uint64_t equipGameData = (uint64_t)(playerGameData + 0x280);
+    uint64_t charAsm = (uint64_t)(equipGameData + 0x80);
+    uint32_t right_weapon_slot_index = *(uint32_t*)(charAsm + 0x10);
+    if (right_weapon_slot_index == 0)
+    {
+        return RightHand1;
+    }
+    else if (right_weapon_slot_index == 1)
+    {
+        return RightHand2;
+    }
+}
