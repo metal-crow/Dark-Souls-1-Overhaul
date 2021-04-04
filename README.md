@@ -37,6 +37,8 @@ Enabling Overhaul mode by default is highly recommended, since it dramatically i
 
 * Hackers can no longer force you into Binoculars or Dragon form, or apply other bad effects to you
 
+* Tranquil Walk of Death bug fixed
+
 * Backstabs will no longer teleport you if you're unreasonably far away (both anti-cheat and QOL)
   
 * Bug fix for invisible attacks after backstabs
