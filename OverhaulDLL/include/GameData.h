@@ -16,6 +16,7 @@
 
 #include <stdint.h>
 #include <optional>
+#include <unordered_set>
 
 #include "DarkSoulsOverhaulMod.h"
 #include "ModData.h"
@@ -282,6 +283,8 @@ public:
 	static uint32_t get_equipped_inventory(uint64_t playerins, InventorySlots index);
 
     static InventorySlots get_equipped_right_weapon_inhand(uint64_t playerins);
+
+	static bool player_has_speffect(uint64_t playerins, std::unordered_set<uint32_t> speffects);
 
     /*
      * Help speedup some functions by, whenever we're loaded into an area,

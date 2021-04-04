@@ -1007,3 +1007,26 @@ InventorySlots Game::get_equipped_right_weapon_inhand(uint64_t playerins)
         return RightHand2;
     }
 }
+
+//given a list of speffects, check if the given player has any of them active
+bool Game::player_has_speffect(uint64_t playerins, std::unordered_set<uint32_t> speffects)
+{
+    uint64_t chrIns = (uint64_t)(playerins + 0x8);
+    uint64_t specialEffects = *(uint64_t*)(chrIns + 0x270);
+    uint64_t specialEffectInfo = *(uint64_t*)(specialEffects + 0x8 + 0x0);
+    while (true)
+    {
+        if (specialEffectInfo == 0x0)
+        {
+            return false;
+        }
+        uint32_t specialEffectInfo_id = *(uint32_t*)(specialEffectInfo + 0x30);
+        if (speffects.count(specialEffectInfo_id))
+        {
+            return true;
+        }
+        //get next in linked list
+        specialEffectInfo = *(uint64_t*)(specialEffectInfo + 0x40);
+    }
+    return false;
+}
