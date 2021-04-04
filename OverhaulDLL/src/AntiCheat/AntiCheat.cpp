@@ -40,10 +40,6 @@ extern "C" {
     void ReadParseType18_packet_injection();
     void ReadParseType18_packet_injection_helper(uint64_t packet);
 
-    uint64_t ReadParseType34_packet_return;
-    void ReadParseType34_packet_injection();
-    void ReadParseType34_packet_injection_helper(uint64_t packet);
-
     uint64_t ReadParseType35_packet_return;
     void ReadParseType35_packet_injection();
     void ReadParseType35_packet_injection_helper(uint64_t packet);
@@ -81,9 +77,6 @@ void start() {
     ConsoleWrite("    Enabling Bad Speffect Packet prevention...");
     write_address = Game::ds1_base + ReadParseType18_packet_offset;
     sp::mem::code::x64::inject_jmp_14b((void*)write_address, &ReadParseType18_packet_return, 7, &ReadParseType18_packet_injection);
-
-    write_address = Game::ds1_base + ReadParseType34_packet_offset;
-    sp::mem::code::x64::inject_jmp_14b((void*)write_address, &ReadParseType34_packet_return, 2, &ReadParseType34_packet_injection);
 
     write_address = Game::ds1_base + ReadParseType35_packet_offset;
     sp::mem::code::x64::inject_jmp_14b((void*)write_address, &ReadParseType35_packet_return, 0, &ReadParseType35_packet_injection);
@@ -140,7 +133,21 @@ void ReadParseType18_packet_injection_helper(uint64_t packet)
 {
     uint32_t* spell_speffect = (uint32_t*)(packet + 0x28);
     uint32_t* weapon_speffect = (uint32_t*)(packet + 0x3c);
+    float* damagephys = (float*)(packet + 0x0);
+    float* damagemagic = (float*)(packet + 0x4);
+    float* damagefire = (float*)(packet + 0x8);
+    float* damagelight = (float*)(packet + 0xc);
 
+    // if the spell_speffect is the spell for TWOP/StoneGreatsword, the packet must do no damage otherwise we get TWOD
+    if (*spell_speffect == 500 && ((*damagephys > 0.0f) || (*damagemagic > 0.0f) || (*damagefire > 0.0f) || (*damagelight > 0.0f)))
+    {
+        *damagephys = 0;
+        *damagemagic = 0;
+        *damagefire = 0;
+        *damagelight = 0;
+    }
+
+    // clear out the normal bad speffects
     if (badSpeffectsList.count(*spell_speffect))
     {
         *spell_speffect = -1;
@@ -149,17 +156,6 @@ void ReadParseType18_packet_injection_helper(uint64_t packet)
     if (badSpeffectsList.count(*weapon_speffect))
     {
         *weapon_speffect = -1;
-    }
-
-    return;
-}
-
-void ReadParseType34_packet_injection_helper(uint64_t packet)
-{
-    uint32_t* speffect = (uint32_t*)(packet + 0x8);
-    if (badSpeffectsList.count(*speffect))
-    {
-        *speffect = -1;
     }
 
     return;

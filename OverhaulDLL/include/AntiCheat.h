@@ -26,7 +26,6 @@ static const uint64_t TeleBackstab_getBSAnimation_offset = 0x3AD0E3;
 static const uint64_t TeleBackstab_setPlayerLocation_offset = 0x2B9A6A;
 static const uint64_t NameCrash_prevention_offset = 0x75E101;
 static const uint64_t ReadParseType18_packet_offset = 0x6e066b;
-static const uint64_t ReadParseType34_packet_offset = 0x0506920;
 static const uint64_t ReadParseType35_packet_offset = 0x0221de33;
 
 } // namespace AntiCheat
