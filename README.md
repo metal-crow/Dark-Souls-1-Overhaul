@@ -39,6 +39,8 @@ Enabling Overhaul mode by default is highly recommended, since it dramatically i
 
 * Tranquil Walk of Death bug fixed
 
+* A bug that allows hackers to crash your game has been fixed
+
 * Backstabs will no longer teleport you if you're unreasonably far away (both anti-cheat and QOL)
   
 * Bug fix for invisible attacks after backstabs
@@ -59,7 +61,7 @@ This solution is imperfect, as areas where you could not do multiplayer before b
 
 * Support for unlimited save slots
 
-* Support for custom  archive file loading  
+* Support for custom archive file loading  
 Specify folder location + filenames to use, and the alternate path will be used to load them
 
 * Fix to prevent homing spells from desyncing
