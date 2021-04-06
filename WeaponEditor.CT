@@ -1179,6 +1179,7 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
 5C 12 00 00 3C A 00 00 18 66 18 00:Mag. Black Iron Grtshld.
 5C 12 00 00 3D A 00 00 18 66 18 00:Div. Black Iron Greatshield
 5C 12 00 00 3E A 00 00 18 66 18 00:Fire Black Iron Greatshield
+84 C 00 00 61 04 00 00 18 31 C 00:Stone Greataxe
 </DropDownList>
           <ShowAsHex>1</ShowAsHex>
           <VariableType>String</VariableType>
