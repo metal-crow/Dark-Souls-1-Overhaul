@@ -53,8 +53,6 @@ Enabling Overhaul mode by default is highly recommended, since it dramatically i
 
 * The game has increased memory capacity (larger files can be loaded)
 
-* Max sized effect ids can now be sent over the network. This means any added effect ids are visible over multiplayer
-
 * You can now invade or summon phantoms __anywhere__.  
 This solution is imperfect, as areas where you could not do multiplayer before but are right next to areas you could (I.E Undead Burg bonfire), are treated as seperate multiplayer areas.  
 (Note that DSR allows summons even with the boss dead).  

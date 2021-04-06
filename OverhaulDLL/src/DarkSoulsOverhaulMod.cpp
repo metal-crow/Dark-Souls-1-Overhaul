@@ -88,7 +88,6 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     Menu::Saves::init_custom_saves();
     AntiCheat::start();
     Game::increase_gui_hpbar_max();
-    Game::unrestrict_network_synced_effectids();
     BloodborneRally::start();
     DeadAngles::start();
     EquipmentUnlock::start();

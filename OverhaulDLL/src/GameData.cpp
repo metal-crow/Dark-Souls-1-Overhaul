@@ -628,22 +628,6 @@ std::optional<float*> Game::get_pc_position() {
     }
 }
 
-static const uint64_t unrestrict_network_synced_effectids_offset = 0x36FBDD;
-
-// Allow effect IDs to be transferred between clients without bounds restrictions
-void Game::unrestrict_network_synced_effectids()
-{
-    global::cmd_out << (Mod::output_prefix + "Unrestricting effectIDs sent over network.\n");
-
-    uint8_t nop_patch[3] = { 0x90, 0x90, 0x90 };
-
-    //Instructions that shift left and right to limit effect id range
-    void *write_address = (void*)(Game::ds1_base + unrestrict_network_synced_effectids_offset);
-
-    sp::mem::patch_bytes(write_address, nop_patch, 3);
-    sp::mem::patch_bytes((void*)((uint64_t)write_address+0xA), nop_patch, 3);
-}
-
 float Game::new_hpbar_max = 2633.0;
 static const uint64_t gui_hpbar_value_offset = 0x676ECD;
 

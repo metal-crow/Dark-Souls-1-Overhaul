@@ -228,9 +228,6 @@ public:
     // Set available pool of memory that Dark Souls allocates for itself
     static void set_memory_limit();
 
-    // Allow effect IDs to be transferred between clients without bounds restrictions
-    static void unrestrict_network_synced_effectids();
-
     static float new_hpbar_max;
 
     // Fix the bug where the player HP could be greater than the displayed GUI bar
