@@ -1180,6 +1180,16 @@ C0 12 00 00 6C 09 00 00 78 DF 16 00:Fire Bloodshield
 5C 12 00 00 3D A 00 00 18 66 18 00:Div. Black Iron Greatshield
 5C 12 00 00 3E A 00 00 18 66 18 00:Fire Black Iron Greatshield
 84 C 00 00 61 04 00 00 18 31 C 00:Stone Greataxe
+17 E 00 00 97 05 00 00 F8 C4 10 00:Four-Pronged Plow
+17 E 00 00 98 05 00 00 F8 C4 10 00:Crystal Plow
+17 E 00 00 99 05 00 00 F8 C4 10 00:Lightning Plow
+17 E 00 00 9A 05 00 00 F8 C4 10 00:Raw Plow
+17 E 00 00 9B 05 00 00 F8 C4 10 00:Magic Plow
+17 E 00 00 9C 05 00 00 F8 C4 10 00:Enchanted Plow
+17 E 00 00 9D 05 00 00 F8 C4 10 00:Divine Plow
+17 E 00 00 9E 05 00 00 F8 C4 10 00:Occult Plow
+17 E 00 00 A0 05 00 00 F8 C4 10 00:Fire Plow
+17 E 00 00 A1 05 00 00 F8 C4 10 00:Chaos Plow
 </DropDownList>
           <ShowAsHex>1</ShowAsHex>
           <VariableType>String</VariableType>
