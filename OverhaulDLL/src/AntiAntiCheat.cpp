@@ -10,6 +10,7 @@
 #include "GameData.h"
 #include "SP/memory/injection/asm/x64.h"
 #include <string.h>
+#include <unordered_set>
 
 extern "C" {
     uint64_t game_write_playerdata_to_flatbuffer_injection_return;
@@ -355,7 +356,7 @@ void AntiAntiCheat::start() {
 }
 
 const uint32_t hackerFlag = 0x1770;
-const uint32_t known_good_hash_vals_array_x64[] = { 0x0, 0x37A, 0x3DE, 0x0AF0, 0x0E74, 0x29D6, 0x13C5E, 0x1895C, 0x4C4EBA, 0x0F1EB4, 1, 0x317, 0xa8f, 0x3e7 };
+const std::unordered_set<uint32_t> known_good_hash_vals_array_x64 = { 0x0, 0x37A, 0x3DE, 0x0AF0, 0x0E74, 0x29D6, 0x13C5E, 0x1895C, 0x4C4EBA, 0x0F1EB4, 1, 0x317, 0xa8f, 0x3e7 };
 
 // we want to edit this at the latest point possible, so we don't mess up any other parts of the game
 // this changes only the value that's in the flatbuffer
@@ -376,7 +377,7 @@ uint64_t game_write_playerdata_to_flatbuffer_injection_helper(uint32_t* array_st
             continue;
         }
 
-        if (array_start[i] != known_good_hash_vals_array_x64[i])
+        if (known_good_hash_vals_array_x64.count(array_start[i]) == 0)
         {
             ConsoleWrite("Unknown element in flags array: %d=%x", i, array_start[i]);
             FATALERROR("Unknown element in flags array: %d=%x", i, array_start[i]);
