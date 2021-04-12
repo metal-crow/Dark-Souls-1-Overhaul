@@ -33,7 +33,7 @@ Enabling Overhaul mode by default is highly recommended, since it dramatically i
 	
 ### Legacy
 
-* NPCs and Bosses can no longer be killed by hackers
+* NPCs can no longer be killed by hackers
 
 * Hackers can no longer force you into Binoculars or Dragon form, or apply other bad effects to you
 
