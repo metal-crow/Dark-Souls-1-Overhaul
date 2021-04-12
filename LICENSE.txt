@@ -392,6 +392,32 @@ where to find the applicable terms.
 form of a separately written license, or stated as exceptions;
 the above requirements apply either way.
 
+  Additional permission under GNU AGPL:
+  
+  Permission is herby granted to give special exceptions to all used
+  dependencies of this project.
+  If you modify this Program, or any covered work, by linking or combining 
+  it with any and all dependencies this work currently uses (or a modified
+  version of those dependencies), containing parts covered by the terms of the
+  dependencies' licenses, the licensors of this Program grant you additional
+  permission to convey the resulting work.
+  These dependencies at the time of writing, include, but may not be limited to:
+    -SeanP's C++ Utilities
+    -SeanP's Dark Souls Game File Library
+    -Google's Google Cloud Platform C++ Client Libraries (licensed under Apache-2.0)
+    -JochenKalmbach's StackWalker (licensed under BSD-2)
+    -Steam's Steamworks API
+    -The Dark Souls program and executable itself
+  Any and all dependencies this project uses (and ONLY these dependencies)
+  that are not compatable with the AGPL are exempted from this project's
+  license agreement. Use of them and their specific licenses can be done
+  without violating this agreement.
+  In short: this program may use these dependencies under the specific licenses
+  these dependencies are under, regardless of their AGPL compatability, without
+  breaking this license. Furthermore, any end user of this project may do the
+  same for these dependencies, but NOT any others they may add themselves
+  unless permission is given in writing by the developers of this project.
+
   8. Termination.
 
   You may not propagate or modify a covered work except as expressly
