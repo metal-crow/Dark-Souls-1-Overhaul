@@ -250,6 +250,9 @@
     <MASM Include="src\AntiCheat\BadSpeffectProtectASM.asm">
       <Filter>Source Files\AntiCheat</Filter>
     </MASM>
+    <MASM Include="src\FileReloadingASM.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ui\CrashHandler_UI.rc">

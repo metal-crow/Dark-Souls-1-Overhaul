@@ -25,6 +25,7 @@
 #include "FixAnkles.h"
 #include "ModNetworking.h"
 #include "MainLoop.h"
+#include "FileReloading.h"
 
 HMODULE d3d11_module;
 
@@ -97,6 +98,7 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     PhantomUnshackle::start();
     FixAnkles::start();
     ModNetworking::start();
+    FileReloading::start();
     if (Mod::disable_low_fps_disconnect) {
         Game::disable_low_fps_disconnect(true);
     }

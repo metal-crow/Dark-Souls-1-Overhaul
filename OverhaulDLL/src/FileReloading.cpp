@@ -1,7 +1,9 @@
 #include "FileReloading.h"
 #include "GameData.h"
-#include <map>
 #include "Files.h"
+#include "SP/memory/injection/asm/x64.h"
+
+#include <map>
 
 const std::map<IndividualParams, const wchar_t*> IndividualParams_To_String
 {
@@ -134,7 +136,7 @@ void FileReloading::ReloadGameParam()
                                 QwcJudge,
                                 GameAreaParam,
                                 SkeletonParam,
-                                //CalcCorrectGraph, crash on reload
+                                CalcCorrectGraph,
                                 LockCamParam,
                                 ObjActParam,
                                 HitMtrlParam,
@@ -217,4 +219,18 @@ void FileReloading::ReloadParamFile(ParamBNDs paramfile)
 
     void* unused_arg = calloc(3, 8);
     ParambndFileCap_Load(ParamBNDs_To_String.at(paramfile), unused_arg, NULL, NULL);
+}
+
+extern "C" {
+    uint64_t CalcCorrectGraph_injection_return;
+    void CalcCorrectGraph_injection();
+}
+
+void FileReloading::start()
+{
+    ConsoleWrite("%sEnabling File Reloading...", Mod::output_prefix);
+
+    //injection to prevent the CalcCorrectGraph from crashing if it can't find the param (due to reloading, for example)
+    uint8_t *write_address = (uint8_t*)(FileReloading::CalcCorrectGraph_injection_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &CalcCorrectGraph_injection_return, 4, &CalcCorrectGraph_injection);
 }

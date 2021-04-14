@@ -58,6 +58,7 @@ void start() {
 
     // Start BossGuard anti-cheat
     // TODO this has side effects currently. you can't damage enemies in some states (tree guys when underground, hollows breaking out of wood)
+    // should probably just whitelist to bosses, like NPC guard
     //ConsoleWrite("    Enabling BossGuard...");
     //write_address = Game::ds1_base + BossGuard_offset;
     //sp::mem::code::x64::inject_jmp_14b((void*)write_address, &boss_guard_return, 0, &boss_guard_asm_check);

@@ -108,6 +108,7 @@
     <MASM Include="src\CrashHandlerASM.asm" />
     <MASM Include="src\DeadAnglesASM.asm" />
     <MASM Include="src\EquipmentUnlockASM.asm" />
+    <MASM Include="src\FileReloadingASM.asm" />
     <MASM Include="src\FilesASM.asm" />
     <MASM Include="src\FixAnklesASM.asm" />
     <MASM Include="src\GameDataASM.asm" />
