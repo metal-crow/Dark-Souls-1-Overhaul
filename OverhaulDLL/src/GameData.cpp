@@ -217,6 +217,7 @@ static void** SteamSessionLight_cache = NULL;
 static uint32_t* NextPlayerNum_cache = NULL;
 static void** PlayerIns_cache = NULL;
 static void** player_animationMediator_cache = NULL;
+static void** host_player_gamedata_cache = NULL;
 
 void Game::preload_function_caches() {
     global::cmd_out << "Cache loading\n";
@@ -265,6 +266,8 @@ void Game::preload_function_caches() {
     Game::get_PlayerIns();
     player_animationMediator_cache = NULL;
     Game::get_player_animationMediator();
+    host_player_gamedata_cache = NULL;
+    Game::get_host_player_gamedata();
 
     Sleep(10);
     //this pointer is a bit late to resolve on load
@@ -1013,4 +1016,23 @@ bool Game::player_has_speffect(uint64_t playerins, std::unordered_set<uint32_t> 
         specialEffectInfo = *(uint64_t*)(specialEffectInfo + 0x40);
     }
     return false;
+}
+
+std::optional<void*> Game::get_host_player_gamedata()
+{
+    if (host_player_gamedata_cache)
+    {
+        return *host_player_gamedata_cache;
+    }
+
+    sp::mem::pointer host_player_gamedata = sp::mem::pointer<void*>((void*)(Game::game_data_man), { 0x10 });
+    if (host_player_gamedata.resolve() == NULL)
+    {
+        return std::nullopt;
+    }
+    else
+    {
+        host_player_gamedata_cache = host_player_gamedata.resolve();
+        return *host_player_gamedata_cache;
+    }
 }

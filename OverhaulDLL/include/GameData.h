@@ -283,6 +283,8 @@ public:
 
 	static bool player_has_speffect(uint64_t playerins, std::unordered_set<uint32_t> speffects);
 
+	static std::optional<void*> get_host_player_gamedata();
+
     /*
      * Help speedup some functions by, whenever we're loaded into an area,
      * preload/preresolve some pointers and values so they can be much more quickly read when we need them
