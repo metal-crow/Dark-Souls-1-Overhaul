@@ -2,6 +2,7 @@
 #include "GameData.h"
 #include "Files.h"
 #include "SP/memory/injection/asm/x64.h"
+#include "MainLoop.h"
 
 #include <map>
 
@@ -88,12 +89,18 @@ typedef void* Find_ResCap_FUNC(void* ResCapArray, const wchar_t* text);
 typedef void Unload_ResCap_FUNC(void* ResCapArray, void* ResCap);
 typedef void* ParambndFileCap_Load_FUNC(const wchar_t* filename, void* param_2, void* taskItem, void* fileCap_next_functionPtrLoad);
 typedef void Force_PlayerReload_FUNC(void* world_chr_man_imp, const wchar_t* c0000);
+typedef uint32_t Calculate_MaxHP_From_Vit_FUNC(uint32_t vit);
+typedef uint32_t Calculate_MaxMP_From_Att_FUNC(uint32_t att);
+typedef uint32_t Calculate_MaxSP_From_End_FUNC(uint32_t end);
 
 // No need to specify calling convention, it's always the same on x64: https://docs.microsoft.com/en-us/cpp/build/x64-calling-convention?view=msvc-160
 Find_ResCap_FUNC* Find_ResCap = (Find_ResCap_FUNC*)0x140516410;
 Unload_ResCap_FUNC* Unload_ResCap = (Unload_ResCap_FUNC*)0x140516600;
 ParambndFileCap_Load_FUNC* ParambndFileCap_Load = (ParambndFileCap_Load_FUNC*)0x14059dfa0;
 Force_PlayerReload_FUNC* Force_PlayerReload = (Force_PlayerReload_FUNC*)0x1403712a0;
+Calculate_MaxHP_From_Vit_FUNC* Calculate_MaxHP_From_Vit = (Calculate_MaxHP_From_Vit_FUNC*)0x1402ddea0;
+Calculate_MaxMP_From_Att_FUNC* Calculate_MaxMP_From_Att = (Calculate_MaxMP_From_Att_FUNC*)0x1402ddf60;
+Calculate_MaxSP_From_End_FUNC* Calculate_MaxSP_From_End = (Calculate_MaxSP_From_End_FUNC*)0x1402de1d0;
 
 void FileReloading::ReloadPlayer()
 {
@@ -102,6 +109,8 @@ void FileReloading::ReloadPlayer()
     // Call Force_PlayerReload
     Force_PlayerReload(*(void**)Game::world_chr_man_imp, L"c0000");
 }
+
+bool UpdatePlayerStats(void* unused);
 
 void FileReloading::ReloadGameParam()
 {
@@ -147,8 +156,50 @@ void FileReloading::ReloadGameParam()
                                 });
 
     ReloadParamFile(GameParam);
+
+    //update the character stats based off recalculated values from their level
+    // (required since CalcCorrectGraph is refreshed)
+    //need to wait 1 frame for the files to be reloaded
+    uint32_t* startTime = (uint32_t*)malloc(4);
+    *startTime = Game::get_frame_count();
+    MainLoop::setup_mainloop_callback(UpdatePlayerStats, startTime, "UpdatePlayerStats");
 }
 
+bool UpdatePlayerStats(void* startTime)
+{
+    //check if we've waited long enough for the params to have loaded
+    if (Game::get_frame_count() <= *(uint32_t*)startTime + 10)
+    {
+        return true;
+    }
+
+    //get the player stats and levels
+    auto playerins_o = Game::get_PlayerIns();
+    auto playergamedata_o = Game::get_host_player_gamedata();
+    if (!playerins_o.has_value() || !playergamedata_o.has_value())
+    {
+        return true;
+    }
+
+    uint64_t playerins = (uint64_t)playerins_o.value();
+    uint64_t playergamedata = (uint64_t)playergamedata_o.value();
+
+    //update the player stats
+    uint32_t vit = *(uint32_t*)(playergamedata + 0x40);
+    uint32_t* baseMaxHp = (uint32_t*)(playergamedata + 0x1C);
+    *baseMaxHp = Calculate_MaxHP_From_Vit(vit);
+
+    uint32_t att = *(uint32_t*)(playergamedata + 0x48);
+    uint32_t* baseMaxMp = (uint32_t*)(playergamedata + 0x28);
+    *baseMaxMp = Calculate_MaxMP_From_Att(att);
+
+    uint32_t end = *(uint32_t*)(playergamedata + 0x50);
+    uint32_t* baseMaxSp = (uint32_t*)(playergamedata + 0x38);
+    *baseMaxSp = Calculate_MaxSP_From_End(end);
+
+    free(startTime);
+    return false;
+}
 
 /*
  * Given a list of IndividualParams, unload them
