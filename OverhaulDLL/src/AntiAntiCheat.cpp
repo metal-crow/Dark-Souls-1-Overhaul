@@ -11,12 +11,7 @@
 #include "SP/memory/injection/asm/x64.h"
 #include <string.h>
 #include <unordered_set>
-
-extern "C" {
-    uint64_t game_write_playerdata_to_flatbuffer_injection_return;
-    void game_write_playerdata_to_flatbuffer_injection();
-    uint64_t game_write_playerdata_to_flatbuffer_injection_helper(uint32_t*, uint64_t);
-}
+#include <unordered_map>
 
 const std::tuple<uint64_t, uint8_t> AntiAntiCheat::game_runtime_hash_checks[] = {
 {0x1400e3a70,6},{0x142faf485,4},{0x140325c58,4},{0x14032ca5e,4},{0x142d6e989,6},{0x1430f9a22,4},{0x14210df08,4},{0x1420c4012,4},{0x1420c5671,4},{0x1420c74ca,4},
@@ -332,6 +327,205 @@ const uint64_t AntiAntiCheat::game_hash_compare_checks[] = {
     0x143730374, 0x143732B24, 0x14373F0AF, 0x143740859, 0x14374C6E5, 0x14375054F
 };
 
+extern "C" {
+    uint64_t game_write_playerdata_to_flatbuffer_injection_return;
+    void game_write_playerdata_to_flatbuffer_injection();
+    uint64_t game_write_playerdata_to_flatbuffer_injection_helper(uint32_t*, uint64_t);
+
+    uint64_t PlayerStat_ClearCount_injection_return;
+    void PlayerStat_ClearCount_injection();
+    uint64_t PlayerStat_New_Name_5_injection_return;
+    void PlayerStat_New_Name_5_injection();
+    uint64_t PlayerStat_New_Name_7_injection_return;
+    void PlayerStat_New_Name_7_injection();
+    uint64_t PlayerStat_SoulCount_injection_return;
+    void PlayerStat_SoulCount_injection();
+    uint64_t PlayerStat_SoulMemory_injection_return;
+    void PlayerStat_SoulMemory_injection();
+    uint64_t PlayerStat_Archetype_injection_return;
+    void PlayerStat_Archetype_injection();
+    uint64_t PlayerStat_HP_injection_return;
+    void PlayerStat_HP_injection();
+    uint64_t PlayerStat_MaxHp_injection_return;
+    void PlayerStat_MaxHp_injection();
+    uint64_t PlayerStat_BaseMaxHp_1_injection_return;
+    void PlayerStat_BaseMaxHp_1_injection();
+    uint64_t PlayerStat_Mp_injection_return;
+    void PlayerStat_Mp_injection();
+    uint64_t PlayerStat_MaxMp_injection_return;
+    void PlayerStat_MaxMp_injection();
+    uint64_t PlayerStat_BaseMaxHp_2_injection_return;
+    void PlayerStat_BaseMaxHp_2_injection();
+    uint64_t PlayerStat_Vitality_injection_return;
+    void PlayerStat_Vitality_injection();
+    uint64_t PlayerStat_Attunement_injection_return;
+    void PlayerStat_Attunement_injection();
+    uint64_t PlayerStat_Endurance_injection_return;
+    void PlayerStat_Endurance_injection();
+    uint64_t PlayerStat_Strength_injection_return;
+    void PlayerStat_Strength_injection();
+    uint64_t PlayerStat_Dexterity_injection_return;
+    void PlayerStat_Dexterity_injection();
+    uint64_t PlayerStat_Resistance_injection_return;
+    void PlayerStat_Resistance_injection();
+}
+
+enum MemberFlags_IdentifiersEnum
+{
+    AreaId = 0x0,
+    ClearCount = 0x1,
+    DeathCount = 0x2,
+    MultiplayerCount = 0x3,
+    CoopSuccessCount = 0x4,
+    New_Name_5 = 0x5,
+    New_Name_6 = 0x6,
+    New_Name_7 = 0x7,
+    SoulLevel = 0x8,
+    SoulCount = 0x9,
+    SoulMemory = 0xa,
+    Archetype = 0xb,
+    HP = 0xc,
+    MaxHp = 0xd,
+    BaseMaxHp_1 = 0xe,
+    Mp = 0xf,
+    MaxMp = 0x10,
+    BaseMaxHp_2 = 0x11,
+    Vitality = 0x12,
+    Attunement = 0x13,
+    Endurance = 0x14,
+    Strength = 0x15,
+    Dexterity = 0x16,
+    Resistance = 0x17,
+    Intelligence = 0x18,
+    Force = 0x19,
+    ItemDiscoveryRate = 0x1a,
+    attackR1 = 0x1b,
+    attackR2 = 0x1c,
+    attackL1 = 0x1d,
+    attackL2 = 0x1e,
+    MaxWeaponLevel = 0x1f,
+    EstusLevel = 0x20,
+    RankingRegistration = 0x21,
+    PlayTime = 0x22,
+    HumanityCount = 0x23,
+    Left_Hand_1 = 0x24,
+    Left_Hand_2 = 0x25,
+    Right_Hand_1 = 0x26,
+    Right_Hand_2 = 0x27,
+    ArmorHead = 0x28,
+    ArmorBody = 0x29,
+    ArmorArms = 0x2a,
+    ArmorLegs = 0x2b,
+    LeftHandHeldWeaponSlot = 0x2c,
+    RightHandHeldWeaponSlot = 0x2d,
+    Stamina = 0x2e,
+    MaxStamina = 0x2f,
+    BaseMaxStamina = 0x30,
+    WeaponinSlot0 = 0x31,
+    WeaponinSlot2 = 0x32,
+    WeaponinSlot1 = 0x33,
+    WeaponinSlot3 = 0x34,
+    ArmorinSlot0 = 0x35,
+    ArmorinSlot1 = 0x36,
+    ArmorinSlot2 = 0x37,
+    ArmorinSlot3 = 0x38,
+    RinginSlot0 = 0x39,
+    RinginSlot1 = 0x3a,
+    IteminQuickbar0 = 0x3b,
+    IteminQuickbar1 = 0x3c,
+    IteminQuickbar2 = 0x3d,
+    IteminQuickbar3 = 0x3e,
+    IteminQuickbar4 = 0x3f,
+    IteminArrowBoltSlot0 = 0x40,
+    IteminArrowBoltSlot1 = 0x41,
+    IteminArrowBoltSlot2 = 0x42,
+    IteminArrowBoltSlot3 = 0x43,
+    EquippedSpell1 = 0x44,
+    EquippedSpell2 = 0x45,
+    EquippedSpell3 = 0x46,
+    EquippedSpell4 = 0x47,
+    EquippedSpell5 = 0x48,
+    EquippedSpell6 = 0x49,
+    EquippedSpell7 = 0x4a,
+    EquippedSpell8 = 0x4b,
+    EquippedSpell9 = 0x4c,
+    EquippedSpell10 = 0x4d,
+    EquippedSpell11 = 0x4e,
+    EquippedSpell12 = 0x4f,
+    CovenantLevel_1 = 0x50,
+    New_Name_81 = 0x51,
+    New_Name_82 = 0x52,
+    RegionMatchmaking = 0x53,
+    isPlayerHollow = 0x54,
+    PlayerSex = 0x55,
+    New_Name_86 = 0x56,
+    New_Name_87 = 0x57,
+    New_Name_88 = 0x58,
+    New_Name_89 = 0x59,
+    hasInvasionTimeLimit = 0x5a,
+    New_Name_91 = 0x5b,
+    Const0 = 0x5c,
+    New_Name_93 = 0x5d,
+    defSAToughnessTotal = 0x5e,
+    MaxEquipLoad = 0x5f,
+    CharacterName = 0x60,
+    New_Name_97 = 0x61,
+    New_Name_98 = 0x62,
+    New_Name_99 = 0x63,
+    New_Name_100 = 0x64,
+    New_Name_101 = 0x65,
+    New_Name_102 = 0x66,
+    CovenantId = 0x67,
+    inSession = 0x68,
+    New_Name_105 = 0x69,
+    NormalDefenses = 0x6a,
+    PoisonBleedResist = 0x6b,
+    CovenantLevel_2 = 0x6c,
+    New_Name_109 = 0x6d,
+    New_Name_110 = 0x6e,
+    New_Name_111 = 0x6f,
+    New_Name_112 = 0x70,
+    New_Name_113 = 0x71,
+    New_Name_114 = 0x72,
+    New_Name_115 = 0x73,
+    New_Name_116 = 0x74,
+    New_Name_117 = 0x75,
+    New_Name_118 = 0x76,
+};
+
+class PlayerStatRead_Value
+{
+public:
+    PlayerStatRead_Value(uint64_t offset_, uint32_t nop_count_) :
+        offset(offset_),
+        nop_count(nop_count_)
+    {
+    };
+    uint64_t offset;
+    uint32_t nop_count;
+};
+
+std::unordered_map<MemberFlags_IdentifiersEnum, PlayerStatRead_Value> PlayerStatRead_adjustments = {
+    {MemberFlags_IdentifiersEnum::ClearCount, PlayerStatRead_Value(0x7ef75c, 2)},
+    {MemberFlags_IdentifiersEnum::New_Name_5, PlayerStatRead_Value(0x7ef7b2, 1)},
+    {MemberFlags_IdentifiersEnum::New_Name_7, PlayerStatRead_Value(0x7ef7c9, 2)},
+    {MemberFlags_IdentifiersEnum::SoulCount, PlayerStatRead_Value(0x7ef7f6, 1)},
+    {MemberFlags_IdentifiersEnum::SoulMemory, PlayerStatRead_Value(0x7ef80a, 1)},
+    {MemberFlags_IdentifiersEnum::Archetype, PlayerStatRead_Value(0x7ef81e, 2)},
+    {MemberFlags_IdentifiersEnum::HP, PlayerStatRead_Value(0x7ef833, 3)},
+    {MemberFlags_IdentifiersEnum::MaxHp, PlayerStatRead_Value(0x7ef844, 3)},
+    {MemberFlags_IdentifiersEnum::BaseMaxHp_1, PlayerStatRead_Value(0x7ef855, 3)},
+    {MemberFlags_IdentifiersEnum::Mp, PlayerStatRead_Value(0x7ef866, 3)},
+    {MemberFlags_IdentifiersEnum::MaxMp, PlayerStatRead_Value(0x7ef877, 3)},
+    {MemberFlags_IdentifiersEnum::BaseMaxHp_2, PlayerStatRead_Value(0x7ef888, 3)},
+    {MemberFlags_IdentifiersEnum::Vitality, PlayerStatRead_Value(0x7ef899, 3)},
+    {MemberFlags_IdentifiersEnum::Attunement, PlayerStatRead_Value(0x7ef8aa, 3)},
+    {MemberFlags_IdentifiersEnum::Endurance, PlayerStatRead_Value(0x7ef8bb, 3)},
+    {MemberFlags_IdentifiersEnum::Strength, PlayerStatRead_Value(0x7ef8cc, 3)},
+    {MemberFlags_IdentifiersEnum::Dexterity, PlayerStatRead_Value(0x7ef8dd, 3)},
+    {MemberFlags_IdentifiersEnum::Resistance, PlayerStatRead_Value(0x7ef8ee, 3)},
+};
+
 void AntiAntiCheat::start() {
     global::cmd_out << Mod::output_prefix << "Disabling built in AntiCheat...\n";
     uint8_t *write_address;
@@ -353,6 +547,80 @@ void AntiAntiCheat::start() {
     //Before sending to the server make sure the data is correct
     write_address = (uint8_t*)(AntiAntiCheat::game_write_playerdata_to_flatbuffer_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &game_write_playerdata_to_flatbuffer_injection_return, 0, &game_write_playerdata_to_flatbuffer_injection);
+
+    //Override all the character stats sent to the server that can be used to detect cheats and ban players
+
+    //ClearCount
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ClearCount].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_ClearCount_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ClearCount].nop_count, &PlayerStat_ClearCount_injection);
+
+    //New_Name_5
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::New_Name_5].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_New_Name_5_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::New_Name_5].nop_count, &PlayerStat_New_Name_5_injection);
+
+    //New_Name_7
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::New_Name_7].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_New_Name_7_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::New_Name_7].nop_count, &PlayerStat_New_Name_7_injection);
+
+    //SoulCount
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::SoulCount].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_SoulCount_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::SoulCount].nop_count, &PlayerStat_SoulCount_injection);
+
+    //SoulMemory
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::SoulMemory].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_SoulMemory_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::SoulMemory].nop_count, &PlayerStat_SoulMemory_injection);
+
+    //Archetype
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Archetype].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_Archetype_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Archetype].nop_count, &PlayerStat_Archetype_injection);
+
+    //HP
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::HP].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_HP_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::HP].nop_count, &PlayerStat_HP_injection);
+
+    //MaxHP
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::MaxHp].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_MaxHp_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::MaxHp].nop_count, &PlayerStat_MaxHp_injection);
+
+    //BaseMaxHp_1
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::BaseMaxHp_1].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_BaseMaxHp_1_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::BaseMaxHp_1].nop_count, &PlayerStat_BaseMaxHp_1_injection);
+
+    //Mp
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Mp].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_Mp_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Mp].nop_count, &PlayerStat_Mp_injection);
+
+    //MaxMP
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::MaxMp].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_MaxMp_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::MaxMp].nop_count, &PlayerStat_MaxMp_injection);
+
+    //BaseMaxHp_2
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::BaseMaxHp_2].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_BaseMaxHp_2_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::BaseMaxHp_2].nop_count, &PlayerStat_BaseMaxHp_2_injection);
+
+    //Vitality
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Vitality].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_Vitality_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Vitality].nop_count, &PlayerStat_Vitality_injection);
+
+    //Attunement
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Attunement].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_Attunement_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Attunement].nop_count, &PlayerStat_Attunement_injection);
+
+    //Endurance
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Endurance].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_Endurance_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Endurance].nop_count, &PlayerStat_Endurance_injection);
+
+    //Strength
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Strength].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_Strength_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Strength].nop_count, &PlayerStat_Strength_injection);
+
+    //Dexterity
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Dexterity].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_Dexterity_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Dexterity].nop_count, &PlayerStat_Dexterity_injection);
+
+    //Resistance
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Resistance].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_Resistance_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Resistance].nop_count, &PlayerStat_Resistance_injection);
 }
 
 const uint32_t hackerFlag = 0x1770;
