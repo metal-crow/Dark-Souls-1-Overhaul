@@ -514,4 +514,100 @@ call    qword ptr [set_value_in_MemberFlags_array2]
 jmp     PlayerStat_BaseMaxStamina_injection_return
 PlayerStat_BaseMaxStamina_injection ENDP
 
+extern PlayerStat_WeaponinSlot0_injection_return: qword
+PUBLIC PlayerStat_WeaponinSlot0_injection
+PlayerStat_WeaponinSlot0_injection PROC
+;no weapon
+mov     r8d, 900000
+;original code
+lea     edx, [r12+2Fh]
+mov     rcx, rdi
+call    qword ptr [set_value_in_MemberFlags_array2]
+jmp     PlayerStat_WeaponinSlot0_injection_return
+PlayerStat_WeaponinSlot0_injection ENDP
+
+extern PlayerStat_WeaponinSlot2_injection_return: qword
+PUBLIC PlayerStat_WeaponinSlot2_injection
+PlayerStat_WeaponinSlot2_injection PROC
+;no weapon
+mov     r8d, 900000
+;original code
+lea     edx, [r12+30h]
+mov     rcx, rdi
+call    qword ptr [set_value_in_MemberFlags_array2]
+jmp     PlayerStat_WeaponinSlot2_injection_return
+PlayerStat_WeaponinSlot2_injection ENDP
+
+extern PlayerStat_WeaponinSlot1_injection_return: qword
+PUBLIC PlayerStat_WeaponinSlot1_injection
+PlayerStat_WeaponinSlot1_injection PROC
+;no weapon
+mov     r8d, 900000
+;original code
+lea     edx, [r12+31h]
+mov     rcx, rdi
+call    qword ptr [set_value_in_MemberFlags_array2]
+jmp     PlayerStat_WeaponinSlot1_injection_return
+PlayerStat_WeaponinSlot1_injection ENDP
+
+extern PlayerStat_WeaponinSlot3_injection_return: qword
+PUBLIC PlayerStat_WeaponinSlot3_injection
+PlayerStat_WeaponinSlot3_injection PROC
+;no weapon
+mov     r8d, 900000
+;original code
+lea     edx, [r12+32h]
+mov     rcx, rdi
+call    qword ptr [set_value_in_MemberFlags_array2]
+jmp     PlayerStat_WeaponinSlot3_injection_return
+PlayerStat_WeaponinSlot3_injection ENDP
+
+extern PlayerStat_ArmorinSlot0_injection_return: qword
+PUBLIC PlayerStat_ArmorinSlot0_injection
+PlayerStat_ArmorinSlot0_injection PROC
+;no armor
+mov     r8d, 900000
+;original code
+lea     edx, [r12+33h]
+mov     rcx, rdi
+call    qword ptr [set_value_in_MemberFlags_array2]
+jmp     PlayerStat_ArmorinSlot0_injection_return
+PlayerStat_ArmorinSlot0_injection ENDP
+
+extern PlayerStat_ArmorinSlot1_injection_return: qword
+PUBLIC PlayerStat_ArmorinSlot1_injection
+PlayerStat_ArmorinSlot1_injection PROC
+;no armor
+mov     r8d, 901000
+;original code
+lea     edx, [r12+34h]
+mov     rcx, rdi
+call    qword ptr [set_value_in_MemberFlags_array2]
+jmp     PlayerStat_ArmorinSlot1_injection_return
+PlayerStat_ArmorinSlot1_injection ENDP
+
+extern PlayerStat_ArmorinSlot2_injection_return: qword
+PUBLIC PlayerStat_ArmorinSlot2_injection
+PlayerStat_ArmorinSlot2_injection PROC
+;no armor
+mov     r8d, 902000
+;original code
+lea     edx, [r12+35h]
+mov     rcx, rdi
+call    qword ptr [set_value_in_MemberFlags_array2]
+jmp     PlayerStat_ArmorinSlot2_injection_return
+PlayerStat_ArmorinSlot2_injection ENDP
+
+extern PlayerStat_ArmorinSlot3_injection_return: qword
+PUBLIC PlayerStat_ArmorinSlot3_injection
+PlayerStat_ArmorinSlot3_injection PROC
+;no armor
+mov     r8d, 903000
+;original code
+lea     edx, [r12+36h]
+mov     rcx, rdi
+call    qword ptr [set_value_in_MemberFlags_array2]
+jmp     PlayerStat_ArmorinSlot3_injection_return
+PlayerStat_ArmorinSlot3_injection ENDP
+
 END

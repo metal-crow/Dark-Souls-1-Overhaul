@@ -408,6 +408,23 @@ extern "C" {
     void PlayerStat_MaxStamina_injection();
     uint64_t PlayerStat_BaseMaxStamina_injection_return;
     void PlayerStat_BaseMaxStamina_injection();
+    uint64_t PlayerStat_WeaponinSlot0_injection_return;
+    void PlayerStat_WeaponinSlot0_injection();
+    uint64_t PlayerStat_WeaponinSlot2_injection_return;
+    void PlayerStat_WeaponinSlot2_injection();
+    uint64_t PlayerStat_WeaponinSlot1_injection_return;
+    void PlayerStat_WeaponinSlot1_injection();
+    uint64_t PlayerStat_WeaponinSlot3_injection_return;
+    void PlayerStat_WeaponinSlot3_injection();
+    uint64_t PlayerStat_ArmorinSlot0_injection_return;
+    void PlayerStat_ArmorinSlot0_injection();
+    uint64_t PlayerStat_ArmorinSlot1_injection_return;
+    void PlayerStat_ArmorinSlot1_injection();
+    uint64_t PlayerStat_ArmorinSlot2_injection_return;
+    void PlayerStat_ArmorinSlot2_injection();
+    uint64_t PlayerStat_ArmorinSlot3_injection_return;
+    void PlayerStat_ArmorinSlot3_injection();
+
 }
 
 enum MemberFlags_IdentifiersEnum
@@ -584,7 +601,14 @@ std::unordered_map<MemberFlags_IdentifiersEnum, PlayerStatRead_Value> PlayerStat
     {MemberFlags_IdentifiersEnum::Stamina, PlayerStatRead_Value(0x7efb1c, 3)},
     {MemberFlags_IdentifiersEnum::MaxStamina, PlayerStatRead_Value(0x7efb2d, 3)},
     {MemberFlags_IdentifiersEnum::BaseMaxStamina, PlayerStatRead_Value(0x7efb3e, 3)},
-
+    {MemberFlags_IdentifiersEnum::WeaponinSlot0, PlayerStatRead_Value(0x7efb59, 2)},
+    {MemberFlags_IdentifiersEnum::WeaponinSlot2, PlayerStatRead_Value(0x7efb74, 2)},
+    {MemberFlags_IdentifiersEnum::WeaponinSlot1, PlayerStatRead_Value(0x7efb91, 2)},
+    {MemberFlags_IdentifiersEnum::WeaponinSlot3, PlayerStatRead_Value(0x7efbae, 2)},
+    {MemberFlags_IdentifiersEnum::ArmorinSlot0, PlayerStatRead_Value(0x7efbc8, 2)},
+    {MemberFlags_IdentifiersEnum::ArmorinSlot1, PlayerStatRead_Value(0x7efbe5, 2)},
+    {MemberFlags_IdentifiersEnum::ArmorinSlot2, PlayerStatRead_Value(0x7efc00, 2)},
+    {MemberFlags_IdentifiersEnum::ArmorinSlot3, PlayerStatRead_Value(0x7efc1d, 2)},
 };
 
 void AntiAntiCheat::start() {
@@ -762,6 +786,39 @@ void AntiAntiCheat::start() {
     //BaseMaxStamina
     write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::BaseMaxStamina].offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_BaseMaxStamina_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::BaseMaxStamina].nop_count, &PlayerStat_BaseMaxStamina_injection);
+
+    //WeaponinSlot0
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::WeaponinSlot0].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_WeaponinSlot0_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::WeaponinSlot0].nop_count, &PlayerStat_WeaponinSlot0_injection);
+
+    //WeaponinSlot2
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::WeaponinSlot2].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_WeaponinSlot2_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::WeaponinSlot2].nop_count, &PlayerStat_WeaponinSlot2_injection);
+
+    //WeaponinSlot1
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::WeaponinSlot1].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_WeaponinSlot1_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::WeaponinSlot1].nop_count, &PlayerStat_WeaponinSlot1_injection);
+
+    //WeaponinSlot3
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::WeaponinSlot3].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_WeaponinSlot3_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::WeaponinSlot3].nop_count, &PlayerStat_WeaponinSlot3_injection);
+
+    //ArmorinSlot0
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorinSlot0].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_ArmorinSlot0_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorinSlot0].nop_count, &PlayerStat_ArmorinSlot0_injection);
+
+    //ArmorinSlot1
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorinSlot1].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_ArmorinSlot1_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorinSlot1].nop_count, &PlayerStat_ArmorinSlot1_injection);
+
+    //ArmorinSlot2
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorinSlot2].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_ArmorinSlot2_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorinSlot2].nop_count, &PlayerStat_ArmorinSlot2_injection);
+
+    //ArmorinSlot3
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorinSlot3].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_ArmorinSlot3_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorinSlot3].nop_count, &PlayerStat_ArmorinSlot3_injection);
+
 }
 
 const uint32_t hackerFlag = 0x1770;
