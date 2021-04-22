@@ -19,6 +19,7 @@
 #include <Windows.h>
 #include <direct.h>
 #include <ctime>
+#include <string>
 
 uint64_t panic_debug_offset = 0xd4ff86;
 extern "C" {
@@ -287,6 +288,28 @@ DWORD WINAPI crash_handler_dump_process(LPVOID output_dir)
     WaitForSingleObject(procdump_pi.hProcess, 15 * 1000);
     CloseHandle(procdump_pi.hProcess);
     CloseHandle(procdump_pi.hThread);
+
+    //remove the extra mostly-useless modules. only need the exe and the d3d11 dumps
+    std::string pattern((char*)output_dir);
+    pattern.append("\\*");
+    WIN32_FIND_DATA data;
+    HANDLE hFind;
+    if ((hFind = FindFirstFile(pattern.c_str(), &data)) != INVALID_HANDLE_VALUE)
+    {
+        do
+        {
+            std::string filename(data.cFileName);
+            if (filename.find("DarkSoulsRemastered.exe") == std::string::npos && filename.find("d3d11.dll") == std::string::npos && filename.find("message") == std::string::npos)
+            {
+                std::string full_filename((char*)output_dir);
+                full_filename.append("\\");
+                full_filename.append(data.cFileName);
+                DeleteFile(full_filename.c_str());
+            }
+        } while (FindNextFile(hFind, &data) != 0);
+        FindClose(hFind);
+    }
+
     return 0;
 }
 
