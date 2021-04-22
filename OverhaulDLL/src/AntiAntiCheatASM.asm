@@ -95,7 +95,7 @@ extern PlayerStat_New_Name_7_injection_return: qword
 PUBLIC PlayerStat_New_Name_7_injection
 PlayerStat_New_Name_7_injection PROC
 ;unknown. 0xFDE80 seems to be normal
-mov     eax, FDE80h
+mov     eax, 0FDE80h
 ;original code
 mov     r8d, eax
 lea     edx, [r12+5]
@@ -278,7 +278,6 @@ mov     r8d, 12
 ;original code
 lea     edx, [r12+15h]
 mov     rcx, rdi
-call    qword ptr [set_value_in_MemberFlags_array1]
 jmp     PlayerStat_Resistance_injection_return
 PlayerStat_Resistance_injection ENDP
 
@@ -479,7 +478,6 @@ mov     rcx, rdi
 call    qword ptr [set_value_in_MemberFlags_array1]
 jmp     PlayerStat_ArmorLegs_injection_return
 PlayerStat_ArmorLegs_injection ENDP
-_TEXT    ENDS
 
 extern PlayerStat_Stamina_injection_return: qword
 PUBLIC PlayerStat_Stamina_injection
@@ -617,7 +615,7 @@ extern PlayerStat_RinginSlot0_injection_return: qword
 PUBLIC PlayerStat_RinginSlot0_injection
 PlayerStat_RinginSlot0_injection PROC
 ;no ring
-mov     r8d, FFFFFFFFh
+mov     r8d, 0FFFFFFFFh
 ;original code
 lea     edx, [r12+37h]
 mov     rcx, rdi
@@ -629,7 +627,7 @@ extern PlayerStat_RinginSlot1_injection_return: qword
 PUBLIC PlayerStat_RinginSlot1_injection
 PlayerStat_RinginSlot1_injection PROC
 ;no ring
-mov     r8d, FFFFFFFFh
+mov     r8d, 0FFFFFFFFh
 ;original code
 lea     edx, [r12+38h]
 mov     rcx, rdi
@@ -641,7 +639,7 @@ extern PlayerStat_IteminQuickbar0_injection_return: qword
 PUBLIC PlayerStat_IteminQuickbar0_injection
 PlayerStat_IteminQuickbar0_injection PROC
 ;no item
-mov     r8d, FFFFFFFFh
+mov     r8d, 0FFFFFFFFh
 ;original code
 lea     edx, [r12+39h]
 mov     rcx, rdi
@@ -653,7 +651,7 @@ extern PlayerStat_IteminQuickbar1_injection_return: qword
 PUBLIC PlayerStat_IteminQuickbar1_injection
 PlayerStat_IteminQuickbar1_injection PROC
 ;no item
-mov     r8d, FFFFFFFFh
+mov     r8d, 0FFFFFFFFh
 ;original code
 lea     edx, [r12+3Ah]
 mov     rcx, rdi
@@ -665,7 +663,7 @@ extern PlayerStat_IteminQuickbar2_injection_return: qword
 PUBLIC PlayerStat_IteminQuickbar2_injection
 PlayerStat_IteminQuickbar2_injection PROC
 ;no item
-mov     r8d, FFFFFFFFh
+mov     r8d, 0FFFFFFFFh
 ;original code
 lea     edx, [r12+3Bh]
 mov     rcx, rdi
@@ -677,7 +675,7 @@ extern PlayerStat_IteminQuickbar3_injection_return: qword
 PUBLIC PlayerStat_IteminQuickbar3_injection
 PlayerStat_IteminQuickbar3_injection PROC
 ;no item
-mov     r8d, FFFFFFFFh
+mov     r8d, 0FFFFFFFFh
 ;original code
 lea     edx, [r12+3Ch]
 mov     rcx, rdi
@@ -689,7 +687,7 @@ extern PlayerStat_IteminQuickbar4_injection_return: qword
 PUBLIC PlayerStat_IteminQuickbar4_injection
 PlayerStat_IteminQuickbar4_injection PROC
 ;no item
-mov     r8d, FFFFFFFFh
+mov     r8d, 0FFFFFFFFh
 ;original code
 lea     edx, [r12+3Dh]
 mov     rcx, rdi
@@ -701,7 +699,7 @@ extern PlayerStat_IteminArrowBoltSlot0_injection_return: qword
 PUBLIC PlayerStat_IteminArrowBoltSlot0_injection
 PlayerStat_IteminArrowBoltSlot0_injection PROC
 ;no item
-mov     r8d, FFFFFFFFh
+mov     r8d, 0FFFFFFFFh
 ;original code
 lea     edx, [r12+3Eh]
 mov     rcx, rdi
@@ -713,7 +711,7 @@ extern PlayerStat_IteminArrowBoltSlot1_injection_return: qword
 PUBLIC PlayerStat_IteminArrowBoltSlot1_injection
 PlayerStat_IteminArrowBoltSlot1_injection PROC
 ;no item
-mov     r8d, FFFFFFFFh
+mov     r8d, 0FFFFFFFFh
 ;original code
 lea     edx, [r12+3Fh]
 mov     rcx, rdi
@@ -725,7 +723,7 @@ extern PlayerStat_IteminArrowBoltSlot2_injection_return: qword
 PUBLIC PlayerStat_IteminArrowBoltSlot2_injection
 PlayerStat_IteminArrowBoltSlot2_injection PROC
 ;no item
-mov     r8d, FFFFFFFFh
+mov     r8d, 0FFFFFFFFh
 ;original code
 lea     edx, [r12+40h]
 mov     rcx, rdi
@@ -737,7 +735,7 @@ extern PlayerStat_IteminArrowBoltSlot3_injection_return: qword
 PUBLIC PlayerStat_IteminArrowBoltSlot3_injection
 PlayerStat_IteminArrowBoltSlot3_injection PROC
 ;no item
-mov     r8d, FFFFFFFFh
+mov     r8d, 0FFFFFFFFh
 ;original code
 lea     edx, [r12+41h]
 mov     rcx, rdi
@@ -749,7 +747,7 @@ extern PlayerStat_EquippedSpell1_injection_return: qword
 PUBLIC PlayerStat_EquippedSpell1_injection
 PlayerStat_EquippedSpell1_injection PROC
 ;no spell
-mov     r8d, FFFFFFFFh
+mov     r8d, 0FFFFFFFFh
 ;original code
 mov     edx, [r15]
 mov     rcx, rdi
@@ -821,4 +819,5 @@ call    qword ptr [set_value_in_MemberFlags_array5]
 jmp     PlayerStat_New_Name_93_injection_return
 PlayerStat_New_Name_93_injection ENDP
 
+_TEXT    ENDS
 END

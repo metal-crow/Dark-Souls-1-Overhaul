@@ -502,10 +502,10 @@ enum MemberFlags_IdentifiersEnum
     Left_Hand_2 = 0x25,
     Right_Hand_1 = 0x26,
     Right_Hand_2 = 0x27,
-    ArmorHead = 0x28,
-    ArmorBody = 0x29,
-    ArmorArms = 0x2a,
-    ArmorLegs = 0x2b,
+    ArmorHeadInv = 0x28,
+    ArmorBodyInv = 0x29,
+    ArmorArmsInv = 0x2a,
+    ArmorLegsInv = 0x2b,
     LeftHandHeldWeaponSlot = 0x2c,
     RightHandHeldWeaponSlot = 0x2d,
     Stamina = 0x2e,
@@ -586,6 +586,11 @@ enum MemberFlags_IdentifiersEnum
 class PlayerStatRead_Value
 {
 public:
+    PlayerStatRead_Value()
+    {
+        offset = 0;
+        nop_count = 0;
+    };
     PlayerStatRead_Value(uint64_t offset_, uint32_t nop_count_) :
         offset(offset_),
         nop_count(nop_count_)
@@ -613,7 +618,7 @@ std::unordered_map<MemberFlags_IdentifiersEnum, PlayerStatRead_Value> PlayerStat
     {MemberFlags_IdentifiersEnum::Endurance, PlayerStatRead_Value(0x7ef8bb, 3)},
     {MemberFlags_IdentifiersEnum::Strength, PlayerStatRead_Value(0x7ef8cc, 3)},
     {MemberFlags_IdentifiersEnum::Dexterity, PlayerStatRead_Value(0x7ef8dd, 3)},
-    {MemberFlags_IdentifiersEnum::Resistance, PlayerStatRead_Value(0x7ef8ee, 3)},
+    {MemberFlags_IdentifiersEnum::Resistance, PlayerStatRead_Value(0x7ef8ee, 1)},
     {MemberFlags_IdentifiersEnum::Intelligence, PlayerStatRead_Value(0x7ef92b, 3)},
     {MemberFlags_IdentifiersEnum::Force, PlayerStatRead_Value(0x7ef93c, 3)},
     {MemberFlags_IdentifiersEnum::ItemDiscoveryRate, PlayerStatRead_Value(0x7ef94d, 1)},
@@ -627,10 +632,10 @@ std::unordered_map<MemberFlags_IdentifiersEnum, PlayerStatRead_Value> PlayerStat
     {MemberFlags_IdentifiersEnum::Left_Hand_2, PlayerStatRead_Value(0x7efa2c, 2)},
     {MemberFlags_IdentifiersEnum::Right_Hand_1, PlayerStatRead_Value(0x7efa49, 2)},
     {MemberFlags_IdentifiersEnum::Right_Hand_2, PlayerStatRead_Value(0x7efa66, 2)},
-    {MemberFlags_IdentifiersEnum::ArmorHead, PlayerStatRead_Value(0x7efa83, 2)},
-    {MemberFlags_IdentifiersEnum::ArmorBody, PlayerStatRead_Value(0x7efaa0, 2)},
-    {MemberFlags_IdentifiersEnum::ArmorArms, PlayerStatRead_Value(0x7efabd, 2)},
-    {MemberFlags_IdentifiersEnum::ArmorLegs, PlayerStatRead_Value(0x7efada, 2)},
+    {MemberFlags_IdentifiersEnum::ArmorHeadInv, PlayerStatRead_Value(0x7efa83, 2)},
+    {MemberFlags_IdentifiersEnum::ArmorBodyInv, PlayerStatRead_Value(0x7efaa0, 2)},
+    {MemberFlags_IdentifiersEnum::ArmorArmsInv, PlayerStatRead_Value(0x7efabd, 2)},
+    {MemberFlags_IdentifiersEnum::ArmorLegsInv, PlayerStatRead_Value(0x7efada, 2)},
     {MemberFlags_IdentifiersEnum::Stamina, PlayerStatRead_Value(0x7efb1c, 3)},
     {MemberFlags_IdentifiersEnum::MaxStamina, PlayerStatRead_Value(0x7efb2d, 3)},
     {MemberFlags_IdentifiersEnum::BaseMaxStamina, PlayerStatRead_Value(0x7efb3e, 3)},
@@ -645,7 +650,7 @@ std::unordered_map<MemberFlags_IdentifiersEnum, PlayerStatRead_Value> PlayerStat
     {MemberFlags_IdentifiersEnum::RinginSlot0, PlayerStatRead_Value(0x7efc37, 2)},
     {MemberFlags_IdentifiersEnum::RinginSlot1, PlayerStatRead_Value(0x7efc54, 2)},
     {MemberFlags_IdentifiersEnum::IteminQuickbar0, PlayerStatRead_Value(0x7efc6e, 2)},
-    {MemberFlags_IdentifiersEnum::IteminQuickbar1, PlayerStatRead_Value(0x7efc6e, 2)},
+    {MemberFlags_IdentifiersEnum::IteminQuickbar1, PlayerStatRead_Value(0x7efc86, 2)},
     {MemberFlags_IdentifiersEnum::IteminQuickbar2, PlayerStatRead_Value(0x7efca6, 2)},
     {MemberFlags_IdentifiersEnum::IteminQuickbar3, PlayerStatRead_Value(0x7efcc3, 2)},
     {MemberFlags_IdentifiersEnum::IteminQuickbar4, PlayerStatRead_Value(0x7efce0, 2)},
@@ -654,9 +659,9 @@ std::unordered_map<MemberFlags_IdentifiersEnum, PlayerStatRead_Value> PlayerStat
     {MemberFlags_IdentifiersEnum::IteminArrowBoltSlot2, PlayerStatRead_Value(0x7efd37, 2)},
     {MemberFlags_IdentifiersEnum::IteminArrowBoltSlot3, PlayerStatRead_Value(0x7efd54, 2)},
     {MemberFlags_IdentifiersEnum::EquippedSpell1, PlayerStatRead_Value(0x7efdb6, 0)},
-    {MemberFlags_IdentifiersEnum::New_Name_86, PlayerStatRead_Value(0x7efe5e, 2)},
-    {MemberFlags_IdentifiersEnum::New_Name_87, PlayerStatRead_Value(0x7efe86, 2)},
-    {MemberFlags_IdentifiersEnum::New_Name_88, PlayerStatRead_Value(0x7efeae, 2)},
+    {MemberFlags_IdentifiersEnum::New_Name_86, PlayerStatRead_Value(0x7efe5e, 6)},
+    {MemberFlags_IdentifiersEnum::New_Name_87, PlayerStatRead_Value(0x7efe86, 6)},
+    {MemberFlags_IdentifiersEnum::New_Name_88, PlayerStatRead_Value(0x7efeae, 6)},
     {MemberFlags_IdentifiersEnum::New_Name_89, PlayerStatRead_Value(0x7efed6, 4)},
     {MemberFlags_IdentifiersEnum::New_Name_93, PlayerStatRead_Value(0x7eff1e, 2)},
 
@@ -811,20 +816,20 @@ void AntiAntiCheat::start() {
     sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_Right_Hand_2_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Right_Hand_2].nop_count, &PlayerStat_Right_Hand_2_injection);
 
     //ArmorHead
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorHead].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_ArmorHead_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorHead].nop_count, &PlayerStat_ArmorHead_injection);
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorHeadInv].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_ArmorHead_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorHeadInv].nop_count, &PlayerStat_ArmorHead_injection);
 
     //ArmorBody
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorBody].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_ArmorBody_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorBody].nop_count, &PlayerStat_ArmorBody_injection);
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorBodyInv].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_ArmorBody_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorBodyInv].nop_count, &PlayerStat_ArmorBody_injection);
 
     //ArmorArms
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorArms].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_ArmorArms_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorArms].nop_count, &PlayerStat_ArmorArms_injection);
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorArmsInv].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_ArmorArms_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorArmsInv].nop_count, &PlayerStat_ArmorArms_injection);
 
     //ArmorLegs
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorLegs].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_ArmorLegs_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorLegs].nop_count, &PlayerStat_ArmorLegs_injection);
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorLegsInv].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_ArmorLegs_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorLegsInv].nop_count, &PlayerStat_ArmorLegs_injection);
 
     //Stamina
     write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Stamina].offset + Game::ds1_base);
