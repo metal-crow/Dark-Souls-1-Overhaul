@@ -3,6 +3,9 @@ _DATA SEGMENT
 sub_140BCEDB0   dq  140BCEDB0h
 set_value_in_MemberFlags_array1   dq  140BA8400h
 set_value_in_MemberFlags_array2   dq  140ba80d0h
+set_value_in_MemberFlags_array4   dq  140ba9dc0h
+set_value_in_MemberFlags_array5   dq  140BA8730h
+const0_float    dd  0.0
 
 _DATA ENDS
 
@@ -609,5 +612,213 @@ mov     rcx, rdi
 call    qword ptr [set_value_in_MemberFlags_array2]
 jmp     PlayerStat_ArmorinSlot3_injection_return
 PlayerStat_ArmorinSlot3_injection ENDP
+
+extern PlayerStat_RinginSlot0_injection_return: qword
+PUBLIC PlayerStat_RinginSlot0_injection
+PlayerStat_RinginSlot0_injection PROC
+;no ring
+mov     r8d, FFFFFFFFh
+;original code
+lea     edx, [r12+37h]
+mov     rcx, rdi
+call    qword ptr [set_value_in_MemberFlags_array2]
+jmp     PlayerStat_RinginSlot0_injection_return
+PlayerStat_RinginSlot0_injection ENDP
+
+extern PlayerStat_RinginSlot1_injection_return: qword
+PUBLIC PlayerStat_RinginSlot1_injection
+PlayerStat_RinginSlot1_injection PROC
+;no ring
+mov     r8d, FFFFFFFFh
+;original code
+lea     edx, [r12+38h]
+mov     rcx, rdi
+call    qword ptr [set_value_in_MemberFlags_array2]
+jmp     PlayerStat_RinginSlot1_injection_return
+PlayerStat_RinginSlot1_injection ENDP
+
+extern PlayerStat_IteminQuickbar0_injection_return: qword
+PUBLIC PlayerStat_IteminQuickbar0_injection
+PlayerStat_IteminQuickbar0_injection PROC
+;no item
+mov     r8d, FFFFFFFFh
+;original code
+lea     edx, [r12+39h]
+mov     rcx, rdi
+call    qword ptr [set_value_in_MemberFlags_array2]
+jmp     PlayerStat_IteminQuickbar0_injection_return
+PlayerStat_IteminQuickbar0_injection ENDP
+
+extern PlayerStat_IteminQuickbar1_injection_return: qword
+PUBLIC PlayerStat_IteminQuickbar1_injection
+PlayerStat_IteminQuickbar1_injection PROC
+;no item
+mov     r8d, FFFFFFFFh
+;original code
+lea     edx, [r12+3Ah]
+mov     rcx, rdi
+call    qword ptr [set_value_in_MemberFlags_array2]
+jmp     PlayerStat_IteminQuickbar1_injection_return
+PlayerStat_IteminQuickbar1_injection ENDP
+
+extern PlayerStat_IteminQuickbar2_injection_return: qword
+PUBLIC PlayerStat_IteminQuickbar2_injection
+PlayerStat_IteminQuickbar2_injection PROC
+;no item
+mov     r8d, FFFFFFFFh
+;original code
+lea     edx, [r12+3Bh]
+mov     rcx, rdi
+call    qword ptr [set_value_in_MemberFlags_array2]
+jmp     PlayerStat_IteminQuickbar2_injection_return
+PlayerStat_IteminQuickbar2_injection ENDP
+
+extern PlayerStat_IteminQuickbar3_injection_return: qword
+PUBLIC PlayerStat_IteminQuickbar3_injection
+PlayerStat_IteminQuickbar3_injection PROC
+;no item
+mov     r8d, FFFFFFFFh
+;original code
+lea     edx, [r12+3Ch]
+mov     rcx, rdi
+call    qword ptr [set_value_in_MemberFlags_array2]
+jmp     PlayerStat_IteminQuickbar3_injection_return
+PlayerStat_IteminQuickbar3_injection ENDP
+
+extern PlayerStat_IteminQuickbar4_injection_return: qword
+PUBLIC PlayerStat_IteminQuickbar4_injection
+PlayerStat_IteminQuickbar4_injection PROC
+;no item
+mov     r8d, FFFFFFFFh
+;original code
+lea     edx, [r12+3Dh]
+mov     rcx, rdi
+call    qword ptr [set_value_in_MemberFlags_array2]
+jmp     PlayerStat_IteminQuickbar4_injection_return
+PlayerStat_IteminQuickbar4_injection ENDP
+
+extern PlayerStat_IteminArrowBoltSlot0_injection_return: qword
+PUBLIC PlayerStat_IteminArrowBoltSlot0_injection
+PlayerStat_IteminArrowBoltSlot0_injection PROC
+;no item
+mov     r8d, FFFFFFFFh
+;original code
+lea     edx, [r12+3Eh]
+mov     rcx, rdi
+call    qword ptr [set_value_in_MemberFlags_array2]
+jmp     PlayerStat_IteminArrowBoltSlot0_injection_return
+PlayerStat_IteminArrowBoltSlot0_injection ENDP
+
+extern PlayerStat_IteminArrowBoltSlot1_injection_return: qword
+PUBLIC PlayerStat_IteminArrowBoltSlot1_injection
+PlayerStat_IteminArrowBoltSlot1_injection PROC
+;no item
+mov     r8d, FFFFFFFFh
+;original code
+lea     edx, [r12+3Fh]
+mov     rcx, rdi
+call    qword ptr [set_value_in_MemberFlags_array2]
+jmp     PlayerStat_IteminArrowBoltSlot1_injection_return
+PlayerStat_IteminArrowBoltSlot1_injection ENDP
+
+extern PlayerStat_IteminArrowBoltSlot2_injection_return: qword
+PUBLIC PlayerStat_IteminArrowBoltSlot2_injection
+PlayerStat_IteminArrowBoltSlot2_injection PROC
+;no item
+mov     r8d, FFFFFFFFh
+;original code
+lea     edx, [r12+40h]
+mov     rcx, rdi
+call    qword ptr [set_value_in_MemberFlags_array2]
+jmp     PlayerStat_IteminArrowBoltSlot2_injection_return
+PlayerStat_IteminArrowBoltSlot2_injection ENDP
+
+extern PlayerStat_IteminArrowBoltSlot3_injection_return: qword
+PUBLIC PlayerStat_IteminArrowBoltSlot3_injection
+PlayerStat_IteminArrowBoltSlot3_injection PROC
+;no item
+mov     r8d, FFFFFFFFh
+;original code
+lea     edx, [r12+41h]
+mov     rcx, rdi
+call    qword ptr [set_value_in_MemberFlags_array2]
+jmp     PlayerStat_IteminArrowBoltSlot3_injection_return
+PlayerStat_IteminArrowBoltSlot3_injection ENDP
+
+extern PlayerStat_EquippedSpell1_injection_return: qword
+PUBLIC PlayerStat_EquippedSpell1_injection
+PlayerStat_EquippedSpell1_injection PROC
+;no spell
+mov     r8d, FFFFFFFFh
+;original code
+mov     edx, [r15]
+mov     rcx, rdi
+call    qword ptr [set_value_in_MemberFlags_array2]
+jmp     PlayerStat_EquippedSpell1_injection_return
+PlayerStat_EquippedSpell1_injection ENDP
+
+extern PlayerStat_New_Name_86_injection_return: qword
+PUBLIC PlayerStat_New_Name_86_injection
+PlayerStat_New_Name_86_injection PROC
+;this seems to be human/not-human?
+mov     r8d, 1
+;original code
+mov     edx, 56h
+mov     rcx, rdi
+call    qword ptr [set_value_in_MemberFlags_array4]
+cmp     byte ptr [rsi+3C0h], 0
+jmp     PlayerStat_New_Name_86_injection_return
+PlayerStat_New_Name_86_injection ENDP
+
+extern PlayerStat_New_Name_87_injection_return: qword
+PUBLIC PlayerStat_New_Name_87_injection
+PlayerStat_New_Name_87_injection PROC
+;
+mov     r8d, 0
+;original code
+mov     edx, 57h
+mov     rcx, rdi
+call    qword ptr [set_value_in_MemberFlags_array4]
+cmp     byte ptr [rsi+3C0h], 0
+jmp     PlayerStat_New_Name_87_injection_return
+PlayerStat_New_Name_87_injection ENDP
+
+extern PlayerStat_New_Name_88_injection_return: qword
+PUBLIC PlayerStat_New_Name_88_injection
+PlayerStat_New_Name_88_injection PROC
+;
+mov     r8d, 0
+;original code
+mov     edx, 58h
+mov     rcx, rdi
+call    qword ptr [set_value_in_MemberFlags_array4]
+cmp     byte ptr [rsi+3C0h], 0
+jmp     PlayerStat_New_Name_88_injection_return
+PlayerStat_New_Name_88_injection ENDP
+
+extern PlayerStat_New_Name_89_injection_return: qword
+PUBLIC PlayerStat_New_Name_89_injection
+PlayerStat_New_Name_89_injection PROC
+;
+mov     r8d, 0
+;original code
+mov     edx, 59h
+mov     rcx, rdi
+call    qword ptr [set_value_in_MemberFlags_array4]
+mov     edx, 1Ch
+jmp     PlayerStat_New_Name_89_injection_return
+PlayerStat_New_Name_89_injection ENDP
+
+extern PlayerStat_New_Name_93_injection_return: qword
+PUBLIC PlayerStat_New_Name_93_injection
+PlayerStat_New_Name_93_injection PROC
+;
+movss   xmm2, dword ptr [const0_float]
+;original code
+mov     edx, 5Dh
+mov     rcx, rdi
+call    qword ptr [set_value_in_MemberFlags_array5]
+jmp     PlayerStat_New_Name_93_injection_return
+PlayerStat_New_Name_93_injection ENDP
 
 END
