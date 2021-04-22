@@ -398,7 +398,7 @@ void crash_handler(char* message_str)
         char* username;
         errno_t err = _dupenv_s(&username, NULL, "USERNAME");
         char crashname[120];
-        snprintf(crashname, sizeof(crashname), "%s:%s", username, time_str);
+        snprintf(crashname, sizeof(crashname), "%s%s", username, time_str);
 
         //upload crash
         GoogleCloudLib::CreateClient(key_path);
