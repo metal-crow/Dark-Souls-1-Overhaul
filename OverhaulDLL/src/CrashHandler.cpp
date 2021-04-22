@@ -287,20 +287,6 @@ DWORD WINAPI crash_handler_dump_process(LPVOID output_dir)
     WaitForSingleObject(procdump_pi.hProcess, 15 * 1000);
     CloseHandle(procdump_pi.hProcess);
     CloseHandle(procdump_pi.hThread);
-
-    //command to pass to zip folder
-    snprintf(cmd, sizeof(cmd), "powershell.exe -command \"Compress-Archive '%s' '%s.zip'\"", (char*)output_dir, (char*)output_dir);
-
-    ZeroMemory(&si, sizeof(si));
-    si.cb = sizeof(si);
-    ZeroMemory(&procdump_pi, sizeof(procdump_pi));
-    bool zipdump = CreateProcess(NULL, cmd, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &procdump_pi);
-
-    // Wait 15 sec max for the zip to finish
-    WaitForSingleObject(procdump_pi.hProcess, 15 * 1000);
-    CloseHandle(procdump_pi.hProcess);
-    CloseHandle(procdump_pi.hThread);
-
     return 0;
 }
 
@@ -366,24 +352,30 @@ void crash_handler(char* message_str)
     }
     fclose(fp);
 
-    // Wait for the process dump+zip to finish
+    // Wait for the process dump to finish
     WaitForSingleObject(dump_thread, INFINITE);
+
+    //zip the folder
+    char cmd[MAX_PATH + 100 + 50];
+    snprintf(cmd, sizeof(cmd), "powershell.exe -command \"Compress-Archive '%s' '%s.zip'\"", (char*)output_dir, (char*)output_dir);
+    PROCESS_INFORMATION zip_pi;
+    STARTUPINFO si;
+    ZeroMemory(&si, sizeof(si));
+    si.cb = sizeof(si);
+    ZeroMemory(&zip_pi, sizeof(zip_pi));
+    bool zipdump = CreateProcess(NULL, cmd, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &zip_pi);
+    // Wait 15 sec max for the zip to finish
+    WaitForSingleObject(zip_pi.hProcess, 15 * 1000);
+    CloseHandle(zip_pi.hProcess);
+    CloseHandle(zip_pi.hThread);
 
     // Send the report
     if (send_report != 0) {
-        //generate name for this upload (hash of host + datetime)
+        //generate name for this upload (hostname + datetime)
         char* username;
-        size_t username_hash;
         errno_t err = _dupenv_s(&username, NULL, "USERNAME");
-        if (err) {
-            username_hash = 0;
-        } else {
-            std::hash<std::string> hash;
-            username_hash = hash(username);
-        }
-        free(username);
         char crashname[120];
-        snprintf(crashname, sizeof(crashname), "%016zx%s", username_hash, time_str);
+        snprintf(crashname, sizeof(crashname), "%s:%s", username, time_str);
 
         //upload crash
         GoogleCloudLib::CreateClient(key_path);
