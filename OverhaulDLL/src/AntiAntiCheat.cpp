@@ -458,6 +458,10 @@ extern "C" {
     void PlayerStat_New_Name_89_injection();
     uint64_t PlayerStat_New_Name_93_injection_return;
     void PlayerStat_New_Name_93_injection();
+    uint64_t PlayerStat_defSAToughnessTotal_injection_return;
+    void PlayerStat_defSAToughnessTotal_injection();
+    uint64_t PlayerStat_MaxEquipLoad_injection_return;
+    void PlayerStat_MaxEquipLoad_injection();
 }
 
 enum MemberFlags_IdentifiersEnum
@@ -664,6 +668,8 @@ std::unordered_map<MemberFlags_IdentifiersEnum, PlayerStatRead_Value> PlayerStat
     {MemberFlags_IdentifiersEnum::New_Name_88, PlayerStatRead_Value(0x7efeae, 6)},
     {MemberFlags_IdentifiersEnum::New_Name_89, PlayerStatRead_Value(0x7efed6, 4)},
     {MemberFlags_IdentifiersEnum::New_Name_93, PlayerStatRead_Value(0x7eff1e, 2)},
+    {MemberFlags_IdentifiersEnum::defSAToughnessTotal, PlayerStatRead_Value(0x7eff2e, 3)},
+    {MemberFlags_IdentifiersEnum::MaxEquipLoad, PlayerStatRead_Value(0x7eff47, 0)},
 
 };
 
@@ -942,6 +948,15 @@ void AntiAntiCheat::start() {
     //New_Name_93
     write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::New_Name_93].offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_New_Name_93_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::New_Name_93].nop_count, &PlayerStat_New_Name_93_injection);
+
+    //defSAToughnessTotal
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::defSAToughnessTotal].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_defSAToughnessTotal_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::defSAToughnessTotal].nop_count, &PlayerStat_defSAToughnessTotal_injection);
+
+    //MaxEquipLoad
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::MaxEquipLoad].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_MaxEquipLoad_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::MaxEquipLoad].nop_count, &PlayerStat_MaxEquipLoad_injection);
+
 }
 
 const uint32_t hackerFlag = 0x1770;

@@ -6,6 +6,8 @@ set_value_in_MemberFlags_array2   dq  140ba80d0h
 set_value_in_MemberFlags_array4   dq  140ba9dc0h
 set_value_in_MemberFlags_array5   dq  140BA8730h
 const0_float    dd  0.0
+const0    dd  0
+defaultPyroEquipLoad    dd  51.0
 
 _DATA ENDS
 
@@ -818,6 +820,28 @@ mov     rcx, rdi
 call    qword ptr [set_value_in_MemberFlags_array5]
 jmp     PlayerStat_New_Name_93_injection_return
 PlayerStat_New_Name_93_injection ENDP
+
+extern PlayerStat_defSAToughnessTotal_injection_return: qword
+PUBLIC PlayerStat_defSAToughnessTotal_injection
+PlayerStat_defSAToughnessTotal_injection PROC
+;0 poise
+movd   xmm2, dword ptr [const0]
+;original code
+cvtdq2ps xmm2, xmm2
+mov     edx, 5Eh
+jmp     PlayerStat_defSAToughnessTotal_injection_return
+PlayerStat_defSAToughnessTotal_injection ENDP
+
+extern PlayerStat_MaxEquipLoad_injection_return: qword
+PUBLIC PlayerStat_MaxEquipLoad_injection
+PlayerStat_MaxEquipLoad_injection PROC
+;use the default Pyro Equip Load
+movss   xmm2, dword ptr [defaultPyroEquipLoad]
+;original code
+mov     edx, 5Fh
+jmp     PlayerStat_MaxEquipLoad_injection_return
+PlayerStat_MaxEquipLoad_injection ENDP
+
 
 _TEXT    ENDS
 END
