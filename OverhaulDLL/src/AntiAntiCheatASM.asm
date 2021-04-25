@@ -8,6 +8,9 @@ set_value_in_MemberFlags_array5   dq  140BA8730h
 const0_float    dd  0.0
 const0    dd  0
 defaultPyroEquipLoad    dd  51.0
+pyro_normal_defs    dd  20, 20, 20, 20, 13, 21, 16
+pyro_normal_resists dd  44, 42, 30
+max_covenant_levels dd  100, 100, 100, 100, 100, 100, 100
 
 _DATA ENDS
 
@@ -842,6 +845,44 @@ mov     edx, 5Fh
 jmp     PlayerStat_MaxEquipLoad_injection_return
 PlayerStat_MaxEquipLoad_injection ENDP
 
+extern PlayerStat_NormalDefenses_injection_return: qword
+PUBLIC PlayerStat_NormalDefenses_injection
+PlayerStat_NormalDefenses_injection PROC
+;original code
+mov     [rbp-1], eax
+;use the default pyro naked defs
+lea     r8, [pyro_normal_defs]
+;original code
+mov     edx, 6Ah
+mov     rcx, rdi
+jmp     PlayerStat_NormalDefenses_injection_return
+PlayerStat_NormalDefenses_injection ENDP
+
+extern PlayerStat_NormalResists_injection_return: qword
+PUBLIC PlayerStat_NormalResists_injection
+PlayerStat_NormalResists_injection PROC
+;original code
+mov     [rbp-71h], ecx
+;use the default pyro naked resists
+lea     r8, [pyro_normal_resists]
+;original code
+mov     edx, 6Bh
+mov     rcx, rdi
+jmp     PlayerStat_NormalResists_injection_return
+PlayerStat_NormalResists_injection ENDP
+
+extern PlayerStat_CovenantLevel_injection_return: qword
+PUBLIC PlayerStat_CovenantLevel_injection
+PlayerStat_CovenantLevel_injection PROC
+;original code
+mov     [rbp-1], ebx
+;max levels in every covenant
+lea     r8, [max_covenant_levels]
+;original code
+mov     edx, 6Ch
+mov     rcx, rdi
+jmp     PlayerStat_CovenantLevel_injection_return
+PlayerStat_CovenantLevel_injection ENDP
 
 _TEXT    ENDS
 END

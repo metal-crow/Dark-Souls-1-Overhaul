@@ -462,6 +462,12 @@ extern "C" {
     void PlayerStat_defSAToughnessTotal_injection();
     uint64_t PlayerStat_MaxEquipLoad_injection_return;
     void PlayerStat_MaxEquipLoad_injection();
+    uint64_t PlayerStat_NormalDefenses_injection_return;
+    void PlayerStat_NormalDefenses_injection();
+    uint64_t PlayerStat_NormalResists_injection_return;
+    void PlayerStat_NormalResists_injection();
+    uint64_t PlayerStat_CovenantLevel_injection_return;
+    void PlayerStat_CovenantLevel_injection();
 }
 
 enum MemberFlags_IdentifiersEnum
@@ -573,7 +579,7 @@ enum MemberFlags_IdentifiersEnum
     inSession = 0x68,
     New_Name_105 = 0x69,
     NormalDefenses = 0x6a,
-    PoisonBleedResist = 0x6b,
+    NormalResists = 0x6b,
     CovenantLevel = 0x6c,
     New_Name_109 = 0x6d,
     New_Name_110 = 0x6e,
@@ -670,7 +676,9 @@ std::unordered_map<MemberFlags_IdentifiersEnum, PlayerStatRead_Value> PlayerStat
     {MemberFlags_IdentifiersEnum::New_Name_93, PlayerStatRead_Value(0x7eff1e, 2)},
     {MemberFlags_IdentifiersEnum::defSAToughnessTotal, PlayerStatRead_Value(0x7eff2e, 3)},
     {MemberFlags_IdentifiersEnum::MaxEquipLoad, PlayerStatRead_Value(0x7eff47, 0)},
-
+    {MemberFlags_IdentifiersEnum::NormalDefenses, PlayerStatRead_Value(0x7f0157, 1)},
+    {MemberFlags_IdentifiersEnum::NormalResists, PlayerStatRead_Value(0x7f0190, 1)},
+    {MemberFlags_IdentifiersEnum::CovenantLevel, PlayerStatRead_Value(0x7f0225, 1)},
 };
 
 void AntiAntiCheat::start() {
@@ -956,6 +964,18 @@ void AntiAntiCheat::start() {
     //MaxEquipLoad
     write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::MaxEquipLoad].offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_MaxEquipLoad_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::MaxEquipLoad].nop_count, &PlayerStat_MaxEquipLoad_injection);
+
+    //NormalDefenses
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::NormalDefenses].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_NormalDefenses_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::NormalDefenses].nop_count, &PlayerStat_NormalDefenses_injection);
+
+    //NormalResists
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::NormalResists].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_NormalResists_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::NormalResists].nop_count, &PlayerStat_NormalResists_injection);
+
+    //CovenantLevel
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::CovenantLevel].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_CovenantLevel_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::CovenantLevel].nop_count, &PlayerStat_CovenantLevel_injection);
 
 }
 
