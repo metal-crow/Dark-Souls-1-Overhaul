@@ -327,6 +327,25 @@ const uint64_t AntiAntiCheat::game_hash_compare_checks[] = {
     0x143730374, 0x143732B24, 0x14373F0AF, 0x143740859, 0x14374C6E5, 0x14375054F
 };
 
+const uint64_t game_invalid_data_checks[] = {
+    0x7ee804,
+    0x7ee81f,
+    0x7ee83c,
+    0x7ee859,
+    0x7ee876,
+    0x7ee8a4,
+    0x7ee8d2,
+    0x7ee900,
+    0x7ee92e,
+    0x7ee99a,
+    0x7eea0a,
+    0x7eea27,
+    0x7eea66,
+    0x7eea86,
+    0x7eeaa8,
+
+};
+
 extern "C" {
     uint64_t game_write_playerdata_to_flatbuffer_injection_return;
     void game_write_playerdata_to_flatbuffer_injection();
@@ -573,7 +592,7 @@ enum MemberFlags_IdentifiersEnum
     New_Name_98 = 0x62,
     New_Name_99 = 0x63,
     New_Name_100 = 0x64,
-    New_Name_101 = 0x65,
+    MpRegion = 0x65,
     New_Name_102 = 0x66,
     CovenantId1 = 0x67,
     inSession = 0x68,
@@ -699,6 +718,16 @@ void AntiAntiCheat::start() {
         if (!res) FATALERROR("Unable to disable jmp anti-cheat for addr %x", std::get<0>(patch_loc));
     }
 
+    //Disable what appear to be cheat detection things
+    //change the setting of the bool so that it always stays false
+    //i don't see any situation where this bool is actually _read_, but better safe
+    uint8_t patch_false = 0 ;
+    for (auto patch_loc : game_invalid_data_checks)
+    {
+        bool res = sp::mem::patch_bytes((void*)patch_loc, &patch_false, 1);
+        if (!res) FATALERROR("Unable to disable invalid game data check for addr %x", patch_loc);
+    }
+    
     //Before sending to the server make sure the data is correct
     write_address = (uint8_t*)(AntiAntiCheat::game_write_playerdata_to_flatbuffer_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &game_write_playerdata_to_flatbuffer_injection_return, 0, &game_write_playerdata_to_flatbuffer_injection);
