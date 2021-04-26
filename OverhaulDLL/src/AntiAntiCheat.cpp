@@ -724,7 +724,7 @@ void AntiAntiCheat::start() {
     uint8_t patch_false = 0 ;
     for (auto patch_loc : game_invalid_data_checks)
     {
-        bool res = sp::mem::patch_bytes((void*)patch_loc, &patch_false, 1);
+        bool res = sp::mem::patch_bytes((void*)(patch_loc+6), &patch_false, 1);
         if (!res) FATALERROR("Unable to disable invalid game data check for addr %x", patch_loc);
     }
     
