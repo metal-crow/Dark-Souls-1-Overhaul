@@ -11,6 +11,8 @@ defaultPyroEquipLoad    dd  51.0
 pyro_normal_defs    dd  20, 20, 20, 20, 13, 21, 16
 pyro_normal_resists dd  44, 42, 30
 max_covenant_levels dd  100, 100, 100, 100, 100, 100, 100
+New_Name_110_const  db  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+New_Name_111_const  dd  0, 0, 0, 0, 0, 0, 0
 
 _DATA ENDS
 
@@ -883,6 +885,32 @@ mov     edx, 6Ch
 mov     rcx, rdi
 jmp     PlayerStat_CovenantLevel_injection_return
 PlayerStat_CovenantLevel_injection ENDP
+
+extern PlayerStat_New_Name_110_injection_return: qword
+PUBLIC PlayerStat_New_Name_110_injection
+PlayerStat_New_Name_110_injection PROC
+;original code
+mov     [rbp-6Fh], al
+;
+lea     r8, [New_Name_110_const]
+;original code
+mov     edx, 6Eh
+mov     rcx, rdi
+jmp     PlayerStat_New_Name_110_injection_return
+PlayerStat_New_Name_110_injection ENDP
+
+extern PlayerStat_New_Name_111_injection_return: qword
+PUBLIC PlayerStat_New_Name_111_injection
+PlayerStat_New_Name_111_injection PROC
+;original code
+mov     [rbp-1], eax
+;
+lea     r8, [New_Name_111_const]
+;original code
+mov     edx, 6Fh
+mov     rcx, rdi
+jmp     PlayerStat_New_Name_111_injection_return
+PlayerStat_New_Name_111_injection ENDP
 
 _TEXT    ENDS
 END

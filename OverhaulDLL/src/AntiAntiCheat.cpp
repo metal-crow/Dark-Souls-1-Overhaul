@@ -487,6 +487,10 @@ extern "C" {
     void PlayerStat_NormalResists_injection();
     uint64_t PlayerStat_CovenantLevel_injection_return;
     void PlayerStat_CovenantLevel_injection();
+    uint64_t PlayerStat_New_Name_110_injection_return;
+    void PlayerStat_New_Name_110_injection();
+    uint64_t PlayerStat_New_Name_111_injection_return;
+    void PlayerStat_New_Name_111_injection();
 }
 
 enum MemberFlags_IdentifiersEnum
@@ -698,6 +702,8 @@ std::unordered_map<MemberFlags_IdentifiersEnum, PlayerStatRead_Value> PlayerStat
     {MemberFlags_IdentifiersEnum::NormalDefenses, PlayerStatRead_Value(0x7f0157, 1)},
     {MemberFlags_IdentifiersEnum::NormalResists, PlayerStatRead_Value(0x7f0190, 1)},
     {MemberFlags_IdentifiersEnum::CovenantLevel, PlayerStatRead_Value(0x7f0225, 1)},
+    {MemberFlags_IdentifiersEnum::New_Name_110, PlayerStatRead_Value(0x7f0286, 1)},
+    {MemberFlags_IdentifiersEnum::New_Name_111, PlayerStatRead_Value(0x7f030b, 1)},
 };
 
 void AntiAntiCheat::start() {
@@ -1005,6 +1011,14 @@ void AntiAntiCheat::start() {
     //CovenantLevel
     write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::CovenantLevel].offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_CovenantLevel_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::CovenantLevel].nop_count, &PlayerStat_CovenantLevel_injection);
+
+    //New_Name_110
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::New_Name_110].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_New_Name_110_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::New_Name_110].nop_count, &PlayerStat_New_Name_110_injection);
+
+    //New_Name_111
+    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::New_Name_111].offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_New_Name_111_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::New_Name_111].nop_count, &PlayerStat_New_Name_111_injection);
 
 }
 
