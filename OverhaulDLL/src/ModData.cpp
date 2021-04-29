@@ -15,6 +15,7 @@
 #include "FileReloading.h"
 #include "SpellDesyncFixes.h"
 #include "ModNetworking.h"
+#include "MainLoop.h"
 
 #define _SP_DEFINE_VK_NAME_STRINGS_  // Must be defined to use Virtual-key code name strings from SP_IO_Strings.hpp (opt-in by default because it increases filesize by a few KB)
 
@@ -75,6 +76,12 @@ void Mod::get_init_preferences()
     Mod::disable_low_fps_disconnect = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DISABLE_LOW_FPS_DISCONNECT_, (int)Mod::disable_low_fps_disconnect, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
 }
 
+bool check_hotkeys(void* unused)
+{
+    sp::io::keybinds::check_hotkeys();
+    return true;
+}
+
 // Get user-defined keybinds from the settings file
 void Mod::get_user_keybinds()
 {
@@ -84,6 +91,9 @@ void Mod::get_user_keybinds()
     // Load keybinds here
     // Toggle mouse input keybind
     //get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_MOUSE_INPUT_, kf_toggle_mouse_input);
+
+    // Enable the keybinds check
+    MainLoop::setup_mainloop_callback(check_hotkeys, NULL, "check_hotkeys");
 }
 
 // Helper function for get_user_keybinds() that loads the specified keybind from the config file and binds it to the specified function
