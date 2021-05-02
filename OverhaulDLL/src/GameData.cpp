@@ -17,6 +17,7 @@
 #include "BloodborneRallySystem.h"
 #include "AnimationEdits.h"
 #include "SP/memory/injection/asm/x64.h"
+#include "FileReloading.h"
 
 
 /*
@@ -152,6 +153,9 @@ bool Game::on_character_load(void* unused)
         Game::preload_function_caches();
 
         character_reload_run = true;
+
+        //need to force refresh the character in case the legacy mod changed while the game was off (restarting the game doesn't do this for some reason)
+        FileReloading::RefreshPlayerStats();
 
         ConsoleWrite("%s All character loading finished!", Mod::output_prefix);
 

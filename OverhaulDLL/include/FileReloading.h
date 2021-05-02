@@ -91,6 +91,7 @@ public:
     static void start();
     static void ReloadGameParam();
     static void ReloadPlayer();
+    static void RefreshPlayerStats();
 private:
     static void UnloadIndividualParams(std::vector<IndividualParams> params);
     static void UnloadIndividualSoloParams(std::vector<IndividualSoloParams> params);

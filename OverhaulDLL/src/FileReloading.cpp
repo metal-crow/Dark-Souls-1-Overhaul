@@ -153,10 +153,15 @@ void FileReloading::ReloadGameParam()
                                 LevelSyncParam,
                                 CoolTimeParam,
                                 WhiteCoolTimeParam
-                                });
+        });
 
     ReloadParamFile(GameParam);
 
+    FileReloading::RefreshPlayerStats();
+}
+
+void FileReloading::RefreshPlayerStats()
+{
     //update the character stats based off recalculated values from their level
     // (required since CalcCorrectGraph is refreshed)
     //need to wait 1 frame for the files to be reloaded
