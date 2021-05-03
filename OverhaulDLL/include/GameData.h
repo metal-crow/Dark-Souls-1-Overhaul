@@ -285,6 +285,8 @@ public:
 
 	static std::optional<void*> get_host_player_gamedata();
 
+	static bool set_display_name(bool useSteam);
+
     /*
      * Help speedup some functions by, whenever we're loaded into an area,
      * preload/preresolve some pointers and values so they can be much more quickly read when we need them

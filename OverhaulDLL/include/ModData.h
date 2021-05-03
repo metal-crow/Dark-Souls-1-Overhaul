@@ -22,6 +22,7 @@
 #define _DS1_OVERHAUL_PREF_CUSTOM_GAME_CFG_FILE_ "CustomGameConfigFile"
 // General settings:
 #define _DS1_OVERHAUL_PREF_DISABLE_LOW_FPS_DISCONNECT_ "DisableLowFpsDisconnect"
+#define _DS1_OVERHAUL_PREF_USE_STEAM_NAMES_ "UseSteamNames"
 
 #define _DS1_OVERHAUL_SETTINGS_STRING_BUFF_LEN_ 256  // Length of the string buffer used when obtaining user preference-related string data
 
@@ -63,6 +64,9 @@ public:
 
     // Determines to disable the game's "Framerate insufficient for online play" disconnection
     static bool disable_low_fps_disconnect;
+
+    // If we use steam names or character names for players
+    static bool use_steam_names;
 
     // Custom game archive files to load instead of the vanilla game files
     static std::wstring custom_game_archive_path;

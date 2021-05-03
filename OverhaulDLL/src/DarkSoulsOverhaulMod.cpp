@@ -99,9 +99,7 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     FixAnkles::start();
     ModNetworking::start();
     FileReloading::start();
-    if (Mod::disable_low_fps_disconnect) {
-        Game::disable_low_fps_disconnect(true);
-    }
+    Game::disable_low_fps_disconnect(Mod::disable_low_fps_disconnect);
 
     ConsoleWrite("%s All initial loading finished!", Mod::output_prefix);
 

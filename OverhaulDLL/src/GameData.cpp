@@ -152,6 +152,8 @@ bool Game::on_character_load(void* unused)
 
         Game::preload_function_caches();
 
+        Game::set_display_name(Mod::use_steam_names);
+
         character_reload_run = true;
 
         //need to force refresh the character in case the legacy mod changed while the game was off (restarting the game doesn't do this for some reason)
@@ -222,6 +224,7 @@ static uint32_t* NextPlayerNum_cache = NULL;
 static void** PlayerIns_cache = NULL;
 static void** player_animationMediator_cache = NULL;
 static void** host_player_gamedata_cache = NULL;
+static bool* display_name_cache = NULL;
 
 void Game::preload_function_caches() {
     global::cmd_out << "Cache loading\n";
@@ -1038,5 +1041,26 @@ std::optional<void*> Game::get_host_player_gamedata()
     {
         host_player_gamedata_cache = host_player_gamedata.resolve();
         return *host_player_gamedata_cache;
+    }
+}
+
+bool Game::set_display_name(bool useSteam)
+{
+    if (display_name_cache)
+    {
+        *display_name_cache = useSteam;
+        return true;
+    }
+
+    sp::mem::pointer display_name = sp::mem::pointer<bool>((void*)(Game::game_data_man), { 0x58, 0x3e });
+    if (display_name.resolve() == NULL)
+    {
+        return false;
+    }
+    else
+    {
+        display_name_cache = display_name.resolve();
+        *display_name_cache = useSteam;
+        return true;
     }
 }

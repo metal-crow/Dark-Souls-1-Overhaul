@@ -36,6 +36,9 @@ bool Mod::legacy_mode = false;
 // Determines to disable the game's "Low framerate detected" disconnection
 bool Mod::disable_low_fps_disconnect = false;
 
+// If we use steam names or character names for players
+bool Mod::use_steam_names = false;
+
 // Custom game archive files to load instead of the vanilla game files
 std::wstring Mod::custom_game_archive_path;
 
@@ -74,6 +77,8 @@ void Mod::get_init_preferences()
     Mod::get_custom_game_files();
 
     Mod::disable_low_fps_disconnect = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DISABLE_LOW_FPS_DISCONNECT_, (int)Mod::disable_low_fps_disconnect, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+
+    Mod::use_steam_names = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_USE_STEAM_NAMES_, (int)Mod::use_steam_names, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
 }
 
 bool check_hotkeys(void* unused)
