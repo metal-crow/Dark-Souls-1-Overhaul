@@ -1046,6 +1046,8 @@ std::optional<void*> Game::get_host_player_gamedata()
 
 bool Game::set_display_name(bool useSteam)
 {
+    ConsoleWrite("Setting display name setting...");
+
     if (display_name_cache)
     {
         *display_name_cache = useSteam;

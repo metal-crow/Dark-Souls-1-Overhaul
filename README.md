@@ -72,6 +72,8 @@ This will be obsolete eventually.
 * Crash handler and reporter  
 Hope to obsolete this when i make compatable with ModEngine2.
 
+* Option to use steam display names instead of character names.
+
 ### Overhaul
 
 * Gestures can be canceled via rolling
@@ -98,3 +100,6 @@ These include everything EXCEPT: Combustions, Firestorms, and all miracles but L
 * Fix for the halberd instant running attack glitch in mud and pvp
 
 * Backstab distance and angle has been reduced. (60 degrees to 45, 1.5 distance to 1)
+
+* Large scale health increase across the board.  
+Average SL 125 build should be ~3k HP.
