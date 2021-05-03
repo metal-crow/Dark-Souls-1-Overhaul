@@ -89,7 +89,7 @@ uint64_t control_timer_function(uint64_t bar_id, uint64_t orange_bar) {
         //got hit before previous timer went down. partially drop orange bar
         if (gothit == 2) {
             gothit = 1;
-            float new_orange_bar = (float)beforehit_hp / (float)Game::get_player_char_max_hp().value_or(Game::new_hpbar_max);
+            float new_orange_bar = (float)beforehit_hp / (float)Game::get_player_char_max_hp().value_or(Game::current_hpbar_max);
             *((float*)(orange_bar + 0x60)) = new_orange_bar;
             return 1;
         }

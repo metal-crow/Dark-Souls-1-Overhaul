@@ -23,6 +23,7 @@
 // General settings:
 #define _DS1_OVERHAUL_PREF_DISABLE_LOW_FPS_DISCONNECT_ "DisableLowFpsDisconnect"
 #define _DS1_OVERHAUL_PREF_USE_STEAM_NAMES_ "UseSteamNames"
+#define _DS1_OVERHAUL_PREF_FIX_HP_BAR_SIZE_ "FixHpBarSize"
 
 #define _DS1_OVERHAUL_SETTINGS_STRING_BUFF_LEN_ 256  // Length of the string buffer used when obtaining user preference-related string data
 
@@ -64,6 +65,9 @@ public:
 
     // Determines to disable the game's "Framerate insufficient for online play" disconnection
     static bool disable_low_fps_disconnect;
+
+    // If the user wants to use the default broken UI for the HP bar
+    static bool fix_hp_bar_size;
 
     // If we use steam names or character names for players
     static bool use_steam_names;

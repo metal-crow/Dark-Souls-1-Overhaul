@@ -638,17 +638,33 @@ std::optional<float*> Game::get_pc_position() {
     }
 }
 
-float Game::new_hpbar_max = 2633.0;
+float Game::current_hpbar_max = 0;
+const float overhaul_hpbar_max = 5267.0;
+const float corrected_vanilla_hpbar_max = 2633.0;
+const float original_vanilla_hpbar_max = 1900.0;
 static const uint64_t gui_hpbar_value_offset = 0x676ECD;
 
 // Fix the bug where the player HP could be greater than the displayed GUI bar
-void Game::increase_gui_hpbar_max()
+void Game::set_gui_hpbar_max()
 {
-    global::cmd_out << (Mod::output_prefix + "Fixing hp bar.\n");
+    if (!Mod::fix_hp_bar_size)
+    {
+        current_hpbar_max = original_vanilla_hpbar_max;
+    }
+    else if (Mod::fix_hp_bar_size && Mod::legacy_mode)
+    {
+        current_hpbar_max = corrected_vanilla_hpbar_max;
+    }
+    else if (Mod::fix_hp_bar_size && !Mod::legacy_mode)
+    {
+        current_hpbar_max = overhaul_hpbar_max;
+    }
+
+    ConsoleWrite("Setting hp bar to %f", current_hpbar_max);
 
     //Instruction that loads the immediate float (+6 for immediate location in opcode)
     void *write_address = (void*)(Game::ds1_base + gui_hpbar_value_offset);
-    sp::mem::patch_bytes((void*)((uint64_t)write_address+6), (uint8_t*)&new_hpbar_max, 4);
+    sp::mem::patch_bytes((void*)((uint64_t)write_address+6), (uint8_t*)&current_hpbar_max, 4);
 }
 
 

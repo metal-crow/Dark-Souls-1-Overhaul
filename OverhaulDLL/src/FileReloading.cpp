@@ -203,15 +203,7 @@ bool UpdatePlayerStats(void* startTime)
     *baseMaxSp = Calculate_MaxSP_From_End(end);
 
     //update the hp bar so it is scaled correctly
-    if (Mod::legacy_mode == false)
-    {
-        Game::new_hpbar_max = 5267.0; //custom for the current overhaul params
-    }
-    else
-    {
-        Game::new_hpbar_max = 2633.0;
-    }
-    Game::increase_gui_hpbar_max();
+    Game::set_gui_hpbar_max();
 
     free(startTime);
     return false;

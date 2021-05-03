@@ -228,10 +228,10 @@ public:
     // Set available pool of memory that Dark Souls allocates for itself
     static void set_memory_limit();
 
-    static float new_hpbar_max;
+    static float current_hpbar_max;
 
     // Fix the bug where the player HP could be greater than the displayed GUI bar
-    static void increase_gui_hpbar_max();
+    static void set_gui_hpbar_max();
 
     // Gets currently equipped L hand weapon
 	static std::optional<uint32_t> left_hand_weapon();
