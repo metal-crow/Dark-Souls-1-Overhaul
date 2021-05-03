@@ -49,7 +49,7 @@ Enabling Overhaul mode by default is highly recommended, since it dramatically i
 
 * Equipment can again be changed while in any animation
 
-* Bug with HP bar not reflecting the correct amount of health has been fixed
+* Bug with HP bar not reflecting the correct amount of health has been fixed (but can be disabled)
 
 * The game has increased memory capacity (larger files can be loaded)
 
@@ -67,12 +67,12 @@ Specify folder location + filenames to use, and the alternate path will be used 
 * Fix the "broken ankles" bug when rolling
 
 * (Tentatively) compatable with [DSR Watchdog](https://www.nexusmods.com/darksoulsremastered/mods/160). Rename the d3d11.dll file given by watchdog to watchdog.dll, put it in the same folder as DarkSoulsRemastered.exe, and in this mod's d3d11_mod.ini, set `d3d11Chain=watchdog.dll`  
-This will be obsolete eventually.
+This will be obsolete eventually
 
 * Crash handler and reporter  
-Hope to obsolete this when i make compatable with ModEngine2.
+Hope to obsolete this when i make compatable with ModEngine2
 
-* Option to use steam display names instead of character names.
+* Option to use steam display names instead of character names
 
 ### Overhaul
 
