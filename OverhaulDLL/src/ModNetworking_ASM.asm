@@ -237,6 +237,67 @@ jmp     SendRawP2PPacket_injection_return
 
 SendRawP2PPacket_injection ENDP
 
+
+EXTERN ParseRawP2PPacketType_injection_helper: PROC
+EXTERN ParseRawP2PPacketType_injection_return: qword
+
+PUBLIC ParseRawP2PPacketType_injection
+ParseRawP2PPacketType_injection PROC
+
+;original code
+movzx   eax, byte ptr [r15] ;gets the encapsulated packet type
+
+;check if this is our custom packet type
+cmp     eax, 4
+jne     exit
+
+sub     rsp, 10h
+movdqu  [rsp], xmm0
+sub     rsp, 10h
+movdqu  [rsp], xmm1
+sub     rsp, 10h
+movdqu  [rsp], xmm2
+sub     rsp, 10h
+movdqu  [rsp], xmm3
+push    rax
+push    rcx
+push    rdx
+push    r8
+push    r9
+push    r10
+push    r11
+sub     rsp, 28h
+
+mov     rcx, r15 ;start of the packet data
+mov     rdx, qword ptr [rbp-40h] ;sender's steamId
+call    ParseRawP2PPacketType_injection_helper
+
+add     rsp, 28h
+pop     r11
+pop     r10
+pop     r9
+pop     r8
+pop     rdx
+pop     rcx
+pop     rax
+movdqu  xmm3, [rsp]
+add     rsp, 10h
+movdqu  xmm2, [rsp]
+add     rsp, 10h
+movdqu  xmm1, [rsp]
+add     rsp, 10h
+movdqu  xmm0, [rsp]
+add     rsp, 10h
+
+exit:
+;original code
+dec     r14d
+mov     [rsp+0C8h], rsi
+
+jmp     ParseRawP2PPacketType_injection_return
+
+ParseRawP2PPacketType_injection ENDP
+
 _TEXT    ENDS
 
 END

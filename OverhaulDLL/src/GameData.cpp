@@ -18,6 +18,7 @@
 #include "AnimationEdits.h"
 #include "SP/memory/injection/asm/x64.h"
 #include "FileReloading.h"
+#include "ModNetworking.h"
 
 
 /*
@@ -138,6 +139,9 @@ void Game::init()
     sp::mem::code::x64::inject_jmp_14b(write_address, &char_loaded_injection_return, 6, &char_loaded_injection);
     write_address = (uint8_t*)(Game::char_loading_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &char_loading_injection_return, 1, &char_loading_injection);
+
+    //get the frequency of the clock so we can get an accurate timer
+    QueryPerformanceFrequency(&Game::PerformanceFrequency);
 }
 
 static bool character_reload_run = false;
@@ -1081,4 +1085,19 @@ bool Game::set_display_name(bool useSteam)
         *display_name_cache = useSteam;
         return true;
     }
+}
+
+LARGE_INTEGER Game::PerformanceFrequency;
+
+uint64_t Game::get_accurate_time()
+{
+    LARGE_INTEGER time;
+    QueryPerformanceCounter(&time);
+    uint64_t realTime = (uint64_t)(time.QuadPart / Game::PerformanceFrequency.QuadPart);
+    return realTime;
+}
+
+uint64_t Game::get_synced_time()
+{
+    return Game::get_accurate_time() + ModNetworking::timer_offset;
 }

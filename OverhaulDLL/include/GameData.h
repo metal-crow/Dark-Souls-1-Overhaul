@@ -155,6 +155,8 @@ public:
     static const uint64_t char_loaded_injection_offset = 0x24D8D0;
     static const uint64_t char_loading_injection_offset = 0x278FC0;
 
+    static LARGE_INTEGER PerformanceFrequency;
+
     // Player character status (loading, human, co-op, invader, hollow)
     static sp::mem::pointer<int32_t> player_char_status;
 
@@ -286,6 +288,10 @@ public:
 	static std::optional<void*> get_host_player_gamedata();
 
 	static bool set_display_name(bool useSteam);
+
+	static uint64_t get_accurate_time();
+
+	static uint64_t get_synced_time();
 
     /*
      * Help speedup some functions by, whenever we're loaded into an area,
