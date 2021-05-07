@@ -111,12 +111,14 @@ public:
         timePingPacketReceived = 0;
         packetDelay = 0;
         waitingForPingResponse = false;
+        pingResponseReceived = false;
     };
     uint64_t timeOfLastResync;
     uint64_t timePingPacketSent;
     uint64_t timePingPacketReceived;
     uint64_t packetDelay;
     bool waitingForPingResponse;
+    bool pingResponseReceived;
 };
 
 //key: steamid
@@ -177,10 +179,11 @@ bool HostTimerSync(void* unused)
                 {
                     hostTimerSyncronizationData[SteamId].timePingPacketSent = Game::get_accurate_time();
                     hostTimerSyncronizationData[SteamId].waitingForPingResponse = true;
+                    hostTimerSyncronizationData[SteamId].pingResponseReceived = false;
                 }
             }
             // Using the ping packet data, send our the guest's corrected clock
-            else
+            else if (hostTimerSyncronizationData[SteamId].waitingForPingResponse && hostTimerSyncronizationData[SteamId].pingResponseReceived)
             {
                 // compute the 1 way latency
                 uint64_t ping = (hostTimerSyncronizationData[SteamId].timePingPacketReceived - hostTimerSyncronizationData[SteamId].timePingPacketSent);
@@ -207,6 +210,7 @@ bool HostTimerSync(void* unused)
                     //update our sync time with this guest
                     hostTimerSyncronizationData[SteamId].timeOfLastResync = Game::get_accurate_time();
                     hostTimerSyncronizationData[SteamId].waitingForPingResponse = false;
+                    hostTimerSyncronizationData[SteamId].pingResponseReceived = false;
                 }
             }
         }
@@ -231,6 +235,7 @@ void ParseRawP2PPacketType_injection_helper(uint8_t* data, uint64_t steamId_remo
     if (session_action_result == TryToCreateSession || session_action_result == CreateSessionSuccess)
     {
         hostTimerSyncronizationData[steamId_remote].timePingPacketReceived = Game::get_accurate_time();
+        hostTimerSyncronizationData[steamId_remote].pingResponseReceived = true;
     }
 
     // If we're the guest, handle the clock packets
