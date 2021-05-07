@@ -228,7 +228,7 @@ void ParseRawP2PPacketType_injection_helper(uint8_t* data, uint64_t steamId_remo
     }
 
     // If we're the guest, handle the clock packets
-    else
+    else if (session_action_result == TryToJoinSession || session_action_result == JoinSessionSuccess)
     {
         // Host is computing the delay. Just resend the packet back to them
         if (data[1] == TimestampSyncPacketTypes::DelayCalc)
