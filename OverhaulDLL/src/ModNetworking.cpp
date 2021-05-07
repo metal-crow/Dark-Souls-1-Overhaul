@@ -134,52 +134,56 @@ bool HostTimerSync(void* unused)
         }
     }
 
-    //get the session members
-    auto steamsessionlight_o = Game::get_SessionManagerImp_SteamSessionLight();
-    if (!steamsessionlight_o.has_value())
+    //only do anything if we're in non-legacy mode
+    if (!Mod::legacy_mode)
     {
-        ConsoleWrite("Unable to get_SessionManagerImp_SteamSessionLight in %s", __FUNCTION__);
-        return true;
-    }
-    uint64_t steamsessionlight = (uint64_t)steamsessionlight_o.value();
-    uint64_t SessionMembersStart = *(uint64_t*)(steamsessionlight + 8 + 0x68);
-    uint64_t SessionMembersEnd = *(uint64_t*)(steamsessionlight + 8 + 0x70);
-
-    while (SessionMembersStart != SessionMembersEnd)
-    {
-        uint64_t SteamSessionMemberLight = *(uint64_t*)SessionMembersStart;
-        uint64_t SteamId = *(uint64_t*)(SteamSessionMemberLight + 0xc8);
-
-        // If this is a new guest, start tracking them
-        if (hostTimerSyncronizationData.count(SteamId) == 0)
+        //get the session members
+        auto steamsessionlight_o = Game::get_SessionManagerImp_SteamSessionLight();
+        if (!steamsessionlight_o.has_value())
         {
-            hostTimerSyncronizationData.emplace(SteamId, TimerClientInfo());
+            ConsoleWrite("Unable to get_SessionManagerImp_SteamSessionLight in %s", __FUNCTION__);
+            return true;
         }
+        uint64_t steamsessionlight = (uint64_t)steamsessionlight_o.value();
+        uint64_t SessionMembersStart = *(uint64_t*)(steamsessionlight + 8 + 0x68);
+        uint64_t SessionMembersEnd = *(uint64_t*)(steamsessionlight + 8 + 0x70);
 
-        // If it's time to resync with this guest, do so
-        if ((Game::get_accurate_time() - hostTimerSyncronizationData[SteamId].timeOfLastResync) > ResyncPeriodMS)
+        while (SessionMembersStart != SessionMembersEnd)
         {
-            // Send the ping packet out to compute the latency
-            if (!hostTimerSyncronizationData[SteamId].waitingForPingResponse)
-            {
-                uint8_t resyncbuf[] = {
-                    (4 | (1 << 4)), //custom clock sync packet type, TCP
-                    (uint8_t)TimestampSyncPacketTypes::DelayCalc, //type of clock sync packet
-                };
+            uint64_t SteamSessionMemberLight = *(uint64_t*)SessionMembersStart;
+            uint64_t SteamId = *(uint64_t*)(SteamSessionMemberLight + 0xc8);
 
-                void* SteamInternal = (*SteamInternal_ContextInit)(Init_SteamInternal_FUNCPTR);
-                uint64_t SteamNetworking = *(uint64_t*)((uint64_t)SteamInternal + 0x40);
-                SteamInternal_SteamNetworkingSend_FUNC* SteamNetworkingSend = (SteamInternal_SteamNetworkingSend_FUNC*)**(uint64_t**)SteamNetworking;
-                bool success = SteamNetworkingSend((void*)SteamNetworking, SteamId, resyncbuf, sizeof(resyncbuf), 2, 0);
-                if (success) //if this fails to send retry from beginning
+            // If this is a new guest, start tracking them
+            if (hostTimerSyncronizationData.count(SteamId) == 0)
+            {
+                hostTimerSyncronizationData.emplace(SteamId, TimerClientInfo());
+            }
+
+            // If it's time to resync with this guest, do so
+            if ((Game::get_accurate_time() - hostTimerSyncronizationData[SteamId].timeOfLastResync) > ResyncPeriodMS)
+            {
+                // Send the ping packet out to compute the latency
+                if (!hostTimerSyncronizationData[SteamId].waitingForPingResponse)
                 {
-                    hostTimerSyncronizationData[SteamId].timePingPacketSent = Game::get_accurate_time();
-                    hostTimerSyncronizationData[SteamId].waitingForPingResponse = true;
+                    uint8_t resyncbuf[] = {
+                        (4 | (1 << 4)), //custom clock sync packet type, TCP
+                        (uint8_t)TimestampSyncPacketTypes::DelayCalc, //type of clock sync packet
+                    };
+
+                    void* SteamInternal = (*SteamInternal_ContextInit)(Init_SteamInternal_FUNCPTR);
+                    uint64_t SteamNetworking = *(uint64_t*)((uint64_t)SteamInternal + 0x40);
+                    SteamInternal_SteamNetworkingSend_FUNC* SteamNetworkingSend = (SteamInternal_SteamNetworkingSend_FUNC*)**(uint64_t**)SteamNetworking;
+                    bool success = SteamNetworkingSend((void*)SteamNetworking, SteamId, resyncbuf, sizeof(resyncbuf), 2, 0);
+                    if (success) //if this fails to send retry from beginning
+                    {
+                        hostTimerSyncronizationData[SteamId].timePingPacketSent = Game::get_accurate_time();
+                        hostTimerSyncronizationData[SteamId].waitingForPingResponse = true;
+                    }
                 }
             }
-        }
 
-        SessionMembersStart += 8;
+            SessionMembersStart += 8;
+        }
     }
 
     return true;
@@ -187,6 +191,11 @@ bool HostTimerSync(void* unused)
 
 void ParseRawP2PPacketType_injection_helper(uint8_t* data, uint64_t steamId_remote)
 {
+    if (Mod::legacy_mode)
+    {
+        return;
+    }
+
     auto session_action_o = Game::get_SessionManagerImp_session_action_result();
     if (!session_action_o.has_value())
     {
