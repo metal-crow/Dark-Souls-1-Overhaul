@@ -108,23 +108,19 @@ public:
     {
         timeOfLastResync = 0;
         timePingPacketSent = 0;
-        timePingPacketReceived = 0;
         packetDelay = 0;
         waitingForPingResponse = false;
-        pingResponseReceived = false;
     };
     uint64_t timeOfLastResync;
     uint64_t timePingPacketSent;
-    uint64_t timePingPacketReceived;
     uint64_t packetDelay;
     bool waitingForPingResponse;
-    bool pingResponseReceived;
 };
 
 //key: steamid
 std::unordered_map<uint64_t, TimerClientInfo> hostTimerSyncronizationData;
 
-// Handle resyncing all the guests to the correct time as needed
+// Handle sending out the delay calculation packets as needed
 bool HostTimerSync(void* unused)
 {
     //exit this once we're no longer hosting
@@ -138,13 +134,13 @@ bool HostTimerSync(void* unused)
         }
     }
 
+    //get the session members
     auto steamsessionlight_o = Game::get_SessionManagerImp_SteamSessionLight();
     if (!steamsessionlight_o.has_value())
     {
         ConsoleWrite("Unable to get_SessionManagerImp_SteamSessionLight in %s", __FUNCTION__);
         return true;
     }
-
     uint64_t steamsessionlight = (uint64_t)steamsessionlight_o.value();
     uint64_t SessionMembersStart = *(uint64_t*)(steamsessionlight + 8 + 0x68);
     uint64_t SessionMembersEnd = *(uint64_t*)(steamsessionlight + 8 + 0x70);
@@ -163,7 +159,7 @@ bool HostTimerSync(void* unused)
         // If it's time to resync with this guest, do so
         if ((Game::get_accurate_time() - hostTimerSyncronizationData[SteamId].timeOfLastResync) > ResyncPeriodMS)
         {
-            // Send the first ping packet out to compute the latency
+            // Send the ping packet out to compute the latency
             if (!hostTimerSyncronizationData[SteamId].waitingForPingResponse)
             {
                 uint8_t resyncbuf[] = {
@@ -179,38 +175,6 @@ bool HostTimerSync(void* unused)
                 {
                     hostTimerSyncronizationData[SteamId].timePingPacketSent = Game::get_accurate_time();
                     hostTimerSyncronizationData[SteamId].waitingForPingResponse = true;
-                    hostTimerSyncronizationData[SteamId].pingResponseReceived = false;
-                }
-            }
-            // Using the ping packet data, send our the guest's corrected clock
-            else if (hostTimerSyncronizationData[SteamId].waitingForPingResponse && hostTimerSyncronizationData[SteamId].pingResponseReceived)
-            {
-                // compute the 1 way latency
-                uint64_t ping = (hostTimerSyncronizationData[SteamId].timePingPacketReceived - hostTimerSyncronizationData[SteamId].timePingPacketSent);
-                hostTimerSyncronizationData[SteamId].packetDelay = ping/2;
-                // sanity check the computed latency
-                if (ping > 10 * 1000)
-                {
-                    ConsoleWrite("Host computed ping value of realllly high (%d). Ignoring.", ping);
-                }
-                else
-                {
-                    // Send the time the guest clock should be, accounting for latency
-                    uint8_t updatebuf[10] = {
-                        (4 | (1 << 4)), //custom clock sync packet type, TCP
-                        (uint8_t)TimestampSyncPacketTypes::UpdateTime, //type of clock sync packet
-                    };
-                    *(uint64_t*)(updatebuf + 2) = Game::get_accurate_time() + hostTimerSyncronizationData[SteamId].packetDelay;
-
-                    void* SteamInternal = (*SteamInternal_ContextInit)(Init_SteamInternal_FUNCPTR);
-                    uint64_t SteamNetworking = *(uint64_t*)((uint64_t)SteamInternal + 0x40);
-                    SteamInternal_SteamNetworkingSend_FUNC* SteamNetworkingSend = (SteamInternal_SteamNetworkingSend_FUNC*)**(uint64_t**)SteamNetworking;
-                    SteamNetworkingSend((void*)SteamNetworking, SteamId, updatebuf, sizeof(updatebuf), 2, 0); //if this fails to send we'll just resend in 15 sec anyway
-
-                    //update our sync time with this guest
-                    hostTimerSyncronizationData[SteamId].timeOfLastResync = Game::get_accurate_time();
-                    hostTimerSyncronizationData[SteamId].waitingForPingResponse = false;
-                    hostTimerSyncronizationData[SteamId].pingResponseReceived = false;
                 }
             }
         }
@@ -231,11 +195,36 @@ void ParseRawP2PPacketType_injection_helper(uint8_t* data, uint64_t steamId_remo
     }
     auto session_action_result = session_action_o.value();
 
-    // If we're the host, save the ping packet response
+    // If we're the host, save the ping packet response and immediately do the reply
     if (session_action_result == TryToCreateSession || session_action_result == CreateSessionSuccess)
     {
-        hostTimerSyncronizationData[steamId_remote].timePingPacketReceived = Game::get_accurate_time();
-        hostTimerSyncronizationData[steamId_remote].pingResponseReceived = true;
+        // Using the ping packet data, send out the guest's corrected clock
+        // compute the 1 way latency
+        uint64_t ping = (Game::get_accurate_time() - hostTimerSyncronizationData[steamId_remote].timePingPacketSent);
+        hostTimerSyncronizationData[steamId_remote].packetDelay = ping / 2;
+        // sanity check the computed latency
+        if (ping > 10 * 1000)
+        {
+            ConsoleWrite("Host computed ping value of realllly high (%d). Ignoring.", ping);
+        }
+        else
+        {
+            // Send the time the guest clock should be, accounting for latency
+            uint8_t updatebuf[10] = {
+                (4 | (1 << 4)), //custom clock sync packet type, TCP
+                (uint8_t)TimestampSyncPacketTypes::UpdateTime, //type of clock sync packet
+            };
+            *(uint64_t*)(updatebuf + 2) = Game::get_accurate_time() + hostTimerSyncronizationData[steamId_remote].packetDelay;
+
+            void* SteamInternal = (*SteamInternal_ContextInit)(Init_SteamInternal_FUNCPTR);
+            uint64_t SteamNetworking = *(uint64_t*)((uint64_t)SteamInternal + 0x40);
+            SteamInternal_SteamNetworkingSend_FUNC* SteamNetworkingSend = (SteamInternal_SteamNetworkingSend_FUNC*)**(uint64_t**)SteamNetworking;
+            SteamNetworkingSend((void*)SteamNetworking, steamId_remote, updatebuf, sizeof(updatebuf), 2, 0); //if this fails to send we'll just resend in 15 sec anyway
+
+            //update our sync time with this guest
+            hostTimerSyncronizationData[steamId_remote].timeOfLastResync = Game::get_accurate_time();
+            hostTimerSyncronizationData[steamId_remote].waitingForPingResponse = false;
+        }
     }
 
     // If we're the guest, handle the clock packets
