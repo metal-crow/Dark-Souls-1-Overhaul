@@ -33,7 +33,7 @@ private:
     // Enables gesture cancelling via rolling
     static void enable_gesture_cancelling();
 
-    static void alter_animation_speeds();
+    static void alter_animation_parameters();
 
     static void disable_whiff_animations();
 

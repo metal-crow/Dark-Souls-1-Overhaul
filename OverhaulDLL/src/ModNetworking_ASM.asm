@@ -298,6 +298,104 @@ jmp     ParseRawP2PPacketType_injection_return
 
 ParseRawP2PPacketType_injection ENDP
 
+
+EXTERN type1_32byte_p2pPacket_parse_rollback_injection_helper: PROC
+EXTERN type1_32byte_p2pPacket_parse_rollback_injection_return: qword
+
+PUBLIC type1_32byte_p2pPacket_parse_rollback_injection
+type1_32byte_p2pPacket_parse_rollback_injection PROC
+
+;original code will be handled in the helper
+
+sub     rsp, 10h
+movdqu  [rsp], xmm0
+sub     rsp, 10h
+movdqu  [rsp], xmm1
+sub     rsp, 10h
+movdqu  [rsp], xmm2
+sub     rsp, 10h
+movdqu  [rsp], xmm3
+push    rcx
+push    rdx
+push    r8
+push    r9
+push    r10
+push    r11
+sub     rsp, 20h
+
+call    type1_32byte_p2pPacket_parse_rollback_injection_helper
+
+add     rsp, 20h
+pop     r11
+pop     r10
+pop     r9
+pop     r8
+pop     rdx
+pop     rcx
+movdqu  xmm3, [rsp]
+add     rsp, 10h
+movdqu  xmm2, [rsp]
+add     rsp, 10h
+movdqu  xmm1, [rsp]
+add     rsp, 10h
+movdqu  xmm0, [rsp]
+add     rsp, 10h
+
+;original code
+test    eax, eax
+
+jmp     type1_32byte_p2pPacket_parse_rollback_injection_return
+
+type1_32byte_p2pPacket_parse_rollback_injection ENDP
+
+EXTERN type1_40byte_p2pPacket_parse_rollback_injection_helper: PROC
+EXTERN type1_40byte_p2pPacket_parse_rollback_injection_return: qword
+
+PUBLIC type1_40byte_p2pPacket_parse_rollback_injection
+type1_40byte_p2pPacket_parse_rollback_injection PROC
+
+;original code
+lea     rdx, [rbx+30h]
+;rest of original code will be handled in the helper
+
+sub     rsp, 10h
+movdqu  [rsp], xmm0
+sub     rsp, 10h
+movdqu  [rsp], xmm1
+sub     rsp, 10h
+movdqu  [rsp], xmm2
+sub     rsp, 10h
+movdqu  [rsp], xmm3
+push    rcx
+push    rdx
+push    r8
+push    r9
+push    r10
+push    r11
+sub     rsp, 20h
+
+call    type1_40byte_p2pPacket_parse_rollback_injection_helper
+
+add     rsp, 20h
+pop     r11
+pop     r10
+pop     r9
+pop     r8
+pop     rdx
+pop     rcx
+movdqu  xmm3, [rsp]
+add     rsp, 10h
+movdqu  xmm2, [rsp]
+add     rsp, 10h
+movdqu  xmm1, [rsp]
+add     rsp, 10h
+movdqu  xmm0, [rsp]
+add     rsp, 10h
+
+jmp     type1_40byte_p2pPacket_parse_rollback_injection_return
+
+type1_40byte_p2pPacket_parse_rollback_injection ENDP
+
 _TEXT    ENDS
 
 END

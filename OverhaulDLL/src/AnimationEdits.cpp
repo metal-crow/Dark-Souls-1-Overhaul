@@ -12,14 +12,18 @@
 #include <unordered_map>
 #include <set>
 #include "MainLoop.h"
+#include "ModNetworking.h"
 
 void AnimationEdits::start()
 {
-    AnimationEdits::alter_animation_speeds();
+    AnimationEdits::alter_animation_parameters();
     AnimationEdits::disable_whiff_animations();
     AnimationEdits::fix_curvedsword_infinites();
 }
 
+/*
+ * ========== ADJUST ANIMATION SPEEDS
+ */
 
 // key - animation id
 // value - new speed ratio (Any large number ~>10 does a frame 1 skip), and point to start speed ajustment in seconds
@@ -44,9 +48,9 @@ extern "C" {
     void read_body_aid_injection_helper_function(int32_t*, float*);
 }
 
-void AnimationEdits::alter_animation_speeds()
+void AnimationEdits::alter_animation_parameters()
 {
-    global::cmd_out << Mod::output_prefix << ("Enabling animation speed alteration injection...\n");
+    global::cmd_out << Mod::output_prefix << ("Enabling animation parameter alteration injection...\n");
 
     uint8_t *write_address = (uint8_t*)(AnimationEdits::animation_entry_set_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &animation_entry_set_return, 1, &animation_entry_set_injection);
@@ -91,6 +95,10 @@ void read_body_aid_injection_helper_function(int32_t* animation_id, float* speed
     if (Mod::legacy_mode) {
         return;
     }
+
+    //Set the current offset time for this animation to what the rollback netcode specifies 
+    //have to check this is the correct player and animation for this offset
+
 
     //Since we set animation speed at the table entry level, when it gets unset the speed is automatically reset. No cleanup needed
     auto ajust_aid = ANIMATIONS_TO_AJUST_SPEED_RATIO.find(*animation_id);
@@ -150,6 +158,10 @@ void read_body_aid_injection_helper_function(int32_t* animation_id, float* speed
     }
 }
 
+/*
+ * ========== DISABLE WHIFF ANIMATIONS
+ */
+
 extern "C" {
     uint64_t disable_whiff_animations_injection_return;
     void disable_whiff_animations_injection();
@@ -178,6 +190,10 @@ extern "C" {
     void TAE_GetDamageRate_StunLen_finish_injection();
     float TAE_GetDamageRate_StunLen_finish_helper_function(float);
 }
+
+/*
+ * ========== FIX CURVED SWORD INFINTITES
+ */
 
 void AnimationEdits::fix_curvedsword_infinites() {
     global::cmd_out << Mod::output_prefix << ("Fix curved swords stun time...\n");
