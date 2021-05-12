@@ -11,6 +11,7 @@
 #define DS1_OVERHAUL_ANIMATION_EDITS_H_
 
 #include <cstdint>
+#include <unordered_map>
 
 typedef struct {
     int32_t animation_id;
@@ -21,6 +22,14 @@ typedef struct {
     uint32_t count;
 } AnimationEntry;
 
+typedef struct
+{
+    void* animationMediatorPtr;
+    uint16_t animationState;
+    uint64_t timeAnimationTriggered;
+    uint32_t frameStart;
+} SetAnimationTimeOffsetArg;
+
 class AnimationEdits
 {
 public:
@@ -28,6 +37,10 @@ public:
     const static uint32_t gesture_anim_ids[15];
 
     static void start();
+
+    static std::unordered_map<uint16_t, AnimationStateTypesEnum> STATEIDS_TO_ROLLBACK;
+
+    static bool SetAnimationTimeOffset(void * time_offset_arg);
 
 private:
     // Enables gesture cancelling via rolling

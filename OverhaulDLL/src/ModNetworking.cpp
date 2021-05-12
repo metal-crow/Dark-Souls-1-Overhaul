@@ -2,6 +2,7 @@
 #include "SP/memory/injection/asm/x64.h"
 #include "DarkSoulsOverhaulMod.h"
 #include "MainLoop.h"
+#include "AnimationEdits.h"
 
 bool ModNetworking::allow_connect_with_non_mod_host = false;
 bool ModNetworking::allow_connect_with_legacy_mod_host = false;
@@ -23,6 +24,15 @@ typedef void* SteamInternal_ContextInit_FUNC(uint64_t Init_SteamInternal_FUNCPTR
 SteamInternal_ContextInit_FUNC** SteamInternal_ContextInit = (SteamInternal_ContextInit_FUNC**)0x1420B6738; //the address of the location for the imported function address
 uint64_t Init_SteamInternal_FUNCPTR = 0x141AC1020;
 typedef void* SteamInternal_SteamNetworkingSend_FUNC(void* SteamNetworking, uint64_t steamid, const uint8_t* packet_data, uint32_t packet_len, uint32_t eP2PSendType, uint32_t nChannel);
+
+typedef uint64_t getNetMessage_Typedef(void* session_man, void* player, uint32_t type, byte *store_data_here, uint32_t max_message_size);
+getNetMessage_Typedef* getNetMessage = (getNetMessage_Typedef*)0x140509560;
+
+typedef uint64_t getPlayerInsForConnectedPlayerData_Typedef(void *worldchrman, void *player);
+getPlayerInsForConnectedPlayerData_Typedef* getPlayerInsForConnectedPlayerData = (getPlayerInsForConnectedPlayerData_Typedef*)0x140372710;
+
+typedef uint64_t getSteamIDForConnectedPlayerData_Typedef(void *player);
+getSteamIDForConnectedPlayerData_Typedef* getSteamIDForConnectedPlayerData = (getSteamIDForConnectedPlayerData_Typedef*)0x141062d40;
 
 extern "C" {
     uint64_t sendPacket_injection_return;
@@ -185,6 +195,7 @@ bool HostTimerSync(void* unused)
     return true;
 }
 
+// Handle receiving the clock sync packets
 void ParseRawP2PPacketType_injection_helper(uint8_t* data, uint64_t steamId_remote)
 {
     if (Mod::legacy_mode)
@@ -262,47 +273,67 @@ void ParseRawP2PPacketType_injection_helper(uint8_t* data, uint64_t steamId_remo
     }
 }
 
+// Handle including the rollback data in the type1 packet sending
+void type1_p2pPacket_send_rollback_injection_helper()
+{
 
-typedef uint64_t getNetMessage_Typedef(void* session_man, void* player,uint32_t type, byte *store_data_here, uint32_t max_message_size);
-getNetMessage_Typedef* getNetMessage = (getNetMessage_Typedef*)0x140509560;
+}
 
-typedef uint64_t getSteamIDForConnectedPlayerData_Typedef(void *player);
-getSteamIDForConnectedPlayerData_Typedef* getSteamIDForConnectedPlayerData = (getSteamIDForConnectedPlayerData_Typedef*)0x141062d40;
-
-uint64_t type1_32byte_p2pPacket_parse_rollback_injection_helper(void* session_man, void* player, uint32_t type, byte *store_data_here)
+// Handle parsing and getting the rollback data from the type1 packet for the animation
+uint64_t type1_p2pPacket_parse_rollback_injection_helper(void* session_man, void* player, uint32_t type, byte *store_data_here, uint32_t size)
 {
     uint64_t gotbytes;
 
     //do the original code if we're in legacy
     if (Mod::legacy_mode)
     {
-        gotbytes = getNetMessage(session_man, player, type, store_data_here, 32);
+        gotbytes = getNetMessage(session_man, player, type, store_data_here, size);
         return gotbytes;
     }
 
-    gotbytes = getNetMessage(session_man, player, type, store_data_here, 32+8);
-    uint64_t steamId = getSteamIDForConnectedPlayerData(player);
-    ModNetworking::hostTimerSyncronizationData[steamId].timeAnimationTriggered = *(uint64_t*)(store_data_here + 32);
-    ModNetworking::hostTimerSyncronizationData[steamId].animationToUpdate = *(uint32_t*)(store_data_here + 12);
+    //get the data for this animation
+    gotbytes = getNetMessage(session_man, player, type, store_data_here, size + 8);
+    uint64_t timeAnimationTriggered = *(uint64_t*)(store_data_here + size);
+    uint32_t animationToUpdate = *(uint32_t*)(store_data_here + 12);
+
+    //check if this is the starting packet for this animation, and discard if not
+    uint8_t counter = (animationToUpdate >> 28);
+    uint64_t SteamId = getSteamIDForConnectedPlayerData(player);
+    if (counter == ModNetworking::hostTimerSyncronizationData[SteamId].lastAidCount)
+    {
+        return gotbytes;
+    }
+    ModNetworking::hostTimerSyncronizationData[SteamId].lastAidCount = counter;
+
+    //check if this is an animation state we care about
+    uint16_t animState = (uint16_t)(animationToUpdate & 0xffff);
+    if (AnimationEdits::STATEIDS_TO_ROLLBACK.count(animState) == 0)
+    {
+        return gotbytes;
+    }
+
+    //get a pointer to the animation mediator for this player
+    uint64_t playerins = getPlayerInsForConnectedPlayerData(*(void**)Game::world_chr_man_imp, player);
+    void* animationMediator = Game::get_PlayerIns_EzStateMachineImpl(playerins);
+
+    //pass data to the callback
+    SetAnimationTimeOffsetArg* animTimeArg = (SetAnimationTimeOffsetArg*)malloc(sizeof(SetAnimationTimeOffsetArg));
+    animTimeArg->animationState = animState;
+    animTimeArg->timeAnimationTriggered = timeAnimationTriggered;
+    animTimeArg->animationMediatorPtr = animationMediator;
+    animTimeArg->frameStart = Game::get_frame_count();
+    MainLoop::setup_mainloop_callback(AnimationEdits::SetAnimationTimeOffset, animTimeArg, "SetAnimationTimeOffset");
+
     return gotbytes;
 }
 
+uint64_t type1_32byte_p2pPacket_parse_rollback_injection_helper(void* session_man, void* player, uint32_t type, byte *store_data_here)
+{
+    type1_p2pPacket_parse_rollback_injection_helper(session_man, player, type, store_data_here, 32);
+}
 uint64_t type1_40byte_p2pPacket_parse_rollback_injection_helper(void* session_man, void* player, uint32_t type, byte *store_data_here)
 {
-    uint64_t gotbytes;
-
-    //do the original code if we're in legacy
-    if (Mod::legacy_mode)
-    {
-        gotbytes = getNetMessage(session_man, player, type, store_data_here, 40);
-        return gotbytes;
-    }
-
-    gotbytes = getNetMessage(session_man, player, type, store_data_here, 40+8);
-    uint64_t steamId = getSteamIDForConnectedPlayerData(player);
-    ModNetworking::hostTimerSyncronizationData[steamId].timeAnimationTriggered = *(uint64_t*)(store_data_here + 40);
-    ModNetworking::hostTimerSyncronizationData[steamId].animationToUpdate = *(uint32_t*)(store_data_here + 12);
-    return gotbytes;
+    type1_p2pPacket_parse_rollback_injection_helper(session_man, player, type, store_data_here, 40);
 }
 
 

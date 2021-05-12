@@ -209,7 +209,7 @@ public:
 
     static std::optional<void*> get_player_animationMediator();
 
-    static std::optional<int32_t> get_animation_mediator_state_animation(void* animationMediator, AnimationStateTypesEnum state_id);
+    static int32_t get_animation_mediator_state_animation(void* animationMediator, AnimationStateTypesEnum state_id);
 
     static void set_animation_mediator_state_entry(void* animationMediator, AnimationStateTypesEnum state_id, int32_t new_aid, float new_progressTime);
 
@@ -268,6 +268,8 @@ public:
     static uint32_t get_last_attack_weapon_id();
 
 	static std::optional<void*> get_pc_ActiveState_EzStateMachineImpl();
+
+	static void* get_PlayerIns_EzStateMachineImpl(uint64_t playerIns);
 
 	static std::optional<uint64_t> get_EzStateMachineImpl_curstate_id(void * EzStateMachineImpl);
 

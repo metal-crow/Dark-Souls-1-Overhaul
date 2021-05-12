@@ -576,7 +576,7 @@ std::optional<void*> Game::get_player_animationMediator()
     }
 }
 
-std::optional<int32_t> Game::get_animation_mediator_state_animation(void* animationMediator, AnimationStateTypesEnum state_id) {
+int32_t Game::get_animation_mediator_state_animation(void* animationMediator, AnimationStateTypesEnum state_id) {
     void* state_entry = (void*)((uint64_t)animationMediator + 168 * state_id);
     return *(int32_t*)((uint64_t)state_entry + 0);
 }
@@ -830,6 +830,7 @@ std::optional<uint32_t> Game::get_pc_playernum() {
     }
 }
 
+// returns PlayerIns
 std::optional<uint64_t> Game::get_connected_player(uint32_t i) {
     //go to the given index in the connectedPlayers_ChrSlotArray, grab the first value (pointer to PlayerIns) and return it
     if (connected_players_array_cache) {
@@ -915,6 +916,21 @@ std::optional<void*> Game::get_pc_ActiveState_EzStateMachineImpl() {
         return *pc_EzStateMachineImpl_cache;
     }
 }
+
+void* Game::get_PlayerIns_EzStateMachineImpl(uint64_t playerIns)
+{
+    //PlayerIns -> ChrIns -> PlayerCtrl -> ChrCtrl -> ActionCtrl -> ActiveState -> EzStateMachineImpl
+    sp::mem::pointer EzStateMachineImpl = sp::mem::pointer<void*>((void*)(playerIns + 8 + 0x60), { 0x48, 0x30 + (0x20 * 1) });
+    if (EzStateMachineImpl.resolve() == NULL)
+    {
+        return NULL;
+    }
+    else
+    {
+        return *EzStateMachineImpl.resolve();
+    }
+}
+
 
 std::optional<uint64_t> Game::get_EzStateMachineImpl_curstate_id(void* EzStateMachineImpl) {
     void* ezstate_state = *(void**)((uint64_t)EzStateMachineImpl + 0x20);

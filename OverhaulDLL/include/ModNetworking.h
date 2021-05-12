@@ -15,17 +15,14 @@ public:
         timePingPacketSent = 0;
         packetDelay = 0;
         waitingForPingResponse = false;
-        animationToUpdate = 0;
-        timeAnimationTriggered = 0;
+        lastAidCount = 0xff;
     };
     uint64_t timeOfLastResync;
     uint64_t timePingPacketSent;
     uint64_t packetDelay;
     bool waitingForPingResponse;
-
-    //data for the animation rollback itself
-    uint32_t animationToUpdate;
-    uint64_t timeAnimationTriggered;
+    //state indicator for what animation we've received (the most sig 3 bits in the type1 packet)
+    uint8_t lastAidCount;
 };
 
 class ModNetworking

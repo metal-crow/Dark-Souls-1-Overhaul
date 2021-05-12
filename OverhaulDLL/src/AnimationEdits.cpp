@@ -9,7 +9,6 @@
 #include "AnimationEdits.h"
 #include "DarkSoulsOverhaulMod.h"
 #include "SP/memory/injection/asm/x64.h"
-#include <unordered_map>
 #include <set>
 #include "MainLoop.h"
 #include "ModNetworking.h"
@@ -22,7 +21,7 @@ void AnimationEdits::start()
 }
 
 /*
- * ========== ADJUST ANIMATION SPEEDS
+ * ========== ADJUST ANIMATION PARAMETERS
  */
 
 // key - animation id
@@ -41,6 +40,43 @@ static const std::unordered_map<int32_t, std::tuple<float, float>> ANIMATIONS_TO
     { 9000, {1.25f, 3.0f}}, { 9420, {1.25f, 3.0f}},  //getting backstabbed (total times 5.9 and 5.766667)
 };
 
+std::unordered_map<uint16_t, AnimationStateTypesEnum> AnimationEdits::STATEIDS_TO_ROLLBACK = {
+    //dodges
+    {32, Upper_SpecialAttack},
+    {33, Upper_SpecialAttack},
+    {34, Upper_SpecialAttack},
+    {35, Upper_SpecialAttack},
+    {36, Upper_SpecialAttack},
+    {38, Upper_SpecialAttack},
+    {94, Upper_SpecialAttack},
+    {95, Upper_SpecialAttack},
+    {96, Upper_SpecialAttack},
+    {97, Upper_SpecialAttack},
+    {98, Upper_SpecialAttack},
+    {100, Upper_SpecialAttack},
+    //weapon attacks
+    {41, Upper_SpecialAttack},
+    {45, Upper_SpecialAttack},
+    {46, Upper_SpecialAttack},
+    {48, Upper_SpecialAttack},
+    {49, Upper_SpecialAttack},
+    {53, Upper_SpecialAttack},
+    {55, Upper_SpecialAttack},
+    {59, Upper_SpecialAttack},
+    {60, Upper_SpecialAttack},
+    {89, Upper_SpecialAttack},
+    {90, Upper_SpecialAttack},
+    {103, Upper_SpecialAttack},
+    {107, Upper_SpecialAttack},
+    {109, Upper_SpecialAttack},
+    {110, Upper_SpecialAttack},
+    {113, Upper_SpecialAttack},
+    {115, Upper_SpecialAttack},
+    {116, Upper_SpecialAttack},
+    {86, Upper_SpecialAttack}, //Left Hand Special Move
+    //spell attacks
+};
+
 
 extern "C" {
     uint64_t animation_entry_set_return;
@@ -54,6 +90,29 @@ void AnimationEdits::alter_animation_parameters()
 
     uint8_t *write_address = (uint8_t*)(AnimationEdits::animation_entry_set_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &animation_entry_set_return, 1, &animation_entry_set_injection);
+}
+
+bool AnimationEdits::SetAnimationTimeOffset(void* time_offset_arg)
+{
+    SetAnimationTimeOffsetArg* time_offset = (SetAnimationTimeOffsetArg*)time_offset_arg;
+
+    //wait a frame for the animation to be loaded in
+    if (time_offset->frameStart <= Game::get_frame_count())
+    {
+        return true;
+    }
+
+    //check the animation mediator passed and check for the given animation id
+    int32_t animId = Game::get_animation_mediator_state_animation(time_offset->animationMediatorPtr, AnimationEdits::STATEIDS_TO_ROLLBACK[time_offset->animationState]);
+
+    //if found, set it's new offset and exit
+    float startingOffset = Game::get_accurate_time() - time_offset->timeAnimationTriggered;
+    ConsoleWrite("Set animId=%d to offset=%f", animId, startingOffset);
+
+    Game::set_animation_mediator_state_entry(time_offset->animationMediatorPtr, AnimationEdits::STATEIDS_TO_ROLLBACK[time_offset->animationState], animId, startingOffset);
+
+    free(time_offset_arg);
+    return false;
 }
 
 typedef struct SpeedAlterStruct_ {
@@ -95,10 +154,6 @@ void read_body_aid_injection_helper_function(int32_t* animation_id, float* speed
     if (Mod::legacy_mode) {
         return;
     }
-
-    //Set the current offset time for this animation to what the rollback netcode specifies 
-    //have to check this is the correct player and animation for this offset
-
 
     //Since we set animation speed at the table entry level, when it gets unset the speed is automatically reset. No cleanup needed
     auto ajust_aid = ANIMATIONS_TO_AJUST_SPEED_RATIO.find(*animation_id);
