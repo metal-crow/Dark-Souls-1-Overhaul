@@ -155,8 +155,6 @@ public:
     static const uint64_t char_loaded_injection_offset = 0x24D8D0;
     static const uint64_t char_loading_injection_offset = 0x278FC0;
 
-    static LARGE_INTEGER PerformanceFrequency;
-
     // Player character status (loading, human, co-op, invader, hollow)
     static sp::mem::pointer<int32_t> player_char_status;
 
@@ -208,6 +206,8 @@ public:
     static std::optional<int32_t> get_player_lower_body_anim_id();
 
     static std::optional<void*> get_player_animationMediator();
+
+    static void* get_PlayerIns_AnimationMediator(uint64_t playerIns);
 
     static int32_t get_animation_mediator_state_animation(void* animationMediator, AnimationStateTypesEnum state_id);
 
@@ -269,8 +269,6 @@ public:
 
 	static std::optional<void*> get_pc_ActiveState_EzStateMachineImpl();
 
-	static void* get_PlayerIns_EzStateMachineImpl(uint64_t playerIns);
-
 	static std::optional<uint64_t> get_EzStateMachineImpl_curstate_id(void * EzStateMachineImpl);
 
     static std::optional<SessionActionResultEnum> get_SessionManagerImp_session_action_result();
@@ -294,6 +292,8 @@ public:
 	static uint64_t get_accurate_time();
 
 	static uint64_t get_synced_time();
+
+	static float convert_time_to_offset(uint64_t time);
 
     /*
      * Help speedup some functions by, whenever we're loaded into an area,

@@ -53,6 +53,7 @@ private:
     static const uint64_t ParseRawP2PPacketType_injection_offset = 0x10b5340;
     static const uint64_t type1_32byte_p2pPacket_parsing_rollback_injection_offset = 0x5034ab;
     static const uint64_t type1_40byte_p2pPacket_parsing_rollback_injection_offset = 0x5034e6;
+    static const uint64_t type1_p2pPacket_sending_rollback_injection_offset = 0x503223;
 };
 
 #endif

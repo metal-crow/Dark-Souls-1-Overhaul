@@ -12,6 +12,7 @@
 
 #include <cstdint>
 #include <unordered_map>
+#include "GameData.h"
 
 typedef struct {
     int32_t animation_id;

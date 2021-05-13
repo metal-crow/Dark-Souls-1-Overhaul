@@ -139,9 +139,6 @@ void Game::init()
     sp::mem::code::x64::inject_jmp_14b(write_address, &char_loaded_injection_return, 6, &char_loaded_injection);
     write_address = (uint8_t*)(Game::char_loading_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &char_loading_injection_return, 1, &char_loading_injection);
-
-    //get the frequency of the clock so we can get an accurate timer
-    QueryPerformanceFrequency(&Game::PerformanceFrequency);
 }
 
 static bool character_reload_run = false;
@@ -576,6 +573,19 @@ std::optional<void*> Game::get_player_animationMediator()
     }
 }
 
+void* Game::get_PlayerIns_AnimationMediator(uint64_t playerIns)
+{
+    sp::mem::pointer animationMediator = sp::mem::pointer<void*>((void*)(playerIns + 0x68), { 0x20 });
+    if (animationMediator.resolve() == NULL)
+    {
+        return NULL;
+    }
+    else
+    {
+        return *animationMediator.resolve();
+    }
+}
+
 int32_t Game::get_animation_mediator_state_animation(void* animationMediator, AnimationStateTypesEnum state_id) {
     void* state_entry = (void*)((uint64_t)animationMediator + 168 * state_id);
     return *(int32_t*)((uint64_t)state_entry + 0);
@@ -917,21 +927,6 @@ std::optional<void*> Game::get_pc_ActiveState_EzStateMachineImpl() {
     }
 }
 
-void* Game::get_PlayerIns_EzStateMachineImpl(uint64_t playerIns)
-{
-    //PlayerIns -> ChrIns -> PlayerCtrl -> ChrCtrl -> ActionCtrl -> ActiveState -> EzStateMachineImpl
-    sp::mem::pointer EzStateMachineImpl = sp::mem::pointer<void*>((void*)(playerIns + 8 + 0x60), { 0x48, 0x30 + (0x20 * 1) });
-    if (EzStateMachineImpl.resolve() == NULL)
-    {
-        return NULL;
-    }
-    else
-    {
-        return *EzStateMachineImpl.resolve();
-    }
-}
-
-
 std::optional<uint64_t> Game::get_EzStateMachineImpl_curstate_id(void* EzStateMachineImpl) {
     void* ezstate_state = *(void**)((uint64_t)EzStateMachineImpl + 0x20);
     return *(uint64_t*)((uint64_t)ezstate_state + 0);
@@ -1103,17 +1098,21 @@ bool Game::set_display_name(bool useSteam)
     }
 }
 
-LARGE_INTEGER Game::PerformanceFrequency;
-
 uint64_t Game::get_accurate_time()
 {
-    LARGE_INTEGER time;
-    QueryPerformanceCounter(&time);
-    uint64_t realTime = (uint64_t)(time.QuadPart / Game::PerformanceFrequency.QuadPart);
-    return realTime;
+    uint64_t time;
+    //returns time in units of 100 nanoseconds
+    QueryUnbiasedInterruptTime(&time);
+    return time;
 }
 
 uint64_t Game::get_synced_time()
 {
     return Game::get_accurate_time() + ModNetworking::timer_offset;
+}
+
+//convert the time we get from accurate/synced time (unit of 100ns) to the amount required for the animation entry offset value (unit of seconds)
+float Game::convert_time_to_offset(uint64_t time)
+{
+    return time / 10000000.0;
 }

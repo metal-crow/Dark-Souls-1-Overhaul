@@ -40,13 +40,7 @@ bool equipment_change_unlock_injection_helper(InventorySlots menu_slot)
     }
     auto animation_mediator = animation_mediator_o.value();
 
-    auto state_anim_o = Game::get_animation_mediator_state_animation(animation_mediator, Upper_ThrowAnim);
-    if (!state_anim_o.has_value())
-    {
-        ConsoleWrite("Warning: unable to get_animation_mediator_state_animation in %s\n",__FUNCTION__);
-        return true;
-    }
-    auto state_anim = state_anim_o.value();
+    auto state_anim = Game::get_animation_mediator_state_animation(animation_mediator, Upper_ThrowAnim);
 
     //if we're currently backstabbing, don't allow any swaps
     //(anim ids ending in 400 are backstab, 401 is hornet bs)

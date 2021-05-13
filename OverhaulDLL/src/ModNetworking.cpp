@@ -34,6 +34,9 @@ getPlayerInsForConnectedPlayerData_Typedef* getPlayerInsForConnectedPlayerData =
 typedef uint64_t getSteamIDForConnectedPlayerData_Typedef(void *player);
 getSteamIDForConnectedPlayerData_Typedef* getSteamIDForConnectedPlayerData = (getSteamIDForConnectedPlayerData_Typedef*)0x141062d40;
 
+typedef uint64_t sendNetMessageToAllPlayers_Typedef(void* sessionMan, uint32_t type, byte * data, int size);
+sendNetMessageToAllPlayers_Typedef* sendNetMessageToAllPlayers = (sendNetMessageToAllPlayers_Typedef*)0x1405098a0;
+
 extern "C" {
     uint64_t sendPacket_injection_return;
     void sendPacket_injection();
@@ -61,6 +64,10 @@ extern "C" {
     void type1_40byte_p2pPacket_parse_rollback_injection();
     uint64_t type1_32byte_p2pPacket_parse_rollback_injection_helper(void* session_man, void* player, uint32_t type, byte *store_data_here);
     uint64_t type1_40byte_p2pPacket_parse_rollback_injection_helper(void* session_man, void* player, uint32_t type, byte *store_data_here);
+
+    uint64_t type1_p2pPacket_sending_rollback_injection_return;
+    void type1_p2pPacket_sending_rollback_injection();
+    void type1_p2pPacket_send_rollback_injection_helper(void* sessionMan, uint32_t type, byte * data, int size);
 }
 
 
@@ -101,7 +108,8 @@ void ModNetworking::start()
     sp::mem::code::x64::inject_jmp_14b(write_address, &ParseRawP2PPacketType_injection_return, 1, &ParseRawP2PPacketType_injection);
 
     //inject into the type1 packet sending function and include the current time
-
+    write_address = (uint8_t*)(ModNetworking::type1_p2pPacket_sending_rollback_injection_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &type1_p2pPacket_sending_rollback_injection_return, 1, &type1_p2pPacket_sending_rollback_injection);
 
     //inject into the type1 packet parsing function and read the given time and adjust the animation starting offset
     write_address = (uint8_t*)(ModNetworking::type1_32byte_p2pPacket_parsing_rollback_injection_offset + Game::ds1_base);
@@ -122,7 +130,8 @@ enum TimestampSyncPacketTypes
     UpdateTime = 1,
 };
 
-const uint32_t ResyncPeriodMS = 15 * 1000; // 15 seconds
+const uint32_t ResyncPeriod = 15 * 10000000; // 15 seconds
+const uint32_t SaneDelay = 2 * 10000000; // 2 seconds
 
 std::unordered_map<uint64_t, TimerClientInfo> ModNetworking::hostTimerSyncronizationData;
 
@@ -143,6 +152,9 @@ bool HostTimerSync(void* unused)
     //only do anything if we're in non-legacy mode
     if (!Mod::legacy_mode)
     {
+        //as the host our offset is always 0
+        ModNetworking::timer_offset = 0;
+
         //get the session members
         auto steamsessionlight_o = Game::get_SessionManagerImp_SteamSessionLight();
         if (!steamsessionlight_o.has_value())
@@ -152,6 +164,7 @@ bool HostTimerSync(void* unused)
         }
         uint64_t steamsessionlight = (uint64_t)steamsessionlight_o.value();
         uint64_t SessionMembersStart = *(uint64_t*)(steamsessionlight + 8 + 0x68);
+        SessionMembersStart += 8; //skip the first connection (which is ourselves)
         uint64_t SessionMembersEnd = *(uint64_t*)(steamsessionlight + 8 + 0x70);
 
         while (SessionMembersStart != SessionMembersEnd)
@@ -166,7 +179,7 @@ bool HostTimerSync(void* unused)
             }
 
             // If it's time to resync with this guest, do so
-            if ((Game::get_accurate_time() - ModNetworking::hostTimerSyncronizationData[SteamId].timeOfLastResync) > ResyncPeriodMS)
+            if ((Game::get_accurate_time() - ModNetworking::hostTimerSyncronizationData[SteamId].timeOfLastResync) > ResyncPeriod)
             {
                 // Send the ping packet out to compute the latency
                 if (!ModNetworking::hostTimerSyncronizationData[SteamId].waitingForPingResponse)
@@ -182,6 +195,8 @@ bool HostTimerSync(void* unused)
                     bool success = SteamNetworkingSend((void*)SteamNetworking, SteamId, resyncbuf, sizeof(resyncbuf), 2, 0);
                     if (success) //if this fails to send retry from beginning
                     {
+                        ConsoleWrite("Resync sent");
+
                         ModNetworking::hostTimerSyncronizationData[SteamId].timePingPacketSent = Game::get_accurate_time();
                         ModNetworking::hostTimerSyncronizationData[SteamId].waitingForPingResponse = true;
                     }
@@ -214,33 +229,40 @@ void ParseRawP2PPacketType_injection_helper(uint8_t* data, uint64_t steamId_remo
     // If we're the host, save the ping packet response and immediately do the reply
     if (session_action_result == TryToCreateSession || session_action_result == CreateSessionSuccess)
     {
-        // Using the ping packet data, send out the guest's corrected clock
-        // compute the 1 way latency
-        uint64_t ping = (Game::get_accurate_time() - ModNetworking::hostTimerSyncronizationData[steamId_remote].timePingPacketSent);
-        // TODO should update this as a running average of some kind
-        ModNetworking::hostTimerSyncronizationData[steamId_remote].packetDelay = ping / 2;
-        // sanity check the computed latency
-        if (ping > 10 * 1000)
+        if (data[1] == TimestampSyncPacketTypes::DelayCalc)
         {
-            ConsoleWrite("Host computed ping value of realllly high (%d). Ignoring.", ping);
-        }
-        else
-        {
-            // Send the time the guest clock should be, accounting for latency
-            uint8_t updatebuf[10] = {
-                (4 | (1 << 4)), //custom clock sync packet type, TCP
-                (uint8_t)TimestampSyncPacketTypes::UpdateTime, //type of clock sync packet
-            };
-            *(uint64_t*)(updatebuf + 2) = Game::get_accurate_time() + ModNetworking::hostTimerSyncronizationData[steamId_remote].packetDelay;
+            ConsoleWrite("Resync response got for %llu", steamId_remote);
 
-            void* SteamInternal = (*SteamInternal_ContextInit)(Init_SteamInternal_FUNCPTR);
-            uint64_t SteamNetworking = *(uint64_t*)((uint64_t)SteamInternal + 0x40);
-            SteamInternal_SteamNetworkingSend_FUNC* SteamNetworkingSend = (SteamInternal_SteamNetworkingSend_FUNC*)**(uint64_t**)SteamNetworking;
-            SteamNetworkingSend((void*)SteamNetworking, steamId_remote, updatebuf, sizeof(updatebuf), 2, 0); //if this fails to send we'll just resend in 15 sec anyway
+            // Using the ping packet data, send out the guest's corrected clock
+            // compute the 1 way latency
+            uint64_t ping = (Game::get_accurate_time() - ModNetworking::hostTimerSyncronizationData[steamId_remote].timePingPacketSent);
+            // TODO should update this as a running average of some kind
+            ModNetworking::hostTimerSyncronizationData[steamId_remote].packetDelay = ping / 2;
+            // sanity check the computed latency
+            if (ping > SaneDelay)
+            {
+                ConsoleWrite("Host computed ping value of realllly high (%d). Ignoring.", ping);
+            }
+            else
+            {
+                ConsoleWrite("Timer update sent for ping of = %fms", ping/10000.0);
 
-            //update our sync time with this guest
-            ModNetworking::hostTimerSyncronizationData[steamId_remote].timeOfLastResync = Game::get_accurate_time();
-            ModNetworking::hostTimerSyncronizationData[steamId_remote].waitingForPingResponse = false;
+                // Send the time the guest clock should be, accounting for latency
+                uint8_t updatebuf[10] = {
+                    (4 | (1 << 4)), //custom clock sync packet type, TCP
+                    (uint8_t)TimestampSyncPacketTypes::UpdateTime, //type of clock sync packet
+                };
+                *(uint64_t*)(updatebuf + 2) = Game::get_accurate_time() + ModNetworking::hostTimerSyncronizationData[steamId_remote].packetDelay;
+
+                void* SteamInternal = (*SteamInternal_ContextInit)(Init_SteamInternal_FUNCPTR);
+                uint64_t SteamNetworking = *(uint64_t*)((uint64_t)SteamInternal + 0x40);
+                SteamInternal_SteamNetworkingSend_FUNC* SteamNetworkingSend = (SteamInternal_SteamNetworkingSend_FUNC*)**(uint64_t**)SteamNetworking;
+                SteamNetworkingSend((void*)SteamNetworking, steamId_remote, updatebuf, sizeof(updatebuf), 2, 0); //if this fails to send we'll just resend in 15 sec anyway
+
+                //update our sync time with this guest
+                ModNetworking::hostTimerSyncronizationData[steamId_remote].timeOfLastResync = Game::get_accurate_time();
+                ModNetworking::hostTimerSyncronizationData[steamId_remote].waitingForPingResponse = false;
+            }
         }
     }
 
@@ -250,6 +272,8 @@ void ParseRawP2PPacketType_injection_helper(uint8_t* data, uint64_t steamId_remo
         // Host is computing the delay. Just resend the packet back to them
         if (data[1] == TimestampSyncPacketTypes::DelayCalc)
         {
+            ConsoleWrite("Resync request got for %llu", steamId_remote);
+
             void* SteamInternal = (*SteamInternal_ContextInit)(Init_SteamInternal_FUNCPTR);
             uint64_t SteamNetworking = *(uint64_t*)((uint64_t)SteamInternal + 0x40);
             SteamInternal_SteamNetworkingSend_FUNC* SteamNetworkingSend = (SteamInternal_SteamNetworkingSend_FUNC*)**(uint64_t**)SteamNetworking;
@@ -260,26 +284,38 @@ void ParseRawP2PPacketType_injection_helper(uint8_t* data, uint64_t steamId_remo
         {
             uint64_t trueTime = *(uint64_t*)(data + 2);
             uint64_t ourTime = Game::get_accurate_time();
-            //sanity check the offset value. If it's more than 10 seconds something is wrong
-            if ((uint64_t)(trueTime - ourTime) < 10 * 1000)
-            {
-                ModNetworking::timer_offset = trueTime - ourTime;
-            }
-            else
-            {
-                ConsoleWrite("Guest got timer offset value of realllly high (%d). Ignoring.", (uint64_t)(trueTime - ourTime));
-            }
+            //can't sanity check the offset value since the timer starts at desktop boot time
+            ModNetworking::timer_offset = trueTime - ourTime;
+            ConsoleWrite("Timer update got: %lld", ModNetworking::timer_offset);
         }
     }
 }
 
 // Handle including the rollback data in the type1 packet sending
-void type1_p2pPacket_send_rollback_injection_helper()
+void type1_p2pPacket_send_rollback_injection_helper(void* sessionMan, uint32_t type, byte * data, int size)
 {
+    //do the original code if we're in legacy
+    if (Mod::legacy_mode)
+    {
+        sendNetMessageToAllPlayers(sessionMan, type, data, size);
+        return;
+    }
 
+    //create a new, larger, packet, and send that
+    byte* new_data = (byte*)malloc(size + 8);
+    memcpy(new_data, data, size);
+
+    //insert the current time into this
+    //TODO in theory the current offset in the animation here may not be 0, so the correction to the other player might not be fully accurate
+    *(uint64_t*)(new_data + size) = Game::get_synced_time();
+
+    //send the changed packet
+    sendNetMessageToAllPlayers(sessionMan, type, new_data, size + 8);
+
+    free(new_data);
 }
 
-// Handle parsing and getting the rollback data from the type1 packet for the animation
+// Handle parsing and getting the rollback data from the type1 packet reading
 uint64_t type1_p2pPacket_parse_rollback_injection_helper(void* session_man, void* player, uint32_t type, byte *store_data_here, uint32_t size)
 {
     uint64_t gotbytes;
@@ -291,8 +327,13 @@ uint64_t type1_p2pPacket_parse_rollback_injection_helper(void* session_man, void
         return gotbytes;
     }
 
-    //get the data for this animation
+    //get the data for this animation if we recieve a packet
     gotbytes = getNetMessage(session_man, player, type, store_data_here, size + 8);
+    if (gotbytes == 0)
+    {
+        return gotbytes;
+    }
+
     uint64_t timeAnimationTriggered = *(uint64_t*)(store_data_here + size);
     uint32_t animationToUpdate = *(uint32_t*)(store_data_here + 12);
 
@@ -314,7 +355,12 @@ uint64_t type1_p2pPacket_parse_rollback_injection_helper(void* session_man, void
 
     //get a pointer to the animation mediator for this player
     uint64_t playerins = getPlayerInsForConnectedPlayerData(*(void**)Game::world_chr_man_imp, player);
-    void* animationMediator = Game::get_PlayerIns_EzStateMachineImpl(playerins);
+    void* animationMediator = Game::get_PlayerIns_AnimationMediator(playerins);
+    if (animationMediator == NULL)
+    {
+        ConsoleWrite("Unable to get Animation Mediator for player");
+        return gotbytes;
+    }
 
     //pass data to the callback
     SetAnimationTimeOffsetArg* animTimeArg = (SetAnimationTimeOffsetArg*)malloc(sizeof(SetAnimationTimeOffsetArg));
@@ -329,11 +375,11 @@ uint64_t type1_p2pPacket_parse_rollback_injection_helper(void* session_man, void
 
 uint64_t type1_32byte_p2pPacket_parse_rollback_injection_helper(void* session_man, void* player, uint32_t type, byte *store_data_here)
 {
-    type1_p2pPacket_parse_rollback_injection_helper(session_man, player, type, store_data_here, 32);
+    return type1_p2pPacket_parse_rollback_injection_helper(session_man, player, type, store_data_here, 32);
 }
 uint64_t type1_40byte_p2pPacket_parse_rollback_injection_helper(void* session_man, void* player, uint32_t type, byte *store_data_here)
 {
-    type1_p2pPacket_parse_rollback_injection_helper(session_man, player, type, store_data_here, 40);
+    return type1_p2pPacket_parse_rollback_injection_helper(session_man, player, type, store_data_here, 40);
 }
 
 
