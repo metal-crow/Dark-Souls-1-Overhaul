@@ -591,10 +591,57 @@ int32_t Game::get_animation_mediator_state_animation(void* animationMediator, An
     return *(int32_t*)((uint64_t)state_entry + 0);
 }
 
-void Game::set_animation_mediator_state_entry(void* animationMediator, AnimationStateTypesEnum state_id, int32_t new_aid, float new_progressTime) {
-    void* state_entry = (void*)((uint64_t)animationMediator + 168 * state_id);
-    *(int32_t*)((uint64_t)state_entry + 0) = new_aid;
-    *(float*)((uint64_t)state_entry + 0xa4) = new_progressTime;
+bool Game::set_animation_currentProgress(void* animationMediator, AnimationStateTypesEnum state_id, float new_progressTime) {
+    uint64_t state_entry = ((uint64_t)animationMediator + 168 * state_id);
+
+    //sets the currentProgress that is read by the renderer this frame
+    *(float*)(state_entry + 0xa4) = new_progressTime;
+
+    //sets the currentProgress that is used to overwrite the above currentProgress in all later frames
+    uint32_t animationController_index = -1;
+
+    uint64_t linked_animation1 = *(uint64_t*)(state_entry + 0x90);
+    if (linked_animation1 != NULL)
+    {
+        animationController_index = *(uint32_t*)(linked_animation1 + 4);
+    }
+    else
+    {
+        animationController_index = *(uint32_t*)(state_entry + 4);
+    }
+    animationController_index = (animationController_index & 0xffff);
+    if (animationController_index >= 6)
+    {
+        return false;
+    }
+
+    uint64_t AnimationMediator_field0x1460 = *(uint64_t*)((uint64_t)(animationMediator)+0x1460);
+    uint64_t AnimationMediator_field0x1460_field0x8_elem = *(uint64_t*)(AnimationMediator_field0x1460 + 0x8 + animationController_index*8);
+    if (AnimationMediator_field0x1460_field0x8_elem == NULL)
+    {
+        return false;
+    }
+    uint32_t ChrCtrl_Animation_index = *(uint32_t*)(AnimationMediator_field0x1460_field0x8_elem + 0x140) & 0xffff;
+
+    uint64_t ChrCtrl_AnimationQueue = *(uint64_t*)(AnimationMediator_field0x1460+0);
+    uint64_t ChrCtrl_AnimationQueue_arrayLength = *(uint32_t*)(ChrCtrl_AnimationQueue + 0);
+    if (ChrCtrl_Animation_index >= ChrCtrl_AnimationQueue_arrayLength)
+    {
+        return false;
+    }
+    uint64_t ChrCtrl_AnimationQueue_field0x8 = *(uint64_t*)(ChrCtrl_AnimationQueue + 8);
+    uint64_t ChrCtrl_AnimationQueue_field0x8_elem = (ChrCtrl_AnimationQueue_field0x8 + ChrCtrl_Animation_index*0x78);
+    uint16_t ChrCtrl_AnimationQueue_field0x8_elem_field0x0 = *(uint16_t*)(ChrCtrl_AnimationQueue_field0x8_elem + 0);
+    if (ChrCtrl_AnimationQueue_field0x8_elem_field0x0 != ChrCtrl_Animation_index)
+    {
+        return false;
+    }
+    uint64_t FrpgDefaultAnimationControl = *(uint64_t*)(ChrCtrl_AnimationQueue_field0x8_elem + 8);
+    float* curTimeInAnimation = (float*)(FrpgDefaultAnimationControl + 0x10);
+
+    *curTimeInAnimation = new_progressTime;
+
+    return true;
 }
 
 // Return pointer to current game time in milliseconds since the game has started
@@ -1114,5 +1161,5 @@ uint64_t Game::get_synced_time()
 //convert the time we get from accurate/synced time (unit of 100ns) to the amount required for the animation entry offset value (unit of seconds)
 float Game::convert_time_to_offset(uint64_t time)
 {
-    return time / 10000000.0;
+    return time / 10000000.0f;
 }

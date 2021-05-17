@@ -211,7 +211,7 @@ public:
 
     static int32_t get_animation_mediator_state_animation(void* animationMediator, AnimationStateTypesEnum state_id);
 
-    static void set_animation_mediator_state_entry(void* animationMediator, AnimationStateTypesEnum state_id, int32_t new_aid, float new_progressTime);
+    static bool set_animation_currentProgress(void* animationMediator, AnimationStateTypesEnum state_id, float new_progressTime);
 
     // Return pointer to current game time in milliseconds since the game has started
     static std::optional<uint32_t*> get_game_time_ms();

@@ -96,20 +96,20 @@ bool AnimationEdits::SetAnimationTimeOffset(void* time_offset_arg)
 {
     SetAnimationTimeOffsetArg* time_offset = (SetAnimationTimeOffsetArg*)time_offset_arg;
 
-    //wait a frame for the animation to be loaded in (redundant since callbacks run the next frame after they're started anyway)
-    if (time_offset->frameStart >= Game::get_frame_count())
+    //wait 2 frames for the animation to be loaded in and the "true offset" to be available
+    if (time_offset->frameStart + 1 >= Game::get_frame_count())
     {
         return true;
     }
 
-    //check the animation mediator passed and check for the given animation id
-    int32_t animId = Game::get_animation_mediator_state_animation(time_offset->animationMediatorPtr, AnimationEdits::STATEIDS_TO_ROLLBACK[time_offset->animationState]);
-
-    //if found, set it's new offset and exit
+    //set the animations new offset
     float startingOffset = Game::convert_time_to_offset(Game::get_synced_time() - time_offset->timeAnimationTriggered);
-
-    // TODO this isn't setting the offset correctly
-    Game::set_animation_mediator_state_entry(time_offset->animationMediatorPtr, AnimationEdits::STATEIDS_TO_ROLLBACK[time_offset->animationState], animId, startingOffset);
+    //ConsoleWrite("Setting %lld to offset %f", Game::get_animation_mediator_state_animation(time_offset->animationMediatorPtr, AnimationEdits::STATEIDS_TO_ROLLBACK[time_offset->animationState]), startingOffset);
+    bool res = Game::set_animation_currentProgress(time_offset->animationMediatorPtr, AnimationEdits::STATEIDS_TO_ROLLBACK[time_offset->animationState], startingOffset);
+    if (!res)
+    {
+        return true;
+    }
 
     free(time_offset_arg);
     return false;
