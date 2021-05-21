@@ -912,5 +912,81 @@ mov     rcx, rdi
 jmp     PlayerStat_New_Name_111_injection_return
 PlayerStat_New_Name_111_injection ENDP
 
+extern PlayerStat_SoulLevel_injection_return: qword
+PUBLIC PlayerStat_SoulLevel_injection
+PlayerStat_SoulLevel_injection PROC
+;Set soul level to 1
+;the server doesn't use this for matchmaking it seems
+mov     r8d, 1
+;original code
+lea     edx, [r12+6]
+mov     rcx, rdi
+call    qword ptr [set_value_in_MemberFlags_array1]
+jmp     PlayerStat_SoulLevel_injection_return
+PlayerStat_SoulLevel_injection ENDP
+
+extern PlayerStat_MaxWeaponLevel_injection_return: qword
+PUBLIC PlayerStat_MaxWeaponLevel_injection
+PlayerStat_MaxWeaponLevel_injection PROC
+;Set weapon level to 0
+;the server doesn't use this for matchmaking it seems
+mov     r8d, 0
+;original code
+lea     edx, [r12+1dh]
+mov     rcx, rdi
+call    qword ptr [set_value_in_MemberFlags_array1]
+jmp     PlayerStat_MaxWeaponLevel_injection_return
+PlayerStat_MaxWeaponLevel_injection ENDP
+
+
+extern construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper: PROC
+extern construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_return: qword
+
+PUBLIC construct_flatbuffer_from_PlayerStatus_MemberFlags_injection
+construct_flatbuffer_from_PlayerStatus_MemberFlags_injection PROC
+
+;original code
+lea     rbp, [rsp-110h]
+sub     rsp, 210h
+
+sub     rsp, 10h
+movdqu  [rsp], xmm0
+sub     rsp, 10h
+movdqu  [rsp], xmm1
+sub     rsp, 10h
+movdqu  [rsp], xmm2
+sub     rsp, 10h
+movdqu  [rsp], xmm3
+push    rax
+push    rcx
+push    rdx
+push    r8
+push    r9
+push    r10
+push    r11
+sub     rsp, 28h
+
+call    game_write_playerdata_to_flatbuffer_injection_helper
+
+add     rsp, 28h
+pop     r11
+pop     r10
+pop     r9
+pop     r8
+pop     rdx
+pop     rcx
+pop     rax
+movdqu  xmm3, [rsp]
+add     rsp, 10h
+movdqu  xmm2, [rsp]
+add     rsp, 10h
+movdqu  xmm1, [rsp]
+add     rsp, 10h
+movdqu  xmm0, [rsp]
+add     rsp, 10h
+
+jmp     construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_return
+construct_flatbuffer_from_PlayerStatus_MemberFlags_injection ENDP
+
 _TEXT    ENDS
 END

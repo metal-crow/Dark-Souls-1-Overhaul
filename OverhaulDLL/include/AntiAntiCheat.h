@@ -22,6 +22,7 @@ private:
     static const uint64_t game_hash_compare_checks[];
     static const std::tuple<uint64_t, uint8_t> game_runtime_hash_checks[];
     static const uint64_t game_write_playerdata_to_flatbuffer_injection_offset = 0xbd22e6;
+    static const uint64_t construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_offset = 0xbd047c;
 };
 
 #endif

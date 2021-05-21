@@ -74,7 +74,7 @@ std::unordered_map<uint16_t, AnimationStateTypesEnum> AnimationEdits::STATEIDS_T
     {115, Upper_SpecialAttack},
     {116, Upper_SpecialAttack},
     {86, Upper_SpecialAttack}, //Left Hand Special Move
-    //spell attacks
+    //TODO spell attacks
 };
 
 

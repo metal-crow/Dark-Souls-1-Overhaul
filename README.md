@@ -103,3 +103,6 @@ These include everything EXCEPT: Combustions, Firestorms, and all miracles but L
 
 * Large scale health increase across the board.  
 Average SL 125 build should be ~3k HP.
+
+* Start of rollback netcode:
+Animatinos are re-synced between players to compensate for lag.
