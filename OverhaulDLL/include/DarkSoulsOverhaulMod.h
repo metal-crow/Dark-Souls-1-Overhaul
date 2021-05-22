@@ -42,6 +42,8 @@ void inline FATALERROR(const char* error_str, ...) {
     vsnprintf(dest, 1024, error_str, argptr);
     va_end(argptr);
 
+    global::cmd_out << dest << "\n";
+
     crash_handler(dest);
 }
 

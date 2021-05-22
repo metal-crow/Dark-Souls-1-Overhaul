@@ -966,7 +966,7 @@ push    r10
 push    r11
 sub     rsp, 28h
 
-call    game_write_playerdata_to_flatbuffer_injection_helper
+call    construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper
 
 add     rsp, 28h
 pop     r11

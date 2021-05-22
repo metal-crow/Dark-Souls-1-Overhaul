@@ -1066,7 +1066,7 @@ void set_value_in_MemberFlags(uint64_t input_data, MemberFlags_IdentifiersEnum f
     uint32_t flag_5 = flag - 0x5D;
     if (flag_5 < 0x3)
     {
-        *(float*)(input_data + 0x17C + 4*flag_4) = *(float*)value;
+        *(float*)(input_data + 0x17C + 4*flag_5) = *(float*)value;
         return;
     }
     if (flag == MemberFlags_IdentifiersEnum::NormalResists)
@@ -1108,6 +1108,7 @@ void set_value_in_MemberFlags(uint64_t input_data, MemberFlags_IdentifiersEnum f
         *(uint64_t*)(input_data + 0x2a8+8) = *(uint64_t*)((uint64_t)value + 8);
         *(uint64_t*)(input_data + 0x2a8+16) = *(uint64_t*)((uint64_t)value + 16);
         *(uint32_t*)(input_data + 0x2a8+24) = *(uint32_t*)((uint64_t)value + 24);
+        return;
     }
 
     FATALERROR("%s Invalid flag=%d", __FUNCTION__, flag);
@@ -1115,6 +1116,8 @@ void set_value_in_MemberFlags(uint64_t input_data, MemberFlags_IdentifiersEnum f
 void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_t input_data)
 {
     uint8_t tmp[28];
+
+    input_data = input_data + 0x78; //&input_data->memberflags
 
     //set the clear count to 1 so players can have all NG + stuff without being detected as banned
     *(uint32_t*)tmp = 1;
@@ -1538,7 +1541,6 @@ uint64_t game_write_playerdata_to_flatbuffer_injection_helper(uint32_t* array_st
 
         if (known_good_hash_vals_array_x64.count(array_start[i]) == 0)
         {
-            ConsoleWrite("Unknown element in flags array: %d=%x", i, array_start[i]);
             FATALERROR("Unknown element in flags array: %d=%x", i, array_start[i]);
         }
 
