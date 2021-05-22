@@ -1095,6 +1095,20 @@ void set_value_in_MemberFlags(uint64_t input_data, MemberFlags_IdentifiersEnum f
         *(uint32_t*)(input_data + 0x298) = *(uint32_t*)((uint64_t)value + 24);
         return;
     }
+    if (flag == MemberFlags_IdentifiersEnum::New_Name_110)
+    {
+        *(uint64_t*)(input_data + 0x29c) = *(uint64_t*)((uint64_t)value + 0);
+        *(uint16_t*)(input_data + 0x2a4) = *(uint16_t*)((uint64_t)value + 8);
+        *(uint8_t*)(input_data + 0x2a6) = *(uint8_t*)((uint64_t)value + 10);
+        return;
+    }
+    if (flag == MemberFlags_IdentifiersEnum::New_Name_111)
+    {
+        *(uint64_t*)(input_data + 0x2a8) = *(uint64_t*)((uint64_t)value + 0);
+        *(uint64_t*)(input_data + 0x2a8+8) = *(uint64_t*)((uint64_t)value + 8);
+        *(uint64_t*)(input_data + 0x2a8+16) = *(uint64_t*)((uint64_t)value + 16);
+        *(uint32_t*)(input_data + 0x2a8+24) = *(uint32_t*)((uint64_t)value + 24);
+    }
 
     FATALERROR("%s Invalid flag=%d", __FUNCTION__, flag);
 }
@@ -1398,11 +1412,9 @@ void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_
     *(uint32_t*)tmp = 0xFFFFFFFF;
     set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::EquippedSpell12, tmp);
 
-    //TODO
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_81, tmp);
+    //set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_81, tmp);
 
-    //TODO
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_82, tmp);
+    //set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_82, tmp);
 
     //this seems to be human/not-human?
     *(uint8_t*)tmp = 1;
@@ -1420,7 +1432,7 @@ void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_
     *(uint8_t*)tmp = 0;
     set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_89, tmp);
 
-    //TODO
+    //unknown
     *(uint8_t*)tmp = 0;
     set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_91, tmp);
 
@@ -1440,14 +1452,11 @@ void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_
     *(float*)tmp = 51.0f;
     set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::MaxEquipLoad, tmp);
 
-    //TODO
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_99, tmp);
+    //set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_99, tmp);
 
-    //TODO
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_102, tmp);
+    //set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_102, tmp);
 
-    //TODO
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_105, tmp);
+    //set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_105, tmp);
 
     //pyro default defs
     *(uint32_t*)(tmp + 0) = 20;
@@ -1475,35 +1484,34 @@ void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_
     *(uint32_t*)(tmp + 24) = 100;
     set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::CovenantLevel, tmp);
 
-    //TODO
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_109, tmp);
+    //set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_109, tmp);
 
-    //TODO
+    //unknown, but all 1's
+    *(uint64_t*)(tmp + 0) = 0x101010101010101;
+    *(uint16_t*)(tmp + 8) = 0x101;
+    *(uint8_t*)(tmp + 10) = 1;
     set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_110, tmp);
 
-    //TODO
+    //unknown, but all 0's
+    *(uint64_t*)(tmp + 0) = 0;
+    *(uint64_t*)(tmp + 8) = 0;
+    *(uint64_t*)(tmp + 16) = 0;
+    *(uint32_t*)(tmp + 24) = 0;
     set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_111, tmp);
 
-    //TODO
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_112, tmp);
+    //set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_112, tmp);
 
-    //TODO
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_113, tmp);
+    //set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_113, tmp);
 
-    //TODO
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_114, tmp);
+    //set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_114, tmp);
 
-    //TODO
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_115, tmp);
+    //set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_115, tmp);
 
-    //TODO
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_116, tmp);
+    //set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_116, tmp);
 
-    //TODO
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_117, tmp);
+    //set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_117, tmp);
 
-    //TODO
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_118, tmp);
+    //set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_118, tmp);
 }
 
 const uint32_t hackerFlag = 0x1770;
