@@ -11,7 +11,6 @@
 #include "SP/memory/injection/asm/x64.h"
 #include <string.h>
 #include <unordered_set>
-#include <unordered_map>
 
 const std::tuple<uint64_t, uint8_t> AntiAntiCheat::game_runtime_hash_checks[] = {
 {0x1400e3a70,6},{0x142faf485,4},{0x140325c58,4},{0x14032ca5e,4},{0x142d6e989,6},{0x1430f9a22,4},{0x14210df08,4},{0x1420c4012,4},{0x1420c5671,4},{0x1420c74ca,4},
@@ -351,154 +350,13 @@ extern "C" {
     void game_write_playerdata_to_flatbuffer_injection();
     uint64_t game_write_playerdata_to_flatbuffer_injection_helper(uint32_t*, uint64_t);
 
-    uint64_t PlayerStat_ClearCount_injection_return;
-    void PlayerStat_ClearCount_injection();
-    uint64_t PlayerStat_New_Name_5_injection_return;
-    void PlayerStat_New_Name_5_injection();
-    uint64_t PlayerStat_New_Name_7_injection_return;
-    void PlayerStat_New_Name_7_injection();
-    uint64_t PlayerStat_SoulCount_injection_return;
-    void PlayerStat_SoulCount_injection();
-    uint64_t PlayerStat_SoulMemory_injection_return;
-    void PlayerStat_SoulMemory_injection();
-    uint64_t PlayerStat_Archetype_injection_return;
-    void PlayerStat_Archetype_injection();
-    uint64_t PlayerStat_HP_injection_return;
-    void PlayerStat_HP_injection();
-    uint64_t PlayerStat_MaxHp_injection_return;
-    void PlayerStat_MaxHp_injection();
-    uint64_t PlayerStat_BaseMaxHp_1_injection_return;
-    void PlayerStat_BaseMaxHp_1_injection();
-    uint64_t PlayerStat_Mp_injection_return;
-    void PlayerStat_Mp_injection();
-    uint64_t PlayerStat_MaxMp_injection_return;
-    void PlayerStat_MaxMp_injection();
-    uint64_t PlayerStat_BaseMaxHp_2_injection_return;
-    void PlayerStat_BaseMaxHp_2_injection();
-    uint64_t PlayerStat_Vitality_injection_return;
-    void PlayerStat_Vitality_injection();
-    uint64_t PlayerStat_Attunement_injection_return;
-    void PlayerStat_Attunement_injection();
-    uint64_t PlayerStat_Endurance_injection_return;
-    void PlayerStat_Endurance_injection();
-    uint64_t PlayerStat_Strength_injection_return;
-    void PlayerStat_Strength_injection();
-    uint64_t PlayerStat_Dexterity_injection_return;
-    void PlayerStat_Dexterity_injection();
-    uint64_t PlayerStat_Resistance_injection_return;
-    void PlayerStat_Resistance_injection();
-    uint64_t PlayerStat_Intelligence_injection_return;
-    void PlayerStat_Intelligence_injection();
-    uint64_t PlayerStat_Force_injection_return;
-    void PlayerStat_Force_injection();
-    uint64_t PlayerStat_ItemDiscoveryRate_injection_return;
-    void PlayerStat_ItemDiscoveryRate_injection();
-    uint64_t PlayerStat_HumanityCount_injection_return;
-    void PlayerStat_HumanityCount_injection();
-    uint64_t PlayerStat_attackR1_injection_return;
-    void PlayerStat_attackR1_injection();
-    uint64_t PlayerStat_attackR2_injection_return;
-    void PlayerStat_attackR2_injection();
-    uint64_t PlayerStat_attackL1_injection_return;
-    void PlayerStat_attackL1_injection();
-    uint64_t PlayerStat_attackL2_injection_return;
-    void PlayerStat_attackL2_injection();
-    uint64_t PlayerStat_EstusLevel_injection_return;
-    void PlayerStat_EstusLevel_injection();
-    uint64_t PlayerStat_Left_Hand_1_injection_return;
-    void PlayerStat_Left_Hand_1_injection();
-    uint64_t PlayerStat_Left_Hand_2_injection_return;
-    void PlayerStat_Left_Hand_2_injection();
-    uint64_t PlayerStat_Right_Hand_1_injection_return;
-    void PlayerStat_Right_Hand_1_injection();
-    uint64_t PlayerStat_Right_Hand_2_injection_return;
-    void PlayerStat_Right_Hand_2_injection();
-    uint64_t PlayerStat_ArmorHead_injection_return;
-    void PlayerStat_ArmorHead_injection();
-    uint64_t PlayerStat_ArmorBody_injection_return;
-    void PlayerStat_ArmorBody_injection();
-    uint64_t PlayerStat_ArmorArms_injection_return;
-    void PlayerStat_ArmorArms_injection();
-    uint64_t PlayerStat_ArmorLegs_injection_return;
-    void PlayerStat_ArmorLegs_injection();
-    uint64_t PlayerStat_Stamina_injection_return;
-    void PlayerStat_Stamina_injection();
-    uint64_t PlayerStat_MaxStamina_injection_return;
-    void PlayerStat_MaxStamina_injection();
-    uint64_t PlayerStat_BaseMaxStamina_injection_return;
-    void PlayerStat_BaseMaxStamina_injection();
-    uint64_t PlayerStat_WeaponinSlot0_injection_return;
-    void PlayerStat_WeaponinSlot0_injection();
-    uint64_t PlayerStat_WeaponinSlot2_injection_return;
-    void PlayerStat_WeaponinSlot2_injection();
-    uint64_t PlayerStat_WeaponinSlot1_injection_return;
-    void PlayerStat_WeaponinSlot1_injection();
-    uint64_t PlayerStat_WeaponinSlot3_injection_return;
-    void PlayerStat_WeaponinSlot3_injection();
-    uint64_t PlayerStat_ArmorinSlot0_injection_return;
-    void PlayerStat_ArmorinSlot0_injection();
-    uint64_t PlayerStat_ArmorinSlot1_injection_return;
-    void PlayerStat_ArmorinSlot1_injection();
-    uint64_t PlayerStat_ArmorinSlot2_injection_return;
-    void PlayerStat_ArmorinSlot2_injection();
-    uint64_t PlayerStat_ArmorinSlot3_injection_return;
-    void PlayerStat_ArmorinSlot3_injection();
-    uint64_t PlayerStat_RinginSlot0_injection_return;
-    void PlayerStat_RinginSlot0_injection();
-    uint64_t PlayerStat_RinginSlot1_injection_return;
-    void PlayerStat_RinginSlot1_injection();
-    uint64_t PlayerStat_IteminQuickbar0_injection_return;
-    void PlayerStat_IteminQuickbar0_injection();
-    uint64_t PlayerStat_IteminQuickbar1_injection_return;
-    void PlayerStat_IteminQuickbar1_injection();
-    uint64_t PlayerStat_IteminQuickbar2_injection_return;
-    void PlayerStat_IteminQuickbar2_injection();
-    uint64_t PlayerStat_IteminQuickbar3_injection_return;
-    void PlayerStat_IteminQuickbar3_injection();
-    uint64_t PlayerStat_IteminQuickbar4_injection_return;
-    void PlayerStat_IteminQuickbar4_injection();
-    uint64_t PlayerStat_IteminArrowBoltSlot0_injection_return;
-    void PlayerStat_IteminArrowBoltSlot0_injection();
-    uint64_t PlayerStat_IteminArrowBoltSlot1_injection_return;
-    void PlayerStat_IteminArrowBoltSlot1_injection();
-    uint64_t PlayerStat_IteminArrowBoltSlot2_injection_return;
-    void PlayerStat_IteminArrowBoltSlot2_injection();
-    uint64_t PlayerStat_IteminArrowBoltSlot3_injection_return;
-    void PlayerStat_IteminArrowBoltSlot3_injection();
-    uint64_t PlayerStat_EquippedSpell1_injection_return;
-    void PlayerStat_EquippedSpell1_injection();
-    uint64_t PlayerStat_New_Name_86_injection_return;
-    void PlayerStat_New_Name_86_injection();
-    uint64_t PlayerStat_New_Name_87_injection_return;
-    void PlayerStat_New_Name_87_injection();
-    uint64_t PlayerStat_New_Name_88_injection_return;
-    void PlayerStat_New_Name_88_injection();
-    uint64_t PlayerStat_New_Name_89_injection_return;
-    void PlayerStat_New_Name_89_injection();
-    uint64_t PlayerStat_New_Name_93_injection_return;
-    void PlayerStat_New_Name_93_injection();
-    uint64_t PlayerStat_defSAToughnessTotal_injection_return;
-    void PlayerStat_defSAToughnessTotal_injection();
-    uint64_t PlayerStat_MaxEquipLoad_injection_return;
-    void PlayerStat_MaxEquipLoad_injection();
-    uint64_t PlayerStat_NormalDefenses_injection_return;
-    void PlayerStat_NormalDefenses_injection();
-    uint64_t PlayerStat_NormalResists_injection_return;
-    void PlayerStat_NormalResists_injection();
-    uint64_t PlayerStat_CovenantLevel_injection_return;
-    void PlayerStat_CovenantLevel_injection();
-    uint64_t PlayerStat_New_Name_110_injection_return;
-    void PlayerStat_New_Name_110_injection();
-    uint64_t PlayerStat_New_Name_111_injection_return;
-    void PlayerStat_New_Name_111_injection();
-    uint64_t PlayerStat_SoulLevel_injection_return;
-    void PlayerStat_SoulLevel_injection();
-    uint64_t PlayerStat_MaxWeaponLevel_injection_return;
-    void PlayerStat_MaxWeaponLevel_injection();
-
     uint64_t construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_return;
     void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection();
     void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_t);
+
+    uint64_t finish_construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_return;
+    void finish_construct_flatbuffer_from_PlayerStatus_MemberFlags_injection();
+    void finish_construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper();
 }
 
 enum MemberFlags_IdentifiersEnum
@@ -624,98 +482,6 @@ enum MemberFlags_IdentifiersEnum
     New_Name_118 = 0x76,
 };
 
-class PlayerStatRead_Value
-{
-public:
-    PlayerStatRead_Value()
-    {
-        offset = 0;
-        nop_count = 0;
-    };
-    PlayerStatRead_Value(uint64_t offset_, uint32_t nop_count_) :
-        offset(offset_),
-        nop_count(nop_count_)
-    {
-    };
-    uint64_t offset;
-    uint32_t nop_count;
-};
-
-std::unordered_map<MemberFlags_IdentifiersEnum, PlayerStatRead_Value> PlayerStatRead_adjustments = {
-    {MemberFlags_IdentifiersEnum::ClearCount, PlayerStatRead_Value(0x7ef75c, 2)},
-    {MemberFlags_IdentifiersEnum::New_Name_5, PlayerStatRead_Value(0x7ef7b2, 1)},
-    {MemberFlags_IdentifiersEnum::New_Name_7, PlayerStatRead_Value(0x7ef7c9, 2)},
-    {MemberFlags_IdentifiersEnum::SoulCount, PlayerStatRead_Value(0x7ef7f6, 1)},
-    {MemberFlags_IdentifiersEnum::SoulMemory, PlayerStatRead_Value(0x7ef80a, 1)},
-    {MemberFlags_IdentifiersEnum::Archetype, PlayerStatRead_Value(0x7ef81e, 2)},
-    {MemberFlags_IdentifiersEnum::HP, PlayerStatRead_Value(0x7ef833, 3)},
-    {MemberFlags_IdentifiersEnum::MaxHp, PlayerStatRead_Value(0x7ef844, 3)},
-    {MemberFlags_IdentifiersEnum::BaseMaxHp_1, PlayerStatRead_Value(0x7ef855, 3)},
-    {MemberFlags_IdentifiersEnum::Mp, PlayerStatRead_Value(0x7ef866, 3)},
-    {MemberFlags_IdentifiersEnum::MaxMp, PlayerStatRead_Value(0x7ef877, 3)},
-    {MemberFlags_IdentifiersEnum::BaseMaxHp_2, PlayerStatRead_Value(0x7ef888, 3)},
-    {MemberFlags_IdentifiersEnum::Vitality, PlayerStatRead_Value(0x7ef899, 3)},
-    {MemberFlags_IdentifiersEnum::Attunement, PlayerStatRead_Value(0x7ef8aa, 3)},
-    {MemberFlags_IdentifiersEnum::Endurance, PlayerStatRead_Value(0x7ef8bb, 3)},
-    {MemberFlags_IdentifiersEnum::Strength, PlayerStatRead_Value(0x7ef8cc, 3)},
-    {MemberFlags_IdentifiersEnum::Dexterity, PlayerStatRead_Value(0x7ef8dd, 3)},
-    {MemberFlags_IdentifiersEnum::Resistance, PlayerStatRead_Value(0x7ef8ee, 1)},
-    {MemberFlags_IdentifiersEnum::Intelligence, PlayerStatRead_Value(0x7ef92b, 3)},
-    {MemberFlags_IdentifiersEnum::Force, PlayerStatRead_Value(0x7ef93c, 3)},
-    {MemberFlags_IdentifiersEnum::ItemDiscoveryRate, PlayerStatRead_Value(0x7ef94d, 1)},
-    {MemberFlags_IdentifiersEnum::HumanityCount, PlayerStatRead_Value(0x7ef91b, 2)},
-    {MemberFlags_IdentifiersEnum::attackR1, PlayerStatRead_Value(0x7ef961, 1)},
-    {MemberFlags_IdentifiersEnum::attackR2, PlayerStatRead_Value(0x7ef975, 1)},
-    {MemberFlags_IdentifiersEnum::attackL1, PlayerStatRead_Value(0x7ef989, 1)},
-    {MemberFlags_IdentifiersEnum::attackL2, PlayerStatRead_Value(0x7ef99d, 1)},
-    {MemberFlags_IdentifiersEnum::EstusLevel, PlayerStatRead_Value(0x7ef9c9, 2)},
-    {MemberFlags_IdentifiersEnum::Left_Hand_1, PlayerStatRead_Value(0x7efa11, 2)},
-    {MemberFlags_IdentifiersEnum::Left_Hand_2, PlayerStatRead_Value(0x7efa2c, 2)},
-    {MemberFlags_IdentifiersEnum::Right_Hand_1, PlayerStatRead_Value(0x7efa49, 2)},
-    {MemberFlags_IdentifiersEnum::Right_Hand_2, PlayerStatRead_Value(0x7efa66, 2)},
-    {MemberFlags_IdentifiersEnum::ArmorHeadInv, PlayerStatRead_Value(0x7efa83, 2)},
-    {MemberFlags_IdentifiersEnum::ArmorBodyInv, PlayerStatRead_Value(0x7efaa0, 2)},
-    {MemberFlags_IdentifiersEnum::ArmorArmsInv, PlayerStatRead_Value(0x7efabd, 2)},
-    {MemberFlags_IdentifiersEnum::ArmorLegsInv, PlayerStatRead_Value(0x7efada, 2)},
-    {MemberFlags_IdentifiersEnum::Stamina, PlayerStatRead_Value(0x7efb1c, 3)},
-    {MemberFlags_IdentifiersEnum::MaxStamina, PlayerStatRead_Value(0x7efb2d, 3)},
-    {MemberFlags_IdentifiersEnum::BaseMaxStamina, PlayerStatRead_Value(0x7efb3e, 3)},
-    {MemberFlags_IdentifiersEnum::WeaponinSlot0, PlayerStatRead_Value(0x7efb59, 2)},
-    {MemberFlags_IdentifiersEnum::WeaponinSlot2, PlayerStatRead_Value(0x7efb74, 2)},
-    {MemberFlags_IdentifiersEnum::WeaponinSlot1, PlayerStatRead_Value(0x7efb91, 2)},
-    {MemberFlags_IdentifiersEnum::WeaponinSlot3, PlayerStatRead_Value(0x7efbae, 2)},
-    {MemberFlags_IdentifiersEnum::ArmorinSlot0, PlayerStatRead_Value(0x7efbc8, 2)},
-    {MemberFlags_IdentifiersEnum::ArmorinSlot1, PlayerStatRead_Value(0x7efbe5, 2)},
-    {MemberFlags_IdentifiersEnum::ArmorinSlot2, PlayerStatRead_Value(0x7efc00, 2)},
-    {MemberFlags_IdentifiersEnum::ArmorinSlot3, PlayerStatRead_Value(0x7efc1d, 2)},
-    {MemberFlags_IdentifiersEnum::RinginSlot0, PlayerStatRead_Value(0x7efc37, 2)},
-    {MemberFlags_IdentifiersEnum::RinginSlot1, PlayerStatRead_Value(0x7efc54, 2)},
-    {MemberFlags_IdentifiersEnum::IteminQuickbar0, PlayerStatRead_Value(0x7efc6e, 2)},
-    {MemberFlags_IdentifiersEnum::IteminQuickbar1, PlayerStatRead_Value(0x7efc86, 2)},
-    {MemberFlags_IdentifiersEnum::IteminQuickbar2, PlayerStatRead_Value(0x7efca6, 2)},
-    {MemberFlags_IdentifiersEnum::IteminQuickbar3, PlayerStatRead_Value(0x7efcc3, 2)},
-    {MemberFlags_IdentifiersEnum::IteminQuickbar4, PlayerStatRead_Value(0x7efce0, 2)},
-    {MemberFlags_IdentifiersEnum::IteminArrowBoltSlot0, PlayerStatRead_Value(0x7efcfd, 2)},
-    {MemberFlags_IdentifiersEnum::IteminArrowBoltSlot1, PlayerStatRead_Value(0x7efd1a, 2)},
-    {MemberFlags_IdentifiersEnum::IteminArrowBoltSlot2, PlayerStatRead_Value(0x7efd37, 2)},
-    {MemberFlags_IdentifiersEnum::IteminArrowBoltSlot3, PlayerStatRead_Value(0x7efd54, 2)},
-    {MemberFlags_IdentifiersEnum::EquippedSpell1, PlayerStatRead_Value(0x7efdb6, 0)},
-    {MemberFlags_IdentifiersEnum::New_Name_86, PlayerStatRead_Value(0x7efe5e, 6)},
-    {MemberFlags_IdentifiersEnum::New_Name_87, PlayerStatRead_Value(0x7efe86, 6)},
-    {MemberFlags_IdentifiersEnum::New_Name_88, PlayerStatRead_Value(0x7efeae, 6)},
-    {MemberFlags_IdentifiersEnum::New_Name_89, PlayerStatRead_Value(0x7efed6, 4)},
-    {MemberFlags_IdentifiersEnum::New_Name_93, PlayerStatRead_Value(0x7eff1e, 2)},
-    {MemberFlags_IdentifiersEnum::defSAToughnessTotal, PlayerStatRead_Value(0x7eff2e, 3)},
-    {MemberFlags_IdentifiersEnum::MaxEquipLoad, PlayerStatRead_Value(0x7eff47, 0)},
-    {MemberFlags_IdentifiersEnum::NormalDefenses, PlayerStatRead_Value(0x7f0157, 1)},
-    {MemberFlags_IdentifiersEnum::NormalResists, PlayerStatRead_Value(0x7f0190, 1)},
-    {MemberFlags_IdentifiersEnum::CovenantLevel, PlayerStatRead_Value(0x7f0225, 1)},
-    {MemberFlags_IdentifiersEnum::New_Name_110, PlayerStatRead_Value(0x7f0286, 1)},
-    {MemberFlags_IdentifiersEnum::New_Name_111, PlayerStatRead_Value(0x7f030b, 1)},
-    {MemberFlags_IdentifiersEnum::SoulLevel, PlayerStatRead_Value(0x7ef7e6, 2)},
-    {MemberFlags_IdentifiersEnum::MaxWeaponLevel, PlayerStatRead_Value(0x7ef9b9, 2)},
-};
-
 void AntiAntiCheat::start() {
     global::cmd_out << Mod::output_prefix << "Disabling built in AntiCheat...\n";
     uint8_t *write_address;
@@ -748,301 +514,20 @@ void AntiAntiCheat::start() {
     write_address = (uint8_t*)(AntiAntiCheat::game_write_playerdata_to_flatbuffer_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &game_write_playerdata_to_flatbuffer_injection_return, 0, &game_write_playerdata_to_flatbuffer_injection);
 
-    //Override all the character stats sent to the server that can be used to detect cheats and ban players
-
-    //ClearCount
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ClearCount].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_ClearCount_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ClearCount].nop_count, &PlayerStat_ClearCount_injection);
-
-    //New_Name_5
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::New_Name_5].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_New_Name_5_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::New_Name_5].nop_count, &PlayerStat_New_Name_5_injection);
-
-    //New_Name_7
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::New_Name_7].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_New_Name_7_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::New_Name_7].nop_count, &PlayerStat_New_Name_7_injection);
-
-    //SoulCount
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::SoulCount].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_SoulCount_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::SoulCount].nop_count, &PlayerStat_SoulCount_injection);
-
-    //SoulMemory
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::SoulMemory].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_SoulMemory_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::SoulMemory].nop_count, &PlayerStat_SoulMemory_injection);
-
-    //Archetype
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Archetype].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_Archetype_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Archetype].nop_count, &PlayerStat_Archetype_injection);
-
-    //HP
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::HP].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_HP_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::HP].nop_count, &PlayerStat_HP_injection);
-
-    //MaxHP
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::MaxHp].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_MaxHp_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::MaxHp].nop_count, &PlayerStat_MaxHp_injection);
-
-    //BaseMaxHp_1
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::BaseMaxHp_1].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_BaseMaxHp_1_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::BaseMaxHp_1].nop_count, &PlayerStat_BaseMaxHp_1_injection);
-
-    //Mp
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Mp].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_Mp_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Mp].nop_count, &PlayerStat_Mp_injection);
-
-    //MaxMP
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::MaxMp].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_MaxMp_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::MaxMp].nop_count, &PlayerStat_MaxMp_injection);
-
-    //BaseMaxHp_2
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::BaseMaxHp_2].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_BaseMaxHp_2_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::BaseMaxHp_2].nop_count, &PlayerStat_BaseMaxHp_2_injection);
-
-    //Vitality
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Vitality].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_Vitality_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Vitality].nop_count, &PlayerStat_Vitality_injection);
-
-    //Attunement
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Attunement].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_Attunement_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Attunement].nop_count, &PlayerStat_Attunement_injection);
-
-    //Endurance
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Endurance].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_Endurance_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Endurance].nop_count, &PlayerStat_Endurance_injection);
-
-    //Strength
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Strength].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_Strength_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Strength].nop_count, &PlayerStat_Strength_injection);
-
-    //Dexterity
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Dexterity].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_Dexterity_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Dexterity].nop_count, &PlayerStat_Dexterity_injection);
-
-    //Resistance
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Resistance].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_Resistance_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Resistance].nop_count, &PlayerStat_Resistance_injection);
-
-    //Intelligence
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Intelligence].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_Intelligence_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Intelligence].nop_count, &PlayerStat_Intelligence_injection);
-
-    //Force
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Force].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_Force_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Force].nop_count, &PlayerStat_Force_injection);
-
-    //ItemDiscoveryRate
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ItemDiscoveryRate].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_ItemDiscoveryRate_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ItemDiscoveryRate].nop_count, &PlayerStat_ItemDiscoveryRate_injection);
-
-    //HumanityCount
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::HumanityCount].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_HumanityCount_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::HumanityCount].nop_count, &PlayerStat_HumanityCount_injection);
-
-    //attackR1
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::attackR1].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_attackR1_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::attackR1].nop_count, &PlayerStat_attackR1_injection);
-
-    //attackR2
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::attackR2].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_attackR2_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::attackR2].nop_count, &PlayerStat_attackR2_injection);
-
-    //attackL1
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::attackL1].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_attackL1_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::attackL1].nop_count, &PlayerStat_attackL1_injection);
-
-    //attackL2
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::attackL2].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_attackL2_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::attackL2].nop_count, &PlayerStat_attackL2_injection);
-
-    //EstusLevel
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::EstusLevel].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_EstusLevel_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::EstusLevel].nop_count, &PlayerStat_EstusLevel_injection);
-
-    //Left_Hand_1
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Left_Hand_1].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_Left_Hand_1_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Left_Hand_1].nop_count, &PlayerStat_Left_Hand_1_injection);
-
-    //Left_Hand_2
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Left_Hand_2].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_Left_Hand_2_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Left_Hand_2].nop_count, &PlayerStat_Left_Hand_2_injection);
-
-    //Right_Hand_1
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Right_Hand_1].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_Right_Hand_1_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Right_Hand_1].nop_count, &PlayerStat_Right_Hand_1_injection);
-
-    //Right_Hand_2
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Right_Hand_2].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_Right_Hand_2_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Right_Hand_2].nop_count, &PlayerStat_Right_Hand_2_injection);
-
-    //ArmorHead
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorHeadInv].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_ArmorHead_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorHeadInv].nop_count, &PlayerStat_ArmorHead_injection);
-
-    //ArmorBody
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorBodyInv].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_ArmorBody_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorBodyInv].nop_count, &PlayerStat_ArmorBody_injection);
-
-    //ArmorArms
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorArmsInv].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_ArmorArms_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorArmsInv].nop_count, &PlayerStat_ArmorArms_injection);
-
-    //ArmorLegs
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorLegsInv].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_ArmorLegs_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorLegsInv].nop_count, &PlayerStat_ArmorLegs_injection);
-
-    //Stamina
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Stamina].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_Stamina_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::Stamina].nop_count, &PlayerStat_Stamina_injection);
-
-    //MaxStamina
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::MaxStamina].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_MaxStamina_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::MaxStamina].nop_count, &PlayerStat_MaxStamina_injection);
-
-    //BaseMaxStamina
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::BaseMaxStamina].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_BaseMaxStamina_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::BaseMaxStamina].nop_count, &PlayerStat_BaseMaxStamina_injection);
-
-    //WeaponinSlot0
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::WeaponinSlot0].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_WeaponinSlot0_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::WeaponinSlot0].nop_count, &PlayerStat_WeaponinSlot0_injection);
-
-    //WeaponinSlot2
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::WeaponinSlot2].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_WeaponinSlot2_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::WeaponinSlot2].nop_count, &PlayerStat_WeaponinSlot2_injection);
-
-    //WeaponinSlot1
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::WeaponinSlot1].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_WeaponinSlot1_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::WeaponinSlot1].nop_count, &PlayerStat_WeaponinSlot1_injection);
-
-    //WeaponinSlot3
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::WeaponinSlot3].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_WeaponinSlot3_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::WeaponinSlot3].nop_count, &PlayerStat_WeaponinSlot3_injection);
-
-    //ArmorinSlot0
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorinSlot0].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_ArmorinSlot0_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorinSlot0].nop_count, &PlayerStat_ArmorinSlot0_injection);
-
-    //ArmorinSlot1
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorinSlot1].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_ArmorinSlot1_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorinSlot1].nop_count, &PlayerStat_ArmorinSlot1_injection);
-
-    //ArmorinSlot2
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorinSlot2].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_ArmorinSlot2_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorinSlot2].nop_count, &PlayerStat_ArmorinSlot2_injection);
-
-    //ArmorinSlot3
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorinSlot3].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_ArmorinSlot3_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::ArmorinSlot3].nop_count, &PlayerStat_ArmorinSlot3_injection);
-
-    //RinginSlot0
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::RinginSlot0].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_RinginSlot0_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::RinginSlot0].nop_count, &PlayerStat_RinginSlot0_injection);
-
-    //RinginSlot1
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::RinginSlot1].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_RinginSlot1_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::RinginSlot1].nop_count, &PlayerStat_RinginSlot1_injection);
-
-    //IteminQuickbar0
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::IteminQuickbar0].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_IteminQuickbar0_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::IteminQuickbar0].nop_count, &PlayerStat_IteminQuickbar0_injection);
-
-    //IteminQuickbar1
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::IteminQuickbar1].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_IteminQuickbar1_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::IteminQuickbar1].nop_count, &PlayerStat_IteminQuickbar1_injection);
-
-    //IteminQuickbar2
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::IteminQuickbar2].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_IteminQuickbar2_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::IteminQuickbar2].nop_count, &PlayerStat_IteminQuickbar2_injection);
-
-    //IteminQuickbar3
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::IteminQuickbar3].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_IteminQuickbar3_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::IteminQuickbar3].nop_count, &PlayerStat_IteminQuickbar3_injection);
-
-    //IteminQuickbar4
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::IteminQuickbar4].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_IteminQuickbar4_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::IteminQuickbar4].nop_count, &PlayerStat_IteminQuickbar4_injection);
-
-    //IteminArrowBoltSlot0
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::IteminArrowBoltSlot0].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_IteminArrowBoltSlot0_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::IteminArrowBoltSlot0].nop_count, &PlayerStat_IteminArrowBoltSlot0_injection);
-
-    //IteminArrowBoltSlot1
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::IteminArrowBoltSlot1].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_IteminArrowBoltSlot1_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::IteminArrowBoltSlot1].nop_count, &PlayerStat_IteminArrowBoltSlot1_injection);
-
-    //IteminArrowBoltSlot2
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::IteminArrowBoltSlot2].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_IteminArrowBoltSlot2_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::IteminArrowBoltSlot2].nop_count, &PlayerStat_IteminArrowBoltSlot2_injection);
-
-    //IteminArrowBoltSlot3
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::IteminArrowBoltSlot3].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_IteminArrowBoltSlot3_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::IteminArrowBoltSlot3].nop_count, &PlayerStat_IteminArrowBoltSlot3_injection);
-
-    //EquippedSpell1
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::EquippedSpell1].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_EquippedSpell1_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::EquippedSpell1].nop_count, &PlayerStat_EquippedSpell1_injection);
-
-    //New_Name_86
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::New_Name_86].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_New_Name_86_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::New_Name_86].nop_count, &PlayerStat_New_Name_86_injection);
-
-    //New_Name_87
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::New_Name_87].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_New_Name_87_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::New_Name_87].nop_count, &PlayerStat_New_Name_87_injection);
-
-    //New_Name_88
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::New_Name_88].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_New_Name_88_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::New_Name_88].nop_count, &PlayerStat_New_Name_88_injection);
-
-    //New_Name_89
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::New_Name_89].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_New_Name_89_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::New_Name_89].nop_count, &PlayerStat_New_Name_89_injection);
-
-    //New_Name_93
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::New_Name_93].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_New_Name_93_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::New_Name_93].nop_count, &PlayerStat_New_Name_93_injection);
-
-    //defSAToughnessTotal
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::defSAToughnessTotal].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_defSAToughnessTotal_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::defSAToughnessTotal].nop_count, &PlayerStat_defSAToughnessTotal_injection);
-
-    //MaxEquipLoad
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::MaxEquipLoad].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_MaxEquipLoad_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::MaxEquipLoad].nop_count, &PlayerStat_MaxEquipLoad_injection);
-
-    //NormalDefenses
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::NormalDefenses].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_NormalDefenses_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::NormalDefenses].nop_count, &PlayerStat_NormalDefenses_injection);
-
-    //NormalResists
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::NormalResists].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_NormalResists_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::NormalResists].nop_count, &PlayerStat_NormalResists_injection);
-
-    //CovenantLevel
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::CovenantLevel].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_CovenantLevel_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::CovenantLevel].nop_count, &PlayerStat_CovenantLevel_injection);
-
-    //New_Name_110
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::New_Name_110].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_New_Name_110_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::New_Name_110].nop_count, &PlayerStat_New_Name_110_injection);
-
-    //New_Name_111
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::New_Name_111].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_New_Name_111_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::New_Name_111].nop_count, &PlayerStat_New_Name_111_injection);
-
-    //SoulLevel
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::SoulLevel].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_SoulLevel_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::SoulLevel].nop_count, &PlayerStat_SoulLevel_injection);
-
-    //WeaponLevel
-    write_address = (uint8_t*)(PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::MaxWeaponLevel].offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &PlayerStat_MaxWeaponLevel_injection_return, PlayerStatRead_adjustments[MemberFlags_IdentifiersEnum::MaxWeaponLevel].nop_count, &PlayerStat_MaxWeaponLevel_injection);
-
-    //Make doubly sure RequestUpdatePlayerStatus doesn't send anything we don't want it too
+    //Prevent RequestUpdatePlayerStatus from sending anything we don't want it too
     //fix all but the mandatory flags from the inputdata when it's read by construct_flatbuffer_from_PlayerStatus_MemberFlags 
     write_address = (uint8_t*)(AntiAntiCheat::construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_return, 1, &construct_flatbuffer_from_PlayerStatus_MemberFlags_injection);
+
+    write_address = (uint8_t*)(AntiAntiCheat::finish_construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &finish_construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_return, 1, &finish_construct_flatbuffer_from_PlayerStatus_MemberFlags_injection);
 }
+
+
+//use to store the original values of the memberflags before we edited them, since touching them directly can break stuff
+//save the game's true value here on function entry, overwrite the game values so the flatbuffer sees our values, then restore to this on function exit
+void* memberflags_ptr = NULL;
+uint8_t memberflags_orig[708];
 
 void set_value_in_MemberFlags(uint64_t input_data, MemberFlags_IdentifiersEnum flag, void* value)
 {
@@ -1113,29 +598,22 @@ void set_value_in_MemberFlags(uint64_t input_data, MemberFlags_IdentifiersEnum f
 
     FATALERROR("%s Invalid flag=%d", __FUNCTION__, flag);
 }
+
 void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_t input_data)
 {
     uint8_t tmp[28];
 
     input_data = input_data + 0x78; //&input_data->memberflags
 
+    //save the old values
+    memberflags_ptr = (void*)input_data;
+    memcpy(memberflags_orig, memberflags_ptr, sizeof(memberflags_orig));
+
     //set the clear count to 1 so players can have all NG + stuff without being detected as banned
     *(uint32_t*)tmp = 1;
     set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::ClearCount, tmp);
 
-    //unknown. 0 seems to be normal
-    *(uint32_t*)tmp = 0;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_5, tmp);
-
-    //unknown. 0 seems to be normal
-    *(uint32_t*)tmp = 0;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_6, tmp);
-
-    //unknown. 0xFDE80 seems to be normal
-    *(uint32_t*)tmp = 0xFDE80;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_7, tmp);
-
-    //sl=1, since it's not used for matchmaking?
+    //keep soul level at 1, since the server doesn't use it for matchmaking
     *(uint32_t*)tmp = 1;
     set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::SoulLevel, tmp);
 
@@ -1227,7 +705,7 @@ void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_
     *(uint32_t*)tmp = 20;
     set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::attackL2, tmp);
 
-    //Set weapon level to 0 since it's not used for matchmaking?
+    //keep weapon level at 0, since the server doesn't use it for matchmaking
     *(uint32_t*)tmp = 0;
     set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::MaxWeaponLevel, tmp);
 
@@ -1415,38 +893,6 @@ void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_
     *(uint32_t*)tmp = 0xFFFFFFFF;
     set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::EquippedSpell12, tmp);
 
-    //set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_81, tmp);
-
-    //set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_82, tmp);
-
-    //this seems to be human/not-human?
-    *(uint8_t*)tmp = 1;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_86, tmp);
-
-    //
-    *(uint8_t*)tmp = 0;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_87, tmp);
-
-    //
-    *(uint8_t*)tmp = 0;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_88, tmp);
-
-    //
-    *(uint8_t*)tmp = 0;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_89, tmp);
-
-    //unknown
-    *(uint8_t*)tmp = 0;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_91, tmp);
-
-    //const 0
-    *(uint8_t*)tmp = 0;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::Const0, tmp);
-
-    //const 0
-    *(float*)tmp = 0.0f;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_93, tmp);
-
     //0 poise
     *(float*)tmp = 0.0f;
     set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::defSAToughnessTotal, tmp);
@@ -1454,12 +900,6 @@ void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_
     //default Pyro Equip Load
     *(float*)tmp = 51.0f;
     set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::MaxEquipLoad, tmp);
-
-    //set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_99, tmp);
-
-    //set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_102, tmp);
-
-    //set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_105, tmp);
 
     //pyro default defs
     *(uint32_t*)(tmp + 0) = 20;
@@ -1486,36 +926,20 @@ void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_
     *(uint32_t*)(tmp + 20) = 100;
     *(uint32_t*)(tmp + 24) = 100;
     set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::CovenantLevel, tmp);
-
-    //set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_109, tmp);
-
-    //unknown, but all 1's
-    *(uint64_t*)(tmp + 0) = 0x101010101010101;
-    *(uint16_t*)(tmp + 8) = 0x101;
-    *(uint8_t*)(tmp + 10) = 1;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_110, tmp);
-
-    //unknown, but all 0's
-    *(uint64_t*)(tmp + 0) = 0;
-    *(uint64_t*)(tmp + 8) = 0;
-    *(uint64_t*)(tmp + 16) = 0;
-    *(uint32_t*)(tmp + 24) = 0;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_111, tmp);
-
-    //set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_112, tmp);
-
-    //set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_113, tmp);
-
-    //set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_114, tmp);
-
-    //set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_115, tmp);
-
-    //set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_116, tmp);
-
-    //set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_117, tmp);
-
-    //set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::New_Name_118, tmp);
 }
+
+void finish_construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper()
+{
+    if (memberflags_ptr == NULL)
+    {
+        FATALERROR("%s has memberflags_ptr as null", __FUNCTION__);
+        return;
+    }
+    //restore the old values and be safe to ensure we don't use a stale pointer
+    memcpy(memberflags_ptr, memberflags_orig, sizeof(memberflags_orig));
+    memberflags_ptr = NULL;
+}
+
 
 const uint32_t hackerFlag = 0x1770;
 const std::unordered_set<uint32_t> known_good_hash_vals_array_x64 = { 0x0, 0x37A, 0x3DE, 0x0AF0, 0x0E74, 0x29D6, 0x13C5E, 0x1895C, 0x4C4EBA, 0x0F1EB4, 1, 0x317, 0xa8f, 0x3e7 };
