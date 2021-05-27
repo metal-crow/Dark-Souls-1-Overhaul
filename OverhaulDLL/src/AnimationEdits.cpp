@@ -17,7 +17,6 @@ void AnimationEdits::start()
 {
     AnimationEdits::alter_animation_parameters();
     AnimationEdits::disable_whiff_animations();
-    AnimationEdits::fix_curvedsword_infinites();
 }
 
 /*
@@ -239,78 +238,3 @@ uint8_t disable_whiff_animations_injection_helper(uint8_t whiff) {
 
     return 0; //disable whiff
 }
-
-extern "C" {
-    uint64_t TAE_GetDamageRate_StunLen_finish_return;
-    void TAE_GetDamageRate_StunLen_finish_injection();
-    float TAE_GetDamageRate_StunLen_finish_helper_function(float);
-}
-
-/*
- * ========== FIX CURVED SWORD INFINTITES
- */
-
-void AnimationEdits::fix_curvedsword_infinites() {
-    global::cmd_out << Mod::output_prefix << ("Fix curved swords stun time...\n");
-
-    uint8_t *write_address = (uint8_t*)(AnimationEdits::TAE_GetDamageRate_StunLen_finish_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &TAE_GetDamageRate_StunLen_finish_return, 0, &TAE_GetDamageRate_StunLen_finish_injection);
-}
-
-//decrease the stun length so that defender can roll escape
-float TAE_GetDamageRate_StunLen_finish_helper_function(float current_stun)
-{
-    //If feature disabled, don't do anything
-    if (Mod::legacy_mode) {
-        return current_stun;
-    }
-
-    uint32_t weaponid = Game::get_last_attack_weapon_id();
-
-    //if this is a curved sword (except QFS)
-    if ((weaponid >= 400000 && weaponid < 406000) || weaponid == 9010000) {
-        return (current_stun - 0.15f);
-    }
-    return current_stun;
-}
-
-#if 0
-extern "C" {
-    uint64_t Calculate_movement_delta_return;
-    void Calculate_movement_delta_injection();
-    void Calculate_movement_delta_helper_function(uint64_t, float*);
-}
-
-void AnimationEdits::fix_roll_distance() {
-    global::cmd_out << Mod::output_prefix << ("Correct roll distance...\n");
-
-    uint8_t *write_address = (uint8_t*)(AnimationEdits::Calculate_movement_delta_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &Calculate_movement_delta_return, 2, &Calculate_movement_delta_injection);
-}
-
-static const std::unordered_map<int32_t, const std::vector<float>> hka_reference_frames_distances = {
-    {700, {}}, //Roll forward(fast)
-    {701, {}}, //Roll backward(fast)
-    {702, {}}, //Roll left(fast)
-    {703, {}}, //Roll right(fast)
-
-    {710, {}}, //Roll forward(mid)
-    {711, {}}, //Roll backward(mid)
-    {712, {}}, //Roll left(mid)
-    {713, {}}, //Roll right(mid)
-
-    {720, {}}, //Roll forward(fat / slow)
-    {721, {}}, //Roll backward(fat / slow)
-    {722, {}}, //Roll left(fat / slow)
-    {723, {}}, //Roll right(fat / slow)
-
-    {735, {}}, //Roll forward(fast, Dark Wood Grain Ring)
-    {736, {}}, //Roll backward(fast, Dark Wood Grain Ring)
-    {737, {}}, //Roll left(fast, Dark Wood Grain Ring)
-    {738, {}}, //Roll right(fast, Dark Wood Grain Ring)
-};
-
-void Calculate_movement_delta_helper_function(uint64_t playerCtrl, float* movement_delta)
-{
-}
-#endif

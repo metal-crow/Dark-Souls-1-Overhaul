@@ -44,22 +44,13 @@ public:
     static bool SetAnimationTimeOffset(void * time_offset_arg);
 
 private:
-    // Enables gesture cancelling via rolling
-    static void enable_gesture_cancelling();
-
     static void alter_animation_parameters();
 
     static void disable_whiff_animations();
 
-    static void fix_curvedsword_infinites();
-
-    static void fix_roll_distance();
-
 private:
     static const uint64_t animation_entry_set_offset = 0x43E281; //Triggered when an animation entry in the table has it's speed set
     static const uint64_t animation_whiff_set_offset = 0x386CC4;
-    static const uint64_t TAE_GetDamageRate_StunLen_finish_offset = 0x2dd71f;
-    static const uint64_t Calculate_movement_delta_offset = 0x37a22a;
 };
 
 #endif
