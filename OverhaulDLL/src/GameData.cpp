@@ -157,6 +157,11 @@ bool Game::on_character_load(void* unused)
 
         character_reload_run = true;
 
+        //only now, on first load, do we load the overhaul files
+        //This way we know they're the 2nd thing loaded
+        //(also only load them once since they get saved once loaded)
+        FileReloading::LoadGameParam();
+
         //need to force refresh the character in case the legacy mod changed while the game was off (restarting the game doesn't do this for some reason)
         FileReloading::RefreshPlayerStats();
 

@@ -41,6 +41,8 @@ public:
 
     static std::set<std::wstring> files_to_intercept_loading;
 
+    static bool UseCustomFiles;
+
 private:
     static void set_save_file_index(int unsigned index);
 };

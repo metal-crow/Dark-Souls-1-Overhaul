@@ -102,6 +102,8 @@ Calculate_MaxHP_From_Vit_FUNC* Calculate_MaxHP_From_Vit = (Calculate_MaxHP_From_
 Calculate_MaxMP_From_Att_FUNC* Calculate_MaxMP_From_Att = (Calculate_MaxMP_From_Att_FUNC*)0x1402ddf60;
 Calculate_MaxSP_From_End_FUNC* Calculate_MaxSP_From_End = (Calculate_MaxSP_From_End_FUNC*)0x1402de1d0;
 
+/* --------------------------------------------------------------------- */
+
 void FileReloading::ReloadPlayer()
 {
     // Set bPlayerReload flag to true
@@ -110,11 +112,16 @@ void FileReloading::ReloadPlayer()
     Force_PlayerReload(*(void**)Game::world_chr_man_imp, L"c0000");
 }
 
-bool UpdatePlayerStats(void* unused);
+/* --------------------------------------------------------------------- */
 
-void FileReloading::ReloadGameParam()
+bool FileReloading::GameParamsLoaded = false;
+bool CheckIfGameParamsLoaded(void* unused);
+
+void FileReloading::LoadGameParam()
 {
-    UnloadIndividualSoloParams({
+    Files::UseCustomFiles = true;
+
+    UnloadIndividualParams({}, {
                                 EquipParamWeapon,
                                 EquipParamProtector,
                                 EquipParamAccessory,
@@ -133,7 +140,7 @@ void FileReloading::ReloadGameParam()
                                 SpEffectParam,
                                 SpEffectVfxParam,
                                 TalkParam,
-                                //MenuColorTableParam, crash on reload
+                                MenuColorTableParam,
                                 ItemLotParam,
                                 MoveParam,
                                 CharaInitParam,
@@ -157,18 +164,79 @@ void FileReloading::ReloadGameParam()
 
     ReloadParamFile(GameParam);
 
-    FileReloading::RefreshPlayerStats();
+    MainLoop::setup_mainloop_callback(CheckIfGameParamsLoaded, NULL, "CheckIfGameParamsLoaded");
 }
 
-void FileReloading::RefreshPlayerStats()
+void UnloadIndividualParam(void* ParamMan_resCapArray, const wchar_t* param)
 {
-    //update the character stats based off recalculated values from their level
-    // (required since CalcCorrectGraph is refreshed)
-    //need to wait 1 frame for the files to be reloaded
-    uint32_t* startTime = (uint32_t*)malloc(4);
-    *startTime = Game::get_frame_count();
-    MainLoop::setup_mainloop_callback(UpdatePlayerStats, startTime, "UpdatePlayerStats");
+    void* param_res_cap = Find_ResCap(ParamMan_resCapArray, param);
+    if (param_res_cap != NULL)
+    {
+        Unload_ResCap(ParamMan_resCapArray, param_res_cap);
+    }
+    else
+    {
+        std::string out;
+        Files::string_wide_to_mb((wchar_t*)param, out);
+        global::cmd_out << "Unable to find " << out.c_str() << "\n";
+    }
 }
+
+/*
+ * Given a list of IndividualParams or IndividualSoloParams, unload them
+ */
+void FileReloading::UnloadIndividualParams(std::vector<IndividualParams> i_params, std::vector<IndividualSoloParams> is_params)
+{
+    void* ParamMan_resCapArray = (void*)((*(uint64_t*)Game::param_man) + 8);
+
+    for (auto param : i_params)
+    {
+        UnloadIndividualParam(ParamMan_resCapArray, IndividualParams_To_String.at(param));
+    }
+    for (auto param : is_params)
+    {
+        UnloadIndividualParam(ParamMan_resCapArray, IndividualSoloParams_To_String.at(param));
+    }
+}
+
+/*
+ * Given a paramBnd file, unload it from FileMan and reload it with the function call
+ */
+void FileReloading::ReloadParamFile(ParamBNDs paramfile)
+{
+    void* fileMan_FileCapArray_8 = (void*)((*(uint64_t*)Game::file_man) + 8);
+
+    void* param_file_found = Find_ResCap(fileMan_FileCapArray_8, ParamBNDs_To_String.at(paramfile));
+    if (param_file_found != NULL)
+    {
+        Unload_ResCap(fileMan_FileCapArray_8, param_file_found);
+    }
+    else
+    {
+        std::string out;
+        Files::string_wide_to_mb((wchar_t*)ParamBNDs_To_String.at(paramfile), out);
+        global::cmd_out << "Unable to find " << out.c_str() << "\n";
+    }
+
+    void* unused_arg = calloc(3, 8);
+    ParambndFileCap_Load(ParamBNDs_To_String.at(paramfile), unused_arg, NULL, NULL);
+}
+
+// Set a flag once the game finishes loading the overhaul game params
+bool CheckIfGameParamsLoaded(void* unused)
+{
+    int32_t containingRes_count = *(uint32_t*)((*(uint64_t*)Game::solo_param_man) + 0x10 + EquipParamWeapon * 72);
+    if (containingRes_count == 1)
+    {
+        return true;
+    }
+
+    Files::UseCustomFiles = false;
+    FileReloading::GameParamsLoaded = true;
+    return false;
+}
+
+/* --------------------------------------------------------------------- */
 
 bool UpdatePlayerStats(void* startTime)
 {
@@ -209,80 +277,25 @@ bool UpdatePlayerStats(void* startTime)
     return false;
 }
 
-/*
- * Given a list of IndividualParams, unload them
- */
-void FileReloading::UnloadIndividualParams(std::vector<IndividualParams> params)
+void FileReloading::RefreshPlayerStats()
 {
-    void* ParamMan_resCapArray = (void*)((*(uint64_t*)Game::param_man) + 8);
-
-    for (auto param : params)
-    {
-        void* param_res_cap = Find_ResCap(ParamMan_resCapArray, IndividualParams_To_String.at(param));
-        if (param_res_cap != NULL)
-        {
-            Unload_ResCap(ParamMan_resCapArray, param_res_cap);
-        }
-        else
-        {
-            std::string out;
-            Files::string_wide_to_mb((wchar_t*)IndividualParams_To_String.at(param), out);
-            global::cmd_out << "Unable to find " << out.c_str() << "\n";
-        }
-    }
+    //update the character stats based off recalculated values from their level
+    // (required since CalcCorrectGraph is refreshed)
+    //need to wait 1 frame for the files to be reloaded
+    uint32_t* startTime = (uint32_t*)malloc(4);
+    *startTime = Game::get_frame_count();
+    MainLoop::setup_mainloop_callback(UpdatePlayerStats, startTime, "UpdatePlayerStats");
 }
 
-/*
- * Given a list of IndividualSoloParams, unload them and set the SoloParamMan entry for each to overwite the old one
- */
-void FileReloading::UnloadIndividualSoloParams(std::vector<IndividualSoloParams> params)
-{
-    void* ParamMan_resCapArray = (void*) ((*(uint64_t*)Game::param_man) + 8);
-
-    for (auto param : params)
-    {
-        void* param_res_cap = Find_ResCap(ParamMan_resCapArray, IndividualSoloParams_To_String.at(param));
-        if (param_res_cap != NULL)
-        {
-            Unload_ResCap(ParamMan_resCapArray, param_res_cap);
-
-            *(uint32_t*)((*(uint64_t*)Game::solo_param_man) + (param + param * 8) * 8 + 0x10) = 0;
-        }
-        else
-        {
-            std::string out;
-            Files::string_wide_to_mb((wchar_t*)IndividualSoloParams_To_String.at(param), out);
-            global::cmd_out << "Unable to find " << out.c_str() << "\n";
-        }
-    }
-}
-
-/*
- * Given a paramBnd file, unload it from FileMan and reload it with the function call
- */
-void FileReloading::ReloadParamFile(ParamBNDs paramfile)
-{
-    void* fileMan_FileCapArray_8 = (void*)((*(uint64_t*)Game::file_man) + 8);
-
-    void* param_file_found = Find_ResCap(fileMan_FileCapArray_8, ParamBNDs_To_String.at(paramfile));
-    if (param_file_found != NULL)
-    {
-        Unload_ResCap(fileMan_FileCapArray_8, param_file_found);
-    }
-    else
-    {
-        std::string out;
-        Files::string_wide_to_mb((wchar_t*)ParamBNDs_To_String.at(paramfile), out);
-        global::cmd_out << "Unable to find " << out.c_str() << "\n";
-    }
-
-    void* unused_arg = calloc(3, 8);
-    ParambndFileCap_Load(ParamBNDs_To_String.at(paramfile), unused_arg, NULL, NULL);
-}
+/* --------------------------------------------------------------------- */
 
 extern "C" {
     uint64_t CalcCorrectGraph_injection_return;
     void CalcCorrectGraph_injection();
+
+    uint64_t get_ParamResCap_from_ParamMan_injection_return;
+    void get_ParamResCap_from_ParamMan_injection();
+    uint32_t SoloParamRes_curindex;
 }
 
 void FileReloading::start()
@@ -292,4 +305,23 @@ void FileReloading::start()
     //injection to prevent the CalcCorrectGraph from crashing if it can't find the param (due to reloading, for example)
     uint8_t *write_address = (uint8_t*)(FileReloading::CalcCorrectGraph_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &CalcCorrectGraph_injection_return, 4, &CalcCorrectGraph_injection);
+
+    //injection to change what paramRes the game reads from. We'll have 2 loaded, and can just change which one we refer to
+    write_address = (uint8_t*)(FileReloading::get_ParamResCap_from_ParamMan_injection_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &get_ParamResCap_from_ParamMan_injection_return, 2, &get_ParamResCap_from_ParamMan_injection);
+    SoloParamRes_curindex = 0;
+}
+
+void FileReloading::SetParamsToUse(bool legacy)
+{
+    if (legacy)
+    {
+        //the original files are always loaded first
+        SoloParamRes_curindex = 0;
+    }
+    else
+    {
+        //the overhaul files are loaded after boot
+        SoloParamRes_curindex = 1;
+    }
 }

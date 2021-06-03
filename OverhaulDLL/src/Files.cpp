@@ -22,6 +22,8 @@ std::set<std::wstring> Files::files_to_intercept_loading = {
     L"fdlc_main.fsb",
 };
 
+bool Files::UseCustomFiles = false;
+
 int Files::string_wide_to_mb(wchar_t *in_string, std::string &out_string)
 {
     if (in_string == NULL)
@@ -132,7 +134,7 @@ HANDLE WINAPI intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesiredAccess,
                 load_file = Files::get_save_file_path();
             }
 
-            else if (Files::files_to_intercept_loading.count(filename) && Mod::custom_game_archive_path.length() > 0 && !Mod::legacy_mode) {
+            else if (Files::files_to_intercept_loading.count(filename) && Mod::custom_game_archive_path.length() > 0 && Files::UseCustomFiles) {
                 load_file = Mod::custom_game_archive_path + filename;
 
                 std::string filename_str(filename.begin(), filename.end());

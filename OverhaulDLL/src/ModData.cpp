@@ -28,10 +28,11 @@
 const std::string Mod::output_prefix = "[Overhaul Mod] ";
 
 // Determines if we want to be in legacy mode or not
-bool Mod::prefer_legacy_mode = false;
+bool Mod::prefer_legacy_mode = true;
 
 // Determines whether we are in legacy mode (only applies fixes, no gameplay changes)
-bool Mod::legacy_mode = false;
+// This shouls start as true, and only change to false once game is first loaded and we've set up everything needed for overhaul mode
+bool Mod::legacy_mode = true;
 
 // Determines to disable the game's "Low framerate detected" disconnection
 bool Mod::disable_low_fps_disconnect = false;
@@ -63,9 +64,10 @@ void Mod::get_init_preferences()
     global::cmd_out << (Mod::output_prefix + "Loading settings preferences...\n");
 
     // Check if legacy mode is enabled
+    // Don't update the actual variable, only the preferred. So we only switch on initial character load
+    // This helps us keep consistant what is loaded first
     Mod::prefer_legacy_mode = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_LEGACY_MODE_, (int)Mod::prefer_legacy_mode, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
-    Mod::legacy_mode = Mod::prefer_legacy_mode;
-    if (Mod::legacy_mode)
+    if (Mod::prefer_legacy_mode)
     {
         global::cmd_out << ("    Legacy mode enabled. Gameplay changes will not be applied.\n");
         ModNetworking::allow_connect_with_legacy_mod_host = true;
@@ -204,8 +206,10 @@ void Mod::set_mode(bool legacy, bool mod_installed)
     if (Mod::legacy_mode != legacy)
     {
         legacy_mode = legacy;
-        FileReloading::ReloadGameParam();
+        Files::UseCustomFiles = !legacy;
+        FileReloading::SetParamsToUse(legacy);
         FileReloading::ReloadPlayer();
+        FileReloading::RefreshPlayerStats();
     }
 }
 
@@ -228,7 +232,7 @@ ModMode Mod::get_mode()
 
 bool Mod::set_preferred_mode(void* unused)
 {
-    if (Game::playerchar_is_loaded())
+    if (Game::playerchar_is_loaded() && FileReloading::GameParamsLoaded)
     {
         // Check if we are not in any multiplayer setting, so that the user's preferred legacy mode setting can be applied
         auto session_action_result = Game::get_SessionManagerImp_session_action_result();
