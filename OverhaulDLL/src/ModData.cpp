@@ -206,7 +206,7 @@ void Mod::set_mode(bool legacy, bool mod_installed)
     if (Mod::legacy_mode != legacy)
     {
         legacy_mode = legacy;
-        Files::UseCustomFiles = !legacy;
+        Files::UseOverhaulFiles = !legacy;
         FileReloading::SetParamsToUse(legacy);
         FileReloading::ReloadPlayer();
         FileReloading::RefreshPlayerStats();

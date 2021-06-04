@@ -3,6 +3,8 @@
 #include "Menu/SavedCharacters.h"
 #include "Save/Sl2.h"
 #include "SP/memory/injection/asm/x64.h"
+#include <algorithm>
+#include <iterator>
 
 
 int Files::save_file_index = 0;
@@ -12,17 +14,22 @@ bool Files::save_file_index_make_new = false;
 bool first_save_load = true;
 std::string Files::save_file;
 
-//Make sure this is lowercase
+//Make sure file names are lowercase
+//These have edits to existing entries, and thus are overhaul only
 std::set<std::wstring> Files::files_to_intercept_loading = {
-    L"frpg_sfxbnd_commoneffects.ffxbnd.dcx",
     L"gameparam.parambnd.dcx",
     L"c0000.esd.dcx",
     L"c0000.anibnd.dcx",
+};
+
+//These don't have any edits, just additions to support changes
+std::set<std::wstring> Files::files_to_always_intercept_loading = {
+    L"frpg_sfxbnd_commoneffects.ffxbnd.dcx",
     L"fdlc_main.fev",
     L"fdlc_main.fsb",
 };
 
-bool Files::UseCustomFiles = false;
+bool Files::UseOverhaulFiles = false;
 
 int Files::string_wide_to_mb(wchar_t *in_string, std::string &out_string)
 {
@@ -134,7 +141,10 @@ HANDLE WINAPI intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesiredAccess,
                 load_file = Files::get_save_file_path();
             }
 
-            else if (Files::files_to_intercept_loading.count(filename) && Mod::custom_game_archive_path.length() > 0 && Files::UseCustomFiles) {
+            else if (
+                (Files::files_to_intercept_loading.count(filename) && Mod::custom_game_archive_path.length() > 0 && Files::UseOverhaulFiles) ||
+                (Files::files_to_always_intercept_loading.count(filename) && Mod::custom_game_archive_path.length() > 0)
+            ){
                 load_file = Mod::custom_game_archive_path + filename;
 
                 std::string filename_str(filename.begin(), filename.end());
@@ -381,7 +391,11 @@ void Files::check_custom_archive_file_path()
     }
 
     // Check that custom game archive files exist
-    for (auto custom_file : files_to_intercept_loading)
+    std::set<std::wstring> custom_files;
+    std::set_union(Files::files_to_intercept_loading.begin(), Files::files_to_intercept_loading.end(),
+                   Files::files_to_always_intercept_loading.begin(), Files::files_to_always_intercept_loading.end(),
+                   std::inserter(custom_files, custom_files.begin()));
+    for (auto custom_file : custom_files)
     {
         std::wstring filepath = std::wstring(Mod::custom_game_archive_path).append(custom_file);
         std::string custom_file_str;

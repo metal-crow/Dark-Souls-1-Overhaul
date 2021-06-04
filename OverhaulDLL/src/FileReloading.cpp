@@ -119,7 +119,7 @@ bool CheckIfGameParamsLoaded(void* unused);
 
 void FileReloading::LoadGameParam()
 {
-    Files::UseCustomFiles = true;
+    Files::UseOverhaulFiles = true;
 
     UnloadIndividualParams({}, {
                                 EquipParamWeapon,
@@ -231,7 +231,7 @@ bool CheckIfGameParamsLoaded(void* unused)
         return true;
     }
 
-    Files::UseCustomFiles = false;
+    Files::UseOverhaulFiles = false;
     FileReloading::GameParamsLoaded = true;
     return false;
 }
