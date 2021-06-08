@@ -155,6 +155,8 @@ public:
     static const uint64_t char_loaded_injection_offset = 0x24D8D0;
     static const uint64_t char_loading_injection_offset = 0x278FC0;
 
+    static const uint64_t gui_hpbar_max_injection_offset = 0x676ed7;
+
     // Player character status (loading, human, co-op, invader, hollow)
     static sp::mem::pointer<int32_t> player_char_status;
 

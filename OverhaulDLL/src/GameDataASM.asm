@@ -62,6 +62,21 @@ jmp     char_loading_injection_return
 
 char_loading_injection ENDP
 
+
+extern gui_hpbar_max_injection_return: qword
+extern Gui_HP_bar_UI_ptr: qword
+
+PUBLIC gui_hpbar_max_injection
+gui_hpbar_max_injection PROC
+;save the pointer to the HP bar ui size
+mov     Gui_HP_bar_UI_ptr, rbx
+add     Gui_HP_bar_UI_ptr, 504h
+;original code
+mov     dword ptr [rbx+508h], 44220000h
+mov     qword ptr [rbx+50Ch], 43C80000h
+jmp     gui_hpbar_max_injection_return
+gui_hpbar_max_injection ENDP
+
 _TEXT    ENDS
 
 END

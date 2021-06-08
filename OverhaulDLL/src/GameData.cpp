@@ -61,6 +61,9 @@ extern "C" {
     void char_loaded_injection();
     uint64_t char_loading_injection_return;
     void char_loading_injection();
+
+    uint64_t gui_hpbar_max_injection_return;
+    void gui_hpbar_max_injection();
 }
 
 // Flag to determine if any characters have been loaded since the game was launched (useful if player had a character loaded but returned to main menu)
@@ -139,6 +142,10 @@ void Game::init()
     sp::mem::code::x64::inject_jmp_14b(write_address, &char_loaded_injection_return, 6, &char_loaded_injection);
     write_address = (uint8_t*)(Game::char_loading_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &char_loading_injection_return, 1, &char_loading_injection);
+
+    //inject the code that saves the HP Bar UI element pointer
+    write_address = (uint8_t*)(Game::gui_hpbar_max_injection_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &gui_hpbar_max_injection_return, 7, &gui_hpbar_max_injection);
 }
 
 static bool character_reload_run = false;
@@ -710,6 +717,10 @@ const float corrected_vanilla_hpbar_max = 2633.0;
 const float original_vanilla_hpbar_max = 1900.0;
 static const uint64_t gui_hpbar_value_offset = 0x676ECD;
 
+extern "C" {
+    uint64_t Gui_HP_bar_UI_ptr = NULL;
+}
+
 // Fix the bug where the player HP could be greater than the displayed GUI bar
 void Game::set_gui_hpbar_max()
 {
@@ -731,6 +742,14 @@ void Game::set_gui_hpbar_max()
     //Instruction that loads the immediate float (+6 for immediate location in opcode)
     void *write_address = (void*)(Game::ds1_base + gui_hpbar_value_offset);
     sp::mem::patch_bytes((void*)((uint64_t)write_address+6), (uint8_t*)&current_hpbar_max, 4);
+
+    //Also update the FrpgMenuDlgPCGauge variable that is set based on the above, so the change is immediate
+    //If we're calling this before the variable is init'd, it's fine since the above injection will set the value and we don't need this
+    //If we're calling it after the above injection has already been exec'd, this pointer will be saved and current
+    if (Gui_HP_bar_UI_ptr != NULL)
+    {
+        *(float*)Gui_HP_bar_UI_ptr = current_hpbar_max;
+    }
 }
 
 
