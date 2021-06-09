@@ -48,6 +48,8 @@ uint64_t Game::file_man = NULL;
 
 uint64_t Game::session_man_imp = NULL;
 
+uint64_t Game::menu_man = NULL;
+
 // Player character status (loading, human, co-op, invader, hollow)
 sp::mem::pointer<int32_t> Game::player_char_status;
 
@@ -130,6 +132,8 @@ void Game::init()
     Game::file_man = Game::ds1_base + 0x1d1e4f8;
 
     Game::session_man_imp = Game::ds1_base + 0x1d1a370;
+
+    Game::menu_man = Game::ds1_base + 0x1d26168;
 
     //hook the code that calculates attack damage and save off the weapon id used for the attack
     last_attack_weaponid = -1;
@@ -1186,4 +1190,39 @@ uint64_t Game::get_synced_time()
 float Game::convert_time_to_offset(uint64_t time)
 {
     return time / 10000000.0f;
+}
+
+typedef void FUN_1406e8a60_Typedef(uint64_t unk, const wchar_t* str);
+FUN_1406e8a60_Typedef* FUN_1406e8a60 = (FUN_1406e8a60_Typedef*)0x1406e8a60;
+
+//This is mostly copied from the debug code that creates a test message. Function 1406e9840
+void Game::show_popup_message(const wchar_t* msg)
+{
+    uint64_t pcVar3 = *((uint64_t*)Game::menu_man) + 0xa48;
+    int i = 0;
+    uint64_t pcVar7 = pcVar3;
+    do
+    {
+        pcVar7 = pcVar7 + 0x40;
+        if (*(byte*)pcVar7 == 0)
+        {
+            *(uint32_t*)(pcVar3 + 0x150) = *(uint32_t*)(pcVar3 + 0x8);
+            *(uint32_t*)(pcVar3 + 0x8) = i;
+            uint64_t pcVar7 = pcVar3 + i * 0x40 + 0x10;
+            if (pcVar7 != NULL)
+            {
+                *(uint64_t*)(pcVar7 + 0x8) = 0xffffffffffffffff;
+                *(uint32_t*)(pcVar7 + 0x4) = 0xffffffff;
+                *(uint32_t*)(pcVar7 + 0x18) = 1;
+                *(uint32_t*)(pcVar7 + 0x34) = 0x1;
+                *(uint32_t*)(pcVar7 + 0x38) = 0x7;
+                *(uint8_t*)(pcVar7 + 0x30) = 1;
+            }
+            FUN_1406e8a60(pcVar3, msg);
+            *(uint16_t*)(pcVar7 + 0x30) = 0x101;
+            *(uint32_t*)(pcVar3 + 0x8) = *(uint32_t*)(pcVar3 + 0x150);
+            break;
+        }
+        i = i + 1;
+    } while (i < 5);
 }

@@ -47,7 +47,7 @@ Enabling Overhaul mode by default is highly recommended, since it dramatically i
 
 * Dead Angles and Ghost Hits are back, and made slighly more consistent  
 
-* Equipment can again be changed while in any animation
+* Equipment (except weapons) can again be changed while in any animation
 
 * Bug with HP bar not reflecting the correct amount of health has been fixed (but can be disabled)
 
