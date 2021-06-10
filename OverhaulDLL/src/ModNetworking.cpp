@@ -3,6 +3,7 @@
 #include "DarkSoulsOverhaulMod.h"
 #include "MainLoop.h"
 #include "AnimationEdits.h"
+#include <wchar.h>
 
 bool ModNetworking::allow_connect_with_non_mod_host = false;
 bool ModNetworking::allow_connect_with_legacy_mod_host = false;
@@ -395,7 +396,7 @@ const uint8_t data_buf[] = {
     255, 0, 0, 25 }; //data (const 0xff000019)
 
 // Only call as Host, since this assumes session is connected and you can D/C other player
-void HostForceDisconnectSession(void* SteamSessionMemberLight)
+void HostForceDisconnectSession(void* SteamSessionMemberLight, const wchar_t* dc_reason)
 {
     void* SteamInternal = (*SteamInternal_ContextInit)(Init_SteamInternal_FUNCPTR);
 
@@ -418,6 +419,11 @@ void HostForceDisconnectSession(void* SteamSessionMemberLight)
     }
 
     //TODO also set variables in this SessionMember struct to disable the connection locally
+
+    //Tell the host why we're dcing this guest
+    wchar_t dc_msg[300];
+    swprintf(dc_msg, 300, L"Disconnecting incoming guest player.\n%s", dc_reason);
+    Game::show_popup_message(dc_msg);
 }
 
 //returns the type of the intercepted packet
@@ -442,7 +448,7 @@ uint32_t GetSteamData_Packet_injection_helper(void* data, uint32_t type, void* S
     if (type == 36 && (session_action_result == TryToCreateSession || session_action_result == CreateSessionSuccess))
     {
         //if we don't have the extra flags byte at the end of the packet, non-mod user
-        //handle the the that the dword at the end is optional
+        //handle the fact that the dword at the end of the normal packet is optional
         if (data_remaining != 5 && data_remaining != 1)
         {
             ModNetworking::guest_mod_installed = false;
@@ -487,7 +493,7 @@ uint32_t GetSteamData_Packet_injection_helper(void* data, uint32_t type, void* S
                 // If this new guest is a non-mod user but we already have a mod user connected
                 if (Mod::get_mode() != Compatability)
                 {
-                    HostForceDisconnectSession(SteamSessionMemberLight);
+                    HostForceDisconnectSession(SteamSessionMemberLight, L"Incoming guest is a non-mod user, but mod user is already connected.");
                 }
                 else
                 {
@@ -497,19 +503,19 @@ uint32_t GetSteamData_Packet_injection_helper(void* data, uint32_t type, void* S
             // unknown playernum state
             else
             {
-                HostForceDisconnectSession(SteamSessionMemberLight);
+                HostForceDisconnectSession(SteamSessionMemberLight, L"Error. Next player number is <2, somehow. Report me.");
             }
         }
         // If specified in options, we must disconnect the non-mod player, since they won't on their own
         else if (ModNetworking::guest_mod_installed == false && ModNetworking::allow_connect_with_non_mod_guest == false)
         {
-            HostForceDisconnectSession(SteamSessionMemberLight);
+            HostForceDisconnectSession(SteamSessionMemberLight, L"Incoming guest is non-mod user, and you do not allow connections with non-mod users.");
         }
         // At this point, we've already sent our info packet
         // If the guest hasn't already updated to it and this packet doesn't reflect our configs, something is wrong, so DC them
         else if (ModNetworking::guest_mod_installed == true && ModNetworking::guest_legacy_enabled != Mod::legacy_mode)
         {
-            HostForceDisconnectSession(SteamSessionMemberLight);
+            HostForceDisconnectSession(SteamSessionMemberLight, L"Incoming guest is mod-user, but isn't matching your legacy/overhaul mode.");
         }
         // Otherwise we're good to go, the configs match!
         //ConsoleWrite("Host Config match!");
@@ -573,8 +579,24 @@ uint32_t GetSteamData_Packet_injection_helper(void* data, uint32_t type, void* S
         }
         else
         {
+            //Tell the player why we're dcing
+            wchar_t dc_msg[300];
+            wcscpy_s(dc_msg, L"Unable to connect to host player.\n");
+            if (ModNetworking::host_mod_installed == false && ModNetworking::allow_connect_with_non_mod_host == false)
+            {
+                wcscat_s(dc_msg, L"Host does not have mod and you do not allow connections with non-mod users.");
+            }
+            else if (ModNetworking::host_mod_installed && ModNetworking::host_legacy_enabled == false && ModNetworking::allow_connect_with_overhaul_mod_host == false)
+            {
+                wcscat_s(dc_msg, L"Host is in overhaul mode and you do not allow connections with overhaul mode users.");
+            }
+            else if (ModNetworking::host_mod_installed && ModNetworking::host_legacy_enabled == true && ModNetworking::allow_connect_with_legacy_mod_host == false)
+            {
+                wcscat_s(dc_msg, L"Host is in legacy mode and you do not allow connections with legacy mode users.");
+            }
+            Game::show_popup_message(dc_msg);
+
             //we can't kick out the other player since we're not the host. So pretend we received the kickout packet
-            //ConsoleWrite("Guest Self-disconnect");
             *data_size_ptr += 4;
             ((uint32_t*)data_buf)[0] = 0xff000019;
             return 46;
