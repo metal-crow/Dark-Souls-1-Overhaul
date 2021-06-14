@@ -441,7 +441,7 @@ enum MemberFlags_IdentifiersEnum
     EquippedSpell10 = 0x4d,
     EquippedSpell11 = 0x4e,
     EquippedSpell12 = 0x4f,
-    CovenantId2 = 0x50,
+    SessionRoleID = 0x50,
     New_Name_81 = 0x51,
     New_Name_82 = 0x52,
     RegionMatchmaking = 0x53,
@@ -460,11 +460,11 @@ enum MemberFlags_IdentifiersEnum
     CharacterName = 0x60,
     New_Name_97 = 0x61,
     New_Name_98 = 0x62,
-    New_Name_99 = 0x63,
+    recentMPAreasVisited = 0x63,
     New_Name_100 = 0x64,
     MpRegion = 0x65,
-    New_Name_102 = 0x66,
-    CovenantId1 = 0x67,
+    SessionNatType = 0x66,
+    CovenantId = 0x67,
     inSession = 0x68,
     New_Name_105 = 0x69,
     NormalDefenses = 0x6a,
@@ -599,333 +599,37 @@ void set_value_in_MemberFlags(uint64_t input_data, MemberFlags_IdentifiersEnum f
     FATALERROR("%s Invalid flag=%d", __FUNCTION__, flag);
 }
 
+void set_MemberFlags_bitflag(uint64_t input_data, MemberFlags_IdentifiersEnum flag)
+{
+    *(uint64_t*)(input_data + (flag >> 0x6) * 0x8) = (*(uint64_t*)(input_data + (flag >> 0x6) * 0x8)) | 1ULL << (flag & 0x3f);
+    *(uint64_t*)(input_data + 0x10 + (flag >> 0x6) * 0x8) = (*(uint64_t*)(input_data + 0x10 + (flag >> 0x6) * 0x8)) | 1ULL << (flag & 0x3f);
+}
+
 void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_t input_data)
 {
-    uint8_t tmp[28];
-
     input_data = input_data + 0x78; //&input_data->memberflags
 
     //save the old values
     memberflags_ptr = (void*)input_data;
     memcpy(memberflags_orig, memberflags_ptr, sizeof(memberflags_orig));
 
-    //set the clear count to 1 so players can have all NG + stuff without being detected as banned
-    *(uint32_t*)tmp = 1;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::ClearCount, tmp);
-
-    //keep soul level at 1, since the server doesn't use it for matchmaking
-    *(uint32_t*)tmp = 1;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::SoulLevel, tmp);
-
-    //enough to level up to max
-    *(uint32_t*)tmp = 2000000000;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::SoulCount, tmp);
-
-    //enough to level up to max and same as above
-    *(uint32_t*)tmp = 2000000000;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::SoulMemory, tmp);
-
-    //hardcode as pyrocmancer (since they can start at sl1)
-    *(uint32_t*)tmp = 7;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::Archetype, tmp);
-
-    //default pyromancer hp
-    *(uint32_t*)tmp = 573;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::HP, tmp);
-
-    //default pyromancer MaxHp
-    *(uint32_t*)tmp = 573;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::MaxHp, tmp);
-
-    //default pyromancer Base MaxHp
-    *(uint32_t*)tmp = 573;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::BaseMaxHp_1, tmp);
-
-    //default pyromancer MP
-    *(uint32_t*)tmp = 81;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::Mp, tmp);
-
-    //default pyromancer MP
-    *(uint32_t*)tmp = 81;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::MaxMp, tmp);
-
-    //default pyromancer Base MaxHp
-    *(uint32_t*)tmp = 573;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::BaseMaxHp_2, tmp);
-
-    //default pyromancer Vitality
-    *(uint32_t*)tmp = 10;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::Vitality, tmp);
-
-    //default pyromancer Attunement
-    *(uint32_t*)tmp = 12;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::Attunement, tmp);
-
-    //default pyromancer Endurance
-    *(uint32_t*)tmp = 11;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::Endurance, tmp);
-
-    //default pyromancer Strength
-    *(uint32_t*)tmp = 12;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::Strength, tmp);
-
-    //default pyromancer Dexterity
-    *(uint32_t*)tmp = 9;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::Dexterity, tmp);
-
-    //default pyromancer Resistance
-    *(uint32_t*)tmp = 12;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::Resistance, tmp);
-
-    //default pyromancer Intelligence
-    *(uint32_t*)tmp = 10;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::Intelligence, tmp);
-
-    //default pyromancer Faith
-    *(uint32_t*)tmp = 8;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::Force, tmp);
-
-    //default pyromancer ItemDiscoveryRate
-    *(uint32_t*)tmp = 100;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::ItemDiscoveryRate, tmp);
-
-    //bare fists
-    *(uint32_t*)tmp = 20;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::attackR1, tmp);
-
-    //bare fists
-    *(uint32_t*)tmp = 20;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::attackR2, tmp);
-
-    //bare fists
-    *(uint32_t*)tmp = 20;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::attackL1, tmp);
-
-    //bare fists
-    *(uint32_t*)tmp = 20;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::attackL2, tmp);
-
-    //keep weapon level at 0, since the server doesn't use it for matchmaking
-    *(uint32_t*)tmp = 0;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::MaxWeaponLevel, tmp);
-
-    //no upgrade
-    *(uint32_t*)tmp = 0;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::EstusLevel, tmp);
-
-    //0 humanity
-    *(uint32_t*)tmp = 0;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::HumanityCount, tmp);
-
-    //bare fist
-    *(uint32_t*)tmp = 5;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::Left_Hand_1, tmp);
-
-    //bare fist
-    *(uint32_t*)tmp = 5;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::Left_Hand_2, tmp);
-
-    //bare fist
-    *(uint32_t*)tmp = 5;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::Right_Hand_1, tmp);
-
-    //bare fist
-    *(uint32_t*)tmp = 5;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::Right_Hand_2, tmp);
-
-    //no armor
-    *(uint32_t*)tmp = 0;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::ArmorHeadInv, tmp);
-
-    //no armor
-    *(uint32_t*)tmp = 0;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::ArmorBodyInv, tmp);
-
-    //no armor
-    *(uint32_t*)tmp = 0;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::ArmorArmsInv, tmp);
-
-    //no armor
-    *(uint32_t*)tmp = 0;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::ArmorLegsInv, tmp);
-
-    //no weapon
-    *(uint32_t*)tmp = 900000;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::LeftHandHeldWeaponSlot, tmp);
-
-    //no weapon
-    *(uint32_t*)tmp = 900000;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::RightHandHeldWeaponSlot, tmp);
-
-    //default pyro stamina
-    *(uint32_t*)tmp = 93;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::Stamina, tmp);
-
-    //default pyro stamina
-    *(uint32_t*)tmp = 93;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::MaxStamina, tmp);
-
-    //default pyro stamina
-    *(uint32_t*)tmp = 93;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::BaseMaxStamina, tmp);
-
-    //no weapon
-    *(uint32_t*)tmp = 900000;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::WeaponinSlot0, tmp);
-
-    //no weapon
-    *(uint32_t*)tmp = 900000;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::WeaponinSlot1, tmp);
-
-    //no weapon
-    *(uint32_t*)tmp = 900000;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::WeaponinSlot2, tmp);
-
-    //no weapon
-    *(uint32_t*)tmp = 900000;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::WeaponinSlot3, tmp);
-
-    //no armor
-    *(uint32_t*)tmp = 900000;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::ArmorinSlot0, tmp);
-
-    //no armor
-    *(uint32_t*)tmp = 901000;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::ArmorinSlot1, tmp);
-
-    //no armor
-    *(uint32_t*)tmp = 902000;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::ArmorinSlot2, tmp);
-
-    //no armor
-    *(uint32_t*)tmp = 903000;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::ArmorinSlot3, tmp);
-
-    //no ring
-    *(uint32_t*)tmp = 0xFFFFFFFF;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::RinginSlot0, tmp);
-
-    //no ring
-    *(uint32_t*)tmp = 0xFFFFFFFF;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::RinginSlot1, tmp);
-
-    //no item
-    *(uint32_t*)tmp = 0xFFFFFFFF;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::IteminQuickbar0, tmp);
-
-    //no item
-    *(uint32_t*)tmp = 0xFFFFFFFF;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::IteminQuickbar1, tmp);
-
-    //no item
-    *(uint32_t*)tmp = 0xFFFFFFFF;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::IteminQuickbar2, tmp);
-
-    //no item
-    *(uint32_t*)tmp = 0xFFFFFFFF;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::IteminQuickbar3, tmp);
-
-    //no item
-    *(uint32_t*)tmp = 0xFFFFFFFF;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::IteminQuickbar4, tmp);
-
-    //no item
-    *(uint32_t*)tmp = 0xFFFFFFFF;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::IteminArrowBoltSlot0, tmp);
-
-    //no item
-    *(uint32_t*)tmp = 0xFFFFFFFF;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::IteminArrowBoltSlot1, tmp);
-
-    //no item
-    *(uint32_t*)tmp = 0xFFFFFFFF;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::IteminArrowBoltSlot2, tmp);
-
-    //no item
-    *(uint32_t*)tmp = 0xFFFFFFFF;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::IteminArrowBoltSlot3, tmp);
-
-    //no spell
-    *(uint32_t*)tmp = 0xFFFFFFFF;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::EquippedSpell1, tmp);
-
-    //no spell
-    *(uint32_t*)tmp = 0xFFFFFFFF;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::EquippedSpell2, tmp);
-
-    //no spell
-    *(uint32_t*)tmp = 0xFFFFFFFF;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::EquippedSpell3, tmp);
-
-    //no spell
-    *(uint32_t*)tmp = 0xFFFFFFFF;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::EquippedSpell4, tmp);
-
-    //no spell
-    *(uint32_t*)tmp = 0xFFFFFFFF;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::EquippedSpell5, tmp);
-
-    //no spell
-    *(uint32_t*)tmp = 0xFFFFFFFF;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::EquippedSpell6, tmp);
-
-    //no spell
-    *(uint32_t*)tmp = 0xFFFFFFFF;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::EquippedSpell7, tmp);
-
-    //no spell
-    *(uint32_t*)tmp = 0xFFFFFFFF;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::EquippedSpell8, tmp);
-
-    //no spell
-    *(uint32_t*)tmp = 0xFFFFFFFF;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::EquippedSpell9, tmp);
-
-    //no spell
-    *(uint32_t*)tmp = 0xFFFFFFFF;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::EquippedSpell10, tmp);
-
-    //no spell
-    *(uint32_t*)tmp = 0xFFFFFFFF;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::EquippedSpell11, tmp);
-
-    //no spell
-    *(uint32_t*)tmp = 0xFFFFFFFF;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::EquippedSpell12, tmp);
-
-    //0 poise
-    *(float*)tmp = 0.0f;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::defSAToughnessTotal, tmp);
-
-    //default Pyro Equip Load
-    *(float*)tmp = 51.0f;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::MaxEquipLoad, tmp);
-
-    //pyro default defs
-    *(uint32_t*)(tmp + 0) = 20;
-    *(uint32_t*)(tmp + 4) = 20;
-    *(uint32_t*)(tmp + 8) = 20;
-    *(uint32_t*)(tmp + 12) = 20;
-    *(uint32_t*)(tmp + 16) = 13;
-    *(uint32_t*)(tmp + 20) = 21;
-    *(uint32_t*)(tmp + 24) = 16;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::NormalDefenses, tmp);
-
-    //pyro default resists
-    *(uint32_t*)(tmp + 0) = 44;
-    *(uint32_t*)(tmp + 4) = 42;
-    *(uint32_t*)(tmp + 8) = 30;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::NormalResists, tmp);
-
-    //max covenant levels
-    *(uint32_t*)(tmp + 0) = 100;
-    *(uint32_t*)(tmp + 4) = 100;
-    *(uint32_t*)(tmp + 8) = 100;
-    *(uint32_t*)(tmp + 12) = 100;
-    *(uint32_t*)(tmp + 16) = 100;
-    *(uint32_t*)(tmp + 20) = 100;
-    *(uint32_t*)(tmp + 24) = 100;
-    set_value_in_MemberFlags(input_data, MemberFlags_IdentifiersEnum::CovenantLevel, tmp);
+    //unset all the bitflags, so we don't send any info to the server
+    memset((void*)input_data, 0xff, 32);
+
+    //allow only some mandatory data to be sent
+    set_MemberFlags_bitflag(input_data, MemberFlags_IdentifiersEnum::AreaId);
+    set_MemberFlags_bitflag(input_data, MemberFlags_IdentifiersEnum::MpRegion);
+    set_MemberFlags_bitflag(input_data, MemberFlags_IdentifiersEnum::RankingRegistration);
+    set_MemberFlags_bitflag(input_data, MemberFlags_IdentifiersEnum::RegionMatchmaking);
+    set_MemberFlags_bitflag(input_data, MemberFlags_IdentifiersEnum::isPlayerHollow);
+    set_MemberFlags_bitflag(input_data, MemberFlags_IdentifiersEnum::CharacterName);
+    set_MemberFlags_bitflag(input_data, MemberFlags_IdentifiersEnum::CovenantId);
+    set_MemberFlags_bitflag(input_data, MemberFlags_IdentifiersEnum::inSession);
+    set_MemberFlags_bitflag(input_data, MemberFlags_IdentifiersEnum::SessionNatType);
+    set_MemberFlags_bitflag(input_data, MemberFlags_IdentifiersEnum::SessionRoleID);
+    set_MemberFlags_bitflag(input_data, MemberFlags_IdentifiersEnum::hasInvasionTimeLimit);
+    set_MemberFlags_bitflag(input_data, MemberFlags_IdentifiersEnum::recentMPAreasVisited);
+    set_MemberFlags_bitflag(input_data, MemberFlags_IdentifiersEnum::New_Name_100);
 }
 
 void finish_construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper()
