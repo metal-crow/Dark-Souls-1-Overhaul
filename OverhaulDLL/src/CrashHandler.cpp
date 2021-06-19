@@ -379,18 +379,21 @@ void crash_handler(char* message_str)
     WaitForSingleObject(dump_thread, INFINITE);
 
     //zip the folder
-    char cmd[MAX_PATH + 100 + 50];
-    snprintf(cmd, sizeof(cmd), "powershell.exe -command \"Compress-Archive '%s' '%s.zip'\"", (char*)output_dir, (char*)output_dir);
-    PROCESS_INFORMATION zip_pi;
-    STARTUPINFO si;
-    ZeroMemory(&si, sizeof(si));
-    si.cb = sizeof(si);
-    ZeroMemory(&zip_pi, sizeof(zip_pi));
-    bool zipdump = CreateProcess(NULL, cmd, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &zip_pi);
-    // Wait 15 sec max for the zip to finish
-    WaitForSingleObject(zip_pi.hProcess, 15 * 1000);
-    CloseHandle(zip_pi.hProcess);
-    CloseHandle(zip_pi.hThread);
+    if (send_report != 0)
+    {
+        char cmd[MAX_PATH + 100 + 50];
+        snprintf(cmd, sizeof(cmd), "powershell.exe -command \"Compress-Archive '%s' '%s.zip'\"", (char*)output_dir, (char*)output_dir);
+        PROCESS_INFORMATION zip_pi;
+        STARTUPINFO si;
+        ZeroMemory(&si, sizeof(si));
+        si.cb = sizeof(si);
+        ZeroMemory(&zip_pi, sizeof(zip_pi));
+        bool zipdump = CreateProcess(NULL, cmd, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &zip_pi);
+        // Wait 15 sec max for the zip to finish
+        WaitForSingleObject(zip_pi.hProcess, 15 * 1000);
+        CloseHandle(zip_pi.hProcess);
+        CloseHandle(zip_pi.hThread);
+    }
 
     // Send the report
     if (send_report != 0) {
