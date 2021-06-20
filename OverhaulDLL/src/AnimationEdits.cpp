@@ -36,7 +36,6 @@ static const std::unordered_map<int32_t, std::tuple<float, float>> ANIMATIONS_TO
     { 6420, {1.0f,  0.0f}}, { 6520, {1.0f,  0.0f}},  //Sunlight Heal knealing animation
     { 6218, {10.0f, 0.0f}}, { 6318, {10.0f, 0.0f}},  //lightning spear starting animation
     { 6418, {1.2f,  0.0f}}, { 6518, {1.2f,  0.0f}},  //lightning spear throwing animation
-    { 9000, {1.25f, 3.0f}}, { 9420, {1.25f, 3.0f}},  //getting backstabbed (total times 5.9 and 5.766667)
 };
 
 std::unordered_map<uint16_t, AnimationStateTypesEnum> AnimationEdits::STATEIDS_TO_ROLLBACK = {
@@ -178,31 +177,6 @@ void read_body_aid_injection_helper_function(int32_t* animation_id, float* speed
                 return;
             }
             thread_data->time_to_adjust_speed_at = std::get<1>(ajust_aid->second)*1000 + *cur_time_o.value();
-
-            thread_data->animation_entry_speed_ptr = speed;
-
-            MainLoop::setup_mainloop_callback(DelayAnimationSpeedAjustment, thread_data, "DelayAnimationSpeedAjustment");
-            return;
-        }
-    }
-
-    //handle backstabING detection (b/c it's a ton of diff animations)
-    if (*animation_id > 200000)
-    {
-        if (*animation_id % 1000 == 400 || *animation_id % 1000 == 401)
-        {
-            SpeedAlterStruct* thread_data = (SpeedAlterStruct*)malloc(sizeof(SpeedAlterStruct));
-            thread_data->new_animation_speed = 1.25f;
-
-            //compute the absolute time this anim should be changed at. cur_time + offset_time_to_adjust
-            auto cur_time_o = Game::get_game_time_ms();
-            if (!cur_time_o.has_value())
-            {
-                ConsoleWrite("Unable to get_game_time_ms for start_time in %s", __FUNCTION__);
-                free(thread_data);
-                return;
-            }
-            thread_data->time_to_adjust_speed_at = 3.0f * 1000 + *cur_time_o.value();
 
             thread_data->animation_entry_speed_ptr = speed;
 

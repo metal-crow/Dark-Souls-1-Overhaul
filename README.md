@@ -83,7 +83,6 @@ Hope to obsolete this when i make compatable with ModEngine2
   * Gravelord Sword Dance startup and main animation have been sped up (x10 and x1.6)
   * All kneeling heals have had their startup sped up (x6)
   * Lightning Spear startup and main animation have been sped up (x10 and x1.2)
-  * Backstab animations are sped up (after 3 seconds, x1.25)
 
 * All whiff animations on weapons have been removed (they always have the on-hit animation instead)
 
