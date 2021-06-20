@@ -352,10 +352,7 @@ void crash_handler(char* message_str)
     sw.ShowCallstack(); //This interally calls OnOutput, which we overwrite to only save the output
     std::string stack_info = sw.GetOutput(); // Get the saved output
 
-    // Run the UI. This won't return until the user closes the window
-    INT_PTR send_report = make_crash_handler_ui();
-
-    // Write out the stack trace and any message info
+    // Write out the stack trace
     FILE* fp;
     char msg_file[sizeof(output_dir)];
     snprintf(msg_file, sizeof(msg_file), "%s\\%s", output_dir, "message");
@@ -364,6 +361,13 @@ void crash_handler(char* message_str)
     if (message_str != NULL) {
         fprintf(fp, "%s", message_str);
     }
+    fclose(fp);
+
+    // Run the UI. This won't return until the user closes the window
+    INT_PTR send_report = make_crash_handler_ui();
+
+    // Write out any message info
+    fopen_s(&fp, msg_file, "a");
     if (error_description_text != nullptr) {
         fprintf(fp, "--------------------\nUser Error Report: %s\n", error_description_text);
     }
