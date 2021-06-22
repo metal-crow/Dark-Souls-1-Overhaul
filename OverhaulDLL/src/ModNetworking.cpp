@@ -5,10 +5,10 @@
 #include "AnimationEdits.h"
 #include <wchar.h>
 
-bool ModNetworking::allow_connect_with_non_mod_host = false;
-bool ModNetworking::allow_connect_with_legacy_mod_host = false;
-bool ModNetworking::allow_connect_with_overhaul_mod_host = false;
-bool ModNetworking::allow_connect_with_non_mod_guest = false;
+bool ModNetworking::allow_connect_with_non_mod_host = true;
+bool ModNetworking::allow_connect_with_legacy_mod_host = true;
+bool ModNetworking::allow_connect_with_overhaul_mod_host = true;
+bool ModNetworking::allow_connect_with_non_mod_guest = true;
 
 bool ModNetworking::host_mod_installed = false;
 bool ModNetworking::host_legacy_enabled = false;
