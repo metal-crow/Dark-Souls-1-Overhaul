@@ -42,7 +42,7 @@ typedef struct BulletNetworkInfo_Struct {
 BulletNetworkInfo BulletNetworkInfo_Array[10];
 
 void SpellDesync::start() {
-    global::cmd_out << Mod::output_prefix << "Fixing Spell Desync...\n";
+    ConsoleWrite("Fixing Spell Desync...");
 
     //inject into the spell casting function to trigger a packet sending, which includes the custom needed data
     uint8_t *write_address = (uint8_t*)(SpellDesync::homing_spell_trigger_injection_offset + Game::ds1_base);
@@ -75,13 +75,12 @@ void homing_spell_trigger_injection_helper_function(uint32_t target, uint8_t bul
     }
 
     CustomSpellPacketData homingPkt;
-    char error[100];
 
     auto owner_o = Game::get_pc_playernum();
     auto target_o = Game::convert_handle_to_playernum(target);
     if (!owner_o.has_value() || !target_o.has_value())
     {
-        global::cmd_out << "WARNING. Unable to get bullet owner or target\n";
+        ConsoleWrite("WARNING. Unable to get bullet owner or target");
         return;
     }
 
@@ -90,8 +89,7 @@ void homing_spell_trigger_injection_helper_function(uint32_t target, uint8_t bul
     homingPkt.target = target_o.value();
     //handle error case
     if (homingPkt.target == -1) {
-        snprintf(error, 100, "WARNING. Unable to convert Handle(%x) to a player number\n", target);
-        global::cmd_out << error;
+        ConsoleWrite("WARNING. Unable to convert Handle(%x) to a player number\n", target);
         return;
     }
 
@@ -110,23 +108,19 @@ void type1_p2pPacket_parse_injection_helper_function(CustomSpellPacketData* bull
         return;
     }
 
-    char error[100];
-
     if (received_SpellData_count < 10)
     {
         //Convert from player numbers to handles
         uint32_t ownerHandle = Game::convert_playernum_to_handle(bullet_packet->owner).value_or(0);
         if (ownerHandle == 0) {
-            snprintf(error, 100, "WARNING. Unable to convert Owner PlayerNo(%d) to a handle\n", bullet_packet->owner);
-            global::cmd_out << error;
+            ConsoleWrite("WARNING. Unable to convert Owner PlayerNo(%d) to a handle", bullet_packet->owner);
             return;
         }
         BulletNetworkInfo_Array[received_SpellData_count].owner_id = ownerHandle;
 
         uint32_t targetHandle = Game::convert_playernum_to_handle(bullet_packet->target).value_or(0);
         if (targetHandle == 0) {
-            snprintf(error, 100, "WARNING. Unable to convert Target PlayerNo(%d) to a handle\n", bullet_packet->target);
-            global::cmd_out << error;
+            ConsoleWrite("WARNING. Unable to convert Target PlayerNo(%d) to a handle", bullet_packet->target);
             return;
         }
         BulletNetworkInfo_Array[received_SpellData_count].target_id = targetHandle;

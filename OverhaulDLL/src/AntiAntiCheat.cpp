@@ -483,7 +483,7 @@ enum MemberFlags_IdentifiersEnum
 };
 
 void AntiAntiCheat::start() {
-    global::cmd_out << Mod::output_prefix << "Disabling built in AntiCheat...\n";
+    ConsoleWrite("Disabling built in AntiCheat...");
     uint8_t *write_address;
 
     //patch out the hash comparison checks (compare with input to always be true)

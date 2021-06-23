@@ -176,7 +176,7 @@ bool Game::on_character_load(void* unused)
         //need to force refresh the character in case the legacy mod changed while the game was off (restarting the game doesn't do this for some reason)
         FileReloading::RefreshPlayerStats();
 
-        ConsoleWrite("%s All character loading finished!", Mod::output_prefix);
+        ConsoleWrite("All character loading finished!");
 
         return true;
     }
@@ -244,7 +244,7 @@ static void** host_player_gamedata_cache = NULL;
 static bool* display_name_cache = NULL;
 
 void Game::preload_function_caches() {
-    global::cmd_out << "Cache loading\n";
+    ConsoleWrite("Cache loading");
 
     pc_entity_ptr = NULL;
     Game::get_pc_entity_pointer();
@@ -432,13 +432,13 @@ void Game::disable_low_fps_disconnect(bool enable)
 
     if (enable)
     {
-        global::cmd_out << Mod::output_prefix + "Enabling low FPS disconnect...\n";
+        ConsoleWrite("Enabling low FPS disconnect...");
         *fps_warn = 0xEB;
         *(fps_warn+1) = 0x5;
     }
     else
     {
-        global::cmd_out << Mod::output_prefix + "Disabling low FPS disconnect...\n";
+        ConsoleWrite("Disabling low FPS disconnect...");
         *fps_warn = 0x75;
         *(fps_warn + 1) = 0xD;
     }
@@ -480,7 +480,7 @@ static void set_memory_limit_chunk(uint64_t default_chunk_size, uint64_t new_chu
 // Set available pool of memory that Dark Souls allocates for itself
 void Game::set_memory_limit()
 {
-    global::cmd_out << Mod::output_prefix << "Increasing game memory allocation size.\n";
+    ConsoleWrite("Increasing game memory allocation size");
 
     set_memory_limit_chunk(0x1C200000, 0x7C200000);
     set_memory_limit_chunk(0x500000  , 0xA00000);

@@ -84,7 +84,7 @@ extern "C" {
 
 void AnimationEdits::alter_animation_parameters()
 {
-    global::cmd_out << Mod::output_prefix << ("Enabling animation parameter alteration injection...\n");
+    ConsoleWrite("Enabling animation parameter alteration injection...");
 
     uint8_t *write_address = (uint8_t*)(AnimationEdits::animation_entry_set_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &animation_entry_set_return, 1, &animation_entry_set_injection);
@@ -197,7 +197,7 @@ extern "C" {
 }
 
 void AnimationEdits::disable_whiff_animations() {
-    global::cmd_out << Mod::output_prefix << ("Enabling remove animation whiffs...\n");
+    ConsoleWrite("Enabling remove animation whiffs...");
 
     //make jump over setting whiff unconditional
     uint8_t *write_address = (uint8_t*)(AnimationEdits::animation_whiff_set_offset + Game::ds1_base);

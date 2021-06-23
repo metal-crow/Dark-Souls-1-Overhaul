@@ -48,7 +48,7 @@ extern "C" {
 namespace AntiCheat {
 
 void start() {
-    ConsoleWrite("%sStarting anti-cheat protections:", Mod::output_prefix);
+    ConsoleWrite("Starting anti-cheat protections:");
 
     // Start NpcGuard anti-cheat
     ConsoleWrite("    Enabling NpcGuard...");

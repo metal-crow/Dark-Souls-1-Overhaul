@@ -74,7 +74,7 @@ extern "C" {
 
 void ModNetworking::start()
 {
-    global::cmd_out << (Mod::output_prefix + "Enabling mod networking...\n");
+    ConsoleWrite("Enabling mod networking...");
 
     uint8_t *write_address;
 
@@ -402,7 +402,7 @@ void HostForceDisconnectSession(void* SteamSessionMemberLight, const wchar_t* dc
 
     if (SteamInternal == NULL)
     {
-        global::cmd_out << "Unable to disconnect player: unable to create SteamInternal\n";
+        ConsoleWrite("Unable to disconnect player: unable to create SteamInternal");
         return;
     }
 
@@ -415,7 +415,7 @@ void HostForceDisconnectSession(void* SteamSessionMemberLight, const wchar_t* dc
     bool success = SteamNetworkingSend((void*)SteamNetworking, steamid, data_buf, sizeof(data_buf), 2, 0);
     if (!success)
     {
-        global::cmd_out << "Unable to disconnect player: error return val from SteamNetworkingSend\n";
+        ConsoleWrite("Unable to disconnect player: error return val from SteamNetworkingSend");
     }
 
     //TODO also set variables in this SessionMember struct to disable the connection locally

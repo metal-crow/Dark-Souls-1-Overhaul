@@ -9,7 +9,7 @@ extern "C" {
 }
 
 void EquipmentUnlock::start() {
-    global::cmd_out << Mod::output_prefix << "Enabling Equipment Change Unlock...\n";
+    ConsoleWrite("Enabling Equipment Change Unlock...");
 
     //nop out the check which says if the menu is enterable or not
     uint8_t nop_patch1[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };

@@ -178,7 +178,7 @@ void UnloadIndividualParam(void* ParamMan_resCapArray, const wchar_t* param)
     {
         std::string out;
         Files::string_wide_to_mb((wchar_t*)param, out);
-        global::cmd_out << "Unable to find " << out.c_str() << "\n";
+        ConsoleWrite("Unable to find %s",out.c_str());
     }
 }
 
@@ -215,7 +215,7 @@ void FileReloading::ReloadParamFile(ParamBNDs paramfile)
     {
         std::string out;
         Files::string_wide_to_mb((wchar_t*)ParamBNDs_To_String.at(paramfile), out);
-        global::cmd_out << "Unable to find " << out.c_str() << "\n";
+        ConsoleWrite("Unable to find %s", out.c_str());
     }
 
     void* unused_arg = calloc(3, 8);
@@ -300,7 +300,7 @@ extern "C" {
 
 void FileReloading::start()
 {
-    ConsoleWrite("%sEnabling File Reloading...", Mod::output_prefix);
+    ConsoleWrite("Enabling File Reloading...");
 
     //injection to prevent the CalcCorrectGraph from crashing if it can't find the param (due to reloading, for example)
     uint8_t *write_address = (uint8_t*)(FileReloading::CalcCorrectGraph_injection_offset + Game::ds1_base);

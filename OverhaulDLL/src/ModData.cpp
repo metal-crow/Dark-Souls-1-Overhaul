@@ -61,7 +61,7 @@ void Mod::get_init_preferences()
     std::string msg;
 
     // Begin loading startup preferences
-    global::cmd_out << (Mod::output_prefix + "Loading settings preferences...\n");
+    ConsoleWrite("Loading settings preferences...");
 
     // Check if legacy mode is enabled
     // Don't update the actual variable, only the preferred. So we only switch on initial character load
@@ -69,12 +69,12 @@ void Mod::get_init_preferences()
     Mod::prefer_legacy_mode = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_LEGACY_MODE_, (int)Mod::prefer_legacy_mode, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
     if (Mod::prefer_legacy_mode)
     {
-        global::cmd_out << ("    Legacy mode enabled. Gameplay changes will not be applied.\n");
+        ConsoleWrite("Legacy mode enabled. Gameplay changes will not be applied.");
         ModNetworking::allow_connect_with_legacy_mod_host = true;
     }
     else
     {
-        global::cmd_out << ("    Overhaul mode enabled. Gameplay changes will be applied.\n");
+        ConsoleWrite("Overhaul mode enabled. Gameplay changes will be applied.");
         ModNetworking::allow_connect_with_overhaul_mod_host = true;
     }
 
@@ -98,7 +98,7 @@ bool check_hotkeys(void* unused)
 void Mod::get_user_keybinds()
 {
     // Begin loading keybinds
-    global::cmd_out << (Mod::output_prefix + "Loading keybinds...\n");
+    ConsoleWrite("Loading keybinds...");
 
     // Load keybinds here
     // Toggle mouse input keybind
@@ -131,7 +131,7 @@ void Mod::get_single_user_keybind(const char *keybind_name, int(*function)())
         hex_stream << std::hex << (int)key; // Convert Virtual-key code to hex string
         output.append(hex_stream.str());
         output += ')';
-        global::cmd_out << (output.c_str());
+        ConsoleWrite(output.c_str());
     }
 }
 
@@ -153,7 +153,7 @@ void Mod::get_custom_game_files()
     Files::string_mb_to_wide(custom_file_name_buff, Mod::custom_game_archive_path);
     if (std::string(custom_file_name_buff).length() > 0)
     {
-        global::cmd_out << (std::string("    Found custom game archive file definition: \"").append(custom_file_name_buff).append("\"\n"));
+        ConsoleWrite("Found custom game archive file definition: \"%s\"",custom_file_name_buff);
     }
 
 
@@ -170,7 +170,7 @@ void Mod::get_custom_game_files()
     Files::save_file = custom_file_name_buff;
     if (std::string(custom_file_name_buff).length() > 0)
     {
-        global::cmd_out << (std::string("    Found custom game save file definition: \"").append(custom_file_name_buff).append("\"\n"));
+        ConsoleWrite("Found custom game save file definition: \"%s\"",custom_file_name_buff);
     }
 
 
@@ -188,7 +188,7 @@ void Mod::get_custom_game_files()
     Files::string_mb_to_wide(custom_file_name_buff, Mod::custom_config_file_path);
     if (std::string(custom_file_name_buff).length() > 0)
     {
-        global::cmd_out << (std::string("    Found custom game config file definition: \"").append(custom_file_name_buff).append("\"\n"));
+        ConsoleWrite("Found custom game config file definition: \"%s\"",custom_file_name_buff);
     }
 }
 

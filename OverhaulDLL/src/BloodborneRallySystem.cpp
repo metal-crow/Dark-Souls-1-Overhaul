@@ -48,7 +48,7 @@ extern "C" {
 bool Apply_rally_capable_sfx_and_starting_hp(void*);
 
 void BloodborneRally::start() {
-    global::cmd_out << Mod::output_prefix << "Setting up Bloodborne Rally System...\n";
+    ConsoleWrite("Setting up Bloodborne Rally System...");
 
     // Inject function to clear rally on weapon toggle
     uint8_t *write_address = (uint8_t*)(BloodborneRally::weapon_toggle_injection_offset + Game::ds1_base);

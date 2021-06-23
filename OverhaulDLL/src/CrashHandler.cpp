@@ -299,7 +299,10 @@ DWORD WINAPI crash_handler_dump_process(LPVOID output_dir)
         do
         {
             std::string filename(data.cFileName);
-            if (filename.find("DarkSoulsRemastered.exe") == std::string::npos && filename.find("d3d11.dll") == std::string::npos && filename.find("message") == std::string::npos)
+            if (filename.find("DarkSoulsRemastered.exe") == std::string::npos &&
+                filename.find("d3d11.dll") == std::string::npos &&
+                filename.find("message") == std::string::npos &&
+                filename.find(logfilename) == std::string::npos)
             {
                 std::string full_filename((char*)output_dir);
                 full_filename.append("\\");
@@ -362,6 +365,14 @@ void crash_handler(char* message_str)
         fprintf(fp, "%s", message_str);
     }
     fclose(fp);
+
+    // Copy the log file into the crash folder
+    fflush(logfile);
+    fclose(logfile);
+
+    char log_file[sizeof(output_dir)];
+    snprintf(log_file, sizeof(log_file), "%s\\%s", output_dir, logfilename);
+    CopyFile(logfilename, log_file, false);
 
     // Run the UI. This won't return until the user closes the window
     INT_PTR send_report = make_crash_handler_ui();
@@ -479,7 +490,7 @@ LONG WINAPI vectored_exception_handler(EXCEPTION_POINTERS * ExceptionInfo)
 
 void set_crash_handlers()
 {
-    global::cmd_out << Mod::output_prefix + "Adding crash handlers...\n";
+    ConsoleWrite("Adding crash handlers...");
 
     // https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/set-terminate-crt?view=vs-2019
     // Replacing this function ensures we catch any exception that calls terminate (https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/terminate-crt?view=msvc-160)

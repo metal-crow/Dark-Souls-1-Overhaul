@@ -11,7 +11,7 @@ extern "C" {
 }
 
 void DeadAngles::start() {
-    global::cmd_out << Mod::output_prefix << "Enabling Dead Angles...\n";
+    ConsoleWrite("Enabling Dead Angles...");
 
     uint8_t *write_address = (uint8_t*)(DeadAngles::main_dead_angle_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &main_dead_angle_injection_return, 2, &main_dead_angle_injection);
@@ -28,7 +28,7 @@ uint64_t main_dead_angle_helper(uint64_t attacker, uint64_t target)
     auto attacker_rotation = Game::get_entity_rotation((void*)attacker);
     if (!target_rotation.has_value() ||! attacker_rotation.has_value())
     {
-        global::cmd_out << "WARNING: Unable to get players rotation values\n";
+        ConsoleWrite("WARNING: Unable to get players rotation values");
         return 1;
     }
 

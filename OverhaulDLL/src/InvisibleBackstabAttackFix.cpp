@@ -11,7 +11,7 @@ extern "C" {
 }
 
 void InvisBackstabFix::start() {
-    global::cmd_out << Mod::output_prefix << "Fixing Invisible Backstab attack bug...\n";
+    ConsoleWrite("Fixing Invisible Backstab attack bug...");
 
     //Forcably send a packet containing the attacker's ezstate info after the throw packet.
     uint8_t *write_address = (uint8_t*)(InvisBackstabFix::send_throw_packet_injection_offset + Game::ds1_base);

@@ -98,7 +98,7 @@ void gather_DirectInput8GetDeviceState_helper(uint64_t arg) {
 
 // Initializes pointers and other data used to monitor gamepad input
 void initialize() {
-    global::cmd_out << (Mod::output_prefix + "Initializing Input hooks...\n");
+    ConsoleWrite("Initializing Input hooks...");
 
     apply_function_intercepts();
 }

@@ -22,7 +22,7 @@ extern "C" {
 bool change_mp_zone(void* unused);
 
 void PhantomUnshackle::start() {
-    global::cmd_out << Mod::output_prefix << "Enabling Phantom Unshackle patch...\n";
+    ConsoleWrite("Enabling Phantom Unshackle patch...");
 
     world_char_base_asm = Game::world_chr_man_imp;
 

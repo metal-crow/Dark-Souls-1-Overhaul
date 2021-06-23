@@ -9,7 +9,7 @@ extern "C" {
 }
 
 void FixAnkles::start() {
-    global::cmd_out << Mod::output_prefix << "Enabling Ankle fix...\n";
+    ConsoleWrite("Enabling Ankle fix...");
 
     //injection to change the foot ik type
     uint8_t *write_address = (uint8_t*)(FixAnkles::set_foot_ikvalue_injection_offset + Game::ds1_base);
