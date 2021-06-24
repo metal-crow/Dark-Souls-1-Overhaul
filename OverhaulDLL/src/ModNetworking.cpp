@@ -259,7 +259,8 @@ void ParseRawP2PPacketType_injection_helper(uint8_t* data, uint64_t steamId_remo
                 void* SteamInternal = (*SteamInternal_ContextInit)(Init_SteamInternal_FUNCPTR);
                 uint64_t SteamNetworking = *(uint64_t*)((uint64_t)SteamInternal + 0x40);
                 SteamInternal_SteamNetworkingSend_FUNC* SteamNetworkingSend = (SteamInternal_SteamNetworkingSend_FUNC*)**(uint64_t**)SteamNetworking;
-                SteamNetworkingSend((void*)SteamNetworking, steamId_remote, updatebuf, sizeof(updatebuf), 2, 0); //if this fails to send we'll just resend in 15 sec anyway
+                // TMP: disable till calculation is fixed
+                //SteamNetworkingSend((void*)SteamNetworking, steamId_remote, updatebuf, sizeof(updatebuf), 2, 0); //if this fails to send we'll just resend in 15 sec anyway
 
                 //update our sync time with this guest
                 ModNetworking::hostTimerSyncronizationData[steamId_remote].timeOfLastResync = Game::get_accurate_time();
