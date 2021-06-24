@@ -238,7 +238,8 @@ void ParseRawP2PPacketType_injection_helper(uint8_t* data, uint64_t steamId_remo
             // compute the 1 way latency
             uint64_t ping = (Game::get_accurate_time() - ModNetworking::hostTimerSyncronizationData[steamId_remote].timePingPacketSent);
             // TODO should update this as a running average of some kind
-            ModNetworking::hostTimerSyncronizationData[steamId_remote].packetDelay = ping / 2;
+            // TMP: disable till calculation is fixed
+            //ModNetworking::hostTimerSyncronizationData[steamId_remote].packetDelay = ping / 2;
             // sanity check the computed latency
             if (ping > SaneDelay)
             {
