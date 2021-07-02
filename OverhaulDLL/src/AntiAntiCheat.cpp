@@ -516,11 +516,11 @@ void AntiAntiCheat::start() {
 
     //Prevent RequestUpdatePlayerStatus from sending anything we don't want it too
     //fix all but the mandatory flags from the inputdata when it's read by construct_flatbuffer_from_PlayerStatus_MemberFlags 
-    write_address = (uint8_t*)(AntiAntiCheat::construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_return, 1, &construct_flatbuffer_from_PlayerStatus_MemberFlags_injection);
+    //write_address = (uint8_t*)(AntiAntiCheat::construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_offset + Game::ds1_base);
+    //sp::mem::code::x64::inject_jmp_14b(write_address, &construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_return, 1, &construct_flatbuffer_from_PlayerStatus_MemberFlags_injection);
 
-    write_address = (uint8_t*)(AntiAntiCheat::finish_construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &finish_construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_return, 1, &finish_construct_flatbuffer_from_PlayerStatus_MemberFlags_injection);
+    //write_address = (uint8_t*)(AntiAntiCheat::finish_construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_offset + Game::ds1_base);
+    //sp::mem::code::x64::inject_jmp_14b(write_address, &finish_construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_return, 1, &finish_construct_flatbuffer_from_PlayerStatus_MemberFlags_injection);
 }
 
 
