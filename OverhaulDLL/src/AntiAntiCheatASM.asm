@@ -1,6 +1,7 @@
 _DATA SEGMENT
 
 sub_140BCEDB0   dq  140BCEDB0h
+sub_14112C930   dq  14112C930h
 
 _DATA ENDS
 
@@ -160,6 +161,79 @@ add     rsp, 210h
 
 jmp     finish_construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_return
 finish_construct_flatbuffer_from_PlayerStatus_MemberFlags_injection ENDP
+
+
+extern prevent_send_server_requests_injection_return: qword
+
+PUBLIC prevent_send_server_requests_injection
+prevent_send_server_requests_injection PROC
+movzx   eax, cl
+
+cmp     eax, 46
+jg      abort
+;compare eax(type) to allowed list
+cmp     eax, 33
+je      normal
+cmp     eax, 6
+je      normal
+jmp     abort
+
+;original code
+normal:
+mov     rcx, 141B0F400h
+mov     rax, [rcx+rax*8]
+jmp     prevent_send_server_requests_injection_return
+
+abort:
+add     rsp, 0F0h
+pop     r15
+pop     r14
+pop     r13
+pop     r12
+pop     rdi
+pop     rsi
+pop     rbp
+ret
+prevent_send_server_requests_injection ENDP
+
+extern prevent_send_server_pushs_injection_return: qword
+
+PUBLIC prevent_send_server_pushs_injection
+prevent_send_server_pushs_injection PROC
+;original code
+mov     rdx, r12
+mov     rcx, r15
+call    qword ptr [sub_14112C930]
+
+;get the packet type
+push    rbx
+;offset_loc = data + 4 + -Dword(data)
+mov     rdi, rax
+add     rdi, 4h
+mov     rbx, 0
+mov     ebx, dword ptr [rax]
+sub     rdi, rbx
+;offset = Word(offset_loc)
+mov     rbx, 0
+mov     bx, word ptr [rdi]
+;type = Byte(offset+data)
+mov     rdi, rbx
+add     rdi, rax
+mov     dil, byte ptr [rdi]
+
+pop     rbx
+
+cmp     dil, 51
+jg      abort
+;compare dil(type) to allowed list
+jmp     abort
+mov     rdi, rax
+jmp     prevent_send_server_pushs_injection_return
+
+abort:
+mov     rax, 0
+mov     rdi, rax
+prevent_send_server_pushs_injection ENDP
 
 _TEXT    ENDS
 END
