@@ -628,7 +628,7 @@ void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_
     memcpy(memberflags_orig, memberflags_ptr, sizeof(memberflags_orig));
 
     //unset all the bitflags, so we don't send any info to the server
-    memset((void*)input_data, 0xff, 32);
+    memset((void*)input_data, 0x0, 32);
 
     //allow only some mandatory data to be sent
     set_MemberFlags_bitflag(input_data, MemberFlags_IdentifiersEnum::AreaId);
