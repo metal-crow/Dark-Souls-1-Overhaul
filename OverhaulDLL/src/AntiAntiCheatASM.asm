@@ -109,6 +109,9 @@ add     rsp, 10h
 movdqu  xmm0, [rsp]
 add     rsp, 10h
 
+;force arg6 to be always 0 so the code doesn't ignore if the is_present flag is set
+mov     r9b, 0
+
 jmp     construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_return
 construct_flatbuffer_from_PlayerStatus_MemberFlags_injection ENDP
 
