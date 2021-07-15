@@ -50,6 +50,10 @@ uint64_t Game::session_man_imp = NULL;
 
 uint64_t Game::menu_man = NULL;
 
+static uint64_t BaseBOffset = NULL;
+
+static uint64_t BaseB = NULL;
+
 // Player character status (loading, human, co-op, invader, hollow)
 sp::mem::pointer<int32_t> Game::player_char_status;
 
@@ -80,7 +84,6 @@ sp::mem::pointer<uint8_t> Game::saves_enabled;
 // Multiplayer node count
 int Game::node_count = -1;
 
-
 // Initializes pointers and base addresses required for most other functions
 void Game::init()
 {
@@ -110,6 +113,7 @@ void Game::init()
     if (Game::frpg_net_base > Game::ds1_base*1.5) {
         FATALERROR("frpg_net_base_sp is an invalid pointer");
     }
+    BaseBOffset = (uint64_t)sp::mem::aob_scan("48 8B 05 ?? ?? ?? ?? 45 33 ED 48 8B F1 48 85 C0");
 
     // Game saving on/off
     void* saves_enabled_sp = sp::mem::aob_scan("48 8B 05 xx xx xx xx 0F 28 01 66 0F 7F 80 xx xx 00 00 C6 80");
@@ -420,6 +424,340 @@ void Hud::set_show_node_graph(bool enable, bool game_flag_only)
     node_graph_ptr.write((uint8_t)enable);
 }
 #endif
+
+// Replenish spell casts
+void Game::replenishSpells() {
+
+    if (!BaseB) {
+        BaseB = *((uint64_t*)(BaseBOffset + *(uint32_t*)((uint64_t)BaseBOffset + 3) + 7));
+    }
+
+    if (BaseB) {
+
+        uint32_t spells[] = {
+            90,          // 3000 - Sorcery: Soul Arrow
+            60,          // 3010 - Sorcery: Great Soul Arrow
+            36,          // 3020 - Sorcery: Heavy Soul Arrow
+            24,          // 3030 - Sorcery: Great Heavy Soul Arrow
+            30,          // 3040 - Sorcery: Homing Soulmass
+            30,          // 3050 - Sorcery: Homing Crystal Soulmass
+            12,          // 3060 - Sorcery: Soul Spear
+            12,          // 3070 - Sorcery: Crystal Soul Spear
+            0,           // 3080
+            0,           // 3090
+            15,          // 3100 - Sorcery: Magic Weapon
+            9,           // 3110 - Sorcery: Great Magic Weapon
+            9,           // 3120 - Sorcery: Crystal Magic Weapon
+            0,           // 3130
+            0,           // 3140
+            0,           // 3150
+            0,           // 3160
+            0,           // 3170
+            0,           // 3180
+            0,           // 3190
+            0,           // 3200
+            0,           // 3210
+            0,           // 3220
+            0,           // 3230
+            0,           // 3240
+            0,           // 3250
+            0,           // 3260
+            0,           // 3270
+            0,           // 3280
+            0,           // 3290
+            15,          // 3300 - Sorcery: Magic Shield
+            9,           // 3310 - Sorcery: Strong Magic Shield
+            0,           // 3320
+            0,           // 3330
+            0,           // 3340
+            0,           // 3350
+            0,           // 3360
+            0,           // 3370
+            0,           // 3380
+            0,           // 3390
+            9,           // 3400 - Sorcery: Hidden Weapon
+            9,           // 3410 - Sorcery: Hidden Body
+            0,           // 3420
+            0,           // 3430
+            0,           // 3440
+            0,           // 3450
+            0,           // 3460
+            0,           // 3470
+            0,           // 3480
+            0,           // 3490
+            9,           // 3500 - Sorcery: Cast Light
+            18,          // 3510 - Sorcery: Hush
+            60,          // 3520 - Sorcery: Aural Decoy
+            3,           // 3530 - Sorcery: Repair
+            30,          // 3540 - Sorcery: Fall Control
+            33,          // 3550 - Sorcery: Chameleon
+            0,           // 3560
+            0,           // 3570
+            0,           // 3580
+            0,           // 3590
+            12,          // 3600 - Sorcery: Resist Curse
+            12,          // 3610 - Sorcery: Remedy
+            0,           // 3620
+            0,           // 3630
+            0,           // 3640
+            0,           // 3650
+            0,           // 3660
+            0,           // 3670
+            0,           // 3680
+            0,           // 3690
+            60,          // 3700 - Sorcery: White Dragon Breath
+            36,          // 3710 - Sorcery: Dark Orb
+            18,          // 3720 - Sorcery: Dark Bead
+            6,           // 3730 - Sorcery: Dark Fog
+            9,           // 3740 - Sorcery: Pursuers
+            0,           // 3750
+            0,           // 3760
+            0,           // 3770
+            0,           // 3780
+            0,           // 3790
+            0,           // 3800
+            0,           // 3810
+            0,           // 3820
+            0,           // 3830
+            0,           // 3840
+            0,           // 3850
+            0,           // 3860
+            0,           // 3870
+            0,           // 3880
+            0,           // 3890
+            0,           // 3900
+            0,           // 3910
+            0,           // 3920
+            0,           // 3930
+            0,           // 3940
+            0,           // 3950
+            0,           // 3960
+            0,           // 3970
+            0,           // 3980
+            0,           // 3990
+            24,          // 4000 - Pyromancy: Fireball
+            18,          // 4010 - Pyromancy: Fire Orb
+            12,          // 4020 - Pyromancy: Great Fireball
+            60,          // 4030 - Pyromancy: Firestorm
+            60,          // 4040 - Pyromancy: Fire Tempest
+            240,         // 4050 - Pyromancy: Fire Surge
+            240,         // 4060 - Pyromancy: Fire Whip
+            0,           // 4070
+            0,           // 4080
+            0,           // 4090
+            48,          // 4100 - Pyromancy: Combustion
+            24,          // 4110 - Pyromancy: Great Combustion
+            0,           // 4120
+            0,           // 4130
+            0,           // 4140
+            0,           // 4150
+            0,           // 4160
+            0,           // 4170
+            0,           // 4180
+            0,           // 4190
+            9,           // 4200 - Pyromancy: Poison Mist
+            3,           // 4210 - Pyromancy: Toxic Mist
+            6,           // 4220 - Pyromancy: Acid Surge
+            0,           // 4230
+            0,           // 4240
+            0,           // 4250
+            0,           // 4260
+            0,           // 4270
+            0,           // 4280
+            0,           // 4290
+            9,           // 4300 - Pyromancy: Iron Flesh
+            9,           // 4310 - Pyromancy: Flash Sweat
+            0,           // 4320
+            0,           // 4330
+            0,           // 4340
+            0,           // 4350
+            21,          // 4360 - Pyromancy: Undead Rapport
+            0,           // 4370
+            0,           // 4380
+            0,           // 4390
+            3,           // 4400 - Pyromancy: Power Within
+            0,           // 4410
+            0,           // 4420
+            0,           // 4430
+            0,           // 4440
+            0,           // 4450
+            0,           // 4460
+            0,           // 4470
+            0,           // 4480
+            0,           // 4490
+            12,          // 4500 - Pyromancy: Great Chaos Fireball
+            60,          // 4510 - Pyromancy: Chaos Storm
+            240,         // 4520 - Pyromancy: Chaos Fire Whip
+            24,          // 4530 - Pyromancy: Black Flame
+            0,           // 4540
+            0,           // 4550
+            0,           // 4560
+            0,           // 4570
+            0,           // 4580
+            0,           // 4590
+            0,           // 4600
+            0,           // 4610
+            0,           // 4620
+            0,           // 4630
+            0,           // 4640
+            0,           // 4650
+            0,           // 4660
+            0,           // 4670
+            0,           // 4680
+            0,           // 4690
+            0,           // 4700
+            0,           // 4710
+            0,           // 4720
+            0,           // 4730
+            0,           // 4740
+            0,           // 4750
+            0,           // 4760
+            0,           // 4770
+            0,           // 4780
+            0,           // 4790
+            0,           // 4800
+            0,           // 4810
+            0,           // 4820
+            0,           // 4830
+            0,           // 4840
+            0,           // 4850
+            0,           // 4860
+            0,           // 4870
+            0,           // 4880
+            0,           // 4890
+            0,           // 4900
+            0,           // 4910
+            0,           // 4920
+            0,           // 4930
+            0,           // 4940
+            0,           // 4950
+            0,           // 4960
+            0,           // 4970
+            0,           // 4980
+            0,           // 4990
+            15,          // 5000 - Miracle: Heal
+            9,           // 5010 - Miracle: Great Heal
+            3,           // 5020 - Miracle: Great Heal Excerpt
+            9,           // 5030 - Miracle: Soothing Sunlight
+            6,           // 5040 - Miracle: Replenishment
+            6,           // 5050 - Miracle: Bountiful Sunlight
+            0,           // 5060
+            0,           // 5070
+            0,           // 5080
+            0,           // 5090
+            120,         // 5100 - Miracle: Gravelord Sword Dance
+            120,         // 5110 - Miracle: Gravelord Greatsword Dance
+            0,           // 5120
+            0,           // 5130
+            0,           // 5140
+            0,           // 5150
+            0,           // 5160
+            0,           // 5170
+            0,           // 5180
+            0,           // 5190
+            3,           // 5200 - Miracle: Escape Death
+            3,           // 5210 - Miracle: Homeward
+            0,           // 5220
+            0,           // 5230
+            0,           // 5240
+            0,           // 5250
+            0,           // 5260
+            0,           // 5270
+            0,           // 5280
+            0,           // 5290
+            63,          // 5300 - Miracle: Force
+            9,           // 5310 - Miracle: Wrath of the Gods
+            18,          // 5320 - Miracle: Emit Force
+            0,           // 5330
+            0,           // 5340
+            0,           // 5350
+            0,           // 5360
+            0,           // 5370
+            0,           // 5380
+            0,           // 5390
+            15,          // 5400 - Miracle: Seek Guidance
+            0,           // 5410
+            0,           // 5420
+            0,           // 5430
+            0,           // 5440
+            0,           // 5450
+            0,           // 5460
+            0,           // 5470
+            0,           // 5480
+            0,           // 5490
+            30,          // 5500 - Miracle: Lightning Spear
+            30,          // 5510 - Miracle: Great Lightning Spear
+            15,          // 5520 - Miracle: Sunlight Spear
+            0,           // 5530
+            0,           // 5540
+            0,           // 5550
+            0,           // 5560
+            0,           // 5570
+            0,           // 5580
+            0,           // 5590
+            12,          // 5600 - Miracle: Magic Barrier
+            6,           // 5610 - Miracle: Great Magic Barrier
+            0,           // 5620
+            0,           // 5630
+            0,           // 5640
+            0,           // 5650
+            0,           // 5660
+            0,           // 5670
+            0,           // 5680
+            0,           // 5690
+            12,          // 5700 - Miracle: Karmic Justice
+            0,           // 5710
+            0,           // 5720
+            0,           // 5730
+            0,           // 5740
+            0,           // 5750
+            0,           // 5760
+            0,           // 5770
+            0,           // 5780
+            0,           // 5790
+            15,          // 5800 - Miracle: Tranquil Walk of Peace
+            6,           // 5810 - Miracle: Vow of Silence
+            0,           // 5820
+            0,           // 5830
+            0,           // 5840
+            0,           // 5850
+            0,           // 5860
+            0,           // 5870
+            0,           // 5880
+            0,           // 5890
+            3,           // 5900 - Miracle: Sunlight Blade
+            3,           // 5910 - Miracle: Darkmoon Blade
+
+        };
+
+        uint64_t SlotBase = *((uint64_t*)(BaseB + 0x10));
+        SlotBase = *((uint64_t*)(SlotBase + 0x418));
+        SlotBase = SlotBase + 0x18;
+
+        // For each of the ten attunement slots...
+        for (int i = 0; i < 11; i++) {
+
+            // Read the spell ID
+            uint32_t spellID = *(uint32_t*)SlotBase;
+
+            // Check for unused slot
+            if (spellID == -1 || spellID == 0) {
+                SlotBase += 8;
+                continue;
+            }
+
+            // Lookup spell quantity
+            uint32_t spellQuantity = spells[(spellID / 10) - 300];
+
+            // Replenish spells
+            *(uint32_t*)(SlotBase + 4) = spellQuantity;
+
+            // Next slot
+            SlotBase += 8;
+
+        }
+    }
+}
 
 static const uint64_t disable_low_fps_disconnect_offset = 0x778B29;
 

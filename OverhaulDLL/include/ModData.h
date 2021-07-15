@@ -25,6 +25,9 @@
 #define _DS1_OVERHAUL_PREF_USE_STEAM_NAMES_ "UseSteamNames"
 #define _DS1_OVERHAUL_PREF_FIX_HP_BAR_SIZE_ "FixHpBarSize"
 
+// Keybinds:
+#define _DS1_OVERHAUL_HOTKEY_REPLENISH_SPELLS_ "ReplenishSpells"
+
 #define _DS1_OVERHAUL_SETTINGS_STRING_BUFF_LEN_ 256  // Length of the string buffer used when obtaining user preference-related string data
 
 ////////////////////////////// MOD CONSTANTS //////////////////////////////
