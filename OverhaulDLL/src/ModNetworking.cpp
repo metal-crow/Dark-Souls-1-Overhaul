@@ -180,7 +180,9 @@ bool HostTimerSync(void* unused)
             }
 
             // If it's time to resync with this guest, do so
-            if ((Game::get_accurate_time() - ModNetworking::hostTimerSyncronizationData[SteamId].timeOfLastResync) > ResyncPeriod)
+            //if ((Game::get_accurate_time() - ModNetworking::hostTimerSyncronizationData[SteamId].timeOfLastResync) > ResyncPeriod)
+            //TMP: disable till calculation is fixed
+            if (ModNetworking::hostTimerSyncronizationData[SteamId].timeOfLastResync == 0)
             {
                 // Send the ping packet out to compute the latency
                 if (!ModNetworking::hostTimerSyncronizationData[SteamId].waitingForPingResponse)
@@ -238,8 +240,7 @@ void ParseRawP2PPacketType_injection_helper(uint8_t* data, uint64_t steamId_remo
             // compute the 1 way latency
             uint64_t ping = (Game::get_accurate_time() - ModNetworking::hostTimerSyncronizationData[steamId_remote].timePingPacketSent);
             // TODO should update this as a running average of some kind
-            // TMP: disable till calculation is fixed
-            //ModNetworking::hostTimerSyncronizationData[steamId_remote].packetDelay = ping / 2;
+            ModNetworking::hostTimerSyncronizationData[steamId_remote].packetDelay = ping / 2;
             // sanity check the computed latency
             if (ping > SaneDelay)
             {
@@ -259,8 +260,7 @@ void ParseRawP2PPacketType_injection_helper(uint8_t* data, uint64_t steamId_remo
                 void* SteamInternal = (*SteamInternal_ContextInit)(Init_SteamInternal_FUNCPTR);
                 uint64_t SteamNetworking = *(uint64_t*)((uint64_t)SteamInternal + 0x40);
                 SteamInternal_SteamNetworkingSend_FUNC* SteamNetworkingSend = (SteamInternal_SteamNetworkingSend_FUNC*)**(uint64_t**)SteamNetworking;
-                // TMP: disable till calculation is fixed
-                //SteamNetworkingSend((void*)SteamNetworking, steamId_remote, updatebuf, sizeof(updatebuf), 2, 0); //if this fails to send we'll just resend in 15 sec anyway
+                SteamNetworkingSend((void*)SteamNetworking, steamId_remote, updatebuf, sizeof(updatebuf), 2, 0); //if this fails to send we'll just resend in 15 sec anyway
 
                 //update our sync time with this guest
                 ModNetworking::hostTimerSyncronizationData[steamId_remote].timeOfLastResync = Game::get_accurate_time();

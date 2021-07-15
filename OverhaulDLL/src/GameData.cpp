@@ -1176,7 +1176,7 @@ bool Game::set_display_name(bool useSteam)
 uint64_t Game::get_accurate_time()
 {
     uint64_t time;
-    //returns time in units of 100 nanoseconds
+    //returns time in units of 100 nanoseconds since system started
     QueryUnbiasedInterruptTime(&time);
     return time;
 }
