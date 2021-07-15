@@ -357,12 +357,6 @@ extern "C" {
     uint64_t finish_construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_return;
     void finish_construct_flatbuffer_from_PlayerStatus_MemberFlags_injection();
     void finish_construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper();
-
-    uint64_t prevent_send_server_requests_injection_return;
-    void prevent_send_server_requests_injection();
-
-    uint64_t prevent_send_server_pushs_injection_return;
-    void prevent_send_server_pushs_injection();
 }
 
 enum MemberFlags_IdentifiersEnum
@@ -527,14 +521,6 @@ void AntiAntiCheat::start() {
 
     write_address = (uint8_t*)(AntiAntiCheat::finish_construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &finish_construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_return, 1, &finish_construct_flatbuffer_from_PlayerStatus_MemberFlags_injection);
-
-    //Disable sending all server requests
-    write_address = (uint8_t*)(0xbc75d6 + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &prevent_send_server_requests_injection_return, 0, &prevent_send_server_requests_injection);
-
-    //Disable recving all server pushes
-    write_address = (uint8_t*)(0xBC6CB0 + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &prevent_send_server_pushs_injection_return, 0, &prevent_send_server_pushs_injection);
 }
 
 
