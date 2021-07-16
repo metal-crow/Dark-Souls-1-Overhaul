@@ -304,6 +304,61 @@ void Game::preload_function_caches() {
     if (i>=16) FATALERROR("Unable to set_current_player_animation_speed.");
 }
 
+// Stop Durability Damage
+extern "C" {
+    uint64_t stop_durability_damage_injection_return;
+    uint64_t stop_durability_damage_original_jump;
+    void stop_durability_damage_hook();
+}
+
+void Game::stopDurabilityDamage(bool enable) {
+
+    if (enable) {
+
+        ConsoleWrite("Disabling durability damage...");
+
+        uint64_t InfDur1AOB = Game::ds1_base + 0x74bb07;
+
+        // A conditional (and therefore relative) jump was overwritten by inject_jmp_14b. Calculate absolute address of the jump target
+        // This allows the stop_durability_damage_hook procedure to correctly replicate the instructions overwritten by the trampoline
+        stop_durability_damage_original_jump = InfDur1AOB + 0x1F;
+
+        // Apply the injection
+        sp::mem::code::x64::inject_jmp_14b((void*)InfDur1AOB, &stop_durability_damage_injection_return, 0, &stop_durability_damage_hook);
+
+        /*
+        Before injection:
+        InfDura1AOB:
+        .text:000000014074BB07 45 89 4B 14                                mov     [r11+14h], r9d
+        .text:000000014074BB0B 44 3B 51 20                                cmp     r10d, [rcx+20h]
+        .text:000000014074BB0F 7D 15                                      jge     short loc_14074BB26
+        .text:000000014074BB11 48 8B 41 30                                mov     rax, [rcx+30h]
+                               ^^^^^^^^^^^ these 14 bytes are patched with a long jump to stop_durability_damage_hook
+        After injections:
+        .text:000000014074BB07 ff 25 00 00 00 00 dd f3 1c 4a fc 7f 00 00  jmp stop_durability_damage_hook
+        Injection Code:
+            cmp [r11+14h], r9d
+            jle originalcode
+            mov r9d, dword ptr[r11+14h]                                   ; set the new durability value to be the current value
+            originalcode:
+                mov dword ptr[r11+14h], r9d
+                cmp r10d, dword ptr[rcx+20h]
+                jge hopper
+                mov rax, qword ptr[rcx+20h]
+                jmp stop_durability_damage_injection_return
+            hopper:
+                jmp stop_durability_damage_original_jump                  ; another function somewhere
+        Returning from injection:
+        .text:000000014074BB15 44 89 44 02 18                             mov     [rdx+rax+18h], r8d
+        .text:000000014074BB1A 48 8D 0C 02                                lea     rcx, [rdx+rax]
+        .text:000000014074BB1E B0 01                                      mov     al, 1
+        .text:000000014074BB20 48 8B 5C 24 08                             mov     rbx, [rsp+arg_0]
+        .text:000000014074BB25 C3                                         retn
+
+        */
+    }
+}
+
 // Check if dim lava mod is currently active
 #if 0
 bool Game::dim_lava_enabled()

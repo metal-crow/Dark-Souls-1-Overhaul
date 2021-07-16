@@ -244,8 +244,10 @@ public:
 
     // Gets currently equipped R hand weapon
     static std::optional<uint32_t> right_hand_weapon();
-
+    
 	static bool playerchar_is_loaded();
+
+    static void stopDurabilityDamage(bool enable);
 
 	static std::optional<uint32_t> get_player_char_max_hp();
 
