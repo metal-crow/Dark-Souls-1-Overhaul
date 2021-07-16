@@ -103,6 +103,7 @@ void Mod::get_user_keybinds()
     // Load keybinds here
     // Toggle mouse input keybind
     //get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_TOGGLE_MOUSE_INPUT_, kf_toggle_mouse_input);
+    get_single_user_keybind(_DS1_OVERHAUL_HOTKEY_REPLENISH_SPELLS_, (int(*)())Game::replenishSpells);
 
     // Enable the keybinds check
     MainLoop::setup_mainloop_callback(check_hotkeys, NULL, "check_hotkeys");
