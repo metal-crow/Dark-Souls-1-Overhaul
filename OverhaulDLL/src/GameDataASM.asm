@@ -77,6 +77,30 @@ mov     qword ptr [rbx+50Ch], 43C80000h
 jmp     gui_hpbar_max_injection_return
 gui_hpbar_max_injection ENDP
 
+extern stop_durability_damage_injection_return: qword
+extern stop_durability_damage_original_jump: qword
+
+PUBLIC stop_durability_damage_hook
+stop_durability_damage_hook PROC
+
+    cmp dword ptr[r11+14h], r9d                     ; if the new durability value is NOT lower than the current value
+    jle originalcode                                ;     we don't need to change the new value since it's the same or large than the current one
+    mov r9d, dword ptr[r11+14h]                     ; else: set the new durability value to the current one (freezing it)
+    
+    originalcode:                                   ; since the long jump overwrites part of the function it is added here
+                                                    ; the long jump overwrites the following four instructions
+        mov dword ptr [r11+14h], r9d                ; updates the durability value (to new value - which was set to the current value)
+        cmp r10d, dword ptr[rcx+20h]                ; instruction that was overwritten
+        jge hopper                                  ; this was tricky, since the relative jump was overwritten we calculate the address it would have jumped to (stop_durability_damage_original_jump)
+        mov rax, qword ptr[rcx+20h]                 ; last instruciton that was overwritten
+        jmp stop_durability_damage_injection_return ; jump back to the original code (right after the long jump)
+
+    hopper:
+        jmp stop_durability_damage_original_jump    ; had to use a hopper & jmp as conditional jumps only support relative mode
+
+stop_durability_damage_hook ENDP
+
+
 _TEXT    ENDS
 
 END
