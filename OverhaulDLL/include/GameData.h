@@ -196,6 +196,9 @@ public:
     // Returns multiplayer node count as an int (or -1 if player is not online)
     static int get_node_count();
 
+    // Hotkey function for replenishing spell casts
+    static void replenishSpells();
+
     // Enables/Disables automatic game disconnection when low framerate is detected
     static void disable_low_fps_disconnect(bool enable);
 
