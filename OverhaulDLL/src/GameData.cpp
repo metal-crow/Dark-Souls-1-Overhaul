@@ -113,8 +113,7 @@ void Game::init()
     if (Game::frpg_net_base > Game::ds1_base*1.5) {
         FATALERROR("frpg_net_base_sp is an invalid pointer");
     }
-    BaseBOffset = (uint64_t)sp::mem::aob_scan("48 8B 05 ?? ?? ?? ?? 45 33 ED 48 8B F1 48 85 C0");
-
+   
     // Game saving on/off
     void* saves_enabled_sp = sp::mem::aob_scan("48 8B 05 xx xx xx xx 0F 28 01 66 0F 7F 80 xx xx 00 00 C6 80");
     if (saves_enabled_sp == NULL) {
@@ -138,6 +137,8 @@ void Game::init()
     Game::session_man_imp = Game::ds1_base + 0x1d1a370;
 
     Game::menu_man = Game::ds1_base + 0x1d26168;
+
+    BaseBOffset = Game::ds1_base + 0x728E50;
 
     //hook the code that calculates attack damage and save off the weapon id used for the attack
     last_attack_weaponid = -1;
