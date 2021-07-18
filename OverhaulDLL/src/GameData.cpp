@@ -193,6 +193,9 @@ bool Game::on_character_load(void* unused)
             }
         }*/
 
+        //need to force refresh the character in case this character was in a different mode then the current when it was previous loaded
+        FileReloading::RefreshPlayerStats();
+
         character_reload_run = true;
 
         return true;
