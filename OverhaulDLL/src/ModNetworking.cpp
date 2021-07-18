@@ -523,7 +523,8 @@ uint32_t GetSteamData_Packet_injection_helper(void* data, uint32_t type, void* S
         //ConsoleWrite("Host Config match!");
 
         // As the host, start up the clock syncronization function
-        MainLoop::setup_mainloop_callback(HostTimerSync, NULL, "HostTimerSync");
+        // TMP: Disable entirly
+        //MainLoop::setup_mainloop_callback(HostTimerSync, NULL, "HostTimerSync");
 
         //game doesn't parse this extra byte in the packet, no need to remove
         return type;
