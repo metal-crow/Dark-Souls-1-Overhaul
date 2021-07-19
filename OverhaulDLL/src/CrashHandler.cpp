@@ -284,8 +284,9 @@ DWORD WINAPI crash_handler_dump_process(LPVOID output_dir)
     ZeroMemory(&procdump_pi, sizeof(procdump_pi));
     bool procdump = CreateProcess(NULL, cmd, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &procdump_pi);
 
-    // Wait 15 sec max for the process dump to finish
+    // Wait 15 sec max for the process dump to finish, or kill it if it doesn't
     WaitForSingleObject(procdump_pi.hProcess, 15 * 1000);
+    TerminateProcess(procdump_pi.hProcess, 0);
     CloseHandle(procdump_pi.hProcess);
     CloseHandle(procdump_pi.hThread);
 
@@ -404,8 +405,9 @@ void crash_handler(char* message_str)
         si.cb = sizeof(si);
         ZeroMemory(&zip_pi, sizeof(zip_pi));
         bool zipdump = CreateProcess(NULL, cmd, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &zip_pi);
-        // Wait 15 sec max for the zip to finish
+        // Wait 15 sec max for the zip to finish, or kill it if it doesn't
         WaitForSingleObject(zip_pi.hProcess, 15 * 1000);
+        TerminateProcess(zip_pi.hProcess, 0);
         CloseHandle(zip_pi.hProcess);
         CloseHandle(zip_pi.hThread);
     }
