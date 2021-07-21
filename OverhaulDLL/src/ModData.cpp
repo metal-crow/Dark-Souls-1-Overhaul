@@ -44,7 +44,7 @@ bool Mod::fix_hp_bar_size = true;
 bool Mod::use_steam_names = false;
 
 // Enables stopDurabilityDamage function
-bool Mod::stop_durability_damage;
+bool Mod::stop_durability_damage = false;
 
 // Custom game archive files to load instead of the vanilla game files
 std::wstring Mod::custom_game_archive_path;
