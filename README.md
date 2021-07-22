@@ -74,6 +74,8 @@ Hope to obsolete this when i make compatable with ModEngine2
 
 * Option to use steam display names instead of character names
 
+* Option to disable the durability system
+
 ### Overhaul
 
 * Gestures can be canceled via rolling
