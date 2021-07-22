@@ -447,7 +447,7 @@ enum MemberFlags_IdentifiersEnum
     RegionMatchmaking = 0x53,
     isPlayerHollow = 0x54,
     PlayerSex = 0x55,
-    New_Name_86 = 0x56,
+    isPlayerHuman = 0x56,
     New_Name_87 = 0x57,
     New_Name_88 = 0x58,
     New_Name_89 = 0x59,
@@ -630,6 +630,12 @@ void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_
     set_MemberFlags_bitflag(input_data, MemberFlags_IdentifiersEnum::hasInvasionTimeLimit);
     set_MemberFlags_bitflag(input_data, MemberFlags_IdentifiersEnum::recentMPAreasVisited);
     set_MemberFlags_bitflag(input_data, MemberFlags_IdentifiersEnum::New_Name_100);
+    set_MemberFlags_bitflag(input_data, MemberFlags_IdentifiersEnum::SoulLevel);
+    set_MemberFlags_bitflag(input_data, MemberFlags_IdentifiersEnum::isPlayerHuman);
+    set_MemberFlags_bitflag(input_data, MemberFlags_IdentifiersEnum::ClearCount);
+    set_MemberFlags_bitflag(input_data, MemberFlags_IdentifiersEnum::MaxWeaponLevel);
+    set_MemberFlags_bitflag(input_data, MemberFlags_IdentifiersEnum::New_Name_7);
+    set_MemberFlags_bitflag(input_data, MemberFlags_IdentifiersEnum::New_Name_105);
 }
 
 void finish_construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper()
