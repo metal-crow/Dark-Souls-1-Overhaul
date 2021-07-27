@@ -202,6 +202,105 @@ jmp     ReadP2PPacket_Replacement_injection_return
 ReadP2PPacket_Replacement_injection ENDP
 
 
+EXTERN SendP2PPacket_Replacement_injection_helper: PROC
+
+EXTERN SendP2PPacket_voice_Replacement_injection_return: qword
+PUBLIC SendP2PPacket_voice_Replacement_injection
+SendP2PPacket_voice_Replacement_injection PROC
+
+sub     rsp, 10h
+movdqu  [rsp], xmm0
+sub     rsp, 10h
+movdqu  [rsp], xmm1
+sub     rsp, 10h
+movdqu  [rsp], xmm2
+sub     rsp, 10h
+movdqu  [rsp], xmm3
+push    rcx
+push    rdx
+push    r8
+push    r9
+push    r10
+push    r11
+xor     r12, r12
+push    r12 ;nChannel = 0
+push    r12 ;extra for stack alignment
+sub     rsp, 20h
+
+mov     rcx, [rbx] ;steamIDRemote
+lea     rdx, [rsp+70h + 40h+8*8+20h] ;pubData
+mov     r8d, [rsp+50h + 40h+8*8+20h] ;cubData
+inc     r8d ;i dunno, DSR does it
+mov     r9d, 1 ;eP2PSendType::k_EP2PSendUnreliableNoDelay (voice specific)
+call    SendP2PPacket_Replacement_injection_helper
+
+add     rsp, 30h
+pop     r11
+pop     r10
+pop     r9
+pop     r8
+pop     rdx
+pop     rcx
+movdqu  xmm3, [rsp]
+add     rsp, 10h
+movdqu  xmm2, [rsp]
+add     rsp, 10h
+movdqu  xmm1, [rsp]
+add     rsp, 10h
+movdqu  xmm0, [rsp]
+add     rsp, 10h
+
+jmp     SendP2PPacket_voice_Replacement_injection_return
+SendP2PPacket_voice_Replacement_injection ENDP
+
+EXTERN SendP2PPacket_Replacement_injection_return: qword
+PUBLIC SendP2PPacket_Replacement_injection
+SendP2PPacket_Replacement_injection PROC
+
+sub     rsp, 10h
+movdqu  [rsp], xmm0
+sub     rsp, 10h
+movdqu  [rsp], xmm1
+sub     rsp, 10h
+movdqu  [rsp], xmm2
+sub     rsp, 10h
+movdqu  [rsp], xmm3
+push    rcx
+push    rdx
+push    r8
+push    r9
+push    r10
+push    r11
+xor     r12, r12
+push    r12 ;nChannel = 0
+push    r12 ;extra for stack alignment
+sub     rsp, 20h
+
+mov     rcx, [rbp+0C8h + 40h+8*8+20h] ;steamIDRemote
+mov     rdx, r14 ;pubData
+mov     r8d, r15d ;cubData
+mov     r9d, [rsp+40h + 40h+8*8+20h] ;eP2PSendType
+call    SendP2PPacket_Replacement_injection_helper
+
+add     rsp, 30h
+pop     r11
+pop     r10
+pop     r9
+pop     r8
+pop     rdx
+pop     rcx
+movdqu  xmm3, [rsp]
+add     rsp, 10h
+movdqu  xmm2, [rsp]
+add     rsp, 10h
+movdqu  xmm1, [rsp]
+add     rsp, 10h
+movdqu  xmm0, [rsp]
+add     rsp, 10h
+
+jmp     SendP2PPacket_Replacement_injection_return
+SendP2PPacket_Replacement_injection ENDP
+
 _TEXT    ENDS
 
 END

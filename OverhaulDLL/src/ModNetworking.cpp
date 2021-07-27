@@ -22,6 +22,12 @@ extern "C" {
     uint64_t ReadP2PPacket_Replacement_injection_return;
     void ReadP2PPacket_Replacement_injection();
     bool ReadP2PPacket_Replacement_injection_helper(void *pubDest, uint32 cubDest, uint32 *pcubMsgSize, CSteamID *psteamIDRemote, int nChannel);
+
+    uint64_t SendP2PPacket_voice_Replacement_injection_return;
+    void SendP2PPacket_voice_Replacement_injection();
+    uint64_t SendP2PPacket_Replacement_injection_return;
+    void SendP2PPacket_Replacement_injection();
+    bool SendP2PPacket_Replacement_injection_helper(CSteamID steamIDRemote, const void *pubData, uint32 cubData, EP2PSend eP2PSendType, int nChannel);
 }
 
 typedef void* gfGetSteamInterface(int iSteamUser, int iUnkInt, const char* pcVersion, const char* pcInterface);
@@ -127,6 +133,15 @@ void ModNetworking::start()
      */
     write_address = (uint8_t*)(ModNetworking::ReadP2PPacket_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &ReadP2PPacket_Replacement_injection_return, 26, &ReadP2PPacket_Replacement_injection);
+
+    /*
+     * Code to replace the SendP2PPacket call with a compatible ISteamNetworkingMessages API call
+     * Nop out a big chunk since we want to replace the entire call
+     */
+    write_address = (uint8_t*)(ModNetworking::SendP2PPacket_voice_injection_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &SendP2PPacket_voice_Replacement_injection_return, 37, &SendP2PPacket_voice_Replacement_injection);
+    write_address = (uint8_t*)(ModNetworking::SendP2PPacket_injection_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &SendP2PPacket_Replacement_injection_return, 39, &SendP2PPacket_Replacement_injection);
 }
 
 /*
@@ -234,6 +249,39 @@ bool ReadP2PPacket_Replacement_injection_helper(void *pubDest, uint32 cubDest, u
     }
 }
 
+//SendP2PPacket/SendMessageToUser
+bool SendP2PPacket_Replacement_injection_helper(CSteamID steamIDRemote, const void *pubData, uint32 cubData, EP2PSend eP2PSendType, int nChannel)
+{
+    if (SteamNetworkingMessages_Supported())
+    {
+        SteamNetworkingIdentity target;
+        target.SetSteamID(steamIDRemote);
+
+        int nSendFlags;
+        switch (eP2PSendType)
+        {
+            case k_EP2PSendUnreliable:
+                nSendFlags = k_nSteamNetworkingSend_UnreliableNoNagle;
+                break;
+            case k_EP2PSendUnreliableNoDelay:
+                nSendFlags = k_nSteamNetworkingSend_UnreliableNoDelay;
+                break;
+            case k_EP2PSendReliable:
+                nSendFlags = k_nSteamNetworkingSend_ReliableNoNagle;
+                break;
+            case k_EP2PSendReliableWithBuffering:
+                nSendFlags = k_nSteamNetworkingSend_Reliable;
+                break;
+        }
+
+        EResult res = ModNetworking::SteamNetMessages->SendMessageToUser(target, pubData, cubData, nSendFlags, nChannel);
+        return res == EResult::k_EResultOK;
+    }
+    else
+    {
+        return ModNetworking::SteamNetworking->SendP2PPacket(steamIDRemote, pubData, cubData, eP2PSendType, nChannel);
+    }
+}
 
 /*
  * ===========CONNECTION HANDSHAKE SECTION

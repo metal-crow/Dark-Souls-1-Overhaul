@@ -78,6 +78,8 @@ private:
     static const uint64_t IsP2PPacketAvailable_1_injection_offset = 0x10b6cc0;
     static const uint64_t IsP2PPacketAvailable_2_injection_offset = 0x10b6d45;
     static const uint64_t ReadP2PPacket_injection_offset = 0x10b52fd;
+    static const uint64_t SendP2PPacket_voice_injection_offset = 0x10b7d24;
+    static const uint64_t SendP2PPacket_injection_offset = 0x10BA437;
 };
 
 #endif
