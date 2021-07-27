@@ -287,7 +287,7 @@ typedef struct
     uint64_t start_time;
 } GuestAwaitIncomingLobbyData_Struct;
 
-static const uint32_t MS_TO_WAIT_FOR_HOST_DATA = (uint32_t)0.25 * 10000000;
+static const uint32_t MS_TO_WAIT_FOR_HOST_DATA = (uint32_t)(0.25 * 10000000);
 
 bool GuestAwaitIncomingLobbyData(void* unused);
 
@@ -498,7 +498,7 @@ typedef struct
     uint64_t steamid;
 } AwaitIncomingUserChatMessage_Struct;
 
-static const uint32_t MS_TO_WAIT_FOR_GUEST_MSG = (uint32_t)0.75 * 10000000;
+static const uint32_t MS_TO_WAIT_FOR_GUEST_MSG = (uint32_t)(0.75 * 10000000);
 
 bool HostAwaitIncomingGuestChatMessage(void* data_a);
 
