@@ -57,7 +57,9 @@ Enabling Overhaul mode by default is highly recommended, since it dramatically i
 This solution is imperfect, as areas where you could not do multiplayer before but are right next to areas you could (I.E Undead Burg bonfire), are treated as seperate multiplayer areas.  
 (Note that DSR allows summons even with the boss dead).  
 
-* Support for unlimited save slots
+* Support for unlimited save slots.  
+Press left/right arrow or left/right dpad while in the Load Game menu to change your current save.  
+It's like pages in a book. Each "page" is 10 characters.  
 
 * Support for custom archive file loading  
 Specify folder location + filenames to use, and the alternate path will be used to load them
