@@ -1,76 +1,98 @@
-#include "ModNetworking.h"
+ #include "ModNetworking.h"
 #include "SP/memory/injection/asm/x64.h"
 #include "DarkSoulsOverhaulMod.h"
 #include "MainLoop.h"
 #include "AnimationEdits.h"
 #include <wchar.h>
 
-bool ModNetworking::allow_connect_with_non_mod_host = true;
-bool ModNetworking::allow_connect_with_legacy_mod_host = true;
-bool ModNetworking::allow_connect_with_overhaul_mod_host = true;
-bool ModNetworking::allow_connect_with_non_mod_guest = true;
-
-bool ModNetworking::host_mod_installed = false;
-bool ModNetworking::host_legacy_enabled = false;
-bool ModNetworking::guest_mod_installed = false;
-bool ModNetworking::guest_legacy_enabled = false;
-
-int64_t ModNetworking::timer_offset = 0;
-
-const uint8_t MOD_ENABLED = 0x80; //it's encoded that the mod is active in the most significant bit
-const uint8_t LEGACY_ENABLED = 0x40; //it's encoded that the mod is in legacy mode in the 2nd most significant bit
-const uint8_t REMOVE_FLAGS = ~(MOD_ENABLED | LEGACY_ENABLED);
-
-typedef void* SteamInternal_ContextInit_FUNC(uint64_t Init_SteamInternal_FUNCPTR);
-SteamInternal_ContextInit_FUNC** SteamInternal_ContextInit = (SteamInternal_ContextInit_FUNC**)0x1420B6738; //the address of the location for the imported function address
-uint64_t Init_SteamInternal_FUNCPTR = 0x141AC1020;
-typedef void* SteamInternal_SteamNetworkingSend_FUNC(void* SteamNetworking, uint64_t steamid, const uint8_t* packet_data, uint32_t packet_len, uint32_t eP2PSendType, uint32_t nChannel);
-
-typedef uint64_t getNetMessage_Typedef(void* session_man, void* player, uint32_t type, byte *store_data_here, uint32_t max_message_size);
-getNetMessage_Typedef* getNetMessage = (getNetMessage_Typedef*)0x140509560;
-
-typedef uint64_t getPlayerInsForConnectedPlayerData_Typedef(void *worldchrman, void *player);
-getPlayerInsForConnectedPlayerData_Typedef* getPlayerInsForConnectedPlayerData = (getPlayerInsForConnectedPlayerData_Typedef*)0x140372710;
-
-typedef uint64_t getSteamIDForConnectedPlayerData_Typedef(void *player);
-getSteamIDForConnectedPlayerData_Typedef* getSteamIDForConnectedPlayerData = (getSteamIDForConnectedPlayerData_Typedef*)0x141062d40;
-
-typedef uint64_t sendNetMessageToAllPlayers_Typedef(void* sessionMan, uint32_t type, byte * data, int size);
-sendNetMessageToAllPlayers_Typedef* sendNetMessageToAllPlayers = (sendNetMessageToAllPlayers_Typedef*)0x1405098a0;
+//This is needed for the steam callbacks to work
+static ModNetworking modnet = ModNetworking();
 
 extern "C" {
-    uint64_t sendPacket_injection_return;
-    void sendPacket_injection();
-    void sendPacket_injection_helper(uint8_t* data, uint32_t size, uint32_t type);
+    uint64_t AcceptP2PSessionWithUser_injection_return;
+    void AcceptP2PSessionWithUser_injection();
+    bool AcceptP2PSessionWithUser_injection_helper(uint64_t incoming_steamid);
 
-    uint64_t GetSteamData_Packet_injection_return;
-    void GetSteamData_Packet_injection();
-    uint32_t GetSteamData_Packet_injection_helper(void* data, uint32_t type, void* SteamSessionMemberLight);
+    uint64_t IsP2PPacketAvailable_1_Replacement_injection_return;
+    void IsP2PPacketAvailable_1_Replacement_injection();
+    uint64_t IsP2PPacketAvailable_2_Replacement_injection_return;
+    void IsP2PPacketAvailable_2_Replacement_injection();
+    bool IsP2PPacketAvailable_Replacement_injection_helper(uint32 *pcubMsgSize, int nChannel);
 
-    uint64_t getNetMessage_injection_return;
-    void getNetMessage_injection();
-    void getNetMessage_injection_helper(uint8_t* data, uint32_t size, uint32_t type);
-
-    uint64_t SendRawP2PPacket_injection_return;
-    void SendRawP2PPacket_injection();
-    uint64_t SendRawP2PPacket_injection_helper(uint8_t* data, uint64_t size, uint32_t type);
-
-    uint64_t ParseRawP2PPacketType_injection_return;
-    void ParseRawP2PPacketType_injection();
-    void ParseRawP2PPacketType_injection_helper(uint8_t* data, uint64_t steamId_remote);
-
-    uint64_t type1_32byte_p2pPacket_parse_rollback_injection_return;
-    uint64_t type1_40byte_p2pPacket_parse_rollback_injection_return;
-    void type1_32byte_p2pPacket_parse_rollback_injection();
-    void type1_40byte_p2pPacket_parse_rollback_injection();
-    uint64_t type1_32byte_p2pPacket_parse_rollback_injection_helper(void* session_man, void* player, uint32_t type, byte *store_data_here);
-    uint64_t type1_40byte_p2pPacket_parse_rollback_injection_helper(void* session_man, void* player, uint32_t type, byte *store_data_here);
-
-    uint64_t type1_p2pPacket_sending_rollback_injection_return;
-    void type1_p2pPacket_sending_rollback_injection();
-    void type1_p2pPacket_send_rollback_injection_helper(void* sessionMan, uint32_t type, byte * data, int size);
+    uint64_t ReadP2PPacket_Replacement_injection_return;
+    void ReadP2PPacket_Replacement_injection();
+    bool ReadP2PPacket_Replacement_injection_helper(void *pubDest, uint32 cubDest, uint32 *pcubMsgSize, CSteamID *psteamIDRemote, int nChannel);
 }
 
+typedef void* gfGetSteamInterface(int iSteamUser, int iUnkInt, const char* pcVersion, const char* pcInterface);
+typedef ISteamClient* gfCreateSteamInterface(const char* pSteamClientVer, uint32_t iUnkZero);
+ISteamUser* ModNetworking::SteamUser = nullptr;
+ISteamFriends* ModNetworking::SteamFriends = nullptr;
+ISteamMatchmaking* ModNetworking::SteamMatchmaking = nullptr;
+ISteamNetworking* ModNetworking::SteamNetworking = nullptr;
+ISteamNetworkingMessages* ModNetworking::SteamNetMessages = nullptr;
+ISteamNetworkingUtils* ModNetworking::SteamNetUtils = nullptr;
+
+bool Init_ISteam_Interfaces(void* unused)
+{
+    if (!SteamAPI_GetHSteamUser() || !SteamAPI_GetHSteamPipe())
+    {
+        return true;
+    }
+
+    HMODULE hSteamClient64 = GetModuleHandleA("steamclient64.dll");
+    if (!hSteamClient64)
+    {
+        return true;
+    }
+
+    gfCreateSteamInterface* fCreateSteamInterface = (gfCreateSteamInterface*)GetProcAddress(hSteamClient64, "CreateInterface");
+    if (!fCreateSteamInterface)
+    {
+        return true;
+    }
+
+    ISteamClient* SteamClient = fCreateSteamInterface("SteamClient017", 0);
+    if (!SteamClient)
+    {
+        return true;
+    }
+
+    ModNetworking::SteamUser = (ISteamUser*)SteamClient->GetISteamGenericInterface(1, 1, STEAMUSER_INTERFACE_VERSION);
+    if (!ModNetworking::SteamUser)
+    {
+        return true;
+    }
+    ModNetworking::SteamFriends = (ISteamFriends*)SteamClient->GetISteamGenericInterface(1, 1, STEAMFRIENDS_INTERFACE_VERSION);
+    if (!ModNetworking::SteamFriends)
+    {
+        return true;
+    }
+    ModNetworking::SteamMatchmaking = (ISteamMatchmaking*)SteamClient->GetISteamGenericInterface(1, 1, STEAMMATCHMAKING_INTERFACE_VERSION);
+    if (!ModNetworking::SteamMatchmaking)
+    {
+        return true;
+    }
+    ModNetworking::SteamNetworking = (ISteamNetworking*)SteamClient->GetISteamGenericInterface(1, 1, STEAMNETWORKING_INTERFACE_VERSION);
+    if (!ModNetworking::SteamNetworking)
+    {
+        return true;
+    }
+    ModNetworking::SteamNetMessages = (ISteamNetworkingMessages*)SteamClient->GetISteamGenericInterface(1, 1, STEAMNETWORKINGMESSAGES_INTERFACE_VERSION);
+    if (!ModNetworking::SteamNetMessages)
+    {
+        return true;
+    }
+    ModNetworking::SteamNetUtils = (ISteamNetworkingUtils*)SteamClient->GetISteamGenericInterface(1, 1, STEAMNETWORKINGUTILS_INTERFACE_VERSION);
+    if (!ModNetworking::SteamNetUtils)
+    {
+        return true;
+    }
+
+    ConsoleWrite("Steam Init_ISteam_Interfaces loaded");
+
+    return false;
+}
 
 void ModNetworking::start()
 {
@@ -79,348 +101,180 @@ void ModNetworking::start()
     uint8_t *write_address;
 
     /*
-     * Inject code that will piggypack on the packet sent upon the start of an initial connection with a person, and will provide data on the mod.
-     * This will specify if the mod is installed, and what mode it is in (legacy/non-legacy)
+     * Code to initalize the ISteamNetworkingMessages Interface
      */
-    //handle reading from GameData packets
-    //write_address = (uint8_t*)(ModNetworking::sendPacket_injection_offset + Game::ds1_base);
-    //sp::mem::code::x64::inject_jmp_14b(write_address, &sendPacket_injection_return, 1, &sendPacket_injection);
-
-    //handle reading the handshake from SteamData packets
-    write_address = (uint8_t*)(ModNetworking::GetSteamData_Packet_injection_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &GetSteamData_Packet_injection_return, 2, &GetSteamData_Packet_injection);
-
-    //handle writing to GameData packets
-    //write_address = (uint8_t*)(ModNetworking::getNetMessage_injection_offset + Game::ds1_base);
-    //sp::mem::code::x64::inject_jmp_14b(write_address, &getNetMessage_injection_return, 4, &getNetMessage_injection);
-
-    //handle setting the handshake in SteamData packets
-    write_address = (uint8_t*)(ModNetworking::SendRawP2PPacket_injection_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &SendRawP2PPacket_injection_return, 0, &SendRawP2PPacket_injection);
+    MainLoop::setup_mainloop_callback(Init_ISteam_Interfaces, NULL, "Init_ISteam_Interfaces");
 
     /*
-     * Code to support rollback netcode functionality.
-     * A callback function which has the host syncronize the time with the clients.
-     * And an injection for the clients to get that sync packet
+     * Supporting code for the connection handshake section
+     * Inject into the AcceptP2PSessionWithUser callback to be sure we d/c users
      */
+    write_address = (uint8_t*)(ModNetworking::AcceptP2PSessionWithUser_injection_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &AcceptP2PSessionWithUser_injection_return, 0, &AcceptP2PSessionWithUser_injection);
 
-    //inject into ParseRawP2PPacketType to have a handler for our custom encapsulated packet type
-    write_address = (uint8_t*)(ModNetworking::ParseRawP2PPacketType_injection_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &ParseRawP2PPacketType_injection_return, 1, &ParseRawP2PPacketType_injection);
+    /*
+     * Code to replace the IsP2PPacketAvailable call with a compatible ISteamNetworkingMessages API call
+     * Nop out a big chunk since we want to replace the entire call
+     */
+    write_address = (uint8_t*)(ModNetworking::IsP2PPacketAvailable_1_injection_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &IsP2PPacketAvailable_1_Replacement_injection_return, 17, &IsP2PPacketAvailable_1_Replacement_injection);
+    write_address = (uint8_t*)(ModNetworking::IsP2PPacketAvailable_2_injection_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &IsP2PPacketAvailable_2_Replacement_injection_return, 17, &IsP2PPacketAvailable_2_Replacement_injection);
 
-    //inject into the type1 packet sending function and include the current time
-    write_address = (uint8_t*)(ModNetworking::type1_p2pPacket_sending_rollback_injection_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &type1_p2pPacket_sending_rollback_injection_return, 1, &type1_p2pPacket_sending_rollback_injection);
-
-    //inject into the type1 packet parsing function and read the given time and adjust the animation starting offset
-    write_address = (uint8_t*)(ModNetworking::type1_32byte_p2pPacket_parsing_rollback_injection_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &type1_32byte_p2pPacket_parse_rollback_injection_return, 1, &type1_32byte_p2pPacket_parse_rollback_injection);
-    //same as above but for the other type of type1
-    write_address = (uint8_t*)(ModNetworking::type1_40byte_p2pPacket_parsing_rollback_injection_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &type1_40byte_p2pPacket_parse_rollback_injection_return, 3, &type1_40byte_p2pPacket_parse_rollback_injection);
-
+    /*
+     * Code to replace the ReadP2PPacket call with a compatible ISteamNetworkingMessages API call
+     * Nop out a big chunk since we want to replace the entire call
+     */
+    write_address = (uint8_t*)(ModNetworking::ReadP2PPacket_injection_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &ReadP2PPacket_Replacement_injection_return, 26, &ReadP2PPacket_Replacement_injection);
 }
 
 /*
  * ===========ROLLBACK NETCODE SECTION
  */
+int64_t ModNetworking::timer_offset = 0;
 
-enum TimestampSyncPacketTypes
+
+/*
+ * ===========ISteamNetworkingMessages REPLACEMENT SECTION
+ */
+
+ //Only use the new steamapi if we have finished the handshake connection and all connected users support it
+bool SteamNetworkingMessages_Supported()
 {
-    DelayCalc = 0,
-    UpdateTime = 1,
-};
+    return ModNetworking::currentLobby != 0 && ModNetworking::lobby_setup_complete && Mod::get_mode() != ModMode::Compatability;
+}
 
-const uint32_t ResyncPeriod = 15 * 10000000; // 15 seconds
-const uint32_t SaneDelay = 2 * 10000000; // 2 seconds
-
-std::unordered_map<uint64_t, TimerClientInfo> ModNetworking::hostTimerSyncronizationData;
-
-// Handle sending out the delay calculation packets as needed
-bool HostTimerSync(void* unused)
+//Add a new callback for the NetMessages equivalent of AcceptP2PSessionWithUser
+void ModNetworking::SteamNetworkingMessagesSessionRequestCallback(SteamNetworkingMessagesSessionRequest_t* pCallback)
 {
-    //exit this once we're no longer hosting
-    auto session_action_o = Game::get_SessionManagerImp_session_action_result();
-    if (session_action_o.has_value())
+    CSteamID user = pCallback->m_identityRemote.GetSteamID();
+
+    //Check they're not blocked
+    EFriendRelationship relation = ModNetworking::SteamFriends->GetFriendRelationship(user);
+    if (relation == EFriendRelationship::k_EFriendRelationshipIgnored)
     {
-        auto session_action_result = session_action_o.value();
-        if (session_action_result != TryToCreateSession && session_action_result != CreateSessionSuccess)
+        return;
+    }
+
+    //Check they're in the lobby with us
+    if (!ModNetworking::SteamFriends->IsUserInSource(user, ModNetworking::currentLobby))
+    {
+        return;
+    }
+
+    ModNetworking::SteamNetMessages->AcceptSessionWithUser(pCallback->m_identityRemote);
+}
+
+static SteamNetworkingMessage_t* message[1];
+static bool have_message = false;
+static int have_message_on_channel = 0; //in theory this should be redundant since DSR only uses channel 0
+
+//IsP2PPacketAvailable
+bool IsP2PPacketAvailable_Replacement_injection_helper(uint32 *pcubMsgSize, int nChannel)
+{
+    if (SteamNetworkingMessages_Supported())
+    {
+        /*
+         * There is no equivilent in the NetworkingMessages API, so just grab a message if one is present and save it
+         * Grab this saved message and return it in the upcoming ReadP2PPacket call
+         */
+
+        //the dark souls code can only handle 1 message at a time, and only reads them from 1 channel: channel 0
+        if (have_message)
         {
+            ConsoleWrite("WARNING: IsP2PPacketAvailable called but we had an unread message waiting. Dropping it.");
+            have_message = false;
+            message[0]->Release();
+            message[0] = nullptr;
+        }
+        int num_messages = ModNetworking::SteamNetMessages->ReceiveMessagesOnChannel(nChannel, message, 1);
+
+        if (num_messages == 1)
+        {
+            *pcubMsgSize = message[0]->m_cbSize;
+            have_message = true;
+            have_message_on_channel = nChannel;
+        }
+        return have_message;
+    }
+    else
+    {
+        return ModNetworking::SteamNetworking->IsP2PPacketAvailable(pcubMsgSize, nChannel);
+    }
+}
+
+//ReadP2PPacket/ReceiveMessagesOnChannel
+bool ReadP2PPacket_Replacement_injection_helper(void *pubDest, uint32 cubDest, uint32 *pcubMsgSize, CSteamID *psteamIDRemote, int nChannel)
+{
+    if (SteamNetworkingMessages_Supported())
+    {
+        //fill out the given args from the saved network message struct
+        if (have_message && message[0] != nullptr && have_message_on_channel == nChannel)
+        {
+            memcpy_s(pubDest, cubDest, message[0]->m_pData, message[0]->m_cbSize);
+            *pcubMsgSize = message[0]->m_cbSize;
+            *psteamIDRemote = message[0]->m_identityPeer.GetSteamID();
+
+            message[0]->Release();
+            message[0] = nullptr;
+            have_message = false;
+            return true;
+        }
+        else
+        {
+            ConsoleWrite("WARNING: ReadP2PPacket called but we didn't have a message to read or the channel was incorrect. have_message=%d, have_message_on_channel:%d!=%d", have_message, have_message_on_channel, nChannel);
+            have_message = false;
             return false;
         }
     }
-
-    //only do anything if we're in non-legacy mode
-    if (!Mod::legacy_mode)
+    else
     {
-        //as the host our offset is always 0
-        ModNetworking::timer_offset = 0;
-
-        //get the session members
-        auto steamsessionlight_o = Game::get_SessionManagerImp_SteamSessionLight();
-        if (!steamsessionlight_o.has_value())
-        {
-            ConsoleWrite("Unable to get_SessionManagerImp_SteamSessionLight in %s", __FUNCTION__);
-            return true;
-        }
-        uint64_t steamsessionlight = (uint64_t)steamsessionlight_o.value();
-        uint64_t SessionMembersStart = *(uint64_t*)(steamsessionlight + 8 + 0x68);
-        SessionMembersStart += 8; //skip the first connection (which is ourselves)
-        uint64_t SessionMembersEnd = *(uint64_t*)(steamsessionlight + 8 + 0x70);
-
-        while (SessionMembersStart != SessionMembersEnd)
-        {
-            uint64_t SteamSessionMemberLight = *(uint64_t*)SessionMembersStart;
-            uint64_t SteamId = *(uint64_t*)(SteamSessionMemberLight + 0xc8);
-
-            // If this is a new guest, start tracking them
-            if (ModNetworking::hostTimerSyncronizationData.count(SteamId) == 0)
-            {
-                ModNetworking::hostTimerSyncronizationData.emplace(SteamId, TimerClientInfo());
-            }
-
-            // If it's time to resync with this guest, do so
-            //if ((Game::get_accurate_time() - ModNetworking::hostTimerSyncronizationData[SteamId].timeOfLastResync) > ResyncPeriod)
-            //TMP: disable till calculation is fixed
-            if (ModNetworking::hostTimerSyncronizationData[SteamId].timeOfLastResync == 0)
-            {
-                // Send the ping packet out to compute the latency
-                if (!ModNetworking::hostTimerSyncronizationData[SteamId].waitingForPingResponse)
-                {
-                    uint8_t resyncbuf[] = {
-                        (4 | (1 << 4)), //custom clock sync packet type, TCP
-                        (uint8_t)TimestampSyncPacketTypes::DelayCalc, //type of clock sync packet
-                    };
-
-                    void* SteamInternal = (*SteamInternal_ContextInit)(Init_SteamInternal_FUNCPTR);
-                    uint64_t SteamNetworking = *(uint64_t*)((uint64_t)SteamInternal + 0x40);
-                    SteamInternal_SteamNetworkingSend_FUNC* SteamNetworkingSend = (SteamInternal_SteamNetworkingSend_FUNC*)**(uint64_t**)SteamNetworking;
-                    bool success = SteamNetworkingSend((void*)SteamNetworking, SteamId, resyncbuf, sizeof(resyncbuf), 2, 0);
-                    if (success) //if this fails to send retry from beginning
-                    {
-                        ConsoleWrite("Resync sent");
-
-                        ModNetworking::hostTimerSyncronizationData[SteamId].timePingPacketSent = Game::get_accurate_time();
-                        ModNetworking::hostTimerSyncronizationData[SteamId].waitingForPingResponse = true;
-                    }
-                }
-            }
-
-            SessionMembersStart += 8;
-        }
+        return ModNetworking::SteamNetworking->ReadP2PPacket(pubDest, cubDest, pcubMsgSize, psteamIDRemote, nChannel);
     }
-
-    return true;
-}
-
-// Handle receiving the clock sync packets
-void ParseRawP2PPacketType_injection_helper(uint8_t* data, uint64_t steamId_remote)
-{
-    if (Mod::legacy_mode)
-    {
-        return;
-    }
-
-    auto session_action_o = Game::get_SessionManagerImp_session_action_result();
-    if (!session_action_o.has_value())
-    {
-        ConsoleWrite("Unable to get SessionAction in %s", __FUNCTION__);
-        return;
-    }
-    auto session_action_result = session_action_o.value();
-
-    // If we're the host, save the ping packet response and immediately do the reply
-    if (session_action_result == TryToCreateSession || session_action_result == CreateSessionSuccess)
-    {
-        if (data[1] == TimestampSyncPacketTypes::DelayCalc)
-        {
-            ConsoleWrite("Resync response got for %llu", steamId_remote);
-
-            // Using the ping packet data, send out the guest's corrected clock
-            // compute the 1 way latency
-            uint64_t ping = (Game::get_accurate_time() - ModNetworking::hostTimerSyncronizationData[steamId_remote].timePingPacketSent);
-            // TODO should update this as a running average of some kind
-            ModNetworking::hostTimerSyncronizationData[steamId_remote].packetDelay = ping / 2;
-            // sanity check the computed latency
-            if (ping > SaneDelay)
-            {
-                ConsoleWrite("Host computed ping value of realllly high (%d). Ignoring.", ping);
-            }
-            else
-            {
-                ConsoleWrite("Timer update sent for ping of = %fms", ping/10000.0);
-
-                // Send the time the guest clock should be, accounting for latency
-                uint8_t updatebuf[10] = {
-                    (4 | (1 << 4)), //custom clock sync packet type, TCP
-                    (uint8_t)TimestampSyncPacketTypes::UpdateTime, //type of clock sync packet
-                };
-                *(uint64_t*)(updatebuf + 2) = Game::get_accurate_time() + ModNetworking::hostTimerSyncronizationData[steamId_remote].packetDelay;
-
-                void* SteamInternal = (*SteamInternal_ContextInit)(Init_SteamInternal_FUNCPTR);
-                uint64_t SteamNetworking = *(uint64_t*)((uint64_t)SteamInternal + 0x40);
-                SteamInternal_SteamNetworkingSend_FUNC* SteamNetworkingSend = (SteamInternal_SteamNetworkingSend_FUNC*)**(uint64_t**)SteamNetworking;
-                SteamNetworkingSend((void*)SteamNetworking, steamId_remote, updatebuf, sizeof(updatebuf), 2, 0); //if this fails to send we'll just resend in 15 sec anyway
-
-                //update our sync time with this guest
-                ModNetworking::hostTimerSyncronizationData[steamId_remote].timeOfLastResync = Game::get_accurate_time();
-                ModNetworking::hostTimerSyncronizationData[steamId_remote].waitingForPingResponse = false;
-            }
-        }
-    }
-
-    // If we're the guest, handle the clock packets
-    else if (session_action_result == TryToJoinSession || session_action_result == JoinSessionSuccess)
-    {
-        // Host is computing the delay. Just resend the packet back to them
-        if (data[1] == TimestampSyncPacketTypes::DelayCalc)
-        {
-            ConsoleWrite("Resync request got for %llu", steamId_remote);
-
-            void* SteamInternal = (*SteamInternal_ContextInit)(Init_SteamInternal_FUNCPTR);
-            uint64_t SteamNetworking = *(uint64_t*)((uint64_t)SteamInternal + 0x40);
-            SteamInternal_SteamNetworkingSend_FUNC* SteamNetworkingSend = (SteamInternal_SteamNetworkingSend_FUNC*)**(uint64_t**)SteamNetworking;
-            SteamNetworkingSend((void*)SteamNetworking, steamId_remote, data, 2, 2, 0);
-        }
-        // Host has sent us the correct time. Use this to update our offset
-        else if (data[1] == TimestampSyncPacketTypes::UpdateTime)
-        {
-            uint64_t trueTime = *(uint64_t*)(data + 2);
-            uint64_t ourTime = Game::get_accurate_time();
-            //can't sanity check the offset value since the timer starts at desktop boot time
-            ModNetworking::timer_offset = trueTime - ourTime;
-            ConsoleWrite("Timer update got: %lld", ModNetworking::timer_offset);
-        }
-    }
-}
-
-// Handle including the rollback data in the type1 packet sending
-void type1_p2pPacket_send_rollback_injection_helper(void* sessionMan, uint32_t type, byte * data, int size)
-{
-    //do the original code if we're in legacy
-    if (Mod::legacy_mode)
-    {
-        sendNetMessageToAllPlayers(sessionMan, type, data, size);
-        return;
-    }
-
-    //create a new, larger, packet, and send that
-    byte* new_data = (byte*)malloc(size + 8);
-    memcpy(new_data, data, size);
-
-    //insert the current time into this
-    //TODO in theory the current offset in the animation here may not be 0, so the correction to the other player might not be fully accurate
-    *(uint64_t*)(new_data + size) = Game::get_synced_time();
-
-    //send the changed packet
-    sendNetMessageToAllPlayers(sessionMan, type, new_data, size + 8);
-
-    free(new_data);
-}
-
-// Handle parsing and getting the rollback data from the type1 packet reading
-uint64_t type1_p2pPacket_parse_rollback_injection_helper(void* session_man, void* player, uint32_t type, byte *store_data_here, uint32_t size)
-{
-    uint64_t gotbytes;
-
-    //do the original code if we're in legacy
-    if (Mod::legacy_mode)
-    {
-        gotbytes = getNetMessage(session_man, player, type, store_data_here, size);
-        return gotbytes;
-    }
-
-    //get the data for this animation if we recieve a packet
-    gotbytes = getNetMessage(session_man, player, type, store_data_here, size + 8);
-    if (gotbytes == 0)
-    {
-        return gotbytes;
-    }
-
-    uint64_t timeAnimationTriggered = *(uint64_t*)(store_data_here + size);
-    uint32_t animationToUpdate = *(uint32_t*)(store_data_here + 12);
-
-    //check if this is the starting packet for this animation, and discard if not
-    uint8_t counter = (animationToUpdate >> 28);
-    uint64_t SteamId = getSteamIDForConnectedPlayerData(player);
-    if (counter == ModNetworking::hostTimerSyncronizationData[SteamId].lastAidCount)
-    {
-        return gotbytes;
-    }
-    ModNetworking::hostTimerSyncronizationData[SteamId].lastAidCount = counter;
-
-    //check if this is an animation state we care about
-    uint16_t animState = (uint16_t)(animationToUpdate & 0xffff);
-    if (AnimationEdits::STATEIDS_TO_ROLLBACK.count(animState) == 0)
-    {
-        return gotbytes;
-    }
-
-    //get a pointer to the animation mediator for this player
-    uint64_t playerins = getPlayerInsForConnectedPlayerData(*(void**)Game::world_chr_man_imp, player);
-    void* animationMediator = Game::get_PlayerIns_AnimationMediator(playerins);
-    if (animationMediator == NULL)
-    {
-        ConsoleWrite("Unable to get Animation Mediator for player");
-        return gotbytes;
-    }
-
-    //pass data to the callback
-    SetAnimationTimeOffsetArg* animTimeArg = (SetAnimationTimeOffsetArg*)malloc(sizeof(SetAnimationTimeOffsetArg));
-    animTimeArg->animationState = animState;
-    animTimeArg->timeAnimationTriggered = timeAnimationTriggered;
-    animTimeArg->animationMediatorPtr = animationMediator;
-    animTimeArg->frameStart = Game::get_frame_count();
-    MainLoop::setup_mainloop_callback(AnimationEdits::SetAnimationTimeOffset, animTimeArg, "SetAnimationTimeOffset");
-
-    return gotbytes;
-}
-
-uint64_t type1_32byte_p2pPacket_parse_rollback_injection_helper(void* session_man, void* player, uint32_t type, byte *store_data_here)
-{
-    return type1_p2pPacket_parse_rollback_injection_helper(session_man, player, type, store_data_here, 32);
-}
-uint64_t type1_40byte_p2pPacket_parse_rollback_injection_helper(void* session_man, void* player, uint32_t type, byte *store_data_here)
-{
-    return type1_p2pPacket_parse_rollback_injection_helper(session_man, player, type, store_data_here, 40);
 }
 
 
 /*
  * ===========CONNECTION HANDSHAKE SECTION
  */
+const char* MOD_LOBBY_DATA_KEY = "DarkSoulsOverhaulModData";
+const uint8_t MOD_ENABLED = 0x80; //it's encoded that the mod is active in the most significant bit
+const uint8_t LEGACY_ENABLED = 0x40; //it's encoded that the mod is in legacy mode in the 2nd most significant bit
 
-const uint8_t data_buf[] = {
-    (1 | (1 << 4)), //p2p packet type
-    78, 88, 82, 86, //magic
-    5, 132, //header
-    46, //type KickOutTask
-    255, 0, 0, 25 }; //data (const 0xff000019)
+bool ModNetworking::allow_connect_with_non_mod_host = true;
+bool ModNetworking::allow_connect_with_legacy_mod_host = true;
+bool ModNetworking::allow_connect_with_overhaul_mod_host = true;
+bool ModNetworking::allow_connect_with_non_mod_guest = true;
 
-// Only call as Host, since this assumes session is connected and you can D/C other player
-void HostForceDisconnectSession(void* SteamSessionMemberLight, const wchar_t* dc_reason)
+bool ModNetworking::host_got_info = false;
+bool ModNetworking::host_mod_installed = false;
+bool ModNetworking::host_legacy_enabled = false;
+bool ModNetworking::incoming_guest_got_info = false;
+bool ModNetworking::incoming_guest_mod_installed = false;
+bool ModNetworking::incoming_guest_legacy_enabled = false;
+uint64_t ModNetworking::incoming_guest_to_not_accept = 0;
+
+uint64_t ModNetworking::currentLobby = 0;
+bool ModNetworking::lobby_setup_complete = false;
+
+bool AcceptP2PSessionWithUser_injection_helper(uint64_t incoming_steamid)
 {
-    void* SteamInternal = (*SteamInternal_ContextInit)(Init_SteamInternal_FUNCPTR);
-
-    if (SteamInternal == NULL)
+    if (incoming_steamid == ModNetworking::incoming_guest_to_not_accept)
     {
-        ConsoleWrite("Unable to disconnect player: unable to create SteamInternal");
-        return;
+        ConsoleWrite("Denying connection to d/c'd user %llx", incoming_steamid);
+        return false;
     }
+    return true;
+}
 
-    uint64_t SteamNetworking = *(uint64_t*)((uint64_t)SteamInternal + 0x40);
-    SteamInternal_SteamNetworkingSend_FUNC* SteamNetworkingSend = (SteamInternal_SteamNetworkingSend_FUNC*)**(uint64_t**)SteamNetworking;
+void HostForceDisconnectGuest(uint64_t steamid, const wchar_t* dc_reason)
+{
+    //Ensure we don't implicitly accept the connection via calling SendP2PPacket to this user
+    ModNetworking::incoming_guest_to_not_accept = steamid;
 
-    uint64_t steamid = *(uint64_t*)((uint64_t)SteamSessionMemberLight + 0xc8);
-
-    //eP2PSendType = k_EP2PSendReliable
-    bool success = SteamNetworkingSend((void*)SteamNetworking, steamid, data_buf, sizeof(data_buf), 2, 0);
-    if (!success)
-    {
-        ConsoleWrite("Unable to disconnect player: error return val from SteamNetworkingSend");
-    }
-
-    //TODO also set variables in this SessionMember struct to disable the connection locally
+    //Disconnect any existing session we have
+    //CloseP2PSessionWithUser / CloseSessionWithUser
 
     //Tell the host why we're dcing this guest
     wchar_t dc_msg[300];
@@ -428,123 +282,68 @@ void HostForceDisconnectSession(void* SteamSessionMemberLight, const wchar_t* dc
     Game::show_popup_message(dc_msg);
 }
 
-//returns the type of the intercepted packet
-uint32_t GetSteamData_Packet_injection_helper(void* data, uint32_t type, void* SteamSessionMemberLight)
+typedef struct
 {
-    int64_t* data_offset_ptr = (int64_t*)(((uint64_t)data) + 0x18);
-    int64_t data_offset = *data_offset_ptr;
-    int64_t* data_size_ptr = (int64_t*)(((uint64_t)data) + 0x8);
-    int64_t data_size = *data_size_ptr;
-    uint8_t* data_buf = (uint8_t*)(*(uint64_t*)((uint64_t)data + 0x10) + data_offset);
-    int64_t data_remaining = data_size - data_offset;
+    uint64_t start_time;
+} GuestAwaitIncomingLobbyData_Struct;
 
-    if (!Game::get_SessionManagerImp_session_action_result().has_value())
+static const uint32_t MS_TO_WAIT_FOR_HOST_DATA = (uint32_t)0.25 * 10000000;
+
+bool GuestAwaitIncomingLobbyData(void* unused);
+
+void ModNetworking::LobbyEnterCallback(LobbyEnter_t* pCallback)
+{
+    CSteamID lobbyowner = ModNetworking::SteamMatchmaking->GetLobbyOwner(pCallback->m_ulSteamIDLobby);
+    CSteamID selfsteamid = ModNetworking::SteamUser->GetSteamID();
+    ModNetworking::currentLobby = pCallback->m_ulSteamIDLobby;
+    ModNetworking::lobby_setup_complete = false;
+
+    // 1. As the host, upon lobby creation(and self entry into it) set the lobby data to inform connecting users of our mod status
+    // Since lobby data is persistent, we don't have to worry about resending anything for new connections
+    if (lobbyowner == selfsteamid)
     {
-        return type;
-    }
-    SessionActionResultEnum session_action_result = Game::get_SessionManagerImp_session_action_result().value();
-
-    //ConsoleWrite("GetSteamData_Packet_injection_helper session_action=%x type=%d from=%x", session_action_result, type, *(uint64_t*)((uint64_t)SteamSessionMemberLight + 0xc8));
-
-    // 4. If we recieve a type36 AND we're the host (we created the session)
-    if (type == 36 && (session_action_result == TryToCreateSession || session_action_result == CreateSessionSuccess))
-    {
-        //if we don't have the extra flags byte at the end of the packet, non-mod user
-        //handle the fact that the dword at the end of the normal packet is optional
-        if (data_remaining != 5 && data_remaining != 1)
+        char value = MOD_ENABLED;
+        if (Mod::legacy_mode)
         {
-            ModNetworking::guest_mod_installed = false;
+            value |= LEGACY_ENABLED;
         }
-        else
-        {
-            uint8_t value = *(data_buf+(data_remaining-1)); //ignore the dword of normal data at the end if it exists
-
-            //ConsoleWrite("Host Read custom type36=%x from=%x", value, *(uint64_t*)((uint64_t)SteamSessionMemberLight + 0xc8));
-
-            if ((value & MOD_ENABLED) != 0)
-            {
-                ModNetworking::guest_mod_installed = true;
-            }
-            else
-            {
-                ModNetworking::guest_mod_installed = false;
-            }
-
-            if ((value & LEGACY_ENABLED) != 0)
-            {
-                ModNetworking::guest_legacy_enabled = true;
-            }
-            else
-            {
-                ModNetworking::guest_legacy_enabled = false;
-            }
-        }
-
-        // Parse the received data
-        // As the host, we only change our settings if the connecting user is non-mod, and we allow non-mod connections, and we don't have any other non-mod phantoms in here
-        if (ModNetworking::guest_mod_installed == false && ModNetworking::allow_connect_with_non_mod_guest == true)
-        {
-            // first non-mod user (we haven't updated the playernum at this point, the 1st guest will be 2), change settings
-            if (Game::get_SessionManagerImp_Next_Player_Num().value_or(0) == 2)
-            {
-                Mod::set_mode(true, ModNetworking::guest_mod_installed);
-            }
-            // not first non-mod user
-            else if (Game::get_SessionManagerImp_Next_Player_Num().value_or(0) > 2)
-            {
-                // If this new guest is a non-mod user but we already have a mod user connected
-                if (Mod::get_mode() != Compatability)
-                {
-                    HostForceDisconnectSession(SteamSessionMemberLight, L"Incoming guest is a non-mod user, but mod user is already connected.");
-                }
-                else
-                {
-                    //no change needed, we're already in compatability mode
-                }
-            }
-            // unknown playernum state
-            else
-            {
-                HostForceDisconnectSession(SteamSessionMemberLight, L"Error. Next player number is <2, somehow. Report me.");
-            }
-        }
-        // If specified in options, we must disconnect the non-mod player, since they won't on their own
-        else if (ModNetworking::guest_mod_installed == false && ModNetworking::allow_connect_with_non_mod_guest == false)
-        {
-            HostForceDisconnectSession(SteamSessionMemberLight, L"Incoming guest is non-mod user, and you do not allow connections with non-mod users.");
-        }
-        // At this point, we've already sent our info packet
-        // If the guest hasn't already updated to it and this packet doesn't reflect our configs, something is wrong, so DC them
-        else if (ModNetworking::guest_mod_installed == true && ModNetworking::guest_legacy_enabled != Mod::legacy_mode)
-        {
-            HostForceDisconnectSession(SteamSessionMemberLight, L"Incoming guest is mod-user, but isn't matching your legacy/overhaul mode.");
-        }
-        // Otherwise we're good to go, the configs match!
-        //ConsoleWrite("Host Config match!");
-
-        // As the host, start up the clock syncronization function
-        // TMP: Disable entirly
-        //MainLoop::setup_mainloop_callback(HostTimerSync, NULL, "HostTimerSync");
-
-        //game doesn't parse this extra byte in the packet, no need to remove
-        return type;
+        ConsoleWrite("1. Host set lobby data = %hhx", value);
+        ModNetworking::SteamMatchmaking->SetLobbyData(pCallback->m_ulSteamIDLobby, MOD_LOBBY_DATA_KEY, &value);
+        return;
     }
 
-    // 2. If we recieve a type12 AND we're the new guest (we're joining the session)
-    if (type == 12 && (session_action_result == TryToJoinSession))
+    // 2. If we're the guest, upon lobby connection check for lobby data on mod status
+    // This callback is only triggered when WE attempt to enter a lobby, so existing guests won't have this trigger
+    // The lobby data may not arrive for a bit, so set up a callback to trigger when we do get the data (if we get it)
+    if (lobbyowner != selfsteamid)
     {
-        //if we don't have the extra flags byte at the end of the packet, non-mod user
-        if (!(data_remaining > 0))
+        GuestAwaitIncomingLobbyData_Struct* data = (GuestAwaitIncomingLobbyData_Struct*)malloc(sizeof(GuestAwaitIncomingLobbyData_Struct));
+        data->start_time = Game::get_accurate_time();
+        MainLoop::setup_mainloop_callback(GuestAwaitIncomingLobbyData, nullptr, "GuestAwaitIncomingLobbyData");
+        return;
+    }
+}
+
+void ModNetworking::LobbyDataUpdateCallback(LobbyDataUpdate_t* pCallback)
+{
+    CSteamID lobbyowner = ModNetworking::SteamMatchmaking->GetLobbyOwner(pCallback->m_ulSteamIDLobby);
+    CSteamID selfsteamid = ModNetworking::SteamUser->GetSteamID();
+
+    // 2. If we're the guest, listen to the callback for lobby data updates
+    // This will be triggered upon joining a lobby, and also upon reciving any lobby data updates
+    if (lobbyowner != selfsteamid)
+    {
+        const char* mod_value_arry = ModNetworking::SteamMatchmaking->GetLobbyData(pCallback->m_ulSteamIDLobby, MOD_LOBBY_DATA_KEY);
+        char mod_value = mod_value_arry[0];
+        ConsoleWrite("2. Guest get lobby data = %hhx", mod_value);
+
+        if (mod_value == 0)
         {
             ModNetworking::host_mod_installed = false;
         }
         else
         {
-            uint8_t value = *data_buf;
-
-            //ConsoleWrite("Guest Read custom type12=%x from=%x", value, *(uint64_t*)((uint64_t)SteamSessionMemberLight + 0xc8));
-
-            if ((value & MOD_ENABLED) != 0)
+            if ((mod_value & MOD_ENABLED) != 0)
             {
                 ModNetworking::host_mod_installed = true;
             }
@@ -553,7 +352,7 @@ uint32_t GetSteamData_Packet_injection_helper(void* data, uint32_t type, void* S
                 ModNetworking::host_mod_installed = false;
             }
 
-            if ((value & LEGACY_ENABLED) != 0)
+            if ((mod_value & LEGACY_ENABLED) != 0)
             {
                 ModNetworking::host_legacy_enabled = true;
             }
@@ -561,125 +360,229 @@ uint32_t GetSteamData_Packet_injection_helper(void* data, uint32_t type, void* S
             {
                 ModNetworking::host_legacy_enabled = false;
             }
-        }
 
-        // Parse the received data
-        // As the guest, we must change our settings to match the host (based on how we've configured our options), or else disconnect.
-        if (ModNetworking::host_mod_installed == false && ModNetworking::allow_connect_with_non_mod_host == true)
-        {
-            //connecting to non-mod
-            Mod::set_mode(true, ModNetworking::host_mod_installed);
+            ModNetworking::host_got_info = true;
         }
-        else if (ModNetworking::host_mod_installed == true && ModNetworking::host_legacy_enabled == false && ModNetworking::allow_connect_with_overhaul_mod_host == true)
-        {
-            //connecting to overhaul
-            Mod::set_mode(ModNetworking::host_legacy_enabled, ModNetworking::host_mod_installed);
-        }
-        else if (ModNetworking::host_mod_installed == true && ModNetworking::host_legacy_enabled == true && ModNetworking::allow_connect_with_legacy_mod_host == true)
-        {
-            //connecting to legacy
-            Mod::set_mode(ModNetworking::host_legacy_enabled, ModNetworking::host_mod_installed);
-        }
-        else
-        {
-            //Tell the player why we're dcing
-            wchar_t dc_msg[300];
-            wcscpy_s(dc_msg, L"Unable to connect to host player.\n");
-            if (ModNetworking::host_mod_installed == false && ModNetworking::allow_connect_with_non_mod_host == false)
-            {
-                wcscat_s(dc_msg, L"Host does not have mod and you do not allow connections with non-mod users.");
-            }
-            else if (ModNetworking::host_mod_installed && ModNetworking::host_legacy_enabled == false && ModNetworking::allow_connect_with_overhaul_mod_host == false)
-            {
-                wcscat_s(dc_msg, L"Host is in overhaul mode and you do not allow connections with overhaul mode users.");
-            }
-            else if (ModNetworking::host_mod_installed && ModNetworking::host_legacy_enabled == true && ModNetworking::allow_connect_with_legacy_mod_host == false)
-            {
-                wcscat_s(dc_msg, L"Host is in legacy mode and you do not allow connections with legacy mode users.");
-            }
-            Game::show_popup_message(dc_msg);
-
-            //we can't kick out the other player since we're not the host. So pretend we received the kickout packet
-            *data_size_ptr += 4;
-            ((uint32_t*)data_buf)[0] = 0xff000019;
-            return 46;
-        }
-
-        //game doesn't parse this extra byte in the packet, no need to remove
-        return type;
     }
-
-    return type;
 }
 
-uint64_t SendRawP2PPacket_injection_helper(uint8_t* data, uint64_t size, uint32_t type)
+bool GuestAwaitIncomingLobbyData(void* data_a)
 {
-    // verify we're the SteamData packet type
-    if (!(type == 1 || type == 3))
+    GuestAwaitIncomingLobbyData_Struct* data = (GuestAwaitIncomingLobbyData_Struct*)data_a;
+
+    // Wait till we either recieve data from the host about mod status, or we timeout
+    // If we timeout, then we know they aren't a mod user
+
+    //No timeout yet, back to sleep
+    if (ModNetworking::host_got_info == false && !(Game::get_accurate_time() > data->start_time + MS_TO_WAIT_FOR_HOST_DATA))
     {
-        return size;
+        return true;
+    }
+    //Timeout, host is non-mod user
+    if (ModNetworking::host_got_info == false && (Game::get_accurate_time() > data->start_time + MS_TO_WAIT_FOR_HOST_DATA))
+    {
+        ModNetworking::host_mod_installed = false;
     }
 
-    //sanity check size
-    if (size < 7)
+    // 3. As the guest, we must change our settings to match the host (based on how we've configured our options), or else disconnect.
+    if (ModNetworking::host_mod_installed == false && ModNetworking::allow_connect_with_non_mod_host == true)
     {
-        return size;
+        //connecting to non-mod
+        Mod::set_mode(true, ModNetworking::host_mod_installed);
     }
-
-    if (!Game::get_SessionManagerImp_session_action_result().has_value())
+    else if (ModNetworking::host_mod_installed == true && ModNetworking::host_legacy_enabled == false && ModNetworking::allow_connect_with_overhaul_mod_host == true)
     {
-        return size;
+        //connecting to overhaul
+        Mod::set_mode(ModNetworking::host_legacy_enabled, ModNetworking::host_mod_installed);
     }
-    SessionActionResultEnum session_action_result = Game::get_SessionManagerImp_session_action_result().value();
-
-    uint8_t packet_type = data[6];
-
-    //ConsoleWrite("SendRawP2PPacket_injection_helper session_action=%x type=%d", session_action_result, packet_type);
-
-    // 1. If we send a type12 AND we're the host (we created the session) OR a current guest
-    // existing guest phantoms also send the type12 packet to the new phantom, so we need to account for that
-    // It's ok to increase the length since the underlying buffer is 128 bytes long
-    if (packet_type == 12 && (session_action_result == TryToCreateSession || session_action_result == CreateSessionSuccess || session_action_result == JoinSessionSuccess))
+    else if (ModNetworking::host_mod_installed == true && ModNetworking::host_legacy_enabled == true && ModNetworking::allow_connect_with_legacy_mod_host == true)
     {
-        //ConsoleWrite("Send custom type12");
-        //the mod is active (always true, since we're running the mod)
-        uint8_t value = MOD_ENABLED;
-
-        if (Mod::legacy_mode)
+        //connecting to legacy
+        Mod::set_mode(ModNetworking::host_legacy_enabled, ModNetworking::host_mod_installed);
+    }
+    else
+    {
+        //Tell the player why we're dcing
+        wchar_t dc_msg[300];
+        wcscpy_s(dc_msg, L"Unable to connect to host player.\n");
+        if (ModNetworking::host_mod_installed == false && ModNetworking::allow_connect_with_non_mod_host == false)
         {
-            value |= LEGACY_ENABLED;
+            wcscat_s(dc_msg, L"Host does not have mod and you do not allow connections with non-mod users.");
         }
-
-        data[size] = value;
-        return size+1;
-    }
-
-    // 3. If we send a type36 AND we're the new guest (we're joining the session)
-    // It's ok to increase the length since the underlying buffer is 128 bytes long
-    if (packet_type == 36 && (session_action_result == TryToJoinSession))
-    {
-        //ConsoleWrite("Guest Send custom type36");
-        //the mod is active (always true, since we're running the mod)
-        uint8_t value = MOD_ENABLED;
-
-        if (Mod::legacy_mode)
+        else if (ModNetworking::host_mod_installed && ModNetworking::host_legacy_enabled == false && ModNetworking::allow_connect_with_overhaul_mod_host == false)
         {
-            value |= LEGACY_ENABLED;
+            wcscat_s(dc_msg, L"Host is in overhaul mode and you do not allow connections with overhaul mode users.");
         }
+        else if (ModNetworking::host_mod_installed && ModNetworking::host_legacy_enabled == true && ModNetworking::allow_connect_with_legacy_mod_host == false)
+        {
+            wcscat_s(dc_msg, L"Host is in legacy mode and you do not allow connections with legacy mode users.");
+        }
+        Game::show_popup_message(dc_msg);
+        ConsoleWrite("3. Guest disconnecting due to settings");
 
-        data[size] = value;
-        return size+1;
+        //disconnect
+        ModNetworking::SteamMatchmaking->LeaveLobby(ModNetworking::currentLobby);
+        ModNetworking::currentLobby = 0;
+        ModNetworking::lobby_setup_complete = false;
+        ModNetworking::host_got_info = false;
+        free(data);
+        return false;
     }
 
-    return size;
+    //send a chat message confirming we also respect these settings and have the mod
+    char value = MOD_ENABLED;
+    if (Mod::legacy_mode)
+    {
+        value |= LEGACY_ENABLED;
+    }
+    ModNetworking::SteamMatchmaking->SendLobbyChatMsg(ModNetworking::currentLobby, &value, sizeof(value));
+    ConsoleWrite("3. Guest send chat msg = %hhx", value);
+    ModNetworking::lobby_setup_complete = true;
+
+    //reset the incoming guest info for next host
+    ModNetworking::host_got_info = false;
+    free(data);
+    return false;
 }
 
-void getNetMessage_injection_helper(uint8_t* data, uint32_t size, uint32_t type)
+void ModNetworking::LobbyChatMsgCallback(LobbyChatMsg_t* pCallback)
 {
+    CSteamID lobbyowner = ModNetworking::SteamMatchmaking->GetLobbyOwner(pCallback->m_ulSteamIDLobby);
+    CSteamID selfsteamid = ModNetworking::SteamUser->GetSteamID();
 
+    if (pCallback->m_ulSteamIDLobby != currentLobby)
+    {
+        return;
+    }
+    if (pCallback->m_ulSteamIDUser == selfsteamid.ConvertToUint64())
+    {
+        return;
+    }
+
+    // 4. If we're the host, listen for the response chat message from the guest saying they respect these settings
+    if (lobbyowner == selfsteamid)
+    {
+        char value;
+        int iMsgSize = ModNetworking::SteamMatchmaking->GetLobbyChatEntry(pCallback->m_ulSteamIDLobby, pCallback->m_iChatID, nullptr, &value, sizeof(value), nullptr);
+
+        if (iMsgSize >= 1)
+        {
+            ConsoleWrite("4. Host got chat msg = %hhx", value);
+
+            if ((value & MOD_ENABLED) != 0)
+            {
+                ModNetworking::incoming_guest_mod_installed = true;
+            }
+            else
+            {
+                ModNetworking::incoming_guest_mod_installed = false;
+            }
+
+            if ((value & LEGACY_ENABLED) != 0)
+            {
+                ModNetworking::incoming_guest_legacy_enabled = true;
+            }
+            else
+            {
+                ModNetworking::incoming_guest_legacy_enabled = false;
+            }
+
+            ModNetworking::incoming_guest_got_info = true; //Wait until we're all done before setting this, so we don't get interrupted
+        }
+    }
 }
 
-void sendPacket_injection_helper(uint8_t* data, uint32_t size, uint32_t type)
+typedef struct
 {
+    uint64_t start_time;
+    uint64_t steamid;
+} AwaitIncomingUserChatMessage_Struct;
 
+static const uint32_t MS_TO_WAIT_FOR_GUEST_MSG = (uint32_t)0.75 * 10000000;
+
+bool HostAwaitIncomingGuestChatMessage(void* data_a);
+
+void ModNetworking::LobbyChatUpdateCallback(LobbyChatUpdate_t* pCallback)
+{
+    CSteamID lobbyowner = ModNetworking::SteamMatchmaking->GetLobbyOwner(pCallback->m_ulSteamIDLobby);
+    CSteamID selfsteamid = ModNetworking::SteamUser->GetSteamID();
+
+    // 4. As the host, when a new user connects to the lobby set a timer to wait for their response chat message
+    // Need to handle the case where they don't send a chat message, and thus are a non-mod user and we must disconnect them from this lobby
+    // UNLESS: we allow non-mod connections, and we don't have any other non-mod phantoms in here
+    if (lobbyowner == selfsteamid && pCallback->m_rgfChatMemberStateChange == EChatMemberStateChange::k_EChatMemberStateChangeEntered && pCallback->m_ulSteamIDUserChanged != selfsteamid.ConvertToUint64())
+    {
+        AwaitIncomingUserChatMessage_Struct* data = (AwaitIncomingUserChatMessage_Struct*)malloc(sizeof(AwaitIncomingUserChatMessage_Struct));
+        data->start_time = Game::get_accurate_time();
+        data->steamid = pCallback->m_ulSteamIDUserChanged;
+        MainLoop::setup_mainloop_callback(HostAwaitIncomingGuestChatMessage, data, "HostAwaitIncomingGuestChatMessage");
+    }
+}
+
+bool HostAwaitIncomingGuestChatMessage(void* data_a)
+{
+    AwaitIncomingUserChatMessage_Struct* data = (AwaitIncomingUserChatMessage_Struct*)data_a;
+
+    //No timeout yet, back to sleep
+    if (ModNetworking::incoming_guest_got_info == false && !(Game::get_accurate_time() > data->start_time + MS_TO_WAIT_FOR_GUEST_MSG))
+    {
+        return true;
+    }
+
+    //Timed out waiting for a message from the incoming guest, so they're a non-mod user
+    //Also handle the (impossible?) case where we got the response from the guest but they say they don't have the mod
+    else if ((ModNetworking::incoming_guest_got_info == false && Game::get_accurate_time() > data->start_time + MS_TO_WAIT_FOR_GUEST_MSG) ||
+        (ModNetworking::incoming_guest_got_info == true && ModNetworking::incoming_guest_mod_installed == false))
+    {
+        ConsoleWrite("4. Host detects incoming guest is non-mod user");
+
+        //As the host, we only change our settings if the connecting user is non-mod, and we allow non-mod connections, and we don't have any other non-mod phantoms in here
+        if (ModNetworking::allow_connect_with_non_mod_guest == true)
+        {
+            // first non-mod user, change settings
+            if (ModNetworking::SteamMatchmaking->GetNumLobbyMembers(ModNetworking::currentLobby) == 2)
+            {
+                Mod::set_mode(true, false);
+            }
+            // not first non-mod user and the other guests are not in a non-mod compatible mode
+            else if (ModNetworking::SteamMatchmaking->GetNumLobbyMembers(ModNetworking::currentLobby) > 2 && Mod::get_mode() != Compatability)
+            {
+                HostForceDisconnectGuest(data->steamid, L"Incoming guest is a non-mod user, but mod user is already connected.");
+            }
+
+            else
+            {
+                FATALERROR("Number of lobby members is %d. Impossible.", ModNetworking::SteamMatchmaking->GetNumLobbyMembers(ModNetworking::currentLobby));
+            }
+        }
+        // If specified in options, we must disconnect the non-mod player, since they won't on their own
+        else if (ModNetworking::allow_connect_with_non_mod_guest == false)
+        {
+            HostForceDisconnectGuest(data->steamid, L"Incoming guest is non-mod user, and you do not allow connections with non-mod users.");
+        }
+    }
+
+    // If the guest isn't respecting our settings for some reason, disconnect them right away
+    else if (ModNetworking::incoming_guest_mod_installed == true && ModNetworking::incoming_guest_legacy_enabled != Mod::legacy_mode)
+    {
+        ConsoleWrite("4. Host detects incoming guest has wrong settings");
+
+        HostForceDisconnectGuest(data->steamid, L"Incoming guest is mod-user, but isn't matching your legacy/overhaul mode.");
+    }
+
+    //Success state for a new guest
+    else
+    {
+        ConsoleWrite("4. Host allows guest in!");
+
+        ModNetworking::lobby_setup_complete = true;
+
+        // As the host, start up the clock syncronization function
+        //MainLoop::setup_mainloop_callback(HostTimerSync, NULL, "HostTimerSync");
+    }
+
+    //reset the incoming guest info for next guest
+    ModNetworking::incoming_guest_got_info = false;
+    free(data);
+    return false;
 }

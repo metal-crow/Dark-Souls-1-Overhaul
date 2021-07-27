@@ -207,6 +207,8 @@ void Mod::set_mode(bool legacy, bool mod_installed)
     }
     SpellDesync::enabled = mod_installed; //since this requires reciving custom packets to work, not compatable with non-mod
 
+    ConsoleWrite("Setting mode: legacy=%d mod_installed=%d", legacy, mod_installed);
+
     //only change if we're not already in the mode
     if (Mod::legacy_mode != legacy)
     {

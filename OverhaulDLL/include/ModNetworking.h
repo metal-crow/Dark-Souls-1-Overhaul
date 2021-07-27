@@ -5,6 +5,10 @@
 
 #include <cstdint>
 #include <unordered_map>
+#pragma warning( push )
+#pragma warning( disable : 4996 )
+#include "steam/steam_api.h"
+#pragma warning( pop )
 
 class TimerClientInfo
 {
@@ -28,7 +32,28 @@ public:
 class ModNetworking
 {
 public:
+    ModNetworking() { }; //This is needed for the steam callbacks to work
     static void start();
+
+    static ISteamUser* SteamUser;
+    static ISteamFriends* SteamFriends;
+    static ISteamMatchmaking* SteamMatchmaking;
+    static ISteamNetworking* SteamNetworking;
+    static ISteamNetworkingMessages* SteamNetMessages;
+    static ISteamNetworkingUtils* SteamNetUtils;
+
+    //Register a LobbyEnterCallback so that we can differentiate between mod and non-mod users without even using the ISteamNetworking Interface
+    //This allows us to avoid leaking our IP on that interface
+    STEAM_CALLBACK(ModNetworking, LobbyEnterCallback, LobbyEnter_t);
+    STEAM_CALLBACK(ModNetworking, LobbyChatUpdateCallback, LobbyChatUpdate_t);
+    STEAM_CALLBACK(ModNetworking, LobbyChatMsgCallback, LobbyChatMsg_t);
+    STEAM_CALLBACK(ModNetworking, LobbyDataUpdateCallback, LobbyDataUpdate_t);
+
+    //callback for the new ISteamNetworkingMessages api
+    STEAM_CALLBACK(ModNetworking, SteamNetworkingMessagesSessionRequestCallback, SteamNetworkingMessagesSessionRequest_t);
+
+    static uint64_t currentLobby; //Set upon entry into a lobby; set to 0 upon exit
+    static bool lobby_setup_complete; //Set to true when a lobby handshake is complete and all settings are finalized; set to false upon lobby exit
 
     //configuration options for who can connect if you're host/how to change settings if you're guest
     static bool allow_connect_with_non_mod_host;
@@ -37,23 +62,22 @@ public:
     static bool allow_connect_with_non_mod_guest;
 
     //info about the current host/guest
+    static bool host_got_info;
     static bool host_mod_installed;
     static bool host_legacy_enabled;
-    static bool guest_mod_installed;
-    static bool guest_legacy_enabled;
+    static bool incoming_guest_got_info;
+    static bool incoming_guest_mod_installed;
+    static bool incoming_guest_legacy_enabled;
+    static uint64_t incoming_guest_to_not_accept; //The steamid of the incoming user if we want to d/c them. When AcceptSessionWithUser/AcceptP2PSessionWithUser is called with this id, decline the session
 
+    //info for clock synchronization
     static int64_t timer_offset;
-    //key: steamid
-    static std::unordered_map<uint64_t, TimerClientInfo> hostTimerSyncronizationData;
+    static std::unordered_map<uint64_t, TimerClientInfo> hostTimerSyncronizationData; //key: steamid
 private:
-    static const uint64_t sendPacket_injection_offset = 0x5096dc; //injection is before the send call so we can modify the packet
-    static const uint64_t getNetMessage_injection_offset = 0x509606;
-    static const uint64_t GetSteamData_Packet_injection_offset = 0x108806a;
-    static const uint64_t SendRawP2PPacket_injection_offset = 0x10ba232;
-    static const uint64_t ParseRawP2PPacketType_injection_offset = 0x10b5340;
-    static const uint64_t type1_32byte_p2pPacket_parsing_rollback_injection_offset = 0x5034ab;
-    static const uint64_t type1_40byte_p2pPacket_parsing_rollback_injection_offset = 0x5034e6;
-    static const uint64_t type1_p2pPacket_sending_rollback_injection_offset = 0x503223;
+    static const uint64_t AcceptP2PSessionWithUser_injection_offset = 0x10b3846;
+    static const uint64_t IsP2PPacketAvailable_1_injection_offset = 0x10b6cc0;
+    static const uint64_t IsP2PPacketAvailable_2_injection_offset = 0x10b6d45;
+    static const uint64_t ReadP2PPacket_injection_offset = 0x10b52fd;
 };
 
 #endif
