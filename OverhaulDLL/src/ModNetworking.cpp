@@ -633,7 +633,7 @@ bool HostAwaitIncomingGuestChatMessage(void* data_a)
     else if ((ModNetworking::incoming_guest_got_info == false && Game::get_accurate_time() > data->start_time + MS_TO_WAIT_FOR_GUEST_MSG) ||
         (ModNetworking::incoming_guest_got_info == true && ModNetworking::incoming_guest_mod_installed == false))
     {
-        ConsoleWrite("4. Host detects incoming guest is non-mod user");
+        ConsoleWrite("4. Host detects incoming guest is non-mod user. d/cing due to settings.");
 
         //As the host, we only change our settings if the connecting user is non-mod, and we allow non-mod connections, and we don't have any other non-mod phantoms in here
         if (ModNetworking::allow_connect_with_non_mod_guest == true)

@@ -276,7 +276,7 @@ push    r12 ;nChannel = 0
 push    r12 ;extra for stack alignment
 sub     rsp, 20h
 
-mov     rcx, [rbp+0C8h + 40h+8*8+20h] ;steamIDRemote
+mov     rcx, [rbp+0C8h] ;steamIDRemote
 mov     rdx, r14 ;pubData
 mov     r8d, r15d ;cubData
 mov     r9d, [rsp+40h + 40h+8*8+20h] ;eP2PSendType
