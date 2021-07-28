@@ -301,6 +301,51 @@ add     rsp, 10h
 jmp     SendP2PPacket_Replacement_injection_return
 SendP2PPacket_Replacement_injection ENDP
 
+
+EXTERN CloseP2PSessionWithUser_Replacement_injection_helper: PROC
+EXTERN CloseP2PSessionWithUser_Replacement_injection_return: qword
+
+PUBLIC CloseP2PSessionWithUser_Replacement_injection
+CloseP2PSessionWithUser_Replacement_injection PROC
+
+sub     rsp, 10h
+movdqu  [rsp], xmm0
+sub     rsp, 10h
+movdqu  [rsp], xmm1
+sub     rsp, 10h
+movdqu  [rsp], xmm2
+sub     rsp, 10h
+movdqu  [rsp], xmm3
+push    rcx
+push    rdx
+push    r8
+push    r9
+push    r10
+push    r11
+sub     rsp, 20h
+
+mov     rcx, [rbx+0C8h]
+call    CloseP2PSessionWithUser_Replacement_injection_helper
+
+add     rsp, 20h
+pop     r11
+pop     r10
+pop     r9
+pop     r8
+pop     rdx
+pop     rcx
+movdqu  xmm3, [rsp]
+add     rsp, 10h
+movdqu  xmm2, [rsp]
+add     rsp, 10h
+movdqu  xmm1, [rsp]
+add     rsp, 10h
+movdqu  xmm0, [rsp]
+add     rsp, 10h
+
+jmp     CloseP2PSessionWithUser_Replacement_injection_return
+CloseP2PSessionWithUser_Replacement_injection ENDP
+
 _TEXT    ENDS
 
 END

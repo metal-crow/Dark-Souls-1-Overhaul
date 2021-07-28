@@ -80,6 +80,7 @@ private:
     static const uint64_t ReadP2PPacket_injection_offset = 0x10b52fd;
     static const uint64_t SendP2PPacket_voice_injection_offset = 0x10b7d24;
     static const uint64_t SendP2PPacket_injection_offset = 0x10BA437;
+    static const uint64_t CloseP2PSessionWithUser_Replacement_injection_offset = 0x10baaa5;
 };
 
 #endif

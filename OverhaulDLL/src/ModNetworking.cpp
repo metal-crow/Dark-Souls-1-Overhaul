@@ -28,6 +28,10 @@ extern "C" {
     uint64_t SendP2PPacket_Replacement_injection_return;
     void SendP2PPacket_Replacement_injection();
     bool SendP2PPacket_Replacement_injection_helper(CSteamID steamIDRemote, const void *pubData, uint32 cubData, EP2PSend eP2PSendType, int nChannel);
+
+    uint64_t CloseP2PSessionWithUser_Replacement_injection_return;
+    void CloseP2PSessionWithUser_Replacement_injection();
+    bool CloseP2PSessionWithUser_Replacement_injection_helper(CSteamID steamIDRemote);
 }
 
 typedef void* gfGetSteamInterface(int iSteamUser, int iUnkInt, const char* pcVersion, const char* pcInterface);
@@ -142,6 +146,14 @@ void ModNetworking::start()
     sp::mem::code::x64::inject_jmp_14b(write_address, &SendP2PPacket_voice_Replacement_injection_return, 37, &SendP2PPacket_voice_Replacement_injection);
     write_address = (uint8_t*)(ModNetworking::SendP2PPacket_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &SendP2PPacket_Replacement_injection_return, 39, &SendP2PPacket_Replacement_injection);
+
+    /*
+     * Code to replace the CloseP2PSessionWithUser call with a compatible ISteamNetworkingMessages API call
+     * Nop out a big chunk since we want to replace the entire call
+     */
+    write_address = (uint8_t*)(ModNetworking::CloseP2PSessionWithUser_Replacement_injection_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &CloseP2PSessionWithUser_Replacement_injection_return, 9, &CloseP2PSessionWithUser_Replacement_injection);
+
 }
 
 /*
@@ -294,6 +306,22 @@ bool SendP2PPacket_Replacement_injection_helper(CSteamID steamIDRemote, const vo
         return ModNetworking::SteamNetworking->SendP2PPacket(steamIDRemote, pubData, cubData, eP2PSendType, nChannel);
     }
 }
+
+//CloseP2PSessionWithUser/CloseSessionWithUser
+bool CloseP2PSessionWithUser_Replacement_injection_helper(CSteamID steamIDRemote)
+{
+    if (SteamNetworkingMessages_Supported())
+    {
+        SteamNetworkingIdentity remote;
+        remote.SetSteamID(steamIDRemote);
+        return ModNetworking::SteamNetMessages->CloseSessionWithUser(remote);
+    }
+    else
+    {
+        return ModNetworking::SteamNetworking->CloseP2PSessionWithUser(steamIDRemote);
+    }
+}
+
 
 /*
  * ===========CONNECTION HANDSHAKE SECTION
