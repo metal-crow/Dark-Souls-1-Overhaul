@@ -169,7 +169,7 @@ int64_t ModNetworking::timer_offset = 0;
  //Only use the new steamapi if we have finished the handshake connection and all connected users support it
 bool SteamNetworkingMessages_Supported()
 {
-    return ModNetworking::currentLobby != 0 && ModNetworking::lobby_setup_complete && Mod::get_mode() != ModMode::Compatability;
+    return false && ModNetworking::currentLobby != 0 && ModNetworking::lobby_setup_complete && Mod::get_mode() != ModMode::Compatability;
 }
 
 //Add a new callback for the NetMessages equivalent of AcceptP2PSessionWithUser
@@ -361,8 +361,17 @@ void HostForceDisconnectGuest(uint64_t steamid, const wchar_t* dc_reason)
     //Ensure we don't implicitly accept the connection via calling SendP2PPacket to this user
     ModNetworking::incoming_guest_to_not_accept = steamid;
 
-    //Disconnect any existing session we have
-    //CloseP2PSessionWithUser / CloseSessionWithUser
+    //Disconnect any existing session we have via CloseP2PSessionWithUser / CloseSessionWithUser
+    if (SteamNetworkingMessages_Supported())
+    {
+        SteamNetworkingIdentity remote;
+        remote.SetSteamID(steamid);
+        ModNetworking::SteamNetMessages->CloseSessionWithUser(remote);
+    }
+    else
+    {
+        ModNetworking::SteamNetworking->CloseP2PSessionWithUser(steamid);
+    }
 
     //Tell the host why we're dcing this guest
     wchar_t dc_msg[300];
