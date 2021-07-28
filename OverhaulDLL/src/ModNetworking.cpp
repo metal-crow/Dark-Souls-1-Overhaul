@@ -165,6 +165,12 @@ void ModNetworking::SteamNetworkingMessagesSessionRequestCallback(SteamNetworkin
 {
     CSteamID user = pCallback->m_identityRemote.GetSteamID();
 
+    //Check if we want to d/c them
+    if (ModNetworking::incoming_guest_to_not_accept != 0 && user.ConvertToUint64() == ModNetworking::incoming_guest_to_not_accept)
+    {
+        return;
+    }
+
     //Check they're not blocked
     EFriendRelationship relation = ModNetworking::SteamFriends->GetFriendRelationship(user);
     if (relation == EFriendRelationship::k_EFriendRelationshipIgnored)
@@ -252,6 +258,12 @@ bool ReadP2PPacket_Replacement_injection_helper(void *pubDest, uint32 cubDest, u
 //SendP2PPacket/SendMessageToUser
 bool SendP2PPacket_Replacement_injection_helper(CSteamID steamIDRemote, const void *pubData, uint32 cubData, EP2PSend eP2PSendType, int nChannel)
 {
+    // Handle disconnecting a user
+    if (ModNetworking::incoming_guest_to_not_accept != 0 && ModNetworking::incoming_guest_to_not_accept == steamIDRemote.ConvertToUint64())
+    {
+        return false;
+    }
+
     if (SteamNetworkingMessages_Supported())
     {
         SteamNetworkingIdentity target;
@@ -308,7 +320,7 @@ bool ModNetworking::lobby_setup_complete = false;
 
 bool AcceptP2PSessionWithUser_injection_helper(uint64_t incoming_steamid)
 {
-    if (incoming_steamid == ModNetworking::incoming_guest_to_not_accept)
+    if (ModNetworking::incoming_guest_to_not_accept != 0 && incoming_steamid == ModNetworking::incoming_guest_to_not_accept)
     {
         ConsoleWrite("Denying connection to d/c'd user %llx", incoming_steamid);
         return false;
@@ -345,6 +357,7 @@ void ModNetworking::LobbyEnterCallback(LobbyEnter_t* pCallback)
     CSteamID selfsteamid = ModNetworking::SteamUser->GetSteamID();
     ModNetworking::currentLobby = pCallback->m_ulSteamIDLobby;
     ModNetworking::lobby_setup_complete = false;
+    ModNetworking::incoming_guest_to_not_accept = 0; //prevent any holdover data on new lobby
 
     // 1. As the host, upon lobby creation(and self entry into it) set the lobby data to inform connecting users of our mod status
     // Since lobby data is persistent, we don't have to worry about resending anything for new connections
@@ -554,6 +567,7 @@ void ModNetworking::LobbyChatUpdateCallback(LobbyChatUpdate_t* pCallback)
 {
     CSteamID lobbyowner = ModNetworking::SteamMatchmaking->GetLobbyOwner(pCallback->m_ulSteamIDLobby);
     CSteamID selfsteamid = ModNetworking::SteamUser->GetSteamID();
+    ModNetworking::incoming_guest_to_not_accept = 0; //make sure a reconnecting user has another chance (this is reset on both leave and join)
 
     // 4. As the host, when a new user connects to the lobby set a timer to wait for their response chat message
     // Need to handle the case where they don't send a chat message, and thus are a non-mod user and we must disconnect them from this lobby
