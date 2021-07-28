@@ -169,7 +169,7 @@ int64_t ModNetworking::timer_offset = 0;
  //Only use the new steamapi if we have finished the handshake connection and all connected users support it
 bool SteamNetworkingMessages_Supported()
 {
-    return false && ModNetworking::currentLobby != 0 && ModNetworking::lobby_setup_complete && Mod::get_mode() != ModMode::Compatability;
+    return ModNetworking::currentLobby != 0 && ModNetworking::lobby_setup_complete && Mod::get_mode() != ModMode::Compatability;
 }
 
 //Add a new callback for the NetMessages equivalent of AcceptP2PSessionWithUser
@@ -246,8 +246,14 @@ bool ReadP2PPacket_Replacement_injection_helper(void *pubDest, uint32 cubDest, u
         if (have_message && message[0] != nullptr && have_message_on_channel == nChannel)
         {
             memcpy_s(pubDest, cubDest, message[0]->m_pData, message[0]->m_cbSize);
-            *pcubMsgSize = message[0]->m_cbSize;
-            *psteamIDRemote = message[0]->m_identityPeer.GetSteamID();
+            if (pcubMsgSize != nullptr)
+            {
+                *pcubMsgSize = message[0]->m_cbSize;
+            }
+            if (psteamIDRemote != nullptr)
+            {
+                *psteamIDRemote = message[0]->m_identityPeer.GetSteamID();
+            }
 
             message[0]->Release();
             message[0] = nullptr;
@@ -273,6 +279,7 @@ bool SendP2PPacket_Replacement_injection_helper(CSteamID steamIDRemote, const vo
     // Handle disconnecting a user
     if (ModNetworking::incoming_guest_to_not_accept != 0 && ModNetworking::incoming_guest_to_not_accept == steamIDRemote.ConvertToUint64())
     {
+        ConsoleWrite("Forcing d/c on user %lld", steamIDRemote.ConvertToUint64());
         return false;
     }
 

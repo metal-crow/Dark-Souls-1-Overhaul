@@ -178,8 +178,8 @@ sub     rsp, 20h
 
 mov     rcx, r15 ;pubDest
 mov     edx, ebx ;cubDest
-lea     r8, [rbp-38h] ;pcubMsgSize
-lea     r9, [rbp-40h] ;psteamIDRemote
+lea     r8, [rbp-38h] ;pcubMsgSize (DSR passes null)
+lea     r9, [rbp-40h] ;psteamIDRemote (DSR passes null)
 call    ReadP2PPacket_Replacement_injection_helper
 
 add     rsp, 30h
