@@ -495,7 +495,12 @@ bool GuestAwaitIncomingLobbyData(void* data_a)
         return true;
     }
 
-    guest_get_host_info_mtx.lock();
+    //try and lock here. If we can't, don't block (since that blocks DSR's main thread). We'll just run next frame anyway
+    bool locked = guest_get_host_info_mtx.try_lock();
+    if (!locked)
+    {
+        return true;
+    }
 
     //Timeout, host is non-mod user
     if (ModNetworking::host_got_info == false && (Game::get_accurate_time() > data->start_time + MS_TO_WAIT_FOR_HOST_DATA))
@@ -665,7 +670,12 @@ bool HostAwaitIncomingGuestChatMessage(void* data_a)
         return true;
     }
 
-    host_get_guest_response_mtx.lock();
+    //try and lock here. If we can't, don't block (since that blocks DSR's main thread). We'll just run next frame anyway
+    bool locked = host_get_guest_response_mtx.try_lock();
+    if (!locked)
+    {
+        return true;
+    }
 
     //Timed out waiting for a message from the incoming guest, so they're a non-mod user
     //Also handle the (impossible?) case where we got the response from the guest but they say they don't have the mod
