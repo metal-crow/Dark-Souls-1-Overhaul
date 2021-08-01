@@ -99,25 +99,12 @@ If you are planning to PvP in the Arena+ area then you want this on.").c_str(),
 }
 
 static uint32_t bow_cam_change_return;
+static uint32_t ChrAimCam_addr;
 void __declspec(naked) __stdcall bow_cam_change_injection()
 {
     __asm {
-        mov dword ptr[esi + 0x58], 0x3e4ccccd //0.2f
-        mov dword ptr[esi + 0x134], 0x3f48f5c3 //0.785f
-        mov dword ptr[esi + 0x130], 0x3d8f5c29 //0.07f
-        mov dword ptr[esi + 0x140], 0x3d4ccccd //0.05f
-        mov dword ptr[esi + 0xB0], 0x3e800000 //0.25f
-        mov dword ptr[esi + 0xB4], 0x3fb0a3d7 //1.38f
-        mov dword ptr[esi + 0xB8], 0x3f000000 //0.5f
-        mov dword ptr[esi + 0xBC], 0x00000000 //0.0f
-        mov dword ptr[esi + 0xC0], 0x3e800000 //0.25f
-        mov dword ptr[esi + 0xC4], 0x3fb0a3d7 //1.38f
-        mov dword ptr[esi + 0xC8], 0x3ec7ae14 //0.39f
-        mov dword ptr[esi + 0xCC], 0x00000000 //0.0f
-        mov dword ptr[esi + 0xF0], 0x42700000 //60.0f
-        mov dword ptr[esi + 0xF4], 0xc2820000 //-65.0f
-        mov dword ptr[esi + 0x104], 0x3f066666 //0.525f
-        mov dword ptr[esi + 0x108], 0x3f066666 //0.525f
+        //save the address so we can edit it as needed
+        mov ChrAimCam_addr, esi
 
         //original code
         mov    eax, esi
@@ -162,7 +149,7 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
         Challenge::GravelordPhantoms::enable();
     }
 
-    //Write the bow changes to the game
+    //Allow us to have bow aiming changes
     uint8_t *write_address = (uint8_t*)(0xf18857);
     set_mem_protection(write_address, 5, MEM_PROTECT_RWX);
     inject_jmp_5b(write_address, &bow_cam_change_return, 0, &bow_cam_change_injection);
@@ -261,6 +248,59 @@ __declspec(dllexport) void __stdcall initialize_plugin()
     }
 
     Mod::initialized = true; // Should be the last statement in this function
+}
+
+
+typedef struct
+{
+    float NearClip;
+    float FovMax;
+    float FovMin;
+    float ZoomSpeedScale;
+    float ZoomInOrigin_X;
+    float ZoomInOrigin_Y;
+    float ZoomInOrigin_Z;
+    float ZoomInOrigin_W;
+    float ZoomOutOrigin_X;
+    float ZoomOutOrigin_Y;
+    float ZoomOutOrigin_Z;
+    float ZoomOutOrigin_W;
+    float VerticalLookLimit_Low;
+    float VerticalLookLimit_High;
+    float CamRotateSpeedMin_X;
+    float CamRotateSpeedMin_Y;
+    float CamRotateSpeedMax_X;
+    float CamRotateSpeedMax_Y;
+    float CamRotateSpeedHiMin_X;
+    float CamRotateSpeedHiMin_Y;
+    float CamRotateSpeedHiMax_X;
+    float CamRotateSpeedHiMax_Y;
+} CameraAimStruct;
+
+void Set_ChrAimCam_From_CameraAimStruct(uint32_t ChrAimCam, CameraAimStruct CamData)
+{
+    *(float*)(ChrAimCam + 0x58) = CamData.NearClip;
+    *(float*)(ChrAimCam + 0x134) = CamData.FovMax;
+    *(float*)(ChrAimCam + 0x130) = CamData.FovMin;
+    *(float*)(ChrAimCam + 0x140) = CamData.ZoomSpeedScale;
+    *(float*)(ChrAimCam + 0xB0) = CamData.ZoomInOrigin_X;
+    *(float*)(ChrAimCam + 0xB4) = CamData.ZoomInOrigin_Y;
+    *(float*)(ChrAimCam + 0xB8) = CamData.ZoomInOrigin_Z;
+    *(float*)(ChrAimCam + 0xBC) = CamData.ZoomInOrigin_W;
+    *(float*)(ChrAimCam + 0xC0) = CamData.ZoomOutOrigin_X;
+    *(float*)(ChrAimCam + 0xC4) = CamData.ZoomOutOrigin_Y;
+    *(float*)(ChrAimCam + 0xC8) = CamData.ZoomOutOrigin_Z;
+    *(float*)(ChrAimCam + 0xCC) = CamData.ZoomOutOrigin_W;
+    *(float*)(ChrAimCam + 0xF0) = CamData.VerticalLookLimit_Low;
+    *(float*)(ChrAimCam + 0xF4) = CamData.VerticalLookLimit_High;
+    *(float*)(ChrAimCam + 0x104) = CamData.CamRotateSpeedMin_X;
+    *(float*)(ChrAimCam + 0x108) = CamData.CamRotateSpeedMin_Y;
+    *(float*)(ChrAimCam + 0x10C) = CamData.CamRotateSpeedMax_X;
+    *(float*)(ChrAimCam + 0x110) = CamData.CamRotateSpeedMax_Y;
+    *(float*)(ChrAimCam + 0x11C) = CamData.CamRotateSpeedHiMin_X;
+    *(float*)(ChrAimCam + 0x120) = CamData.CamRotateSpeedHiMin_Y;
+    *(float*)(ChrAimCam + 0x124) = CamData.CamRotateSpeedHiMax_X;
+    *(float*)(ChrAimCam + 0x128) = CamData.CamRotateSpeedHiMax_Y;
 }
 
 /*
@@ -363,36 +403,141 @@ __declspec(dllexport) void __stdcall main_loop()
 			Game::on_reloaded();
 		}*/
 
-        // Check if the player character has the special force-cooperation speffect applied, and force the invasion type
-        // This is automatically reset back to -3 (SESSION_FORCEJOIN) on invasion, so no need to worry about resetting it
-        bool found_forcewhite_speffect = false;
-        uint32_t forcewhite_speffect = 9513;
 
         //hunt through the currently applied speffects
         //this is a linked list
         SpPointer speffect_cur = SpPointer(Game::world_char_base, { 0x28, 0x10, 0x4, 0x28 });
         uint32_t* speffect_cur_addr = NULL;
-        while (!found_forcewhite_speffect && (speffect_cur_addr = (uint32_t*)speffect_cur.resolve()) != NULL)
+        while ((speffect_cur_addr = (uint32_t*)speffect_cur.resolve()) != NULL)
         {
             uint32_t speffect_id = *speffect_cur_addr;
-            if (speffect_id == forcewhite_speffect)
+
+            // Check if the player character has the special force-cooperation speffect applied, and force the invasion type
+            // This is automatically reset back to -3 (SESSION_FORCEJOIN) on invasion, so no need to worry about resetting it
+            if (speffect_id == 9513)
             {
-                found_forcewhite_speffect = true;
+                SpPointer invasionTypeSPP = SpPointer((void *)0x13784A0, { 0xBE4 });
+                if (invasionTypeSPP.resolve() != NULL)
+                {
+                    *(uint32_t*)invasionTypeSPP.resolve() = -1; //SESSION_WHITE
+                }
             }
+
+            //over the shoulder + wide fov
+            if (speffect_id == 9425)
+            {
+                CameraAimStruct cam;
+                cam.NearClip = 0.200000003f;
+                cam.FovMax = 0.6108653545f;
+                cam.FovMin = 0.0872665f;
+                cam.ZoomSpeedScale = 0.04500000179f;
+                cam.ZoomInOrigin_X = 0.25f;
+                cam.ZoomInOrigin_Y = 1.379999995f;
+                cam.ZoomInOrigin_Z = 0.5f;
+                cam.ZoomInOrigin_W = 0.0f;
+                cam.ZoomOutOrigin_X = 0.25f;
+                cam.ZoomOutOrigin_Y = 1.379999995f;
+                cam.ZoomOutOrigin_Z = 0.3899999857f;
+                cam.ZoomOutOrigin_W = 0.0f;
+                cam.VerticalLookLimit_Low = 60.0f;
+                cam.VerticalLookLimit_High = -50.0f;
+                cam.CamRotateSpeedMin_X = 0.6108653545f;
+                cam.CamRotateSpeedMin_Y = 0.6108653545f;
+                cam.CamRotateSpeedMax_X = 1.658063054f;
+                cam.CamRotateSpeedMax_Y = 1.658063054f;
+                cam.CamRotateSpeedHiMin_X = 0.6108653545f;
+                cam.CamRotateSpeedHiMin_Y = 0.6108653545f;
+                cam.CamRotateSpeedHiMax_X = 1.658062577f;
+                cam.CamRotateSpeedHiMax_Y = 1.658062577f;
+                Set_ChrAimCam_From_CameraAimStruct(ChrAimCam_addr, cam);
+            }
+            //over the shoulder + slight XY offset + wide fov + low zoom
+            else if (speffect_id == 9426)
+            {
+                CameraAimStruct cam;
+                cam.NearClip = 0.200000003f;
+                cam.FovMax = 0.6108653545f;
+                cam.FovMin = 0.2268927991f;
+                cam.ZoomSpeedScale = 0.04500000179f;
+                cam.ZoomInOrigin_X = 0.330f;
+                cam.ZoomInOrigin_Y = 1.570f;
+                cam.ZoomInOrigin_Z = 0.000f;
+                cam.ZoomInOrigin_W = 0.600f;
+                cam.ZoomOutOrigin_X = 0.380f;
+                cam.ZoomOutOrigin_Y = 1.570f;
+                cam.ZoomOutOrigin_Z = 0.000f;
+                cam.ZoomOutOrigin_W = 0.820f;
+                cam.VerticalLookLimit_Low = 60.0f;
+                cam.VerticalLookLimit_High = -50.0f;
+                cam.CamRotateSpeedMin_X = 0.6108653545f;
+                cam.CamRotateSpeedMin_Y = 0.6108653545f;
+                cam.CamRotateSpeedMax_X = 1.658063054f;
+                cam.CamRotateSpeedMax_Y = 1.658063054f;
+                cam.CamRotateSpeedHiMin_X = 0.6108653545f;
+                cam.CamRotateSpeedHiMin_Y = 0.6108653545f;
+                cam.CamRotateSpeedHiMax_X = 1.658062577f;
+                cam.CamRotateSpeedHiMax_Y = 1.658062577f;
+                Set_ChrAimCam_From_CameraAimStruct(ChrAimCam_addr, cam);
+            }
+            //lower side angle + wide fov + low zoom
+            else if (speffect_id == 9427)
+            {
+                CameraAimStruct cam;
+                cam.NearClip = 0.200000003f;
+                cam.FovMax = 0.6108653545f;
+                cam.FovMin = 0.2617993951f;
+                cam.ZoomSpeedScale = 0.04500000179f;
+                cam.ZoomInOrigin_X = 0.310f;
+                cam.ZoomInOrigin_Y = 1.370f;
+                cam.ZoomInOrigin_Z = 0.000f;
+                cam.ZoomInOrigin_W = 0.600f;
+                cam.ZoomOutOrigin_X = 0.380f;
+                cam.ZoomOutOrigin_Y = 1.370f;
+                cam.ZoomOutOrigin_Z = 0.000f;
+                cam.ZoomOutOrigin_W = 1.000f;
+                cam.VerticalLookLimit_Low = 60.0f;
+                cam.VerticalLookLimit_High = -50.0f;
+                cam.CamRotateSpeedMin_X = 0.6108653545f;
+                cam.CamRotateSpeedMin_Y = 0.6108653545f;
+                cam.CamRotateSpeedMax_X = 1.658063054f;
+                cam.CamRotateSpeedMax_Y = 1.658063054f;
+                cam.CamRotateSpeedHiMin_X = 0.6108653545f;
+                cam.CamRotateSpeedHiMin_Y = 0.6108653545f;
+                cam.CamRotateSpeedHiMax_X = 1.658062577f;
+                cam.CamRotateSpeedHiMax_Y = 1.658062577f;
+                Set_ChrAimCam_From_CameraAimStruct(ChrAimCam_addr, cam);
+            }
+            //default aim
             else
             {
-                uint32_t next_speffect_addr = *(uint32_t*)((uint32_t)speffect_cur_addr+8);
-                speffect_cur = SpPointer((void*)(next_speffect_addr+0x28));
+                CameraAimStruct cam;
+                cam.NearClip = 0.200000003f;
+                cam.FovMax = 0.7850000262f;
+                cam.FovMin = 0.0700000003f;
+                cam.ZoomSpeedScale = 0.04500000179f;
+                cam.ZoomInOrigin_X = 0.25f;
+                cam.ZoomInOrigin_Y = 1.379999995f;
+                cam.ZoomInOrigin_Z = 0.5f;
+                cam.ZoomInOrigin_W = 0.0f;
+                cam.ZoomOutOrigin_X = 0.25f;
+                cam.ZoomOutOrigin_Y = 1.379999995f;
+                cam.ZoomOutOrigin_Z = 0.3899999857f;
+                cam.ZoomOutOrigin_W = 0.0f;
+                cam.VerticalLookLimit_Low = 60.0f;
+                cam.VerticalLookLimit_High = -65.0f;
+                cam.CamRotateSpeedMin_X = 0.6108653545f;
+                cam.CamRotateSpeedMin_Y = 0.6108653545f;
+                cam.CamRotateSpeedMax_X = 1.658063054f;
+                cam.CamRotateSpeedMax_Y = 1.658063054f;
+                cam.CamRotateSpeedHiMin_X = 0.6108653545f;
+                cam.CamRotateSpeedHiMin_Y = 0.6108653545f;
+                cam.CamRotateSpeedHiMax_X = 1.658062577f;
+                cam.CamRotateSpeedHiMax_Y = 1.658062577f;
+                Set_ChrAimCam_From_CameraAimStruct(ChrAimCam_addr, cam);
             }
-        }
-
-        if (found_forcewhite_speffect)
-        {
-            SpPointer invasionTypeSPP = SpPointer((void *)0x13784A0, { 0xBE4 });
-            if (invasionTypeSPP.resolve() != NULL)
-            {
-                *(uint32_t*)invasionTypeSPP.resolve() = -1; //SESSION_WHITE
-            }
+            
+            uint32_t next_speffect_addr = *(uint32_t*)((uint32_t)speffect_cur_addr+8);
+            speffect_cur = SpPointer((void*)(next_speffect_addr+0x28));
         }
     }
 }
