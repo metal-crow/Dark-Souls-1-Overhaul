@@ -128,6 +128,10 @@ void type1_p2pPacket_parse_injection_helper_function(CustomSpellPacketData* bull
         BulletNetworkInfo_Array[received_SpellData_count].number = (uint8_t)bullet_packet->bullet_number;
         received_SpellData_count++;
     }
+    else
+    {
+        ConsoleWrite("WARNING. Got a spell desync fix packet, but couldn't save it due to a full queue.");
+    }
 }
 
 
