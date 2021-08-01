@@ -280,7 +280,7 @@ bool SendP2PPacket_Replacement_injection_helper(CSteamID steamIDRemote, const vo
     // Handle disconnecting a user
     if (ModNetworking::incoming_guest_to_not_accept != 0 && ModNetworking::incoming_guest_to_not_accept == steamIDRemote.ConvertToUint64())
     {
-        ConsoleWrite("Forcing d/c on user %lld", steamIDRemote.ConvertToUint64());
+        //ConsoleWrite("Forcing d/c on user %lld", steamIDRemote.ConvertToUint64());
         return false;
     }
 
@@ -426,7 +426,7 @@ void ModNetworking::LobbyEnterCallback(LobbyEnter_t* pCallback)
     {
         GuestAwaitIncomingLobbyData_Struct* data = (GuestAwaitIncomingLobbyData_Struct*)malloc(sizeof(GuestAwaitIncomingLobbyData_Struct));
         data->start_time = Game::get_accurate_time();
-        MainLoop::setup_mainloop_callback(GuestAwaitIncomingLobbyData, nullptr, "GuestAwaitIncomingLobbyData");
+        MainLoop::setup_mainloop_callback(GuestAwaitIncomingLobbyData, data, "GuestAwaitIncomingLobbyData");
         return;
     }
 }
@@ -658,6 +658,14 @@ void ModNetworking::LobbyChatUpdateCallback(LobbyChatUpdate_t* pCallback)
         data->steamid = pCallback->m_ulSteamIDUserChanged;
         MainLoop::setup_mainloop_callback(HostAwaitIncomingGuestChatMessage, data, "HostAwaitIncomingGuestChatMessage");
     }
+
+    // 4. Handle the case where the guest disconnects on their own during the handshake (i.e they don't like our settings)
+    if (lobbyowner == selfsteamid && pCallback->m_rgfChatMemberStateChange == EChatMemberStateChange::k_EChatMemberStateChangeLeft && pCallback->m_ulSteamIDUserChanged != selfsteamid.ConvertToUint64())
+    {
+        host_get_guest_response_mtx.lock();
+        new_guest_incoming = false;
+        host_get_guest_response_mtx.unlock();
+    }
 }
 
 bool HostAwaitIncomingGuestChatMessage(void* data_a)
@@ -677,9 +685,17 @@ bool HostAwaitIncomingGuestChatMessage(void* data_a)
         return true;
     }
 
+    // If the guest disconnected on their own
+    if (new_guest_incoming == false)
+    {
+        ConsoleWrite("4. Host detects that guest d/c'd on their own.");
+        Game::show_popup_message(L"Guest declined to connect to your world due to their settings.");
+        goto exit;
+    }
+
     //Timed out waiting for a message from the incoming guest, so they're a non-mod user
     //Also handle the (impossible?) case where we got the response from the guest but they say they don't have the mod
-    if ((ModNetworking::incoming_guest_got_info == false && Game::get_accurate_time() > data->start_time + MS_TO_WAIT_FOR_GUEST_MSG) ||
+    else if ((ModNetworking::incoming_guest_got_info == false && Game::get_accurate_time() > data->start_time + MS_TO_WAIT_FOR_GUEST_MSG) ||
         (ModNetworking::incoming_guest_got_info == true && ModNetworking::incoming_guest_mod_installed == false))
     {
         ConsoleWrite("4. Host detects incoming guest is non-mod user.");
@@ -698,7 +714,11 @@ bool HostAwaitIncomingGuestChatMessage(void* data_a)
                 HostForceDisconnectGuest(data->steamid, L"Incoming guest is a non-mod user, but mod user is already connected.");
                 goto exit;
             }
-
+            // not first non-mod user and the other guests are in a non-mod compatible mode
+            else if (ModNetworking::SteamMatchmaking->GetNumLobbyMembers(ModNetworking::currentLobby) > 2 && Mod::get_mode() == Compatability)
+            {
+                //no action needed
+            }
             else
             {
                 FATALERROR("Number of lobby members is %d. Impossible.", ModNetworking::SteamMatchmaking->GetNumLobbyMembers(ModNetworking::currentLobby));
