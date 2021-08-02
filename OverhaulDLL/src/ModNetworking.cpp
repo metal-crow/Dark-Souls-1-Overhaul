@@ -167,10 +167,66 @@ int64_t ModNetworking::timer_offset = 0;
  * ===========ISteamNetworkingMessages REPLACEMENT SECTION
  */
 
- //Only use the new steamapi if we have finished the handshake connection and all connected users support it
+//At the point this is called, we should know the exact nature of the other user. So we should be all set up, mode-wise.
 bool SteamNetworkingMessages_Supported()
 {
-    return ModNetworking::currentLobby != 0 && ModNetworking::lobby_setup_complete && Mod::get_mode() != ModMode::Compatability;
+    return Mod::get_mode() != ModMode::Compatability;
+}
+
+//Use this to determine for how long we should save and queue up packets to be sent
+//Once the lobby setup is complete, we know what networking API is supported and can send over the packets queued during this setup period
+//This is needed because if we try to talk to a user with the wrong API, steam internals can get fucked up and the connection can just randomly die.
+bool InLobbyWarmup()
+{
+    return ModNetworking::currentLobby != 0 && !ModNetworking::lobby_setup_complete;
+}
+
+class PacketStorageData
+{
+public:
+    CSteamID steamIDRemote;
+    void *pubData;
+    uint32 cubData;
+    EP2PSend eP2PSendType;
+    int nChannel;
+
+    PacketStorageData(CSteamID steamIDRemote_a, const void *pubData_a, uint32 cubData_a, EP2PSend eP2PSendType_a, int nChannel_a)
+    {
+        steamIDRemote = steamIDRemote_a;
+        pubData = malloc(cubData_a);
+        cubData = cubData_a;
+        memcpy_s(pubData, cubData, pubData_a, cubData_a);
+        eP2PSendType = eP2PSendType_a;
+        nChannel = nChannel_a;
+    };
+
+    ~PacketStorageData()
+    {
+        free(pubData);
+        pubData = nullptr;
+    }
+};
+
+static std::vector<PacketStorageData*> queued_packets;
+
+bool ResendQueuedPacketsOnLobbySetupCompleted(void* unused)
+{
+    //Wait until we have finalized the connection
+    if (InLobbyWarmup())
+    {
+        return true;
+    }
+
+    //send out all the packets that were queued during this time, then clear out the list
+    for (auto elem : queued_packets)
+    {
+        bool sent = SendP2PPacket_Replacement_injection_helper(elem->steamIDRemote, elem->pubData, elem->cubData, elem->eP2PSendType, elem->nChannel);
+        ConsoleWrite("Sending queued packets: total %d sent=%d", queued_packets.size(), sent);
+        delete elem;
+    }
+    queued_packets.clear();
+
+    return false;
 }
 
 //Add a new callback for the NetMessages equivalent of AcceptP2PSessionWithUser
@@ -282,6 +338,14 @@ bool SendP2PPacket_Replacement_injection_helper(CSteamID steamIDRemote, const vo
     {
         //ConsoleWrite("Forcing d/c on user %lld", steamIDRemote.ConvertToUint64());
         return false;
+    }
+
+    //Any packet sent during this period where we don't know the other user's API nature, save them to send later.
+    if (InLobbyWarmup())
+    {
+        queued_packets.push_back(new PacketStorageData(steamIDRemote, pubData, cubData, eP2PSendType, nChannel));
+        ConsoleWrite("Saving queued packets: total %d", queued_packets.size());
+        return true;
     }
 
     if (SteamNetworkingMessages_Supported())
@@ -404,6 +468,8 @@ void ModNetworking::LobbyEnterCallback(LobbyEnter_t* pCallback)
     ModNetworking::currentLobby = pCallback->m_ulSteamIDLobby;
     ModNetworking::lobby_setup_complete = false;
     ModNetworking::incoming_guest_to_not_accept = 0; //prevent any holdover data on new lobby
+
+    MainLoop::setup_mainloop_callback(ResendQueuedPacketsOnLobbySetupCompleted, nullptr, "ResendQueuedPacketsOnLobbySetupCompleted");
 
     // 1. As the host, upon lobby creation(and self entry into it) set the lobby data to inform connecting users of our mod status
     // Since lobby data is persistent, we don't have to worry about resending anything for new connections
