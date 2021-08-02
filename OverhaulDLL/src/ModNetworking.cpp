@@ -487,7 +487,7 @@ void ModNetworking::LobbyEnterCallback(LobbyEnter_t* pCallback)
 
     // 2. If we're the guest, upon lobby connection check for lobby data on mod status
     // This callback is only triggered when WE attempt to enter a lobby, so existing guests won't have this trigger
-    // The lobby data may not arrive for a bit, so set up a callback to trigger when we do get the data (if we get it)
+    // The lobby data may not arrive for a bit (since the host JITs the lobby for a new connection and we then add the lobby data right after), so set up a callback to trigger when we do get the data (if we get it)
     if (lobbyowner != selfsteamid)
     {
         GuestAwaitIncomingLobbyData_Struct* data = (GuestAwaitIncomingLobbyData_Struct*)malloc(sizeof(GuestAwaitIncomingLobbyData_Struct));
