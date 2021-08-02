@@ -69,6 +69,7 @@ public:
     static bool incoming_guest_mod_installed;
     static bool incoming_guest_legacy_enabled;
     static uint64_t incoming_guest_to_not_accept; //The steamid of the incoming user if we want to d/c them. When AcceptSessionWithUser/AcceptP2PSessionWithUser is called with this id, decline the session
+    static bool new_guest_incoming;
 
     //info for clock synchronization
     static int64_t timer_offset;

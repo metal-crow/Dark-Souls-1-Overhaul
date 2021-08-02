@@ -178,7 +178,7 @@ bool SteamNetworkingMessages_Supported()
 //This is needed because if we try to talk to a user with the wrong API, steam internals can get fucked up and the connection can just randomly die.
 bool InLobbyWarmup()
 {
-    return ModNetworking::currentLobby != 0 && !ModNetworking::lobby_setup_complete;
+    return ModNetworking::new_guest_incoming && !ModNetworking::lobby_setup_complete;
 }
 
 class PacketStorageData
@@ -220,10 +220,14 @@ bool ResendQueuedPacketsOnLobbySetupCompleted(void* unused)
     //send out all the packets that were queued during this time, then clear out the list
     for (auto elem : queued_packets)
     {
-        bool sent = SendP2PPacket_Replacement_injection_helper(elem->steamIDRemote, elem->pubData, elem->cubData, elem->eP2PSendType, elem->nChannel);
-        ConsoleWrite("Sending queued packets: total %d sent=%d", queued_packets.size(), sent);
+        if (ModNetworking::lobby_setup_complete)
+        {
+            bool sent = SendP2PPacket_Replacement_injection_helper(elem->steamIDRemote, elem->pubData, elem->cubData, elem->eP2PSendType, elem->nChannel);
+            ConsoleWrite("Sending queued packets: total %d sent=%d", queued_packets.size(), sent);
+        }
         delete elem;
     }
+    ConsoleWrite("Cleared queued packets");
     queued_packets.clear();
 
     return false;
@@ -428,13 +432,13 @@ bool AcceptP2PSessionWithUser_injection_helper(uint64_t incoming_steamid)
     return true;
 }
 
-void HostForceDisconnectGuest(uint64_t steamid, const wchar_t* dc_reason)
+void HostForceDisconnectGuest(uint64_t steamid, const wchar_t* dc_reason, bool use_old_api = false)
 {
     //Ensure we don't implicitly accept the connection via calling SendP2PPacket to this user
     ModNetworking::incoming_guest_to_not_accept = steamid;
 
     //Disconnect any existing session we have via CloseP2PSessionWithUser / CloseSessionWithUser
-    if (SteamNetworkingMessages_Supported())
+    if (SteamNetworkingMessages_Supported() && !use_old_api)
     {
         SteamNetworkingIdentity remote;
         remote.SetSteamID(steamid);
@@ -638,7 +642,7 @@ bool GuestAwaitIncomingLobbyData(void* data_a)
     return false;
 }
 
-static bool new_guest_incoming = false;
+bool ModNetworking::new_guest_incoming = false;
 //Used to prevent the callbacks (run from a seperate thread) from interrupting and corrupting data HostAwaitIncomingGuestChatMessage is using
 static std::mutex host_get_guest_response_mtx;
 
@@ -661,7 +665,7 @@ void ModNetworking::LobbyChatMsgCallback(LobbyChatMsg_t* pCallback)
     // 4. If we're the host, listen for the response chat message from the guest saying they respect these settings
     // Make sure we stop listening once we've finalized this guest.
     // Otherwise, this data could arrive late and when a new guest arrives flags might apply to them incorrectly
-    if (lobbyowner == selfsteamid && new_guest_incoming)
+    if (lobbyowner == selfsteamid && ModNetworking::new_guest_incoming)
     {
         char value;
         int iMsgSize = ModNetworking::SteamMatchmaking->GetLobbyChatEntry(pCallback->m_ulSteamIDLobby, pCallback->m_iChatID, nullptr, &value, sizeof(value), nullptr);
@@ -712,7 +716,7 @@ void ModNetworking::LobbyChatUpdateCallback(LobbyChatUpdate_t* pCallback)
     CSteamID selfsteamid = ModNetworking::SteamUser->GetSteamID();
     ModNetworking::incoming_guest_to_not_accept = 0; //make sure a reconnecting user has another chance (this is reset on both leave and join)
     host_get_guest_response_mtx.lock();
-    new_guest_incoming = true;
+    ModNetworking::new_guest_incoming = true;
     host_get_guest_response_mtx.unlock();
 
     // 4. As the host, when a new user connects to the lobby set a timer to wait for their response chat message
@@ -730,7 +734,7 @@ void ModNetworking::LobbyChatUpdateCallback(LobbyChatUpdate_t* pCallback)
     if (lobbyowner == selfsteamid && pCallback->m_rgfChatMemberStateChange == EChatMemberStateChange::k_EChatMemberStateChangeLeft && pCallback->m_ulSteamIDUserChanged != selfsteamid.ConvertToUint64())
     {
         host_get_guest_response_mtx.lock();
-        new_guest_incoming = false;
+        ModNetworking::new_guest_incoming = false;
         host_get_guest_response_mtx.unlock();
     }
 }
@@ -753,7 +757,7 @@ bool HostAwaitIncomingGuestChatMessage(void* data_a)
     }
 
     // If the guest disconnected on their own
-    if (new_guest_incoming == false)
+    if (ModNetworking::new_guest_incoming == false)
     {
         ConsoleWrite("4. Host detects that guest d/c'd on their own.");
         Game::show_popup_message(L"Guest declined to connect to your world due to their settings.");
@@ -778,7 +782,7 @@ bool HostAwaitIncomingGuestChatMessage(void* data_a)
             // not first non-mod user and the other guests are not in a non-mod compatible mode
             else if (ModNetworking::SteamMatchmaking->GetNumLobbyMembers(ModNetworking::currentLobby) > 2 && Mod::get_mode() != Compatability)
             {
-                HostForceDisconnectGuest(data->steamid, L"Incoming guest is a non-mod user, but mod user is already connected.");
+                HostForceDisconnectGuest(data->steamid, L"Incoming guest is a non-mod user, but mod user is already connected.", true);
                 goto exit;
             }
             // not first non-mod user and the other guests are in a non-mod compatible mode
@@ -821,7 +825,7 @@ bool HostAwaitIncomingGuestChatMessage(void* data_a)
     //reset for next guest
     exit:
     ModNetworking::incoming_guest_got_info = false;
-    new_guest_incoming = false;
+    ModNetworking::new_guest_incoming = false;
     host_get_guest_response_mtx.unlock();
     free(data);
     return false;
