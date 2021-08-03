@@ -367,20 +367,20 @@ bool SendP2PPacket_Replacement_injection_helper(CSteamID steamIDRemote, const vo
         SteamNetworkingIdentity target;
         target.SetSteamID(steamIDRemote);
 
-        int nSendFlags;
+        int nSendFlags = k_nSteamNetworkingSend_AutoRestartBrokenSession; //default behavior in original netcode
         switch (eP2PSendType)
         {
             case k_EP2PSendUnreliable:
-                nSendFlags = k_nSteamNetworkingSend_UnreliableNoNagle;
+                nSendFlags |= k_nSteamNetworkingSend_UnreliableNoNagle;
                 break;
             case k_EP2PSendUnreliableNoDelay:
-                nSendFlags = k_nSteamNetworkingSend_UnreliableNoDelay;
+                nSendFlags |= k_nSteamNetworkingSend_UnreliableNoDelay;
                 break;
             case k_EP2PSendReliable:
-                nSendFlags = k_nSteamNetworkingSend_ReliableNoNagle;
+                nSendFlags |= k_nSteamNetworkingSend_ReliableNoNagle;
                 break;
             case k_EP2PSendReliableWithBuffering:
-                nSendFlags = k_nSteamNetworkingSend_Reliable;
+                nSendFlags |= k_nSteamNetworkingSend_Reliable;
                 break;
         }
 
