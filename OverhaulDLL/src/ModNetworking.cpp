@@ -173,14 +173,6 @@ bool SteamNetworkingMessages_Supported()
     return Mod::get_mode() != ModMode::Compatability;
 }
 
-//Use this to determine for how long we should save and queue up packets to be sent
-//Once the lobby setup is complete, we know what networking API is supported and can send over the packets queued during this setup period
-//This is needed because if we try to talk to a user with the wrong API, steam internals can get fucked up and the connection can just randomly die.
-bool InLobbyWarmup()
-{
-    return ModNetworking::new_guest_incoming && !ModNetworking::lobby_setup_complete;
-}
-
 class PacketStorageData
 {
 public:
@@ -207,16 +199,12 @@ public:
     }
 };
 
+//Once the lobby setup is complete, we know what networking API is supported and can send over the packets queued during this setup period
+//This is needed because if we try to talk to a user with the wrong API, steam internals can get fucked up and the connection can just randomly die.
 static std::vector<PacketStorageData*> queued_packets;
 
-bool ResendQueuedPacketsOnLobbySetupCompleted(void* unused)
+bool ResendQueuedPacketsOnLobbySetupCompleted()
 {
-    //Wait until we have finalized the connection
-    if (InLobbyWarmup())
-    {
-        return true;
-    }
-
     //send out all the packets that were queued during this time, then clear out the list
     for (auto elem : queued_packets)
     {
@@ -231,6 +219,28 @@ bool ResendQueuedPacketsOnLobbySetupCompleted(void* unused)
     queued_packets.clear();
 
     return false;
+}
+
+bool ResendQueuedPacketsOnLobbySetupCompleted_Guest(void* unused)
+{
+    //Wait until we have finalized the connection
+    if (!ModNetworking::lobby_setup_complete && ModNetworking::currentLobby != 0)
+    {
+        return true;
+    }
+
+    return ResendQueuedPacketsOnLobbySetupCompleted();
+}
+
+bool ResendQueuedPacketsOnLobbySetupCompleted_Host(void* unused)
+{
+    //Wait until we have finalized the connection
+    if (!ModNetworking::lobby_setup_complete && ModNetworking::new_guest_incoming)
+    {
+        return true;
+    }
+
+    return ResendQueuedPacketsOnLobbySetupCompleted();
 }
 
 //Add a new callback for the NetMessages equivalent of AcceptP2PSessionWithUser
@@ -345,7 +355,7 @@ bool SendP2PPacket_Replacement_injection_helper(CSteamID steamIDRemote, const vo
     }
 
     //Any packet sent during this period where we don't know the other user's API nature, save them to send later.
-    if (InLobbyWarmup())
+    if (!ModNetworking::lobby_setup_complete)
     {
         queued_packets.push_back(new PacketStorageData(steamIDRemote, pubData, cubData, eP2PSendType, nChannel));
         ConsoleWrite("Saving queued packets: total %d", queued_packets.size());
@@ -473,8 +483,6 @@ void ModNetworking::LobbyEnterCallback(LobbyEnter_t* pCallback)
     ModNetworking::lobby_setup_complete = false;
     ModNetworking::incoming_guest_to_not_accept = 0; //prevent any holdover data on new lobby
 
-    MainLoop::setup_mainloop_callback(ResendQueuedPacketsOnLobbySetupCompleted, nullptr, "ResendQueuedPacketsOnLobbySetupCompleted");
-
     // 1. As the host, upon lobby creation(and self entry into it) set the lobby data to inform connecting users of our mod status
     // Since lobby data is persistent, we don't have to worry about resending anything for new connections
     if (lobbyowner == selfsteamid)
@@ -495,6 +503,8 @@ void ModNetworking::LobbyEnterCallback(LobbyEnter_t* pCallback)
     // Waiting until we get this data before sending our confirmation as guest we also have the mod does eat into the HostAwaitIncomingGuestChatMessage timeout a bit, but probably not by any more then a dozen-ish ms
     if (lobbyowner != selfsteamid)
     {
+        MainLoop::setup_mainloop_callback(ResendQueuedPacketsOnLobbySetupCompleted_Guest, nullptr, "ResendQueuedPacketsOnLobbySetupCompleted_Guest");
+
         GuestAwaitIncomingLobbyData_Struct* data = (GuestAwaitIncomingLobbyData_Struct*)malloc(sizeof(GuestAwaitIncomingLobbyData_Struct));
         data->start_time = Game::get_accurate_time();
         MainLoop::setup_mainloop_callback(GuestAwaitIncomingLobbyData, data, "GuestAwaitIncomingLobbyData");
@@ -724,6 +734,8 @@ void ModNetworking::LobbyChatUpdateCallback(LobbyChatUpdate_t* pCallback)
     // UNLESS: we allow non-mod connections, and we don't have any other non-mod phantoms in here
     if (lobbyowner == selfsteamid && pCallback->m_rgfChatMemberStateChange == EChatMemberStateChange::k_EChatMemberStateChangeEntered && pCallback->m_ulSteamIDUserChanged != selfsteamid.ConvertToUint64())
     {
+        MainLoop::setup_mainloop_callback(ResendQueuedPacketsOnLobbySetupCompleted_Host, nullptr, "ResendQueuedPacketsOnLobbySetupCompleted_Host");
+
         AwaitIncomingUserChatMessage_Struct* data = (AwaitIncomingUserChatMessage_Struct*)malloc(sizeof(AwaitIncomingUserChatMessage_Struct));
         data->start_time = Game::get_accurate_time();
         data->steamid = pCallback->m_ulSteamIDUserChanged;
