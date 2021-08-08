@@ -50,6 +50,8 @@ uint64_t Game::session_man_imp = NULL;
 
 uint64_t Game::menu_man = NULL;
 
+uint64_t Game::bullet_man = NULL;
+
 // Player character status (loading, human, co-op, invader, hollow)
 sp::mem::pointer<int32_t> Game::player_char_status;
 
@@ -134,6 +136,8 @@ void Game::init()
     Game::session_man_imp = Game::ds1_base + 0x1d1a370;
 
     Game::menu_man = Game::ds1_base + 0x1d26168;
+
+    Game::bullet_man = Game::ds1_base + 0x1d177e8;
 
     //hook the code that calculates attack damage and save off the weapon id used for the attack
     last_attack_weaponid = -1;
@@ -1002,9 +1006,13 @@ std::optional<int32_t> Game::convert_handle_to_playernum(uint32_t handle) {
             std::optional<uint64_t> guest_o = Game::get_connected_player(i);
             if (guest_o.has_value()) {
                 uint64_t guest = guest_o.value();
-                uint32_t guestHandle = *(uint32_t*)(guest + 8);
-                if (guestHandle == handle) {
-                    return *(uint32_t*)((*(uint64_t*)(guest + 0x578)) + 0x10);
+                if (guest != 0)
+                {
+                    uint32_t guestHandle = *(uint32_t*)(guest + 8);
+                    if (guestHandle == handle)
+                    {
+                        return *(uint32_t*)((*(uint64_t*)(guest + 0x578)) + 0x10);
+                    }
                 }
             }
             else
@@ -1012,7 +1020,7 @@ std::optional<int32_t> Game::convert_handle_to_playernum(uint32_t handle) {
                 return std::nullopt;
             }
         }
-        return -1;
+        return std::nullopt;
     }
 }
 
@@ -1283,4 +1291,25 @@ void Game::show_popup_message(const wchar_t* msg)
         }
         i = i + 1;
     } while (i < 5);
+}
+
+std::optional<void*> Game::find_bullet(uint32_t owner_handle, uint32_t bullet_num)
+{
+    //this points to a linked list of the bullets in use. Follow backwards till there isn't another node in the list
+    uint64_t current_bullet_in_use = *(uint64_t*)((*(uint64_t*)Game::bullet_man) + 8);
+    while(current_bullet_in_use != NULL)
+    {
+        uint8_t cur_bullet_num = *(uint8_t*)(current_bullet_in_use + 8);
+        uint32_t cur_bullet_owner = *(uint32_t*)(current_bullet_in_use + 156);
+        if (cur_bullet_num == bullet_num && cur_bullet_owner == cur_bullet_owner)
+        {
+            return (void*)(current_bullet_in_use);
+        }
+        else
+        {
+            current_bullet_in_use = *(uint64_t*)(current_bullet_in_use + 0x348);
+        }
+    }
+
+    return std::nullopt;
 }

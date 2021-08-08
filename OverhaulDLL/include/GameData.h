@@ -152,6 +152,8 @@ public:
 
     static uint64_t menu_man;
 
+    static uint64_t bullet_man;
+
     static const uint64_t calculate_attack_damage_offset = 0x2a8ead6;
 
     static const uint64_t char_loaded_injection_offset = 0x24D8D0;
@@ -302,6 +304,8 @@ public:
 	static float convert_time_to_offset(uint64_t time);
 
     static void show_popup_message(const wchar_t * msg);
+
+	static std::optional<void*> find_bullet(uint32_t owner_handle, uint32_t bullet_num);
 
     /*
      * Help speedup some functions by, whenever we're loaded into an area,

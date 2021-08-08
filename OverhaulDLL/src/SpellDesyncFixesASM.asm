@@ -16,15 +16,8 @@ EXTERN homing_spell_trigger_injection_helper_function: PROC
 PUBLIC homing_spell_trigger_injection
 homing_spell_trigger_injection PROC
 
-cmp     dword ptr [rbx+9Ch], 10044000h ;check this homing bullet is from the PC
+cmp     dword ptr [rbx+9Ch], 10044000h ;check this homing bullet is from the PC, since we (the player with the bullet) are the sole decider of if it fires or not
 jne     exit
-;check that the target is another PC (don't clutter up network for enemies
-;PC handle is of the form 0x1004400X
-cmp     dword ptr [rsp+20h], 10044000h
-jl      exit
-cmp     dword ptr [rsp+20h], 1004400Fh
-jg      exit
-
 
 sub     rsp, 8
 sub     rsp, 10h
@@ -89,11 +82,11 @@ cmp     dword ptr [rsp+30h], 7fc00001h
 jne     normal_exit
 
 lea     rcx, [rsp+30h] ;the incoming packet data
-sub     rsp, 8
+sub     rsp, 28h ;align the stack and add shadow stack space
 call    type1_p2pPacket_parse_injection_helper_function
 
 ;exit the function we've injected into
-add     rsp, 68h
+add     rsp, 88h
 pop     rdi
 ret
 
@@ -168,59 +161,6 @@ jmp     homing_spell_checkIfTriggered_injection_return
 
 homing_spell_checkIfTriggered_injection ENDP
 
-
-EXTERN check_all_bullets_finished_injection_return: qword
-extern check_all_bullets_finished_injection_helper_function: PROC
-
-PUBLIC check_all_bullets_finished_injection
-check_all_bullets_finished_injection PROC
-
-;original code
-cmp     byte ptr [rsi+68h], 0
-mov     r15, [rsp+30h]
-mov     rdi, [rsp+60h]
-
-sub     rsp, 8
-sub     rsp, 10h
-movdqu  [rsp], xmm0
-sub     rsp, 10h
-movdqu  [rsp], xmm1
-sub     rsp, 10h
-movdqu  [rsp], xmm2
-sub     rsp, 10h
-movdqu  [rsp], xmm3
-push    rax
-push    rcx
-push    rdx
-push    r8
-push    r9
-push    r10
-push    r11
-sub     rsp, 20h
-
-call    check_all_bullets_finished_injection_helper_function
-
-add     rsp, 20h
-pop     r11
-pop     r10
-pop     r9
-pop     r8
-pop     rdx
-pop     rcx
-pop     rax
-movdqu  xmm3, [rsp]
-add     rsp, 10h
-movdqu  xmm2, [rsp]
-add     rsp, 10h
-movdqu  xmm1, [rsp]
-add     rsp, 10h
-movdqu  xmm0, [rsp]
-add     rsp, 10h
-add     rsp, 8
-
-jmp     check_all_bullets_finished_injection_return
-
-check_all_bullets_finished_injection ENDP
 
 _TEXT    ENDS
 
