@@ -49,6 +49,12 @@ bool equipment_change_unlock_injection_helper(InventorySlots menu_slot)
         return false;
     }
 
+    //if we're currently riposting, don't allow any swaps
+    if ((state_anim % 1000) == 201 || (state_anim % 1000) == 202 || (state_anim % 1000) == 203)
+    {
+        return false;
+    }
+
     //if we're being backstabbed, allow ALL swaps (so weapon blocking can be done on getup)
     if (state_anim == 9000 || state_anim == 9420)
     {
