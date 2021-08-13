@@ -16,9 +16,17 @@ std::string Files::save_file;
 
 //Make sure file names are lowercase
 //These have edits to existing entries, and thus are overhaul only
-std::set<std::wstring> Files::files_to_intercept_loading = {
+std::set<std::wstring> Files::files_to_intercept_loading_overhaul = {
     L"gameparam.parambnd.dcx",
     L"c0000.esd.dcx",
+    L"c0000.anibnd.dcx",
+};
+
+static const std::wstring files_to_intercept_loading_overhaul_subpath = L"overhaul\\";
+
+//These have edits to existing entries, but the edits are legacy compatable
+std::set<std::wstring> Files::files_to_intercept_loading_legacy = {
+    L"gameparam.parambnd.dcx",
     L"c0000.anibnd.dcx",
 };
 
@@ -141,16 +149,35 @@ HANDLE WINAPI intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesiredAccess,
                 load_file = Files::get_save_file_path();
             }
 
-            else if (
-                (Files::files_to_intercept_loading.count(filename) && Mod::custom_game_archive_path.length() > 0 && Files::UseOverhaulFiles) ||
-                (Files::files_to_always_intercept_loading.count(filename) && Mod::custom_game_archive_path.length() > 0)
-            ){
-                load_file = Mod::custom_game_archive_path + filename;
+            else if (Mod::custom_game_archive_path.length() > 0)
+            {
+                bool log_fileload = true;
 
-                std::string filename_str(filename.begin(), filename.end());
-                std::string loadfile_str(load_file.begin(), load_file.end());
-                std::string load_file_msg = "Loading custom file \"" + filename_str + "\" as \"" + loadfile_str + "\"";
-                ConsoleWrite(load_file_msg.c_str());
+                if (Files::files_to_always_intercept_loading.count(filename))
+                {
+                    load_file = Mod::custom_game_archive_path + filename;
+                }
+                else if (Files::files_to_intercept_loading_legacy.count(filename) && !Files::UseOverhaulFiles)
+                {
+                    load_file = Mod::custom_game_archive_path + filename;
+                }
+                else if (Files::files_to_intercept_loading_overhaul.count(filename) && Files::UseOverhaulFiles)
+                {
+                    load_file = Mod::custom_game_archive_path + files_to_intercept_loading_overhaul_subpath + filename;
+                }
+                else
+                {
+                    //normal boring file. don't print a notice for it
+                    log_fileload = false;
+                }
+
+                if (log_fileload)
+                {
+                    std::string filename_str(filename.begin(), filename.end());
+                    std::string loadfile_str(load_file.begin(), load_file.end());
+                    std::string load_file_msg = "Loading custom file \"" + filename_str + "\" as \"" + loadfile_str + "\"";
+                    ConsoleWrite(load_file_msg.c_str());
+                }
             }
         }
         // Call original function
@@ -376,42 +403,54 @@ void Files::apply_function_intercepts()
 void Files::check_custom_archive_file_path()
 {
     if ((int)Mod::custom_game_archive_path.length() == 0)
-        return;
-
-    ConsoleWrite("Checking if custom game archive files exist...");
-
-    // Get char* strings for printing console messages
-    std::string archive_name_ch = "";
-    if (string_wide_to_mb((wchar_t*)Mod::custom_game_archive_path.c_str(), archive_name_ch))
     {
-        // Error converting from wide char to char
-        ConsoleWrite("ERROR: Unable to parse custom archive file name. Using default archive files instead.");
-        Mod::custom_game_archive_path = L"";
         return;
     }
 
+    ConsoleWrite("Checking if custom game archive files exist...");
+
     // Check that custom game archive files exist
     std::set<std::wstring> custom_files;
-    std::set_union(Files::files_to_intercept_loading.begin(), Files::files_to_intercept_loading.end(),
+    std::set_union(Files::files_to_intercept_loading_legacy.begin(), Files::files_to_intercept_loading_legacy.end(),
                    Files::files_to_always_intercept_loading.begin(), Files::files_to_always_intercept_loading.end(),
                    std::inserter(custom_files, custom_files.begin()));
     for (auto custom_file : custom_files)
     {
         std::wstring filepath = std::wstring(Mod::custom_game_archive_path).append(custom_file);
-        std::string custom_file_str;
-        string_wide_to_mb((wchar_t*)custom_file.c_str(), custom_file_str);
+        std::string filepath_cs;
+        string_wide_to_mb((wchar_t*)filepath.c_str(), filepath_cs);
 
         if (!FileUtil::file_exists(filepath.c_str()))
         {
             // Custom file doesn't exist
-            ConsoleWrite("ERROR: The file \"%s%s\" could not be found. Using default files instead.", archive_name_ch.c_str(), custom_file_str.c_str());
+            ConsoleWrite("ERROR: The file \"%s\" could not be found. Using default files instead.", filepath_cs.c_str());
             Mod::custom_game_archive_path = L"";
             return;
         }
         else
-            ConsoleWrite("Found %s%s",archive_name_ch.c_str(),custom_file_str.c_str());
+        {
+            ConsoleWrite("Found %s", filepath_cs.c_str());
+        }
     }
-    ConsoleWrite("SUCCESS: Custom game archive files will be loaded (\"%s\"", archive_name_ch.c_str());
+    for (auto custom_file : Files::files_to_intercept_loading_overhaul)
+    {
+        std::wstring filepath = std::wstring(Mod::custom_game_archive_path + files_to_intercept_loading_overhaul_subpath).append(custom_file);
+        std::string filepath_cs;
+        string_wide_to_mb((wchar_t*)filepath.c_str(), filepath_cs);
+
+        if (!FileUtil::file_exists(filepath.c_str()))
+        {
+            // Custom file doesn't exist
+            ConsoleWrite("ERROR: The file \"%s\" could not be found. Using default files instead.", filepath_cs.c_str());
+            Mod::custom_game_archive_path = L"";
+            return;
+        }
+        else
+        {
+            ConsoleWrite("Found %s", filepath_cs.c_str());
+        }
+    }
+    ConsoleWrite("SUCCESS: Custom game archive files will be loaded");
 }
 
 

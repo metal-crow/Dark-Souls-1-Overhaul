@@ -39,7 +39,8 @@ public:
     static bool save_file_index_pending_set_prev;
     static bool save_file_index_make_new;
 
-    static std::set<std::wstring> files_to_intercept_loading;
+    static std::set<std::wstring> files_to_intercept_loading_overhaul;
+    static std::set<std::wstring> files_to_intercept_loading_legacy;
     static std::set<std::wstring> files_to_always_intercept_loading;
 
     static bool UseOverhaulFiles;
