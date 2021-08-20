@@ -102,6 +102,9 @@
     <ClCompile Include="src\MainLoop.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\AllAreasSearchInvasion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3d11-wrapper\include\d3d11\exports.h">
@@ -150,6 +153,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\MainLoop.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AllAreasSearchInvasion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -251,6 +257,9 @@
       <Filter>Source Files\AntiCheat</Filter>
     </MASM>
     <MASM Include="src\FileReloadingASM.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="src\AllAreasSearchInvasionASM.asm">
       <Filter>Source Files</Filter>
     </MASM>
   </ItemGroup>

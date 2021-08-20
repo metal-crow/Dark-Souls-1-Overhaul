@@ -52,6 +52,8 @@ uint64_t Game::menu_man = NULL;
 
 uint64_t Game::bullet_man = NULL;
 
+uint64_t Game::unknown_global_struct_141d283a8 = NULL;
+
 // Player character status (loading, human, co-op, invader, hollow)
 sp::mem::pointer<int32_t> Game::player_char_status;
 
@@ -138,6 +140,8 @@ void Game::init()
     Game::menu_man = Game::ds1_base + 0x1d26168;
 
     Game::bullet_man = Game::ds1_base + 0x1d177e8;
+
+    Game::unknown_global_struct_141d283a8 = 0x141d283a8;
 
     //hook the code that calculates attack damage and save off the weapon id used for the attack
     last_attack_weaponid = -1;
@@ -1312,4 +1316,18 @@ std::optional<void*> Game::find_bullet(uint32_t owner_handle, uint32_t bullet_nu
     }
 
     return std::nullopt;
+}
+
+bool Game::set_invasion_refresh_timer(float newtime)
+{
+    sp::mem::pointer refresh_timer = sp::mem::pointer<float>((void*)(Game::unknown_global_struct_141d283a8), { 0x8, 0x8, 0x1e4 });
+    if (refresh_timer.resolve() == NULL)
+    {
+        return false;
+    }
+    else
+    {
+        *(refresh_timer.resolve()) = newtime;
+        return true;
+    }
 }
