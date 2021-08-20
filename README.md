@@ -78,6 +78,9 @@ Hope to obsolete this when i make compatable with ModEngine2
 
 * Option to disable the durability system
 
+* New item that searches all multiplayer areas while trying to invade  
+This allows you to invade any area across the entire game via a custom Red Eye Orb item
+
 ### Overhaul
 
 * Gestures can be canceled via rolling
