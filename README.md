@@ -78,8 +78,10 @@ Hope to obsolete this when i make compatable with ModEngine2
 
 * Option to disable the durability system
 
-* New item that searches all multiplayer areas while trying to invade  
-This allows you to invade any area across the entire game via a custom Red Eye Orb item
+* Steam netcode updated to reduce latency and hide IP address
+
+* New item, "Searching Red Eye Orb" (id 104), that searches all multiplayer areas while trying to invade  
+This allows you to invade any area across the entire game via 1 single use. It will continually search all areas rapidly, until cancelled or invasion found
 
 ### Overhaul
 
