@@ -608,6 +608,7 @@ DWORD WINAPI deferred_tasks(LPVOID lpParam)
         https://msdn.microsoft.com/en-us/library/windows/desktop/bb174336(v=vs.85).aspx
 
 */
+#if 0
 __declspec(dllexport) void __stdcall draw_overlay(std::string *text_feed_info_header)
 {
     /*
@@ -635,6 +636,7 @@ __declspec(dllexport) void __stdcall draw_overlay(std::string *text_feed_info_he
         text_feed_info_header->append(Game::play_time_str.c_str());
     }
 }
+#endif
 
 /*
     Called every frame from the Present() member function of either the D3D9 device or SwapChain (depends on the game's rendering method; Dark Souls uses Device).
@@ -644,6 +646,7 @@ __declspec(dllexport) void __stdcall draw_overlay(std::string *text_feed_info_he
         https://msdn.microsoft.com/en-us/library/windows/desktop/bb174423(v=vs.85).aspx
 
 */
+#if 0
 __declspec(dllexport) void __stdcall present(const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA *pDirtyRegion, DWORD dwFlags)
 {
     /*
@@ -662,6 +665,7 @@ __declspec(dllexport) void __stdcall present(const RECT *pSourceRect, const RECT
         _d3d9_dev->Clear(2, DurabilityBars::render_data.bars, D3DCLEAR_TARGET, D3DXCOLOR(0x00563433), 0, 0); // Red
     }
 }
+#endif
 
 /*
     Called from the EndScene() member function of the D3D9 device.
@@ -671,6 +675,7 @@ __declspec(dllexport) void __stdcall present(const RECT *pSourceRect, const RECT
         https://msdn.microsoft.com/en-us/library/windows/desktop/bb174375(v=vs.85).aspx
 
 */
+#if 0
 __declspec(dllexport) void __stdcall end_scene()
 {
     /*
@@ -680,6 +685,7 @@ __declspec(dllexport) void __stdcall end_scene()
         code in this function as optimized as possible to avoid performance issues.
     */
 }
+#endif
 
 /*
     Called every time GetRawInputData() is called with a non-null pData argument.

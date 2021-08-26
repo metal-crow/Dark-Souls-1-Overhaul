@@ -4,6 +4,3 @@ LIBRARY DS_Overhaul.dll
 EXPORTS
 	initialize_plugin @1
 	main_loop @2
-	draw_overlay @3
-	present @5
-	end_scene @6
