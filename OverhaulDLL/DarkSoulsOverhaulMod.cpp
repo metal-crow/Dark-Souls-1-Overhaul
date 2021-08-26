@@ -654,7 +654,7 @@ __declspec(dllexport) void __stdcall present(const RECT *pSourceRect, const RECT
     */
 
     // Draw weapon durability meter HUD elements
-    if (DurabilityBars::render_data.display)
+    if (DurabilityBars::enable_pref && DurabilityBars::render_data.display)
     {
         _d3d9_dev->GetDisplayMode(0, &DurabilityBars::render_data.display_mode);
 
