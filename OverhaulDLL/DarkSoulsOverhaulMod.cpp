@@ -99,7 +99,7 @@ If you are planning to PvP in the Arena+ area then you want this on.").c_str(),
 }
 
 static uint32_t bow_cam_change_return;
-static uint32_t ChrAimCam_addr;
+static uint32_t ChrAimCam_addr = 0;
 void __declspec(naked) __stdcall bow_cam_change_injection()
 {
     __asm {
@@ -279,6 +279,11 @@ typedef struct
 
 void Set_ChrAimCam_From_CameraAimStruct(uint32_t ChrAimCam, CameraAimStruct CamData)
 {
+    if (ChrAimCam == 0)
+    {
+        return;
+    }
+
     *(float*)(ChrAimCam + 0x58) = CamData.NearClip;
     *(float*)(ChrAimCam + 0x134) = CamData.FovMax;
     *(float*)(ChrAimCam + 0x130) = CamData.FovMin;
@@ -403,6 +408,37 @@ __declspec(dllexport) void __stdcall main_loop()
 			Game::on_reloaded();
 		}*/
 
+        int char_status;
+        Game::player_char_status.read(&char_status);
+
+        //default aim and camera
+        if (char_status != DS1_PLAYER_STATUS_LOADING)
+        {
+            CameraAimStruct cam;
+            cam.NearClip = 0.200000003f;
+            cam.FovMax = 0.7850000262f;
+            cam.FovMin = 0.0700000003f;
+            cam.ZoomSpeedScale = 0.04500000179f;
+            cam.ZoomInOrigin_X = 0.25f;
+            cam.ZoomInOrigin_Y = 1.379999995f;
+            cam.ZoomInOrigin_Z = 0.5f;
+            cam.ZoomInOrigin_W = 0.0f;
+            cam.ZoomOutOrigin_X = 0.25f;
+            cam.ZoomOutOrigin_Y = 1.379999995f;
+            cam.ZoomOutOrigin_Z = 0.3899999857f;
+            cam.ZoomOutOrigin_W = 0.0f;
+            cam.VerticalLookLimit_Low = 60.0f;
+            cam.VerticalLookLimit_High = -65.0f;
+            cam.CamRotateSpeedMin_X = 0.6108653545f;
+            cam.CamRotateSpeedMin_Y = 0.6108653545f;
+            cam.CamRotateSpeedMax_X = 1.658063054f;
+            cam.CamRotateSpeedMax_Y = 1.658063054f;
+            cam.CamRotateSpeedHiMin_X = 0.6108653545f;
+            cam.CamRotateSpeedHiMin_Y = 0.6108653545f;
+            cam.CamRotateSpeedHiMax_X = 1.658062577f;
+            cam.CamRotateSpeedHiMax_Y = 1.658062577f;
+            Set_ChrAimCam_From_CameraAimStruct(ChrAimCam_addr, cam);
+        }
 
         //hunt through the currently applied speffects
         //this is a linked list
@@ -507,35 +543,7 @@ __declspec(dllexport) void __stdcall main_loop()
                 cam.CamRotateSpeedHiMax_Y = 1.658062577f;
                 Set_ChrAimCam_From_CameraAimStruct(ChrAimCam_addr, cam);
             }
-            //default aim
-            else
-            {
-                CameraAimStruct cam;
-                cam.NearClip = 0.200000003f;
-                cam.FovMax = 0.7850000262f;
-                cam.FovMin = 0.0700000003f;
-                cam.ZoomSpeedScale = 0.04500000179f;
-                cam.ZoomInOrigin_X = 0.25f;
-                cam.ZoomInOrigin_Y = 1.379999995f;
-                cam.ZoomInOrigin_Z = 0.5f;
-                cam.ZoomInOrigin_W = 0.0f;
-                cam.ZoomOutOrigin_X = 0.25f;
-                cam.ZoomOutOrigin_Y = 1.379999995f;
-                cam.ZoomOutOrigin_Z = 0.3899999857f;
-                cam.ZoomOutOrigin_W = 0.0f;
-                cam.VerticalLookLimit_Low = 60.0f;
-                cam.VerticalLookLimit_High = -65.0f;
-                cam.CamRotateSpeedMin_X = 0.6108653545f;
-                cam.CamRotateSpeedMin_Y = 0.6108653545f;
-                cam.CamRotateSpeedMax_X = 1.658063054f;
-                cam.CamRotateSpeedMax_Y = 1.658063054f;
-                cam.CamRotateSpeedHiMin_X = 0.6108653545f;
-                cam.CamRotateSpeedHiMin_Y = 0.6108653545f;
-                cam.CamRotateSpeedHiMax_X = 1.658062577f;
-                cam.CamRotateSpeedHiMax_Y = 1.658062577f;
-                Set_ChrAimCam_From_CameraAimStruct(ChrAimCam_addr, cam);
-            }
-            
+
             uint32_t next_speffect_addr = *(uint32_t*)((uint32_t)speffect_cur_addr+8);
             speffect_cur = SpPointer((void*)(next_speffect_addr+0x28));
         }
