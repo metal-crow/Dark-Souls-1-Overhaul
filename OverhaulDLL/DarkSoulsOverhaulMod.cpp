@@ -432,7 +432,7 @@ __declspec(dllexport) void __stdcall main_loop()
             }
 
             //over the shoulder + wide fov
-            if (speffect_id == 9425)
+            if (speffect_id == 9425 && char_status != DS1_PLAYER_STATUS_LOADING)
             {
                 CameraAimStruct cam;
                 cam.NearClip = 0.200000003f;
@@ -460,8 +460,9 @@ __declspec(dllexport) void __stdcall main_loop()
                 Set_ChrAimCam_From_CameraAimStruct(ChrAimCam_addr, cam);
                 use_default_camera = false;
             }
+
             //over the shoulder + slight XY offset + wide fov + low zoom
-            else if (speffect_id == 9426)
+            if (speffect_id == 9426 && char_status != DS1_PLAYER_STATUS_LOADING)
             {
                 CameraAimStruct cam;
                 cam.NearClip = 0.200000003f;
@@ -489,8 +490,9 @@ __declspec(dllexport) void __stdcall main_loop()
                 Set_ChrAimCam_From_CameraAimStruct(ChrAimCam_addr, cam);
                 use_default_camera = false;
             }
+
             //lower side angle + wide fov + low zoom
-            else if (speffect_id == 9427)
+            if (speffect_id == 9427 && char_status != DS1_PLAYER_STATUS_LOADING)
             {
                 CameraAimStruct cam;
                 cam.NearClip = 0.200000003f;
@@ -524,7 +526,7 @@ __declspec(dllexport) void __stdcall main_loop()
         }
 
         //default aim and camera
-        if (use_default_camera)
+        if (use_default_camera && char_status != DS1_PLAYER_STATUS_LOADING)
         {
             CameraAimStruct cam;
             cam.NearClip = 0.200000003f;
