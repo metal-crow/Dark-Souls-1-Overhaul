@@ -615,6 +615,8 @@ void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_
 
     //allow only some mandatory data to be sent
     uint64_t membitflags_allowed[4];
+    memset(membitflags_allowed, 0, sizeof(membitflags_allowed));
+
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::AreaId);
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::MpRegion);
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::RankingRegistration);
