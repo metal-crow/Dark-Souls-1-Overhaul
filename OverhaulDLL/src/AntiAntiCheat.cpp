@@ -631,11 +631,8 @@ void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::recentMPAreasVisited);
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::New_Name_100);
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::SoulLevel);
-    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::isPlayerHuman);
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::ClearCount);
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::MaxWeaponLevel);
-    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::New_Name_7);
-    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::New_Name_105);
 
     //unset all the bitflags we don't whitelist
     //this ensures we only remove data, instead of adding data
