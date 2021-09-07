@@ -47,7 +47,6 @@ public:
     //This allows us to avoid leaking our IP on that interface
     STEAM_CALLBACK(ModNetworking, LobbyEnterCallback, LobbyEnter_t);
     STEAM_CALLBACK(ModNetworking, LobbyChatUpdateCallback, LobbyChatUpdate_t);
-    STEAM_CALLBACK(ModNetworking, LobbyChatMsgCallback, LobbyChatMsg_t);
     STEAM_CALLBACK(ModNetworking, LobbyDataUpdateCallback, LobbyDataUpdate_t);
 
     //callback for the new ISteamNetworkingMessages api

@@ -494,7 +494,7 @@ void ModNetworking::LobbyEnterCallback(LobbyEnter_t* pCallback)
     // 2. If we're the guest, upon lobby connection check for lobby data on mod status
     // This callback is only triggered when WE attempt to enter a lobby, so existing guests won't have this trigger
     // The lobby data may not arrive for a bit (since the host JITs the lobby for a new connection and we then add the lobby data right after), so set up a callback to trigger when we do get the data (if we get it)
-    // Waiting until we get this data before sending our confirmation as guest we also have the mod does eat into the HostAwaitIncomingGuestChatMessage timeout a bit, but probably not by any more then a dozen-ish ms
+    // Waiting until we get this data before sending our confirmation as guest we also have the mod does eat into the HostAwaitIncomingGuestMemberData timeout a bit, but probably not by any more then a 1/2 of the ping
     if (lobbyowner != selfsteamid)
     {
         MainLoop::setup_mainloop_callback(ResendQueuedPacketsOnLobbySetupCompleted_Guest, nullptr, "ResendQueuedPacketsOnLobbySetupCompleted_Guest");
@@ -508,20 +508,24 @@ void ModNetworking::LobbyEnterCallback(LobbyEnter_t* pCallback)
 
 //Used to prevent LobbyDataUpdateCallback (run from a seperate thread) from interrupting and corrupting data GuestAwaitIncomingLobbyData is using
 static std::mutex guest_get_host_info_mtx;
+//If we know an incoming guest is on the way (they've connected to the lobby)
+bool ModNetworking::new_guest_incoming = false;
+//Used to prevent the callbacks (run from a seperate thread) from interrupting and corrupting data HostAwaitIncomingGuestMemberData is using
+static std::mutex host_get_guest_response_mtx;
 
 void ModNetworking::LobbyDataUpdateCallback(LobbyDataUpdate_t* pCallback)
 {
     CSteamID lobbyowner = ModNetworking::SteamMatchmaking->GetLobbyOwner(pCallback->m_ulSteamIDLobby);
     CSteamID selfsteamid = ModNetworking::SteamUser->GetSteamID();
 
-    guest_get_host_info_mtx.lock();
-
     // 2. If we're the guest, listen to the callback for lobby data updates
     // This will be triggered upon joining a lobby, and also upon reciving any lobby data updates
     // Make sure if for some reason we get more data later, after we're connected, we ignore it.
     // Otherwise it might set flags in a bad state and corrupt the next host we join
-    if (lobbyowner != selfsteamid && !ModNetworking::lobby_setup_complete)
+    if (pCallback->m_ulSteamIDMember == pCallback->m_ulSteamIDLobby && lobbyowner != selfsteamid && !ModNetworking::lobby_setup_complete)
     {
+        guest_get_host_info_mtx.lock();
+
         const char* mod_value_arry = ModNetworking::SteamMatchmaking->GetLobbyData(pCallback->m_ulSteamIDLobby, MOD_LOBBY_DATA_KEY);
         char mod_value = mod_value_arry[0];
         ConsoleWrite("2. Guest get lobby data = %hhx", mod_value);
@@ -536,9 +540,34 @@ void ModNetworking::LobbyDataUpdateCallback(LobbyDataUpdate_t* pCallback)
             ModNetworking::host_mod_mode = static_cast<ModMode>(mod_value);
             ModNetworking::host_got_info = true;
         }
+
+        guest_get_host_info_mtx.unlock();
     }
 
-    guest_get_host_info_mtx.unlock();
+    // 4. If we're the host, listen for the response member data info from the guest saying they respect these settings
+    // Make sure we stop listening once we've finalized this guest.
+    // Otherwise, this data could arrive late and when a new guest arrives flags might apply to them incorrectly
+    if (pCallback->m_ulSteamIDMember != pCallback->m_ulSteamIDLobby && pCallback->m_ulSteamIDMember != selfsteamid.ConvertToUint64() && lobbyowner == selfsteamid && ModNetworking::new_guest_incoming)
+    {
+        host_get_guest_response_mtx.lock();
+
+        const char* mod_guest_value_arry = ModNetworking::SteamMatchmaking->GetLobbyMemberData(pCallback->m_ulSteamIDLobby, pCallback->m_ulSteamIDMember, MOD_LOBBY_DATA_KEY);
+        char mod_guest_value = mod_guest_value_arry[0];
+        ConsoleWrite("4. Host got guest data = %hhx", mod_guest_value);
+
+        if (mod_guest_value == 0)
+        {
+            ModNetworking::incoming_guest_mod_installed = false;
+        }
+        else
+        {
+            ModNetworking::incoming_guest_mod_installed = true;
+            ModNetworking::incoming_guest_mod_mode = static_cast<ModMode>(mod_guest_value);
+            ModNetworking::incoming_guest_got_info = true;
+        }
+
+        host_get_guest_response_mtx.unlock();
+    }
 }
 
 bool GuestAwaitIncomingLobbyData(void* data_a)
@@ -617,9 +646,9 @@ bool GuestAwaitIncomingLobbyData(void* data_a)
         return false;
     }
 
-    //send a chat message confirming we also respect these settings and have the mod
-    ModNetworking::SteamMatchmaking->SendLobbyChatMsg(ModNetworking::currentLobby, &chat_value, sizeof(chat_value));
-    ConsoleWrite("3. Guest send chat msg = %hhx", chat_value);
+    //set our lobby member data confirming we also respect these settings and have the mod
+    ModNetworking::SteamMatchmaking->SetLobbyMemberData(ModNetworking::currentLobby, MOD_LOBBY_DATA_KEY, &chat_value);
+    ConsoleWrite("3. Guest set member data = %hhx", chat_value);
     ModNetworking::lobby_setup_complete = true;
 
     //this flag is finished, we don't need it anymore. Reset for next time we connect to a host.
@@ -629,65 +658,15 @@ bool GuestAwaitIncomingLobbyData(void* data_a)
     return false;
 }
 
-bool ModNetworking::new_guest_incoming = false;
-//Used to prevent the callbacks (run from a seperate thread) from interrupting and corrupting data HostAwaitIncomingGuestChatMessage is using
-static std::mutex host_get_guest_response_mtx;
-
-void ModNetworking::LobbyChatMsgCallback(LobbyChatMsg_t* pCallback)
-{
-    CSteamID lobbyowner = ModNetworking::SteamMatchmaking->GetLobbyOwner(pCallback->m_ulSteamIDLobby);
-    CSteamID selfsteamid = ModNetworking::SteamUser->GetSteamID();
-
-    if (pCallback->m_ulSteamIDLobby != currentLobby)
-    {
-        return;
-    }
-    if (pCallback->m_ulSteamIDUser == selfsteamid.ConvertToUint64())
-    {
-        return;
-    }
-
-    host_get_guest_response_mtx.lock(); 
-
-    // 4. If we're the host, listen for the response chat message from the guest saying they respect these settings
-    // Make sure we stop listening once we've finalized this guest.
-    // Otherwise, this data could arrive late and when a new guest arrives flags might apply to them incorrectly
-    if (lobbyowner == selfsteamid && ModNetworking::new_guest_incoming)
-    {
-        char value;
-        int iMsgSize = ModNetworking::SteamMatchmaking->GetLobbyChatEntry(pCallback->m_ulSteamIDLobby, pCallback->m_iChatID, nullptr, &value, sizeof(value), nullptr);
-
-        if (iMsgSize >= 1)
-        {
-            ConsoleWrite("4. Host got chat msg = %hhx", value);
-
-            if (value != 0)
-            {
-                ModNetworking::incoming_guest_mod_installed = true;
-                ModNetworking::incoming_guest_mod_mode = static_cast<ModMode>(value);
-            }
-            else
-            {
-                //this should be impossible, but take it anyway
-                ModNetworking::incoming_guest_mod_installed = false;
-            }
-
-            ModNetworking::incoming_guest_got_info = true; //Wait until we're all done before setting this, so we don't get interrupted
-        }
-    }
-
-    host_get_guest_response_mtx.unlock();
-}
-
 typedef struct
 {
     uint64_t start_time;
     uint64_t steamid;
-} AwaitIncomingUserChatMessage_Struct;
+} AwaitIncomingUserMemberData_Struct;
 
 static const uint32_t MS_TO_WAIT_FOR_GUEST_MSG = (uint32_t)(0.75 * 10000000);
 
-bool HostAwaitIncomingGuestChatMessage(void* data_a);
+bool HostAwaitIncomingGuestMemberData(void* data_a);
 
 //This is called when another user has joined/left the lobby.
 void ModNetworking::LobbyChatUpdateCallback(LobbyChatUpdate_t* pCallback)
@@ -699,17 +678,17 @@ void ModNetworking::LobbyChatUpdateCallback(LobbyChatUpdate_t* pCallback)
     ModNetworking::new_guest_incoming = true;
     host_get_guest_response_mtx.unlock();
 
-    // 4. As the host, when a new user connects to the lobby set a timer to wait for their response chat message
-    // Need to handle the case where they don't send a chat message, and thus are a non-mod user and we must disconnect them from this lobby
+    // 4. As the host, when a new user connects to the lobby set a timer to wait for their response member data setting
+    // Need to handle the case where they don't set any member data, and thus are a non-mod user and we must disconnect them from this lobby
     // UNLESS: we allow non-mod connections, and we don't have any other non-mod phantoms in here
     if (lobbyowner == selfsteamid && pCallback->m_rgfChatMemberStateChange == EChatMemberStateChange::k_EChatMemberStateChangeEntered && pCallback->m_ulSteamIDUserChanged != selfsteamid.ConvertToUint64())
     {
         MainLoop::setup_mainloop_callback(ResendQueuedPacketsOnLobbySetupCompleted_Host, nullptr, "ResendQueuedPacketsOnLobbySetupCompleted_Host");
 
-        AwaitIncomingUserChatMessage_Struct* data = (AwaitIncomingUserChatMessage_Struct*)malloc(sizeof(AwaitIncomingUserChatMessage_Struct));
+        AwaitIncomingUserMemberData_Struct* data = (AwaitIncomingUserMemberData_Struct*)malloc(sizeof(AwaitIncomingUserMemberData_Struct));
         data->start_time = Game::get_accurate_time();
         data->steamid = pCallback->m_ulSteamIDUserChanged;
-        MainLoop::setup_mainloop_callback(HostAwaitIncomingGuestChatMessage, data, "HostAwaitIncomingGuestChatMessage");
+        MainLoop::setup_mainloop_callback(HostAwaitIncomingGuestMemberData, data, "HostAwaitIncomingGuestMemberData");
     }
 
     // 4. Handle the case where the guest disconnects on their own during the handshake (i.e they don't like our settings)
@@ -721,9 +700,9 @@ void ModNetworking::LobbyChatUpdateCallback(LobbyChatUpdate_t* pCallback)
     }
 }
 
-bool HostAwaitIncomingGuestChatMessage(void* data_a)
+bool HostAwaitIncomingGuestMemberData(void* data_a)
 {
-    AwaitIncomingUserChatMessage_Struct* data = (AwaitIncomingUserChatMessage_Struct*)data_a;
+    AwaitIncomingUserMemberData_Struct* data = (AwaitIncomingUserMemberData_Struct*)data_a;
 
     //No timeout yet, back to sleep
     if (ModNetworking::incoming_guest_got_info == false && !(Game::get_accurate_time() > data->start_time + MS_TO_WAIT_FOR_GUEST_MSG))
@@ -747,11 +726,10 @@ bool HostAwaitIncomingGuestChatMessage(void* data_a)
     }
 
     //Timed out waiting for a message from the incoming guest, so they're a non-mod user
-    //Also handle the (impossible?) case where we got the response from the guest but they say they don't have the mod
-    else if ((ModNetworking::incoming_guest_got_info == false && Game::get_accurate_time() > data->start_time + MS_TO_WAIT_FOR_GUEST_MSG) ||
-        (ModNetworking::incoming_guest_got_info == true && ModNetworking::incoming_guest_mod_installed == false))
+    else if (ModNetworking::incoming_guest_got_info == false && Game::get_accurate_time() > data->start_time + MS_TO_WAIT_FOR_GUEST_MSG)
     {
         ConsoleWrite("4. Host detects incoming guest is non-mod user.");
+        ModNetworking::incoming_guest_mod_installed = false;
 
         //As the host, we only change our settings if the connecting user is non-mod, and we allow non-mod connections, and we don't have any other non-mod phantoms in here
         if (ModNetworking::allow_connect_with_non_mod_guest == true)
@@ -786,7 +764,7 @@ bool HostAwaitIncomingGuestChatMessage(void* data_a)
         }
     }
 
-    // If the guest isn't respecting our settings for some reason, disconnect them right away
+    // If the guest isn't respecting our settings for some reason (can't hurt to check), disconnect them right away
     else if (ModNetworking::incoming_guest_got_info == true && ModNetworking::incoming_guest_mod_installed == true && ModNetworking::incoming_guest_mod_mode != Mod::get_mode())
     {
         ConsoleWrite("4. Host detects incoming guest has wrong settings");
