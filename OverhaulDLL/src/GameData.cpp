@@ -798,11 +798,11 @@ void Game::set_gui_hpbar_max()
     {
         current_hpbar_max = original_vanilla_hpbar_max;
     }
-    else if (Mod::fix_hp_bar_size && Mod::legacy_mode)
+    else if (Mod::fix_hp_bar_size && Mod::get_mode() != ModMode::Overhaul)
     {
         current_hpbar_max = corrected_vanilla_hpbar_max;
     }
-    else if (Mod::fix_hp_bar_size && !Mod::legacy_mode)
+    else if (Mod::fix_hp_bar_size && Mod::get_mode() == ModMode::Overhaul)
     {
         current_hpbar_max = overhaul_hpbar_max;
     }

@@ -9,6 +9,7 @@
 #pragma warning( disable : 4996 )
 #include "steam/steam_api.h"
 #pragma warning( pop )
+#include "ModData.h"
 
 class TimerClientInfo
 {
@@ -64,10 +65,10 @@ public:
     //info about the current host/guest
     static bool host_got_info;
     static bool host_mod_installed;
-    static bool host_legacy_enabled;
+    static ModMode host_mod_mode;
     static bool incoming_guest_got_info;
     static bool incoming_guest_mod_installed;
-    static bool incoming_guest_legacy_enabled;
+    static ModMode incoming_guest_mod_mode;
     static uint64_t incoming_guest_to_not_accept; //The steamid of the incoming user if we want to d/c them. When AcceptSessionWithUser/AcceptP2PSessionWithUser is called with this id, decline the session
     static bool new_guest_incoming;
 

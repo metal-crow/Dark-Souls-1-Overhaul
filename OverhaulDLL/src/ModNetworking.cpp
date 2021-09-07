@@ -413,8 +413,6 @@ bool CloseP2PSessionWithUser_Replacement_injection_helper(CSteamID steamIDRemote
  * ===========CONNECTION HANDSHAKE SECTION
  */
 const char* MOD_LOBBY_DATA_KEY = "DarkSoulsOverhaulModData";
-const uint8_t MOD_ENABLED = 0x80; //it's encoded that the mod is active in the most significant bit
-const uint8_t LEGACY_ENABLED = 0x40; //it's encoded that the mod is in legacy mode in the 2nd most significant bit
 
 bool ModNetworking::allow_connect_with_non_mod_host = true;
 bool ModNetworking::allow_connect_with_legacy_mod_host = true;
@@ -423,10 +421,10 @@ bool ModNetworking::allow_connect_with_non_mod_guest = true;
 
 bool ModNetworking::host_got_info = false;
 bool ModNetworking::host_mod_installed = false;
-bool ModNetworking::host_legacy_enabled = false;
+ModMode ModNetworking::host_mod_mode;
 bool ModNetworking::incoming_guest_got_info = false;
 bool ModNetworking::incoming_guest_mod_installed = false;
-bool ModNetworking::incoming_guest_legacy_enabled = false;
+ModMode ModNetworking::incoming_guest_mod_mode;
 uint64_t ModNetworking::incoming_guest_to_not_accept = 0;
 
 uint64_t ModNetworking::currentLobby = 0;
@@ -487,11 +485,7 @@ void ModNetworking::LobbyEnterCallback(LobbyEnter_t* pCallback)
     // Since lobby data is persistent, we don't have to worry about resending anything for new connections
     if (lobbyowner == selfsteamid)
     {
-        char value = MOD_ENABLED;
-        if (Mod::legacy_mode)
-        {
-            value |= LEGACY_ENABLED;
-        }
+        char value = static_cast<char>(Mod::get_mode());
         ConsoleWrite("1. Host set lobby data = %hhx", value);
         ModNetworking::SteamMatchmaking->SetLobbyData(pCallback->m_ulSteamIDLobby, MOD_LOBBY_DATA_KEY, &value);
         return;
@@ -538,24 +532,8 @@ void ModNetworking::LobbyDataUpdateCallback(LobbyDataUpdate_t* pCallback)
         }
         else
         {
-            if ((mod_value & MOD_ENABLED) != 0)
-            {
-                ModNetworking::host_mod_installed = true;
-            }
-            else
-            {
-                ModNetworking::host_mod_installed = false;
-            }
-
-            if ((mod_value & LEGACY_ENABLED) != 0)
-            {
-                ModNetworking::host_legacy_enabled = true;
-            }
-            else
-            {
-                ModNetworking::host_legacy_enabled = false;
-            }
-
+            ModNetworking::host_mod_installed = true;
+            ModNetworking::host_mod_mode = static_cast<ModMode>(mod_value);
             ModNetworking::host_got_info = true;
         }
     }
@@ -590,20 +568,24 @@ bool GuestAwaitIncomingLobbyData(void* data_a)
     }
 
     // 3. As the guest, we must change our settings to match the host (based on how we've configured our options), or else disconnect.
+    char chat_value = 0;
     if (ModNetworking::host_mod_installed == false && ModNetworking::allow_connect_with_non_mod_host == true)
     {
         //connecting to non-mod
-        Mod::set_mode(true, ModNetworking::host_mod_installed);
+        Mod::set_mode(ModMode::Compatability);
+        chat_value = static_cast<char>(ModMode::Compatability);
     }
-    else if (ModNetworking::host_mod_installed == true && ModNetworking::host_legacy_enabled == false && ModNetworking::allow_connect_with_overhaul_mod_host == true)
+    else if (ModNetworking::host_mod_installed == true && ModNetworking::host_mod_mode == ModMode::Overhaul && ModNetworking::allow_connect_with_overhaul_mod_host == true)
     {
         //connecting to overhaul
-        Mod::set_mode(ModNetworking::host_legacy_enabled, ModNetworking::host_mod_installed);
+        Mod::set_mode(ModMode::Overhaul);
+        chat_value = static_cast<char>(ModMode::Overhaul);
     }
-    else if (ModNetworking::host_mod_installed == true && ModNetworking::host_legacy_enabled == true && ModNetworking::allow_connect_with_legacy_mod_host == true)
+    else if (ModNetworking::host_mod_installed == true && ModNetworking::host_mod_mode == ModMode::Legacy && ModNetworking::allow_connect_with_legacy_mod_host == true)
     {
         //connecting to legacy
-        Mod::set_mode(ModNetworking::host_legacy_enabled, ModNetworking::host_mod_installed);
+        Mod::set_mode(ModMode::Legacy);
+        chat_value = static_cast<char>(ModMode::Legacy);
     }
     else
     {
@@ -614,11 +596,11 @@ bool GuestAwaitIncomingLobbyData(void* data_a)
         {
             wcscat_s(dc_msg, L"Host does not have mod and you do not allow connections with non-mod users.");
         }
-        else if (ModNetworking::host_mod_installed && ModNetworking::host_legacy_enabled == false && ModNetworking::allow_connect_with_overhaul_mod_host == false)
+        else if (ModNetworking::host_mod_installed && ModNetworking::host_mod_mode == ModMode::Overhaul && ModNetworking::allow_connect_with_overhaul_mod_host == false)
         {
             wcscat_s(dc_msg, L"Host is in overhaul mode and you do not allow connections with overhaul mode users.");
         }
-        else if (ModNetworking::host_mod_installed && ModNetworking::host_legacy_enabled == true && ModNetworking::allow_connect_with_legacy_mod_host == false)
+        else if (ModNetworking::host_mod_installed && ModNetworking::host_mod_mode == ModMode::Legacy && ModNetworking::allow_connect_with_legacy_mod_host == false)
         {
             wcscat_s(dc_msg, L"Host is in legacy mode and you do not allow connections with legacy mode users.");
         }
@@ -636,13 +618,8 @@ bool GuestAwaitIncomingLobbyData(void* data_a)
     }
 
     //send a chat message confirming we also respect these settings and have the mod
-    char value = MOD_ENABLED;
-    if (Mod::legacy_mode)
-    {
-        value |= LEGACY_ENABLED;
-    }
-    ModNetworking::SteamMatchmaking->SendLobbyChatMsg(ModNetworking::currentLobby, &value, sizeof(value));
-    ConsoleWrite("3. Guest send chat msg = %hhx", value);
+    ModNetworking::SteamMatchmaking->SendLobbyChatMsg(ModNetworking::currentLobby, &chat_value, sizeof(chat_value));
+    ConsoleWrite("3. Guest send chat msg = %hhx", chat_value);
     ModNetworking::lobby_setup_complete = true;
 
     //this flag is finished, we don't need it anymore. Reset for next time we connect to a host.
@@ -684,22 +661,15 @@ void ModNetworking::LobbyChatMsgCallback(LobbyChatMsg_t* pCallback)
         {
             ConsoleWrite("4. Host got chat msg = %hhx", value);
 
-            if ((value & MOD_ENABLED) != 0)
+            if (value != 0)
             {
                 ModNetworking::incoming_guest_mod_installed = true;
+                ModNetworking::incoming_guest_mod_mode = static_cast<ModMode>(value);
             }
             else
             {
+                //this should be impossible, but take it anyway
                 ModNetworking::incoming_guest_mod_installed = false;
-            }
-
-            if ((value & LEGACY_ENABLED) != 0)
-            {
-                ModNetworking::incoming_guest_legacy_enabled = true;
-            }
-            else
-            {
-                ModNetworking::incoming_guest_legacy_enabled = false;
             }
 
             ModNetworking::incoming_guest_got_info = true; //Wait until we're all done before setting this, so we don't get interrupted
@@ -789,7 +759,7 @@ bool HostAwaitIncomingGuestChatMessage(void* data_a)
             // first non-mod user, change settings
             if (ModNetworking::SteamMatchmaking->GetNumLobbyMembers(ModNetworking::currentLobby) == 2)
             {
-                Mod::set_mode(true, false);
+                Mod::set_mode(ModMode::Compatability);
             }
             // not first non-mod user and the other guests are not in a non-mod compatible mode
             else if (ModNetworking::SteamMatchmaking->GetNumLobbyMembers(ModNetworking::currentLobby) > 2 && Mod::get_mode() != Compatability)
@@ -817,7 +787,7 @@ bool HostAwaitIncomingGuestChatMessage(void* data_a)
     }
 
     // If the guest isn't respecting our settings for some reason, disconnect them right away
-    else if (ModNetworking::incoming_guest_got_info == true && ModNetworking::incoming_guest_mod_installed == true && ModNetworking::incoming_guest_legacy_enabled != Mod::legacy_mode)
+    else if (ModNetworking::incoming_guest_got_info == true && ModNetworking::incoming_guest_mod_installed == true && ModNetworking::incoming_guest_mod_mode != Mod::get_mode())
     {
         ConsoleWrite("4. Host detects incoming guest has wrong settings");
 

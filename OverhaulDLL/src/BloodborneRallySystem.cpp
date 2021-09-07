@@ -70,7 +70,7 @@ void BloodborneRally::start() {
 uint64_t control_timer_function(uint64_t bar_id, uint64_t orange_bar) {
     //0x24 is the orange bar hidden behind the HP bar.
     //Only adjust the bar when feature enabled.
-    if (bar_id == 0x24 && !Mod::legacy_mode) {
+    if (bar_id == 0x24 && Mod::get_mode() == ModMode::Overhaul) {
         uint32_t curtime = 0;
         if (Game::get_game_time_ms().has_value())
         {
@@ -125,7 +125,7 @@ static bool isOccult(uint32_t weaponid) {
 
 void main_rally_function(uint64_t attacker, uint64_t target, uint64_t attack_data, uint64_t new_hp) {
     //Don't do anything if feature disabled
-    if (Mod::legacy_mode) {
+    if (Mod::get_mode() != ModMode::Overhaul) {
         return;
     }
 
@@ -205,7 +205,7 @@ bool Apply_rally_capable_sfx_and_starting_hp(void* unused) {
     }
 
     //don't apply sfx if feature disabled
-    if (loaded && !Mod::legacy_mode) {
+    if (loaded && Mod::get_mode() == ModMode::Overhaul) {
         uint32_t weaponid_R = Game::right_hand_weapon().value_or(-1);
         uint32_t weaponid_L = Game::left_hand_weapon().value_or(-1);
 

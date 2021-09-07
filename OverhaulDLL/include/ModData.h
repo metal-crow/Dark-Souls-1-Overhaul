@@ -36,10 +36,9 @@
 
 enum ModMode
 {
-    ModeNone,
-    Overhaul,
-    Legacy,
-    Compatability
+    Overhaul = 3,
+    Legacy = 2,
+    Compatability = 1,
 };
 
 class Mod
@@ -58,11 +57,8 @@ public:
     // Used in console messages to inform users that a message is being printed by the Overhaul mod
     static const std::string output_prefix;
 
-    // Determines if we want to be in legacy mode or not
-    static bool prefer_legacy_mode;
-
-    // Determines whether we are in legacy mode (only applies fixes, no gameplay changes)
-    static bool legacy_mode;
+    // This sets the default mode when the user is hosting/in their own world. I.e the mode the game is biased towards.
+    static ModMode user_selected_default_mode;
 
     // Determines to disable the game's "Framerate insufficient for online play" disconnection
     static bool disable_low_fps_disconnect;
@@ -91,11 +87,11 @@ public:
     // Plays the credits for the Dark Souls Overhaul Mod (displays the list of people who contributed to development)
     static void play_credits();
 
-    static void set_mode(bool, bool);
-
     static ModMode get_mode();
 
-	static bool set_preferred_mode(void * unused);
+    static void set_mode(ModMode mode);
+
+	static bool mode_setting_process(void * unused);
 
 private:
     // Helper function for get_user_keybinds() that loads the specified keybind from the config file and binds it to the specified function
@@ -103,6 +99,13 @@ private:
 
     // Get custom game files from the settings file
     static void get_custom_game_files();
+
+    static void change_mode(ModMode);
+
+    // The mode we will next enter as soon as the mode_setting_process is capable
+    static ModMode next_mode;
+
+    static ModMode current_mode;
 };
 
 

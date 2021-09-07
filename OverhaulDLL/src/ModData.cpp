@@ -27,12 +27,14 @@
 // Used in console messages to inform users that a message is being printed by the Overhaul mod
 const std::string Mod::output_prefix = "[Overhaul Mod] ";
 
-// Determines if we want to be in legacy mode or not
-bool Mod::prefer_legacy_mode = true;
+// This sets the default mode when the user is hosting/in their own world. I.e the mode the game is biased towards.
+ModMode Mod::user_selected_default_mode = ModMode::Legacy;
 
-// Determines whether we are in legacy mode (only applies fixes, no gameplay changes)
-// This shouls start as true, and only change to false once game is first loaded and we've set up everything needed for overhaul mode
-bool Mod::legacy_mode = true;
+// The mode we will next enter as soon as the mode_setting_process is capable
+ModMode Mod::next_mode;
+
+// This should start as legacy, and only change once game is first loaded and we've set up everything needed for overhaul mode
+ModMode Mod::current_mode = ModMode::Legacy;
 
 // Determines to disable the game's "Low framerate detected" disconnection
 bool Mod::disable_low_fps_disconnect = false;
@@ -69,16 +71,19 @@ void Mod::get_init_preferences()
     // Check if legacy mode is enabled
     // Don't update the actual variable, only the preferred. So we only switch on initial character load
     // This helps us keep consistant what is loaded first
-    Mod::prefer_legacy_mode = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_LEGACY_MODE_, (int)Mod::prefer_legacy_mode, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
-    if (Mod::prefer_legacy_mode)
+    bool default_legacy_mode = true;
+    default_legacy_mode = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_LEGACY_MODE_, (int)default_legacy_mode, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    if (default_legacy_mode)
     {
         ConsoleWrite("Legacy mode enabled. Gameplay changes will not be applied.");
         ModNetworking::allow_connect_with_legacy_mod_host = true;
+        Mod::user_selected_default_mode = ModMode::Legacy;
     }
     else
     {
         ConsoleWrite("Overhaul mode enabled. Gameplay changes will be applied.");
         ModNetworking::allow_connect_with_overhaul_mod_host = true;
+        Mod::user_selected_default_mode = ModMode::Overhaul;
     }
 
     // Check for custom game files
@@ -197,47 +202,40 @@ void Mod::get_custom_game_files()
     }
 }
 
-// Change the legacy mode, and also reload the files that we modify now that we're using the original/new ones
-// Also update any specific settings required to be compatable with non-mod users
-void Mod::set_mode(bool legacy, bool mod_installed)
+// Immediatly change the mode, and also reload the files that we modify now that we're using the original/new ones
+// This shouldn't be called directly, but only through mode_setting_process so it can be called at the approprite time to not crash the game
+void Mod::change_mode(ModMode mode)
 {
-    if (!mod_installed)
-    {
-        legacy = true;
-    }
-    SpellDesync::enabled = mod_installed; //since this requires reciving custom packets to work, not compatable with non-mod
-
-    ConsoleWrite("Setting mode: legacy=%d mod_installed=%d", legacy, mod_installed);
+    ConsoleWrite("Setting mode: legacy=%d mod_installed=%d", mode != ModMode::Overhaul, mode != ModMode::Compatability);
 
     //only change if we're not already in the mode
-    if (Mod::legacy_mode != legacy)
+    if (Mod::current_mode != mode)
     {
-        legacy_mode = legacy;
-        Files::UseOverhaulFiles = !legacy;
-        FileReloading::SetParamsToUse(legacy);
+        Mod::current_mode = mode;
+        if (mode == ModMode::Overhaul)
+        {
+            Files::UseOverhaulFiles = true;
+        }
+        else
+        {
+            Files::UseOverhaulFiles = false;
+        }
+        if (mode == ModMode::Overhaul)
+        {
+            FileReloading::SetParamsToUse(false);
+        }
+        else
+        {
+            FileReloading::SetParamsToUse(true);
+        }
         FileReloading::ReloadPlayer();
         FileReloading::RefreshPlayerStats();
     }
 }
 
-ModMode Mod::get_mode()
-{
-    if (Mod::legacy_mode && !SpellDesync::enabled)
-    {
-        return Compatability;
-    }
-    else if (Mod::legacy_mode && SpellDesync::enabled)
-    {
-        return Legacy;
-    }
-    else if (!Mod::legacy_mode)
-    {
-        return Overhaul;
-    }
-    return ModeNone;
-}
-
-bool Mod::set_preferred_mode(void* unused)
+// A infinite callback function that is responsible for setting the mode based on parameters
+// Continually monitors the desired/needed mode, and sets it as soon as possible when the game can accept the change
+bool Mod::mode_setting_process(void* unused)
 {
     if (Game::playerchar_is_loaded() && FileReloading::GameParamsLoaded)
     {
@@ -245,12 +243,31 @@ bool Mod::set_preferred_mode(void* unused)
         auto session_action_result = Game::get_SessionManagerImp_session_action_result();
         if (session_action_result.has_value() && session_action_result.value() == NoSession)
         {
-            if (Mod::legacy_mode != Mod::prefer_legacy_mode)
+            if (Mod::current_mode != Mod::user_selected_default_mode)
             {
-                Mod::set_mode(Mod::prefer_legacy_mode, true);
+                Mod::change_mode(Mod::user_selected_default_mode);
             }
+        }
+        // If we are in a multiplayer session, then we may need to change the mode to something else if forced
+        else
+        {
+            if (Mod::current_mode != Mod::next_mode)
+            {
+                Mod::change_mode(Mod::next_mode);
+            }
+
         }
     }
 
     return true;
+}
+
+ModMode Mod::get_mode()
+{
+    return Mod::current_mode;
+}
+
+void Mod::set_mode(ModMode mode)
+{
+    Mod::next_mode = mode;
 }

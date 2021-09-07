@@ -111,7 +111,7 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     MainLoop::setup_mainloop_callback(Game::on_character_load, NULL, "on_character_load");
 
     //start callback for setting the preferred mode
-    MainLoop::setup_mainloop_callback(Mod::set_preferred_mode, NULL, "set_preferred_mode");
+    MainLoop::setup_mainloop_callback(Mod::mode_setting_process, NULL, "mode_setting_process");
 
     return 0;
 }

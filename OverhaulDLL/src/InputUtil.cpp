@@ -239,8 +239,16 @@ void handle_input(XINPUT_GAMEPAD* xold, XINPUT_GAMEPAD* xcurrent, DIJOYSTATE2* d
         }
         if (Button::pressed(kbold, kbcurrent, DIK_F5))
         {
-            Mod::prefer_legacy_mode = !Mod::prefer_legacy_mode;
-            ConsoleWrite("Set legacy_mode=%d", Mod::prefer_legacy_mode);
+            if (Mod::user_selected_default_mode == ModMode::Legacy)
+            {
+                Mod::user_selected_default_mode = ModMode::Overhaul;
+                ConsoleWrite("Set prefer Overhaul mode");
+            }
+            else if (Mod::user_selected_default_mode == ModMode::Overhaul)
+            {
+                Mod::user_selected_default_mode = ModMode::Legacy;
+                ConsoleWrite("Set prefer Legacy mode");
+            }
         }
     }
 }

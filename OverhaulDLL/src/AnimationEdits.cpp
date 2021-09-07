@@ -149,7 +149,7 @@ bool DelayAnimationSpeedAjustment(void* thread_data_arg) {
 
 void read_body_aid_injection_helper_function(int32_t* animation_id, float* speed) {
     //If feature disabled, don't do anything
-    if (Mod::legacy_mode) {
+    if (Mod::get_mode() != ModMode::Overhaul) {
         return;
     }
 
@@ -206,7 +206,7 @@ void AnimationEdits::disable_whiff_animations() {
 
 uint8_t disable_whiff_animations_injection_helper(uint8_t whiff) {
     //Disable feature
-    if (Mod::legacy_mode) {
+    if (Mod::get_mode() != ModMode::Overhaul) {
         return whiff;
     }
 
