@@ -63,9 +63,13 @@ void inline ConsoleWrite(const char* str, ...)
     vsnprintf(dest, 1024, str, argptr);
     va_end(argptr);
 
-    global::cmd_out << dest << "\n";
+    uint64_t time;
+    QueryUnbiasedInterruptTime(&time); //returns time in units of 100 nanoseconds since system started
+    time = time / 10000; //to ms
 
-    fprintf(logfile, "%s\n", dest);
+    global::cmd_out << "[" << std::to_string(time) << "] " << dest << "\n";
+
+    fprintf(logfile, "[%lld] %s\n", time, dest);
 }
 
 #endif

@@ -206,7 +206,7 @@ void Mod::get_custom_game_files()
 // This shouldn't be called directly, but only through mode_setting_process so it can be called at the approprite time to not crash the game
 void Mod::change_mode(ModMode mode)
 {
-    ConsoleWrite("Setting mode: legacy=%d mod_installed=%d", mode != ModMode::Overhaul, mode != ModMode::Compatability);
+    ConsoleWrite("Setting mode: %d", static_cast<int>(mode));
 
     //only change if we're not already in the mode
     if (Mod::current_mode != mode)
