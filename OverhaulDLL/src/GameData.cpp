@@ -1278,7 +1278,7 @@ void Game::show_popup_message(const wchar_t* msg)
         {
             *(uint32_t*)(pcVar3 + 0x150) = *(uint32_t*)(pcVar3 + 0x8);
             *(uint32_t*)(pcVar3 + 0x8) = i;
-            uint64_t pcVar7 = pcVar3 + i * 0x40 + 0x10;
+            pcVar7 = pcVar3 + i * 0x40 + 0x10;
             if (pcVar7 != NULL)
             {
                 *(uint64_t*)(pcVar7 + 0x8) = 0xffffffffffffffff;

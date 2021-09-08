@@ -164,15 +164,15 @@ void type1_p2pPacket_parse_injection_helper_function(CustomSpellPacketData* bull
 
 
 // Check if the current bullet being checked to fire has been received as a network packet
-void homing_spell_checkIfTriggered_injection_helper_function(uint8_t* bullet, uint32_t* bulletParamEntry)
+void homing_spell_checkIfTriggered_injection_helper_function(uint8_t* firing_bullet, uint32_t* bulletParamEntry)
 {
     if (Mod::get_mode() == ModMode::Compatability)
     {
         return;
     }
 
-    uint32_t bullet_owner = *(uint32_t*)(bullet + 0x9C);
-    uint8_t bullet_num = *(uint8_t*)(bullet + 0x8);
+    uint32_t bullet_owner = *(uint32_t*)(firing_bullet + 0x9C);
+    uint8_t bullet_num = *(uint8_t*)(firing_bullet + 0x8);
 
     //always allow if the owner is the PC
     if (bullet_owner == Game::PC_Handle) {
