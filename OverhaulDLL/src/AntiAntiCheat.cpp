@@ -601,8 +601,8 @@ void set_value_in_MemberFlags(uint64_t input_data, MemberFlags_IdentifiersEnum f
 
 void compute_MemberFlags_bitflag(uint64_t* bitflags_and, MemberFlags_IdentifiersEnum flag)
 {
-    bitflags_and[(flag >> 0x6)] = 1ULL << (flag & 0x3f);
-    bitflags_and[2 + (flag >> 0x6)] = 1ULL << (flag & 0x3f);
+    bitflags_and[(flag >> 0x6)] |= 1ULL << (flag & 0x3f);
+    bitflags_and[2 + (flag >> 0x6)] |= 1ULL << (flag & 0x3f);
 }
 
 void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_t input_data)
@@ -617,6 +617,7 @@ void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_
     uint64_t membitflags_allowed[4];
     memset(membitflags_allowed, 0, sizeof(membitflags_allowed));
 
+    //needed in invade
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::AreaId);
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::MpRegion);
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::RankingRegistration);
@@ -630,9 +631,13 @@ void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::hasInvasionTimeLimit);
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::recentMPAreasVisited);
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::New_Name_100);
+    //needed to be invaded
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::SoulLevel);
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::ClearCount);
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::MaxWeaponLevel);
+    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::isPlayerHuman);
+    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::New_Name_7);
+    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::New_Name_105);
 
     //unset all the bitflags we don't whitelist
     //this ensures we only remove data, instead of adding data
