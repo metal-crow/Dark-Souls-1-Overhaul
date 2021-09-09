@@ -39,6 +39,7 @@ enum ModMode
     Overhaul = 3,
     Legacy = 2,
     Compatability = 1,
+    InvalidMode = 0,
 };
 
 class Mod

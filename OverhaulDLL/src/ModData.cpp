@@ -31,7 +31,7 @@ const std::string Mod::output_prefix = "[Overhaul Mod] ";
 ModMode Mod::user_selected_default_mode = ModMode::Legacy;
 
 // The mode we will next enter as soon as the mode_setting_process is capable
-ModMode Mod::next_mode;
+ModMode Mod::next_mode = ModMode::InvalidMode;
 
 // This should start as legacy, and only change once game is first loaded and we've set up everything needed for overhaul mode
 ModMode Mod::current_mode = ModMode::Legacy;
@@ -209,7 +209,7 @@ void Mod::change_mode(ModMode mode)
     ConsoleWrite("Setting mode: %d", static_cast<int>(mode));
 
     //only change if we're not already in the mode
-    if (Mod::current_mode != mode)
+    if (Mod::current_mode != mode && mode != ModMode::InvalidMode)
     {
         Mod::current_mode = mode;
         if (mode == ModMode::Overhaul)
@@ -251,9 +251,10 @@ bool Mod::mode_setting_process(void* unused)
         // If we are in a multiplayer session, then we may need to change the mode to something else if forced
         else
         {
-            if (Mod::current_mode != Mod::next_mode)
+            if (Mod::next_mode != ModMode::InvalidMode && Mod::current_mode != Mod::next_mode)
             {
                 Mod::change_mode(Mod::next_mode);
+                Mod::next_mode = ModMode::InvalidMode; //unset this so we know we don't have a next_mode still to go
             }
 
         }
