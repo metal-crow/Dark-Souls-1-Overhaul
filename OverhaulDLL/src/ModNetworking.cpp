@@ -593,6 +593,7 @@ bool GuestAwaitIncomingLobbyData(void* data_a)
     //Timeout, host is non-mod user
     if (ModNetworking::host_got_info == false && (Game::get_accurate_time() > data->start_time + MS_TO_WAIT_FOR_HOST_DATA))
     {
+        ConsoleWrite("3. Guest timeout getting host info");
         ModNetworking::host_mod_installed = false;
     }
 
