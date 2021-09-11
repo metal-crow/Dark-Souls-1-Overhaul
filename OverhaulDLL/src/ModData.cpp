@@ -16,6 +16,7 @@
 #include "SpellDesyncFixes.h"
 #include "ModNetworking.h"
 #include "MainLoop.h"
+#include "GameEnum.h"
 
 #define _SP_DEFINE_VK_NAME_STRINGS_  // Must be defined to use Virtual-key code name strings from SP_IO_Strings.hpp (opt-in by default because it increases filesize by a few KB)
 
@@ -212,22 +213,8 @@ void Mod::change_mode(ModMode mode)
     if (Mod::current_mode != mode && mode != ModMode::InvalidMode)
     {
         Mod::current_mode = mode;
-        if (mode == ModMode::Overhaul)
-        {
-            Files::UseOverhaulFiles = true;
-        }
-        else
-        {
-            Files::UseOverhaulFiles = false;
-        }
-        if (mode == ModMode::Overhaul)
-        {
-            FileReloading::SetParamsToUse(false);
-        }
-        else
-        {
-            FileReloading::SetParamsToUse(true);
-        }
+        Files::UseOverhaulFiles = (mode == ModMode::Overhaul);
+        FileReloading::SetParamsToUse(mode != ModMode::Overhaul);
         FileReloading::ReloadPlayer();
         FileReloading::RefreshPlayerStats();
     }
@@ -239,24 +226,34 @@ bool Mod::mode_setting_process(void* unused)
 {
     if (Game::playerchar_is_loaded() && FileReloading::GameParamsLoaded)
     {
-        // Check if we are not in any multiplayer setting, so that the user's preferred legacy mode setting can be applied
-        auto session_action_result = Game::get_SessionManagerImp_session_action_result();
-        if (session_action_result.has_value() && session_action_result.value() == NoSession)
+        auto playerIns_o = Game::get_PlayerIns();
+        if (playerIns_o.has_value() && playerIns_o.value() != NULL)
         {
-            if (Mod::current_mode != Mod::user_selected_default_mode)
-            {
-                Mod::change_mode(Mod::user_selected_default_mode);
-            }
-        }
-        // If we are in a multiplayer session, then we may need to change the mode to something else if forced
-        else
-        {
-            if (Mod::next_mode != ModMode::InvalidMode && Mod::current_mode != Mod::next_mode)
-            {
-                Mod::change_mode(Mod::next_mode);
-                Mod::next_mode = ModMode::InvalidMode; //unset this so we know we don't have a next_mode still to go
-            }
+            uint64_t playerIns = (uint64_t)playerIns_o.value();
 
+            // Check if we are not in any multiplayer setting, so that the user's preferred legacy mode setting can be applied
+            // Also make sure we're in our home world, since the MP setting can be 0 even in another world. It's set to that right after a BC.
+            auto session_action_result = Game::get_SessionManagerImp_session_action_result();
+            if (session_action_result.has_value() && session_action_result.value() == NoSession &&
+                (Game::get_player_chr_type(playerIns) == PLAYER_STATUS::HUMAN || Game::get_player_chr_type(playerIns) == PLAYER_STATUS::HOLLOW))
+            {
+                if (Mod::current_mode != Mod::user_selected_default_mode)
+                {
+                    Mod::change_mode(Mod::user_selected_default_mode);
+                }
+            }
+            // If we are in a multiplayer session, then we may need to change the mode to something else if forced
+            // Wait until we've loaded into the other world before we change modes (and reload anything, otherwise we may crash)
+            else
+            {
+                if (Mod::next_mode != ModMode::InvalidMode && Mod::current_mode != Mod::next_mode &&
+                    (Game::get_player_chr_type(playerIns) == PLAYER_STATUS::COOP || Game::get_player_chr_type(playerIns) == PLAYER_STATUS::INVADER))
+                {
+                    Mod::change_mode(Mod::next_mode);
+                    Mod::next_mode = ModMode::InvalidMode; //unset this so we know we don't have a next_mode still to go
+                }
+
+            }
         }
     }
 
