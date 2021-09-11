@@ -262,6 +262,11 @@ bool Mod::mode_setting_process(void* unused)
 
 ModMode Mod::get_mode()
 {
+    //we'll be in this mode shortly, just may hvae to wait for a loading screen
+    if (Mod::next_mode != ModMode::InvalidMode)
+    {
+        return Mod::next_mode;
+    }
     return Mod::current_mode;
 }
 
