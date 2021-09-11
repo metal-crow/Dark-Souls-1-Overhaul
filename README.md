@@ -64,7 +64,7 @@ It's like pages in a book. Each "page" is 10 characters.
 * Support for custom archive file loading  
 Specify folder location + filenames to use, and the alternate path will be used to load them
 
-* Fix to prevent homing spells from desyncing
+* Fix to prevent homing spells from desyncing (only if both players have mod)
 
 * Fix the "broken ankles" bug when rolling
 
