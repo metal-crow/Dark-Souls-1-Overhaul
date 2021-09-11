@@ -50,13 +50,6 @@ enum InventorySlots
     Quickbar5 = 0x13
 };
 
-enum DS1_PLAYER_STATUS_ENUM {
-    DS1_PLAYER_STATUS_HUMAN = 0,
-    DS1_PLAYER_STATUS_COOP = 1,
-    DS1_PLAYER_STATUS_INVADER = 2,
-    DS1_PLAYER_STATUS_HOLLOW = 8
-};
-
 enum TAE_type0_param_values {
     cancel_by_atk = 4,
     lock_rotation = 7,
@@ -310,6 +303,8 @@ public:
 	static std::optional<void*> find_bullet(uint32_t owner_handle, uint32_t bullet_num);
 
     static bool set_invasion_refresh_timer(float newtime);
+
+    static uint32_t get_player_chr_type(uint64_t playerIns);
 
     /*
      * Help speedup some functions by, whenever we're loaded into an area,

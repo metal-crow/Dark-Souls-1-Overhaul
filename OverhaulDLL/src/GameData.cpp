@@ -1331,3 +1331,8 @@ bool Game::set_invasion_refresh_timer(float newtime)
         return true;
     }
 }
+
+uint32_t Game::get_player_chr_type(uint64_t playerIns)
+{
+    return *(uint32_t*)(playerIns + 0xD4);
+}
