@@ -218,6 +218,8 @@ void Mod::change_mode(ModMode mode)
         FileReloading::ReloadPlayer();
         FileReloading::RefreshPlayerStats();
     }
+
+    Mod::next_mode = ModMode::InvalidMode; //unset this so we know we don't have a next_mode still to go
 }
 
 // A infinite callback function that is responsible for setting the mode based on parameters
@@ -237,7 +239,8 @@ bool Mod::mode_setting_process(void* unused)
             if (session_action_result.has_value() && session_action_result.value() == NoSession &&
                 (Game::get_player_chr_type(playerIns) == PLAYER_STATUS::HUMAN || Game::get_player_chr_type(playerIns) == PLAYER_STATUS::HOLLOW))
             {
-                if (Mod::current_mode != Mod::user_selected_default_mode)
+                //need to check both current_mode and next_mode in case we have a queued mode change that shouldn't happen anymore
+                if (Mod::get_mode() != Mod::user_selected_default_mode)
                 {
                     Mod::change_mode(Mod::user_selected_default_mode);
                 }
@@ -250,9 +253,7 @@ bool Mod::mode_setting_process(void* unused)
                     (Game::get_player_chr_type(playerIns) == PLAYER_STATUS::COOP || Game::get_player_chr_type(playerIns) == PLAYER_STATUS::INVADER))
                 {
                     Mod::change_mode(Mod::next_mode);
-                    Mod::next_mode = ModMode::InvalidMode; //unset this so we know we don't have a next_mode still to go
                 }
-
             }
         }
     }
@@ -262,7 +263,7 @@ bool Mod::mode_setting_process(void* unused)
 
 ModMode Mod::get_mode()
 {
-    //we'll be in this mode shortly, just may hvae to wait for a loading screen
+    //we'll be in this mode shortly, just may have to wait for a loading screen
     if (Mod::next_mode != ModMode::InvalidMode)
     {
         return Mod::next_mode;
