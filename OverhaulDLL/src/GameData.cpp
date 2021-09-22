@@ -88,8 +88,6 @@ int Game::node_count = -1;
 // Initializes pointers and base addresses required for most other functions
 void Game::init()
 {
-    uint8_t* write_address;
-
     ConsoleWrite("Initializing pointers...");
 
     Game::ds1_base = (uint64_t)sp::mem::get_process_base();
@@ -142,6 +140,11 @@ void Game::init()
     Game::bullet_man = Game::ds1_base + 0x1d177e8;
 
     Game::unknown_global_struct_141d283a8 = 0x141d283a8;
+}
+
+void Game::injections_init()
+{
+    uint8_t* write_address;
 
     //hook the code that calculates attack damage and save off the weapon id used for the attack
     last_attack_weaponid = -1;

@@ -181,6 +181,9 @@ public:
     // Initializes pointers and base addresses required for most other functions
     static void init();
 
+    // Any injections that would have been part of Game::Init()
+	static void injections_init();
+
     // Runs tasks that were deferred until a character was loaded
     static bool on_character_load(void*);
 

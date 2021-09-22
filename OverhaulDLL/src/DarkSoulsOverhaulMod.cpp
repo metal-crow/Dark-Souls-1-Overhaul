@@ -46,6 +46,7 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
 
     Game::init();
     AntiAntiCheat::start();
+    Game::injections_init(); //only do injections after we disable the built in code checking
 
     CreateThread(NULL,  // Default security attributes
                  0,     // Use default stack size
