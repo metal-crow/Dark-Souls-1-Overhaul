@@ -270,6 +270,8 @@ bool UpdatePlayerStats(void* startTime)
     uint32_t* baseMaxSp = (uint32_t*)(playergamedata + 0x38);
     *baseMaxSp = Calculate_MaxSP_From_End(end);
 
+    //TODO do i also need endurance, attunement, etc?
+
     //update the hp bar so it is scaled correctly
     Game::set_gui_hpbar_max();
 

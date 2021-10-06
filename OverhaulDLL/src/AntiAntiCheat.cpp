@@ -466,7 +466,7 @@ enum MemberFlags_IdentifiersEnum
     SessionNatType = 0x66,
     CovenantId = 0x67,
     inSession = 0x68,
-    New_Name_105 = 0x69,
+    SessionState = 0x69,
     NormalDefenses = 0x6a,
     NormalResists = 0x6b,
     CovenantLevel = 0x6c,
@@ -637,7 +637,7 @@ void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::MaxWeaponLevel);
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::isPlayerHuman);
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::New_Name_7);
-    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::New_Name_105);
+    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::SessionState);
 
     //unset all the bitflags we don't whitelist
     //this ensures we only remove data, instead of adding data
