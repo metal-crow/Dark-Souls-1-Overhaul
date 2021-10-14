@@ -551,18 +551,30 @@ void Game::set_memory_limit()
 {
     ConsoleWrite("Increasing game memory allocation size");
 
-    set_memory_limit_chunk(0x1C200000, 0x7C200000);
-    set_memory_limit_chunk(0x500000  , 0xA00000);
-    set_memory_limit_chunk(0x2000000 , 0x7800000);
-    set_memory_limit_chunk(0x4000000 , 0xB000000);
-    set_memory_limit_chunk(0x390000  , 0xB00000);
-    set_memory_limit_chunk(0x1320000 , 0x7320000);
-    set_memory_limit_chunk(0x400000  , 0xB00000);
-    set_memory_limit_chunk(0x800000  , 0xF00000);
-    set_memory_limit_chunk(0x380000  , 0xA80000);
-    set_memory_limit_chunk(0x5280000 , 0xB280000);
-    set_memory_limit_chunk(0xE0000   , 0x400000);
-    set_memory_limit_chunk(0x200000  , 0x800000);
+    set_memory_limit_chunk(0x1C200000,
+                           0x7C200000);
+    set_memory_limit_chunk(0x500000,
+                           0xA00000);
+    set_memory_limit_chunk(0x2000000,
+                           0x7800000);
+    set_memory_limit_chunk(0x4000000,
+                           0xB000000);
+    set_memory_limit_chunk(0x390000,
+                           0xB00000);
+    set_memory_limit_chunk(0x1320000,
+                           0x7320000);
+    set_memory_limit_chunk(0x400000,
+                           0xB00000);
+    set_memory_limit_chunk(0x800000,
+                           0xF00000);
+    set_memory_limit_chunk(0x380000,
+                           0xA80000);
+    set_memory_limit_chunk(0x5280000,
+                           0xB280000);
+    set_memory_limit_chunk(0xE0000,
+                          0x400000);
+    set_memory_limit_chunk(0x200000,
+                           0x800000);
 }
 
 
