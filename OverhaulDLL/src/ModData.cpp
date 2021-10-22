@@ -371,7 +371,22 @@ void Mod::get_user_preferences()
     if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_L3_JUMP_, L3Jump::is_active(), _DS1_OVERHAUL_SETTINGS_FILE_) != 0) {
         L3Jump::apply("    ");
     }
-    
+
+    char custom_file_name_buff[MAX_PATH + 1];
+    custom_file_name_buff[MAX_PATH] = '\0';
+    GetPrivateProfileString(_DS1_OVERHAUL_PREFS_SECTION_,
+        _DS1_OVERHAUL_PREF_CUSTOM_SAVE_LOCATION_,
+        NULL,
+        custom_file_name_buff,
+        MAX_PATH + 1,
+        _DS1_OVERHAUL_SETTINGS_FILE_);
+    // Convert string to wide chars
+    string_mb_to_wide(custom_file_name_buff, Mod::custom_save_file_path);
+    if (std::string(custom_file_name_buff).length() > 0)
+    {
+        print_console("Found custom game config file definition:" + std::string(custom_file_name_buff));
+    }
+
     // @TODO Load additional user preferences here
 
 }
