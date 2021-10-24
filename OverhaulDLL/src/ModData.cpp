@@ -373,6 +373,7 @@ void Mod::get_user_preferences()
     }
 
     char custom_file_name_buff[MAX_PATH + 1];
+    char custom_file_name_buff_full[MAX_PATH + 1];
     custom_file_name_buff[MAX_PATH] = '\0';
     GetPrivateProfileString(_DS1_OVERHAUL_PREFS_SECTION_,
         _DS1_OVERHAUL_PREF_CUSTOM_SAVE_LOCATION_,
@@ -380,11 +381,13 @@ void Mod::get_user_preferences()
         custom_file_name_buff,
         MAX_PATH + 1,
         _DS1_OVERHAUL_SETTINGS_FILE_);
+    // resolve the string to an absolute path
+    ExpandEnvironmentStringsA(custom_file_name_buff, custom_file_name_buff_full, MAX_PATH);
     // Convert string to wide chars
-    string_mb_to_wide(custom_file_name_buff, Mod::custom_save_file_path);
-    if (std::string(custom_file_name_buff).length() > 0)
+    string_mb_to_wide(custom_file_name_buff_full, Mod::custom_save_file_path);
+    if (std::string(custom_file_name_buff_full).length() > 0)
     {
-        print_console("Found custom game config file definition:" + std::string(custom_file_name_buff));
+        print_console("Found custom game config file definition:" + std::string(custom_file_name_buff_full));
     }
 
     // @TODO Load additional user preferences here
