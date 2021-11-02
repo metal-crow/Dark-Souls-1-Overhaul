@@ -653,11 +653,17 @@ void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_
         arraystart += 1;
     }
     ConsoleWrite("]");
-    uint32_t RegulationVersion = *(uint32_t*)(input_data + 0x20 + (7 * 4));
+    uint32_t RegulationVersion = *(uint32_t*)(input_data + 0x20 + (MemberFlags_IdentifiersEnum::RegulationVersion * 4));
     ConsoleWrite("RegulationVersion=%d",RegulationVersion);
     if (RegulationVersion != 0 && RegulationVersion != 1040000)
     {
         FATALERROR("UNKNOWN RegulationVersion VALUE");
+    }
+    uint8_t isPlayerHuman = *(uint8_t*)(input_data + 0x170 + ((MemberFlags_IdentifiersEnum::isPlayerHuman-0x53) * 1));
+    ConsoleWrite("isPlayerHuman=%d", isPlayerHuman);
+    if (isPlayerHuman != 0 && isPlayerHuman != 1)
+    {
+        FATALERROR("UNKNOWN isPlayerHuman VALUE");
     }
 
     //unset all the bitflags we don't whitelist
