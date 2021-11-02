@@ -368,7 +368,7 @@ enum MemberFlags_IdentifiersEnum
     CoopSuccessCount = 0x4,
     New_Name_5 = 0x5,
     New_Name_6 = 0x6,
-    New_Name_7 = 0x7,
+    RegulationVersion = 0x7,
     SoulLevel = 0x8,
     SoulCount = 0x9,
     SoulMemory = 0xa,
@@ -636,8 +636,29 @@ void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::ClearCount);
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::MaxWeaponLevel);
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::isPlayerHuman);
-    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::New_Name_7);
+    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::RegulationVersion);
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::SessionState);
+
+    //TMP
+    uint32_t* arraystart = *(uint32_t**)(input_data + 0x228);
+    uint32_t* arrayend = *(uint32_t**)(input_data + 0x230);
+    ConsoleWrite("SessionState=[");
+    while (arraystart != arrayend)
+    {
+        ConsoleWrite("\t%d", *arraystart);
+        if (*arraystart != 0 && *arraystart != 1 && *arraystart != 2 && *arraystart != 3)
+        {
+            FATALERROR("UNKNOWN SessionState VALUE");
+        }
+        arraystart += 1;
+    }
+    ConsoleWrite("]");
+    uint32_t RegulationVersion = *(uint32_t*)(input_data + 0x20 + (7 * 4));
+    ConsoleWrite("RegulationVersion=%d",RegulationVersion);
+    if (RegulationVersion != 0 && RegulationVersion != 1040000)
+    {
+        FATALERROR("UNKNOWN RegulationVersion VALUE");
+    }
 
     //unset all the bitflags we don't whitelist
     //this ensures we only remove data, instead of adding data
