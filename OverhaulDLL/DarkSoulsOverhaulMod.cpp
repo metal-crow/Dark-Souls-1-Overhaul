@@ -33,19 +33,32 @@
 */
 void on_process_attach()
 {
-    if (MessageBox(NULL,
-        std::string("Enable DS Overhaul : Extended Player Limit?\n\
-Hitting yes will increase the player limit to 18, but will disable cooperative play entirely! The player limit increase only applies to red summon signs.\n\
-If you are planning to PvP in the Arena+ area then you want this on.").c_str(),
-        std::string("Overhaul").c_str(),
-        MB_YESNO)
-        == IDYES)
+    LPSTR options = GetCommandLineA();
+
+    //enable multiphatom if we have this arg given, or it's in the ini
+    if (strstr(options, "-phantom-break-on") || (int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_ENABLE_MULTIPHANTOM_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0)
     {
         Mod::enable_multiphantom = true;
+        DWORD OldProtect;
+        //this is the address of the main window's name
+        VirtualProtect((LPVOID)0x01168630, 50, PAGE_READWRITE, &OldProtect);
+        swprintf((wchar_t*)0x01168630, 28, L"DARK SOULS - PHANTOM BREAK");
     }
-    else {
+    //disable multiphatom if we have this alternative arg given, or it's in the ini
+    else if (strstr(options, "-phantom-break-off") || (int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_ENABLE_MULTIPHANTOM_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) == 0)
+    {
         Mod::enable_multiphantom = false;
     }
+    //disable multiphatom by default
+    else
+    {
+        Mod::enable_multiphantom = false;
+    }
+
+    //make sure we set the appid to spacewars, just in case
+    FILE* fp = fopen("./steam_appid.txt", "w");
+    fprintf(fp, "480");
+    fclose(fp);
 
     Mod::startup_messages.push_back(DS1_OVERHAUL_TXT_INTRO);
     Mod::startup_messages.push_back("");
