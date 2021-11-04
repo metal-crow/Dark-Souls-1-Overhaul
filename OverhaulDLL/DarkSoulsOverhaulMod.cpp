@@ -35,8 +35,7 @@ void on_process_attach()
 {
     LPSTR options = GetCommandLineA();
 
-    //enable multiphatom if we have this arg given, or it's in the ini
-    if (strstr(options, "-phantom-break-on") || (int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_ENABLE_MULTIPHANTOM_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0)
+    if (strstr(options, "-phantom-break-on"))
     {
         Mod::enable_multiphantom = true;
         DWORD OldProtect;
@@ -44,10 +43,17 @@ void on_process_attach()
         VirtualProtect((LPVOID)0x01168630, 50, PAGE_READWRITE, &OldProtect);
         swprintf((wchar_t*)0x01168630, 28, L"DARK SOULS - PHANTOM BREAK");
     }
-    //disable multiphatom if we have this alternative arg given, or it's in the ini
-    else if (strstr(options, "-phantom-break-off") || (int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_ENABLE_MULTIPHANTOM_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) == 0)
+    else if (strstr(options, "-phantom-break-off"))
     {
         Mod::enable_multiphantom = false;
+    }
+    else if ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_ENABLE_MULTIPHANTOM_, 0, _DS1_OVERHAUL_SETTINGS_FILE_) != 0)
+    {
+        Mod::enable_multiphantom = true;
+        DWORD OldProtect;
+        //this is the address of the main window's name
+        VirtualProtect((LPVOID)0x01168630, 50, PAGE_READWRITE, &OldProtect);
+        swprintf((wchar_t*)0x01168630, 28, L"DARK SOULS - PHANTOM BREAK");
     }
     //disable multiphatom by default
     else
