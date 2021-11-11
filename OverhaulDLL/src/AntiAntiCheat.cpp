@@ -639,28 +639,23 @@ void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::RegulationVersion);
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::SessionState);
 
-    //TMP
+    //extra checks, to be safe
     uint32_t* arraystart = *(uint32_t**)(input_data + 0x228);
     uint32_t* arrayend = *(uint32_t**)(input_data + 0x230);
-    ConsoleWrite("SessionState=[");
     while (arraystart != arrayend)
     {
-        ConsoleWrite("\t%d", *arraystart);
         if (*arraystart != 0 && *arraystart != 1 && *arraystart != 2 && *arraystart != 3)
         {
             FATALERROR("UNKNOWN SessionState VALUE");
         }
         arraystart += 1;
     }
-    ConsoleWrite("]");
     uint32_t RegulationVersion = *(uint32_t*)(input_data + 0x20 + (MemberFlags_IdentifiersEnum::RegulationVersion * 4));
-    ConsoleWrite("RegulationVersion=%d",RegulationVersion);
     if (RegulationVersion != 0 && RegulationVersion != 1040000)
     {
         FATALERROR("UNKNOWN RegulationVersion VALUE");
     }
     uint8_t isPlayerHuman = *(uint8_t*)(input_data + 0x170 + ((MemberFlags_IdentifiersEnum::isPlayerHuman-0x53) * 1));
-    ConsoleWrite("isPlayerHuman=%d", isPlayerHuman);
     if (isPlayerHuman != 0 && isPlayerHuman != 1)
     {
         FATALERROR("UNKNOWN isPlayerHuman VALUE");
