@@ -46,6 +46,7 @@ Enabling Overhaul mode by default is highly recommended, since it dramatically i
 * Bug fix for invisible attacks after backstabs
 
 * Dead Angles and Ghost Hits are back, and made slighly more consistent  
+This only affects you, the client. If you are playing with a non-mod user, they can dead angle you but you can't them.
 
 * Equipment (except weapons) can again be changed while in any animation
 
