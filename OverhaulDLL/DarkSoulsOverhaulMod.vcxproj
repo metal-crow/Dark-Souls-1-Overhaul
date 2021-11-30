@@ -40,6 +40,7 @@
     <ClCompile Include="src\ModNetworking.cpp" />
     <ClCompile Include="src\PhantomUnshackle.cpp" />
     <ClCompile Include="src\InputUtil.cpp" />
+    <ClCompile Include="src\Rollback.cpp" />
     <ClCompile Include="src\SpellDesyncFixes.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -57,6 +58,7 @@
     <ClInclude Include="include\InvisibleBackstabAttackFix.h" />
     <ClInclude Include="include\MainLoop.h" />
     <ClInclude Include="include\ModNetworking.h" />
+    <ClInclude Include="include\Rollback.h" />
     <ClInclude Include="include\SpellDesyncFixes.h" />
     <ClInclude Include="include\Xinput_1_3.h" />
     <ClInclude Include="ui\crash_hander_ui_resource.h" />
@@ -121,6 +123,7 @@
     <MASM Include="src\ModNetworking_ASM.asm" />
     <MASM Include="src\PhantomUnshackleASM.asm" />
     <MASM Include="src\InputUtilASM.asm" />
+    <MASM Include="src\RollbackASM.asm" />
     <MASM Include="src\SpellDesyncFixesASM.asm" />
   </ItemGroup>
   <ItemGroup>
