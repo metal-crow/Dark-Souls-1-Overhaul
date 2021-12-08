@@ -618,19 +618,11 @@ void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_
     memset(membitflags_allowed, 0, sizeof(membitflags_allowed));
 
     //needed in invade
-    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::AreaId);
-    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::MpRegion);
-    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::RankingRegistration);
-    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::RegionMatchmaking);
-    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::isPlayerHollow);
-    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::CharacterName);
-    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::CovenantId);
-    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::inSession);
-    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::SessionNatType);
-    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::SessionRoleID);
-    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::hasInvasionTimeLimit);
-    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::recentMPAreasVisited);
-    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::New_Name_100);
+    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::AreaId); //verified needed
+    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::MpRegion); //verified needed
+    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::RegionMatchmaking); //verified needed
+    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::CovenantId); //verified needed
+    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::hasInvasionTimeLimit); //verified needed
     //needed to be invaded
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::SoulLevel);
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::ClearCount);
@@ -646,19 +638,19 @@ void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_
     {
         if (*arraystart != 0 && *arraystart != 1 && *arraystart != 2 && *arraystart != 3)
         {
-            FATALERROR("UNKNOWN SessionState VALUE");
+            FATALERROR("UNKNOWN SessionState VALUE: %d", *arraystart);
         }
         arraystart += 1;
     }
     uint32_t RegulationVersion = *(uint32_t*)(input_data + 0x20 + (MemberFlags_IdentifiersEnum::RegulationVersion * 4));
     if (RegulationVersion != 0 && RegulationVersion != 1040000)
     {
-        FATALERROR("UNKNOWN RegulationVersion VALUE");
+        FATALERROR("UNKNOWN RegulationVersion VALUE: %d", RegulationVersion);
     }
     uint8_t isPlayerHuman = *(uint8_t*)(input_data + 0x170 + ((MemberFlags_IdentifiersEnum::isPlayerHuman-0x53) * 1));
     if (isPlayerHuman != 0 && isPlayerHuman != 1)
     {
-        FATALERROR("UNKNOWN isPlayerHuman VALUE");
+        FATALERROR("UNKNOWN isPlayerHuman VALUE: %d", isPlayerHuman);
     }
 
     //unset all the bitflags we don't whitelist
