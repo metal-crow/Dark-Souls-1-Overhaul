@@ -214,9 +214,9 @@ void Mod::change_mode(ModMode mode)
     {
         Mod::current_mode = mode;
         Files::UseOverhaulFiles = (mode == ModMode::Overhaul);
-        FileReloading::SetParamsToUse(mode != ModMode::Overhaul);
-        FileReloading::ReloadPlayer();
-        FileReloading::RefreshPlayerStats();
+        //TEMP//FileReloading::SetParamsToUse(mode != ModMode::Overhaul);
+        //TEMP//FileReloading::ReloadPlayer();
+        //TEMP//FileReloading::RefreshPlayerStats();
     }
 
     Mod::next_mode = ModMode::InvalidMode; //unset this so we know we don't have a next_mode still to go
@@ -226,7 +226,7 @@ void Mod::change_mode(ModMode mode)
 // Continually monitors the desired/needed mode, and sets it as soon as possible when the game can accept the change
 bool Mod::mode_setting_process(void* unused)
 {
-    if (Game::playerchar_is_loaded() && FileReloading::GameParamsLoaded)
+    if (Game::playerchar_is_loaded()) //TEMP//&& FileReloading::GameParamsLoaded)
     {
         auto playerIns_o = Game::get_PlayerIns();
         if (playerIns_o.has_value() && playerIns_o.value() != NULL)

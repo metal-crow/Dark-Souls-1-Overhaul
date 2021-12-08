@@ -102,7 +102,7 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     PhantomUnshackle::start();
     FixAnkles::start();
     ModNetworking::start();
-    FileReloading::start();
+    //TEMP//FileReloading::start();
     AllAreasSearchInvasion::start();
     Game::disable_low_fps_disconnect(Mod::disable_low_fps_disconnect);
 
