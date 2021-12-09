@@ -618,11 +618,11 @@ void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_
     memset(membitflags_allowed, 0, sizeof(membitflags_allowed));
 
     //needed in invade
-    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::AreaId); //verified needed
-    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::MpRegion); //verified needed
-    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::RegionMatchmaking); //verified needed
-    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::CovenantId); //verified needed
-    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::hasInvasionTimeLimit); //verified needed
+    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::AreaId);
+    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::MpRegion);
+    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::RegionMatchmaking);
+    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::CovenantId);
+    compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::hasInvasionTimeLimit);
     //needed to be invaded
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::SoulLevel);
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::ClearCount);
@@ -632,11 +632,14 @@ void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::SessionState);
 
     //extra checks, to be safe
+    //TODO add more checks
+
     uint32_t* arraystart = *(uint32_t**)(input_data + 0x228);
     uint32_t* arrayend = *(uint32_t**)(input_data + 0x230);
     while (arraystart != arrayend)
     {
-        if (*arraystart != 0 && *arraystart != 1 && *arraystart != 2 && *arraystart != 3)
+        //this check probably isn't needed but just to be safe
+        if (*arraystart < 0 || *arraystart > 8)
         {
             FATALERROR("UNKNOWN SessionState VALUE: %d", *arraystart);
         }
