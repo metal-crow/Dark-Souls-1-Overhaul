@@ -332,6 +332,9 @@ void crash_handler(char* message_str)
     }
     triggered_crash_handler = true;
 
+    //make sure the cursor is visible
+    while (ShowCursor(true) < 0);
+
     // Create the locations to output the dump to
     char output_dir[MAX_PATH+100];
     GetCurrentDirectory(MAX_PATH, output_dir);
