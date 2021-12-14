@@ -81,18 +81,20 @@ Hope to obsolete this when i make compatable with ModEngine2
 
 * Steam netcode updated to reduce latency and hide IP address
 
+* Fix for the halberd instant running attack glitch in mud and pvp
+
 * New item, "Searching Red Eye Orb" (id 104), that searches all multiplayer areas while trying to invade  
 This allows you to invade any area across the entire game via 1 single use. It will continually search all areas rapidly, until cancelled or invasion found
 
-### Overhaul
+### Overhaul (some stuff temporarily disabled)
 
-* Gestures can be canceled via rolling
+* ~~Gestures can be canceled via rolling~~
 
 * Animations:
-  * Firestorm startup and main animation have been sped up (x10 and x1.6)
-  * Gravelord Sword Dance startup and main animation have been sped up (x10 and x1.6)
-  * All kneeling heals have had their startup sped up (x6)
-  * Lightning Spear startup and main animation have been sped up (x10 and x1.2)
+  * ~~Firestorm startup and main animation have been sped up (x10 and x1.6)~~
+  * ~~Gravelord Sword Dance startup and main animation have been sped up (x10 and x1.6)~~
+  * ~~All kneeling heals have had their startup sped up (x6)~~
+  * ~~Lightning Spear startup and main animation have been sped up (x10 and x1.2)~~
 
 * All whiff animations on weapons have been removed (they always have the on-hit animation instead)
 
@@ -100,15 +102,13 @@ This allows you to invade any area across the entire game via 1 single use. It w
 HP recovery is equal to `(0.05 + (upgrade level of weapon / 10.0)) * damage given`  
 Time to recover the hp is 5000 ms, or on weapon toggle.  
 
-* Some spell types no longer lock your movement or rotation while they are being casted  
-You can freely walk, run, and rotate as you are casting them, and pivot cancels work as normal    
-These include everything EXCEPT: Combustions, Firestorms, and all miracles but Lighting Spear and Darkmoon Blade/Sunlight Blade  
+* ~~Some spell types no longer lock your movement or rotation while they are being casted~~  
+~~You can freely walk, run, and rotate as you are casting them, and pivot cancels work as normal~~    
+~~These include everything EXCEPT: Combustions, Firestorms, and all miracles but Lighting Spear and Darkmoon Blade/Sunlight Blade~~  
 
 * Fix to prevent curved swords from stunlocking
 
-* Fix for the halberd instant running attack glitch in mud and pvp
+* ~~Backstab distance and angle has been reduced. (60 degrees to 45, 1.5 distance to 1)~~
 
-* Backstab distance and angle has been reduced. (60 degrees to 45, 1.5 distance to 1)
-
-* Large scale health increase across the board.  
-Average SL 125 build should be ~3k HP.
+* ~~Large scale health increase across the board.~~  
+~~Average SL 125 build should be \~3k HP.~~
