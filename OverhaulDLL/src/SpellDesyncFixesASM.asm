@@ -38,7 +38,7 @@ push    r11
 sub     rsp, 20h
 
 mov     ecx, dword ptr [rsp + 20h + 80h + 20h] ;get the bullet target entity id
-mov     dl, byte ptr [rbx+08h] ;get the bullet number
+lea     rdx, dword ptr [rbx+10h] ;get the bullet position
 call    homing_spell_trigger_injection_helper_function
 
 add     rsp, 20h
@@ -82,11 +82,11 @@ cmp     dword ptr [rsp+30h], 7fc00001h
 jne     normal_exit
 
 lea     rcx, [rsp+30h] ;the incoming packet data
-sub     rsp, 28h ;align the stack and add shadow stack space
+sub     rsp, 30h ;align the stack and add shadow stack space
 call    type1_p2pPacket_parse_injection_helper_function
 
 ;exit the function we've injected into
-add     rsp, 88h
+add     rsp, 90h
 pop     rdi
 ret
 

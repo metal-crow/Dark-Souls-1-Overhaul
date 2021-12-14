@@ -1320,17 +1320,62 @@ std::optional<void*> Game::find_bullet(uint32_t owner_handle, uint32_t bullet_nu
     {
         uint8_t cur_bullet_num = *(uint8_t*)(current_bullet_in_use + 8);
         uint32_t cur_bullet_owner = *(uint32_t*)(current_bullet_in_use + 156);
-        if (cur_bullet_num == bullet_num && cur_bullet_owner == cur_bullet_owner)
+        if (cur_bullet_num == bullet_num && owner_handle == cur_bullet_owner)
         {
             return (void*)(current_bullet_in_use);
         }
-        else
-        {
-            current_bullet_in_use = *(uint64_t*)(current_bullet_in_use + 0x348);
-        }
+        current_bullet_in_use = *(uint64_t*)(current_bullet_in_use + 0x348);
     }
 
     return std::nullopt;
+}
+
+// You'd think we'd only ever want to check the bullet_num value, at +8
+// However, this value isn't reliably synced online, so it can't be used for other players and the SpellDesync fix
+// Instead, we have to do it the ugly way, and find the closest by position.
+// Unreliable and ugly, but i don't have a better way
+// we need to include the ones in our current queue, to disallow the heuristic from selecting the same bullet twice
+std::optional<void*> Game::find_unfired_bullet(uint32_t owner_handle, float x_pos, float y_pos, float z_pos, std::unordered_set<uint8_t> formidden_nums)
+{
+    //this points to a linked list of the bullets in use. Follow backwards till there isn't another node in the list
+    uint64_t current_bullet_in_use = *(uint64_t*)((*(uint64_t*)Game::bullet_man) + 8);
+    uint64_t closest_bullet = NULL;
+    float closest_bullet_distance = 99999.0f;
+
+    while (current_bullet_in_use != NULL)
+    {
+        float cur_bullet_x = *(float*)(current_bullet_in_use + 16 + 0);
+        float cur_bullet_y = *(float*)(current_bullet_in_use + 16 + 4);
+        float cur_bullet_z = *(float*)(current_bullet_in_use + 16 + 8);
+        uint8_t cur_bullet_num = *(uint8_t*)(current_bullet_in_use + 8);
+        uint32_t cur_bullet_owner = *(uint32_t*)(current_bullet_in_use + 156);
+        uint32_t cur_bullet_target = *(uint32_t*)(current_bullet_in_use + 656);
+
+        //check the owner, and that the bullet has not yet been fired
+        if (owner_handle == cur_bullet_owner && cur_bullet_target == cur_bullet_owner)
+        {
+            // distance = sqrt(a^2+b^2+c^2)
+            float x_dist = abs(cur_bullet_x - x_pos);
+            float y_dist = abs(cur_bullet_y - y_pos);
+            float z_dist = abs(cur_bullet_z - z_pos);
+            float this_bullet_distance = sqrt(x_dist * x_dist + y_dist * y_dist + z_dist * z_dist);
+            if (this_bullet_distance < closest_bullet_distance && formidden_nums.count(cur_bullet_num) == 0)
+            {
+                closest_bullet = current_bullet_in_use;
+                closest_bullet_distance = this_bullet_distance;
+            }
+        }
+        current_bullet_in_use = *(uint64_t*)(current_bullet_in_use + 0x348);
+    }
+
+    if (closest_bullet == NULL)
+    {
+        return std::nullopt;
+    }
+    else
+    {
+        return (void*)(closest_bullet);
+    }
 }
 
 bool Game::set_invasion_refresh_timer(float newtime)

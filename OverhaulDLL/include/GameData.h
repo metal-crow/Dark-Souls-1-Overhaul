@@ -305,6 +305,8 @@ public:
 
 	static std::optional<void*> find_bullet(uint32_t owner_handle, uint32_t bullet_num);
 
+    static std::optional<void*> find_unfired_bullet(uint32_t owner_handle, float x_pos, float y_pos, float z_pos, std::unordered_set<uint8_t> formidden_nums);
+
     static bool set_invasion_refresh_timer(float newtime);
 
     static uint32_t get_player_chr_type(uint64_t playerIns);

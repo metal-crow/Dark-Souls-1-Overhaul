@@ -9,16 +9,17 @@ typedef struct {
     uint32_t owner;
     uint32_t target;
     uint32_t target_alt;
-    uint32_t bullet_number;
-    const uint32_t padding_a = 0;
-    const uint64_t padding_b[2] = { 0,0 };
+    float pos_x;
+    float pos_y;
+    float pos_z;
+    const uint32_t padding_b[3] = { 0,0,0 };
     const uint8_t include_last_2_vals = 0; //must be at +40
 } CustomSpellPacketData;
 
 extern "C" {
     uint64_t homing_spell_trigger_injection_return;
     void homing_spell_trigger_injection();
-    void homing_spell_trigger_injection_helper_function(uint32_t, uint8_t);
+    void homing_spell_trigger_injection_helper_function(uint32_t, float*);
 
     uint64_t type1_p2pPacket_parse_injection_return;
     void type1_p2pPacket_parse_injection();
@@ -64,7 +65,7 @@ sendType1NetMessage_Typedef* sendType1NetMessage = (sendType1NetMessage_Typedef*
 
 // Send out the custom packet which says a homing bullet has been fired (i.e the actual HSM orb has left the caster and is mid-air).
 // By entering this function we know the owner of the bullet is the PC and the target is another entity
-void homing_spell_trigger_injection_helper_function(uint32_t target, uint8_t bulletNum)
+void homing_spell_trigger_injection_helper_function(uint32_t target, float* bulletPos)
 {
     if (Mod::get_mode() == ModMode::Compatability)
     {
@@ -102,9 +103,11 @@ void homing_spell_trigger_injection_helper_function(uint32_t target, uint8_t bul
         homingPkt.target_alt = target;
     }
 
-    homingPkt.bullet_number = bulletNum;
+    homingPkt.pos_x = bulletPos[0];
+    homingPkt.pos_y = bulletPos[1];
+    homingPkt.pos_z = bulletPos[2];
 
-    ConsoleWrite("Send bullet %x %x %x %d", homingPkt.owner, homingPkt.target, homingPkt.target_alt, homingPkt.bullet_number);
+    ConsoleWrite("Send bullet %x %x %x %f %f %f", homingPkt.owner, homingPkt.target, homingPkt.target_alt, homingPkt.pos_x, homingPkt.pos_y, homingPkt.pos_z);
     //Send the custom packet
     sendType1NetMessage(&homingPkt);
 }
@@ -146,20 +149,26 @@ void type1_p2pPacket_parse_injection_helper_function(CustomSpellPacketData* bull
         bullet->target_id = bullet_packet->target_alt;
     }
 
-    bullet->number = (uint8_t)bullet_packet->bullet_number;
-
     //verify we can find this bullet in our bullet list
-    if (!Game::find_bullet(bullet->owner_id, bullet->number).has_value())
+    std::unordered_set<uint8_t> formidden_nums;
+    for (auto bullet : BulletNetworkInfo_Array)
     {
-        ConsoleWrite("WARNING: Got bullet %x %x %d but unable to find in list.", bullet->owner_id, bullet->target_id, bullet->number);
+        formidden_nums.insert(bullet->number);
+    }
+    auto found_bullet =  Game::find_unfired_bullet(bullet->owner_id, bullet_packet->pos_x, bullet_packet->pos_y, bullet_packet->pos_z, formidden_nums);
+    if (!found_bullet.has_value())
+    {
+        ConsoleWrite("WARNING: Got bullet %x %x %f %f %f but unable to find in list.", bullet->owner_id, bullet->target_id, bullet_packet->pos_x, bullet_packet->pos_y, bullet_packet->pos_z);
         delete bullet;
         return;
     }
+    //get the local bullet number
+    bullet->number = *(uint8_t*)(((uint64_t)found_bullet.value()) + 8);
 
     BulletNetworkInfo_Array_mtx.lock();
     BulletNetworkInfo_Array.push_back(bullet);
     BulletNetworkInfo_Array_mtx.unlock();
-    ConsoleWrite("Got bullet %x %x %d", bullet->owner_id, bullet->target_id, bullet->number);
+    ConsoleWrite("Got bullet %x %x %d %f %f %f", bullet->owner_id, bullet->target_id, bullet->number, bullet_packet->pos_x, bullet_packet->pos_y, bullet_packet->pos_z);
 }
 
 
