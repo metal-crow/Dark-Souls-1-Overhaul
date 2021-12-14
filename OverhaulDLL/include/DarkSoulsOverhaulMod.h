@@ -28,7 +28,7 @@
 // Preprocessor definition utilized by the Dark Souls Game Files C++ library (DsGameFiles.lib)
 #define __DS1_OVERHAUL_MOD
 
-#define VERSION_STRING  "Alpha11"
+#define VERSION_STRING  "Alpha12"
 #define DS1_OVERHAUL_TXT_INTRO "\n+------------------------------------------------------+\n|      Dark Souls Overhaul   ["VERSION_STRING"]                 |\n+------------------------------------------------------+"
 
 extern HMODULE d3d11_module;
