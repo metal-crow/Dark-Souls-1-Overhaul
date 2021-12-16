@@ -91,10 +91,10 @@ This allows you to invade any area across the entire game via 1 single use. It w
 * ~~Gestures can be canceled via rolling~~
 
 * Animations:
-  * ~~Firestorm startup and main animation have been sped up (x10 and x1.6)~~
-  * ~~Gravelord Sword Dance startup and main animation have been sped up (x10 and x1.6)~~
-  * ~~All kneeling heals have had their startup sped up (x6)~~
-  * ~~Lightning Spear startup and main animation have been sped up (x10 and x1.2)~~
+  * Firestorm startup and main animation have been sped up (x10 and x1.6)
+  * Gravelord Sword Dance startup and main animation have been sped up (x10 and x1.6)
+  * All kneeling heals have had their startup sped up (x6)
+  * Lightning Spear startup and main animation have been sped up (x10 and x1.2)
 
 * All whiff animations on weapons have been removed (they always have the on-hit animation instead)
 
