@@ -23,9 +23,9 @@ Building from source requires Visual Studio 2017, and access to some private rep
 
 ## Description
 The mod is completely backwards compatible with vanilla dark souls 1 by default. In __legacy__ mode, it includes a number of significant but fully backwards compatible bugfixes, quality-of-life improvements, visual glitch fixes, and functional anti-cheat measures.  
-It also unlocks a number of in-engine limitations and fixes other engine problems (including disabling the terrible built-in anti-cheat), making it perfect to extend further with other mods.  
+It also unlocks a number of in-engine limitations and fixes other engine problems (including disabling the terrible built-in anti-cheat).  
 
-If you so wish, you can enable __overhaul__ mode at any time to get the full suite of improvements this mod gives.  
+If you so wish, you can enable __overhaul__ mode (by pressing F5 to switch modes) at any time to get the full suite of improvements this mod gives.  
 This will __not__ separate you from vanilla players. A player will have the option of deciding if they want to enable overhaul mode once they receive a connection request from a player with it enabled, and visa-versa. Preferred defaults and auto-allow/decline options can be configured.  
 Enabling Overhaul mode by default is highly recommended, since it dramatically improves pvp experience on a number of metrics (weapon viability, magic use, and more) while still keeping the fundamental dark souls 1 pvp experience intact.  
   
