@@ -259,6 +259,8 @@ public:
 
     static std::optional<int32_t*> get_online_area_id_ptr();
 
+    static std::optional<int32_t*> get_area_id_ptr();
+
     static std::optional<int32_t*> get_saved_chars_menu_flag();
 
     static std::optional<uint8_t*> get_saved_chars_preview_data();

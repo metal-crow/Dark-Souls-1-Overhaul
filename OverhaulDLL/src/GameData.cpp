@@ -244,6 +244,7 @@ static float* set_current_player_animation_speed_cache = NULL;
 static uint8_t* area_num_cache = NULL;
 static uint8_t* world_num_cache = NULL;
 static int32_t* mp_id_cache = NULL;
+static int32_t* area_id_cache = NULL;
 static int32_t* saved_chars_menu_flag_cache = NULL;
 static uint8_t* saved_chars_preview_data_cache = NULL;
 static uint32_t* pc_playernum_cache = NULL;
@@ -284,6 +285,8 @@ void Game::preload_function_caches() {
     Game::get_world_number();
     mp_id_cache = NULL;
     Game::get_online_area_id_ptr();
+    area_id_cache = NULL;
+    Game::get_area_id_ptr();
     saved_chars_menu_flag_cache = NULL;
     Game::get_saved_chars_menu_flag();
     saved_chars_preview_data_cache = NULL;
@@ -948,6 +951,25 @@ std::optional<int32_t*> Game::get_online_area_id_ptr() {
     else {
         mp_id_cache = mp_id.resolve();
         return mp_id_cache;
+    }
+}
+
+std::optional<int32_t*> Game::get_area_id_ptr()
+{
+    if (area_id_cache)
+    {
+        return area_id_cache;
+    }
+
+    sp::mem::pointer area_id = sp::mem::pointer<int32_t>((void*)(Game::world_chr_man_imp), { 0x68, 0x358 });
+    if (area_id.resolve() == NULL)
+    {
+        return std::nullopt;
+    }
+    else
+    {
+        area_id_cache = area_id.resolve();
+        return area_id_cache;
     }
 }
 
