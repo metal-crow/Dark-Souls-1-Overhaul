@@ -54,7 +54,7 @@ This only affects you, the client. If you are playing with a non-mod user, they 
 
 * The game has increased memory capacity (larger files can be loaded)
 
-* You can now invade or summon phantoms __anywhere__.  
+* You can now summon phantoms anywhere.  
 This solution is imperfect, as areas where you could not do multiplayer before but are right next to areas you could (I.E Undead Burg bonfire), are treated as seperate multiplayer areas.  
 (Note that DSR allows summons even with the boss dead).  
 
