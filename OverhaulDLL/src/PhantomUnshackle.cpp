@@ -69,6 +69,10 @@ bool change_mp_zone(void* unused) {
                 //apparently this value can't be set to whatever, the server may validate it or something
                 //a value of 100XXX seems to work reliably
                 *get_online_area_id_ptr = 100000 + Game::get_area_number().value_or(0)*100 + Game::get_world_number().value_or(0);
+
+                //this should always resolve if get_online_area_id_ptr() does
+                //need to update it as well
+                *Game::get_area_id_ptr().value() = *get_online_area_id_ptr;
             }
         }
     }
