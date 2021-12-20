@@ -1,6 +1,6 @@
 #pragma once
-#ifndef AllAreasSearchInvasion_H
-#define AllAreasSearchInvasion_H
+#ifndef CustomInvasionTypes_H
+#define CustomInvasionTypes_H
 
 #include <cstdint>
 
@@ -107,12 +107,14 @@ static const uint32_t MultiPlayerRegionIDs[] =
     180002,
 };
 
-class AllAreasSearchInvasion
+//This handles WexDust invasions and Infinite Upwards SL search invasions
+class CustomInvasionTypes
 {
 public:
     static void start();
 
     static const uint32_t AllAreasInvadingOrbSpEffect = 18;
+    static const uint32_t InfiniteUpwardsInvadingOrbSpEffect = 19;
 private:
     static const uint64_t Send_Type17_GeneralRequestTask_offset = 0xbcce19;
 };

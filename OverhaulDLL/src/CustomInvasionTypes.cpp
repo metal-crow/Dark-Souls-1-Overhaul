@@ -1,4 +1,4 @@
-#include "AllAreasSearchInvasion.h"
+#include "CustomInvasionTypes.h"
 #include "DarkSoulsOverhaulMod.h"
 #include "SP/memory/injection/asm/x64.h"
 #include "MainLoop.h"
@@ -9,16 +9,18 @@ extern "C" {
     void Send_Type17_GeneralRequestTask_injection_helper(uint64_t RequestGetBreakInTargetList_Data);
 }
 
-void AllAreasSearchInvasion::start()
+void CustomInvasionTypes::start()
 {
-    ConsoleWrite("Enabling All Areas Search Invasion...");
+    ConsoleWrite("Enabling Custom Invasions...");
 
-    uint8_t *write_address = (uint8_t*)(AllAreasSearchInvasion::Send_Type17_GeneralRequestTask_offset + Game::ds1_base);
+    uint8_t *write_address = (uint8_t*)(CustomInvasionTypes::Send_Type17_GeneralRequestTask_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &Send_Type17_GeneralRequestTask_injection_return, 1, &Send_Type17_GeneralRequestTask_injection);
 }
 
 static size_t current_mpregionid_offset = 0;
 static bool UsingAllAreasInvadeOrb = false;
+static uint32_t current_soullevel_offset = 0;
+static bool UsingInfiniteUpwardsInvadeOrb = false;
 
 void Send_Type17_GeneralRequestTask_injection_helper(uint64_t RequestGetBreakInTargetList_Data)
 {
@@ -30,14 +32,21 @@ void Send_Type17_GeneralRequestTask_injection_helper(uint64_t RequestGetBreakInT
 
     //If we have the special speffect on, start the custom invasion state
     //This speffect only stays for the 1st frame/send. So we have to remember it
-    if (Game::player_has_speffect((uint64_t)(playerins_o.value()), { AllAreasSearchInvasion::AllAreasInvadingOrbSpEffect }))
+    if (Game::player_has_speffect((uint64_t)(playerins_o.value()), { CustomInvasionTypes::AllAreasInvadingOrbSpEffect }))
     {
         UsingAllAreasInvadeOrb = true;
+        UsingInfiniteUpwardsInvadeOrb = false;
+    }
+    else if (Game::player_has_speffect((uint64_t)(playerins_o.value()), { CustomInvasionTypes::InfiniteUpwardsInvadingOrbSpEffect }))
+    {
+        UsingAllAreasInvadeOrb = false;
+        UsingInfiniteUpwardsInvadeOrb = true;
     }
     //If the player is doing any other normal multiplayer types, don't do this custom code
     else if (Game::player_has_speffect((uint64_t)(playerins_o.value()), { 4, 10, 11, 16, 26, 27, 15 }))
     {
         UsingAllAreasInvadeOrb = false;
+        UsingInfiniteUpwardsInvadeOrb = false;
     }
 
     if (UsingAllAreasInvadeOrb)
@@ -57,5 +66,25 @@ void Send_Type17_GeneralRequestTask_injection_helper(uint64_t RequestGetBreakInT
     {
         //reset the area id list to the start
         current_mpregionid_offset = 0;
+    }
+
+    if (UsingInfiniteUpwardsInvadeOrb)
+    {
+        //Add an offset to the SL we tell the server, so it returns a new range of connection results
+        uint32_t pc_sl = *(uint32_t*)(RequestGetBreakInTargetList_Data + 28);
+        *(uint32_t*)(RequestGetBreakInTargetList_Data + 28) += current_soullevel_offset;
+        current_soullevel_offset += (20 + (uint32_t)(0.1f*pc_sl)); //increase by the search's upper bound: 20+0.1*SL
+        if (pc_sl + current_soullevel_offset > 713)
+        {
+            current_soullevel_offset = 0;
+        }
+
+        //set the timer to be closer to the refresh time (30 seconds)
+        Game::set_invasion_refresh_timer(15.0f);
+    }
+    else
+    {
+        //reset the offset
+        current_soullevel_offset = 0;
     }
 }

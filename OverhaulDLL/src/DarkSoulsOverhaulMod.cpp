@@ -26,7 +26,7 @@
 #include "ModNetworking.h"
 #include "MainLoop.h"
 #include "FileReloading.h"
-#include "AllAreasSearchInvasion.h"
+#include "CustomInvasionTypes.h"
 
 HMODULE d3d11_module;
 FILE* logfile = NULL;
@@ -103,7 +103,7 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     FixAnkles::start();
     ModNetworking::start();
     //TEMP//FileReloading::start();
-    AllAreasSearchInvasion::start();
+    CustomInvasionTypes::start();
     Game::disable_low_fps_disconnect(Mod::disable_low_fps_disconnect);
 
     ConsoleWrite("All initial loading finished!");
