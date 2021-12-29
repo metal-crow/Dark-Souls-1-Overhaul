@@ -83,10 +83,10 @@ Hope to obsolete this when i make compatable with ModEngine2
 
 * Fix for the halberd instant running attack glitch in mud and pvp
 
-* New item, "Searching Red Eye Orb" (id 104), that searches all multiplayer areas while trying to invade  
+* New item, "Searching Red Eye Orb" (id 104, available from the Undead Merchant), that searches all multiplayer areas while trying to invade  
 This allows you to invade any area across the entire game via 1 single use. It will continually search all areas rapidly, until cancelled or invasion found
 
-* New item, "Unbound Red Eye Orb" (id 105), that does PTDE style red eye invasions: searching infinitely upwards in Soul Level.  
+* New item, "Unbound Red Eye Orb" (id 105, available from the Undead Merchant), that does PTDE style red eye invasions: searching infinitely upwards in Soul Level.  
 This means, as a SL 100 character, you can invade anyone from SL 90 to SL 713.  
 This doesn't also enable infinite upwards weapon level searching, however.
 
