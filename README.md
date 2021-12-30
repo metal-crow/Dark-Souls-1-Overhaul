@@ -5,20 +5,12 @@ https://drive.google.com/drive/folders/0BzSQv5PaltE-ci1LaDh5MDRId2M
   
 ### ToDo list:  
 https://trello.com/b/hay0mA7U/general-todo  
-   
-### Balance Changes and Suggestions:  
-https://docs.google.com/document/d/1qlg4kQDUq45ufqmX8PreXchwibFwJJ3ZzK0khrHGNTY/  
-
-### Collaborative Ghidra database
-https://github.com/soulsmods/Soulsborne-Modding-Wiki/wiki/Ghidra-Shared-Repo
-
+  
 ### Custom Archive files (new SFX, Effects, etc):
 https://gitlab.com/metal-crow/darksoulsremastered-overhaul-archives
 
 ### Requirments
 This requires the [Microsoft Visual C++ Redistributable for Visual Studio 2015-2019 ](https://aka.ms/vs/16/release/vc_redist.x64.exe)
-
-Building from source requires Visual Studio 2017, and access to some private repos (ask metalcrow or SeanP)  
 
 
 ## Description
