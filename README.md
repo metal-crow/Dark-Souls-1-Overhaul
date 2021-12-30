@@ -14,12 +14,21 @@ This requires the [Microsoft Visual C++ Redistributable for Visual Studio 2015-2
 
 
 ## Description
-The mod is completely backwards compatible with vanilla dark souls 1 by default. In __legacy__ mode, it includes a number of significant but fully backwards compatible bugfixes, quality-of-life improvements, visual glitch fixes, and functional anti-cheat measures.  
+The mod is completely backwards compatible with vanilla dark souls 1 by default. It will __not__ separate you from vanilla players.  
+  - As a host, anyone connecting with you will confrom to your mod's mode. 
+  	- I.e, if you are in overhaul mode and they are in legacy, they will either change to overhaul or disconnect.
+  	- If it's a non-mod user who is connecting, you can configure if you want to deny their connection attempt, or have your own mode change to match them (the default) via F4.
+  	- The one exception to this is if you already have another mod user connected, and a non-mod user tries to join. In that case, they will always fail to connect.
+  - As a guest, you can configure who you want to be able to connect to. By default you accept all connections and change your mode to match the host.
+  	- You can toggle this behavior with F1 (to disallow connecting to non-mod hosts), F2 (to disallow connecting to legacy mode hosts), and F3 (to disallow connecting to overhaul mode hosts).
+
+Mods can be switched between by pressing F5.
+
+__Legacy__ mode is the default starting mode the mod is in (this can be changed in the ini). It includes a number of significant but fully backwards compatible bugfixes, quality-of-life improvements, visual glitch fixes, and functional anti-cheat measures.  
 It also unlocks a number of in-engine limitations and fixes other engine problems (including disabling the terrible built-in anti-cheat).  
 
-If you so wish, you can enable __overhaul__ mode (by pressing F5 to switch modes) at any time to get the full suite of improvements this mod gives.  
-This will __not__ separate you from vanilla players. A player will have the option of deciding if they want to enable overhaul mode once they receive a connection request from a player with it enabled, and visa-versa. Preferred defaults and auto-allow/decline options can be configured.  
-Enabling Overhaul mode by default is highly recommended, since it dramatically improves pvp experience on a number of metrics (weapon viability, magic use, and more) while still keeping the fundamental dark souls 1 pvp experience intact.  
+__Overhaul__ mode can be switched on to get the full suite of improvements this mod gives. It dramatically improves pvp experience on a number of metrics (weapon viability, magic use, and more) while still keeping the fundamental dark souls 1 pvp experience intact.  
+  
   
 ## Changelist
 	
