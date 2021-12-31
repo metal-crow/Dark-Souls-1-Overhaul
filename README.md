@@ -15,7 +15,7 @@ This requires the [Microsoft Visual C++ Redistributable for Visual Studio 2015-2
 
 ## Description
 The mod is completely backwards compatible with vanilla dark souls 1 by default. It will __not__ separate you from vanilla players.  
-  - As a host, anyone connecting with you will confrom to your mod's mode. 
+  - As a host, anyone connecting with you will conform to your mod's mode. 
   	- I.e, if you are in overhaul mode and they are in legacy, they will either change to overhaul or disconnect.
   	- If it's a non-mod user who is connecting, you can configure if you want to deny their connection attempt, or have your own mode change to match them (the default) via F4.
   	- The one exception to this is if you already have another mod user connected, and a non-mod user tries to join. In that case, they will always fail to connect.
