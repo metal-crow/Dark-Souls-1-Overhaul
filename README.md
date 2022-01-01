@@ -80,7 +80,7 @@ Hope to obsolete this when i make compatable with ModEngine2
 
 * Option to disable the durability system
 
-* Steam netcode updated to reduce latency and hide IP address
+* Steam netcode updated to reduce latency and hide IP address (only if both players have mod)
 
 * Fix for the halberd instant running attack glitch in mud and pvp
 
