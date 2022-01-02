@@ -149,6 +149,8 @@ public:
 
     static uint64_t unknown_global_struct_141d283a8;
 
+    static uint64_t frpg_net_man;
+
     static const uint64_t calculate_attack_damage_offset = 0x2a8ead6;
 
     static const uint64_t char_loaded_injection_offset = 0x24D8D0;
@@ -312,6 +314,8 @@ public:
     static bool set_invasion_refresh_timer(float newtime);
 
     static uint32_t get_player_chr_type(uint64_t playerIns);
+
+    static std::optional<int32_t*> get_MP_AreaID_ptr();
 
     /*
      * Help speedup some functions by, whenever we're loaded into an area,

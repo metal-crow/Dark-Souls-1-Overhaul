@@ -54,6 +54,8 @@ uint64_t Game::bullet_man = NULL;
 
 uint64_t Game::unknown_global_struct_141d283a8 = NULL;
 
+uint64_t Game::frpg_net_man = NULL;
+
 // Player character status (loading, human, co-op, invader, hollow)
 sp::mem::pointer<int32_t> Game::player_char_status;
 
@@ -140,6 +142,8 @@ void Game::init()
     Game::bullet_man = Game::ds1_base + 0x1d177e8;
 
     Game::unknown_global_struct_141d283a8 = 0x141d283a8;
+
+    Game::frpg_net_man = 0x141d27d60;
 }
 
 void Game::injections_init()
@@ -257,6 +261,7 @@ static void** PlayerIns_cache = NULL;
 static void** player_animationMediator_cache = NULL;
 static void** host_player_gamedata_cache = NULL;
 static bool* display_name_cache = NULL;
+static int32_t** MP_AreaID_cache = NULL;
 
 void Game::preload_function_caches() {
     ConsoleWrite("Cache loading");
@@ -309,6 +314,8 @@ void Game::preload_function_caches() {
     Game::get_player_animationMediator();
     host_player_gamedata_cache = NULL;
     Game::get_host_player_gamedata();
+    MP_AreaID_cache = NULL;
+    Game::get_MP_AreaID_ptr();
 
     Sleep(10);
     //this pointer is a bit late to resolve on load
@@ -1417,4 +1424,23 @@ bool Game::set_invasion_refresh_timer(float newtime)
 uint32_t Game::get_player_chr_type(uint64_t playerIns)
 {
     return *(uint32_t*)(playerIns + 0xD4);
+}
+
+std::optional<int32_t*> Game::get_MP_AreaID_ptr()
+{
+    if (MP_AreaID_cache)
+    {
+        return *MP_AreaID_cache;
+    }
+
+    sp::mem::pointer MP_AreaID = sp::mem::pointer<int32_t*>((void*)(Game::frpg_net_man), { 0xA8C });
+    if (MP_AreaID.resolve() == NULL)
+    {
+        return std::nullopt;
+    }
+    else
+    {
+        MP_AreaID_cache = MP_AreaID.resolve();
+        return *MP_AreaID_cache;
+    }
 }
