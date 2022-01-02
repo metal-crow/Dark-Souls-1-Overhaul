@@ -99,7 +99,7 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     InvisBackstabFix::start();
     AnimationEdits::start();
     SpellDesync::start();
-    PhantomUnshackle::start();
+    //PhantomUnshackle::start();
     FixAnkles::start();
     ModNetworking::start();
     FileReloading::start();
