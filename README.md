@@ -9,10 +9,13 @@ https://trello.com/b/hay0mA7U/general-todo
 ### Custom Archive files (new SFX, Effects, etc):
 https://gitlab.com/metal-crow/darksoulsremastered-overhaul-archives
 
+### Nexus Mods link
+https://www.nexusmods.com/darksoulsremastered/mods/466
+
 ### Installation
 This requires the [Microsoft Visual C++ Redistributable for Visual Studio 2015-2019 ](https://aka.ms/vs/16/release/vc_redist.x64.exe). You should already have it, but just in case.  
   
-Unzip the contents of the zip into your DARK SOULS REMASTERED folder to install (so d3d11.dll should be in the same folder as the game exe). If a command window pops up on game start (which says Beta3 as one of it's first lines), the mod is installed.  
+Unzip the contents of the zip into your DARK SOULS REMASTERED folder to install (so d3d11.dll should be in the same folder as the game exe). If a command window pops up on game start, the mod is installed.  
   
 To uninstall or disable the mod, remove d3d11.dll.
 
