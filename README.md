@@ -9,9 +9,12 @@ https://trello.com/b/hay0mA7U/general-todo
 ### Custom Archive files (new SFX, Effects, etc):
 https://gitlab.com/metal-crow/darksoulsremastered-overhaul-archives
 
-### Requirments
-This requires the [Microsoft Visual C++ Redistributable for Visual Studio 2015-2019 ](https://aka.ms/vs/16/release/vc_redist.x64.exe)
-
+### Installation
+This requires the [Microsoft Visual C++ Redistributable for Visual Studio 2015-2019 ](https://aka.ms/vs/16/release/vc_redist.x64.exe). You should already have it, but just in case.  
+  
+Unzip the contents of the zip into your DARK SOULS REMASTERED folder to install (so d3d11.dll should be in the same folder as the game exe). If a command window pops up on game start (which says Beta3 as one of it's first lines), the mod is installed.  
+  
+To uninstall or disable the mod, remove d3d11.dll.
 
 ## Description
 The mod is completely backwards compatible with vanilla dark souls 1 by default. It will __not__ separate you from vanilla players.  
@@ -70,9 +73,6 @@ Specify folder location + filenames to use, and the alternate path will be used 
 
 * Fix the "broken ankles" bug when rolling
 
-* (Tentatively) compatable with [DSR Watchdog](https://www.nexusmods.com/darksoulsremastered/mods/160). Rename the d3d11.dll file given by watchdog to watchdog.dll, put it in the same folder as DarkSoulsRemastered.exe, and in this mod's d3d11_mod.ini, set `d3d11Chain=watchdog.dll`  
-This will be obsolete eventually
-
 * Crash handler and reporter  
 Hope to obsolete this when i make compatable with ModEngine2
 
@@ -112,8 +112,6 @@ You can freely walk, run, and rotate as you are casting them, and pivot cancels 
 These include everything EXCEPT: Combustions, Firestorms, and all miracles but Lighting Spear and Darkmoon Blade/Sunlight Blade  
 
 * Fix to prevent curved swords from stunlocking
-
-* Backstab distance and angle has been reduced. (60 degrees to 45, 1.5 distance to 1)
 
 * Large scale health increase across the board.  
 Average SL 125 build should be \~3k HP.
