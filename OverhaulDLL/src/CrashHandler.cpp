@@ -417,11 +417,11 @@ void crash_handler(char* message_str)
 
     // Send the report
     if (send_report != 0) {
-        //generate name for this upload (hostname + datetime)
+        //generate name for this upload (hostname + version + datetime)
         char* username;
         errno_t err = _dupenv_s(&username, NULL, "USERNAME");
         char crashname[120];
-        snprintf(crashname, sizeof(crashname), "%s%s", username, time_str);
+        snprintf(crashname, sizeof(crashname), "%s %s %s", username, VERSION_STRING, time_str);
 
         //upload crash
         GoogleCloudLib::CreateClient(key_path);
