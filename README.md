@@ -55,7 +55,7 @@ This only affects you, the client. If you are playing with a non-mod user, they 
 
 * The game has increased memory capacity (larger files can be loaded)
 
-* You can now summon phantoms anywhere.  
+* ~~You can now summon phantoms anywhere.~~  
 This solution is imperfect, as areas where you could not do multiplayer before but are right next to areas you could (I.E Undead Burg bonfire), are treated as seperate multiplayer areas.  
 (Note that DSR allows summons even with the boss dead).  
 
@@ -91,9 +91,9 @@ This allows you to invade any area across the entire game via 1 single use. It w
 This means, as a SL 100 character, you can invade anyone from SL 90 to SL 713.  
 This doesn't also enable infinite upwards weapon level searching, however.
 
-### Overhaul (some stuff temporarily disabled)
+### Overhaul
 
-* ~~Gestures can be canceled via rolling~~
+* Gestures can be canceled via rolling
 
 * Animations:
   * Firestorm startup and main animation have been sped up (x10 and x1.6)
@@ -107,13 +107,13 @@ This doesn't also enable infinite upwards weapon level searching, however.
 HP recovery is equal to `(0.05 + (upgrade level of weapon / 10.0)) * damage given`  
 Time to recover the hp is 5000 ms, or on weapon toggle.  
 
-* ~~Some spell types no longer lock your movement or rotation while they are being casted~~  
-~~You can freely walk, run, and rotate as you are casting them, and pivot cancels work as normal~~    
-~~These include everything EXCEPT: Combustions, Firestorms, and all miracles but Lighting Spear and Darkmoon Blade/Sunlight Blade~~  
+* Some spell types no longer lock your movement or rotation while they are being casted  
+You can freely walk, run, and rotate as you are casting them, and pivot cancels work as normal    
+These include everything EXCEPT: Combustions, Firestorms, and all miracles but Lighting Spear and Darkmoon Blade/Sunlight Blade  
 
 * Fix to prevent curved swords from stunlocking
 
-* ~~Backstab distance and angle has been reduced. (60 degrees to 45, 1.5 distance to 1)~~
+* Backstab distance and angle has been reduced. (60 degrees to 45, 1.5 distance to 1)
 
-* ~~Large scale health increase across the board.~~  
-~~Average SL 125 build should be \~3k HP.~~
+* Large scale health increase across the board.  
+Average SL 125 build should be \~3k HP.
