@@ -1,7 +1,7 @@
 # Dark Souls 1 PvP Fixes and Overhaul  
   
 ### Info Google doc (notes and RE'd knowledge goes here):  
-https://drive.google.com/drive/folders/0BzSQv5PaltE-ci1LaDh5MDRId2M  
+https://drive.google.com/drive/folders/0BzSQv5PaltE-ci1LaDh5MDRId2M?resourcekey=0-9E8yBDVHw0gzKEuWYvCdEA&usp=sharing
   
 ### ToDo list:  
 https://trello.com/b/hay0mA7U/general-todo  
