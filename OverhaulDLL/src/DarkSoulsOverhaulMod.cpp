@@ -31,6 +31,48 @@
 HMODULE d3d11_module;
 FILE* logfile = NULL;
 
+//VERY BASIC update check
+void Update_Check()
+{
+    char cmd[] = "Powershell.exe -Command \"Invoke-WebRequest https://raw.githubusercontent.com/metal-crow/Dark-Souls-1-Overhaul/master/VERSION -O VERSION\"";
+
+    //download the new version info
+    PROCESS_INFORMATION pi;
+    STARTUPINFO si;
+    ZeroMemory(&si, sizeof(si));
+    si.cb = sizeof(si);
+    ZeroMemory(&pi, sizeof(pi));
+    bool err = CreateProcess(NULL, cmd, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi);
+    if (err)
+    {
+        ConsoleWrite("Update_Check failed:%d", GetLastError());
+    }
+    WaitForSingleObject(pi.hProcess, 3 * 1000); // Wait 3 sec max
+    TerminateProcess(pi.hProcess, 0);
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
+
+    //read the new version info
+    FILE *fp = NULL;
+    if (fopen_s(&fp, "./VERSION", "r") != 0 || fp == NULL)
+    {
+        return;
+    }
+    uint64_t new_version;
+    fscanf_s(fp, "%llu", &new_version);
+    fclose(fp);
+
+    if (new_version > VERSION_RAW)
+    {
+        MessageBox(NULL,
+            std::string("There is a new update available! Please go to the nexus page and download the newest version!").c_str(),
+            std::string("Update").c_str(),
+            MB_OK);
+        ConsoleWrite("Found new update, version %llu is > our version %llu", new_version, VERSION_RAW);
+    }
+    ConsoleWrite("No updates found");
+}
+
 /*
     Called from DllMain when the plugin DLL is first loaded into memory (PROCESS_ATTACH case).
     This means this code will be run before _any_ Dark Souls code is.
@@ -113,6 +155,8 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
 
     //start callback for setting the preferred mode
     MainLoop::setup_mainloop_callback(Mod::mode_setting_process, NULL, "mode_setting_process");
+
+    Update_Check();
 
     return 0;
 }

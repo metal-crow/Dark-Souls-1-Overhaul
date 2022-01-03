@@ -92,7 +92,9 @@ This allows you to invade any area across the entire game via 1 single use. It w
 
 * New item, "Unbound Red Eye Orb" (id 105, available from the Undead Merchant), that does PTDE style red eye invasions: searching infinitely upwards in Soul Level.  
 This means, as a SL 100 character, you can invade anyone from SL 90 to SL 713.  
-This doesn't also enable infinite upwards weapon level searching, however.
+This doesn't also enable infinite upwards weapon level searching, however.  
+
+* Basic update check system
 
 ### Overhaul
 
