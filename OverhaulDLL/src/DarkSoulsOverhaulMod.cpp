@@ -43,7 +43,7 @@ void Update_Check()
     si.cb = sizeof(si);
     ZeroMemory(&pi, sizeof(pi));
     bool err = CreateProcess(NULL, cmd, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi);
-    if (err)
+    if (err == 0)
     {
         ConsoleWrite("Update_Check failed:%d", GetLastError());
     }
