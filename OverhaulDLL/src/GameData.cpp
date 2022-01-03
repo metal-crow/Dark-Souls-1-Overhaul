@@ -904,7 +904,7 @@ std::optional<uint32_t> Game::get_player_char_max_hp() {
 //Returns a value between -PI and PI
 std::optional<float> Game::get_entity_rotation(void* entity_ptr) {
     sp::mem::pointer rotation = sp::mem::pointer<float>((void*)((uint64_t)entity_ptr + 0x68), { 0x28, 0x4 });
-    if (rotation.fast_resolve() == NULL) {
+    if (entity_ptr == NULL || rotation.fast_resolve() == NULL) {
         return std::nullopt;
     }
     else {
