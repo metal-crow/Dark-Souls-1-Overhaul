@@ -63,6 +63,7 @@
     <ClInclude Include="include\Xinput_1_3.h" />
     <ClInclude Include="ui\crash_hander_ui_resource.h" />
     <None Include="..\README.md" />
+    <None Include="..\VERSION" />
     <None Include="include\AnimationEdits.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </ExcludedFromBuild>

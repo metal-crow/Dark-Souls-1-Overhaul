@@ -197,6 +197,7 @@
     <None Include="include\InputUtil.h">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="..\VERSION" />
   </ItemGroup>
   <ItemGroup>
     <MASM Include="src\BloodborneRallySystemASM.asm">
