@@ -83,61 +83,61 @@ inline Status status(XINPUT_GAMEPAD *old, XINPUT_GAMEPAD *current, uint16_t butt
 
 } // namespace Button
 
+
+static const uint64_t XInput_Get_State_offset = 0x82AE70;
+static const uint64_t IDirectInputDevice8GetDeviceState_Keyboard_offset = 0xe27300;
+static const uint64_t IDirectInputDevice8GetDeviceState_DIJOYSTATE2_offset = 0xc9ad8e;
+
 extern "C" {
-    uint64_t intercept_IDirectInputDevice8GetDeviceState_inject_return;
-    void intercept_IDirectInputDevice8GetDeviceState_inject();
-    void gather_DirectInput8GetDeviceState_helper(uint64_t);
-}
+    uint64_t XInput_Get_State_inject_return;
+    void XInput_Get_State_inject();
+    DWORD WINAPI intercept_xinput_get_state(DWORD, XINPUT_STATE *);
 
-void gather_DirectInput8GetDeviceState_helper(uint64_t arg) {
-    uint64_t GetDeviceState_func = *(uint64_t*)(*(uint64_t*)(*(uint64_t*)(arg + 8) + 0) + 0x48);
-    //inject it at the end of the func
-    sp::mem::code::x64::inject_jmp_14b((void*)(GetDeviceState_func+0x141), &intercept_IDirectInputDevice8GetDeviceState_inject_return, 1, &intercept_IDirectInputDevice8GetDeviceState_inject);
-}
+    uint64_t IDirectInputDevice8GetDeviceState_Keyboard_injection_return;
+    void IDirectInputDevice8GetDeviceState_Keyboard_injection();
+    void intercept_IDirectInputDevice8GetDeviceState_Keyboard(LPVOID);
 
+    uint64_t IDirectInputDevice8GetDeviceState_DIJOYSTATE2_injection_return;
+    void IDirectInputDevice8GetDeviceState_DIJOYSTATE2_injection();
+    void intercept_IDirectInputDevice8GetDeviceState_DIJOYSTATE2(LPVOID);
+}
 
 // Initializes pointers and other data used to monitor gamepad input
 void initialize() {
     ConsoleWrite("Initializing Input hooks...");
 
-    apply_function_intercepts();
+    // Patches game calls to XInput and DirectInput API funcs, redirecting them to interceptor functions
+
+    // XInputGetState
+    //    Docs: https://msdn.microsoft.com/en-us/library/windows/desktop/microsoft.directx_sdk.reference.xinputgetstate(v=vs.85).aspx
+    void *write_address = (uint8_t*)Game::ds1_base + XInput_Get_State_offset;
+    sp::mem::code::x64::inject_jmp_14b(write_address, &XInput_Get_State_inject_return, 0, &XInput_Get_State_inject);
+
+    // IDirectInputDevice8GetDeviceState call for the keyboard
+    write_address = (uint8_t*)Game::ds1_base + IDirectInputDevice8GetDeviceState_Keyboard_offset;
+    sp::mem::code::x64::inject_jmp_14b(write_address, &IDirectInputDevice8GetDeviceState_Keyboard_injection_return, 0, &IDirectInputDevice8GetDeviceState_Keyboard_injection);
+
+    // IDirectInputDevice8GetDeviceState call for the joystick
+    write_address = (uint8_t*)Game::ds1_base + IDirectInputDevice8GetDeviceState_DIJOYSTATE2_offset;
+    sp::mem::code::x64::inject_jmp_14b(write_address, &IDirectInputDevice8GetDeviceState_DIJOYSTATE2_injection_return, 3, &IDirectInputDevice8GetDeviceState_DIJOYSTATE2_injection);
 }
 
-extern "C" {
-    DWORD WINAPI intercept_xinput_get_state(DWORD, XINPUT_STATE *);
-    void intercept_IDirectInputDevice8GetDeviceState(DWORD, LPVOID);
+static uint8_t keyboard_old_state[256];
+
+void intercept_IDirectInputDevice8GetDeviceState_Keyboard(LPVOID lpvData)
+{
+    uint8_t* data = (uint8_t*)lpvData;
+    handle_input(NULL, NULL, NULL, NULL, keyboard_old_state, data, true, 0);
+    memcpy(keyboard_old_state, data, 256);
 }
 
-void intercept_IDirectInputDevice8GetDeviceState(DWORD cbData, LPVOID lpvData) {
-    //guess the data struct type based on size
-    switch (cbData) {
-        //272
-        case sizeof(DIJOYSTATE2):
-        {
-            static DIJOYSTATE2 old_state;
-            DIJOYSTATE2 * data = (DIJOYSTATE2*)lpvData;
-            handle_input(NULL, NULL, &old_state, data, NULL, NULL, true, 0);
-            old_state = *data;
-            break;
-        }
-        //c_dfDIKeyboard
-        case 256:
-        {
-            static uint8_t old_state[256];
-            uint8_t* data = (uint8_t*)lpvData;
-            handle_input(NULL, NULL, NULL, NULL, old_state, data, true, 0);
-            memcpy(old_state, data, 256);
-            break;
-        }
-        //80
-        case sizeof(DIJOYSTATE):
-        //20
-        case sizeof(DIMOUSESTATE2):
-        //16
-        case sizeof(DIMOUSESTATE):
-        default:
-            break;
-    }
+static DIJOYSTATE2 DIJOYSTATE2_old_state;
+
+void intercept_IDirectInputDevice8GetDeviceState_DIJOYSTATE2(LPVOID lpvData)
+{
+    DIJOYSTATE2 * data = (DIJOYSTATE2*)lpvData;
+    handle_input(NULL, NULL, &DIJOYSTATE2_old_state, data, NULL, NULL, true, 0);
+    DIJOYSTATE2_old_state = *data;
 }
 
 // Called when the game attemps to call XInputGetState
@@ -162,7 +162,6 @@ DWORD WINAPI intercept_xinput_get_state(DWORD dwUserIndex, XINPUT_STATE *pState)
     } // switch (result)
     return result;
 }
-
 
 void handle_input(XINPUT_GAMEPAD* xold, XINPUT_GAMEPAD* xcurrent, DIJOYSTATE2* djold, DIJOYSTATE2* djcurrent, uint8_t* kbold, uint8_t* kbcurrent, bool changed, int player) {
     static bool reset_lock_rotation = false;
@@ -252,28 +251,5 @@ void handle_input(XINPUT_GAMEPAD* xold, XINPUT_GAMEPAD* xcurrent, DIJOYSTATE2* d
         }
     }
 }
-
-static const uint64_t XInput_Get_State_offset = 0x82AE70;
-static const uint64_t DInput_GetDeviceState_gather_offset = 0xE2813B;
-
-extern "C" {
-    uint64_t XInput_Get_State_inject_return;
-    void XInput_Get_State_inject();
-    uint64_t gather_DirectInput8GetDeviceState_inject_return;
-    void gather_DirectInput8GetDeviceState_inject();
-}
-
-// Patches game calls to XInput and DirectInput API funcs, redirecting them to interceptor functions
-void apply_function_intercepts() {
-    // XInputGetState
-    //    Docs: https://msdn.microsoft.com/en-us/library/windows/desktop/microsoft.directx_sdk.reference.xinputgetstate(v=vs.85).aspx
-    void *write_address = (uint8_t*)Game::ds1_base + XInput_Get_State_offset;
-    sp::mem::code::x64::inject_jmp_14b(write_address, &XInput_Get_State_inject_return, 0, &XInput_Get_State_inject);
-
-    //intercept a known call to IDirectInputDevice8::GetDeviceState to get it's in-memory address
-    write_address = (uint8_t*)Game::ds1_base + DInput_GetDeviceState_gather_offset;
-    sp::mem::code::x64::inject_jmp_14b(write_address, &gather_DirectInput8GetDeviceState_inject_return, 4, &gather_DirectInput8GetDeviceState_inject);
-}
-
 
 } // namespace Input

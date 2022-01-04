@@ -1,6 +1,6 @@
 _DATA   SEGMENT
 
-GetDeviceStateInjected  db  0
+LAB_140e27327   dq  140e27327h
 
 _DATA   ENDS
 
@@ -17,23 +17,17 @@ jmp    intercept_xinput_get_state
 
 XInput_Get_State_inject ENDP
 
-;intercept a call to DirectInput8GetDeviceState so we can find it and inject to it
-EXTERN gather_DirectInput8GetDeviceState_inject_return: qword
-EXTERN gather_DirectInput8GetDeviceState_helper: proc
 
-PUBLIC gather_DirectInput8GetDeviceState_inject
-gather_DirectInput8GetDeviceState_inject PROC
+EXTERN intercept_IDirectInputDevice8GetDeviceState_Keyboard: PROC
+EXTERN IDirectInputDevice8GetDeviceState_Keyboard_injection_return: qword
 
-;original code
-lea     r8, [rbx+1B8h]
-mov     edx, 14h
-mov     rax, [rcx]
+PUBLIC IDirectInputDevice8GetDeviceState_Keyboard_injection
+IDirectInputDevice8GetDeviceState_Keyboard_injection PROC
 
-;get the address to inject to and inject
-cmp     byte ptr[GetDeviceStateInjected], 0
-jne     orig_code
+;verify the return value is ok
+cmp     eax, 0
+jne     exit
 
-sub     rsp, 8
 sub     rsp, 10h
 movdqu  [rsp], xmm0
 sub     rsp, 10h
@@ -49,12 +43,12 @@ push    r8
 push    r9
 push    r10
 push    r11
-sub     rsp, 20h
+sub     rsp, 28h
 
-call    gather_DirectInput8GetDeviceState_helper
-mov     byte ptr[GetDeviceStateInjected], 1
+lea     rcx, [rbx+1B0h+8] ;the 1st qword is not keyboard data
+call    intercept_IDirectInputDevice8GetDeviceState_Keyboard
 
-add     rsp, 20h
+add     rsp, 28h
 pop     r11
 pop     r10
 pop     r9
@@ -70,23 +64,24 @@ movdqu  xmm1, [rsp]
 add     rsp, 10h
 movdqu  xmm0, [rsp]
 add     rsp, 10h
-add     rsp, 8
 
 ;original code
-orig_code:
-call    qword ptr [rax+48h]
-jmp     gather_DirectInput8GetDeviceState_inject_return
+exit:
+cmp     eax, 8007001Eh
+jz      continue
+jmp     qword ptr [LAB_140e27327]
+continue:
+mov     rcx, [rbx+1B0h]
+jmp     IDirectInputDevice8GetDeviceState_Keyboard_injection_return
+IDirectInputDevice8GetDeviceState_Keyboard_injection ENDP
 
-gather_DirectInput8GetDeviceState_inject ENDP
 
-;hook DirectInput8GetDeviceState call
-extern intercept_IDirectInputDevice8GetDeviceState_inject_return: qword
-extern intercept_IDirectInputDevice8GetDeviceState: proc
+EXTERN intercept_IDirectInputDevice8GetDeviceState_DIJOYSTATE2: PROC
+EXTERN IDirectInputDevice8GetDeviceState_DIJOYSTATE2_injection_return: qword
 
-public intercept_IDirectInputDevice8GetDeviceState_inject
-intercept_IDirectInputDevice8GetDeviceState_inject PROC
+PUBLIC IDirectInputDevice8GetDeviceState_DIJOYSTATE2_injection
+IDirectInputDevice8GetDeviceState_DIJOYSTATE2_injection PROC
 
-sub     rsp, 8
 sub     rsp, 10h
 movdqu  [rsp], xmm0
 sub     rsp, 10h
@@ -102,13 +97,12 @@ push    r8
 push    r9
 push    r10
 push    r11
-sub     rsp, 20h
+sub     rsp, 28h
 
-mov     rcx, rbp
-mov     rdx, rsi
-call    intercept_IDirectInputDevice8GetDeviceState
+lea     rcx, [RDI + 5f0h + 8]
+call    intercept_IDirectInputDevice8GetDeviceState_DIJOYSTATE2
 
-add     rsp, 20h
+add     rsp, 28h
 pop     r11
 pop     r10
 pop     r9
@@ -124,16 +118,14 @@ movdqu  xmm1, [rsp]
 add     rsp, 10h
 movdqu  xmm0, [rsp]
 add     rsp, 10h
-add     rsp, 8
 
 ;original code
-mov     rdi, [rsp+48h]
-mov     rbp, [rsp+38h]
-mov     rsi, [rsp+40h]
+movaps  xmmword ptr [rsp+30h], xmm6
+lea     rdx, [rbx+180h]
+movaps  xmmword ptr [rsp+20h], xmm7
 
-jmp     intercept_IDirectInputDevice8GetDeviceState_inject_return
-
-intercept_IDirectInputDevice8GetDeviceState_inject ENDP
+jmp     IDirectInputDevice8GetDeviceState_DIJOYSTATE2_injection_return
+IDirectInputDevice8GetDeviceState_DIJOYSTATE2_injection ENDP
 
 _TEXT    ENDS
 

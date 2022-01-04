@@ -102,16 +102,10 @@ inline Status status(XINPUT_GAMEPAD *old, XINPUT_GAMEPAD *current, uint16_t butt
 } // namespace Button
 
 
-extern void *base;
-
 // Initializes pointers and other data used to monitor gamepad input
 void initialize();
 
 void handle_input(XINPUT_GAMEPAD* xold, XINPUT_GAMEPAD* xcurrent, DIJOYSTATE2* djold, DIJOYSTATE2* djcurrent, uint8_t* kbold, uint8_t* kbcurrent, bool changed, int player);
-
-// Patches game calls to XInput API funcs, redirecting them to interceptor functions
-void apply_function_intercepts();
-
 
 } // namespace Input
 
