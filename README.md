@@ -17,7 +17,9 @@ This requires the [Microsoft Visual C++ Redistributable for Visual Studio 2015-2
   
 Unzip the contents of the zip into your DARK SOULS REMASTERED folder to install (so d3d11.dll should be in the same folder as the game exe). If a command window pops up on game start, the mod is installed.  
   
-To uninstall or disable the mod, remove d3d11.dll.
+### Uninstall
+
+To uninstall or disable the mod, remove d3d11.dll. I also recommend deleting or restoring your old save on uninstall, to prevent a possible ban now that the mod is disabled.  
 
 ## Description
 The mod is completely backwards compatible with vanilla dark souls 1 by default. It will __not__ separate you from vanilla players.  
