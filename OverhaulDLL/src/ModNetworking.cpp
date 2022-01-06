@@ -665,7 +665,7 @@ typedef struct
     uint64_t steamid;
 } AwaitIncomingUserMemberData_Struct;
 
-static const uint32_t MS_TO_WAIT_FOR_GUEST_MSG = (uint32_t)(0.75 * 10000000);
+static const uint32_t MS_TO_WAIT_FOR_GUEST_MSG = (uint32_t)(1.25 * 10000000);
 
 bool HostAwaitIncomingGuestMemberData(void* data_a);
 
@@ -768,7 +768,7 @@ bool HostAwaitIncomingGuestMemberData(void* data_a)
     // If the guest isn't respecting our settings for some reason (can't hurt to check), disconnect them right away
     else if (ModNetworking::incoming_guest_got_info == true && ModNetworking::incoming_guest_mod_installed == true && ModNetworking::incoming_guest_mod_mode != Mod::get_mode())
     {
-        ConsoleWrite("4. Host detects incoming guest has wrong settings");
+        ConsoleWrite("4. Host detects incoming guest is mod-user, but isn't matching the legacy/overhaul mode");
 
         HostForceDisconnectGuest(data->steamid, L"Incoming guest is mod-user, but isn't matching your legacy/overhaul mode.");
         goto exit;
