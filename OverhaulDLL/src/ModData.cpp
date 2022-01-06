@@ -250,7 +250,7 @@ bool Mod::mode_setting_process(void* unused)
             else
             {
                 if (Mod::next_mode != ModMode::InvalidMode && Mod::current_mode != Mod::next_mode &&
-                    (Game::get_player_chr_type(playerIns) == PLAYER_STATUS::COOP || Game::get_player_chr_type(playerIns) == PLAYER_STATUS::INVADER))
+                    (Game::get_player_chr_type(playerIns) == PLAYER_STATUS::HUMAN || Game::get_player_chr_type(playerIns) == PLAYER_STATUS::COOP || Game::get_player_chr_type(playerIns) == PLAYER_STATUS::INVADER))
                 {
                     Mod::change_mode(Mod::next_mode);
                 }
