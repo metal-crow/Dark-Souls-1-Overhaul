@@ -782,7 +782,7 @@ bool HostAwaitIncomingGuestMemberData(void* data_a)
     // If the guest isn't respecting our settings for some reason (can't hurt to check), disconnect them right away
     else if (ModNetworking::incoming_guest_got_info == true && ModNetworking::incoming_guest_mod_installed == true && ModNetworking::incoming_guest_mod_mode != Mod::get_mode())
     {
-        ConsoleWrite("4. Host detects incoming guest is mod-user, but isn't matching the legacy/overhaul mode");
+        ConsoleWrite("4. Host detects incoming guest is mod-user, but isn't matching the legacy/overhaul mode. Host=%d, guest=%d.", Mod::get_mode(), ModNetworking::incoming_guest_mod_mode);
 
         HostForceDisconnectGuest(data->steamid, L"Incoming guest is mod-user, but isn't matching your legacy/overhaul mode.");
         goto exit;
