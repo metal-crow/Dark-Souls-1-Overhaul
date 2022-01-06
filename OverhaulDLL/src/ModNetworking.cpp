@@ -605,6 +605,12 @@ bool GuestAwaitIncomingLobbyData(void* data_a)
         Mod::set_mode(ModMode::Compatability);
         chat_value = static_cast<char>(ModMode::Compatability);
     }
+    else if (ModNetworking::host_mod_installed == true && ModNetworking::host_mod_mode == ModMode::Compatability && ModNetworking::allow_connect_with_non_mod_host == true)
+    {
+        //connecting to (basically) non-mod
+        Mod::set_mode(ModMode::Compatability);
+        chat_value = static_cast<char>(ModMode::Compatability);
+    }
     else if (ModNetworking::host_mod_installed == true && ModNetworking::host_mod_mode == ModMode::Overhaul && ModNetworking::allow_connect_with_overhaul_mod_host == true)
     {
         //connecting to overhaul
@@ -625,6 +631,10 @@ bool GuestAwaitIncomingLobbyData(void* data_a)
         if (ModNetworking::host_mod_installed == false && ModNetworking::allow_connect_with_non_mod_host == false)
         {
             wcscat_s(dc_msg, L"Host does not have mod and you do not allow connections with non-mod users.");
+        }
+        else if (ModNetworking::host_mod_installed && ModNetworking::host_mod_mode == ModMode::Compatability && ModNetworking::allow_connect_with_non_mod_host == false)
+        {
+            wcscat_s(dc_msg, L"Host has a non-mod user connected and you do not allow connections with non-mod users.");
         }
         else if (ModNetworking::host_mod_installed && ModNetworking::host_mod_mode == ModMode::Overhaul && ModNetworking::allow_connect_with_overhaul_mod_host == false)
         {
@@ -665,7 +675,7 @@ typedef struct
     uint64_t steamid;
 } AwaitIncomingUserMemberData_Struct;
 
-static const uint32_t MS_TO_WAIT_FOR_GUEST_MSG = (uint32_t)(1.25 * 10000000);
+static const uint32_t MS_TO_WAIT_FOR_GUEST_MSG = (uint32_t)(1.0 * 10000000);
 
 bool HostAwaitIncomingGuestMemberData(void* data_a);
 
@@ -739,11 +749,15 @@ bool HostAwaitIncomingGuestMemberData(void* data_a)
             if (ModNetworking::SteamMatchmaking->GetNumLobbyMembers(ModNetworking::currentLobby) == 2)
             {
                 Mod::set_mode(ModMode::Compatability);
+                char value = static_cast<char>(Mod::get_mode());
+                ConsoleWrite("1. Host reset lobby data = %hhx", value);
+                ModNetworking::SteamMatchmaking->SetLobbyData(ModNetworking::currentLobby, MOD_LOBBY_DATA_KEY, &value);
             }
             // not first non-mod user and the other guests are not in a non-mod compatible mode
             else if (ModNetworking::SteamMatchmaking->GetNumLobbyMembers(ModNetworking::currentLobby) > 2 && Mod::get_mode() != Compatability)
             {
                 HostForceDisconnectGuest(data->steamid, L"Incoming guest is a non-mod user, but mod user is already connected.", true);
+                //TODO need to fix this
                 goto exit;
             }
             // not first non-mod user and the other guests are in a non-mod compatible mode
