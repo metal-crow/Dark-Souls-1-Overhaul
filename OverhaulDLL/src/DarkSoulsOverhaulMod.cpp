@@ -47,7 +47,7 @@ void Update_Check()
     {
         ConsoleWrite("Update_Check failed:%d", GetLastError());
     }
-    WaitForSingleObject(pi.hProcess, 3 * 1000); // Wait 3 sec max
+    WaitForSingleObject(pi.hProcess, 5 * 1000); // Wait 5 sec max
     TerminateProcess(pi.hProcess, 0);
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
@@ -56,6 +56,7 @@ void Update_Check()
     FILE *fp = NULL;
     if (fopen_s(&fp, "./VERSION", "r") != 0 || fp == NULL)
     {
+        ConsoleWrite("Update_Check failed: unable to open file.");
         return;
     }
     uint64_t new_version;
@@ -70,7 +71,10 @@ void Update_Check()
             MB_OK);
         ConsoleWrite("Found new update, version %llu is > our version %llu", new_version, VERSION_RAW);
     }
-    ConsoleWrite("No updates found");
+    else
+    {
+        ConsoleWrite("No updates found");
+    }
 }
 
 /*
