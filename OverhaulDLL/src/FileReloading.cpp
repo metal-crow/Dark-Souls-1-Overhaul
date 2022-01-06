@@ -5,6 +5,7 @@
 #include "MainLoop.h"
 
 #include <map>
+#include <mutex>
 
 const std::map<IndividualParams, const wchar_t*> IndividualParams_To_String
 {
@@ -104,12 +105,19 @@ Calculate_MaxSP_From_End_FUNC* Calculate_MaxSP_From_End = (Calculate_MaxSP_From_
 
 /* --------------------------------------------------------------------- */
 
+//need to add this due to a race condition with DSR accessing some PC data before the reload is finished
+static std::mutex ReloadPlayer_mtx;
+
 void FileReloading::ReloadPlayer()
 {
+    ReloadPlayer_mtx.lock();
+
     // Set bPlayerReload flag to true
     *((uint8_t*)0x141D151DB) = 1;
     // Call Force_PlayerReload
     Force_PlayerReload(*(void**)Game::world_chr_man_imp, L"c0000");
+
+    ReloadPlayer_mtx.unlock();
 }
 
 /* --------------------------------------------------------------------- */
@@ -298,6 +306,10 @@ extern "C" {
     uint64_t get_ParamResCap_from_ParamMan_injection_return;
     void get_ParamResCap_from_ParamMan_injection();
     uint32_t SoloParamRes_curindex;
+
+    uint64_t call_SetHostPlayerIns_offset_injection_return;
+    void call_SetHostPlayerIns_offset_injection();
+    void call_SetHostPlayerIns_offset_helper(bool lock);
 }
 
 void FileReloading::start()
@@ -312,6 +324,10 @@ void FileReloading::start()
     write_address = (uint8_t*)(FileReloading::get_ParamResCap_from_ParamMan_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &get_ParamResCap_from_ParamMan_injection_return, 2, &get_ParamResCap_from_ParamMan_injection);
     SoloParamRes_curindex = 0;
+
+    //injection to check if we're currently reloading the character before the game accesses it (fixes race condition)
+    write_address = (uint8_t*)(FileReloading::call_SetHostPlayerIns_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &call_SetHostPlayerIns_offset_injection_return, 6, &call_SetHostPlayerIns_offset_injection);
 }
 
 void FileReloading::SetParamsToUse(bool legacy)
@@ -325,5 +341,17 @@ void FileReloading::SetParamsToUse(bool legacy)
     {
         //the overhaul files are loaded after boot
         SoloParamRes_curindex = 1;
+    }
+}
+
+void call_SetHostPlayerIns_offset_helper(bool lock)
+{
+    if (lock)
+    {
+        ReloadPlayer_mtx.lock();
+    }
+    else
+    {
+        ReloadPlayer_mtx.unlock();
     }
 }

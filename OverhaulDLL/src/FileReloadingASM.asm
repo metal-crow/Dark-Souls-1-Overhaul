@@ -46,6 +46,96 @@ xor     eax, eax
 ret
 get_ParamResCap_from_ParamMan_injection ENDP
 
+
+EXTERN call_SetHostPlayerIns_offset_injection_return: qword
+extern call_SetHostPlayerIns_offset_helper: proc
+
+PUBLIC call_SetHostPlayerIns_offset_injection
+call_SetHostPlayerIns_offset_injection PROC
+
+sub     rsp, 10h
+movdqu  [rsp], xmm0
+sub     rsp, 10h
+movdqu  [rsp], xmm1
+sub     rsp, 10h
+movdqu  [rsp], xmm2
+sub     rsp, 10h
+movdqu  [rsp], xmm3
+push    rax
+push    rcx
+push    rdx
+push    r8
+push    r9
+push    r10
+push    r11
+sub     rsp, 20h
+
+mov     rcx, 1 ;lock
+call    call_SetHostPlayerIns_offset_helper
+
+add     rsp, 20h
+pop     r11
+pop     r10
+pop     r9
+pop     r8
+pop     rdx
+pop     rcx
+pop     rax
+movdqu  xmm3, [rsp]
+add     rsp, 10h
+movdqu  xmm2, [rsp]
+add     rsp, 10h
+movdqu  xmm1, [rsp]
+add     rsp, 10h
+movdqu  xmm0, [rsp]
+add     rsp, 10h
+
+;original code
+mov     rax, [rsi]
+mov     rcx, rsi
+call    qword ptr [rax+150h]
+movaps  xmm7, xmmword ptr [rsp+0D0h]
+
+sub     rsp, 10h
+movdqu  [rsp], xmm0
+sub     rsp, 10h
+movdqu  [rsp], xmm1
+sub     rsp, 10h
+movdqu  [rsp], xmm2
+sub     rsp, 10h
+movdqu  [rsp], xmm3
+push    rax
+push    rcx
+push    rdx
+push    r8
+push    r9
+push    r10
+push    r11
+sub     rsp, 20h
+
+mov     rcx, 0 ;unlock
+call    call_SetHostPlayerIns_offset_helper
+
+add     rsp, 20h
+pop     r11
+pop     r10
+pop     r9
+pop     r8
+pop     rdx
+pop     rcx
+pop     rax
+movdqu  xmm3, [rsp]
+add     rsp, 10h
+movdqu  xmm2, [rsp]
+add     rsp, 10h
+movdqu  xmm1, [rsp]
+add     rsp, 10h
+movdqu  xmm0, [rsp]
+add     rsp, 10h
+
+jmp     call_SetHostPlayerIns_offset_injection_return
+call_SetHostPlayerIns_offset_injection ENDP
+
 _TEXT    ENDS
 
 END

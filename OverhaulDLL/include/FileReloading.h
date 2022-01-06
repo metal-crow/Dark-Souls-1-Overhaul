@@ -100,6 +100,7 @@ private:
 
     static const uint64_t CalcCorrectGraph_injection_offset = 0x2de08d;
     static const uint64_t get_ParamResCap_from_ParamMan_injection_offset = 0x52fc50;
+    static const uint64_t call_SetHostPlayerIns_offset = 0x357be5;
 };
 
 #endif
