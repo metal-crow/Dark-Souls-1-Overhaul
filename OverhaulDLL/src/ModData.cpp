@@ -215,7 +215,11 @@ void Mod::change_mode(ModMode mode)
         Mod::current_mode = mode;
         Files::UseOverhaulFiles = (mode == ModMode::Overhaul);
         FileReloading::SetParamsToUse(mode != ModMode::Overhaul);
-        FileReloading::ReloadPlayer();
+        //avoid a player reload if not needed
+        if ((Mod::current_mode == ModMode::Legacy && mode == ModMode::Overhaul) || (Mod::current_mode == ModMode::Overhaul && mode == ModMode::Legacy))
+        {
+            FileReloading::ReloadPlayer();
+        }
         FileReloading::RefreshPlayerStats();
     }
 
