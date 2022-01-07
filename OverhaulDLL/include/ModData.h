@@ -33,6 +33,7 @@
 
 
 #include <vector>
+#include <map>
 
 enum ModMode
 {
@@ -40,6 +41,14 @@ enum ModMode
     Legacy = 2,
     Compatability = 1,
     InvalidMode = 0,
+};
+
+const std::map<ModMode, const char*> ModModes_To_String =
+{
+    {Overhaul, "Overhaul"},
+    {Legacy, "Legacy"},
+    {Compatability, "Legacy with non-mod"},
+    {InvalidMode, "InvalidMode"},
 };
 
 class Mod
