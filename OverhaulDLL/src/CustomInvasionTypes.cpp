@@ -79,7 +79,7 @@ void Send_Type17_GeneralRequestTask_injection_helper(uint64_t RequestGetBreakInT
         }
 
         //set the timer to be closer to the refresh time (30 seconds)
-        Game::set_invasion_refresh_timer(28.0f);
+        Game::set_invasion_refresh_timer(26.0f);
     }
     else
     {
@@ -115,7 +115,7 @@ void Send_Type17_GeneralRequestTask_injection_helper(uint64_t RequestGetBreakInT
         }
 
         //set the timer to be closer to the refresh time (30 seconds)
-        Game::set_invasion_refresh_timer(28.0f);
+        Game::set_invasion_refresh_timer(26.0f);
     }
     else
     {
