@@ -789,8 +789,8 @@ void ModNetworking::LobbyChatUpdateCallback(LobbyChatUpdate_t* pCallback)
     if (lobbyowner != selfsteamid && pCallback->m_rgfChatMemberStateChange == EChatMemberStateChange::k_EChatMemberStateChangeEntered && pCallback->m_ulSteamIDUserChanged != selfsteamid.ConvertToUint64())
     {
         ConsoleWrite("G4. Guest detected new guest is trying to join.");
-        //if the host has already changed to Compatability, this waiting isn't needed and we can skip right to approval
-        if (ModNetworking::host_mod_mode == ModMode::Compatability)
+        //if the host has already changed to Compatability or is a non-mod user, this waiting isn't needed and we can skip right to approval
+        if (ModNetworking::host_mod_installed == false || ModNetworking::host_mod_mode == ModMode::Compatability)
         {
             SteamAPIStatusKnown_Users.emplace(pCallback->m_ulSteamIDUserChanged);
             SendQueuedPackets();
