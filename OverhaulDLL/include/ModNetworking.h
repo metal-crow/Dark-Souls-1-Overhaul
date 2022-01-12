@@ -53,7 +53,6 @@ public:
     STEAM_CALLBACK(ModNetworking, SteamNetworkingMessagesSessionRequestCallback, SteamNetworkingMessagesSessionRequest_t);
 
     static uint64_t currentLobby; //Set upon entry into a lobby; set to 0 upon exit
-    static bool lobby_setup_complete; //Set to true when a lobby handshake is complete and all settings are finalized; set to false upon lobby exit
 
     //configuration options for who can connect if you're host/how to change settings if you're guest
     static bool allow_connect_with_non_mod_host;
@@ -68,7 +67,7 @@ public:
     static bool incoming_guest_got_info;
     static bool incoming_guest_mod_installed;
     static ModMode incoming_guest_mod_mode;
-    static uint64_t incoming_guest_to_not_accept; //The steamid of the incoming user if we want to d/c them. When AcceptSessionWithUser/AcceptP2PSessionWithUser is called with this id, decline the session
+    static uint64_t incoming_guest_to_not_accept;
     static bool new_guest_incoming;
 
     //info for clock synchronization

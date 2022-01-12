@@ -5,6 +5,7 @@
 #include "AnimationEdits.h"
 #include <wchar.h>
 #include <mutex>
+#include <unordered_set>
 
 //This is needed for the steam callbacks to work
 static ModNetworking modnet = ModNetworking();
@@ -203,44 +204,60 @@ public:
 //This is needed because if we try to talk to a user with the wrong API, steam internals can get fucked up and the connection can just randomly die.
 static std::vector<PacketStorageData*> queued_packets;
 
-bool ResendQueuedPacketsOnLobbySetupCompleted()
+//We need to keep track of who, specifically, is approved for the new API, even if the lobby is set up
+//This is because if a new non-mod user joins, we want to talk to them correctly and setup everything to use the old API
+static std::unordered_set<uint64_t> SteamAPIStatusKnown_Users;
+
+void ClearQueuedPackets()
 {
-    //send out all the packets that were queued during this time, then clear out the list
+    ConsoleWrite("Cleared queued packets. Size=%d", queued_packets.size());
     for (auto elem : queued_packets)
     {
-        if (ModNetworking::lobby_setup_complete)
-        {
-            bool sent = SendP2PPacket_Replacement_injection_helper(elem->steamIDRemote, elem->pubData, elem->cubData, elem->eP2PSendType, elem->nChannel);
-            ConsoleWrite("Sending queued packets: total %d sent=%d", queued_packets.size(), sent);
-        }
         delete elem;
     }
-    ConsoleWrite("Cleared queued packets");
     queued_packets.clear();
-
-    return false;
 }
 
-bool ResendQueuedPacketsOnLobbySetupCompleted_Guest(void* unused)
+void RemoveQueuedPackets(uint64_t steamid)
 {
-    //Wait until we have finalized the connection
-    if (!ModNetworking::lobby_setup_complete && ModNetworking::currentLobby != 0)
+    ConsoleWrite("Removing queued packets for %llx. Size=%d", steamid, queued_packets.size());
+    std::vector<PacketStorageData*>::iterator pkt_it = queued_packets.begin();
+    while (pkt_it != queued_packets.end())
     {
-        return true;
+        auto elem = *pkt_it;
+        if (elem->steamIDRemote.ConvertToUint64() == steamid)
+        {
+            pkt_it = queued_packets.erase(pkt_it);
+            delete elem;
+        }
+        else
+        {
+            pkt_it++;
+        }
     }
-
-    return ResendQueuedPacketsOnLobbySetupCompleted();
+    ConsoleWrite("Queued packets remaining: %d", queued_packets.size());
 }
 
-bool ResendQueuedPacketsOnLobbySetupCompleted_Host(void* unused)
+void SendQueuedPackets()
 {
-    //Wait until we have finalized the connection
-    if (!ModNetworking::lobby_setup_complete && ModNetworking::new_guest_incoming)
+    //send out all the packets that were queued during this time, and remove them as we send them
+    std::vector<PacketStorageData*>::iterator pkt_it = queued_packets.begin();
+    while (pkt_it != queued_packets.end())
     {
-        return true;
+        auto elem = *pkt_it;
+        if (SteamAPIStatusKnown_Users.count(elem->steamIDRemote.ConvertToUint64()) != 0)
+        {
+            bool sent = SendP2PPacket_Replacement_injection_helper(elem->steamIDRemote, elem->pubData, elem->cubData, elem->eP2PSendType, elem->nChannel);
+            ConsoleWrite("Sending queued packets: total %d was_sent=%d", queued_packets.size(), sent);
+            pkt_it = queued_packets.erase(pkt_it);
+            delete elem;
+        }
+        else
+        {
+            pkt_it++;
+        }
     }
-
-    return ResendQueuedPacketsOnLobbySetupCompleted();
+    ConsoleWrite("Queued packets remaining: %d", queued_packets.size());
 }
 
 //Add a new callback for the NetMessages equivalent of AcceptP2PSessionWithUser
@@ -355,10 +372,10 @@ bool SendP2PPacket_Replacement_injection_helper(CSteamID steamIDRemote, const vo
     }
 
     //Any packet sent during this period where we don't know the other user's API nature, save them to send later.
-    if (!ModNetworking::lobby_setup_complete)
+    if (SteamAPIStatusKnown_Users.count(steamIDRemote.ConvertToUint64()) == 0)
     {
         queued_packets.push_back(new PacketStorageData(steamIDRemote, pubData, cubData, eP2PSendType, nChannel));
-        ConsoleWrite("Saving queued packets: total %d", queued_packets.size());
+        ConsoleWrite("Saving queued packets for %llx: total %d", steamIDRemote.ConvertToUint64(), queued_packets.size());
         return true;
     }
 
@@ -425,10 +442,25 @@ ModMode ModNetworking::host_mod_mode;
 bool ModNetworking::incoming_guest_got_info = false;
 bool ModNetworking::incoming_guest_mod_installed = false;
 ModMode ModNetworking::incoming_guest_mod_mode;
-uint64_t ModNetworking::incoming_guest_to_not_accept = 0;
+uint64_t ModNetworking::incoming_guest_to_not_accept = 0; //The steamid of the incoming user if we want to d/c them. When AcceptSessionWithUser/AcceptP2PSessionWithUser is called with this id, decline the session
 
 uint64_t ModNetworking::currentLobby = 0;
-bool ModNetworking::lobby_setup_complete = false;
+
+//Used to prevent LobbyDataUpdateCallback (run from a seperate thread) from interrupting and corrupting data GuestAwaitIncomingLobbyData is using
+static std::mutex guest_get_host_info_mtx;
+
+//If we know an incoming guest is on the way (they've connected to the lobby)
+bool ModNetworking::new_guest_incoming = false;
+
+//Used to prevent the callbacks (run from a seperate thread) from interrupting and corrupting data HostAwaitIncomingGuestMemberData is using
+static std::mutex host_get_guest_response_mtx;
+
+//As the host, we need to keep track of all connected non-mod users, so if they leave and we still have mod users connected, we can switch modes again
+static std::unordered_set<uint64_t> ConnectedNonMod_Users;
+
+//Use this when the guest has learned of a new user, but needs to wait for the host so we know what API to use
+static uint64_t SteamAPIStatusUnknown_Users_GuestWaitingForHost;
+
 
 bool AcceptP2PSessionWithUser_injection_helper(uint64_t incoming_steamid)
 {
@@ -478,27 +510,27 @@ void ModNetworking::LobbyEnterCallback(LobbyEnter_t* pCallback)
     CSteamID lobbyowner = ModNetworking::SteamMatchmaking->GetLobbyOwner(pCallback->m_ulSteamIDLobby);
     CSteamID selfsteamid = ModNetworking::SteamUser->GetSteamID();
     ModNetworking::currentLobby = pCallback->m_ulSteamIDLobby;
-    ModNetworking::lobby_setup_complete = false;
     ModNetworking::incoming_guest_to_not_accept = 0; //prevent any holdover data on new lobby
+    SteamAPIStatusKnown_Users.clear();
+    ConnectedNonMod_Users.clear();
 
-    // 1. As the host, upon lobby creation(and self entry into it) set the lobby data to inform connecting users of our mod status
+    // H1. As the host, upon lobby creation(and self entry into it) set the lobby data to inform connecting users of our mod status
     // Since lobby data is persistent, we don't have to worry about resending anything for new connections
     if (lobbyowner == selfsteamid)
     {
         char value = static_cast<char>(Mod::get_mode());
-        ConsoleWrite("1. Host set lobby data = %hhx", value);
+        ConsoleWrite("H1. Host set lobby data = %hhx", value);
         ModNetworking::SteamMatchmaking->SetLobbyData(pCallback->m_ulSteamIDLobby, MOD_LOBBY_DATA_KEY, &value);
         return;
     }
 
-    // 2. If we're the guest, upon lobby connection check for lobby data on mod status
+    // G1. If we're the guest, upon lobby connection check for lobby data on mod status
     // This callback is only triggered when WE attempt to enter a lobby, so existing guests won't have this trigger
     // The lobby data may not arrive for a bit (since the host JITs the lobby for a new connection and we then add the lobby data right after), so set up a callback to trigger when we do get the data (if we get it)
     // Waiting until we get this data before sending our confirmation as guest we also have the mod does eat into the HostAwaitIncomingGuestMemberData timeout a bit, but probably not by any more then a 1/2 of the ping
     if (lobbyowner != selfsteamid)
     {
-        MainLoop::setup_mainloop_callback(ResendQueuedPacketsOnLobbySetupCompleted_Guest, nullptr, "ResendQueuedPacketsOnLobbySetupCompleted_Guest");
-
+        ConsoleWrite("G1. Guest joined lobby. Start waiting for incoming lobby data");
         GuestAwaitIncomingLobbyData_Struct* data = (GuestAwaitIncomingLobbyData_Struct*)malloc(sizeof(GuestAwaitIncomingLobbyData_Struct));
         data->start_time = Game::get_accurate_time();
         MainLoop::setup_mainloop_callback(GuestAwaitIncomingLobbyData, data, "GuestAwaitIncomingLobbyData");
@@ -506,29 +538,22 @@ void ModNetworking::LobbyEnterCallback(LobbyEnter_t* pCallback)
     }
 }
 
-//Used to prevent LobbyDataUpdateCallback (run from a seperate thread) from interrupting and corrupting data GuestAwaitIncomingLobbyData is using
-static std::mutex guest_get_host_info_mtx;
-//If we know an incoming guest is on the way (they've connected to the lobby)
-bool ModNetworking::new_guest_incoming = false;
-//Used to prevent the callbacks (run from a seperate thread) from interrupting and corrupting data HostAwaitIncomingGuestMemberData is using
-static std::mutex host_get_guest_response_mtx;
-
 void ModNetworking::LobbyDataUpdateCallback(LobbyDataUpdate_t* pCallback)
 {
     CSteamID lobbyowner = ModNetworking::SteamMatchmaking->GetLobbyOwner(pCallback->m_ulSteamIDLobby);
     CSteamID selfsteamid = ModNetworking::SteamUser->GetSteamID();
 
-    // 2. If we're the guest, listen to the callback for lobby data updates
+    // G2. If we're the guest, listen to the callback for lobby data updates
     // This will be triggered upon joining a lobby, and also upon reciving any lobby data updates
     // Make sure if for some reason we get more data later, after we're connected, we ignore it.
     // Otherwise it might set flags in a bad state and corrupt the next host we join
-    if (pCallback->m_ulSteamIDMember == pCallback->m_ulSteamIDLobby && lobbyowner != selfsteamid && !ModNetworking::lobby_setup_complete)
+    if (pCallback->m_ulSteamIDMember == pCallback->m_ulSteamIDLobby && lobbyowner != selfsteamid && SteamAPIStatusKnown_Users.count(lobbyowner.ConvertToUint64()) == 0)
     {
         guest_get_host_info_mtx.lock();
 
         const char* mod_value_arry = ModNetworking::SteamMatchmaking->GetLobbyData(pCallback->m_ulSteamIDLobby, MOD_LOBBY_DATA_KEY);
         char mod_value = mod_value_arry[0];
-        ConsoleWrite("2. Guest get lobby data = %hhx", mod_value);
+        ConsoleWrite("G2. Guest get lobby data = %hhx", mod_value);
 
         if (mod_value == 0)
         {
@@ -543,8 +568,34 @@ void ModNetworking::LobbyDataUpdateCallback(LobbyDataUpdate_t* pCallback)
 
         guest_get_host_info_mtx.unlock();
     }
+    // G5. If we do get more data later, after we're connected, then the host is telling us that we need to change modes. Obey
+    else if (pCallback->m_ulSteamIDMember == pCallback->m_ulSteamIDLobby && lobbyowner != selfsteamid && SteamAPIStatusKnown_Users.count(lobbyowner.ConvertToUint64()) != 0)
+    {
+        const char* mod_value_arry = ModNetworking::SteamMatchmaking->GetLobbyData(pCallback->m_ulSteamIDLobby, MOD_LOBBY_DATA_KEY);
+        char mod_value = mod_value_arry[0];
+        if (static_cast<ModMode>(mod_value) != ModNetworking::host_mod_mode)
+        {
+            ConsoleWrite("G5. Guest get updated lobby data = %hhx", mod_value);
 
-    // 4. If we're the host, listen for the response member data info from the guest saying they respect these settings
+            Mod::set_mode(static_cast<ModMode>(mod_value));
+            ModNetworking::host_mod_mode = static_cast<ModMode>(mod_value);
+
+            //updating our lobby member data isn't needed for now, but do just in case
+            ModNetworking::SteamMatchmaking->SetLobbyMemberData(ModNetworking::currentLobby, MOD_LOBBY_DATA_KEY, &mod_value);
+            ConsoleWrite("G5. Guest set updated member data = %hhx", mod_value);
+
+            //approve the user in queue
+            if (SteamAPIStatusUnknown_Users_GuestWaitingForHost != 0)
+            {
+                SteamAPIStatusKnown_Users.emplace(SteamAPIStatusUnknown_Users_GuestWaitingForHost);
+                SteamAPIStatusUnknown_Users_GuestWaitingForHost = 0;
+                //now that we know the user, we can send the queued packets
+                SendQueuedPackets();
+            }
+        }
+    }
+
+    // H3. If we're the host, listen for the response member data info from the guest saying they respect these settings
     // Make sure we stop listening once we've finalized this guest.
     // Otherwise, this data could arrive late and when a new guest arrives flags might apply to them incorrectly
     if (pCallback->m_ulSteamIDMember != pCallback->m_ulSteamIDLobby && pCallback->m_ulSteamIDMember != selfsteamid.ConvertToUint64() && lobbyowner == selfsteamid && ModNetworking::new_guest_incoming)
@@ -553,7 +604,7 @@ void ModNetworking::LobbyDataUpdateCallback(LobbyDataUpdate_t* pCallback)
 
         const char* mod_guest_value_arry = ModNetworking::SteamMatchmaking->GetLobbyMemberData(pCallback->m_ulSteamIDLobby, pCallback->m_ulSteamIDMember, MOD_LOBBY_DATA_KEY);
         char mod_guest_value = mod_guest_value_arry[0];
-        ConsoleWrite("4. Host got guest data = %hhx", mod_guest_value);
+        ConsoleWrite("H3. Host got guest data = %hhx", mod_guest_value);
 
         if (mod_guest_value == 0)
         {
@@ -593,7 +644,7 @@ bool GuestAwaitIncomingLobbyData(void* data_a)
     //Timeout, host is non-mod user
     if (ModNetworking::host_got_info == false && (Game::get_accurate_time() > data->start_time + MS_TO_WAIT_FOR_HOST_DATA))
     {
-        ConsoleWrite("3. Guest timeout getting host info");
+        ConsoleWrite("G3. Guest timeout getting host info");
         ModNetworking::host_mod_installed = false;
     }
 
@@ -645,22 +696,32 @@ bool GuestAwaitIncomingLobbyData(void* data_a)
             wcscat_s(dc_msg, L"Host is in legacy mode and you do not allow connections with legacy mode users.");
         }
         Game::show_popup_message(dc_msg);
-        ConsoleWrite("3. Guest disconnecting due to settings");
+        ConsoleWrite("G3. Guest disconnecting due to settings");
 
         //disconnect
         ModNetworking::SteamMatchmaking->LeaveLobby(ModNetworking::currentLobby);
         ModNetworking::currentLobby = 0;
-        ModNetworking::lobby_setup_complete = false;
+        SteamAPIStatusKnown_Users.clear();
         ModNetworking::host_got_info = false;
         guest_get_host_info_mtx.unlock();
+        ClearQueuedPackets();
         free(data);
         return false;
     }
 
     //set our lobby member data confirming we also respect these settings and have the mod
     ModNetworking::SteamMatchmaking->SetLobbyMemberData(ModNetworking::currentLobby, MOD_LOBBY_DATA_KEY, &chat_value);
-    ConsoleWrite("3. Guest set member data = %hhx", chat_value);
-    ModNetworking::lobby_setup_complete = true;
+    ConsoleWrite("G3. Guest set member data = %hhx", chat_value);
+
+    //we now know the status of the host, and any guests the host has connected
+    int numlobbymembers = ModNetworking::SteamMatchmaking->GetNumLobbyMembers(ModNetworking::currentLobby);
+    for (int i = 0; i < numlobbymembers; i++)
+    {
+        CSteamID member = ModNetworking::SteamMatchmaking->GetLobbyMemberByIndex(ModNetworking::currentLobby, i);
+        SteamAPIStatusKnown_Users.emplace(member.ConvertToUint64());
+    }
+    //this also means it's safe to send out the queued packets for everyone
+    SendQueuedPackets();
 
     //this flag is finished, we don't need it anymore. Reset for next time we connect to a host.
     ModNetworking::host_got_info = false;
@@ -689,25 +750,75 @@ void ModNetworking::LobbyChatUpdateCallback(LobbyChatUpdate_t* pCallback)
     ModNetworking::new_guest_incoming = true;
     host_get_guest_response_mtx.unlock();
 
-    // 4. As the host, when a new user connects to the lobby set a timer to wait for their response member data setting
+    // H2. As the host, when a new user connects to the lobby set a timer to wait for their response member data setting
     // Need to handle the case where they don't set any member data, and thus are a non-mod user and we must disconnect them from this lobby
-    // UNLESS: we allow non-mod connections, and we don't have any other non-mod phantoms in here
     if (lobbyowner == selfsteamid && pCallback->m_rgfChatMemberStateChange == EChatMemberStateChange::k_EChatMemberStateChangeEntered && pCallback->m_ulSteamIDUserChanged != selfsteamid.ConvertToUint64())
     {
-        MainLoop::setup_mainloop_callback(ResendQueuedPacketsOnLobbySetupCompleted_Host, nullptr, "ResendQueuedPacketsOnLobbySetupCompleted_Host");
-
+        ConsoleWrite("H2. Host saw user connect. Start waiting for incoming guest member data");
         AwaitIncomingUserMemberData_Struct* data = (AwaitIncomingUserMemberData_Struct*)malloc(sizeof(AwaitIncomingUserMemberData_Struct));
         data->start_time = Game::get_accurate_time();
         data->steamid = pCallback->m_ulSteamIDUserChanged;
         MainLoop::setup_mainloop_callback(HostAwaitIncomingGuestMemberData, data, "HostAwaitIncomingGuestMemberData");
     }
 
-    // 4. Handle the case where the guest disconnects on their own during the handshake (i.e they don't like our settings)
+    // H4. Host: Handle the case where the guest disconnects on their own
     if (lobbyowner == selfsteamid && pCallback->m_rgfChatMemberStateChange == EChatMemberStateChange::k_EChatMemberStateChangeLeft && pCallback->m_ulSteamIDUserChanged != selfsteamid.ConvertToUint64())
     {
+        ConsoleWrite("H4. Guest d/c'd on their own.");
+
         host_get_guest_response_mtx.lock();
         ModNetworking::new_guest_incoming = false;
         host_get_guest_response_mtx.unlock();
+
+        SteamAPIStatusKnown_Users.erase(pCallback->m_ulSteamIDUserChanged); //remove the user from the known list
+        ConnectedNonMod_Users.erase(pCallback->m_ulSteamIDUserChanged); //clear this user from the host's list if they leave
+        RemoveQueuedPackets(pCallback->m_ulSteamIDUserChanged); //get rid of the queued packets for this user since we don't need them anymore
+
+        // We can switch modes back to non-compatability if this list is empty now
+        if (ConnectedNonMod_Users.empty() && Mod::get_mode() == ModMode::Compatability)
+        {
+            Mod::set_mode(Mod::user_selected_default_mode);
+            char value = static_cast<char>(Mod::get_mode());
+            ConsoleWrite("H1. Host reset lobby data = %hhx", value);
+            ModNetworking::SteamMatchmaking->SetLobbyData(ModNetworking::currentLobby, MOD_LOBBY_DATA_KEY, &value);
+        }
+    }
+
+    // G4. If we're a guest, and a new user is joining, we need to queue and send our packets only after we know what API they use
+    // (Guest packets are required for a new guest to connect)
+    // We won't know the API until the host tells up the new mode, however. So we have to save this user and watch for that mode change, and only approve them then
+    // If we don't get a mode change, and they D/C (are forced to by the host), then we can stop waiting to approve them
+    if (lobbyowner != selfsteamid && pCallback->m_rgfChatMemberStateChange == EChatMemberStateChange::k_EChatMemberStateChangeEntered && pCallback->m_ulSteamIDUserChanged != selfsteamid.ConvertToUint64())
+    {
+        ConsoleWrite("G4. Guest detected new guest is trying to join.");
+        //if the host has already changed to Compatability, this waiting isn't needed and we can skip right to approval
+        if (ModNetworking::host_mod_mode == ModMode::Compatability)
+        {
+            SteamAPIStatusKnown_Users.emplace(pCallback->m_ulSteamIDUserChanged);
+            SendQueuedPackets();
+        }
+        else
+        {
+            SteamAPIStatusUnknown_Users_GuestWaitingForHost = pCallback->m_ulSteamIDUserChanged;
+        }
+    }
+
+    // G4. Guest: Handle the case where the guest disconnects
+    if (lobbyowner != selfsteamid && pCallback->m_rgfChatMemberStateChange == EChatMemberStateChange::k_EChatMemberStateChangeLeft && pCallback->m_ulSteamIDUserChanged != selfsteamid.ConvertToUint64())
+    {
+        ConsoleWrite("G4. Guest detected another guest has D/C'd.");
+
+        //this shouldn't be needed for the guest, but just in case
+        host_get_guest_response_mtx.lock();
+        ModNetworking::new_guest_incoming = false;
+        host_get_guest_response_mtx.unlock();
+
+        SteamAPIStatusKnown_Users.erase(pCallback->m_ulSteamIDUserChanged); //remove the user from the known list
+        RemoveQueuedPackets(pCallback->m_ulSteamIDUserChanged);
+        if (pCallback->m_ulSteamIDUserChanged == SteamAPIStatusUnknown_Users_GuestWaitingForHost)
+        {
+            SteamAPIStatusUnknown_Users_GuestWaitingForHost = 0; //clear if the guest is waiting for approval for this user
+        }
     }
 }
 
@@ -731,7 +842,7 @@ bool HostAwaitIncomingGuestMemberData(void* data_a)
     // If the guest disconnected on their own
     if (ModNetworking::new_guest_incoming == false)
     {
-        ConsoleWrite("4. Host detects that guest d/c'd on their own.");
+        ConsoleWrite("H4. Host detects that guest d/c'd on their own.");
         Game::show_popup_message(L"Guest declined to connect to your world due to their settings.");
         goto exit;
     }
@@ -739,41 +850,22 @@ bool HostAwaitIncomingGuestMemberData(void* data_a)
     //Timed out waiting for a message from the incoming guest, so they're a non-mod user
     else if (ModNetworking::incoming_guest_got_info == false && Game::get_accurate_time() > data->start_time + MS_TO_WAIT_FOR_GUEST_MSG)
     {
-        ConsoleWrite("4. Host detects incoming guest is non-mod user.");
+        ConsoleWrite("H4. Host detects incoming guest is non-mod user.");
         ModNetworking::incoming_guest_mod_installed = false;
 
-        //As the host, we only change our settings if the connecting user is non-mod, and we allow non-mod connections, and we don't have any other non-mod phantoms in here
-        if (ModNetworking::allow_connect_with_non_mod_guest == true)
+        //As the host, we only change our settings if the connecting user is non-mod and we allow non-mod connections
+        if (ModNetworking::allow_connect_with_non_mod_guest == true && Mod::get_mode() != ModMode::Compatability)
         {
-            // first non-mod user, change settings
-            if (ModNetworking::SteamMatchmaking->GetNumLobbyMembers(ModNetworking::currentLobby) == 2)
-            {
-                Mod::set_mode(ModMode::Compatability);
-                char value = static_cast<char>(Mod::get_mode());
-                ConsoleWrite("1. Host reset lobby data = %hhx", value);
-                ModNetworking::SteamMatchmaking->SetLobbyData(ModNetworking::currentLobby, MOD_LOBBY_DATA_KEY, &value);
-            }
-            // not first non-mod user and the other guests are not in a non-mod compatible mode
-            else if (ModNetworking::SteamMatchmaking->GetNumLobbyMembers(ModNetworking::currentLobby) > 2 && Mod::get_mode() != Compatability)
-            {
-                HostForceDisconnectGuest(data->steamid, L"Incoming guest is a non-mod user, but mod user is already connected.", true);
-                //TODO need to fix this
-                goto exit;
-            }
-            // not first non-mod user and the other guests are in a non-mod compatible mode
-            else if (ModNetworking::SteamMatchmaking->GetNumLobbyMembers(ModNetworking::currentLobby) > 2 && Mod::get_mode() == Compatability)
-            {
-                //no action needed
-            }
-            else
-            {
-                FATALERROR("Number of lobby members is %d. Impossible.", ModNetworking::SteamMatchmaking->GetNumLobbyMembers(ModNetworking::currentLobby));
-                goto exit;
-            }
+            Mod::set_mode(ModMode::Compatability);
+            char value = static_cast<char>(Mod::get_mode());
+            ConsoleWrite("H1. Host reset lobby data = %hhx", value);
+            ModNetworking::SteamMatchmaking->SetLobbyData(ModNetworking::currentLobby, MOD_LOBBY_DATA_KEY, &value);
+            ConnectedNonMod_Users.emplace(data->steamid);
         }
         // If specified in options, we must disconnect the non-mod player, since they won't on their own
         else if (ModNetworking::allow_connect_with_non_mod_guest == false)
         {
+            ConsoleWrite("H4. Incoming guest is non-mod user, and host do not allow connections with non-mod users.");
             HostForceDisconnectGuest(data->steamid, L"Incoming guest is non-mod user, and you do not allow connections with non-mod users.");
             goto exit;
         }
@@ -782,26 +874,24 @@ bool HostAwaitIncomingGuestMemberData(void* data_a)
     // If the guest isn't respecting our settings for some reason (can't hurt to check), disconnect them right away
     else if (ModNetworking::incoming_guest_got_info == true && ModNetworking::incoming_guest_mod_installed == true && ModNetworking::incoming_guest_mod_mode != Mod::get_mode())
     {
-        ConsoleWrite("4. Host detects incoming guest is mod-user, but isn't matching the legacy/overhaul mode. Host=%d, guest=%d.", Mod::get_mode(), ModNetworking::incoming_guest_mod_mode);
-
+        ConsoleWrite("H4. Host detects incoming guest is mod-user, but isn't matching the legacy/overhaul mode. Host=%d, guest=%d.", static_cast<int>(Mod::get_mode()), static_cast<int>(ModNetworking::incoming_guest_mod_mode));
         HostForceDisconnectGuest(data->steamid, L"Incoming guest is mod-user, but isn't matching your legacy/overhaul mode.");
         goto exit;
     }
 
     //Success state for a new guest
-    ConsoleWrite("4. Host allows guest in!");
+    ConsoleWrite("H4. Host allows guest in!");
 
-    ModNetworking::lobby_setup_complete = true;
-
-    // As the host, start up the clock syncronization function
-    //MainLoop::setup_mainloop_callback(HostTimerSync, NULL, "HostTimerSync");
-
+    //We now know this user's API, so we can send the queued packets
+    SteamAPIStatusKnown_Users.emplace(data->steamid);
+    SendQueuedPackets();
 
     //reset for next guest
     exit:
     ModNetworking::incoming_guest_got_info = false;
     ModNetworking::new_guest_incoming = false;
     host_get_guest_response_mtx.unlock();
+    RemoveQueuedPackets(data->steamid); //get rid of the queued packets if we ended up D/Cing the user (no-op if we accepted them)
     free(data);
     return false;
 }
