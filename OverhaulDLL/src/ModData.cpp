@@ -212,7 +212,6 @@ void Mod::change_mode(ModMode mode)
     //only change if we're not already in the mode
     if (Mod::current_mode != mode && mode != ModMode::InvalidMode)
     {
-        Mod::current_mode = mode;
         Files::UseOverhaulFiles = (mode == ModMode::Overhaul);
         FileReloading::SetParamsToUse(mode != ModMode::Overhaul);
         //avoid a player reload if not needed
@@ -221,6 +220,7 @@ void Mod::change_mode(ModMode mode)
             FileReloading::ReloadPlayer();
         }
         FileReloading::RefreshPlayerStats();
+        Mod::current_mode = mode;
     }
 
     Mod::next_mode = ModMode::InvalidMode; //unset this so we know we don't have a next_mode still to go
