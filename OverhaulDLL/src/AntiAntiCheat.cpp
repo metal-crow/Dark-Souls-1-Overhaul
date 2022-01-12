@@ -357,6 +357,10 @@ extern "C" {
     uint64_t finish_construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_return;
     void finish_construct_flatbuffer_from_PlayerStatus_MemberFlags_injection();
     void finish_construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper();
+
+    uint64_t set_MemberFlags_bitflag_injection_return;
+    void set_MemberFlags_bitflag_injection();
+    bool set_MemberFlags_bitflag_injection_helper(uint64_t flagid_);
 }
 
 enum MemberFlags_IdentifiersEnum
@@ -525,6 +529,9 @@ void AntiAntiCheat::start() {
     //SendBuild_RequestNotifyUserLogMessage_GeneralRequestTask (the other function besides construct_flatbuffer_from_PlayerStatus_MemberFlags that puts flags in the packet)
     //do we need to remove anything here? it seems safe
 
+    //Prevent any member flags from being set ANYWHERE that are not required
+    write_address = (uint8_t*)(AntiAntiCheat::set_MemberFlags_bitflag_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &set_MemberFlags_bitflag_injection_return, 1, &set_MemberFlags_bitflag_injection);
 }
 
 
@@ -636,7 +643,6 @@ void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_
     compute_MemberFlags_bitflag(membitflags_allowed, MemberFlags_IdentifiersEnum::SessionState);
 
     //extra checks, to be safe
-    //TODO add more checks
 
     uint32_t* arraystart = *(uint32_t**)(input_data + 0x228);
     uint32_t* arrayend = *(uint32_t**)(input_data + 0x230);
@@ -714,4 +720,28 @@ uint64_t game_write_playerdata_to_flatbuffer_injection_helper(uint32_t* array_st
     }
 
     return array_len;
+}
+
+//return false if we don't want the flag to be set
+bool set_MemberFlags_bitflag_injection_helper(uint64_t flagid_)
+{
+    MemberFlags_IdentifiersEnum flagid = static_cast<MemberFlags_IdentifiersEnum>(flagid_);
+
+    switch (flagid)
+    {
+    case MemberFlags_IdentifiersEnum::AreaId:
+    case MemberFlags_IdentifiersEnum::MpRegion:
+    case MemberFlags_IdentifiersEnum::RegionMatchmaking:
+    case MemberFlags_IdentifiersEnum::CovenantId:
+    case MemberFlags_IdentifiersEnum::hasInvasionTimeLimit:
+    case MemberFlags_IdentifiersEnum::SoulLevel:
+    case MemberFlags_IdentifiersEnum::ClearCount:
+    case MemberFlags_IdentifiersEnum::MaxWeaponLevel:
+    case MemberFlags_IdentifiersEnum::isPlayerHuman:
+    case MemberFlags_IdentifiersEnum::RegulationVersion:
+    case MemberFlags_IdentifiersEnum::SessionState:
+        return true;
+    default:
+        return false;
+    }
 }

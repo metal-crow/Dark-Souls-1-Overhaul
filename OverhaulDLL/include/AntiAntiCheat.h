@@ -24,6 +24,7 @@ private:
     static const uint64_t game_write_playerdata_to_flatbuffer_injection_offset = 0xbd22e6;
     static const uint64_t construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_offset = 0xbd047c;
     static const uint64_t finish_construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_offset = 0xbd3a09;
+    static const uint64_t set_MemberFlags_bitflag_offset = 0xba9fde;
 };
 
 #endif
