@@ -63,6 +63,13 @@ void Update_Check()
     fscanf_s(fp, "%llu", &new_version);
     fclose(fp);
 
+    //basic sanity check new version
+    if (new_version < 2000000000 || new_version >= 3000000000)
+    {
+        ConsoleWrite("Update_Check failed: got bad new version. %llu", new_version);
+        return;
+    }
+
     if (new_version > VERSION_RAW)
     {
         MessageBox(NULL,
