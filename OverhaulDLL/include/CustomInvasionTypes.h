@@ -6,6 +6,7 @@
 
 //These only need to include 1 area id from each set that match all but the last digit
 //i.e 100000 can invade all areas matching 10000X
+//http://darksouls.wikidot.com/invasion-spawn-locations
 static const uint32_t MultiPlayerRegionIDs[] =
 {
     //Depths
