@@ -29,7 +29,6 @@ static const uint32_t MultiPlayerRegionIDs[] =
     121100,
     121200,
     121210,
-    121300,
     //the catacombs
     130000,
     130010,
