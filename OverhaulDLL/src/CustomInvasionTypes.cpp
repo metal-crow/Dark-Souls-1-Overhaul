@@ -17,11 +17,18 @@ void CustomInvasionTypes::start()
     sp::mem::code::x64::inject_jmp_14b(write_address, &Send_Type17_GeneralRequestTask_injection_return, 1, &Send_Type17_GeneralRequestTask_injection);
 }
 
+enum InvasionOrb
+{
+    AllAreas,
+    InfiniteUp,
+    AllAreasAndInfiniteUp,
+    NoCustomOrb,
+};
+
 static uint32_t last_send_count = 0;
 static size_t current_mpregionid_offset = 0;
-static bool UsingAllAreasInvadeOrb = false;
 static uint32_t current_soullevel_offset = 0;
-static bool UsingInfiniteUpwardsInvadeOrb = false;
+static InvasionOrb current_InvasionOrb = InvasionOrb::NoCustomOrb;
 
 void Send_Type17_GeneralRequestTask_injection_helper(uint64_t RequestGetBreakInTargetList_Data)
 {
@@ -35,25 +42,34 @@ void Send_Type17_GeneralRequestTask_injection_helper(uint64_t RequestGetBreakInT
     //This speffect only stays for the 1st frame/send. So we have to remember it
     if (Game::player_has_speffect((uint64_t)(playerins_o.value()), { CustomInvasionTypes::AllAreasInvadingOrbSpEffect }))
     {
-        UsingAllAreasInvadeOrb = true;
-        UsingInfiniteUpwardsInvadeOrb = false;
+        current_InvasionOrb = InvasionOrb::AllAreas;
         last_send_count = 0;
+        //reset the area id list to the start
+        current_mpregionid_offset = 0;
     }
     else if (Game::player_has_speffect((uint64_t)(playerins_o.value()), { CustomInvasionTypes::InfiniteUpwardsInvadingOrbSpEffect }))
     {
-        UsingAllAreasInvadeOrb = false;
-        UsingInfiniteUpwardsInvadeOrb = true;
+        current_InvasionOrb = InvasionOrb::InfiniteUp;
         last_send_count = 0;
+        //reset the offset
+        current_soullevel_offset = 0;
+    }
+    else if (Game::player_has_speffect((uint64_t)(playerins_o.value()), { CustomInvasionTypes::AllAreasAndInfiniteUpwardsInvadingOrbSpEffect }))
+    {
+        current_InvasionOrb = InvasionOrb::AllAreasAndInfiniteUp;
+        last_send_count = 0;
+        //reset the area id and SL offset
+        current_mpregionid_offset = 0;
+        current_soullevel_offset = 0;
     }
     //If the player is doing any other normal multiplayer types, don't do this custom code
     else if (Game::player_has_speffect((uint64_t)(playerins_o.value()), { 4, 10, 11, 16, 26, 27, 15 }))
     {
-        UsingAllAreasInvadeOrb = false;
-        UsingInfiniteUpwardsInvadeOrb = false;
+        current_InvasionOrb = InvasionOrb::NoCustomOrb;
         last_send_count = 0;
     }
 
-    if (UsingAllAreasInvadeOrb)
+    if (current_InvasionOrb == InvasionOrb::AllAreas)
     {
         //use the current area id in the list
         *(uint32_t*)(RequestGetBreakInTargetList_Data) = MultiPlayerRegionIDs[current_mpregionid_offset];
@@ -81,13 +97,8 @@ void Send_Type17_GeneralRequestTask_injection_helper(uint64_t RequestGetBreakInT
         //set the timer to be closer to the refresh time (30 seconds)
         Game::set_invasion_refresh_timer(26.0f);
     }
-    else
-    {
-        //reset the area id list to the start
-        current_mpregionid_offset = 0;
-    }
 
-    if (UsingInfiniteUpwardsInvadeOrb)
+    if (current_InvasionOrb == InvasionOrb::InfiniteUp)
     {
         //Add an offset to the SL we tell the server, so it returns a new range of connection results
         uint32_t pc_sl = *(uint32_t*)(RequestGetBreakInTargetList_Data + 28);
@@ -106,20 +117,66 @@ void Send_Type17_GeneralRequestTask_injection_helper(uint64_t RequestGetBreakInT
         //(the two requests are not on the same frame)
         if (last_send_count == 0)
         {
-            current_soullevel_offset += 20 + (uint32_t)(0.1f*(pc_searched_sl)); //increase by the search's upper bound: 20+0.1*SL
-        }
-
-        if (pc_sl + current_soullevel_offset > 713)
-        {
-            current_soullevel_offset = 0;
+            current_soullevel_offset += (uint32_t)(1.22222*pc_searched_sl + 22.2222) - pc_searched_sl; //increase by the search's upper and lower bounds
+            //clamp the last search value to 713 if needed
+            if (pc_sl + current_soullevel_offset > 713)
+            {
+                current_soullevel_offset = 713 - pc_sl;
+            }
+            if (pc_searched_sl >= 713)
+            {
+                current_soullevel_offset = 0;
+            }
         }
 
         //set the timer to be closer to the refresh time (30 seconds)
         Game::set_invasion_refresh_timer(26.0f);
     }
-    else
+
+    if (current_InvasionOrb == InvasionOrb::AllAreasAndInfiniteUp)
     {
-        //reset the offset
-        current_soullevel_offset = 0;
+        *(uint32_t*)(RequestGetBreakInTargetList_Data) = MultiPlayerRegionIDs[current_mpregionid_offset];
+
+        uint32_t pc_sl = *(uint32_t*)(RequestGetBreakInTargetList_Data + 28);
+        *(uint32_t*)(RequestGetBreakInTargetList_Data + 28) += current_soullevel_offset;
+        uint32_t pc_searched_sl = pc_sl + current_soullevel_offset;
+
+        ConsoleWrite("Twin eye orb: area %d SL %d", MultiPlayerRegionIDs[current_mpregionid_offset], pc_searched_sl);
+        last_send_count++;
+        if (last_send_count >= 2)
+        {
+            last_send_count = 0;
+        }
+
+        //for some reason, the game calls this function twice for each request. Not sure if one is bad or good or what
+        //so to be safe, we don't change from the 1st request
+        //(the two requests are not on the same frame)
+        if (last_send_count == 0)
+        {
+            //increase the SL offset first
+            current_soullevel_offset += (uint32_t)(1.22222*pc_searched_sl + 22.2222) - pc_searched_sl; //increase by the search's upper and lower bounds
+            //clamp the last search value to 713 if needed
+            if (pc_sl + current_soullevel_offset > 713)
+            {
+                current_soullevel_offset = 713 - pc_sl;
+            }
+            if (pc_searched_sl >= 713)
+            {
+                current_soullevel_offset = 0;
+            }
+
+            //once the SL offset has looped around, go to next area
+            if (current_soullevel_offset == 0)
+            {
+                current_mpregionid_offset++;
+            }
+            if (current_mpregionid_offset >= (sizeof(MultiPlayerRegionIDs) / sizeof(MultiPlayerRegionIDs[0])))
+            {
+                current_mpregionid_offset = 0;
+            }
+        }
+
+        //set the timer to be closer to the refresh time (30 seconds)
+        Game::set_invasion_refresh_timer(26.0f);
     }
 }

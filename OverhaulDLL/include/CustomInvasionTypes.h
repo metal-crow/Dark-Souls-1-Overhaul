@@ -71,6 +71,7 @@ public:
 
     static const uint32_t AllAreasInvadingOrbSpEffect = 18;
     static const uint32_t InfiniteUpwardsInvadingOrbSpEffect = 19;
+    static const uint32_t AllAreasAndInfiniteUpwardsInvadingOrbSpEffect = 90;
 private:
     static const uint64_t Send_Type17_GeneralRequestTask_offset = 0xbcce19;
 };
