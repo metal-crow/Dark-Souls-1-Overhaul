@@ -513,6 +513,7 @@ void ModNetworking::LobbyEnterCallback(LobbyEnter_t* pCallback)
     ModNetworking::incoming_guest_to_not_accept = 0; //prevent any holdover data on new lobby
     SteamAPIStatusKnown_Users.clear();
     ConnectedNonMod_Users.clear();
+    ClearQueuedPackets(); //the game may still send packets to users after they D/C, so clean any leftovers out
 
     // H1. As the host, upon lobby creation(and self entry into it) set the lobby data to inform connecting users of our mod status
     // Since lobby data is persistent, we don't have to worry about resending anything for new connections
