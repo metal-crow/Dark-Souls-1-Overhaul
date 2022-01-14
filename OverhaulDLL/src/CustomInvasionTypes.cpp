@@ -40,33 +40,30 @@ void Send_Type17_GeneralRequestTask_injection_helper(uint64_t RequestGetBreakInT
 
     //If we have the special speffect on, start the custom invasion state
     //This speffect only stays for the 1st frame/send. So we have to remember it
+    //Support save and continue. So if we invade and search again it doesn't go back to the start
     if (Game::player_has_speffect((uint64_t)(playerins_o.value()), { CustomInvasionTypes::AllAreasInvadingOrbSpEffect }))
     {
         current_InvasionOrb = InvasionOrb::AllAreas;
         last_send_count = 0;
-        //reset the area id list to the start
-        current_mpregionid_offset = 0;
     }
     else if (Game::player_has_speffect((uint64_t)(playerins_o.value()), { CustomInvasionTypes::InfiniteUpwardsInvadingOrbSpEffect }))
     {
         current_InvasionOrb = InvasionOrb::InfiniteUp;
         last_send_count = 0;
-        //reset the offset
-        current_soullevel_offset = 0;
     }
     else if (Game::player_has_speffect((uint64_t)(playerins_o.value()), { CustomInvasionTypes::AllAreasAndInfiniteUpwardsInvadingOrbSpEffect }))
     {
         current_InvasionOrb = InvasionOrb::AllAreasAndInfiniteUp;
         last_send_count = 0;
-        //reset the area id and SL offset
-        current_mpregionid_offset = 0;
-        current_soullevel_offset = 0;
     }
     //If the player is doing any other normal multiplayer types, don't do this custom code
     else if (Game::player_has_speffect((uint64_t)(playerins_o.value()), { 4, 10, 11, 16, 26, 27, 15 }))
     {
         current_InvasionOrb = InvasionOrb::NoCustomOrb;
         last_send_count = 0;
+        //reset the area id and SL offset
+        current_mpregionid_offset = 0;
+        current_soullevel_offset = 0;
     }
 
     if (current_InvasionOrb == InvasionOrb::AllAreas)

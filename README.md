@@ -12,6 +12,9 @@ https://gitlab.com/metal-crow/darksoulsremastered-overhaul-archives
 ### Nexus Mods link
 https://www.nexusmods.com/darksoulsremastered/mods/466
 
+### Discord
+https://discord.gg/nABqj8G
+
 ### Installation
 This requires the [Microsoft Visual C++ Redistributable for Visual Studio 2015-2019 ](https://aka.ms/vs/16/release/vc_redist.x64.exe). You should already have it, but just in case.  
   
