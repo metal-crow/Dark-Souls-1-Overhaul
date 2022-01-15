@@ -29,7 +29,7 @@
 #define __DS1_OVERHAUL_MOD
 
 static const uint64_t VERSION_RAW = 2022011200;
-#define VERSION_STRING  "Beta7"
+#define VERSION_STRING  "Beta8"
 #define DS1_OVERHAUL_TXT_INTRO "\n+------------------------------------------------------+\n|      Dark Souls Overhaul   ["VERSION_STRING"]                 |\n+------------------------------------------------------+"
 
 extern HMODULE d3d11_module;
