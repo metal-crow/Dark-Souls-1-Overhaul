@@ -54,8 +54,19 @@ void mp_zone_changing_helper(int32_t vanilla_zone, uint64_t entity)
             //a value of 100XXX seems to work reliably
             int32_t new_zone = 100000 + Game::get_area_number().value_or(0) * 100 + Game::get_world_number().value_or(0);
 
-            *Game::get_online_area_id_ptr().value() = new_zone;
-            *Game::get_MP_AreaID_ptr().value() = new_zone;
+            //set this area id, used for the multiplayer area we invade in
+            auto areaid1 = Game::get_online_area_id_ptr();
+            if (areaid1.has_value())
+            {
+                *areaid1.value() = new_zone;
+            }
+
+            //and this area id, used for what multiplayer area we're currently in
+            auto areaid2 = Game::get_area_id_ptr();
+            if (areaid2.has_value())
+            {
+                *areaid2.value() = new_zone;
+            }
         }
     }
 }
