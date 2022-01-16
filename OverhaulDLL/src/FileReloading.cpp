@@ -107,17 +107,22 @@ Calculate_MaxSP_From_End_FUNC* Calculate_MaxSP_From_End = (Calculate_MaxSP_From_
 
 //need to add this due to a race condition with DSR accessing some PC data before the reload is finished
 static std::mutex ReloadPlayer_mtx;
+static std::mutex ReloadPlayer_locks_remaining_mtx;
+static int ReloadPlayer_locks_remaining;
 
 void FileReloading::ReloadPlayer()
 {
+    //we need to wait on unlocking this mutex until the player is fully reloaded
     ReloadPlayer_mtx.lock();
+
+    ReloadPlayer_locks_remaining_mtx.lock();
+    ReloadPlayer_locks_remaining = 2;
+    ReloadPlayer_locks_remaining_mtx.unlock();
 
     // Set bPlayerReload flag to true
     *((uint8_t*)0x141D151DB) = 1;
     // Call Force_PlayerReload
     Force_PlayerReload(*(void**)Game::world_chr_man_imp, L"c0000");
-
-    ReloadPlayer_mtx.unlock();
 }
 
 /* --------------------------------------------------------------------- */
@@ -125,6 +130,9 @@ void FileReloading::ReloadPlayer()
 bool FileReloading::GameParamsLoaded = false;
 bool CheckIfGameParamsLoaded(void* unused);
 
+//we only call this on game start, so that if there's a race condition with accessing the param data while it's unloaded
+//it can only happen once, on boot
+//all other times we instantly switch between loaded params, so race conditions are eliminated
 void FileReloading::LoadGameParam()
 {
     Files::UseOverhaulFiles = true;
@@ -310,6 +318,12 @@ extern "C" {
     uint64_t call_SetHostPlayerIns_offset_injection_return;
     void call_SetHostPlayerIns_offset_injection();
     void call_SetHostPlayerIns_offset_helper(bool lock);
+
+    uint64_t reload_chrctrl_location1_injection_return;
+    void reload_chrctrl_location1_injection();
+    uint64_t reload_chrctrl_location2_injection_return;
+    void reload_chrctrl_location2_injection();
+    void reload_chrctrl_injection_helper();
 }
 
 void FileReloading::start()
@@ -328,7 +342,41 @@ void FileReloading::start()
     //injection to check if we're currently reloading the character before the game accesses it (fixes race condition)
     write_address = (uint8_t*)(FileReloading::call_SetHostPlayerIns_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &call_SetHostPlayerIns_offset_injection_return, 6, &call_SetHostPlayerIns_offset_injection);
+
+    //injections to determine when the character is actually done reloading, so the lock is held for the correct amount of time
+    write_address = (uint8_t*)(FileReloading::reload_chrctrl_location1_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &reload_chrctrl_location1_injection_return, 0, &reload_chrctrl_location1_injection);
+    write_address = (uint8_t*)(FileReloading::reload_chrctrl_location2_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &reload_chrctrl_location2_injection_return, 0, &reload_chrctrl_location2_injection);
 }
+
+void call_SetHostPlayerIns_offset_helper(bool lock)
+{
+    if (lock)
+    {
+        ReloadPlayer_mtx.lock();
+    }
+    else
+    {
+        ReloadPlayer_mtx.unlock();
+    }
+}
+
+void reload_chrctrl_injection_helper()
+{
+    ReloadPlayer_locks_remaining_mtx.lock();
+    if (ReloadPlayer_locks_remaining == 0)
+    {
+        ReloadPlayer_mtx.unlock();
+        ReloadPlayer_locks_remaining = -1;
+    }
+    else if (ReloadPlayer_locks_remaining > 0)
+    {
+        ReloadPlayer_locks_remaining -= 1;
+    }
+    ReloadPlayer_locks_remaining_mtx.unlock();
+}
+
 
 void FileReloading::SetParamsToUse(bool legacy)
 {
@@ -341,17 +389,5 @@ void FileReloading::SetParamsToUse(bool legacy)
     {
         //the overhaul files are loaded after boot
         SoloParamRes_curindex = 1;
-    }
-}
-
-void call_SetHostPlayerIns_offset_helper(bool lock)
-{
-    if (lock)
-    {
-        ReloadPlayer_mtx.lock();
-    }
-    else
-    {
-        ReloadPlayer_mtx.unlock();
     }
 }

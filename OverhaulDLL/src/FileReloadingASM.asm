@@ -136,6 +136,102 @@ add     rsp, 10h
 jmp     call_SetHostPlayerIns_offset_injection_return
 call_SetHostPlayerIns_offset_injection ENDP
 
+
+extern reload_chrctrl_injection_helper: proc
+
+PUBLIC reload_chrctrl_location1_injection
+reload_chrctrl_location1_injection PROC
+
+sub     rsp, 10h
+movdqu  [rsp], xmm0
+sub     rsp, 10h
+movdqu  [rsp], xmm1
+sub     rsp, 10h
+movdqu  [rsp], xmm2
+sub     rsp, 10h
+movdqu  [rsp], xmm3
+push    rax
+push    rcx
+push    rdx
+push    r8
+push    r9
+push    r10
+push    r11
+sub     rsp, 20h
+
+call    reload_chrctrl_injection_helper
+
+add     rsp, 20h
+pop     r11
+pop     r10
+pop     r9
+pop     r8
+pop     rdx
+pop     rcx
+pop     rax
+movdqu  xmm3, [rsp]
+add     rsp, 10h
+movdqu  xmm2, [rsp]
+add     rsp, 10h
+movdqu  xmm1, [rsp]
+add     rsp, 10h
+movdqu  xmm0, [rsp]
+add     rsp, 10h
+
+;original code
+mov     rbx, [rsp+70h]
+add     rsp, 40h
+pop     rdi
+pop     rsi
+pop     rbp
+ret
+reload_chrctrl_location1_injection ENDP
+
+PUBLIC reload_chrctrl_location2_injection
+reload_chrctrl_location2_injection PROC
+
+sub     rsp, 10h
+movdqu  [rsp], xmm0
+sub     rsp, 10h
+movdqu  [rsp], xmm1
+sub     rsp, 10h
+movdqu  [rsp], xmm2
+sub     rsp, 10h
+movdqu  [rsp], xmm3
+push    rax
+push    rcx
+push    rdx
+push    r8
+push    r9
+push    r10
+push    r11
+sub     rsp, 20h
+
+call    reload_chrctrl_injection_helper
+
+add     rsp, 20h
+pop     r11
+pop     r10
+pop     r9
+pop     r8
+pop     rdx
+pop     rcx
+pop     rax
+movdqu  xmm3, [rsp]
+add     rsp, 10h
+movdqu  xmm2, [rsp]
+add     rsp, 10h
+movdqu  xmm1, [rsp]
+add     rsp, 10h
+movdqu  xmm0, [rsp]
+add     rsp, 10h
+
+;original code
+add     rsp, 50h
+pop     rdi
+ret
+reload_chrctrl_location2_injection ENDP
+
 _TEXT    ENDS
 
 END
