@@ -41,17 +41,17 @@ void Send_Type17_GeneralRequestTask_injection_helper(uint64_t RequestGetBreakInT
     //If we have the special speffect on, start the custom invasion state
     //This speffect only stays for the 1st frame/send. So we have to remember it
     //Support save and continue. So if we invade and search again it doesn't go back to the start
-    if (Game::player_has_speffect((uint64_t)(playerins_o.value()), { CustomInvasionTypes::AllAreasInvadingOrbSpEffect }))
+    if (Game::player_has_speffect((uint64_t)(playerins_o.value()), { CustomInvasionTypes::AllAreasInvadingOrbSpEffect_Red, CustomInvasionTypes::AllAreasInvadingOrbSpEffect_Blue }))
     {
         current_InvasionOrb = InvasionOrb::AllAreas;
         last_send_count = 0;
     }
-    else if (Game::player_has_speffect((uint64_t)(playerins_o.value()), { CustomInvasionTypes::InfiniteUpwardsInvadingOrbSpEffect }))
+    else if (Game::player_has_speffect((uint64_t)(playerins_o.value()), { CustomInvasionTypes::InfiniteUpwardsInvadingOrbSpEffect_Red, CustomInvasionTypes::InfiniteUpwardsInvadingOrbSpEffect_Blue }))
     {
         current_InvasionOrb = InvasionOrb::InfiniteUp;
         last_send_count = 0;
     }
-    else if (Game::player_has_speffect((uint64_t)(playerins_o.value()), { CustomInvasionTypes::AllAreasAndInfiniteUpwardsInvadingOrbSpEffect }))
+    else if (Game::player_has_speffect((uint64_t)(playerins_o.value()), { CustomInvasionTypes::AllAreasAndInfiniteUpwardsInvadingOrbSpEffect_Red, CustomInvasionTypes::AllAreasAndInfiniteUpwardsInvadingOrbSpEffect_Blue }))
     {
         current_InvasionOrb = InvasionOrb::AllAreasAndInfiniteUp;
         last_send_count = 0;
@@ -93,6 +93,7 @@ void Send_Type17_GeneralRequestTask_injection_helper(uint64_t RequestGetBreakInT
 
         //set the timer to be closer to the refresh time (30 seconds)
         Game::set_invasion_refresh_timer(26.0f);
+        Game::set_blue_invasion_refresh_timer(26.0f);
     }
 
     if (current_InvasionOrb == InvasionOrb::InfiniteUp)
@@ -128,6 +129,7 @@ void Send_Type17_GeneralRequestTask_injection_helper(uint64_t RequestGetBreakInT
 
         //set the timer to be closer to the refresh time (30 seconds)
         Game::set_invasion_refresh_timer(26.0f);
+        Game::set_blue_invasion_refresh_timer(26.0f);
     }
 
     if (current_InvasionOrb == InvasionOrb::AllAreasAndInfiniteUp)
@@ -175,5 +177,6 @@ void Send_Type17_GeneralRequestTask_injection_helper(uint64_t RequestGetBreakInT
 
         //set the timer to be closer to the refresh time (30 seconds)
         Game::set_invasion_refresh_timer(26.0f);
+        Game::set_blue_invasion_refresh_timer(26.0f);
     }
 }

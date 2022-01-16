@@ -313,6 +313,8 @@ public:
 
     static bool set_invasion_refresh_timer(float newtime);
 
+    static bool set_blue_invasion_refresh_timer(float newtime);
+
     static uint32_t get_player_chr_type(uint64_t playerIns);
 
     static std::optional<int32_t*> get_MP_AreaID_ptr();

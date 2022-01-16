@@ -1421,6 +1421,20 @@ bool Game::set_invasion_refresh_timer(float newtime)
     }
 }
 
+bool Game::set_blue_invasion_refresh_timer(float newtime)
+{
+    sp::mem::pointer refresh_timer = sp::mem::pointer<float>((void*)(Game::unknown_global_struct_141d283a8), { 0x8, 0x0, 0x1e4 });
+    if (refresh_timer.resolve() == NULL)
+    {
+        return false;
+    }
+    else
+    {
+        *(refresh_timer.resolve()) = newtime;
+        return true;
+    }
+}
+
 uint32_t Game::get_player_chr_type(uint64_t playerIns)
 {
     return *(uint32_t*)(playerIns + 0xD4);

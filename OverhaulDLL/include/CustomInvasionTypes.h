@@ -69,9 +69,12 @@ class CustomInvasionTypes
 public:
     static void start();
 
-    static const uint32_t AllAreasInvadingOrbSpEffect = 18;
-    static const uint32_t InfiniteUpwardsInvadingOrbSpEffect = 19;
-    static const uint32_t AllAreasAndInfiniteUpwardsInvadingOrbSpEffect = 90;
+    static const uint32_t AllAreasInvadingOrbSpEffect_Red = 18;
+    static const uint32_t AllAreasInvadingOrbSpEffect_Blue = 91;
+    static const uint32_t InfiniteUpwardsInvadingOrbSpEffect_Red = 19;
+    static const uint32_t InfiniteUpwardsInvadingOrbSpEffect_Blue = 92;
+    static const uint32_t AllAreasAndInfiniteUpwardsInvadingOrbSpEffect_Red = 90;
+    static const uint32_t AllAreasAndInfiniteUpwardsInvadingOrbSpEffect_Blue = 93;
 private:
     static const uint64_t Send_Type17_GeneralRequestTask_offset = 0xbcce19;
 };
