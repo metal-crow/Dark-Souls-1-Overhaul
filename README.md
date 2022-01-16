@@ -69,6 +69,7 @@ This only affects you, the client. If you are playing with a non-mod user, they 
 * You can now summon phantoms anywhere.   
 This solution is imperfect, as areas where you could not do multiplayer before but are right next to areas you could (I.E Undead Burg bonfire), are treated as seperate multiplayer areas.  
 (Note that DSR allows summons even with the boss dead).  
+There is a current bug with this where if you spawn into one of these areas (via load or return from invasion), this won't work. You have to walk into the area.  
 
 * Support for unlimited save slots.  
 Press left/right arrow or left/right dpad while in the Load Game menu to change your current save.  
