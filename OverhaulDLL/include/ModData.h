@@ -34,6 +34,7 @@
 
 #include <vector>
 #include <map>
+#include <string>
 
 enum ModMode
 {
@@ -43,12 +44,19 @@ enum ModMode
     InvalidMode = 0,
 };
 
+//these must be keep constant, we now rely on them to set the steam lobby mode
 const std::map<ModMode, const char*> ModModes_To_String =
 {
     {Overhaul, "Overhaul"},
     {Legacy, "Legacy"},
-    {Compatability, "Legacy with non-mod"},
+    {Compatability, "Compatability"},
     {InvalidMode, "InvalidMode"},
+};
+const std::map<std::string, ModMode> String_To_ModModes =
+{
+    {"Overhaul", Overhaul},
+    {"Legacy", Legacy},
+    {"Compatability", Compatability},
 };
 
 class Mod
