@@ -29,13 +29,13 @@ push    r8
 push    r9
 push    r10
 push    r11
-sub     rsp, 20h
+sub     rsp, 28h
 
 mov     ecx, dword ptr [rbx+354h] ;the vanilla zone
 mov     rdx, rbx ;the current entity
 call    mp_zone_changing_helper
 
-add     rsp, 20h
+add     rsp, 28h
 pop     r11
 pop     r10
 pop     r9

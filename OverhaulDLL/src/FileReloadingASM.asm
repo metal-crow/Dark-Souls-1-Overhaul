@@ -68,12 +68,12 @@ push    r8
 push    r9
 push    r10
 push    r11
-sub     rsp, 20h
+sub     rsp, 28h
 
 mov     rcx, 1 ;lock
 call    call_SetHostPlayerIns_offset_helper
 
-add     rsp, 20h
+add     rsp, 28h
 pop     r11
 pop     r10
 pop     r9
@@ -111,12 +111,12 @@ push    r8
 push    r9
 push    r10
 push    r11
-sub     rsp, 20h
+sub     rsp, 28h
 
 mov     rcx, 0 ;unlock
 call    call_SetHostPlayerIns_offset_helper
 
-add     rsp, 20h
+add     rsp, 28h
 pop     r11
 pop     r10
 pop     r9
@@ -157,11 +157,11 @@ push    r8
 push    r9
 push    r10
 push    r11
-sub     rsp, 20h
+sub     rsp, 28h
 
 call    reload_chrctrl_injection_helper
 
-add     rsp, 20h
+add     rsp, 28h
 pop     r11
 pop     r10
 pop     r9
@@ -205,11 +205,11 @@ push    r8
 push    r9
 push    r10
 push    r11
-sub     rsp, 20h
+sub     rsp, 28h
 
 call    reload_chrctrl_injection_helper
 
-add     rsp, 20h
+add     rsp, 28h
 pop     r11
 pop     r10
 pop     r9

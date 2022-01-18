@@ -108,7 +108,7 @@ Calculate_MaxSP_From_End_FUNC* Calculate_MaxSP_From_End = (Calculate_MaxSP_From_
 //need to add this due to a race condition with DSR accessing some PC data before the reload is finished
 static std::mutex ReloadPlayer_mtx;
 static std::mutex ReloadPlayer_locks_remaining_mtx;
-static int ReloadPlayer_locks_remaining;
+static int ReloadPlayer_locks_remaining = -1;
 
 void FileReloading::ReloadPlayer()
 {
