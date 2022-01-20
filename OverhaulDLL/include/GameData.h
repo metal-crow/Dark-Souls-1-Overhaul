@@ -307,6 +307,8 @@ public:
 
     static void show_popup_message(const wchar_t * msg);
 
+    static void show_banner_message(const wchar_t * msg);
+
 	static std::optional<void*> find_bullet(uint32_t owner_handle, uint32_t bullet_num);
 
     static std::optional<void*> find_unfired_bullet(uint32_t owner_handle, float x_pos, float y_pos, float z_pos, std::unordered_set<uint8_t> formidden_nums);

@@ -1341,6 +1341,15 @@ void Game::show_popup_message(const wchar_t* msg)
     } while (i < 5);
 }
 
+typedef bool Create_BannerMessage_Func_Typedef(uint64_t menuman_banner, uint32_t banner_type, const wchar_t* str);
+Create_BannerMessage_Func_Typedef* Create_BannerMessage_Func = (Create_BannerMessage_Func_Typedef*)0x14071cf90;
+
+void Game::show_banner_message(const wchar_t* msg)
+{
+    uint64_t MenuMan_BannerMessages = *((uint64_t*)Game::menu_man) + 0xf80;
+    Create_BannerMessage_Func(MenuMan_BannerMessages, 1, msg); //the other banner type, 0, just shows the banner slightly higher
+}
+
 std::optional<void*> Game::find_bullet(uint32_t owner_handle, uint32_t bullet_num)
 {
     //this points to a linked list of the bullets in use. Follow backwards till there isn't another node in the list
