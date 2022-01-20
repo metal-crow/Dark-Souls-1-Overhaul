@@ -500,7 +500,7 @@ void HostForceDisconnectGuest(uint64_t steamid, const wchar_t* dc_reason, bool u
     //Tell the host why we're dcing this guest
     wchar_t dc_msg[300];
     swprintf(dc_msg, 300, L"Disconnecting incoming guest player.\n%s", dc_reason);
-    Game::show_popup_message(dc_msg);
+    Game::show_banner_message(dc_msg);
 }
 
 typedef struct
@@ -876,7 +876,7 @@ bool HostAwaitIncomingGuestMemberData(void* data_a)
     if (ModNetworking::new_guest_incoming == false)
     {
         ConsoleWrite("H4. Host detects that guest d/c'd on their own.");
-        Game::show_popup_message(L"Guest declined to connect to your world due to their settings.");
+        Game::show_banner_message(L"Guest declined to connect to your world due to their settings.");
         goto exit;
     }
 

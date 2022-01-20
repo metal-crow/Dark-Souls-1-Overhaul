@@ -32,6 +32,8 @@ static InvasionOrb current_InvasionOrb = InvasionOrb::NoCustomOrb;
 
 void Send_Type17_GeneralRequestTask_injection_helper(uint64_t RequestGetBreakInTargetList_Data)
 {
+    wchar_t banner_msg[75];
+
     auto playerins_o = Game::get_PlayerIns();
     if (!playerins_o.has_value())
     {
@@ -69,9 +71,12 @@ void Send_Type17_GeneralRequestTask_injection_helper(uint64_t RequestGetBreakInT
     if (current_InvasionOrb == InvasionOrb::AllAreas)
     {
         //use the current area id in the list
-        *(uint32_t*)(RequestGetBreakInTargetList_Data) = MultiPlayerRegionIDs[current_mpregionid_offset];
+        *(uint32_t*)(RequestGetBreakInTargetList_Data) = std::get<0>(MultiPlayerRegionIDs[current_mpregionid_offset]);
 
-        ConsoleWrite("Searching orb: area %d", MultiPlayerRegionIDs[current_mpregionid_offset]);
+        swprintf(banner_msg, sizeof(banner_msg)/sizeof(wchar_t), L"Searching area: %s", std::get<1>(MultiPlayerRegionIDs[current_mpregionid_offset]));
+        Game::show_banner_message(banner_msg);
+
+        ConsoleWrite("Searching orb: area %d", std::get<0>(MultiPlayerRegionIDs[current_mpregionid_offset]));
         last_send_count++;
         if (last_send_count >= 2)
         {
@@ -102,6 +107,9 @@ void Send_Type17_GeneralRequestTask_injection_helper(uint64_t RequestGetBreakInT
         uint32_t pc_sl = *(uint32_t*)(RequestGetBreakInTargetList_Data + 28);
         *(uint32_t*)(RequestGetBreakInTargetList_Data + 28) += current_soullevel_offset;
         uint32_t pc_searched_sl = pc_sl + current_soullevel_offset;
+
+        swprintf(banner_msg, sizeof(banner_msg) / sizeof(wchar_t), L"Using Soul Level: %d", pc_searched_sl);
+        Game::show_banner_message(banner_msg);
 
         ConsoleWrite("Unbound orb: SL %d", pc_searched_sl);
         last_send_count++;
@@ -134,13 +142,16 @@ void Send_Type17_GeneralRequestTask_injection_helper(uint64_t RequestGetBreakInT
 
     if (current_InvasionOrb == InvasionOrb::AllAreasAndInfiniteUp)
     {
-        *(uint32_t*)(RequestGetBreakInTargetList_Data) = MultiPlayerRegionIDs[current_mpregionid_offset];
+        *(uint32_t*)(RequestGetBreakInTargetList_Data) = std::get<0>(MultiPlayerRegionIDs[current_mpregionid_offset]);
 
         uint32_t pc_sl = *(uint32_t*)(RequestGetBreakInTargetList_Data + 28);
         *(uint32_t*)(RequestGetBreakInTargetList_Data + 28) += current_soullevel_offset;
         uint32_t pc_searched_sl = pc_sl + current_soullevel_offset;
 
-        ConsoleWrite("Twin eye orb: area %d SL %d", MultiPlayerRegionIDs[current_mpregionid_offset], pc_searched_sl);
+        swprintf(banner_msg, sizeof(banner_msg) / sizeof(wchar_t), L"Searching area: %s at SL: %d", std::get<1>(MultiPlayerRegionIDs[current_mpregionid_offset]), pc_searched_sl);
+        Game::show_banner_message(banner_msg);
+
+        ConsoleWrite("Twin eye orb: area %d SL %d", std::get<0>(MultiPlayerRegionIDs[current_mpregionid_offset]), pc_searched_sl);
         last_send_count++;
         if (last_send_count >= 2)
         {
