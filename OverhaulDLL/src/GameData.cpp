@@ -19,6 +19,7 @@
 #include "SP/memory/injection/asm/x64.h"
 #include "FileReloading.h"
 #include "ModNetworking.h"
+#include "CustomInvasionTypes.h"
 
 
 /*
@@ -74,8 +75,8 @@ extern "C" {
     void gui_hpbar_max_injection();
 }
 
-// Flag to determine if any characters have been loaded since the game was launched (useful if player had a character loaded but returned to main menu)
-bool Game::characters_loaded = false;
+// Flag to determine if a character have been loaded since the game was launched (useful if player had a character loaded but returned to main menu)
+bool Game::first_character_loaded = false;
 
 // Address of lava brightness effect (used for dimming lava)
 uint8_t *Game::lava_luminosity = NULL;
@@ -168,58 +169,63 @@ void Game::injections_init()
 }
 
 static bool character_reload_run = false;
+static bool character_initial_load_run = false;
+
 
 // Performs tasks that were deferred until a character was loaded/reloaded
 bool Game::on_character_load(void* unused)
 {
-    // Wait for event: first character loaded in this instance of the game
-    if (Game::characters_loaded == false && Game::playerchar_is_loaded())
+    // Triggered on event: first character loaded in this instance of the game
+    if (character_initial_load_run == false && Game::first_character_loaded == false && Game::playerchar_is_loaded())
     {
-        Game::characters_loaded = true;
-
-        Game::preload_function_caches();
+        Game::first_character_loaded = true;
 
         Game::set_display_name(Mod::use_steam_names);
-
-        character_reload_run = true;
 
         //only now, on first load, do we load the overhaul files
         //This way we know they're the 2nd thing loaded
         //(also only load them once since they get saved once loaded)
         FileReloading::LoadGameParam();
 
-        //need to force refresh the character in case the legacy mod changed while the game was off (restarting the game doesn't do this for some reason)
-        FileReloading::RefreshPlayerStats();
+        CustomInvasionTypes::ReadSearchFile();
 
-        ConsoleWrite("All character loading finished!");
+        ConsoleWrite("First character loading finished");
 
-        return true;
+        character_initial_load_run = true;
     }
 
+    //Triggered on event: a character has been loaded from the save menu, but not the first character loaded
+    if (character_initial_load_run == false && Game::first_character_loaded == true && Game::playerchar_is_loaded())
+    {
+        CustomInvasionTypes::ReadSearchFile();
+
+        ConsoleWrite("Another character loading finished");
+
+        character_initial_load_run = true;
+    }
+
+    //Triggered on event: the game has gone through a loading screen
     if (character_reload_run == false && Game::playerchar_is_loaded())
     {
         Game::preload_function_caches();
 
-        /*//refresh the animation table pointers
-        for (int i = 0; i < sizeof(pc_animation_table) / sizeof(void**); i++) {
-            Game::pc_animation_table[i] = (AnimationEntry**)SpPointer(Game::world_char_base, { 0x28, 0x0, 0x28, 0x14, 0x4, 0x10 + (0x60 * i) }).resolve();
-            if (Game::pc_animation_table[i] == NULL) {
-                print_console("Error getting Animation Table Entry address");
-            }
-        }*/
-
+        //need to force refresh the character in case the legacy mod changed while the game was off (restarting the game doesn't do this for some reason)
         //need to force refresh the character in case this character was in a different mode then the current when it was previous loaded
         FileReloading::RefreshPlayerStats();
 
-        character_reload_run = true;
+        ConsoleWrite("Character reload finished");
 
-        return true;
+        character_reload_run = true;
     }
 
+    //set the flags to determine what to run
     if (character_reload_run == true && !Game::playerchar_is_loaded())
     {
         character_reload_run = false;
-        return true;
+    }
+    if (character_initial_load_run == true && Game::get_main_menu_flag().has_value() && *Game::get_main_menu_flag().value() == 1)
+    {
+        character_initial_load_run = false;
     }
 
     return true;
@@ -250,6 +256,7 @@ static uint8_t* world_num_cache = NULL;
 static int32_t* mp_id_cache = NULL;
 static int32_t* area_id_cache = NULL;
 static int32_t* saved_chars_menu_flag_cache = NULL;
+static int32_t* main_menu_flag_cache = NULL;
 static uint8_t* saved_chars_preview_data_cache = NULL;
 static uint32_t* pc_playernum_cache = NULL;
 static uint64_t connected_players_array_cache = NULL;
@@ -294,6 +301,8 @@ void Game::preload_function_caches() {
     Game::get_area_id_ptr();
     saved_chars_menu_flag_cache = NULL;
     Game::get_saved_chars_menu_flag();
+    main_menu_flag_cache = NULL;
+    Game::get_main_menu_flag();
     saved_chars_preview_data_cache = NULL;
     Game::get_saved_chars_preview_data();
     pc_playernum_cache = NULL;
@@ -992,6 +1001,25 @@ std::optional<int32_t*> Game::get_saved_chars_menu_flag() {
     else {
         saved_chars_menu_flag_cache = saved_chars_menu_flag.resolve();
         return saved_chars_menu_flag_cache;
+    }
+}
+
+std::optional<int32_t*> Game::get_main_menu_flag()
+{
+    if (main_menu_flag_cache)
+    {
+        return main_menu_flag_cache;
+    }
+
+    sp::mem::pointer main_menu_flag = sp::mem::pointer<int32_t>((void*)(Game::ds1_base + 0x1D26168), { 0x80 });
+    if (main_menu_flag.resolve() == NULL)
+    {
+        return std::nullopt;
+    }
+    else
+    {
+        main_menu_flag_cache = main_menu_flag.resolve();
+        return main_menu_flag_cache;
     }
 }
 

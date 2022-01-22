@@ -102,6 +102,12 @@ This doesn't also enable infinite upwards weapon level searching, however.
 
 * New item, "Twin Eye Orb" (id 109, available from the Undead Merchant), that does both of the above orbs' functions, combined.  
 
+* Versions of the above eye orbs, for Darkmoons.  
+
+* System for selecting what areas you want to try invading with the above eye orbs.  
+Edit the included searchlist.txt with what areas to search for, and the orbs will only look in those areas.  
+You can also edit the file while the game is running, and reloading your save will refresh it in-game.  
+
 * Basic update check system
 
 ### Overhaul

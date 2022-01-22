@@ -161,8 +161,7 @@ public:
     // Player character status (loading, human, co-op, invader, hollow)
     static sp::mem::pointer<int32_t> player_char_status;
 
-    // Flag to determine if any characters have been loaded since the game was launched (useful if player had a character loaded but returned to main menu)
-    static bool characters_loaded;
+    static bool first_character_loaded;
 
     // Address of lava brightness effect (used for dimming lava)
     static uint8_t *lava_luminosity;
@@ -264,6 +263,8 @@ public:
     static std::optional<int32_t*> get_area_id_ptr();
 
     static std::optional<int32_t*> get_saved_chars_menu_flag();
+
+    static std::optional<int32_t*> get_main_menu_flag();
 
     static std::optional<uint8_t*> get_saved_chars_preview_data();
 
