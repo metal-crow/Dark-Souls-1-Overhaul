@@ -1,0 +1,53 @@
+#Depths
+100000:The Depths
+100010:Lower Depths
+#Undead Parish
+101200:Undead Parish Bridge
+101210:Upper Undead Parish
+#Undead Burg
+101000:Undead Burg Start
+101010:Undead Burg
+101100:Lower Undead Burg
+#Painted World
+110000:Painted World
+110010:Painted World
+#Darkroot Garden/Basin
+120000:Darkroot Garden and Basin
+120010:Darkroot Garden
+120100:Darkroot Garden Forest
+#Artorias of the Abyss
+121000:Sanctuary Garden
+121100:Royal Wood
+121200:Oolacile Township
+121210:Chasm of the Abyss
+#The Catacombs
+130000:The Catacombs Start
+130010:The Catacombs
+#Tomb of the Giants
+131000:Tomb of the Giants Upper
+131010:Tomb of the Giants Lower
+#Blighttown
+140000:Upper Blighttown
+140010:Blighttown Swamp
+#Demon Ruins/Lost Izaleth
+141000:Ceaseless Discharge Bridge
+141100:Demon Ruins
+141200:Centipede Demon Hallway
+141300:Lost Izalith
+#Sens Fortress
+150000:Sen's Fortress
+150010:Sen's Fortress
+150020:Sen's Fortress Roof
+#Anor Londo
+151000:Anor Londo Start
+151010:Anor Londo
+151020:Anor Londo Interior
+#New Londo
+160100:New Londo Start
+160110:New Londo
+160120:New Londo Ground
+#Dukes Archive/Crystal Caves
+170000:Duke's Archives
+170010:Outside Duke's Archives
+#Kiln
+180000:Kiln of the First Flame
