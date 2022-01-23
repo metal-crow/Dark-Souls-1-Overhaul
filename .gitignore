@@ -3,3 +3,6 @@ OverhaulDLL_PtDE/
 
 /OverhaulDLL/Testing.cpp
 /OverhaulDLL/testing.h
+/OverhaulDLL/src/RCEFix.cpp
+/OverhaulDLL/include/RCEFix.h
+/OverhaulDLL/src/RCEFixASM.asm
