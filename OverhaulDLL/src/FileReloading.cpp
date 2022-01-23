@@ -110,19 +110,26 @@ static std::mutex ReloadPlayer_mtx;
 static std::mutex ReloadPlayer_locks_remaining_mtx;
 static int ReloadPlayer_locks_remaining = -1;
 
-void FileReloading::ReloadPlayer()
+void FileReloading::ReloadPlayer(ModMode currentmode, ModMode newmode)
 {
-    //we need to wait on unlocking this mutex until the player is fully reloaded
-    ReloadPlayer_mtx.lock();
+    //avoid a player reload if not needed
+    if (
+        (currentmode == ModMode::Overhaul && newmode != ModMode::Overhaul) ||
+        (currentmode != ModMode::Overhaul && newmode == ModMode::Overhaul)
+        )
+    {
+        //we need to wait on unlocking this mutex until the player is fully reloaded
+        ReloadPlayer_mtx.lock();
 
-    ReloadPlayer_locks_remaining_mtx.lock();
-    ReloadPlayer_locks_remaining = 2;
-    ReloadPlayer_locks_remaining_mtx.unlock();
+        ReloadPlayer_locks_remaining_mtx.lock();
+        ReloadPlayer_locks_remaining = 2;
+        ReloadPlayer_locks_remaining_mtx.unlock();
 
-    // Set bPlayerReload flag to true
-    *((uint8_t*)0x141D151DB) = 1;
-    // Call Force_PlayerReload
-    Force_PlayerReload(*(void**)Game::world_chr_man_imp, L"c0000");
+        // Set bPlayerReload flag to true
+        *((uint8_t*)0x141D151DB) = 1;
+        // Call Force_PlayerReload
+        Force_PlayerReload(*(void**)Game::world_chr_man_imp, L"c0000");
+    }
 }
 
 /* --------------------------------------------------------------------- */

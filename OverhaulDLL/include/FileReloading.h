@@ -5,6 +5,7 @@
 
 #include <cstdint>
 #include <vector>
+#include "ModData.h"
 
 enum IndividualParams {
     LIGHT_BANK = 0x0,
@@ -91,7 +92,7 @@ public:
     static void start();
     static void LoadGameParam();
     static bool GameParamsLoaded;
-    static void ReloadPlayer();
+    static void ReloadPlayer(ModMode currentmode, ModMode newmode);
     static void RefreshPlayerStats();
     static void SetParamsToUse(bool legacy);
 private:
