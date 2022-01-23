@@ -53,6 +53,8 @@ __Overhaul__ mode can be switched on to get the full suite of improvements this 
 
 * A bug that allows hackers to crash your game has been fixed
 
+* A Remote Code Execution (RCE) bug has been fixed
+
 * Backstabs will no longer teleport you if you're unreasonably far away (both anti-cheat and QOL)
   
 * Bug fix for invisible attacks after backstabs
