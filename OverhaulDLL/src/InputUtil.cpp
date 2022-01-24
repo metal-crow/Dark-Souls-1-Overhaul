@@ -216,27 +216,27 @@ void handle_input(XINPUT_GAMEPAD* xold, XINPUT_GAMEPAD* xcurrent, DIJOYSTATE2* d
         // --------------------------
         // TEMP: change the game mode and connection settings via button press
         // --------------------------
-        if (Button::pressed(kbold, kbcurrent, DIK_F1))
+        if (Button::pressed(kbold, kbcurrent, user_setting<uint8_t>(_DS1_OVERHAUL_KEYBINDS_SECTION_, _DS1_OVERHAUL_KEYBIND_NONMOD_HOST_CONNECT_, DIK_F1).read()))
         {
             ModNetworking::allow_connect_with_non_mod_host = !ModNetworking::allow_connect_with_non_mod_host;
             ConsoleWrite("Set allow_connect_with_non_mod_host=%d", ModNetworking::allow_connect_with_non_mod_host);
         }
-        if (Button::pressed(kbold, kbcurrent, DIK_F2))
+        if (Button::pressed(kbold, kbcurrent, user_setting<uint8_t>(_DS1_OVERHAUL_KEYBINDS_SECTION_, _DS1_OVERHAUL_KEYBIND_LEGACYMODE_HOST_CONNECT_, DIK_F2).read()))
         {
             ModNetworking::allow_connect_with_legacy_mod_host = !ModNetworking::allow_connect_with_legacy_mod_host;
             ConsoleWrite("Set allow_connect_with_legacy_mod_host=%d", ModNetworking::allow_connect_with_legacy_mod_host);
         }
-        if (Button::pressed(kbold, kbcurrent, DIK_F3))
+        if (Button::pressed(kbold, kbcurrent, user_setting<uint8_t>(_DS1_OVERHAUL_KEYBINDS_SECTION_, _DS1_OVERHAUL_KEYBIND_OVERHAULMODE_HOST_CONNECT_, DIK_F3).read()))
         {
             ModNetworking::allow_connect_with_overhaul_mod_host = !ModNetworking::allow_connect_with_overhaul_mod_host;
             ConsoleWrite("Set allow_connect_with_overhaul_mod_host=%d", ModNetworking::allow_connect_with_overhaul_mod_host);
         }
-        if (Button::pressed(kbold, kbcurrent, DIK_F4))
+        if (Button::pressed(kbold, kbcurrent, user_setting<uint8_t>(_DS1_OVERHAUL_KEYBINDS_SECTION_, _DS1_OVERHAUL_KEYBIND_NONMOD_GUEST_CONNECT_, DIK_F4).read()))
         {
             ModNetworking::allow_connect_with_non_mod_guest = !ModNetworking::allow_connect_with_non_mod_guest;
             ConsoleWrite("Set allow_connect_with_non_mod_guest=%d", ModNetworking::allow_connect_with_non_mod_guest);
         }
-        if (Button::pressed(kbold, kbcurrent, DIK_F5))
+        if (Button::pressed(kbold, kbcurrent, user_setting<uint8_t>(_DS1_OVERHAUL_KEYBINDS_SECTION_, _DS1_OVERHAUL_KEYBIND_TOGGLEMODE_, DIK_F5).read()))
         {
             if (Mod::user_selected_default_mode == ModMode::Legacy)
             {
