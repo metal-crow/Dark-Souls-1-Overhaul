@@ -43,6 +43,7 @@
     <ClCompile Include="src\RCEFix.cpp" />
     <ClCompile Include="src\Rollback.cpp" />
     <ClCompile Include="src\SpellDesyncFixes.cpp" />
+    <ClCompile Include="src\UIFeatures.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3d11-wrapper\include\d3d11\exports.h" />
@@ -62,6 +63,7 @@
     <ClInclude Include="include\RCEFix.h" />
     <ClInclude Include="include\Rollback.h" />
     <ClInclude Include="include\SpellDesyncFixes.h" />
+    <ClInclude Include="include\UIFeatures.h" />
     <ClInclude Include="include\Xinput_1_3.h" />
     <ClInclude Include="ui\crash_hander_ui_resource.h" />
     <None Include="..\README.md" />
@@ -129,6 +131,7 @@
     <MASM Include="src\RCEFixASM.asm" />
     <MASM Include="src\RollbackASM.asm" />
     <MASM Include="src\SpellDesyncFixesASM.asm" />
+    <MASM Include="src\UIFeaturesASM.asm" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ui\CrashHandler_UI.rc" />

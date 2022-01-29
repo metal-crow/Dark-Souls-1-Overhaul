@@ -111,6 +111,9 @@
     <ClCompile Include="src\RCEFix.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\UIFeatures.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3d11-wrapper\include\d3d11\exports.h">
@@ -168,6 +171,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\RCEFix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\UIFeatures.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -279,6 +285,9 @@
       <Filter>Source Files</Filter>
     </MASM>
     <MASM Include="src\RCEFixASM.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="src\UIFeaturesASM.asm">
       <Filter>Source Files</Filter>
     </MASM>
   </ItemGroup>
