@@ -28,6 +28,7 @@
 #include "FileReloading.h"
 #include "CustomInvasionTypes.h"
 #include "RCEFix.h"
+#include "UIFeatures.h"
 
 HMODULE d3d11_module;
 FILE* logfile = NULL;
@@ -159,6 +160,7 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     ModNetworking::start();
     FileReloading::start();
     CustomInvasionTypes::start();
+    UIFeatures::start();
     Game::disable_low_fps_disconnect(Mod::disable_low_fps_disconnect);
 
     ConsoleWrite("All initial loading finished!");
