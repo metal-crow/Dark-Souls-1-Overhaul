@@ -29,6 +29,7 @@
 #include "CustomInvasionTypes.h"
 #include "RCEFix.h"
 #include "UIFeatures.h"
+#include "Rollback.h"
 
 HMODULE d3d11_module;
 FILE* logfile = NULL;
@@ -155,12 +156,13 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     InvisBackstabFix::start();
     AnimationEdits::start();
     SpellDesync::start();
-    PhantomUnshackle::start();
+    //PhantomUnshackle::start();
     FixAnkles::start();
     ModNetworking::start();
     FileReloading::start();
     CustomInvasionTypes::start();
-    UIFeatures::start();
+    //UIFeatures::start();
+    //Rollback::start();
     Game::disable_low_fps_disconnect(Mod::disable_low_fps_disconnect);
 
     ConsoleWrite("All initial loading finished!");
