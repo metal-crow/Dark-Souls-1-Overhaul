@@ -8,6 +8,8 @@ class Rollback
 {
 public:
     static void start();
+    static void save();
+
 private:
     static const uint64_t disableType18PacketEnforcement = 0x35b13b;
     static const uint64_t disableType18PacketSending = 0x5067f1;

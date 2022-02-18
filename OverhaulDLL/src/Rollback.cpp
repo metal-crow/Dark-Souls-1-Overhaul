@@ -2,6 +2,7 @@
 #include "SP/memory.h"
 #include "SP/memory/injection/asm/x64.h"
 #include "DarkSoulsOverhaulMod.h"
+#include "PlayerInsStruct.h"
 
 extern "C" {
     uint64_t sendType1NetMessage_injection_return;
@@ -30,3 +31,23 @@ void Rollback::start()
 
 
 }
+
+void Rollback::save()
+{
+    auto player_o = Game::get_PlayerIns();
+    if (!player_o.has_value())
+    {
+        return;
+    }
+    uint64_t player = (uint64_t)player_o.value();
+
+    copy_PlayerIns(saved_player, player);
+}
+
+//PlayerIns---
+
+void copy_PlayerIns(PlayerIns* to, PlayerIns* from)
+{
+    copy_ChrIns(to, from);
+}
+//---PlayerIns

@@ -62,6 +62,7 @@
     <ClInclude Include="include\ModNetworking.h" />
     <ClInclude Include="include\RCEFix.h" />
     <ClInclude Include="include\Rollback.h" />
+    <ClInclude Include="include\PlayerInsStruct.h" />
     <ClInclude Include="include\SpellDesyncFixes.h" />
     <ClInclude Include="include\UIFeatures.h" />
     <ClInclude Include="include\Xinput_1_3.h" />
