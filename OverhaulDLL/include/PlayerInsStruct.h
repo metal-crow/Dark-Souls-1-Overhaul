@@ -28,6 +28,11 @@ typedef struct
 
 typedef struct
 {
+    uint8_t padding_0[8];
+} ItemUsed;
+
+typedef struct
+{
 
 } SpecialEffect;
 
@@ -38,18 +43,47 @@ typedef struct
 
 typedef struct
 {
-    uint8_t padding_0[24];
-} EntityThrowAnimationStatus;
 
-typedef struct
-{
-    uint8_t padding_0[0x18];
-} ChrAttachSys;
+} ChrPlayerResidentSlot;
 
 typedef struct
 {
     uint8_t padding_0[8];
-} ItemUsed;
+    //this looks like sfx stuff? do i need it?
+    ChrPlayerResidentSlot* firstChrSlot;
+    uint8_t padding_1[8];
+} ChrAttachSys;
+
+static_assert(offsetof(ChrAttachSys, firstChrSlot) == 0x8);
+static_assert(sizeof(ChrAttachSys) == 0x18);
+
+typedef struct
+{
+    uint8_t padding_0[0x10];
+    void* throw_paramdef; //this is a pointer to a const struct, so just read/write the pointer itself
+    int32_t throw_id;
+    uint8_t padding_1[4];
+    uint8_t throwState;
+    uint8_t padding_2[3];
+    uint32_t ThrowPairHandle;
+    uint8_t padding_3[0x48];
+    float starting_position_self[4];
+    float starting_position_self_[4];
+    float starting_position_other[4];
+    uint8_t padding_4[4];
+    uint32_t throwMask;
+    uint8_t padding_5[8];
+} EntityThrowAnimationStatus;
+
+static_assert(offsetof(EntityThrowAnimationStatus, throw_paramdef) == 0x10);
+static_assert(offsetof(EntityThrowAnimationStatus, throw_id) == 0x18);
+static_assert(offsetof(EntityThrowAnimationStatus, throwState) == 0x20);
+static_assert(offsetof(EntityThrowAnimationStatus, ThrowPairHandle) == 0x24);
+static_assert(offsetof(EntityThrowAnimationStatus, starting_position_self) == 0x70);
+static_assert(offsetof(EntityThrowAnimationStatus, starting_position_self_) == 0x80);
+static_assert(offsetof(EntityThrowAnimationStatus, starting_position_other) == 0x90);
+static_assert(offsetof(EntityThrowAnimationStatus, throwMask) == 0xa4);
+static_assert(sizeof(EntityThrowAnimationStatus) == 0xb0);
 
 typedef struct
 {
@@ -121,28 +155,160 @@ static_assert(sizeof(ChrIns) == 0x570);
 
 typedef struct
 {
+    uint8_t padding_0[0xc];
+    int32_t BaseMaxHp;
+    uint8_t padding_1[0x18];
+    int32_t BaseMaxSp;
+    uint8_t padding_2[0xc4];
+    float PoisonResist;
+    float BleedResist;
+    float ToxicResist;
+    float CurseResist;
+    uint8_t padding_3[0xa4];
+} PlayerGameData_AttributeInfo;
 
+static_assert(offsetof(PlayerGameData_AttributeInfo, BaseMaxHp) == 0xc);
+static_assert(offsetof(PlayerGameData_AttributeInfo, BaseMaxSp) == 0x28);
+static_assert(offsetof(PlayerGameData_AttributeInfo, PoisonResist) == 0xf0);
+static_assert(offsetof(PlayerGameData_AttributeInfo, BleedResist) == 0xf4);
+static_assert(offsetof(PlayerGameData_AttributeInfo, ToxicResist) == 0xf8);
+static_assert(offsetof(PlayerGameData_AttributeInfo, CurseResist) == 0xfc);
+static_assert(sizeof(PlayerGameData_AttributeInfo) == 0x1a4);
+
+typedef struct
+{
+    //this only deals with what stuff is in your inventory, not equipped. Probably will never matter for rollback
+    uint8_t padding_0[0x78];
+} EquipInventoryData;
+
+static_assert(sizeof(EquipInventoryData) == 0x78);
+
+typedef struct
+{
+    int32_t magic_id;
+    uint32_t count;
+} MagicSlot;
+
+static_assert(offsetof(MagicSlot, magic_id) == 0x0);
+static_assert(offsetof(MagicSlot, count) == 0x4);
+static_assert(sizeof(MagicSlot) == 0x8);
+
+typedef struct
+{
+    uint8_t padding_0[0x18];
+    MagicSlot equippedMagicList[12];
+    int32_t curSelectedMagicSlot;
+} EquipMagicData;
+
+static_assert(offsetof(EquipMagicData, equippedMagicList) == 0x18);
+static_assert(offsetof(EquipMagicData, curSelectedMagicSlot) == 0x78);
+static_assert(sizeof(EquipMagicData) == 0x7c);
+
+typedef struct
+{
+    uint8_t padding_0[0x18];
+    uint32_t quickbar[6];
+} EquipItemData;
+
+static_assert(offsetof(EquipItemData, quickbar) == 0x18);
+static_assert(sizeof(EquipItemData) == 0x30);
+
+typedef struct
+{
+    uint8_t padding_0[0x120];
+    EquipInventoryData equippedInventory;
+    EquipMagicData* equipMagicData;
+    EquipItemData equippedItemsInQuickbar;
+    uint8_t padding_1[0x48];
+} EquipGameData;
+
+static_assert(offsetof(EquipGameData, equippedInventory) == 0x120);
+static_assert(offsetof(EquipGameData, equipMagicData) == 0x198);
+static_assert(offsetof(EquipGameData, equippedItemsInQuickbar) == 0x1a0);
+static_assert(sizeof(EquipGameData) == 0x218);
+
+typedef struct
+{
+    //there's a bunch of named fields in here but we can just raw memcpy this entire struct
+    uint8_t blob_of_important_properties[0x90];
+} PlayerGameData_ChrProperties;
+
+static_assert(sizeof(PlayerGameData_ChrProperties) == 0x90);
+
+typedef struct
+{
+    uint8_t padding_0[0x10];
+    PlayerGameData_AttributeInfo attribs;
+    uint8_t padding_1[0xcc];
+    EquipGameData equipGameData;
+    uint8_t padding_2[0xd8];
+    PlayerGameData_ChrProperties ChrProperties;
+    uint8_t padding_3[0x60];
 } PlayerGameData;
 
+static_assert(offsetof(PlayerGameData, attribs) == 0x10);
+static_assert(offsetof(PlayerGameData, equipGameData) == 0x280);
+static_assert(offsetof(PlayerGameData, ChrProperties) == 0x570);
+static_assert(sizeof(PlayerGameData) == 0x660);
+
 typedef struct
 {
-
+    uint8_t padding_0[0x10];
+    SpecialEffect* spEffectList;
+    uint32_t* equipped_rings_ids; //index is slot num, elem is id
+    uint32_t array_len;
+    uint8_t padding_1[0xc];
 } RingEquipCtrl;
 
+static_assert(offsetof(RingEquipCtrl, spEffectList) == 0x10);
+static_assert(offsetof(RingEquipCtrl, equipped_rings_ids) == 0x18);
+static_assert(offsetof(RingEquipCtrl, array_len) == 0x20);
+static_assert(sizeof(RingEquipCtrl) == 0x30);
+
 typedef struct
 {
-
+    uint8_t padding_0[0x10];
+    SpecialEffect* spEffectList;
+    uint32_t* equipped_weapons_ids; //index is slot num, elem is id
+    uint32_t array_len;
+    uint8_t padding_1[0xc];
 } WeaponEquipCtrl;
 
+static_assert(offsetof(WeaponEquipCtrl, spEffectList) == 0x10);
+static_assert(offsetof(WeaponEquipCtrl, equipped_weapons_ids) == 0x18);
+static_assert(offsetof(WeaponEquipCtrl, array_len) == 0x20);
+static_assert(sizeof(WeaponEquipCtrl) == 0x30);
+
 typedef struct
 {
-
+    uint8_t padding_0[0x10];
+    SpecialEffect* spEffectList;
+    uint32_t* equipped_armors_ids; //index is slot num, elem is id
+    uint32_t array_len;
+    uint8_t padding_1[0xc];
 } ProEquipCtrl;
+
+static_assert(offsetof(ProEquipCtrl, spEffectList) == 0x10);
+static_assert(offsetof(ProEquipCtrl, equipped_armors_ids) == 0x18);
+static_assert(offsetof(ProEquipCtrl, array_len) == 0x20);
+static_assert(sizeof(ProEquipCtrl) == 0x30);
 
 typedef struct
 {
     uint8_t padding_0[8];
+    uint32_t equipped_weapon_style;
+    uint32_t l_hand_equipped_index;
+    uint32_t r_hand_equipped_index;
+    uint8_t padding_1[0x10];
+    uint32_t equip_items[20];
+    uint8_t padding_2[0xc];
 } ChrAsm;
+
+static_assert(offsetof(ChrAsm, equipped_weapon_style) == 0x8);
+static_assert(offsetof(ChrAsm, l_hand_equipped_index) == 0xc);
+static_assert(offsetof(ChrAsm, r_hand_equipped_index) == 0x10);
+static_assert(offsetof(ChrAsm, equip_items) == 0x24);
+static_assert(sizeof(ChrAsm) == 0x80);
 
 typedef struct
 {
