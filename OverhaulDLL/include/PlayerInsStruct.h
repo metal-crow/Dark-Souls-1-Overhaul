@@ -12,13 +12,62 @@ typedef struct
 
 typedef struct
 {
-
-} PadManipulator;
+    uint8_t padding_0[0x230];
+} ChrManipulator;
 
 typedef struct
 {
+    //this is probably used in place of PadManipulator in PlayerIns for remote PCs. need to verify
+} NetworkManipulator;
 
-} ChrTaeAnimEvent;
+typedef struct
+{
+    ChrManipulator chrManipulator;
+    uint8_t padding_0[0xc];
+    uint8_t movement_related_flags;
+    uint8_t padding_1[0x22];
+    float DashInputTimer;
+    float y_movement_input[6];
+    uint8_t padding_2[0x38];
+    float x_movement_input[6];
+    uint8_t padding_3[0x38];
+    uint32_t cur_movement_input_index_to_use;
+    float time_spend_forward_strafing;
+    float time_spend_back_strafing;
+    float time_spend_left_strafing;
+    float time_spend_right_strafing;
+    float camera_xaxis_rotation;
+    uint8_t padding_4[8];
+    float Backstep_timer;
+    bool EnableBackStep;
+    bool EnableBackStep_forward;
+    uint8_t padding_5[6];
+    float x_movement_input_reversed;
+    uint8_t padding_6[4];
+    float y_movement_input_reversed;
+    uint8_t padding_7[4];
+    float jump_trigger_time_remaining;
+    uint8_t padding_8[0x1c];
+} PadManipulator;
+
+static_assert(offsetof(PadManipulator, chrManipulator) == 0x0);
+static_assert(offsetof(PadManipulator, movement_related_flags) == 0x23c);
+static_assert(offsetof(PadManipulator, DashInputTimer) == 0x260);
+static_assert(offsetof(PadManipulator, y_movement_input) == 0x264);
+static_assert(offsetof(PadManipulator, x_movement_input) == 0x2b4);
+static_assert(offsetof(PadManipulator, cur_movement_input_index_to_use) == 0x304);
+static_assert(offsetof(PadManipulator, time_spend_forward_strafing) == 0x308);
+static_assert(offsetof(PadManipulator, time_spend_back_strafing) == 0x30c);
+static_assert(offsetof(PadManipulator, time_spend_left_strafing) == 0x310);
+static_assert(offsetof(PadManipulator, time_spend_right_strafing) == 0x314);
+static_assert(offsetof(PadManipulator, camera_xaxis_rotation) == 0x318);
+static_assert(offsetof(PadManipulator, Backstep_timer) == 0x324);
+static_assert(offsetof(PadManipulator, EnableBackStep) == 0x328);
+static_assert(offsetof(PadManipulator, EnableBackStep_forward) == 0x329);
+static_assert(offsetof(PadManipulator, x_movement_input_reversed) == 0x330);
+static_assert(offsetof(PadManipulator, y_movement_input_reversed) == 0x338);
+static_assert(offsetof(PadManipulator, jump_trigger_time_remaining) == 0x340);
+static_assert(sizeof(PadManipulator) == 0x360);
 
 typedef struct
 {
@@ -26,41 +75,114 @@ typedef struct
     uint32_t stateIndex;
 } ChrIns_AnimationMediatorStateInfo;
 
+static_assert(offsetof(ChrIns_AnimationMediatorStateInfo, animationId) == 0x0);
+static_assert(offsetof(ChrIns_AnimationMediatorStateInfo, stateIndex) == 0x4);
+static_assert(sizeof(ChrIns_AnimationMediatorStateInfo) == 0x8);
+
 typedef struct
 {
-    uint8_t padding_0[8];
+    int32_t itemId;
+    int32_t amountUsed;
 } ItemUsed;
 
-typedef struct
-{
-
-} SpecialEffect;
-
-typedef struct
-{
-
-} QwcSpEffectEquipCtrl;
+static_assert(offsetof(ItemUsed, itemId) == 0x0);
+static_assert(offsetof(ItemUsed, amountUsed) == 0x4);
+static_assert(sizeof(ItemUsed) == 0x8);
 
 typedef struct
 {
+    float life;
+    float intervalLength;
+    float intervalCountdownTimer;
+    float unk1;
+    float unk2;
+    uint32_t unk3;
+    uint8_t padding_0[8];
+    uint32_t target;
+    uint32_t attacker;
+    uint8_t unk4;
+    bool isDead;
+    uint8_t unk5;
+    uint8_t unk6;
+    uint32_t unk7;
+    int32_t	speffect_id;
+    uint32_t unk8;
+    uint64_t paramRowBytes; //this is a pointer to a const struct, so just read/write the pointer itself
+    SpecialEffect_Info* next;
+    SpecialEffect_Info* prev;
+} SpecialEffect_Info;
 
-} ChrPlayerResidentSlot;
+static_assert(offsetof(SpecialEffect_Info, life) == 0x0);
+static_assert(offsetof(SpecialEffect_Info, intervalLength) == 0x4);
+static_assert(offsetof(SpecialEffect_Info, intervalCountdownTimer) == 0x8);
+static_assert(offsetof(SpecialEffect_Info, unk1) == 0xc);
+static_assert(offsetof(SpecialEffect_Info, unk2) == 0x10);
+static_assert(offsetof(SpecialEffect_Info, unk3) == 0x14);
+static_assert(offsetof(SpecialEffect_Info, target) == 0x20);
+static_assert(offsetof(SpecialEffect_Info, attacker) == 0x24);
+static_assert(offsetof(SpecialEffect_Info, unk4) == 0x28);
+static_assert(offsetof(SpecialEffect_Info, isDead) == 0x29);
+static_assert(offsetof(SpecialEffect_Info, unk5) == 0x2a);
+static_assert(offsetof(SpecialEffect_Info, unk6) == 0x2b);
+static_assert(offsetof(SpecialEffect_Info, unk7) == 0x2c);
+static_assert(offsetof(SpecialEffect_Info, speffect_id) == 0x30);
+static_assert(offsetof(SpecialEffect_Info, unk8) == 0x34);
+static_assert(offsetof(SpecialEffect_Info, paramRowBytes) == 0x38);
+static_assert(offsetof(SpecialEffect_Info, next) == 0x40);
+static_assert(offsetof(SpecialEffect_Info, prev) == 0x48);
+static_assert(sizeof(SpecialEffect_Info) == 0x50);
 
 typedef struct
 {
     uint8_t padding_0[8];
-    //this looks like sfx stuff? do i need it?
-    ChrPlayerResidentSlot* firstChrSlot;
-    uint8_t padding_1[8];
+    SpecialEffect_Info* specialEffect_Info;
+    bool speffectIsBeingRun;
+    uint8_t padding_1[3];
+    float unk1;
+    uint8_t padding_2[8];
+    uint32_t flags;
+    uint32_t unk2;
+    uint8_t padding_3[8];
+    int32_t debugActivateSpEffect;
+    uint32_t unk3;
+} SpecialEffect;
+
+static_assert(offsetof(SpecialEffect, specialEffect_Info) == 0x0 + 8);
+static_assert(offsetof(SpecialEffect, speffectIsBeingRun) == 0x8 + 8);
+static_assert(offsetof(SpecialEffect, unk1) == 0xc + 8);
+static_assert(offsetof(SpecialEffect, flags) == 0x18 + 8);
+static_assert(offsetof(SpecialEffect, unk2) == 0x1c + 8);
+static_assert(offsetof(SpecialEffect, debugActivateSpEffect) == 0x28 + 8);
+static_assert(offsetof(SpecialEffect, unk3) == 0x2c + 8);
+static_assert(sizeof(SpecialEffect) == 0x38);
+
+typedef struct
+{
+    uint8_t padding_0[0x18];
+    uint32_t* arry;
+    uint32_t arry_len;
+    uint32_t unk1;
+    uint32_t unk2[2];
+} QwcSpEffectEquipCtrl;
+
+static_assert(offsetof(QwcSpEffectEquipCtrl, arry) == 0x18);
+static_assert(offsetof(QwcSpEffectEquipCtrl, arry_len) == 0x20);
+static_assert(offsetof(QwcSpEffectEquipCtrl, unk1) == 0x24);
+static_assert(offsetof(QwcSpEffectEquipCtrl, unk2) == 0x28);
+static_assert(sizeof(QwcSpEffectEquipCtrl) == 0x30);
+
+typedef struct
+{
+    //this is sfx stuff, unneeded for rollback
+    uint8_t padding_0[0x18];
 } ChrAttachSys;
 
-static_assert(offsetof(ChrAttachSys, firstChrSlot) == 0x8);
 static_assert(sizeof(ChrAttachSys) == 0x18);
 
 typedef struct
 {
     uint8_t padding_0[0x10];
-    void* throw_paramdef; //this is a pointer to a const struct, so just read/write the pointer itself
+    uint64_t throw_paramdef; //this is a pointer to a const struct, so just read/write the pointer itself
     int32_t throw_id;
     uint8_t padding_1[4];
     uint8_t throwState;
@@ -90,9 +212,7 @@ typedef struct
     uint8_t padding_0[8 + 0x60];
     PlayerCtrl* playerCtrl;
     PadManipulator* padManipulator;
-    uint8_t padding_1[0x48];
-    ChrTaeAnimEvent* chrTaeAnimEvent;
-    uint8_t padding_2[4];
+    uint8_t padding_1[0x54];
     int32_t CharaInitParamID;
     uint8_t padding_3[0xac];
     ChrIns_AnimationMediatorStateInfo lowerThrowAnim;
@@ -128,7 +248,6 @@ typedef struct
 
 static_assert(offsetof(ChrIns, playerCtrl) == 0x60+8);
 static_assert(offsetof(ChrIns, padManipulator) == 0x68+8);
-static_assert(offsetof(ChrIns, chrTaeAnimEvent) == 0xb8+8);
 static_assert(offsetof(ChrIns, CharaInitParamID) == 0xc4+8);
 static_assert(offsetof(ChrIns, lowerThrowAnim) == 0x174+8);
 static_assert(offsetof(ChrIns, upperThrowAnim) == 0x17c+8);
