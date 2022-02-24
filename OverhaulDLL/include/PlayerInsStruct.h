@@ -2,18 +2,27 @@
 #ifndef PLAYERINS_STRUCT_H
 #define PLAYERINS_STRUCT_H
 
+//NOTE: Anything marked "data_x" is a bunch of non-pointer data that can be saved/loaded without really knowing what it is.
+// See the ghidra repo for more specific info about what is in that blob, if it's even known
+
 #include <stddef.h>
 
 
 typedef struct
 {
+    ChrCtrl chrCtrl;
 
 } PlayerCtrl;
 
+static_assert(sizeof(PlayerCtrl) == 0x36c);
+
 typedef struct
 {
-    uint8_t padding_0[0x230];
+    uint8_t padding_0[0x8];
+    uint8_t data_0[0x228];
 } ChrManipulator;
+
+static_assert(sizeof(ChrManipulator) == 0x230);
 
 typedef struct
 {
@@ -24,49 +33,14 @@ typedef struct
 {
     ChrManipulator chrManipulator;
     uint8_t padding_0[0xc];
-    uint8_t movement_related_flags;
-    uint8_t padding_1[0x22];
-    float DashInputTimer;
-    float y_movement_input[6];
-    uint8_t padding_2[0x38];
-    float x_movement_input[6];
-    uint8_t padding_3[0x38];
-    uint32_t cur_movement_input_index_to_use;
-    float time_spend_forward_strafing;
-    float time_spend_back_strafing;
-    float time_spend_left_strafing;
-    float time_spend_right_strafing;
-    float camera_xaxis_rotation;
-    uint8_t padding_4[8];
-    float Backstep_timer;
-    bool EnableBackStep;
-    bool EnableBackStep_forward;
-    uint8_t padding_5[6];
-    float x_movement_input_reversed;
-    uint8_t padding_6[4];
-    float y_movement_input_reversed;
-    uint8_t padding_7[4];
-    float jump_trigger_time_remaining;
-    uint8_t padding_8[0x1c];
+    uint8_t data_0[4];
+    uint8_t padding_1[0x20];
+    uint8_t data_1[0x100];
 } PadManipulator;
 
 static_assert(offsetof(PadManipulator, chrManipulator) == 0x0);
-static_assert(offsetof(PadManipulator, movement_related_flags) == 0x23c);
-static_assert(offsetof(PadManipulator, DashInputTimer) == 0x260);
-static_assert(offsetof(PadManipulator, y_movement_input) == 0x264);
-static_assert(offsetof(PadManipulator, x_movement_input) == 0x2b4);
-static_assert(offsetof(PadManipulator, cur_movement_input_index_to_use) == 0x304);
-static_assert(offsetof(PadManipulator, time_spend_forward_strafing) == 0x308);
-static_assert(offsetof(PadManipulator, time_spend_back_strafing) == 0x30c);
-static_assert(offsetof(PadManipulator, time_spend_left_strafing) == 0x310);
-static_assert(offsetof(PadManipulator, time_spend_right_strafing) == 0x314);
-static_assert(offsetof(PadManipulator, camera_xaxis_rotation) == 0x318);
-static_assert(offsetof(PadManipulator, Backstep_timer) == 0x324);
-static_assert(offsetof(PadManipulator, EnableBackStep) == 0x328);
-static_assert(offsetof(PadManipulator, EnableBackStep_forward) == 0x329);
-static_assert(offsetof(PadManipulator, x_movement_input_reversed) == 0x330);
-static_assert(offsetof(PadManipulator, y_movement_input_reversed) == 0x338);
-static_assert(offsetof(PadManipulator, jump_trigger_time_remaining) == 0x340);
+static_assert(offsetof(PadManipulator, data_0) == 0x23c);
+static_assert(offsetof(PadManipulator, data_1) == 0x260);
 static_assert(sizeof(PadManipulator) == 0x360);
 
 typedef struct
@@ -91,42 +65,13 @@ static_assert(sizeof(ItemUsed) == 0x8);
 
 typedef struct
 {
-    float life;
-    float intervalLength;
-    float intervalCountdownTimer;
-    float unk1;
-    float unk2;
-    uint32_t unk3;
-    uint8_t padding_0[8];
-    uint32_t target;
-    uint32_t attacker;
-    uint8_t unk4;
-    bool isDead;
-    uint8_t unk5;
-    uint8_t unk6;
-    uint32_t unk7;
-    int32_t	speffect_id;
-    uint32_t unk8;
+    uint8_t data_0[0x38];
     uint64_t paramRowBytes; //this is a pointer to a const struct, so just read/write the pointer itself
     SpecialEffect_Info* next;
     SpecialEffect_Info* prev;
 } SpecialEffect_Info;
 
-static_assert(offsetof(SpecialEffect_Info, life) == 0x0);
-static_assert(offsetof(SpecialEffect_Info, intervalLength) == 0x4);
-static_assert(offsetof(SpecialEffect_Info, intervalCountdownTimer) == 0x8);
-static_assert(offsetof(SpecialEffect_Info, unk1) == 0xc);
-static_assert(offsetof(SpecialEffect_Info, unk2) == 0x10);
-static_assert(offsetof(SpecialEffect_Info, unk3) == 0x14);
-static_assert(offsetof(SpecialEffect_Info, target) == 0x20);
-static_assert(offsetof(SpecialEffect_Info, attacker) == 0x24);
-static_assert(offsetof(SpecialEffect_Info, unk4) == 0x28);
-static_assert(offsetof(SpecialEffect_Info, isDead) == 0x29);
-static_assert(offsetof(SpecialEffect_Info, unk5) == 0x2a);
-static_assert(offsetof(SpecialEffect_Info, unk6) == 0x2b);
-static_assert(offsetof(SpecialEffect_Info, unk7) == 0x2c);
-static_assert(offsetof(SpecialEffect_Info, speffect_id) == 0x30);
-static_assert(offsetof(SpecialEffect_Info, unk8) == 0x34);
+static_assert(offsetof(SpecialEffect_Info, data_0) == 0x0);
 static_assert(offsetof(SpecialEffect_Info, paramRowBytes) == 0x38);
 static_assert(offsetof(SpecialEffect_Info, next) == 0x40);
 static_assert(offsetof(SpecialEffect_Info, prev) == 0x48);
@@ -137,7 +82,7 @@ typedef struct
     uint8_t padding_0[8];
     SpecialEffect_Info* specialEffect_Info;
     bool speffectIsBeingRun;
-    uint8_t padding_1[3];
+    uint8_t data_0[3];
     float unk1;
     uint8_t padding_2[8];
     uint32_t flags;
@@ -183,28 +128,15 @@ typedef struct
 {
     uint8_t padding_0[0x10];
     uint64_t throw_paramdef; //this is a pointer to a const struct, so just read/write the pointer itself
-    int32_t throw_id;
-    uint8_t padding_1[4];
-    uint8_t throwState;
-    uint8_t padding_2[3];
-    uint32_t ThrowPairHandle;
-    uint8_t padding_3[0x48];
-    float starting_position_self[4];
-    float starting_position_self_[4];
-    float starting_position_other[4];
-    uint8_t padding_4[4];
-    uint32_t throwMask;
-    uint8_t padding_5[8];
+    uint8_t data_0[0x40];
+    uint8_t padding_1[0x8];
+    uint8_t data_1[0x50];
 } EntityThrowAnimationStatus;
 
 static_assert(offsetof(EntityThrowAnimationStatus, throw_paramdef) == 0x10);
-static_assert(offsetof(EntityThrowAnimationStatus, throw_id) == 0x18);
-static_assert(offsetof(EntityThrowAnimationStatus, throwState) == 0x20);
-static_assert(offsetof(EntityThrowAnimationStatus, ThrowPairHandle) == 0x24);
-static_assert(offsetof(EntityThrowAnimationStatus, starting_position_self) == 0x70);
-static_assert(offsetof(EntityThrowAnimationStatus, starting_position_self_) == 0x80);
-static_assert(offsetof(EntityThrowAnimationStatus, starting_position_other) == 0x90);
-static_assert(offsetof(EntityThrowAnimationStatus, throwMask) == 0xa4);
+static_assert(offsetof(EntityThrowAnimationStatus, data_0) == 0x18);
+static_assert(offsetof(EntityThrowAnimationStatus, padding_1) == 0x58);
+static_assert(offsetof(EntityThrowAnimationStatus, data_1) == 0x60);
 static_assert(sizeof(EntityThrowAnimationStatus) == 0xb0);
 
 typedef struct
@@ -274,24 +206,9 @@ static_assert(sizeof(ChrIns) == 0x570);
 
 typedef struct
 {
-    uint8_t padding_0[0xc];
-    int32_t BaseMaxHp;
-    uint8_t padding_1[0x18];
-    int32_t BaseMaxSp;
-    uint8_t padding_2[0xc4];
-    float PoisonResist;
-    float BleedResist;
-    float ToxicResist;
-    float CurseResist;
-    uint8_t padding_3[0xa4];
+    uint8_t data_0[0x1a4];
 } PlayerGameData_AttributeInfo;
 
-static_assert(offsetof(PlayerGameData_AttributeInfo, BaseMaxHp) == 0xc);
-static_assert(offsetof(PlayerGameData_AttributeInfo, BaseMaxSp) == 0x28);
-static_assert(offsetof(PlayerGameData_AttributeInfo, PoisonResist) == 0xf0);
-static_assert(offsetof(PlayerGameData_AttributeInfo, BleedResist) == 0xf4);
-static_assert(offsetof(PlayerGameData_AttributeInfo, ToxicResist) == 0xf8);
-static_assert(offsetof(PlayerGameData_AttributeInfo, CurseResist) == 0xfc);
 static_assert(sizeof(PlayerGameData_AttributeInfo) == 0x1a4);
 
 typedef struct
@@ -348,8 +265,7 @@ static_assert(sizeof(EquipGameData) == 0x218);
 
 typedef struct
 {
-    //there's a bunch of named fields in here but we can just raw memcpy this entire struct
-    uint8_t blob_of_important_properties[0x90];
+    uint8_t data_0[0x90];
 } PlayerGameData_ChrProperties;
 
 static_assert(sizeof(PlayerGameData_ChrProperties) == 0x90);
