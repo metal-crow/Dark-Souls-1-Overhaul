@@ -7,14 +7,232 @@
 
 #include <stddef.h>
 
+typedef struct
+{
+
+} ChrCtrl_AnimationQueue;
+
+typedef struct
+{
+
+} AnimationMediator;
+
+typedef struct
+{
+
+} hkpCapsuleShape;
+
+typedef struct
+{
+
+} hkpCharacterProxy;
+
+typedef struct
+{
+    uint8_t data_0[0x38];
+    hkpCharacterProxy* char_proxy;
+    hkpCapsuleShape* capsule_shape_1;
+    hkpCapsuleShape* capsule_shape_2;
+    FrpgPhysShapePhantomIns* physShapePhantomIns_1;
+    FrpgPhysShapePhantomIns* physShapePhantomIns_2;
+
+} PlayerPosition_Struct;
+
+static_assert(offsetof(PlayerPosition_Struct, data_0) == 0);
+static_assert(sizeof(PlayerPosition_Struct) == 0x228);
+
+typedef struct
+{
+    uint8_t padding_0[24];
+    uint8_t data_0[16]; //the pointer in this is just a pointer to const data
+    uint8_t padding_1[0x88]; //i dunno what these pointers are, so hopefully they're unneeded
+    uint8_t data_1[16];
+    uint8_t padding_2[0x68];
+    uint8_t data_2[8];
+} EzState_detail_EzStateMachineImpl;
+
+static_assert(offsetof(EzState_detail_EzStateMachineImpl, data_0) == 0x18);
+static_assert(offsetof(EzState_detail_EzStateMachineImpl, data_1) == 0xb0);
+static_assert(offsetof(EzState_detail_EzStateMachineImpl, data_2) == 0x128);
+static_assert(sizeof(EzState_detail_EzStateMachineImpl) == 0x130);
+
+typedef struct
+{
+    EzState_detail_EzStateMachineImpl* EzStateMachineImpl;
+    uint8_t data_0[0x18];
+} ActionCtrl_0x30Substruct;
+
+static_assert(offsetof(ActionCtrl_0x30Substruct, EzStateMachineImpl) == 0);
+static_assert(offsetof(ActionCtrl_0x30Substruct, data_0) == 8);
+static_assert(sizeof(ActionCtrl_0x30Substruct) == 0x20);
+
+typedef struct
+{
+    uint8_t padding_0[8];
+    uint8_t data_0[8];
+    uint8_t padding_1[32];
+    ActionCtrl_0x30Substruct passive_state;
+    ActionCtrl_0x30Substruct active_state;
+    uint8_t data_1[0x4d0];
+    uint8_t padding_2[8];
+    uint8_t data_2[0x18];
+} ActionCtrl;
+
+static_assert(offsetof(ActionCtrl, data_0) == 0x8);
+static_assert(offsetof(ActionCtrl, passive_state) == 0x30);
+static_assert(offsetof(ActionCtrl, active_state) == 0x50);
+static_assert(offsetof(ActionCtrl, data_1) == 0x70);
+static_assert(offsetof(ActionCtrl, data_2) == 0x548);
+static_assert(sizeof(ActionCtrl) == 0x560);
+
+typedef struct
+{
+    uint8_t padding_0[8];
+    void* data_0; //i don't know what this is
+    uint64_t* data_1; //TODO how long is this?
+    uint64_t data_2;
+    uint64_t data_3;
+    WalkAnim_Twist_Field0x228Elem* next;
+} WalkAnim_Twist_Field0x228Elem;
+
+static_assert(offsetof(WalkAnim_Twist_Field0x228Elem, data_0) == 8);
+static_assert(offsetof(WalkAnim_Twist_Field0x228Elem, data_1) == 0x10);
+static_assert(offsetof(WalkAnim_Twist_Field0x228Elem, data_2) == 0x18);
+static_assert(offsetof(WalkAnim_Twist_Field0x228Elem, data_3) == 0x20);
+static_assert(offsetof(WalkAnim_Twist_Field0x228Elem, next) == 0x28);
+static_assert(sizeof(WalkAnim_Twist_Field0x228Elem) == 0x30);
+
+typedef struct
+{
+    uint8_t padding_0[8];
+    uint8_t data_0[8];
+    uint8_t padding_1[8];
+    uint8_t data_1[0x1b8];
+    uint8_t padding_2[8];
+    uint8_t data_2[16];
+    SpinJoint* Upper_Root_Joint;
+    SpinJoint* master_joint;
+    SpinJoint* neck_joint;
+    uint8_t data_3[0x28];
+    WalkAnim_Twist_Field0x228Elem walkAnim_Twist_Field0x228Elem;
+    uint8_t data_4[0x48];
+} WalkAnim_Twist;
+
+static_assert(offsetof(WalkAnim_Twist, data_0) == 8);
+static_assert(offsetof(WalkAnim_Twist, data_1) == 0x18);
+static_assert(offsetof(WalkAnim_Twist, data_2) == 0x1d8);
+static_assert(offsetof(WalkAnim_Twist, data_3) == 0x200);
+static_assert(offsetof(WalkAnim_Twist, data_4) == 0x258);
+static_assert(sizeof(WalkAnim_Twist) == 0x2a0);
+
+typedef struct
+{
+    uint8_t padding_0[8];
+    uint8_t data_0[8];
+    uint8_t padding_1[8];
+    ChrCtrl_AnimationQueue* animationQueue;
+    AnimationMediator* animationMediator;
+    PlayerPosition_Struct* player_position;
+    uint8_t padding_2[24];
+    ActionCtrl* actionctrl;
+    uint8_t padding_2[0x30];
+    uint8_t data_1[8];
+    uint8_t padding_3[8]; //this is just another pointer to the padMan, can ignore
+    uint8_t data_2[0x118];
+    WalkAnim_Twist* walkAnim_Twist;
+    uint8_t data_3[0xe0];
+    uint8_t padding_4[16];
+    uint8_t data_4[0x60];
+} ChrCtrl;
+
+static_assert(offsetof(ChrCtrl, data_0) == 8);
+static_assert(offsetof(ChrCtrl, animationQueue) == 0x18);
+static_assert(offsetof(ChrCtrl, animationMediator) == 0x20);
+static_assert(offsetof(ChrCtrl, player_position) == 0x28);
+static_assert(offsetof(ChrCtrl, data_1) == 0x80);
+static_assert(offsetof(ChrCtrl, data_2) == 0x90);
+static_assert(offsetof(ChrCtrl, walkAnim_Twist) == 0x1a8);
+static_assert(offsetof(ChrCtrl, data_3) == 0x1b0);
+static_assert(offsetof(ChrCtrl, data_4) == 0x2a0);
+static_assert(sizeof(ChrCtrl) == 0x300);
+
+typedef struct
+{
+    uint8_t padding_0[8];
+    uint8_t data_0[8];
+    uint8_t padding_1[8];
+    uint8_t data_1[0x28];
+    SpinJoint* joint_UpperRoot;
+    SpinJoint* joint_LowerRoot;
+    SpinJoint* joint_spine1_1;
+    SpinJoint* joint_spine_1;
+    SpinJoint* joint_master;
+    uint8_t padding_2[8];
+    uint8_t data_2[0x120];
+    uint8_t padding_3[8];
+    uint8_t data_3[8];
+} TurnAnim;
+
+static_assert(offsetof(TurnAnim, data_0) == 0x8);
+static_assert(offsetof(TurnAnim, data_1) == 0x18);
+static_assert(offsetof(TurnAnim, data_2) == 0x70);
+static_assert(offsetof(TurnAnim, data_3) == 0x198);
+static_assert(sizeof(TurnAnim) == 0x1a0);
+
+typedef struct
+{
+    uint8_t padding_0[8];
+    uint8_t data_0[8];
+    uint8_t padding_1[8];
+    uint8_t data_1[96];
+    uint8_t padding_2[8];
+    uint8_t data_2[8];
+    uint8_t padding_3[8];
+} SpinJoint;
+
+static_assert(offsetof(SpinJoint, data_0) == 8);
+static_assert(offsetof(SpinJoint, padding_1) == 0x10);
+static_assert(offsetof(SpinJoint, data_1) == 0x18);
+static_assert(offsetof(SpinJoint, padding_2) == 0x78);
+static_assert(offsetof(SpinJoint, data_2) == 0x80);
+static_assert(offsetof(SpinJoint, padding_3) == 0x88);
+static_assert(sizeof(SpinJoint) == 0x90);
+
+typedef struct
+{
+    TurnAnim turnAnim;
+    uint8_t padding_0[8];
+    SpinJoint* joint_spine_2;
+    SpinJoint* joint_spine1_2;
+    uint8_t data_0[8];
+} ArrowTurnAnim;
+
+static_assert(offsetof(ArrowTurnAnim, padding_0) == 0x1a0);
+static_assert(offsetof(ArrowTurnAnim, joint_spine_2) == 0x1a8);
+static_assert(offsetof(ArrowTurnAnim, joint_spine1_2) == 0x1b0);
+static_assert(offsetof(ArrowTurnAnim, data_0) == 0x1b8);
+static_assert(sizeof(ArrowTurnAnim) == 0x1c0);
 
 typedef struct
 {
     ChrCtrl chrCtrl;
-
+    uint8_t data_0[8];
+    TurnAnim* turnAnim;
+    ArrowTurnAnim* arrowTurnAnim;
+    uint8_t padding_0[24];
+    uint8_t data_1[8];
+    uint8_t padding_1[32];
+    uint8_t data_2[24];
 } PlayerCtrl;
 
-static_assert(sizeof(PlayerCtrl) == 0x36c);
+static_assert(offsetof(PlayerCtrl, data_0) == 0x300);
+static_assert(offsetof(PlayerCtrl, turnAnim) == 0x308);
+static_assert(offsetof(PlayerCtrl, arrowTurnAnim) == 0x310);
+static_assert(offsetof(PlayerCtrl, padding_0) == 0x318);
+static_assert(offsetof(PlayerCtrl, data_1) == 0x330);
+static_assert(offsetof(PlayerCtrl, padding_1) == 0x338);
+static_assert(offsetof(PlayerCtrl, data_2) == 0x358);
+static_assert(sizeof(PlayerCtrl) == 0x370);
 
 typedef struct
 {
