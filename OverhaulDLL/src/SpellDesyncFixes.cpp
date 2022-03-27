@@ -4,7 +4,7 @@
 #include <vector>
 #include <mutex>
 
-typedef struct {
+typedef struct CustomSpellPacketData_Struct {
     const uint32_t magic = 0x7fc00001; //magic number used to signify this is a spell packet
     uint32_t owner;
     uint32_t target;
