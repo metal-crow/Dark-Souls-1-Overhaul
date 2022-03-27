@@ -17,7 +17,7 @@
 
 
 // Maximum number of phantoms allowed in the player's world
-#define _MAX_SUMMONS_ 9
+#define _MAX_SUMMONS_ 17
 
 
 

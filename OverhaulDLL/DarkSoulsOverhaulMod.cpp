@@ -23,6 +23,40 @@
 
 #include "D3dx9math.h"
 
+uint32_t RCEFixAsm_return_address = 0x708D20;
+void __declspec(naked) __stdcall RCEFixAsm()
+{
+    __asm
+    {
+        CALL       EAX
+        MOV        word ptr[EDI], AX
+        LEA        ECX, [ESP + 0xc8 + 2440]
+        CMP        EDI, ECX
+        JL         nooverflow
+        MOV		   word ptr[EDI], 0
+        MOV		   AX, 0
+        nooverflow:
+        jmp RCEFixAsm_return_address
+    }
+}
+
+void RCEFix()
+{
+    uint32_t RCEFix_location = 0x708d1b;
+
+    uint8_t originalContent[] = { 0xff, 0xd0, 0x66, 0x89, 0x07 };
+    for (int i = 0; i < sizeof(originalContent); i++) {
+        if ((*(uint8_t*)(RCEFix_location + i)) != originalContent[i]) {
+            Mod::startup_messages.push_back("RCE should already be fixed, skipping");
+            return;
+        }
+    }
+
+    set_mem_protection((void*)(RCEFix_location), 5, MEM_PROTECT_RWX);
+    inject_jmp_5b((uint8_t*)(RCEFix_location), &RCEFixAsm_return_address, 0, &RCEFixAsm);
+
+    Mod::startup_messages.push_back("RCE fix added");
+}
 
 /*
     Called from DllMain when the plugin DLL is first loaded into memory (PROCESS_ATTACH case).
@@ -35,6 +69,8 @@ void on_process_attach()
 {
     Mod::startup_messages.push_back(DS1_OVERHAUL_TXT_INTRO);
     Mod::startup_messages.push_back("");
+
+    RCEFix();
 
     // Load startup preferences from settings file
     Mod::get_startup_preferences();
@@ -74,12 +110,12 @@ void on_process_attach()
     Files::check_custom_save_file_path();
     Files::check_custom_game_config_file_path();
 
+    // Apply first part of phantom limit patch
+    Game::increase_phantom_limit1();
+
     if (!Mod::legacy_mode) {
         // Change game version number
         Game::set_game_version(DS1_OVERHAUL_GAME_VER_NUM);
-
-        // Apply first part of phantom limit patch
-        Game::increase_phantom_limit1();
     } else {
         Game::set_game_version(DS1_OVERHAUL_LEGACY_GAME_VER_NUM);
     }
@@ -200,9 +236,8 @@ __declspec(dllexport) void __stdcall initialize_plugin()
     // Initialize pointers
     Game::init_pointers();
 
-    if (!Mod::legacy_mode)
-        // Apply secondary phantom limit patch
-        Game::increase_phantom_limit2();
+    // Apply secondary phantom limit patch
+    Game::increase_phantom_limit2();
 
     if (Mod::disable_low_fps_disconnect)
     {
