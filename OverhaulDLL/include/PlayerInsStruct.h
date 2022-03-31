@@ -9,37 +9,118 @@
 
 typedef struct
 {
+    uint8_t data_0[8];
+    void* padding_0;
+    uint8_t data_1[0x100];
+    uint64_t padding_1[6]; //unknown pointers
+    uint8_t data_2[8];
+    uint64_t padding_2[4]; //think these are just for anim blending
+    uint8_t data_3[24];
+} AnimationQueue_Entry;
 
+static_assert(offsetof(AnimationQueue_Entry, data_1) == 0x10);
+static_assert(offsetof(AnimationQueue_Entry, data_2) == 0x140);
+static_assert(offsetof(AnimationQueue_Entry, data_3) == 0x168);
+static_assert(sizeof(AnimationQueue_Entry) == 0x180);
+
+typedef struct
+{
+    void* padding_0;
+    AnimationQueue_Entry* AnimationQueue_Entries[6];
+    void* padding_1;
+} AnimationQueue;
+
+static_assert(offsetof(AnimationQueue, AnimationQueue_Entries) == 0x8);
+static_assert(sizeof(AnimationQueue) == 0x40);
+
+typedef struct
+{
+    uint8_t data_0[8];
+    uint64_t padding_0[4];
+    uint8_t data_1[0x50];
+} ChrCtrl_AnimationQueue_field0x8;
+
+static_assert(offsetof(ChrCtrl_AnimationQueue_field0x8, data_1) == 0x28);
+static_assert(sizeof(ChrCtrl_AnimationQueue_field0x8) == 0x78);
+
+typedef struct
+{
+    uint32_t array_length;
+    uint32_t data_0;
+    ChrCtrl_AnimationQueue_field0x8* arry;
+    uint8_t padding_0[0x50]; //unknown pointers
+    uint8_t data_1[8];
+    void* padding_1;
+    uint8_t data_2[0x10];
+    void* padding_2;
+    uint64_t data_3;
+    uint64_t padding_3[3];
+    uint8_t data_4[0x20];
+    uint64_t padding_4[2];
+    uint8_t data_5[0x18];
 } ChrCtrl_AnimationQueue;
 
+static_assert(offsetof(ChrCtrl_AnimationQueue, array_length) == 0);
+static_assert(offsetof(ChrCtrl_AnimationQueue, data_0) == 4);
+static_assert(offsetof(ChrCtrl_AnimationQueue, arry) == 8);
+static_assert(offsetof(ChrCtrl_AnimationQueue, data_1) == 0x60);
+static_assert(offsetof(ChrCtrl_AnimationQueue, data_2) == 0x70);
+static_assert(offsetof(ChrCtrl_AnimationQueue, data_3) == 0x88);
+static_assert(offsetof(ChrCtrl_AnimationQueue, data_4) == 0xa8);
+static_assert(offsetof(ChrCtrl_AnimationQueue, data_5) == 0xd8);
+static_assert(sizeof(ChrCtrl_AnimationQueue) == 0xf0);
+
 typedef struct
 {
+    uint8_t data_0[0x90];
+    AnimationMediatorStateEntry* linked_animation1;
+    AnimationMediatorStateEntry* linked_animation2;
+    uint8_t data_1[8];
+} AnimationMediatorStateEntry;
 
+static_assert(offsetof(AnimationMediatorStateEntry, linked_animation1) == 0x90);
+static_assert(offsetof(AnimationMediatorStateEntry, linked_animation2) == 0x98);
+static_assert(offsetof(AnimationMediatorStateEntry, data_1) == 0xa0);
+static_assert(sizeof(AnimationMediatorStateEntry) == 0xa8);
+
+typedef struct
+{
+    AnimationMediatorStateEntry states_list[31];
+    void* padding_0;
+    AnimationQueue* animationQueue;
+    uint8_t data_0[0x28];
 } AnimationMediator;
 
+static_assert(offsetof(AnimationMediator, animationQueue) == 0x1460);
+static_assert(offsetof(AnimationMediator, data_0) == 0x1468);
+static_assert(sizeof(AnimationMediator) == 0x1490);
+
 typedef struct
 {
-
-} hkpCapsuleShape;
-
-typedef struct
-{
-
+    uint8_t padding_0[0x60]; //tbh i don't know what this really is. maybe important
+    uint8_t data_0[0x20];
+    uint8_t padding_1[0x70]; //tbh i don't know what this really is. maybe important
 } hkpCharacterProxy;
+
+static_assert(offsetof(hkpCharacterProxy, data_0) == 0x60);
+static_assert(sizeof(hkpCharacterProxy) == 0xf0);
 
 typedef struct
 {
     uint8_t data_0[0x38];
     hkpCharacterProxy* char_proxy;
-    hkpCapsuleShape* capsule_shape_1;
-    hkpCapsuleShape* capsule_shape_2;
-    FrpgPhysShapePhantomIns* physShapePhantomIns_1;
-    FrpgPhysShapePhantomIns* physShapePhantomIns_2;
+    void* padding_cap[2]; //neither of these seem to do anything
+    void* padding_physShapePhantomIns[2]; //neither of these seem to do anything
+    uint8_t data_1[0x98];
+    uint8_t padding_0[0x190]; //tbh i don't know what this really is. maybe important
+} HavokChara;
 
-} PlayerPosition_Struct;
-
-static_assert(offsetof(PlayerPosition_Struct, data_0) == 0);
-static_assert(sizeof(PlayerPosition_Struct) == 0x228);
+static_assert(offsetof(HavokChara, data_0) == 0);
+static_assert(offsetof(HavokChara, char_proxy) == 0x38);
+static_assert(offsetof(HavokChara, padding_cap) == 0x40);
+static_assert(offsetof(HavokChara, padding_physShapePhantomIns) == 0x50);
+static_assert(offsetof(HavokChara, data_1) == 0x60);
+static_assert(sizeof(HavokChara) == 0x288);
 
 typedef struct
 {
@@ -132,7 +213,7 @@ typedef struct
     uint8_t padding_1[8];
     ChrCtrl_AnimationQueue* animationQueue;
     AnimationMediator* animationMediator;
-    PlayerPosition_Struct* player_position;
+    HavokChara* havokChara;
     uint8_t padding_2[24];
     ActionCtrl* actionctrl;
     uint8_t padding_2[0x30];
@@ -148,7 +229,7 @@ typedef struct
 static_assert(offsetof(ChrCtrl, data_0) == 8);
 static_assert(offsetof(ChrCtrl, animationQueue) == 0x18);
 static_assert(offsetof(ChrCtrl, animationMediator) == 0x20);
-static_assert(offsetof(ChrCtrl, player_position) == 0x28);
+static_assert(offsetof(ChrCtrl, havokChara) == 0x28);
 static_assert(offsetof(ChrCtrl, data_1) == 0x80);
 static_assert(offsetof(ChrCtrl, data_2) == 0x90);
 static_assert(offsetof(ChrCtrl, walkAnim_Twist) == 0x1a8);
