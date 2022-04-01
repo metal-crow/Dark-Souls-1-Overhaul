@@ -216,13 +216,13 @@ typedef struct
     HavokChara* havokChara;
     uint8_t padding_2[24];
     ActionCtrl* actionctrl;
-    uint8_t padding_2[0x30];
+    uint8_t padding_3[0x30];
     uint8_t data_1[8];
-    uint8_t padding_3[8]; //this is just another pointer to the padMan, can ignore
+    uint8_t padding_4[8]; //this is just another pointer to the padMan, can ignore
     uint8_t data_2[0x118];
     WalkAnim_Twist* walkAnim_Twist;
     uint8_t data_3[0xe0];
-    uint8_t padding_4[16];
+    uint8_t padding_5[16];
     uint8_t data_4[0x60];
 } ChrCtrl;
 
@@ -380,24 +380,17 @@ typedef struct
 {
     uint8_t padding_0[8];
     SpecialEffect_Info* specialEffect_Info;
-    bool speffectIsBeingRun;
-    uint8_t data_0[3];
-    float unk1;
+    uint8_t data_0[8];
     uint8_t padding_2[8];
-    uint32_t flags;
-    uint32_t unk2;
+    uint8_t data_1[8];
     uint8_t padding_3[8];
-    int32_t debugActivateSpEffect;
-    uint32_t unk3;
+    uint8_t data_2[8];
 } SpecialEffect;
 
 static_assert(offsetof(SpecialEffect, specialEffect_Info) == 0x0 + 8);
-static_assert(offsetof(SpecialEffect, speffectIsBeingRun) == 0x8 + 8);
-static_assert(offsetof(SpecialEffect, unk1) == 0xc + 8);
-static_assert(offsetof(SpecialEffect, flags) == 0x18 + 8);
-static_assert(offsetof(SpecialEffect, unk2) == 0x1c + 8);
-static_assert(offsetof(SpecialEffect, debugActivateSpEffect) == 0x28 + 8);
-static_assert(offsetof(SpecialEffect, unk3) == 0x2c + 8);
+static_assert(offsetof(SpecialEffect, data_0) == 0x8 + 8);
+static_assert(offsetof(SpecialEffect, data_1) == 0x18 + 8);
+static_assert(offsetof(SpecialEffect, data_2) == 0x28 + 8);
 static_assert(sizeof(SpecialEffect) == 0x38);
 
 typedef struct
@@ -405,14 +398,12 @@ typedef struct
     uint8_t padding_0[0x18];
     uint32_t* arry;
     uint32_t arry_len;
-    uint32_t unk1;
-    uint32_t unk2[2];
+    uint32_t data_0[3];
 } QwcSpEffectEquipCtrl;
 
 static_assert(offsetof(QwcSpEffectEquipCtrl, arry) == 0x18);
 static_assert(offsetof(QwcSpEffectEquipCtrl, arry_len) == 0x20);
-static_assert(offsetof(QwcSpEffectEquipCtrl, unk1) == 0x24);
-static_assert(offsetof(QwcSpEffectEquipCtrl, unk2) == 0x28);
+static_assert(offsetof(QwcSpEffectEquipCtrl, data_0) == 0x24);
 static_assert(sizeof(QwcSpEffectEquipCtrl) == 0x30);
 
 typedef struct
