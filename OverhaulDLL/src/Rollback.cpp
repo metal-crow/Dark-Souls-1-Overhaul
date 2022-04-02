@@ -398,6 +398,33 @@ void copy_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to, ChrCtrl_AnimationQu
     to->data_0 = from->data_0;
     for (int i = 0; i < from->array_length; i++)
     {
-        copy_ChrCtrl_AnimationQueue_field0x8()
+        copy_ChrCtrl_AnimationQueue_field0x8(&to->arry[i], &from->arry[i]);
     }
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    to->data_3 = from->data_3;
+    memcpy(to->data_4, from->data_4, sizeof(to->data_4));
+    memcpy(to->data_5, from->data_5, sizeof(to->data_5));
+}
+
+void copy_ChrCtrl_AnimationQueue_field0x8(ChrCtrl_AnimationQueue_field0x8* to, ChrCtrl_AnimationQueue_field0x8* from)
+{
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+}
+
+void copy_AnimationQueue(AnimationQueue* to, AnimationQueue* from)
+{
+    for (int i = 0; i < 6; i++)
+    {
+        copy_AnimationQueue_Entry(to->AnimationQueue_Entries[i], from->AnimationQueue_Entries[i]);
+    }
+}
+
+void copy_AnimationQueue_Entry(AnimationQueue_Entry* to, AnimationQueue_Entry* from)
+{
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    memcpy(to->data_3, from->data_3, sizeof(to->data_3));
 }
