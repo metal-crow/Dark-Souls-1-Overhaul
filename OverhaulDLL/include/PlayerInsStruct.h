@@ -7,7 +7,50 @@
 
 #include <stddef.h>
 
-typedef struct
+typedef struct AnimationQueue_Entry AnimationQueue_Entry;
+typedef struct AnimationQueue AnimationQueue;
+typedef struct ChrCtrl_AnimationQueue_field0x8 ChrCtrl_AnimationQueue_field0x8;
+typedef struct ChrCtrl_AnimationQueue ChrCtrl_AnimationQueue;
+typedef struct AnimationMediatorStateEntry AnimationMediatorStateEntry;
+typedef struct AnimationMediator AnimationMediator;
+typedef struct hkpCharacterProxy hkpCharacterProxy;
+typedef struct HavokChara HavokChara;
+typedef struct EzState_detail_EzStateMachineImpl EzState_detail_EzStateMachineImpl;
+typedef struct ActionCtrl_0x30Substruct ActionCtrl_0x30Substruct;
+typedef struct ActionCtrl ActionCtrl;
+typedef struct WalkAnim_Twist_Field0x228Elem WalkAnim_Twist_Field0x228Elem;
+typedef struct WalkAnim_Twist WalkAnim_Twist;
+typedef struct ChrCtrl ChrCtrl;
+typedef struct TurnAnim TurnAnim;
+typedef struct SpinJoint SpinJoint;
+typedef struct ArrowTurnAnim ArrowTurnAnim;
+typedef struct PlayerCtrl PlayerCtrl;
+typedef struct ChrManipulator ChrManipulator;
+typedef struct NetworkManipulator NetworkManipulator;
+typedef struct PadManipulator PadManipulator;
+typedef struct ChrIns_AnimationMediatorStateInfo ChrIns_AnimationMediatorStateInfo;
+typedef struct ItemUsed ItemUsed;
+typedef struct SpecialEffect_Info SpecialEffect_Info;
+typedef struct SpecialEffect SpecialEffect;
+typedef struct QwcSpEffectEquipCtrl QwcSpEffectEquipCtrl;
+typedef struct ChrAttachSys ChrAttachSys;
+typedef struct EntityThrowAnimationStatus EntityThrowAnimationStatus;
+typedef struct ChrIns ChrIns;
+typedef struct PlayerGameData_AttributeInfo PlayerGameData_AttributeInfo;
+typedef struct EquipInventoryData EquipInventoryData;
+typedef struct MagicSlot MagicSlot;
+typedef struct EquipMagicData EquipMagicData;
+typedef struct EquipItemData EquipItemData;
+typedef struct EquipGameData EquipGameData;
+typedef struct PlayerGameData_ChrProperties PlayerGameData_ChrProperties;
+typedef struct PlayerGameData PlayerGameData;
+typedef struct RingEquipCtrl RingEquipCtrl;
+typedef struct WeaponEquipCtrl WeaponEquipCtrl;
+typedef struct ProEquipCtrl ProEquipCtrl;
+typedef struct ChrAsm ChrAsm;
+typedef struct PlayerIns PlayerIns;
+
+struct AnimationQueue_Entry
 {
     uint8_t data_0[8];
     void* padding_0;
@@ -16,34 +59,34 @@ typedef struct
     uint8_t data_2[8];
     uint64_t padding_2[4]; //think these are just for anim blending
     uint8_t data_3[24];
-} AnimationQueue_Entry;
+};
 
 static_assert(offsetof(AnimationQueue_Entry, data_1) == 0x10);
 static_assert(offsetof(AnimationQueue_Entry, data_2) == 0x140);
 static_assert(offsetof(AnimationQueue_Entry, data_3) == 0x168);
 static_assert(sizeof(AnimationQueue_Entry) == 0x180);
 
-typedef struct
+struct AnimationQueue
 {
     void* padding_0;
     AnimationQueue_Entry* AnimationQueue_Entries[6];
     void* padding_1;
-} AnimationQueue;
+};
 
 static_assert(offsetof(AnimationQueue, AnimationQueue_Entries) == 0x8);
 static_assert(sizeof(AnimationQueue) == 0x40);
 
-typedef struct
+struct ChrCtrl_AnimationQueue_field0x8
 {
     uint8_t data_0[8];
     uint64_t padding_0[4];
     uint8_t data_1[0x50];
-} ChrCtrl_AnimationQueue_field0x8;
+};
 
 static_assert(offsetof(ChrCtrl_AnimationQueue_field0x8, data_1) == 0x28);
 static_assert(sizeof(ChrCtrl_AnimationQueue_field0x8) == 0x78);
 
-typedef struct
+struct ChrCtrl_AnimationQueue
 {
     uint32_t array_length;
     uint32_t data_0;
@@ -58,7 +101,7 @@ typedef struct
     uint8_t data_4[0x20];
     uint64_t padding_4[2];
     uint8_t data_5[0x18];
-} ChrCtrl_AnimationQueue;
+};
 
 static_assert(offsetof(ChrCtrl_AnimationQueue, array_length) == 0);
 static_assert(offsetof(ChrCtrl_AnimationQueue, data_0) == 4);
@@ -70,42 +113,42 @@ static_assert(offsetof(ChrCtrl_AnimationQueue, data_4) == 0xa8);
 static_assert(offsetof(ChrCtrl_AnimationQueue, data_5) == 0xd8);
 static_assert(sizeof(ChrCtrl_AnimationQueue) == 0xf0);
 
-typedef struct
+struct AnimationMediatorStateEntry
 {
     uint8_t data_0[0x90];
     AnimationMediatorStateEntry* linked_animation1;
     AnimationMediatorStateEntry* linked_animation2;
     uint8_t data_1[8];
-} AnimationMediatorStateEntry;
+};
 
 static_assert(offsetof(AnimationMediatorStateEntry, linked_animation1) == 0x90);
 static_assert(offsetof(AnimationMediatorStateEntry, linked_animation2) == 0x98);
 static_assert(offsetof(AnimationMediatorStateEntry, data_1) == 0xa0);
 static_assert(sizeof(AnimationMediatorStateEntry) == 0xa8);
 
-typedef struct
+struct AnimationMediator
 {
     AnimationMediatorStateEntry states_list[31];
     void* padding_0;
     AnimationQueue* animationQueue;
     uint8_t data_0[0x28];
-} AnimationMediator;
+};
 
 static_assert(offsetof(AnimationMediator, animationQueue) == 0x1460);
 static_assert(offsetof(AnimationMediator, data_0) == 0x1468);
 static_assert(sizeof(AnimationMediator) == 0x1490);
 
-typedef struct
+struct hkpCharacterProxy
 {
     uint8_t padding_0[0x60]; //tbh i don't know what this really is. maybe important
     uint8_t data_0[0x20];
     uint8_t padding_1[0x70]; //tbh i don't know what this really is. maybe important
-} hkpCharacterProxy;
+};
 
 static_assert(offsetof(hkpCharacterProxy, data_0) == 0x60);
 static_assert(sizeof(hkpCharacterProxy) == 0xf0);
 
-typedef struct
+struct HavokChara
 {
     uint8_t data_0[0x38];
     hkpCharacterProxy* char_proxy;
@@ -113,7 +156,7 @@ typedef struct
     void* padding_physShapePhantomIns[2]; //neither of these seem to do anything
     uint8_t data_1[0x98];
     uint8_t padding_0[0x190]; //tbh i don't know what this really is. maybe important
-} HavokChara;
+};
 
 static_assert(offsetof(HavokChara, data_0) == 0);
 static_assert(offsetof(HavokChara, char_proxy) == 0x38);
@@ -122,7 +165,7 @@ static_assert(offsetof(HavokChara, padding_physShapePhantomIns) == 0x50);
 static_assert(offsetof(HavokChara, data_1) == 0x60);
 static_assert(sizeof(HavokChara) == 0x288);
 
-typedef struct
+struct EzState_detail_EzStateMachineImpl
 {
     uint8_t padding_0[24];
     uint8_t data_0[16]; //the pointer in this is just a pointer to const data
@@ -130,24 +173,24 @@ typedef struct
     uint8_t data_1[16];
     uint8_t padding_2[0x68];
     uint8_t data_2[8];
-} EzState_detail_EzStateMachineImpl;
+};
 
 static_assert(offsetof(EzState_detail_EzStateMachineImpl, data_0) == 0x18);
 static_assert(offsetof(EzState_detail_EzStateMachineImpl, data_1) == 0xb0);
 static_assert(offsetof(EzState_detail_EzStateMachineImpl, data_2) == 0x128);
 static_assert(sizeof(EzState_detail_EzStateMachineImpl) == 0x130);
 
-typedef struct
+struct ActionCtrl_0x30Substruct
 {
     EzState_detail_EzStateMachineImpl* EzStateMachineImpl;
     uint8_t data_0[0x18];
-} ActionCtrl_0x30Substruct;
+};
 
 static_assert(offsetof(ActionCtrl_0x30Substruct, EzStateMachineImpl) == 0);
 static_assert(offsetof(ActionCtrl_0x30Substruct, data_0) == 8);
 static_assert(sizeof(ActionCtrl_0x30Substruct) == 0x20);
 
-typedef struct
+struct ActionCtrl
 {
     uint8_t padding_0[8];
     uint8_t data_0[8];
@@ -157,7 +200,7 @@ typedef struct
     uint8_t data_1[0x4d0];
     uint8_t padding_2[8];
     uint8_t data_2[0x18];
-} ActionCtrl;
+};
 
 static_assert(offsetof(ActionCtrl, data_0) == 0x8);
 static_assert(offsetof(ActionCtrl, passive_state) == 0x30);
@@ -166,7 +209,7 @@ static_assert(offsetof(ActionCtrl, data_1) == 0x70);
 static_assert(offsetof(ActionCtrl, data_2) == 0x548);
 static_assert(sizeof(ActionCtrl) == 0x560);
 
-typedef struct
+struct WalkAnim_Twist_Field0x228Elem
 {
     uint8_t padding_0[8];
     void* data_0; //i don't know what this is
@@ -174,7 +217,7 @@ typedef struct
     uint64_t data_2;
     uint64_t data_3;
     WalkAnim_Twist_Field0x228Elem* next;
-} WalkAnim_Twist_Field0x228Elem;
+};
 
 static_assert(offsetof(WalkAnim_Twist_Field0x228Elem, data_0) == 8);
 static_assert(offsetof(WalkAnim_Twist_Field0x228Elem, data_1) == 0x10);
@@ -183,7 +226,7 @@ static_assert(offsetof(WalkAnim_Twist_Field0x228Elem, data_3) == 0x20);
 static_assert(offsetof(WalkAnim_Twist_Field0x228Elem, next) == 0x28);
 static_assert(sizeof(WalkAnim_Twist_Field0x228Elem) == 0x30);
 
-typedef struct
+struct WalkAnim_Twist
 {
     uint8_t padding_0[8];
     uint8_t data_0[8];
@@ -197,7 +240,7 @@ typedef struct
     uint8_t data_3[0x28];
     WalkAnim_Twist_Field0x228Elem walkAnim_Twist_Field0x228Elem;
     uint8_t data_4[0x48];
-} WalkAnim_Twist;
+};
 
 static_assert(offsetof(WalkAnim_Twist, data_0) == 8);
 static_assert(offsetof(WalkAnim_Twist, data_1) == 0x18);
@@ -206,7 +249,7 @@ static_assert(offsetof(WalkAnim_Twist, data_3) == 0x200);
 static_assert(offsetof(WalkAnim_Twist, data_4) == 0x258);
 static_assert(sizeof(WalkAnim_Twist) == 0x2a0);
 
-typedef struct
+struct ChrCtrl
 {
     uint8_t padding_0[8];
     uint8_t data_0[8];
@@ -224,7 +267,7 @@ typedef struct
     uint8_t data_3[0xe0];
     uint8_t padding_5[16];
     uint8_t data_4[0x60];
-} ChrCtrl;
+};
 
 static_assert(offsetof(ChrCtrl, data_0) == 8);
 static_assert(offsetof(ChrCtrl, animationQueue) == 0x18);
@@ -237,7 +280,7 @@ static_assert(offsetof(ChrCtrl, data_3) == 0x1b0);
 static_assert(offsetof(ChrCtrl, data_4) == 0x2a0);
 static_assert(sizeof(ChrCtrl) == 0x300);
 
-typedef struct
+struct TurnAnim
 {
     uint8_t padding_0[8];
     uint8_t data_0[8];
@@ -252,7 +295,7 @@ typedef struct
     uint8_t data_2[0x120];
     uint8_t padding_3[8];
     uint8_t data_3[8];
-} TurnAnim;
+};
 
 static_assert(offsetof(TurnAnim, data_0) == 0x8);
 static_assert(offsetof(TurnAnim, data_1) == 0x18);
@@ -260,7 +303,7 @@ static_assert(offsetof(TurnAnim, data_2) == 0x70);
 static_assert(offsetof(TurnAnim, data_3) == 0x198);
 static_assert(sizeof(TurnAnim) == 0x1a0);
 
-typedef struct
+struct SpinJoint
 {
     uint8_t padding_0[8];
     uint8_t data_0[8];
@@ -269,7 +312,7 @@ typedef struct
     uint8_t padding_2[8];
     uint8_t data_2[8];
     uint8_t padding_3[8];
-} SpinJoint;
+};
 
 static_assert(offsetof(SpinJoint, data_0) == 8);
 static_assert(offsetof(SpinJoint, padding_1) == 0x10);
@@ -279,14 +322,14 @@ static_assert(offsetof(SpinJoint, data_2) == 0x80);
 static_assert(offsetof(SpinJoint, padding_3) == 0x88);
 static_assert(sizeof(SpinJoint) == 0x90);
 
-typedef struct
+struct ArrowTurnAnim
 {
     TurnAnim turnAnim;
     uint8_t padding_0[8];
     SpinJoint* joint_spine_2;
     SpinJoint* joint_spine1_2;
     uint8_t data_0[8];
-} ArrowTurnAnim;
+};
 
 static_assert(offsetof(ArrowTurnAnim, padding_0) == 0x1a0);
 static_assert(offsetof(ArrowTurnAnim, joint_spine_2) == 0x1a8);
@@ -294,7 +337,7 @@ static_assert(offsetof(ArrowTurnAnim, joint_spine1_2) == 0x1b0);
 static_assert(offsetof(ArrowTurnAnim, data_0) == 0x1b8);
 static_assert(sizeof(ArrowTurnAnim) == 0x1c0);
 
-typedef struct
+struct PlayerCtrl
 {
     ChrCtrl chrCtrl;
     uint8_t data_0[8];
@@ -304,7 +347,7 @@ typedef struct
     uint8_t data_1[8];
     uint8_t padding_1[32];
     uint8_t data_2[24];
-} PlayerCtrl;
+};
 
 static_assert(offsetof(PlayerCtrl, data_0) == 0x300);
 static_assert(offsetof(PlayerCtrl, turnAnim) == 0x308);
@@ -315,60 +358,60 @@ static_assert(offsetof(PlayerCtrl, padding_1) == 0x338);
 static_assert(offsetof(PlayerCtrl, data_2) == 0x358);
 static_assert(sizeof(PlayerCtrl) == 0x370);
 
-typedef struct
+struct ChrManipulator
 {
     uint8_t padding_0[0x8];
     uint8_t data_0[0x228];
-} ChrManipulator;
+};
 
 static_assert(sizeof(ChrManipulator) == 0x230);
 
-typedef struct
+struct NetworkManipulator
 {
     //this is probably used in place of PadManipulator in PlayerIns for remote PCs. need to verify
-} NetworkManipulator;
+};
 
-typedef struct
+struct PadManipulator
 {
     ChrManipulator chrManipulator;
     uint8_t padding_0[0xc];
     uint8_t data_0[4];
     uint8_t padding_1[0x20];
     uint8_t data_1[0x100];
-} PadManipulator;
+};
 
 static_assert(offsetof(PadManipulator, chrManipulator) == 0x0);
 static_assert(offsetof(PadManipulator, data_0) == 0x23c);
 static_assert(offsetof(PadManipulator, data_1) == 0x260);
 static_assert(sizeof(PadManipulator) == 0x360);
 
-typedef struct
+struct ChrIns_AnimationMediatorStateInfo
 {
     int32_t animationId;
     uint32_t stateIndex;
-} ChrIns_AnimationMediatorStateInfo;
+};
 
 static_assert(offsetof(ChrIns_AnimationMediatorStateInfo, animationId) == 0x0);
 static_assert(offsetof(ChrIns_AnimationMediatorStateInfo, stateIndex) == 0x4);
 static_assert(sizeof(ChrIns_AnimationMediatorStateInfo) == 0x8);
 
-typedef struct
+struct ItemUsed
 {
     int32_t itemId;
     int32_t amountUsed;
-} ItemUsed;
+};
 
 static_assert(offsetof(ItemUsed, itemId) == 0x0);
 static_assert(offsetof(ItemUsed, amountUsed) == 0x4);
 static_assert(sizeof(ItemUsed) == 0x8);
 
-typedef struct
+struct SpecialEffect_Info
 {
     uint8_t data_0[0x38];
     uint64_t paramRowBytes; //this is a pointer to a const struct, so just read/write the pointer itself
     SpecialEffect_Info* next;
     SpecialEffect_Info* prev;
-} SpecialEffect_Info;
+};
 
 static_assert(offsetof(SpecialEffect_Info, data_0) == 0x0);
 static_assert(offsetof(SpecialEffect_Info, paramRowBytes) == 0x38);
@@ -376,7 +419,7 @@ static_assert(offsetof(SpecialEffect_Info, next) == 0x40);
 static_assert(offsetof(SpecialEffect_Info, prev) == 0x48);
 static_assert(sizeof(SpecialEffect_Info) == 0x50);
 
-typedef struct
+struct SpecialEffect
 {
     uint8_t padding_0[8];
     SpecialEffect_Info* specialEffect_Info;
@@ -385,7 +428,7 @@ typedef struct
     uint8_t data_1[8];
     uint8_t padding_3[8];
     uint8_t data_2[8];
-} SpecialEffect;
+};
 
 static_assert(offsetof(SpecialEffect, specialEffect_Info) == 0x0 + 8);
 static_assert(offsetof(SpecialEffect, data_0) == 0x8 + 8);
@@ -393,35 +436,35 @@ static_assert(offsetof(SpecialEffect, data_1) == 0x18 + 8);
 static_assert(offsetof(SpecialEffect, data_2) == 0x28 + 8);
 static_assert(sizeof(SpecialEffect) == 0x38);
 
-typedef struct
+struct QwcSpEffectEquipCtrl
 {
     uint8_t padding_0[0x18];
     uint32_t* arry;
     uint32_t arry_len;
     uint32_t data_0[3];
-} QwcSpEffectEquipCtrl;
+};
 
 static_assert(offsetof(QwcSpEffectEquipCtrl, arry) == 0x18);
 static_assert(offsetof(QwcSpEffectEquipCtrl, arry_len) == 0x20);
 static_assert(offsetof(QwcSpEffectEquipCtrl, data_0) == 0x24);
 static_assert(sizeof(QwcSpEffectEquipCtrl) == 0x30);
 
-typedef struct
+struct ChrAttachSys
 {
     //this is sfx stuff, unneeded for rollback
     uint8_t padding_0[0x18];
-} ChrAttachSys;
+};
 
 static_assert(sizeof(ChrAttachSys) == 0x18);
 
-typedef struct
+struct EntityThrowAnimationStatus
 {
     uint8_t padding_0[0x10];
     uint64_t throw_paramdef; //this is a pointer to a const struct, so just read/write the pointer itself
     uint8_t data_0[0x40];
     uint8_t padding_1[0x8];
     uint8_t data_1[0x50];
-} EntityThrowAnimationStatus;
+};
 
 static_assert(offsetof(EntityThrowAnimationStatus, throw_paramdef) == 0x10);
 static_assert(offsetof(EntityThrowAnimationStatus, data_0) == 0x18);
@@ -429,7 +472,7 @@ static_assert(offsetof(EntityThrowAnimationStatus, padding_1) == 0x58);
 static_assert(offsetof(EntityThrowAnimationStatus, data_1) == 0x60);
 static_assert(sizeof(EntityThrowAnimationStatus) == 0xb0);
 
-typedef struct
+struct ChrIns
 {
     uint8_t padding_0[8 + 0x60];
     PlayerCtrl* playerCtrl;
@@ -466,7 +509,7 @@ typedef struct
     uint8_t padding_10[0x10];
     EntityThrowAnimationStatus* throw_animation_info;
     uint8_t padding_11[0x120];
-} ChrIns;
+};
 
 static_assert(offsetof(ChrIns, playerCtrl) == 0x60+8);
 static_assert(offsetof(ChrIns, padManipulator) == 0x68+8);
@@ -494,73 +537,73 @@ static_assert(offsetof(ChrIns, resistCurseTotal) == 0x42c+8);
 static_assert(offsetof(ChrIns, throw_animation_info) == 0x440+8);
 static_assert(sizeof(ChrIns) == 0x570);
 
-typedef struct
+struct PlayerGameData_AttributeInfo
 {
     uint8_t data_0[0x1a4];
-} PlayerGameData_AttributeInfo;
+};
 
 static_assert(sizeof(PlayerGameData_AttributeInfo) == 0x1a4);
 
-typedef struct
+struct EquipInventoryData
 {
     //this only deals with what stuff is in your inventory, not equipped. Probably will never matter for rollback
     uint8_t padding_0[0x78];
-} EquipInventoryData;
+};
 
 static_assert(sizeof(EquipInventoryData) == 0x78);
 
-typedef struct
+struct MagicSlot
 {
     int32_t magic_id;
     uint32_t count;
-} MagicSlot;
+};
 
 static_assert(offsetof(MagicSlot, magic_id) == 0x0);
 static_assert(offsetof(MagicSlot, count) == 0x4);
 static_assert(sizeof(MagicSlot) == 0x8);
 
-typedef struct
+struct EquipMagicData
 {
     uint8_t padding_0[0x18];
     MagicSlot equippedMagicList[12];
     int32_t curSelectedMagicSlot;
-} EquipMagicData;
+};
 
 static_assert(offsetof(EquipMagicData, equippedMagicList) == 0x18);
 static_assert(offsetof(EquipMagicData, curSelectedMagicSlot) == 0x78);
 static_assert(sizeof(EquipMagicData) == 0x7c);
 
-typedef struct
+struct EquipItemData
 {
     uint8_t padding_0[0x18];
     uint32_t quickbar[6];
-} EquipItemData;
+};
 
 static_assert(offsetof(EquipItemData, quickbar) == 0x18);
 static_assert(sizeof(EquipItemData) == 0x30);
 
-typedef struct
+struct EquipGameData
 {
     uint8_t padding_0[0x120];
     EquipInventoryData equippedInventory;
     EquipMagicData* equipMagicData;
     EquipItemData equippedItemsInQuickbar;
     uint8_t padding_1[0x48];
-} EquipGameData;
+};
 
 static_assert(offsetof(EquipGameData, equippedInventory) == 0x120);
 static_assert(offsetof(EquipGameData, equipMagicData) == 0x198);
 static_assert(offsetof(EquipGameData, equippedItemsInQuickbar) == 0x1a0);
 static_assert(sizeof(EquipGameData) == 0x218);
 
-typedef struct
+struct PlayerGameData_ChrProperties
 {
     uint8_t data_0[0x90];
-} PlayerGameData_ChrProperties;
+};
 
 static_assert(sizeof(PlayerGameData_ChrProperties) == 0x90);
 
-typedef struct
+struct PlayerGameData
 {
     uint8_t padding_0[0x10];
     PlayerGameData_AttributeInfo attribs;
@@ -569,56 +612,56 @@ typedef struct
     uint8_t padding_2[0xd8];
     PlayerGameData_ChrProperties ChrProperties;
     uint8_t padding_3[0x60];
-} PlayerGameData;
+};
 
 static_assert(offsetof(PlayerGameData, attribs) == 0x10);
 static_assert(offsetof(PlayerGameData, equipGameData) == 0x280);
 static_assert(offsetof(PlayerGameData, ChrProperties) == 0x570);
 static_assert(sizeof(PlayerGameData) == 0x660);
 
-typedef struct
+struct RingEquipCtrl
 {
     uint8_t padding_0[0x10];
     SpecialEffect* spEffectList;
     uint32_t* equipped_rings_ids; //index is slot num, elem is id
     uint32_t array_len;
     uint8_t padding_1[0xc];
-} RingEquipCtrl;
+};
 
 static_assert(offsetof(RingEquipCtrl, spEffectList) == 0x10);
 static_assert(offsetof(RingEquipCtrl, equipped_rings_ids) == 0x18);
 static_assert(offsetof(RingEquipCtrl, array_len) == 0x20);
 static_assert(sizeof(RingEquipCtrl) == 0x30);
 
-typedef struct
+struct WeaponEquipCtrl
 {
     uint8_t padding_0[0x10];
     SpecialEffect* spEffectList;
     uint32_t* equipped_weapons_ids; //index is slot num, elem is id
     uint32_t array_len;
     uint8_t padding_1[0xc];
-} WeaponEquipCtrl;
+};
 
 static_assert(offsetof(WeaponEquipCtrl, spEffectList) == 0x10);
 static_assert(offsetof(WeaponEquipCtrl, equipped_weapons_ids) == 0x18);
 static_assert(offsetof(WeaponEquipCtrl, array_len) == 0x20);
 static_assert(sizeof(WeaponEquipCtrl) == 0x30);
 
-typedef struct
+struct ProEquipCtrl
 {
     uint8_t padding_0[0x10];
     SpecialEffect* spEffectList;
     uint32_t* equipped_armors_ids; //index is slot num, elem is id
     uint32_t array_len;
     uint8_t padding_1[0xc];
-} ProEquipCtrl;
+};
 
 static_assert(offsetof(ProEquipCtrl, spEffectList) == 0x10);
 static_assert(offsetof(ProEquipCtrl, equipped_armors_ids) == 0x18);
 static_assert(offsetof(ProEquipCtrl, array_len) == 0x20);
 static_assert(sizeof(ProEquipCtrl) == 0x30);
 
-typedef struct
+struct ChrAsm
 {
     uint8_t padding_0[8];
     uint32_t equipped_weapon_style;
@@ -627,7 +670,7 @@ typedef struct
     uint8_t padding_1[0x10];
     uint32_t equip_items[20];
     uint8_t padding_2[0xc];
-} ChrAsm;
+};
 
 static_assert(offsetof(ChrAsm, equipped_weapon_style) == 0x8);
 static_assert(offsetof(ChrAsm, l_hand_equipped_index) == 0xc);
@@ -635,7 +678,7 @@ static_assert(offsetof(ChrAsm, r_hand_equipped_index) == 0x10);
 static_assert(offsetof(ChrAsm, equip_items) == 0x24);
 static_assert(sizeof(ChrAsm) == 0x80);
 
-typedef struct
+struct PlayerIns
 {
     ChrIns chrins;
     uint8_t padding_0[8];
@@ -652,7 +695,7 @@ typedef struct
     uint8_t padding_3[0x24];
     ChrAsm* chrasm;
     uint8_t padding_4[0x188];
-} PlayerIns;
+};
 
 static_assert(offsetof(PlayerIns, chrins) == 0x0);
 static_assert(offsetof(PlayerIns, playergamedata) == 0x578);
