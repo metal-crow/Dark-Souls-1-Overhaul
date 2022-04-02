@@ -298,7 +298,7 @@ void copy_QwcSpEffectEquipCtrl(QwcSpEffectEquipCtrl* to, QwcSpEffectEquipCtrl* f
         FATALERROR("Got %d number of speffects for QwcSpEffectEquipCtrl->arry. Only support a max of 64.");
     }
     to->arry_len = from->arry_len;
-    for (int i = 0; i < from->arry_len; i++)
+    for (size_t i = 0; i < from->arry_len; i++)
     {
         to->arry[i] = from->arry[i];
     }
@@ -699,7 +699,7 @@ void copy_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to, ChrCtrl_AnimationQu
     }
     to->array_length = from->array_length;
     to->data_0 = from->data_0;
-    for (int i = 0; i < from->array_length; i++)
+    for (size_t i = 0; i < from->array_length; i++)
     {
         copy_ChrCtrl_AnimationQueue_field0x8(&to->arry[i], &from->arry[i]);
     }
