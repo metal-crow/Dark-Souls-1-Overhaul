@@ -4,12 +4,17 @@
 
 #include <stdint.h>
 #include "PlayerInsStruct.h"
+#include <unordered_map>
 
 class Rollback
 {
 public:
     static void start();
     static void save();
+    static void load();
+
+    static bool bsave;
+    static bool bload;
 
 private:
     static PlayerIns* saved_playerins;
@@ -75,8 +80,8 @@ void copy_hkpCharacterProxy(hkpCharacterProxy* to, hkpCharacterProxy* from);
 hkpCharacterProxy* init_hkpCharacterProxy();
 void copy_AnimationMediator(AnimationMediator* to, AnimationMediator* from);
 AnimationMediator* init_AnimationMediator();
-void copy_AnimationMediatorStateEntry(AnimationMediatorStateEntry* to, AnimationMediatorStateEntry* from);
-AnimationMediatorStateEntry* init_AnimationMediatorStateEntry();
+void copy_AnimationMediatorStateEntry(AnimationMediatorStateEntry* to, AnimationMediatorStateEntry* from, std::unordered_map<AnimationMediatorStateEntry*, AnimationMediatorStateEntry*>& links1, std::unordered_map<AnimationMediatorStateEntry*, AnimationMediatorStateEntry*>& links2);
+AnimationMediatorStateEntry* init_AnimationMediatorStateEntry(size_t depth);
 void copy_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to, ChrCtrl_AnimationQueue* from);
 ChrCtrl_AnimationQueue* init_ChrCtrl_AnimationQueue();
 void copy_ChrCtrl_AnimationQueue_field0x8(ChrCtrl_AnimationQueue_field0x8* to, ChrCtrl_AnimationQueue_field0x8* from);

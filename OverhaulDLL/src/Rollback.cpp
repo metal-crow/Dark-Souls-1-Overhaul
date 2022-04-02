@@ -2,6 +2,8 @@
 #include "SP/memory.h"
 #include "SP/memory/injection/asm/x64.h"
 #include "DarkSoulsOverhaulMod.h"
+#include "MainLoop.h"
+#include "InputUtil.h"
 
 void* malloc_(size_t size)
 {
@@ -23,6 +25,25 @@ extern "C" {
 
 PlayerIns* Rollback::saved_playerins = NULL;
 
+bool Rollback::bsave = false;
+bool Rollback::bload = false;
+bool rollback_test(void* unused)
+{
+    if (Rollback::bsave)
+    {
+        Rollback::save();
+        Rollback::bsave = false;
+    }
+
+    if (Rollback::bload)
+    {
+        Rollback::load();
+        Rollback::bload = false;
+    }
+
+    return true;
+}
+
 void Rollback::start()
 {
     ConsoleWrite("Rollback...");
@@ -43,6 +64,9 @@ void Rollback::start()
 
     //init out copy of the playerins struct, for saving/restoring with rollback
     Rollback::saved_playerins = init_PlayerIns();
+
+    //TEST save/restore with a hotkey
+    MainLoop::setup_mainloop_callback(rollback_test, NULL, "rollback_test");
 }
 
 void Rollback::save()
@@ -56,6 +80,18 @@ void Rollback::save()
 
     //we pre-allocate a static playerins on boot, so we can assume all pointers are set up
     copy_PlayerIns(Rollback::saved_playerins, player);
+}
+
+void Rollback::load()
+{
+    auto player_o = Game::get_PlayerIns();
+    if (!player_o.has_value())
+    {
+        return;
+    }
+    PlayerIns* player = (PlayerIns*)player_o.value();
+
+    copy_PlayerIns(player, Rollback::saved_playerins);
 }
 
 void copy_PlayerIns(PlayerIns* to, PlayerIns* from)
@@ -351,7 +387,8 @@ void copy_SpecialEffect_Info(SpecialEffect_Info* to, SpecialEffect_Info* from)
         }
         if (to->next == NULL)
         {
-            FATALERROR("Unable to recursivly copy SpecialEffect_Info. to->next is null.");
+            ConsoleWrite("Unable to recursivly copy SpecialEffect_Info. to->next is null.");
+            break;
         }
         else
         {
@@ -611,11 +648,17 @@ hkpCharacterProxy* init_hkpCharacterProxy()
     return local_hkpCharacterProxy;
 }
 
+//use this to check if we have already saved a linked_animation. It maps from the address of a from->linked_animation to our saved to
+static std::unordered_map<AnimationMediatorStateEntry*, AnimationMediatorStateEntry*> AnimationMediatorStateEntry_already_saved_links1;
+static std::unordered_map<AnimationMediatorStateEntry*, AnimationMediatorStateEntry*> AnimationMediatorStateEntry_already_saved_links2;
+
 void copy_AnimationMediator(AnimationMediator* to, AnimationMediator* from)
 {
     for (int i = 0; i < 31; i++)
     {
-        copy_AnimationMediatorStateEntry(&to->states_list[i], &from->states_list[i]);
+        AnimationMediatorStateEntry_already_saved_links1.clear();
+        AnimationMediatorStateEntry_already_saved_links2.clear();
+        copy_AnimationMediatorStateEntry(&to->states_list[i], &from->states_list[i], AnimationMediatorStateEntry_already_saved_links1, AnimationMediatorStateEntry_already_saved_links2);
     }
     copy_AnimationQueue(to->animationQueue, from->animationQueue);
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
@@ -627,7 +670,7 @@ AnimationMediator* init_AnimationMediator()
 
     for (int i = 0; i < 31; i++)
     {
-        AnimationMediatorStateEntry* pAnimationMediatorStateEntry = init_AnimationMediatorStateEntry();
+        AnimationMediatorStateEntry* pAnimationMediatorStateEntry = init_AnimationMediatorStateEntry(0);
         local_AnimationMediator->states_list[i] = *pAnimationMediatorStateEntry;
         free(pAnimationMediatorStateEntry);
     }
@@ -636,56 +679,65 @@ AnimationMediator* init_AnimationMediator()
     return local_AnimationMediator;
 }
 
-void copy_AnimationMediatorStateEntry(AnimationMediatorStateEntry* to, AnimationMediatorStateEntry* from)
+void copy_AnimationMediatorStateEntry(AnimationMediatorStateEntry* to, AnimationMediatorStateEntry* from, std::unordered_map<AnimationMediatorStateEntry*, AnimationMediatorStateEntry*>& links1, std::unordered_map<AnimationMediatorStateEntry*, AnimationMediatorStateEntry*>& links2)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     if (from->linked_animation1 != NULL)
     {
-        if (to->linked_animation1 == NULL)
+        //if we have already saved this linked animation, close the pointer loop. linked animations can have cycles
+        auto saved_link1 = links1.find(from->linked_animation1);
+        if (saved_link1 != links1.end())
         {
-            FATALERROR("Unable to recursivly copy AnimationMediatorStateEntry into to->linked_animation. Pointer is null");
+            to->linked_animation1 = saved_link1->second;
         }
         else
         {
-            copy_AnimationMediatorStateEntry(to->linked_animation1, from->linked_animation1);
+            if (to->linked_animation1 == NULL)
+            {
+                ConsoleWrite("Unable to recursivly copy AnimationMediatorStateEntry into to->linked_animation1. Pointer is null");
+            }
+            else
+            {
+                links1.emplace(from->linked_animation1, to->linked_animation1);
+                copy_AnimationMediatorStateEntry(to->linked_animation1, from->linked_animation1, links1, links2);
+            }
         }
     }
     if (from->linked_animation2 != NULL)
     {
-        if (to->linked_animation2 == NULL)
+        auto saved_link2 = links2.find(from->linked_animation2);
+        if (saved_link2 != links2.end())
         {
-            FATALERROR("Unable to recursivly copy AnimationMediatorStateEntry into to->linked_animation. Pointer is null");
+            to->linked_animation2 = saved_link2->second;
         }
         else
         {
-            copy_AnimationMediatorStateEntry(to->linked_animation2, from->linked_animation2);
+            if (to->linked_animation2 == NULL)
+            {
+                ConsoleWrite("Unable to recursivly copy AnimationMediatorStateEntry into to->linked_animation2. Pointer is null");
+            }
+            else
+            {
+                links2.emplace(from->linked_animation2, to->linked_animation2);
+                copy_AnimationMediatorStateEntry(to->linked_animation2, from->linked_animation2, links1, links2);
+            }
         }
     }
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
 }
 
-AnimationMediatorStateEntry* init_AnimationMediatorStateEntry()
+AnimationMediatorStateEntry* init_AnimationMediatorStateEntry(size_t depth)
 {
+    //this is a tree of linked animations. allow for a max tree depth of X means we must have 2^x - 1 linked animation state entries.
+    //only allow a max depth of 5, or 31 nodes
+    if (depth == 5)
+    {
+        return NULL;
+    }
     AnimationMediatorStateEntry* local_AnimationMediatorStateEntry = (AnimationMediatorStateEntry*)malloc_(sizeof(AnimationMediatorStateEntry));
-    //allow for a max storage of 6 linked animations
-    AnimationMediatorStateEntry* local_AnimationMediatorStateEntry1 = (AnimationMediatorStateEntry*)malloc_(sizeof(AnimationMediatorStateEntry)*6);
-    AnimationMediatorStateEntry* local_AnimationMediatorStateEntry2 = (AnimationMediatorStateEntry*)malloc_(sizeof(AnimationMediatorStateEntry)*6);
 
-    local_AnimationMediatorStateEntry->linked_animation1 = &local_AnimationMediatorStateEntry1[0];
-    local_AnimationMediatorStateEntry1[0].linked_animation1 = &local_AnimationMediatorStateEntry1[1];
-    local_AnimationMediatorStateEntry1[1].linked_animation1 = &local_AnimationMediatorStateEntry1[2];
-    local_AnimationMediatorStateEntry1[2].linked_animation1 = &local_AnimationMediatorStateEntry1[3];
-    local_AnimationMediatorStateEntry1[3].linked_animation1 = &local_AnimationMediatorStateEntry1[4];
-    local_AnimationMediatorStateEntry1[4].linked_animation1 = &local_AnimationMediatorStateEntry1[5];
-    local_AnimationMediatorStateEntry1[5].linked_animation1 = NULL;
-
-    local_AnimationMediatorStateEntry->linked_animation2 = &local_AnimationMediatorStateEntry2[0];
-    local_AnimationMediatorStateEntry2[0].linked_animation2 = &local_AnimationMediatorStateEntry2[1];
-    local_AnimationMediatorStateEntry2[1].linked_animation2 = &local_AnimationMediatorStateEntry2[2];
-    local_AnimationMediatorStateEntry2[2].linked_animation2 = &local_AnimationMediatorStateEntry2[3];
-    local_AnimationMediatorStateEntry2[3].linked_animation2 = &local_AnimationMediatorStateEntry2[4];
-    local_AnimationMediatorStateEntry2[4].linked_animation2 = &local_AnimationMediatorStateEntry2[5];
-    local_AnimationMediatorStateEntry2[5].linked_animation2 = NULL;
+    local_AnimationMediatorStateEntry->linked_animation1 = init_AnimationMediatorStateEntry(depth + 1);
+    local_AnimationMediatorStateEntry->linked_animation2 = init_AnimationMediatorStateEntry(depth + 1);
 
     return local_AnimationMediatorStateEntry;
 }
