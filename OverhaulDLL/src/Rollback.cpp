@@ -2,7 +2,17 @@
 #include "SP/memory.h"
 #include "SP/memory/injection/asm/x64.h"
 #include "DarkSoulsOverhaulMod.h"
-#include "PlayerInsStruct.h"
+
+void* malloc_(size_t size)
+{
+    void* out = malloc(size);
+    if (out == NULL)
+    {
+        FATALERROR("Malloc failure. Unable to allocate %d bytes.", size);
+    }
+    memset(out, 0, size);
+    return out;
+}
 
 extern "C" {
     uint64_t sendType1NetMessage_injection_return;
@@ -10,6 +20,8 @@ extern "C" {
     uint64_t recvType1NetMessage_injection_return;
     void recvType1NetMessage_injection();
 }
+
+PlayerIns* Rollback::saved_playerins = NULL;
 
 void Rollback::start()
 {
@@ -29,12 +41,8 @@ void Rollback::start()
     uint8_t disableType18PacketSending_patch[] = { 0x90, 0x90, 0x90, 0x90, 0x90 }; //nop x5
     sp::mem::patch_bytes(write_address, disableType18PacketSending_patch, sizeof(disableType18PacketSending_patch));
 
-
-}
-
-void Rollback::init_saved_PlayerIns()
-{
-    //TODO
+    //init out copy of the playerins struct, for saving/restoring with rollback
+    Rollback::saved_playerins = init_PlayerIns();
 }
 
 void Rollback::save()
@@ -44,10 +52,10 @@ void Rollback::save()
     {
         return;
     }
-    uint64_t player = (uint64_t)player_o.value();
+    PlayerIns* player = (PlayerIns*)player_o.value();
 
     //we pre-allocate a static playerins on boot, so we can assume all pointers are set up
-    copy_PlayerIns(saved_player, player);
+    copy_PlayerIns(Rollback::saved_playerins, player);
 }
 
 void copy_PlayerIns(PlayerIns* to, PlayerIns* from)
@@ -64,6 +72,22 @@ void copy_PlayerIns(PlayerIns* to, PlayerIns* from)
     copy_ChrAsm(to->chrasm, from->chrasm);
 }
 
+PlayerIns* init_PlayerIns()
+{
+    PlayerIns* local_PlayerIns = (PlayerIns*)malloc_(sizeof(PlayerIns));
+
+    ChrIns* pChrIns = init_ChrIns();
+    local_PlayerIns->chrins = *pChrIns;
+    free(pChrIns);
+    local_PlayerIns->playergamedata = init_PlayerGameData();
+    local_PlayerIns->ringequipctrl = init_RingEquipCtrl();
+    local_PlayerIns->weaponequipctrl = init_WeaponEquipCtrl();
+    local_PlayerIns->proequipctrl = init_ProEquipCtrl();
+    local_PlayerIns->chrasm = init_ChrAsm();
+
+    return local_PlayerIns;
+}
+
 void copy_ChrAsm(ChrAsm* to, ChrAsm* from)
 {
     to->equipped_weapon_style = from->equipped_weapon_style;
@@ -72,13 +96,19 @@ void copy_ChrAsm(ChrAsm* to, ChrAsm* from)
     memcpy(to->equip_items, from->equip_items, sizeof(to->equip_items));
 }
 
+ChrAsm* init_ChrAsm()
+{
+    ChrAsm* local_ChrAsm = (ChrAsm*)malloc_(sizeof(ChrAsm));
+    return local_ChrAsm;
+}
+
 void copy_ProEquipCtrl(ProEquipCtrl* to, ProEquipCtrl* from)
 {
     copy_SpecialEffect(to->spEffectList, from->spEffectList);
     //there should always be 5 armors (4 equip and a hair)
     if (from->array_len != 5)
     {
-        FATALERROR("Got %d for ProEquipCtrl->array_len", from->array_len);
+        FATALERROR("Got %d for ProEquipCtrl->array_len, should be 5", from->array_len);
     }
     to->array_len = 5;
     to->equipped_armors_ids[0] = from->equipped_armors_ids[0];
@@ -86,6 +116,17 @@ void copy_ProEquipCtrl(ProEquipCtrl* to, ProEquipCtrl* from)
     to->equipped_armors_ids[2] = from->equipped_armors_ids[2];
     to->equipped_armors_ids[3] = from->equipped_armors_ids[3];
     to->equipped_armors_ids[4] = from->equipped_armors_ids[4];
+}
+
+ProEquipCtrl* init_ProEquipCtrl()
+{
+    ProEquipCtrl* local_ProEquipCtrl = (ProEquipCtrl*)malloc_(sizeof(ProEquipCtrl));
+    uint32_t* local_ProEquipCtrl_equipped_armors_ids = (uint32_t*)malloc_(sizeof(uint32_t)*5);
+
+    local_ProEquipCtrl->spEffectList = init_SpecialEffect();
+    local_ProEquipCtrl->equipped_armors_ids = local_ProEquipCtrl_equipped_armors_ids;
+
+    return local_ProEquipCtrl;
 }
 
 void copy_WeaponEquipCtrl(WeaponEquipCtrl* to, WeaponEquipCtrl* from)
@@ -101,6 +142,17 @@ void copy_WeaponEquipCtrl(WeaponEquipCtrl* to, WeaponEquipCtrl* from)
     to->equipped_weapons_ids[1] = from->equipped_weapons_ids[1];
 }
 
+WeaponEquipCtrl* init_WeaponEquipCtrl()
+{
+    WeaponEquipCtrl* local_WeaponEquipCtrl = (WeaponEquipCtrl*)malloc_(sizeof(WeaponEquipCtrl));
+    uint32_t* local_WeaponEquipCtrl_equipped_weapons_ids = (uint32_t*)malloc_(sizeof(uint32_t)*2);
+
+    local_WeaponEquipCtrl->spEffectList = init_SpecialEffect();
+    local_WeaponEquipCtrl->equipped_weapons_ids = local_WeaponEquipCtrl_equipped_weapons_ids;
+
+    return local_WeaponEquipCtrl;
+}
+
 void copy_RingEquipCtrl(RingEquipCtrl* to, RingEquipCtrl* from)
 {
     copy_SpecialEffect(to->spEffectList, from->spEffectList);
@@ -114,11 +166,33 @@ void copy_RingEquipCtrl(RingEquipCtrl* to, RingEquipCtrl* from)
     to->equipped_rings_ids[1] = from->equipped_rings_ids[1];
 }
 
+RingEquipCtrl* init_RingEquipCtrl()
+{
+    RingEquipCtrl* local_RingEquipCtrl = (RingEquipCtrl*)malloc_(sizeof(RingEquipCtrl));
+    uint32_t* local_RingEquipCtrl_equipped_rings_ids = (uint32_t*)malloc_(sizeof(uint32_t)*2);
+
+    local_RingEquipCtrl->spEffectList = init_SpecialEffect();
+    local_RingEquipCtrl->equipped_rings_ids = local_RingEquipCtrl_equipped_rings_ids;
+
+    return local_RingEquipCtrl;
+}
+
 void copy_PlayerGameData(PlayerGameData* to, PlayerGameData* from)
 {
     copy_PlayerGameData_AttributeInfo(&to->attribs, &from->attribs);
     copy_EquipGameData(&to->equipGameData, &from->equipGameData);
     copy_PlayerGameData_ChrProperties(&to->ChrProperties, &from->ChrProperties);
+}
+
+PlayerGameData* init_PlayerGameData()
+{
+    PlayerGameData* local_PlayerGameData = (PlayerGameData*)malloc_(sizeof(PlayerGameData));
+
+    EquipGameData* pEquipGameData = init_EquipGameData();
+    local_PlayerGameData->equipGameData = *pEquipGameData;
+    free(pEquipGameData);
+
+    return local_PlayerGameData;
 }
 
 void copy_PlayerGameData_ChrProperties(PlayerGameData_ChrProperties* to, PlayerGameData_ChrProperties* from)
@@ -132,6 +206,15 @@ void copy_EquipGameData(EquipGameData* to, EquipGameData* from)
     copy_EquipItemData(&to->equippedItemsInQuickbar, &from->equippedItemsInQuickbar);
 }
 
+EquipGameData* init_EquipGameData()
+{
+    EquipGameData* local_EquipGameData = (EquipGameData*)malloc_(sizeof(EquipGameData));
+
+    local_EquipGameData->equipMagicData = init_EquipMagicData();
+
+    return local_EquipGameData;
+}
+
 void copy_EquipItemData(EquipItemData* to, EquipItemData* from)
 {
     memcpy(to->quickbar, from->quickbar, sizeof(to->quickbar));
@@ -143,13 +226,20 @@ void copy_EquipMagicData(EquipMagicData* to, EquipMagicData* from)
     to->curSelectedMagicSlot = from->curSelectedMagicSlot;
 }
 
+EquipMagicData* init_EquipMagicData()
+{
+    EquipMagicData* local_EquipMagicData = (EquipMagicData*)malloc_(sizeof(EquipMagicData));
+    return local_EquipMagicData;
+}
+
 void copy_PlayerGameData_AttributeInfo(PlayerGameData_AttributeInfo* to, PlayerGameData_AttributeInfo* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 }
+
 void copy_ChrIns(ChrIns* to, ChrIns* from)
 {
-    copy_playerCtrl(to->playerCtrl, from->playerCtrl);
+    copy_PlayerCtrl(to->playerCtrl, from->playerCtrl);
     copy_PadManipulator(to->padManipulator, from->padManipulator);
     to->CharaInitParamID = from->CharaInitParamID;
     to->lowerThrowAnim = from->lowerThrowAnim;
@@ -174,11 +264,30 @@ void copy_ChrIns(ChrIns* to, ChrIns* from)
     copy_EntityThrowAnimationStatus(to->throw_animation_info, from->throw_animation_info);
 }
 
+ChrIns* init_ChrIns()
+{
+    ChrIns* local_ChrIns = (ChrIns*)malloc_(sizeof(ChrIns));
+
+    local_ChrIns->playerCtrl = init_PlayerCtrl();
+    local_ChrIns->padManipulator = init_PadManipulator();
+    local_ChrIns->specialEffects = init_SpecialEffect();
+    local_ChrIns->qwcSpEffectEquipCtrl = init_QwcSpEffectEquipCtrl();
+    local_ChrIns->throw_animation_info = init_EntityThrowAnimationStatus();
+
+    return local_ChrIns;
+}
+
 void copy_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to, EntityThrowAnimationStatus* from)
 {
     to->throw_paramdef = from->throw_paramdef;
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+}
+
+EntityThrowAnimationStatus* init_EntityThrowAnimationStatus()
+{
+    EntityThrowAnimationStatus* local_EntityThrowAnimationStatus = (EntityThrowAnimationStatus*)malloc_(sizeof(EntityThrowAnimationStatus));
+    return local_EntityThrowAnimationStatus;
 }
 
 void copy_QwcSpEffectEquipCtrl(QwcSpEffectEquipCtrl* to, QwcSpEffectEquipCtrl* from)
@@ -196,12 +305,31 @@ void copy_QwcSpEffectEquipCtrl(QwcSpEffectEquipCtrl* to, QwcSpEffectEquipCtrl* f
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 }
 
+QwcSpEffectEquipCtrl* init_QwcSpEffectEquipCtrl()
+{
+    QwcSpEffectEquipCtrl* local_QwcSpEffectEquipCtrl = (QwcSpEffectEquipCtrl*)malloc_(sizeof(QwcSpEffectEquipCtrl));
+    uint32_t* local_QwcSpEffectEquipCtrl_arry = (uint32_t*)malloc_(sizeof(uint32_t)*64);
+
+    local_QwcSpEffectEquipCtrl->arry = local_QwcSpEffectEquipCtrl_arry;
+
+    return local_QwcSpEffectEquipCtrl;
+}
+
 void copy_SpecialEffect(SpecialEffect* to, SpecialEffect* from)
 {
     copy_SpecialEffect_Info(to->specialEffect_Info, from->specialEffect_Info);
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+}
+
+SpecialEffect* init_SpecialEffect()
+{
+    SpecialEffect* local_SpecialEffect = (SpecialEffect*)malloc_(sizeof(SpecialEffect));
+
+    local_SpecialEffect->specialEffect_Info = init_SpecialEffect_Info();
+
+    return local_SpecialEffect;
 }
 
 void copy_SpecialEffect_Info(SpecialEffect_Info* to, SpecialEffect_Info* from)
@@ -233,11 +361,30 @@ void copy_SpecialEffect_Info(SpecialEffect_Info* to, SpecialEffect_Info* from)
     } while (true);
 }
 
+SpecialEffect_Info* init_SpecialEffect_Info()
+{
+    //this is a linked list, so pre-allocate a max of 64 in the list for speffects
+    SpecialEffect_Info* local_SpecialEffect_Info = (SpecialEffect_Info*)malloc_(sizeof(SpecialEffect_Info)*64);
+
+    for (int i = 0; i < 64-1; i++)
+    {
+        local_SpecialEffect_Info[i].next = &local_SpecialEffect_Info[i + 1];
+    }
+
+    return local_SpecialEffect_Info;
+}
+
 void copy_PadManipulator(PadManipulator* to, PadManipulator* from)
 {
     copy_ChrManipulator(&to->chrManipulator, &from->chrManipulator);
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+}
+
+PadManipulator* init_PadManipulator()
+{
+    PadManipulator* local_PadManipulator = (PadManipulator*)malloc_(sizeof(PadManipulator));
+    return local_PadManipulator;
 }
 
 void copy_NetworkManipulator(NetworkManipulator* to, NetworkManipulator* from)
@@ -260,6 +407,19 @@ void copy_PlayerCtrl(PlayerCtrl* to, PlayerCtrl* from)
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
 }
 
+PlayerCtrl* init_PlayerCtrl()
+{
+    PlayerCtrl* local_PlayerCtrl = (PlayerCtrl*)malloc_(sizeof(PlayerCtrl));
+
+    ChrCtrl* pChrCtrl = init_ChrCtrl();
+    local_PlayerCtrl->chrCtrl = *pChrCtrl;
+    free(pChrCtrl);
+    local_PlayerCtrl->turnAnim = init_TurnAnim();
+    local_PlayerCtrl->arrowTurnAnim = init_ArrowTurnAnim();
+
+    return local_PlayerCtrl;
+}
+
 void copy_ArrowTurnAnim(ArrowTurnAnim* to, ArrowTurnAnim* from)
 {
     copy_TurnAnim(&to->turnAnim, &from->turnAnim);
@@ -268,11 +428,30 @@ void copy_ArrowTurnAnim(ArrowTurnAnim* to, ArrowTurnAnim* from)
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 }
 
+ArrowTurnAnim* init_ArrowTurnAnim()
+{
+    ArrowTurnAnim* local_ArrowTurnAnim = (ArrowTurnAnim*)malloc_(sizeof(ArrowTurnAnim));
+
+    TurnAnim* pTurnAnim = init_TurnAnim();
+    local_ArrowTurnAnim->turnAnim = *pTurnAnim;
+    free(pTurnAnim);
+    local_ArrowTurnAnim->joint_spine_2 = init_SpinJoint();
+    local_ArrowTurnAnim->joint_spine1_2 = init_SpinJoint();
+
+    return local_ArrowTurnAnim;
+}
+
 void copy_SpinJoint(SpinJoint* to, SpinJoint* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+}
+
+SpinJoint* init_SpinJoint()
+{
+    SpinJoint* local_SpinJoint = (SpinJoint*)malloc_(sizeof(SpinJoint));
+    return local_SpinJoint;
 }
 
 void copy_TurnAnim(TurnAnim* to, TurnAnim* from)
@@ -286,6 +465,19 @@ void copy_TurnAnim(TurnAnim* to, TurnAnim* from)
     copy_SpinJoint(to->joint_master, from->joint_master);
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
+}
+
+TurnAnim* init_TurnAnim()
+{
+    TurnAnim* local_TurnAnim = (TurnAnim*)malloc_(sizeof(TurnAnim));
+
+    local_TurnAnim->joint_UpperRoot = init_SpinJoint();
+    local_TurnAnim->joint_LowerRoot = init_SpinJoint();
+    local_TurnAnim->joint_spine1_1 = init_SpinJoint();
+    local_TurnAnim->joint_spine_1 = init_SpinJoint();
+    local_TurnAnim->joint_master = init_SpinJoint();
+
+    return local_TurnAnim;
 }
 
 void copy_ChrCtrl(ChrCtrl* to, ChrCtrl* from)
@@ -302,6 +494,19 @@ void copy_ChrCtrl(ChrCtrl* to, ChrCtrl* from)
     memcpy(to->data_4, from->data_4, sizeof(to->data_4));
 }
 
+ChrCtrl* init_ChrCtrl()
+{
+    ChrCtrl* local_ChrCtrl = (ChrCtrl*)malloc_(sizeof(ChrCtrl));
+
+    local_ChrCtrl->animationQueue = init_ChrCtrl_AnimationQueue();
+    local_ChrCtrl->animationMediator = init_AnimationMediator();
+    local_ChrCtrl->havokChara = init_HavokChara();
+    local_ChrCtrl->actionctrl = init_ActionCtrl();
+    local_ChrCtrl->walkAnim_Twist = init_WalkAnim_Twist();
+
+    return local_ChrCtrl;
+}
+
 void copy_WalkAnim_Twist(WalkAnim_Twist* to, WalkAnim_Twist* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
@@ -315,9 +520,30 @@ void copy_WalkAnim_Twist(WalkAnim_Twist* to, WalkAnim_Twist* from)
     memcpy(to->data_4, from->data_4, sizeof(to->data_4));
 }
 
+WalkAnim_Twist* init_WalkAnim_Twist()
+{
+    WalkAnim_Twist* local_WalkAnim_Twist = (WalkAnim_Twist*)malloc_(sizeof(WalkAnim_Twist));
+
+    local_WalkAnim_Twist->Upper_Root_Joint = init_SpinJoint();
+    local_WalkAnim_Twist->master_joint = init_SpinJoint();
+    local_WalkAnim_Twist->neck_joint = init_SpinJoint();
+    WalkAnim_Twist_Field0x228Elem* pWalkAnim_Twist_Field0x228Elem = init_WalkAnim_Twist_Field0x228Elem();
+    local_WalkAnim_Twist->walkAnim_Twist_Field0x228Elem = *pWalkAnim_Twist_Field0x228Elem;
+    free(pWalkAnim_Twist_Field0x228Elem);
+
+    return local_WalkAnim_Twist;
+}
+
 void copy_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* to, WalkAnim_Twist_Field0x228Elem* from)
 {
     //TODO
+}
+
+WalkAnim_Twist_Field0x228Elem* init_WalkAnim_Twist_Field0x228Elem()
+{
+    WalkAnim_Twist_Field0x228Elem* local_WalkAnim_Twist_Field0x228Elem = (WalkAnim_Twist_Field0x228Elem*)malloc_(sizeof(WalkAnim_Twist_Field0x228Elem));
+    //TODO
+    return local_WalkAnim_Twist_Field0x228Elem;
 }
 
 void copy_ActionCtrl(ActionCtrl* to, ActionCtrl* from)
@@ -327,6 +553,16 @@ void copy_ActionCtrl(ActionCtrl* to, ActionCtrl* from)
     copy_ActionCtrl_0x30Substruct(&to->active_state, &from->active_state);
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+}
+
+ActionCtrl* init_ActionCtrl()
+{
+    ActionCtrl* local_ActionCtrl = (ActionCtrl*)malloc_(sizeof(ActionCtrl));
+
+    local_ActionCtrl->passive_state.EzStateMachineImpl = init_EzState_detail_EzStateMachineImpl();
+    local_ActionCtrl->active_state.EzStateMachineImpl = init_EzState_detail_EzStateMachineImpl();
+
+    return local_ActionCtrl;
 }
 
 void copy_ActionCtrl_0x30Substruct(ActionCtrl_0x30Substruct* to, ActionCtrl_0x30Substruct* from)
@@ -342,6 +578,12 @@ void copy_EzState_detail_EzStateMachineImpl(EzState_detail_EzStateMachineImpl* t
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
 }
 
+EzState_detail_EzStateMachineImpl* init_EzState_detail_EzStateMachineImpl()
+{
+    EzState_detail_EzStateMachineImpl* local_EzState_detail_EzStateMachineImpl = (EzState_detail_EzStateMachineImpl*)malloc_(sizeof(EzState_detail_EzStateMachineImpl));
+    return local_EzState_detail_EzStateMachineImpl;
+}
+
 void copy_HavokChara(HavokChara* to, HavokChara* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
@@ -349,9 +591,24 @@ void copy_HavokChara(HavokChara* to, HavokChara* from)
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
 }
 
+HavokChara* init_HavokChara()
+{
+    HavokChara* local_HavokChara = (HavokChara*)malloc_(sizeof(HavokChara));
+
+    local_HavokChara->char_proxy = init_hkpCharacterProxy();
+
+    return local_HavokChara;
+}
+
 void copy_hkpCharacterProxy(hkpCharacterProxy* to, hkpCharacterProxy* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+}
+
+hkpCharacterProxy* init_hkpCharacterProxy()
+{
+    hkpCharacterProxy* local_hkpCharacterProxy = (hkpCharacterProxy*)malloc_(sizeof(hkpCharacterProxy));
+    return local_hkpCharacterProxy;
 }
 
 void copy_AnimationMediator(AnimationMediator* to, AnimationMediator* from)
@@ -362,6 +619,21 @@ void copy_AnimationMediator(AnimationMediator* to, AnimationMediator* from)
     }
     copy_AnimationQueue(to->animationQueue, from->animationQueue);
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+}
+
+AnimationMediator* init_AnimationMediator()
+{
+    AnimationMediator* local_AnimationMediator = (AnimationMediator*)malloc_(sizeof(AnimationMediator));
+
+    for (int i = 0; i < 31; i++)
+    {
+        AnimationMediatorStateEntry* pAnimationMediatorStateEntry = init_AnimationMediatorStateEntry();
+        local_AnimationMediator->states_list[i] = *pAnimationMediatorStateEntry;
+        free(pAnimationMediatorStateEntry);
+    }
+    local_AnimationMediator->animationQueue = init_AnimationQueue();
+
+    return local_AnimationMediator;
 }
 
 void copy_AnimationMediatorStateEntry(AnimationMediatorStateEntry* to, AnimationMediatorStateEntry* from)
@@ -392,8 +664,39 @@ void copy_AnimationMediatorStateEntry(AnimationMediatorStateEntry* to, Animation
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
 }
 
+AnimationMediatorStateEntry* init_AnimationMediatorStateEntry()
+{
+    AnimationMediatorStateEntry* local_AnimationMediatorStateEntry = (AnimationMediatorStateEntry*)malloc_(sizeof(AnimationMediatorStateEntry));
+    //allow for a max storage of 6 linked animations
+    AnimationMediatorStateEntry* local_AnimationMediatorStateEntry1 = (AnimationMediatorStateEntry*)malloc_(sizeof(AnimationMediatorStateEntry)*6);
+    AnimationMediatorStateEntry* local_AnimationMediatorStateEntry2 = (AnimationMediatorStateEntry*)malloc_(sizeof(AnimationMediatorStateEntry)*6);
+
+    local_AnimationMediatorStateEntry->linked_animation1 = &local_AnimationMediatorStateEntry1[0];
+    local_AnimationMediatorStateEntry1[0].linked_animation1 = &local_AnimationMediatorStateEntry1[1];
+    local_AnimationMediatorStateEntry1[1].linked_animation1 = &local_AnimationMediatorStateEntry1[2];
+    local_AnimationMediatorStateEntry1[2].linked_animation1 = &local_AnimationMediatorStateEntry1[3];
+    local_AnimationMediatorStateEntry1[3].linked_animation1 = &local_AnimationMediatorStateEntry1[4];
+    local_AnimationMediatorStateEntry1[4].linked_animation1 = &local_AnimationMediatorStateEntry1[5];
+    local_AnimationMediatorStateEntry1[5].linked_animation1 = NULL;
+
+    local_AnimationMediatorStateEntry->linked_animation2 = &local_AnimationMediatorStateEntry2[0];
+    local_AnimationMediatorStateEntry2[0].linked_animation2 = &local_AnimationMediatorStateEntry2[1];
+    local_AnimationMediatorStateEntry2[1].linked_animation2 = &local_AnimationMediatorStateEntry2[2];
+    local_AnimationMediatorStateEntry2[2].linked_animation2 = &local_AnimationMediatorStateEntry2[3];
+    local_AnimationMediatorStateEntry2[3].linked_animation2 = &local_AnimationMediatorStateEntry2[4];
+    local_AnimationMediatorStateEntry2[4].linked_animation2 = &local_AnimationMediatorStateEntry2[5];
+    local_AnimationMediatorStateEntry2[5].linked_animation2 = NULL;
+
+    return local_AnimationMediatorStateEntry;
+}
+
 void copy_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to, ChrCtrl_AnimationQueue* from)
 {
+    //we allow up to a max of 32 ChrCtrl_AnimationQueue_field0x8 entries in the array
+    if (from->array_length > 32)
+    {
+        FATALERROR("Got %d number of ChrCtrl_AnimationQueue_field0x8 entries for ChrCtrl_AnimationQueue->arry. Only support a max of 32.");
+    }
     to->array_length = from->array_length;
     to->data_0 = from->data_0;
     for (int i = 0; i < from->array_length; i++)
@@ -405,6 +708,16 @@ void copy_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to, ChrCtrl_AnimationQu
     to->data_3 = from->data_3;
     memcpy(to->data_4, from->data_4, sizeof(to->data_4));
     memcpy(to->data_5, from->data_5, sizeof(to->data_5));
+}
+
+ChrCtrl_AnimationQueue* init_ChrCtrl_AnimationQueue()
+{
+    ChrCtrl_AnimationQueue* local_ChrCtrl_AnimationQueue = (ChrCtrl_AnimationQueue*)malloc_(sizeof(ChrCtrl_AnimationQueue));
+    ChrCtrl_AnimationQueue_field0x8* local_ChrCtrl_AnimationQueue_field0x8 = (ChrCtrl_AnimationQueue_field0x8*)malloc_(sizeof(ChrCtrl_AnimationQueue_field0x8) * 32);
+
+    local_ChrCtrl_AnimationQueue->arry = local_ChrCtrl_AnimationQueue_field0x8;
+
+    return local_ChrCtrl_AnimationQueue;
 }
 
 void copy_ChrCtrl_AnimationQueue_field0x8(ChrCtrl_AnimationQueue_field0x8* to, ChrCtrl_AnimationQueue_field0x8* from)
@@ -421,10 +734,28 @@ void copy_AnimationQueue(AnimationQueue* to, AnimationQueue* from)
     }
 }
 
+AnimationQueue* init_AnimationQueue()
+{
+    AnimationQueue* local_AnimationQueue = (AnimationQueue*)malloc_(sizeof(AnimationQueue));
+
+    for (int i = 0; i < 6; i++)
+    {
+        local_AnimationQueue->AnimationQueue_Entries[i] = init_AnimationQueue_Entry();
+    }
+
+    return local_AnimationQueue;
+}
+
 void copy_AnimationQueue_Entry(AnimationQueue_Entry* to, AnimationQueue_Entry* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
+}
+
+AnimationQueue_Entry* init_AnimationQueue_Entry()
+{
+    AnimationQueue_Entry* local_AnimationQueue_Entry = (AnimationQueue_Entry*)malloc_(sizeof(AnimationQueue_Entry));
+    return local_AnimationQueue_Entry;
 }
