@@ -79,7 +79,7 @@ void Rollback::save()
     PlayerIns* player = (PlayerIns*)player_o.value();
 
     //we pre-allocate a static playerins on boot, so we can assume all pointers are set up
-    copy_PlayerIns(Rollback::saved_playerins, player);
+    copy_PlayerIns(Rollback::saved_playerins, player, false);
 }
 
 void Rollback::load()
@@ -91,16 +91,16 @@ void Rollback::load()
     }
     PlayerIns* player = (PlayerIns*)player_o.value();
 
-    copy_PlayerIns(player, Rollback::saved_playerins);
+    copy_PlayerIns(player, Rollback::saved_playerins, true);
 }
 
-void copy_PlayerIns(PlayerIns* to, PlayerIns* from)
+void copy_PlayerIns(PlayerIns* to, PlayerIns* from, bool to_game)
 {
-    copy_ChrIns(&to->chrins, &from->chrins);
+    copy_ChrIns(&to->chrins, &from->chrins, to_game);
     copy_PlayerGameData(to->playergamedata, from->playergamedata);
-    copy_RingEquipCtrl(to->ringequipctrl, from->ringequipctrl);
-    copy_WeaponEquipCtrl(to->weaponequipctrl, from->weaponequipctrl);
-    copy_ProEquipCtrl(to->proequipctrl, from->proequipctrl);
+    copy_RingEquipCtrl(to->ringequipctrl, from->ringequipctrl, to_game);
+    copy_WeaponEquipCtrl(to->weaponequipctrl, from->weaponequipctrl, to_game);
+    copy_ProEquipCtrl(to->proequipctrl, from->proequipctrl, to_game);
     to->curSelectedMagicId = from->curSelectedMagicId;
     to->curUsedItem = from->curUsedItem;
     to->itemId = from->itemId;
@@ -138,9 +138,9 @@ ChrAsm* init_ChrAsm()
     return local_ChrAsm;
 }
 
-void copy_ProEquipCtrl(ProEquipCtrl* to, ProEquipCtrl* from)
+void copy_ProEquipCtrl(ProEquipCtrl* to, ProEquipCtrl* from, bool to_game)
 {
-    copy_SpecialEffect(to->spEffectList, from->spEffectList);
+    copy_SpecialEffect(to->spEffectList, from->spEffectList, to_game);
     //there should always be 5 armors (4 equip and a hair)
     if (from->array_len != 5)
     {
@@ -165,9 +165,9 @@ ProEquipCtrl* init_ProEquipCtrl()
     return local_ProEquipCtrl;
 }
 
-void copy_WeaponEquipCtrl(WeaponEquipCtrl* to, WeaponEquipCtrl* from)
+void copy_WeaponEquipCtrl(WeaponEquipCtrl* to, WeaponEquipCtrl* from, bool to_game)
 {
-    copy_SpecialEffect(to->spEffectList, from->spEffectList);
+    copy_SpecialEffect(to->spEffectList, from->spEffectList, to_game);
     //there should always be 2 weapons
     if (from->array_len != 2)
     {
@@ -189,9 +189,9 @@ WeaponEquipCtrl* init_WeaponEquipCtrl()
     return local_WeaponEquipCtrl;
 }
 
-void copy_RingEquipCtrl(RingEquipCtrl* to, RingEquipCtrl* from)
+void copy_RingEquipCtrl(RingEquipCtrl* to, RingEquipCtrl* from, bool to_game)
 {
-    copy_SpecialEffect(to->spEffectList, from->spEffectList);
+    copy_SpecialEffect(to->spEffectList, from->spEffectList, to_game);
     //there should always be 2 rings
     if (from->array_len != 2)
     {
@@ -273,7 +273,7 @@ void copy_PlayerGameData_AttributeInfo(PlayerGameData_AttributeInfo* to, PlayerG
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 }
 
-void copy_ChrIns(ChrIns* to, ChrIns* from)
+void copy_ChrIns(ChrIns* to, ChrIns* from, bool to_game)
 {
     copy_PlayerCtrl(to->playerCtrl, from->playerCtrl);
     copy_PadManipulator(to->padManipulator, from->padManipulator);
@@ -282,7 +282,7 @@ void copy_ChrIns(ChrIns* to, ChrIns* from)
     to->upperThrowAnim = from->upperThrowAnim;
     to->curSelectedMagicId = from->curSelectedMagicId;
     to->curUsedItem = from->curUsedItem;
-    copy_SpecialEffect(to->specialEffects, from->specialEffects);
+    copy_SpecialEffect(to->specialEffects, from->specialEffects, to_game);
     copy_QwcSpEffectEquipCtrl(to->qwcSpEffectEquipCtrl, from->qwcSpEffectEquipCtrl);
     to->curHp = from->curHp;
     to->maxHp = from->maxHp;
@@ -351,9 +351,9 @@ QwcSpEffectEquipCtrl* init_QwcSpEffectEquipCtrl()
     return local_QwcSpEffectEquipCtrl;
 }
 
-void copy_SpecialEffect(SpecialEffect* to, SpecialEffect* from)
+void copy_SpecialEffect(SpecialEffect* to, SpecialEffect* from, bool to_game)
 {
-    copy_SpecialEffect_Info(to->specialEffect_Info, from->specialEffect_Info);
+    copy_SpecialEffect_Info(to->specialEffect_Info, from->specialEffect_Info, to_game);
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
@@ -368,45 +368,74 @@ SpecialEffect* init_SpecialEffect()
     return local_SpecialEffect;
 }
 
-void copy_SpecialEffect_Info(SpecialEffect_Info* to, SpecialEffect_Info* from)
-{
-    SpecialEffect_Info* to_prev = NULL;
-    do
-    {
-        memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-        to->paramRowBytes = from->paramRowBytes;
-        to->prev = to_prev;
+static const size_t max_preallocated_SpecialEffect_Info = 64;
 
-        if (from->next == NULL)
+void copy_SpecialEffect_Info(SpecialEffect_Info* to, SpecialEffect_Info* from_, bool to_game)
+{
+    SpecialEffect_Info* from = from_;
+
+    if (!to_game)
+    {
+        size_t to_index = 0;
+        while (from)
         {
-            break;
-        }
-        else
-        {
+            if (to_index >= max_preallocated_SpecialEffect_Info)
+            {
+                ConsoleWrite("Unable to recursivly copy SpecialEffect_Info from the game. Out of space.");
+                break;
+            }
+            memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+            to->paramRowBytes = from->paramRowBytes;
+
             from = from->next;
+            to += sizeof(SpecialEffect_Info);
+            to_index += 1;
         }
-        if (to->next == NULL)
+    }
+    else
+    {
+        size_t from_index = 0;
+        while (to)
         {
-            ConsoleWrite("Unable to recursivly copy SpecialEffect_Info. to->next is null.");
-            break;
-        }
-        else
-        {
-            to_prev = to;
+            if (from_index >= max_preallocated_SpecialEffect_Info)
+            {
+                ConsoleWrite("Unable to recursivly copy SpecialEffect_Info into the game. Out of space.");
+                break;
+            }
+            //check if this entry is an actual saved value
+            if (from->paramRowBytes == 0)
+            {
+                //if not and the game has extra links still to go, we need to free them and set the next on the last used on to null
+                SpecialEffect_Info* entry_to_free = to->next;
+                to->next = NULL;
+                while (entry_to_free)
+                {
+                    SpecialEffect_Info* next = entry_to_free->next;
+                    Game::game_free(entry_to_free, sizeof(SpecialEffect_Info));
+                    entry_to_free = next;
+                }
+                break;
+            }
+            else
+            {
+                memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+                to->paramRowBytes = from->paramRowBytes;
+            }
+
+            from += sizeof(SpecialEffect_Info);
             to = to->next;
+            from_index += 1;
         }
-    } while (true);
+
+        //clear the local speffect infos after we're done so we don't have stale data copied back later
+        memset(from_, 0, sizeof(SpecialEffect_Info)*max_preallocated_SpecialEffect_Info);
+    }
 }
 
 SpecialEffect_Info* init_SpecialEffect_Info()
 {
     //this is a linked list, so pre-allocate a max of 64 in the list for speffects
-    SpecialEffect_Info* local_SpecialEffect_Info = (SpecialEffect_Info*)malloc_(sizeof(SpecialEffect_Info)*64);
-
-    for (int i = 0; i < 64-1; i++)
-    {
-        local_SpecialEffect_Info[i].next = &local_SpecialEffect_Info[i + 1];
-    }
+    SpecialEffect_Info* local_SpecialEffect_Info = (SpecialEffect_Info*)malloc_(sizeof(SpecialEffect_Info)*max_preallocated_SpecialEffect_Info);
 
     return local_SpecialEffect_Info;
 }
