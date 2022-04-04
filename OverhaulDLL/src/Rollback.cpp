@@ -406,8 +406,8 @@ void copy_SpecialEffect_Info(SpecialEffect_Info* to, SpecialEffect_Info* from_, 
             if (from->paramRowBytes == 0)
             {
                 //if not and the game has extra links still to go, we need to free them and set the next on the last used on to null
-                SpecialEffect_Info* entry_to_free = to->next;
-                to->next = NULL;
+                SpecialEffect_Info* entry_to_free = to;
+                to->prev->next = NULL;
                 while (entry_to_free)
                 {
                     SpecialEffect_Info* next = entry_to_free->next;
