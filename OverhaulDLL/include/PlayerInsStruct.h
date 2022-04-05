@@ -116,13 +116,12 @@ static_assert(sizeof(ChrCtrl_AnimationQueue) == 0xf0);
 struct AnimationMediatorStateEntry
 {
     uint8_t data_0[0x90];
-    AnimationMediatorStateEntry* linked_animation1;
-    AnimationMediatorStateEntry* linked_animation2;
+    uint64_t padding_0[2]; //these linked animations only point to other StateEntries in the states_list. No need to worry about them
     uint8_t data_1[8];
 };
 
-static_assert(offsetof(AnimationMediatorStateEntry, linked_animation1) == 0x90);
-static_assert(offsetof(AnimationMediatorStateEntry, linked_animation2) == 0x98);
+static_assert(offsetof(AnimationMediatorStateEntry, data_0) == 0);
+static_assert(offsetof(AnimationMediatorStateEntry, padding_0) == 0x90);
 static_assert(offsetof(AnimationMediatorStateEntry, data_1) == 0xa0);
 static_assert(sizeof(AnimationMediatorStateEntry) == 0xa8);
 

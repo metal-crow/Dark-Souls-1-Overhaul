@@ -322,7 +322,7 @@ public:
 
     static std::optional<int32_t*> get_MP_AreaID_ptr();
 
-    static void game_malloc(size_t size, size_t alignment, void* heap);
+    static void* game_malloc(size_t size, size_t alignment, void* heap);
 
     static void game_free(void* p, size_t size);
 

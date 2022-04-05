@@ -387,6 +387,16 @@ void copy_SpecialEffect_Info(SpecialEffect_Info* to, SpecialEffect_Info* from_, 
             memcpy(to->data_0, from->data_0, sizeof(to->data_0));
             to->paramRowBytes = from->paramRowBytes;
 
+            if (from->next != NULL)
+            {
+                to->next = to + sizeof(SpecialEffect_Info);
+            }
+            else
+            {
+                to->next = NULL;
+            }
+            //don't need to handle prev since it should just be as expected
+
             from = from->next;
             to += sizeof(SpecialEffect_Info);
             to_index += 1;
@@ -394,41 +404,40 @@ void copy_SpecialEffect_Info(SpecialEffect_Info* to, SpecialEffect_Info* from_, 
     }
     else
     {
-        size_t from_index = 0;
-        while (to)
+        while (from)
         {
-            if (from_index >= max_preallocated_SpecialEffect_Info)
+            memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+            to->paramRowBytes = from->paramRowBytes;
+
+            //handle if the game's list isn't long enough, and we need to alloc more slots
+            if (from->next != NULL && to->next == NULL)
             {
-                ConsoleWrite("Unable to recursivly copy SpecialEffect_Info into the game. Out of space.");
+                ConsoleWrite("Out of space on game side for SpecialEffect_Info");
                 break;
+                //TODO handle game mallocing
+                //to->next = (SpecialEffect_Info*)Game::game_malloc(sizeof(SpecialEffect_Info), 8, (void*)*(uint64_t*)(0x141C04F30)); //internal_heap_3
+                //to->next->next = NULL;
+                //to->next->prev = to;
             }
-            //check if this entry is an actual saved value
-            if (from->paramRowBytes == 0)
+
+            //handle if the game's list is too long, and we need to free it's extra slots
+            if (from->next == NULL && to->next != NULL)
             {
-                //if not and the game has extra links still to go, we need to free them and set the next on the last used on to null
-                SpecialEffect_Info* entry_to_free = to;
-                to->prev->next = NULL;
+                SpecialEffect_Info* entry_to_free = to->next;
+                to->next = NULL;
                 while (entry_to_free)
                 {
                     SpecialEffect_Info* next = entry_to_free->next;
-                    Game::game_free(entry_to_free, sizeof(SpecialEffect_Info));
+                    //TODO handle game freeing
+                    //Game::game_free(entry_to_free, sizeof(SpecialEffect_Info));
                     entry_to_free = next;
                 }
                 break;
             }
-            else
-            {
-                memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-                to->paramRowBytes = from->paramRowBytes;
-            }
 
-            from += sizeof(SpecialEffect_Info);
+            from = from->next;
             to = to->next;
-            from_index += 1;
         }
-
-        //clear the local speffect infos after we're done so we don't have stale data copied back later
-        memset(from_, 0, sizeof(SpecialEffect_Info)*max_preallocated_SpecialEffect_Info);
     }
 }
 
@@ -677,17 +686,11 @@ hkpCharacterProxy* init_hkpCharacterProxy()
     return local_hkpCharacterProxy;
 }
 
-//use this to check if we have already saved a linked_animation. It maps from the address of a from->linked_animation to our saved to
-static std::unordered_map<AnimationMediatorStateEntry*, AnimationMediatorStateEntry*> AnimationMediatorStateEntry_already_saved_links1;
-static std::unordered_map<AnimationMediatorStateEntry*, AnimationMediatorStateEntry*> AnimationMediatorStateEntry_already_saved_links2;
-
 void copy_AnimationMediator(AnimationMediator* to, AnimationMediator* from)
 {
     for (int i = 0; i < 31; i++)
     {
-        AnimationMediatorStateEntry_already_saved_links1.clear();
-        AnimationMediatorStateEntry_already_saved_links2.clear();
-        copy_AnimationMediatorStateEntry(&to->states_list[i], &from->states_list[i], AnimationMediatorStateEntry_already_saved_links1, AnimationMediatorStateEntry_already_saved_links2);
+        copy_AnimationMediatorStateEntry(&to->states_list[i], &from->states_list[i]);
     }
     copy_AnimationQueue(to->animationQueue, from->animationQueue);
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
@@ -699,7 +702,7 @@ AnimationMediator* init_AnimationMediator()
 
     for (int i = 0; i < 31; i++)
     {
-        AnimationMediatorStateEntry* pAnimationMediatorStateEntry = init_AnimationMediatorStateEntry(0);
+        AnimationMediatorStateEntry* pAnimationMediatorStateEntry = init_AnimationMediatorStateEntry();
         local_AnimationMediator->states_list[i] = *pAnimationMediatorStateEntry;
         free(pAnimationMediatorStateEntry);
     }
@@ -708,66 +711,15 @@ AnimationMediator* init_AnimationMediator()
     return local_AnimationMediator;
 }
 
-void copy_AnimationMediatorStateEntry(AnimationMediatorStateEntry* to, AnimationMediatorStateEntry* from, std::unordered_map<AnimationMediatorStateEntry*, AnimationMediatorStateEntry*>& links1, std::unordered_map<AnimationMediatorStateEntry*, AnimationMediatorStateEntry*>& links2)
+void copy_AnimationMediatorStateEntry(AnimationMediatorStateEntry* to, AnimationMediatorStateEntry* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
-    if (from->linked_animation1 != NULL)
-    {
-        //if we have already saved this linked animation, close the pointer loop. linked animations can have cycles
-        auto saved_link1 = links1.find(from->linked_animation1);
-        if (saved_link1 != links1.end())
-        {
-            to->linked_animation1 = saved_link1->second;
-        }
-        else
-        {
-            if (to->linked_animation1 == NULL)
-            {
-                ConsoleWrite("Unable to recursivly copy AnimationMediatorStateEntry into to->linked_animation1. Pointer is null");
-            }
-            else
-            {
-                links1.emplace(from->linked_animation1, to->linked_animation1);
-                copy_AnimationMediatorStateEntry(to->linked_animation1, from->linked_animation1, links1, links2);
-            }
-        }
-    }
-    if (from->linked_animation2 != NULL)
-    {
-        auto saved_link2 = links2.find(from->linked_animation2);
-        if (saved_link2 != links2.end())
-        {
-            to->linked_animation2 = saved_link2->second;
-        }
-        else
-        {
-            if (to->linked_animation2 == NULL)
-            {
-                ConsoleWrite("Unable to recursivly copy AnimationMediatorStateEntry into to->linked_animation2. Pointer is null");
-            }
-            else
-            {
-                links2.emplace(from->linked_animation2, to->linked_animation2);
-                copy_AnimationMediatorStateEntry(to->linked_animation2, from->linked_animation2, links1, links2);
-            }
-        }
-    }
 }
 
-AnimationMediatorStateEntry* init_AnimationMediatorStateEntry(size_t depth)
+AnimationMediatorStateEntry* init_AnimationMediatorStateEntry()
 {
-    //this is a tree of linked animations. allow for a max tree depth of X means we must have 2^x - 1 linked animation state entries.
-    //only allow a max depth of 5, or 31 nodes
-    if (depth == 5)
-    {
-        return NULL;
-    }
     AnimationMediatorStateEntry* local_AnimationMediatorStateEntry = (AnimationMediatorStateEntry*)malloc_(sizeof(AnimationMediatorStateEntry));
-
-    local_AnimationMediatorStateEntry->linked_animation1 = init_AnimationMediatorStateEntry(depth + 1);
-    local_AnimationMediatorStateEntry->linked_animation2 = init_AnimationMediatorStateEntry(depth + 1);
-
     return local_AnimationMediatorStateEntry;
 }
 

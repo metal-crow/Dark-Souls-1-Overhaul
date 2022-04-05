@@ -1496,10 +1496,10 @@ std::optional<int32_t*> Game::get_MP_AreaID_ptr()
     }
 }
 
-typedef void InGame_Malloc_FUNC(size_t size, size_t alignment, void* heap);
+typedef void* InGame_Malloc_FUNC(size_t size, size_t alignment, void* heap);
 InGame_Malloc_FUNC* InGame_Malloc = (InGame_Malloc_FUNC*)0x140cc0230;
 
-void Game::game_malloc(size_t size, size_t alignment, void* heap)
+void* Game::game_malloc(size_t size, size_t alignment, void* heap)
 {
     return InGame_Malloc(size, alignment, heap);
 }
