@@ -728,7 +728,7 @@ void copy_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to, ChrCtrl_AnimationQu
     //we allow up to a max of 32 ChrCtrl_AnimationQueue_field0x8 entries in the array
     if (from->array_length > 32)
     {
-        FATALERROR("Got %d number of ChrCtrl_AnimationQueue_field0x8 entries for ChrCtrl_AnimationQueue->arry. Only support a max of 32.");
+        FATALERROR("Got %d number of ChrCtrl_AnimationQueue_field0x8 entries for ChrCtrl_AnimationQueue->arry. Only support a max of 32.", from->array_length);
     }
     to->array_length = from->array_length;
     to->data_0 = from->data_0;
@@ -736,6 +736,8 @@ void copy_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to, ChrCtrl_AnimationQu
     {
         copy_ChrCtrl_AnimationQueue_field0x8(&to->arry[i], &from->arry[i]);
     }
+
+    copy_ChrCtrl_AnimationQueue_field0x10(to->field0x10, from->field0x10);
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
     to->data_3 = from->data_3;
@@ -749,8 +751,52 @@ ChrCtrl_AnimationQueue* init_ChrCtrl_AnimationQueue()
     ChrCtrl_AnimationQueue_field0x8* local_ChrCtrl_AnimationQueue_field0x8 = (ChrCtrl_AnimationQueue_field0x8*)malloc_(sizeof(ChrCtrl_AnimationQueue_field0x8) * 32);
 
     local_ChrCtrl_AnimationQueue->arry = local_ChrCtrl_AnimationQueue_field0x8;
+    local_ChrCtrl_AnimationQueue->field0x10 = init_ChrCtrl_AnimationQueue_field0x10();
 
     return local_ChrCtrl_AnimationQueue;
+}
+
+void copy_ChrCtrl_AnimationQueue_field0x10(ChrCtrl_AnimationQueue_field0x10* to, ChrCtrl_AnimationQueue_field0x10* from)
+{
+    if (from->array1_len != 4)
+    {
+        FATALERROR("Got %d number of ChrCtrl_AnimationQueue_field0x10->array1 entries. Only support 4.", from->array1_len);
+    }
+    if (from->array2_len != 8)
+    {
+        FATALERROR("Got %d number of ChrCtrl_AnimationQueue_field0x10->array2 entries. Only support 8.", from->array2_len);
+    }
+    to->array1_len = from->array1_len;
+    to->array2_len = from->array2_len;
+    memcpy(to->arry2, from->arry2, sizeof(ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem) * to->array2_len);
+
+    //adjust the pointers, since they always point to elems in array2
+    for (size_t i = 0; i < to->array1_len; i++)
+    {
+        if (from->arry1[i] == NULL)
+        {
+            to->arry1[i] = NULL;
+        }
+        else
+        {
+            uint64_t offset = (uint64_t)(from->arry1[i]) - (uint64_t)(from->arry2);
+            if (offset > sizeof(ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem*) * to->array2_len)
+            {
+                FATALERROR("Got invalid offset for ChrCtrl_AnimationQueue_field0x10->array1 entry. Got %x", offset);
+            }
+            to->arry1[i] = (ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem*)(offset + (uint64_t)(to->arry2)); //preserve the offset, just change base
+        }
+    }
+}
+
+ChrCtrl_AnimationQueue_field0x10* init_ChrCtrl_AnimationQueue_field0x10()
+{
+    ChrCtrl_AnimationQueue_field0x10* local_ChrCtrl_AnimationQueue_field0x10 = (ChrCtrl_AnimationQueue_field0x10*)malloc_(sizeof(ChrCtrl_AnimationQueue_field0x10));
+
+    local_ChrCtrl_AnimationQueue_field0x10->arry1 = (ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem**)malloc_(sizeof(ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem*) * 4); //allow storage of 4
+    local_ChrCtrl_AnimationQueue_field0x10->arry2 = (ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem*)malloc_(sizeof(ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem) * 8); //allow storage of 8
+
+    return local_ChrCtrl_AnimationQueue_field0x10;
 }
 
 void copy_ChrCtrl_AnimationQueue_field0x8(ChrCtrl_AnimationQueue_field0x8* to, ChrCtrl_AnimationQueue_field0x8* from)

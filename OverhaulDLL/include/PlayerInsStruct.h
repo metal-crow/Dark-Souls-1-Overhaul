@@ -10,6 +10,8 @@
 typedef struct AnimationQueue_Entry AnimationQueue_Entry;
 typedef struct AnimationQueue AnimationQueue;
 typedef struct ChrCtrl_AnimationQueue_field0x8 ChrCtrl_AnimationQueue_field0x8;
+typedef struct ChrCtrl_AnimationQueue_field0x10 ChrCtrl_AnimationQueue_field0x10;
+typedef struct ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem;
 typedef struct ChrCtrl_AnimationQueue ChrCtrl_AnimationQueue;
 typedef struct AnimationMediatorStateEntry AnimationMediatorStateEntry;
 typedef struct AnimationMediator AnimationMediator;
@@ -86,12 +88,35 @@ struct ChrCtrl_AnimationQueue_field0x8
 static_assert(offsetof(ChrCtrl_AnimationQueue_field0x8, data_1) == 0x28);
 static_assert(sizeof(ChrCtrl_AnimationQueue_field0x8) == 0x78);
 
+struct ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem
+{
+    uint8_t data_0[0x10];
+};
+
+static_assert(sizeof(ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem) == 0x10);
+
+struct ChrCtrl_AnimationQueue_field0x10
+{
+    uint32_t array1_len;
+    uint32_t array2_len;
+    ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem** arry1; //this points to elements in arry2
+    ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem* arry2;
+    uint64_t padding_0[2];
+};
+
+static_assert(offsetof(ChrCtrl_AnimationQueue_field0x10, array1_len) == 0x0);
+static_assert(offsetof(ChrCtrl_AnimationQueue_field0x10, array2_len) == 0x4);
+static_assert(offsetof(ChrCtrl_AnimationQueue_field0x10, arry1) == 0x8);
+static_assert(offsetof(ChrCtrl_AnimationQueue_field0x10, arry2) == 0x10);
+static_assert(sizeof(ChrCtrl_AnimationQueue_field0x10) == 0x28);
+
 struct ChrCtrl_AnimationQueue
 {
     uint32_t array_length;
     uint32_t data_0;
     ChrCtrl_AnimationQueue_field0x8* arry;
-    uint8_t padding_0[0x50]; //unknown pointers
+    ChrCtrl_AnimationQueue_field0x10* field0x10;
+    uint8_t padding_0[72]; //unknown pointers
     uint8_t data_1[8];
     void* padding_1;
     uint8_t data_2[0x10];
@@ -106,6 +131,7 @@ struct ChrCtrl_AnimationQueue
 static_assert(offsetof(ChrCtrl_AnimationQueue, array_length) == 0);
 static_assert(offsetof(ChrCtrl_AnimationQueue, data_0) == 4);
 static_assert(offsetof(ChrCtrl_AnimationQueue, arry) == 8);
+static_assert(offsetof(ChrCtrl_AnimationQueue, field0x10) == 0x10);
 static_assert(offsetof(ChrCtrl_AnimationQueue, data_1) == 0x60);
 static_assert(offsetof(ChrCtrl_AnimationQueue, data_2) == 0x70);
 static_assert(offsetof(ChrCtrl_AnimationQueue, data_3) == 0x88);

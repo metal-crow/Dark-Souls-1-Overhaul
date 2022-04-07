@@ -84,6 +84,8 @@ void copy_AnimationMediatorStateEntry(AnimationMediatorStateEntry* to, Animation
 AnimationMediatorStateEntry* init_AnimationMediatorStateEntry();
 void copy_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to, ChrCtrl_AnimationQueue* from);
 ChrCtrl_AnimationQueue* init_ChrCtrl_AnimationQueue();
+ChrCtrl_AnimationQueue_field0x10* init_ChrCtrl_AnimationQueue_field0x10();
+void copy_ChrCtrl_AnimationQueue_field0x10(ChrCtrl_AnimationQueue_field0x10* to, ChrCtrl_AnimationQueue_field0x10* from);
 void copy_ChrCtrl_AnimationQueue_field0x8(ChrCtrl_AnimationQueue_field0x8* to, ChrCtrl_AnimationQueue_field0x8* from);
 void copy_AnimationQueue(AnimationQueue* to, AnimationQueue* from);
 AnimationQueue* init_AnimationQueue();
