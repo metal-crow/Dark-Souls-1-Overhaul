@@ -12,6 +12,10 @@ typedef struct AnimationQueue AnimationQueue;
 typedef struct ChrCtrl_AnimationQueue_field0x8 ChrCtrl_AnimationQueue_field0x8;
 typedef struct ChrCtrl_AnimationQueue_field0x10 ChrCtrl_AnimationQueue_field0x10;
 typedef struct ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem;
+typedef struct hkaAnimatedSkeleton hkaAnimatedSkeleton;
+typedef struct hkaDefaultAnimationControl hkaDefaultAnimationControl;
+typedef struct hkaAnimationControl hkaAnimationControl;
+typedef struct hkaAnimationBinding hkaAnimationBinding;
 typedef struct ChrCtrl_AnimationQueue ChrCtrl_AnimationQueue;
 typedef struct AnimationMediatorStateEntry AnimationMediatorStateEntry;
 typedef struct AnimationMediator AnimationMediator;
@@ -110,13 +114,75 @@ static_assert(offsetof(ChrCtrl_AnimationQueue_field0x10, arry1) == 0x8);
 static_assert(offsetof(ChrCtrl_AnimationQueue_field0x10, arry2) == 0x10);
 static_assert(sizeof(ChrCtrl_AnimationQueue_field0x10) == 0x28);
 
+struct hkaAnimationBinding
+{
+    uint64_t padding_0;
+    uint8_t data_0[16];
+    uint64_t padding_1;
+};
+
+static_assert(sizeof(hkaAnimationBinding) == 0x20);
+
+struct hkaAnimationControl
+{
+    uint64_t padding_0;
+    uint8_t data_0[16];
+    uint8_t* field0x18;
+    uint32_t field0x18_len;
+    uint32_t field0x18_cap;
+    uint8_t* field0x28;
+    uint32_t field0x28_len;
+    uint32_t field0x28_cap;
+    hkaAnimationBinding* HkaAnimationBinding;
+    uint64_t padding_1;
+    uint32_t data_1[3];
+};
+
+static_assert(offsetof(hkaAnimationControl, field0x18) == 0x18);
+static_assert(offsetof(hkaAnimationControl, field0x28) == 0x28);
+static_assert(offsetof(hkaAnimationControl, HkaAnimationBinding) == 0x38);
+static_assert(sizeof(hkaAnimationControl) == 0x58);
+
+struct hkaDefaultAnimationControl
+{
+    hkaAnimationControl HkaAnimationControl;
+    uint8_t data_0[0x50];
+    uint8_t padding_0[24];
+};
+
+static_assert(offsetof(hkaDefaultAnimationControl, data_0) == 0x58);
+static_assert(sizeof(hkaDefaultAnimationControl) == 0xc0);
+
+struct hkaAnimatedSkeleton
+{
+    uint64_t padding_0;
+    uint64_t data_0;
+    uint64_t padding_1;
+    void* padding_HkpRigidBody;
+    hkaDefaultAnimationControl** animCtrl_list;
+    uint32_t animCtrl_list_len;
+    uint32_t data_1;
+    void* padding_2; //seems to be unneeded
+    uint64_t data_2;
+};
+
+static_assert(offsetof(hkaAnimatedSkeleton, data_0) == 8);
+static_assert(offsetof(hkaAnimatedSkeleton, padding_HkpRigidBody) == 0x18);
+static_assert(offsetof(hkaAnimatedSkeleton, animCtrl_list) == 0x20);
+static_assert(offsetof(hkaAnimatedSkeleton, animCtrl_list_len) == 0x28);
+static_assert(offsetof(hkaAnimatedSkeleton, data_1) == 0x2C);
+static_assert(offsetof(hkaAnimatedSkeleton, padding_2) == 0x30);
+static_assert(offsetof(hkaAnimatedSkeleton, data_2) == 0x38);
+static_assert(sizeof(hkaAnimatedSkeleton) == 0x40);
+
 struct ChrCtrl_AnimationQueue
 {
     uint32_t array_length;
     uint32_t data_0;
     ChrCtrl_AnimationQueue_field0x8* arry;
     ChrCtrl_AnimationQueue_field0x10* field0x10;
-    uint8_t padding_0[72]; //unknown pointers
+    hkaAnimatedSkeleton* HkaAnimatedSkeleton;
+    uint64_t padding_0[8]; //unknown pointers
     uint8_t data_1[8];
     void* padding_1;
     uint8_t data_2[0x10];
@@ -132,6 +198,7 @@ static_assert(offsetof(ChrCtrl_AnimationQueue, array_length) == 0);
 static_assert(offsetof(ChrCtrl_AnimationQueue, data_0) == 4);
 static_assert(offsetof(ChrCtrl_AnimationQueue, arry) == 8);
 static_assert(offsetof(ChrCtrl_AnimationQueue, field0x10) == 0x10);
+static_assert(offsetof(ChrCtrl_AnimationQueue, HkaAnimatedSkeleton) == 0x18);
 static_assert(offsetof(ChrCtrl_AnimationQueue, data_1) == 0x60);
 static_assert(offsetof(ChrCtrl_AnimationQueue, data_2) == 0x70);
 static_assert(offsetof(ChrCtrl_AnimationQueue, data_3) == 0x88);

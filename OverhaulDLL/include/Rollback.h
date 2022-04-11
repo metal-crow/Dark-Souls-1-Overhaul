@@ -84,6 +84,14 @@ void copy_AnimationMediatorStateEntry(AnimationMediatorStateEntry* to, Animation
 AnimationMediatorStateEntry* init_AnimationMediatorStateEntry();
 void copy_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to, ChrCtrl_AnimationQueue* from);
 ChrCtrl_AnimationQueue* init_ChrCtrl_AnimationQueue();
+void copy_hkaAnimatedSkeleton(hkaAnimatedSkeleton* to, hkaAnimatedSkeleton* from);
+hkaAnimatedSkeleton* init_hkaAnimatedSkeleton();
+void copy_hkaDefaultAnimationControl(hkaDefaultAnimationControl* to, hkaDefaultAnimationControl* from);
+hkaDefaultAnimationControl* init_hkaDefaultAnimationControl();
+void copy_hkaAnimationControl(hkaAnimationControl* to, hkaAnimationControl* from);
+hkaAnimationControl* init_hkaAnimationControl();
+void copy_hkaAnimationBinding(hkaAnimationBinding* to, hkaAnimationBinding* from);
+hkaAnimationBinding* init_hkaAnimationBinding();
 ChrCtrl_AnimationQueue_field0x10* init_ChrCtrl_AnimationQueue_field0x10();
 void copy_ChrCtrl_AnimationQueue_field0x10(ChrCtrl_AnimationQueue_field0x10* to, ChrCtrl_AnimationQueue_field0x10* from);
 void copy_ChrCtrl_AnimationQueue_field0x8(ChrCtrl_AnimationQueue_field0x8* to, ChrCtrl_AnimationQueue_field0x8* from);

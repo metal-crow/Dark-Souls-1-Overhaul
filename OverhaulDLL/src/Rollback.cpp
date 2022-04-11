@@ -738,6 +738,7 @@ void copy_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to, ChrCtrl_AnimationQu
     }
 
     copy_ChrCtrl_AnimationQueue_field0x10(to->field0x10, from->field0x10);
+    copy_hkaAnimatedSkeleton(to->HkaAnimatedSkeleton, from->HkaAnimatedSkeleton);
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
     to->data_3 = from->data_3;
@@ -752,8 +753,103 @@ ChrCtrl_AnimationQueue* init_ChrCtrl_AnimationQueue()
 
     local_ChrCtrl_AnimationQueue->arry = local_ChrCtrl_AnimationQueue_field0x8;
     local_ChrCtrl_AnimationQueue->field0x10 = init_ChrCtrl_AnimationQueue_field0x10();
+    local_ChrCtrl_AnimationQueue->HkaAnimatedSkeleton = init_hkaAnimatedSkeleton();
 
     return local_ChrCtrl_AnimationQueue;
+}
+
+void copy_hkaAnimatedSkeleton(hkaAnimatedSkeleton* to, hkaAnimatedSkeleton* from)
+{
+    to->data_0 = from->data_0;
+    if (from->animCtrl_list_len > 32)
+    {
+        FATALERROR("Got %d number of hkaAnimatedSkeleton entries for hkaAnimatedSkeleton->animCtrl_list. Only support a max of 32.", from->animCtrl_list_len);
+    }
+    to->animCtrl_list_len = from->animCtrl_list_len;
+    for (uint32_t i = 0; i < to->animCtrl_list_len; i++)
+    {
+        copy_hkaDefaultAnimationControl(to->animCtrl_list[i], from->animCtrl_list[i]);
+    }
+    to->data_1 = from->data_1;
+    to->data_2 = from->data_2;
+}
+
+hkaAnimatedSkeleton* init_hkaAnimatedSkeleton()
+{
+    hkaAnimatedSkeleton* local_hkaAnimatedSkeleton = (hkaAnimatedSkeleton*)malloc_(sizeof(hkaAnimatedSkeleton));
+    hkaDefaultAnimationControl** local_hkaAnimatedSkeleton_animCtrl_list = (hkaDefaultAnimationControl**)malloc_(sizeof(hkaDefaultAnimationControl*) * 32);
+    for (int i = 0; i < 32; i++)
+    {
+        local_hkaAnimatedSkeleton_animCtrl_list[i] = init_hkaDefaultAnimationControl();
+    }
+    local_hkaAnimatedSkeleton->animCtrl_list = local_hkaAnimatedSkeleton_animCtrl_list;
+
+    return local_hkaAnimatedSkeleton;
+}
+
+void copy_hkaDefaultAnimationControl(hkaDefaultAnimationControl* to, hkaDefaultAnimationControl* from)
+{
+    copy_hkaAnimationControl(&to->HkaAnimationControl, &from->HkaAnimationControl);
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+}
+
+hkaDefaultAnimationControl* init_hkaDefaultAnimationControl()
+{
+    hkaDefaultAnimationControl* local_hkaDefaultAnimationControl = (hkaDefaultAnimationControl*)malloc_(sizeof(hkaDefaultAnimationControl));
+
+    hkaAnimationControl* local_hkaAnimationControl = init_hkaAnimationControl();
+    local_hkaDefaultAnimationControl->HkaAnimationControl = *local_hkaAnimationControl;
+    free(local_hkaAnimationControl);
+
+    return local_hkaDefaultAnimationControl;
+}
+
+void copy_hkaAnimationControl(hkaAnimationControl* to, hkaAnimationControl* from)
+{
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+
+    if (from->field0x18_cap > 64)
+    {
+        FATALERROR("Got %d number of hkaAnimationControl->field0x18_len entries. Only support 64.", from->field0x18_cap);
+    }
+    to->field0x18_len = from->field0x18_len;
+    to->field0x18_cap = from->field0x18_cap;
+    memcpy(to->field0x18, from->field0x18, to->field0x18_len);
+
+    if (from->field0x28_cap > 64)
+    {
+        FATALERROR("Got %d number of hkaAnimationControl->field0x28_len entries. Only support 64.", from->field0x28_cap);
+    }
+    to->field0x28_len = from->field0x28_len;
+    to->field0x28_cap = from->field0x28_cap;
+    memcpy(to->field0x28, from->field0x28, to->field0x28_len);
+
+    copy_hkaAnimationBinding(to->HkaAnimationBinding, from->HkaAnimationBinding);
+
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+}
+
+hkaAnimationControl* init_hkaAnimationControl()
+{
+    hkaAnimationControl* local_hkaAnimationControl = (hkaAnimationControl*)malloc_(sizeof(hkaAnimationControl));
+
+    local_hkaAnimationControl->field0x18 = (uint8_t*)malloc_(sizeof(uint8_t) * 64);
+    local_hkaAnimationControl->field0x28 = (uint8_t*)malloc_(sizeof(uint8_t) * 64);
+    local_hkaAnimationControl->HkaAnimationBinding = init_hkaAnimationBinding();
+
+    return local_hkaAnimationControl;
+}
+
+void copy_hkaAnimationBinding(hkaAnimationBinding* to, hkaAnimationBinding* from)
+{
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+}
+
+hkaAnimationBinding* init_hkaAnimationBinding()
+{
+    hkaAnimationBinding* local_hkaAnimationBinding = (hkaAnimationBinding*)malloc_(sizeof(hkaAnimationBinding));
+
+    return local_hkaAnimationBinding;
 }
 
 void copy_ChrCtrl_AnimationQueue_field0x10(ChrCtrl_AnimationQueue_field0x10* to, ChrCtrl_AnimationQueue_field0x10* from)
