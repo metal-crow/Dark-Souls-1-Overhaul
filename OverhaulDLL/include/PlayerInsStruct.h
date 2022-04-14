@@ -16,6 +16,7 @@ typedef struct hkaAnimatedSkeleton hkaAnimatedSkeleton;
 typedef struct hkaDefaultAnimationControl hkaDefaultAnimationControl;
 typedef struct hkaAnimationControl hkaAnimationControl;
 typedef struct hkaAnimationBinding hkaAnimationBinding;
+typedef struct ChrCtrl_AnimationQueue_field0x20 ChrCtrl_AnimationQueue_field0x20;
 typedef struct ChrCtrl_AnimationQueue ChrCtrl_AnimationQueue;
 typedef struct AnimationMediatorStateEntry AnimationMediatorStateEntry;
 typedef struct AnimationMediator AnimationMediator;
@@ -175,6 +176,29 @@ static_assert(offsetof(hkaAnimatedSkeleton, padding_2) == 0x30);
 static_assert(offsetof(hkaAnimatedSkeleton, data_2) == 0x38);
 static_assert(sizeof(hkaAnimatedSkeleton) == 0x40);
 
+struct ChrCtrl_AnimationQueue_field0x20
+{
+    uint64_t padding_0;
+    void* field0x8; // len = this->parent_hkaSkeleton->field0x28_len + 3 // elem size = 0x30, all floats
+    uint32_t data_0[2];
+    void* field0x18; // len = this->parent_hkaSkeleton->field0x28_len + 3 // elem size = 0x30, all floats
+    uint32_t data_1[2];
+    uint32_t* field0x28; // len = this->parent_hkaSkeleton->field0x28_len + 3 // elem size = 4
+    uint32_t data_2[4];
+    uint32_t* padding_field0x40; // len = this->parent_hkaSkeleton->field0x58_len + 3 // elem size = 4. Always seems to be null and length = 0
+    uint32_t data_3[2];
+};
+
+static_assert(offsetof(ChrCtrl_AnimationQueue_field0x20, field0x8) == 0x8);
+static_assert(offsetof(ChrCtrl_AnimationQueue_field0x20, data_0) == 0x10);
+static_assert(offsetof(ChrCtrl_AnimationQueue_field0x20, field0x18) == 0x18);
+static_assert(offsetof(ChrCtrl_AnimationQueue_field0x20, data_1) == 0x20);
+static_assert(offsetof(ChrCtrl_AnimationQueue_field0x20, field0x28) == 0x28);
+static_assert(offsetof(ChrCtrl_AnimationQueue_field0x20, data_2) == 0x30);
+static_assert(offsetof(ChrCtrl_AnimationQueue_field0x20, padding_field0x40) == 0x40);
+static_assert(offsetof(ChrCtrl_AnimationQueue_field0x20, data_3) == 0x48);
+static_assert(sizeof(ChrCtrl_AnimationQueue_field0x20) == 0x50);
+
 struct ChrCtrl_AnimationQueue
 {
     uint32_t array_length;
@@ -182,7 +206,8 @@ struct ChrCtrl_AnimationQueue
     ChrCtrl_AnimationQueue_field0x8* arry;
     ChrCtrl_AnimationQueue_field0x10* field0x10;
     hkaAnimatedSkeleton* HkaAnimatedSkeleton;
-    uint64_t padding_0[8]; //unknown pointers
+    ChrCtrl_AnimationQueue_field0x20* field0x20;
+    uint64_t padding_0[7]; //unknown pointers
     uint8_t data_1[8];
     void* padding_1;
     uint8_t data_2[0x10];
