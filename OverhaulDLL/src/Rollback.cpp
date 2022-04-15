@@ -725,16 +725,16 @@ AnimationMediatorStateEntry* init_AnimationMediatorStateEntry()
 
 void copy_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to, ChrCtrl_AnimationQueue* from, bool to_game)
 {
-    //we allow up to a max of 32 ChrCtrl_AnimationQueue_field0x8 entries in the array
+    //we allow up to a max of 32 AnimationQueueEntry entries in the array
     if (from->array_length > 32)
     {
-        FATALERROR("Got %d number of ChrCtrl_AnimationQueue_field0x8 entries for ChrCtrl_AnimationQueue->arry. Only support a max of 32.", from->array_length);
+        FATALERROR("Got %d number of AnimationQueueEntry entries for ChrCtrl_AnimationQueue->arry. Only support a max of 32.", from->array_length);
     }
     to->array_length = from->array_length;
     to->data_0 = from->data_0;
     for (size_t i = 0; i < from->array_length; i++)
     {
-        copy_ChrCtrl_AnimationQueue_field0x8(&to->arry[i], &from->arry[i]);
+        copy_AnimationQueueEntry(&to->arry[i], &from->arry[i]);
     }
 
     copy_ChrCtrl_AnimationQueue_field0x10(to->field0x10, from->field0x10);
@@ -750,9 +750,15 @@ void copy_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to, ChrCtrl_AnimationQu
 ChrCtrl_AnimationQueue* init_ChrCtrl_AnimationQueue()
 {
     ChrCtrl_AnimationQueue* local_ChrCtrl_AnimationQueue = (ChrCtrl_AnimationQueue*)malloc_(sizeof(ChrCtrl_AnimationQueue));
-    ChrCtrl_AnimationQueue_field0x8* local_ChrCtrl_AnimationQueue_field0x8 = (ChrCtrl_AnimationQueue_field0x8*)malloc_(sizeof(ChrCtrl_AnimationQueue_field0x8) * 32);
+    AnimationQueueEntry* local_AnimationQueueEntry_Array = (AnimationQueueEntry*)malloc_(sizeof(AnimationQueueEntry) * 32);
 
-    local_ChrCtrl_AnimationQueue->arry = local_ChrCtrl_AnimationQueue_field0x8;
+    local_ChrCtrl_AnimationQueue->arry = local_AnimationQueueEntry_Array;
+    for (size_t i = 0; i < 32; i++)
+    {
+        AnimationQueueEntry* local_AnimationQueueEntry = init_AnimationQueueEntry();
+        local_ChrCtrl_AnimationQueue->arry[i] = *local_AnimationQueueEntry;
+        free(local_AnimationQueueEntry);
+    }
     local_ChrCtrl_AnimationQueue->field0x10 = init_ChrCtrl_AnimationQueue_field0x10();
     local_ChrCtrl_AnimationQueue->HkaAnimatedSkeleton = init_hkaAnimatedSkeleton();
     local_ChrCtrl_AnimationQueue->field0x20 = init_ChrCtrl_AnimationQueue_field0x20();
@@ -928,10 +934,20 @@ ChrCtrl_AnimationQueue_field0x10* init_ChrCtrl_AnimationQueue_field0x10()
     return local_ChrCtrl_AnimationQueue_field0x10;
 }
 
-void copy_ChrCtrl_AnimationQueue_field0x8(ChrCtrl_AnimationQueue_field0x8* to, ChrCtrl_AnimationQueue_field0x8* from)
+void copy_AnimationQueueEntry(AnimationQueueEntry* to, AnimationQueueEntry* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    copy_AnimationQueueEntry_AnimationInfo(to->animEntryInfo, from->animEntryInfo);
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+}
+
+AnimationQueueEntry* init_AnimationQueueEntry()
+{
+    AnimationQueueEntry* local_AnimationQueueEntry = (AnimationQueueEntry*)malloc_(sizeof(AnimationQueueEntry));
+
+    local_AnimationQueueEntry->animEntryInfo = init_AnimationQueueEntry_AnimationInfo();
+
+    return local_AnimationQueueEntry;
 }
 
 void copy_AnimationQueue(AnimationQueue* to, AnimationQueue* from)

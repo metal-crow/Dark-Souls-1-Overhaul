@@ -9,7 +9,8 @@
 
 typedef struct AnimationQueue_Entry AnimationQueue_Entry;
 typedef struct AnimationQueue AnimationQueue;
-typedef struct ChrCtrl_AnimationQueue_field0x8 ChrCtrl_AnimationQueue_field0x8;
+typedef struct AnimationQueueEntry AnimationQueueEntry;
+typedef struct AnimationQueueEntry_AnimationInfo AnimationQueueEntry_AnimationInfo;
 typedef struct ChrCtrl_AnimationQueue_field0x10 ChrCtrl_AnimationQueue_field0x10;
 typedef struct ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem;
 typedef struct hkaAnimatedSkeleton hkaAnimatedSkeleton;
@@ -83,15 +84,22 @@ struct AnimationQueue
 static_assert(offsetof(AnimationQueue, AnimationQueue_Entries) == 0x8);
 static_assert(sizeof(AnimationQueue) == 0x40);
 
-struct ChrCtrl_AnimationQueue_field0x8
+struct AnimationQueueEntry_AnimationInfo
 {
     uint8_t data_0[8];
-    uint64_t padding_0[4];
+
+};
+
+struct AnimationQueueEntry
+{
+    uint8_t data_0[8];
+    uint64_t padding_0[3];
+    AnimationQueueEntry_AnimationInfo* animEntryInfo;
     uint8_t data_1[0x50];
 };
 
-static_assert(offsetof(ChrCtrl_AnimationQueue_field0x8, data_1) == 0x28);
-static_assert(sizeof(ChrCtrl_AnimationQueue_field0x8) == 0x78);
+static_assert(offsetof(AnimationQueueEntry, data_1) == 0x28);
+static_assert(sizeof(AnimationQueueEntry) == 0x78);
 
 struct ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem
 {
@@ -203,7 +211,7 @@ struct ChrCtrl_AnimationQueue
 {
     uint32_t array_length;
     uint32_t data_0;
-    ChrCtrl_AnimationQueue_field0x8* arry;
+    AnimationQueueEntry* arry;
     ChrCtrl_AnimationQueue_field0x10* field0x10;
     hkaAnimatedSkeleton* HkaAnimatedSkeleton;
     ChrCtrl_AnimationQueue_field0x20* field0x20;
