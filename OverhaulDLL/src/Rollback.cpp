@@ -937,7 +937,10 @@ ChrCtrl_AnimationQueue_field0x10* init_ChrCtrl_AnimationQueue_field0x10()
 void copy_AnimationQueueEntry(AnimationQueueEntry* to, AnimationQueueEntry* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-    copy_AnimationQueueEntry_AnimationInfo(to->animEntryInfo, from->animEntryInfo);
+    if (to->animEntryInfo != NULL && from->animEntryInfo != NULL)
+    {
+        copy_AnimationQueueEntry_AnimationInfo(to->animEntryInfo, from->animEntryInfo);
+    }
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
 }
 
@@ -948,6 +951,19 @@ AnimationQueueEntry* init_AnimationQueueEntry()
     local_AnimationQueueEntry->animEntryInfo = init_AnimationQueueEntry_AnimationInfo();
 
     return local_AnimationQueueEntry;
+}
+
+void copy_AnimationQueueEntry_AnimationInfo(AnimationQueueEntry_AnimationInfo* to, AnimationQueueEntry_AnimationInfo* from)
+{
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+}
+
+AnimationQueueEntry_AnimationInfo* init_AnimationQueueEntry_AnimationInfo()
+{
+    AnimationQueueEntry_AnimationInfo* local_AnimationQueueEntry_AnimationInfo = (AnimationQueueEntry_AnimationInfo*)malloc_(sizeof(AnimationQueueEntry_AnimationInfo));
+
+    return local_AnimationQueueEntry_AnimationInfo;
 }
 
 void copy_AnimationQueue(AnimationQueue* to, AnimationQueue* from)

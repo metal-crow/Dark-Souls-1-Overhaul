@@ -97,6 +97,8 @@ hkaAnimationBinding* init_hkaAnimationBinding();
 ChrCtrl_AnimationQueue_field0x10* init_ChrCtrl_AnimationQueue_field0x10();
 void copy_ChrCtrl_AnimationQueue_field0x10(ChrCtrl_AnimationQueue_field0x10* to, ChrCtrl_AnimationQueue_field0x10* from);
 AnimationQueueEntry* init_AnimationQueueEntry();
+void copy_AnimationQueueEntry_AnimationInfo(AnimationQueueEntry_AnimationInfo* to, AnimationQueueEntry_AnimationInfo* from);
+AnimationQueueEntry_AnimationInfo* init_AnimationQueueEntry_AnimationInfo();
 void copy_AnimationQueueEntry(AnimationQueueEntry* to, AnimationQueueEntry* from);
 void copy_AnimationQueue(AnimationQueue* to, AnimationQueue* from);
 AnimationQueue* init_AnimationQueue();

@@ -87,8 +87,15 @@ static_assert(sizeof(AnimationQueue) == 0x40);
 struct AnimationQueueEntry_AnimationInfo
 {
     uint8_t data_0[8];
-
+    uint64_t padding_0; // this is already saved from the ChrCtrl_AnimationQueue->hkaAnimatedSkeleton chain
+    uint64_t padding_1;
+    uint32_t data_1[8];
+    uint64_t padding_2;
 };
+
+static_assert(offsetof(AnimationQueueEntry_AnimationInfo, padding_0) == 0x8);
+static_assert(offsetof(AnimationQueueEntry_AnimationInfo, data_1) == 0x18);
+static_assert(sizeof(AnimationQueueEntry_AnimationInfo) == 0x40);
 
 struct AnimationQueueEntry
 {
@@ -98,6 +105,7 @@ struct AnimationQueueEntry
     uint8_t data_1[0x50];
 };
 
+static_assert(offsetof(AnimationQueueEntry, animEntryInfo) == 0x20);
 static_assert(offsetof(AnimationQueueEntry, data_1) == 0x28);
 static_assert(sizeof(AnimationQueueEntry) == 0x78);
 
