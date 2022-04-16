@@ -734,7 +734,7 @@ void copy_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to, ChrCtrl_AnimationQu
     to->data_0 = from->data_0;
     for (size_t i = 0; i < from->array_length; i++)
     {
-        copy_AnimationQueueEntry(&to->arry[i], &from->arry[i]);
+        copy_AnimationQueueEntry(&to->arry[i], &from->arry[i], to_game);
     }
 
     copy_ChrCtrl_AnimationQueue_field0x10(to->field0x10, from->field0x10);
@@ -934,13 +934,44 @@ ChrCtrl_AnimationQueue_field0x10* init_ChrCtrl_AnimationQueue_field0x10()
     return local_ChrCtrl_AnimationQueue_field0x10;
 }
 
-void copy_AnimationQueueEntry(AnimationQueueEntry* to, AnimationQueueEntry* from)
+void copy_AnimationQueueEntry(AnimationQueueEntry* to, AnimationQueueEntry* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-    if (to->animEntryInfo != NULL && from->animEntryInfo != NULL)
+
+    if (to_game)
     {
-        copy_AnimationQueueEntry_AnimationInfo(to->animEntryInfo, from->animEntryInfo);
+        if (to->animEntryInfo == NULL && from->animEntryInfo != NULL)
+        {
+            FATALERROR("Unable to copy AnimationQueueEntry->animEntryInfo into game, pointer is null.");
+        }
+        else if (from->animEntryInfo == NULL)
+        {
+            //TODO need to free this to prevent memory leak
+            to->animEntryInfo = NULL;
+        }
+        else if (to->animEntryInfo != NULL && from->animEntryInfo != NULL)
+        {
+            copy_AnimationQueueEntry_AnimationInfo(to->animEntryInfo, from->animEntryInfo);
+        }
     }
+    else
+    {
+        if (to->animEntryInfo == NULL && from->animEntryInfo != NULL)
+        {
+            to->animEntryInfo = init_AnimationQueueEntry_AnimationInfo();
+            copy_AnimationQueueEntry_AnimationInfo(to->animEntryInfo, from->animEntryInfo);
+        }
+        else if (from->animEntryInfo == NULL)
+        {
+            free(to->animEntryInfo);
+            to->animEntryInfo = NULL;
+        }
+        else if (to->animEntryInfo != NULL && from->animEntryInfo != NULL)
+        {
+            copy_AnimationQueueEntry_AnimationInfo(to->animEntryInfo, from->animEntryInfo);
+        }
+    }
+
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
 }
 

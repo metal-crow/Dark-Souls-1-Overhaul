@@ -99,7 +99,7 @@ void copy_ChrCtrl_AnimationQueue_field0x10(ChrCtrl_AnimationQueue_field0x10* to,
 AnimationQueueEntry* init_AnimationQueueEntry();
 void copy_AnimationQueueEntry_AnimationInfo(AnimationQueueEntry_AnimationInfo* to, AnimationQueueEntry_AnimationInfo* from);
 AnimationQueueEntry_AnimationInfo* init_AnimationQueueEntry_AnimationInfo();
-void copy_AnimationQueueEntry(AnimationQueueEntry* to, AnimationQueueEntry* from);
+void copy_AnimationQueueEntry(AnimationQueueEntry* to, AnimationQueueEntry* from, bool to_game);
 void copy_AnimationQueue(AnimationQueue* to, AnimationQueue* from);
 AnimationQueue* init_AnimationQueue();
 void copy_AnimationQueue_Entry(AnimationQueue_Entry* to, AnimationQueue_Entry* from);
