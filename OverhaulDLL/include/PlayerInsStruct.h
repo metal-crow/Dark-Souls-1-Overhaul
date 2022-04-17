@@ -63,15 +63,23 @@ struct AnimationQueue_Entry
     uint8_t data_0[8];
     void* padding_0;
     uint8_t data_1[0x100];
-    uint64_t padding_1[6]; //unknown pointers
-    uint8_t data_2[8];
-    uint64_t padding_2[4]; //think these are just for anim blending
-    uint8_t data_3[24];
+    uint64_t padding_1;
+    uint64_t data_2;
+    uint64_t padding_2; //unknown pointer
+    uint64_t data_3[4];
+    uint64_t padding_3[4]; //think these are just for anim blending
+    uint8_t data_4[24];
 };
 
+static_assert(offsetof(AnimationQueue_Entry, data_0) == 0x0);
+static_assert(offsetof(AnimationQueue_Entry, padding_0) == 0x8);
 static_assert(offsetof(AnimationQueue_Entry, data_1) == 0x10);
-static_assert(offsetof(AnimationQueue_Entry, data_2) == 0x140);
-static_assert(offsetof(AnimationQueue_Entry, data_3) == 0x168);
+static_assert(offsetof(AnimationQueue_Entry, padding_1) == 0x110);
+static_assert(offsetof(AnimationQueue_Entry, data_2) == 0x118);
+static_assert(offsetof(AnimationQueue_Entry, padding_2) == 0x120);
+static_assert(offsetof(AnimationQueue_Entry, data_3) == 0x128);
+static_assert(offsetof(AnimationQueue_Entry, padding_3) == 0x148);
+static_assert(offsetof(AnimationQueue_Entry, data_4) == 0x168);
 static_assert(sizeof(AnimationQueue_Entry) == 0x180);
 
 struct AnimationQueue
@@ -87,13 +95,13 @@ static_assert(sizeof(AnimationQueue) == 0x40);
 struct AnimationQueueEntry_AnimationInfo
 {
     uint8_t data_0[8];
-    uint64_t padding_0; // this is already saved from the ChrCtrl_AnimationQueue->hkaAnimatedSkeleton chain
-    uint64_t padding_1;
+    uint64_t hkaAnimationBinding; // this is already saved from the ChrCtrl_AnimationQueue->hkaAnimatedSkeleton chain, so just treat as const pointer
+    uint64_t unk;
     uint32_t data_1[8];
-    uint64_t padding_2;
+    uint64_t unk2;
 };
 
-static_assert(offsetof(AnimationQueueEntry_AnimationInfo, padding_0) == 0x8);
+static_assert(offsetof(AnimationQueueEntry_AnimationInfo, hkaAnimationBinding) == 0x8);
 static_assert(offsetof(AnimationQueueEntry_AnimationInfo, data_1) == 0x18);
 static_assert(sizeof(AnimationQueueEntry_AnimationInfo) == 0x40);
 
@@ -224,8 +232,7 @@ struct ChrCtrl_AnimationQueue
     hkaAnimatedSkeleton* HkaAnimatedSkeleton;
     ChrCtrl_AnimationQueue_field0x20* field0x20;
     uint64_t padding_0[7]; //unknown pointers
-    uint8_t data_1[8];
-    void* padding_1;
+    uint8_t data_1[0x10];
     uint8_t data_2[0x10];
     void* padding_2;
     uint64_t data_3;

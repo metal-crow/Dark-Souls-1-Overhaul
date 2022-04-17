@@ -942,7 +942,8 @@ void copy_AnimationQueueEntry(AnimationQueueEntry* to, AnimationQueueEntry* from
     {
         if (to->animEntryInfo == NULL && from->animEntryInfo != NULL)
         {
-            FATALERROR("Unable to copy AnimationQueueEntry->animEntryInfo into game, pointer is null.");
+            to->animEntryInfo = (AnimationQueueEntry_AnimationInfo*)Game::game_malloc(sizeof(AnimationQueueEntry_AnimationInfo), 8, (void*)*(uint64_t*)(0x141C04F30)); //internal_heap_3
+            copy_AnimationQueueEntry_AnimationInfo(to->animEntryInfo, from->animEntryInfo);
         }
         else if (from->animEntryInfo == NULL)
         {
@@ -986,8 +987,12 @@ AnimationQueueEntry* init_AnimationQueueEntry()
 
 void copy_AnimationQueueEntry_AnimationInfo(AnimationQueueEntry_AnimationInfo* to, AnimationQueueEntry_AnimationInfo* from)
 {
+    //since this object is being allocated in-game as needed by us, we need to save everything in it. can't rely on stuff we don't care about being in there already
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    to->hkaAnimationBinding = from->hkaAnimationBinding;
+    to->unk = from->unk;
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    to->unk2 = from->unk2;
 }
 
 AnimationQueueEntry_AnimationInfo* init_AnimationQueueEntry_AnimationInfo()
@@ -1021,8 +1026,9 @@ void copy_AnimationQueue_Entry(AnimationQueue_Entry* to, AnimationQueue_Entry* f
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
-    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    to->data_2 = from->data_2;
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
+    memcpy(to->data_4, from->data_4, sizeof(to->data_4));
 }
 
 AnimationQueue_Entry* init_AnimationQueue_Entry()
