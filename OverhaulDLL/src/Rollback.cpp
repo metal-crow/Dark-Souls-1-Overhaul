@@ -725,16 +725,16 @@ AnimationMediatorStateEntry* init_AnimationMediatorStateEntry()
 
 void copy_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to, ChrCtrl_AnimationQueue* from, bool to_game)
 {
-    //we allow up to a max of 32 AnimationQueueEntry entries in the array
+    //we allow up to a max of 32 ChrCtrl_AnimationQueueEntry entries in the array
     if (from->array_length > 32)
     {
-        FATALERROR("Got %d number of AnimationQueueEntry entries for ChrCtrl_AnimationQueue->arry. Only support a max of 32.", from->array_length);
+        FATALERROR("Got %d number of ChrCtrl_AnimationQueueEntry entries for ChrCtrl_AnimationQueue->arry. Only support a max of 32.", from->array_length);
     }
     to->array_length = from->array_length;
     to->data_0 = from->data_0;
     for (size_t i = 0; i < from->array_length; i++)
     {
-        copy_AnimationQueueEntry(&to->arry[i], &from->arry[i], to_game);
+        copy_ChrCtrl_AnimationQueueEntry(&to->arry[i], &from->arry[i], to_game);
     }
 
     copy_ChrCtrl_AnimationQueue_field0x10(to->field0x10, from->field0x10);
@@ -750,12 +750,12 @@ void copy_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to, ChrCtrl_AnimationQu
 ChrCtrl_AnimationQueue* init_ChrCtrl_AnimationQueue()
 {
     ChrCtrl_AnimationQueue* local_ChrCtrl_AnimationQueue = (ChrCtrl_AnimationQueue*)malloc_(sizeof(ChrCtrl_AnimationQueue));
-    AnimationQueueEntry* local_AnimationQueueEntry_Array = (AnimationQueueEntry*)malloc_(sizeof(AnimationQueueEntry) * 32);
+    ChrCtrl_AnimationQueueEntry* local_AnimationQueueEntry_Array = (ChrCtrl_AnimationQueueEntry*)malloc_(sizeof(ChrCtrl_AnimationQueueEntry) * 32);
 
     local_ChrCtrl_AnimationQueue->arry = local_AnimationQueueEntry_Array;
     for (size_t i = 0; i < 32; i++)
     {
-        AnimationQueueEntry* local_AnimationQueueEntry = init_AnimationQueueEntry();
+        ChrCtrl_AnimationQueueEntry* local_AnimationQueueEntry = init_ChrCtrl_AnimationQueueEntry();
         local_ChrCtrl_AnimationQueue->arry[i] = *local_AnimationQueueEntry;
         free(local_AnimationQueueEntry);
     }
@@ -934,7 +934,7 @@ ChrCtrl_AnimationQueue_field0x10* init_ChrCtrl_AnimationQueue_field0x10()
     return local_ChrCtrl_AnimationQueue_field0x10;
 }
 
-void copy_AnimationQueueEntry(AnimationQueueEntry* to, AnimationQueueEntry* from, bool to_game)
+void copy_ChrCtrl_AnimationQueueEntry(ChrCtrl_AnimationQueueEntry* to, ChrCtrl_AnimationQueueEntry* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 
@@ -976,9 +976,9 @@ void copy_AnimationQueueEntry(AnimationQueueEntry* to, AnimationQueueEntry* from
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
 }
 
-AnimationQueueEntry* init_AnimationQueueEntry()
+ChrCtrl_AnimationQueueEntry* init_ChrCtrl_AnimationQueueEntry()
 {
-    AnimationQueueEntry* local_AnimationQueueEntry = (AnimationQueueEntry*)malloc_(sizeof(AnimationQueueEntry));
+    ChrCtrl_AnimationQueueEntry* local_AnimationQueueEntry = (ChrCtrl_AnimationQueueEntry*)malloc_(sizeof(ChrCtrl_AnimationQueueEntry));
 
     local_AnimationQueueEntry->animEntryInfo = init_AnimationQueueEntry_AnimationInfo();
 
@@ -1026,9 +1026,8 @@ void copy_AnimationQueue_Entry(AnimationQueue_Entry* to, AnimationQueue_Entry* f
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
-    to->data_2 = from->data_2;
+    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
-    memcpy(to->data_4, from->data_4, sizeof(to->data_4));
 }
 
 AnimationQueue_Entry* init_AnimationQueue_Entry()
