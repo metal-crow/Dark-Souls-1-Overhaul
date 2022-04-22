@@ -7,6 +7,7 @@
 
 #include <stddef.h>
 
+typedef struct AnimationQueue_Entry_sub1_field0x10 AnimationQueue_Entry_sub1_field0x10;
 typedef struct AnimationQueue_Entry AnimationQueue_Entry;
 typedef struct AnimationQueue AnimationQueue;
 typedef struct ChrCtrl_AnimationQueueEntry ChrCtrl_AnimationQueueEntry;
@@ -58,19 +59,28 @@ typedef struct ProEquipCtrl ProEquipCtrl;
 typedef struct ChrAsm ChrAsm;
 typedef struct PlayerIns PlayerIns;
 
+struct AnimationQueue_Entry_sub1_field0x10
+{
+    uint64_t data_0[2]; //pointers, but to previously saved values
+};
+
 struct AnimationQueue_Entry
 {
     uint8_t data_0[8];
     void* padding_0;
     uint8_t data_1[0x100];
-    uint64_t padding_1[6]; //unknown pointers
+    uint64_t padding_1[2]; //pointer to unchanging values
+    AnimationQueue_Entry_sub1_field0x10** field0x10;
+    uint64_t field0x10_size;
+    uint64_t padding_2[2]; //unknown pointers. seem to be always null
     uint8_t data_2[8];
-    uint64_t padding_2[4]; //think these are just for anim blending
+    uint64_t padding_3[4]; //think these are just for anim blending
     uint8_t data_3[24];
 };
 
 static_assert(offsetof(AnimationQueue_Entry, data_0) == 0x0);
 static_assert(offsetof(AnimationQueue_Entry, data_1) == 0x10);
+static_assert(offsetof(AnimationQueue_Entry, field0x10) == 0x120);
 static_assert(offsetof(AnimationQueue_Entry, data_2) == 0x140);
 static_assert(offsetof(AnimationQueue_Entry, data_3) == 0x168);
 static_assert(sizeof(AnimationQueue_Entry) == 0x180);

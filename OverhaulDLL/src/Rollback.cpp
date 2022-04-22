@@ -1026,6 +1026,16 @@ void copy_AnimationQueue_Entry(AnimationQueue_Entry* to, AnimationQueue_Entry* f
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    to->field0x10_size = from->field0x10_size;
+    uint64_t field0x10_len = to->field0x10_size / 8;
+    if (field0x10_len > 8)
+    {
+        FATALERROR("AnimationQueue_Entry->field0x10_size is %d, max supported is 8 entries", to->field0x10_size);
+    }
+    for (size_t i = 0; i < field0x10_len; i++)
+    {
+        copy_AnimationQueue_Entry_sub1_field0x10(to->field0x10[i], from->field0x10[i]);
+    }
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
 }
@@ -1033,5 +1043,17 @@ void copy_AnimationQueue_Entry(AnimationQueue_Entry* to, AnimationQueue_Entry* f
 AnimationQueue_Entry* init_AnimationQueue_Entry()
 {
     AnimationQueue_Entry* local_AnimationQueue_Entry = (AnimationQueue_Entry*)malloc_(sizeof(AnimationQueue_Entry));
+
+    local_AnimationQueue_Entry->field0x10 = (AnimationQueue_Entry_sub1_field0x10**)malloc_(sizeof(AnimationQueue_Entry_sub1_field0x10*) * 8);
+    for (size_t i = 0; i < 8; i++)
+    {
+        local_AnimationQueue_Entry->field0x10[i] = (AnimationQueue_Entry_sub1_field0x10*)malloc_(sizeof(AnimationQueue_Entry_sub1_field0x10));
+    }
+
     return local_AnimationQueue_Entry;
+}
+
+void copy_AnimationQueue_Entry_sub1_field0x10(AnimationQueue_Entry_sub1_field0x10* to, AnimationQueue_Entry_sub1_field0x10* from)
+{
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 }
