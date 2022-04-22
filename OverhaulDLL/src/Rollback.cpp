@@ -1034,6 +1034,10 @@ void copy_AnimationQueue_Entry(AnimationQueue_Entry* to, AnimationQueue_Entry* f
     }
     for (size_t i = 0; i < field0x10_len; i++)
     {
+        if (from->field0x10[i] == NULL)
+        {
+            FATALERROR("Why is AnimationQueue_Entry->field0x10[%d] null?", i);
+        }
         copy_AnimationQueue_Entry_sub1_field0x10(to->field0x10[i], from->field0x10[i]);
     }
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));

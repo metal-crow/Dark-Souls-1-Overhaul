@@ -72,8 +72,7 @@ struct AnimationQueue_Entry
     uint64_t padding_1[2]; //pointer to unchanging values
     AnimationQueue_Entry_sub1_field0x10** field0x10;
     uint64_t field0x10_size;
-    uint64_t padding_2[2]; //unknown pointers. seem to be always null
-    uint8_t data_2[8];
+    uint64_t data_2[3];
     uint64_t padding_3[4]; //think these are just for anim blending
     uint8_t data_3[24];
 };
@@ -81,7 +80,8 @@ struct AnimationQueue_Entry
 static_assert(offsetof(AnimationQueue_Entry, data_0) == 0x0);
 static_assert(offsetof(AnimationQueue_Entry, data_1) == 0x10);
 static_assert(offsetof(AnimationQueue_Entry, field0x10) == 0x120);
-static_assert(offsetof(AnimationQueue_Entry, data_2) == 0x140);
+static_assert(offsetof(AnimationQueue_Entry, field0x10_size) == 0x128);
+static_assert(offsetof(AnimationQueue_Entry, data_2) == 0x130);
 static_assert(offsetof(AnimationQueue_Entry, data_3) == 0x168);
 static_assert(sizeof(AnimationQueue_Entry) == 0x180);
 
