@@ -84,6 +84,8 @@ void copy_AnimationMediatorStateEntry(AnimationMediatorStateEntry* to, Animation
 AnimationMediatorStateEntry* init_AnimationMediatorStateEntry();
 void copy_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to, ChrCtrl_AnimationQueue* from, bool to_game);
 ChrCtrl_AnimationQueue* init_ChrCtrl_AnimationQueue();
+void copy_ChrCtrl_AnimationQueue_field0x20(ChrCtrl_AnimationQueue_field0x20* to, ChrCtrl_AnimationQueue_field0x20* from, bool to_game);
+ChrCtrl_AnimationQueue_field0x20* init_ChrCtrl_AnimationQueue_field0x20();
 void copy_hkaAnimatedSkeleton(hkaAnimatedSkeleton* to, hkaAnimatedSkeleton* from);
 hkaAnimatedSkeleton* init_hkaAnimatedSkeleton();
 void copy_hkaDefaultAnimationControl(hkaDefaultAnimationControl* to, hkaDefaultAnimationControl* from);
@@ -94,8 +96,6 @@ void copy_hkaAnimationBinding(hkaAnimationBinding* to, hkaAnimationBinding* from
 hkaAnimationBinding* init_hkaAnimationBinding();
 ChrCtrl_AnimationQueue_field0x10* init_ChrCtrl_AnimationQueue_field0x10();
 void copy_ChrCtrl_AnimationQueue_field0x10(ChrCtrl_AnimationQueue_field0x10* to, ChrCtrl_AnimationQueue_field0x10* from);
-void copy_AnimationQueueEntry_AnimationInfo(AnimationQueueEntry_AnimationInfo* to, AnimationQueueEntry_AnimationInfo* from);
-AnimationQueueEntry_AnimationInfo* init_AnimationQueueEntry_AnimationInfo();
 void copy_ChrCtrl_AnimationQueueEntry(ChrCtrl_AnimationQueueEntry* to, ChrCtrl_AnimationQueueEntry* from, bool to_game);
 ChrCtrl_AnimationQueueEntry* init_ChrCtrl_AnimationQueueEntry();
 void copy_AnimationQueue(AnimationQueue* to, AnimationQueue* from);

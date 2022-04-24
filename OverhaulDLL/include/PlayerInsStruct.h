@@ -11,7 +11,6 @@ typedef struct AnimationQueue_Entry_sub1_field0x10 AnimationQueue_Entry_sub1_fie
 typedef struct AnimationQueue_Entry AnimationQueue_Entry;
 typedef struct AnimationQueue AnimationQueue;
 typedef struct ChrCtrl_AnimationQueueEntry ChrCtrl_AnimationQueueEntry;
-typedef struct AnimationQueueEntry_AnimationInfo AnimationQueueEntry_AnimationInfo;
 typedef struct ChrCtrl_AnimationQueue_field0x10 ChrCtrl_AnimationQueue_field0x10;
 typedef struct ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem;
 typedef struct hkaAnimatedSkeleton hkaAnimatedSkeleton;
@@ -19,6 +18,7 @@ typedef struct hkaDefaultAnimationControl hkaDefaultAnimationControl;
 typedef struct hkaAnimationControl hkaAnimationControl;
 typedef struct hkaAnimationBinding hkaAnimationBinding;
 typedef struct ChrCtrl_AnimationQueue ChrCtrl_AnimationQueue;
+typedef struct ChrCtrl_AnimationQueue_field0x20 ChrCtrl_AnimationQueue_field0x20;
 typedef struct AnimationMediatorStateEntry AnimationMediatorStateEntry;
 typedef struct AnimationMediator AnimationMediator;
 typedef struct hkpCharacterProxy hkpCharacterProxy;
@@ -94,28 +94,15 @@ struct AnimationQueue
 static_assert(offsetof(AnimationQueue, AnimationQueue_Entries) == 0x8);
 static_assert(sizeof(AnimationQueue) == 0x40);
 
-struct AnimationQueueEntry_AnimationInfo
-{
-    uint8_t data_0[8];
-    uint64_t hkaAnimationBinding; // this is already saved from the ChrCtrl_AnimationQueue->hkaAnimatedSkeleton chain, so just treat as const pointer
-    uint64_t unk;
-    uint32_t data_1[8];
-    uint64_t unk2;
-};
-
-static_assert(offsetof(AnimationQueueEntry_AnimationInfo, hkaAnimationBinding) == 0x8);
-static_assert(offsetof(AnimationQueueEntry_AnimationInfo, data_1) == 0x18);
-static_assert(sizeof(AnimationQueueEntry_AnimationInfo) == 0x40);
-
 struct ChrCtrl_AnimationQueueEntry
 {
     uint8_t data_0[8];
     uint64_t padding_0[3];
-    AnimationQueueEntry_AnimationInfo* animEntryInfo;
+    uint64_t HvkAnim_AnimInfoArrayElem; //this should be a const pointer since it's to an animbnd
     uint8_t data_1[0x50];
 };
 
-static_assert(offsetof(ChrCtrl_AnimationQueueEntry, animEntryInfo) == 0x20);
+static_assert(offsetof(ChrCtrl_AnimationQueueEntry, HvkAnim_AnimInfoArrayElem) == 0x20);
 static_assert(offsetof(ChrCtrl_AnimationQueueEntry, data_1) == 0x28);
 static_assert(sizeof(ChrCtrl_AnimationQueueEntry) == 0x78);
 
@@ -202,6 +189,29 @@ static_assert(offsetof(hkaAnimatedSkeleton, padding_2) == 0x30);
 static_assert(offsetof(hkaAnimatedSkeleton, data_2) == 0x38);
 static_assert(sizeof(hkaAnimatedSkeleton) == 0x40);
 
+struct ChrCtrl_AnimationQueue_field0x20
+{
+    uint64_t padding_0;
+    void* field0x8; // len = this->parent_hkaSkeleton->field0x28_len + 3 // elem size = 0x30, all floats
+    uint32_t data_0[2];
+    void* field0x18; // len = this->parent_hkaSkeleton->field0x28_len + 3 // elem size = 0x30, all floats
+    uint32_t data_1[2];
+    uint32_t* field0x28; // len = this->parent_hkaSkeleton->field0x28_len + 3 // elem size = 4
+    uint32_t data_2[4];
+    uint32_t* padding_field0x40; // len = this->parent_hkaSkeleton->field0x58_len + 3 // elem size = 4. Always seems to be null and length = 0
+    uint32_t data_3[2];
+};
+
+static_assert(offsetof(ChrCtrl_AnimationQueue_field0x20, field0x8) == 0x8);
+static_assert(offsetof(ChrCtrl_AnimationQueue_field0x20, data_0) == 0x10);
+static_assert(offsetof(ChrCtrl_AnimationQueue_field0x20, field0x18) == 0x18);
+static_assert(offsetof(ChrCtrl_AnimationQueue_field0x20, data_1) == 0x20);
+static_assert(offsetof(ChrCtrl_AnimationQueue_field0x20, field0x28) == 0x28);
+static_assert(offsetof(ChrCtrl_AnimationQueue_field0x20, data_2) == 0x30);
+static_assert(offsetof(ChrCtrl_AnimationQueue_field0x20, padding_field0x40) == 0x40);
+static_assert(offsetof(ChrCtrl_AnimationQueue_field0x20, data_3) == 0x48);
+static_assert(sizeof(ChrCtrl_AnimationQueue_field0x20) == 0x50);
+
 struct ChrCtrl_AnimationQueue
 {
     uint32_t array_length;
@@ -209,7 +219,7 @@ struct ChrCtrl_AnimationQueue
     ChrCtrl_AnimationQueueEntry* arry;
     ChrCtrl_AnimationQueue_field0x10* field0x10;
     hkaAnimatedSkeleton* HkaAnimatedSkeleton;
-    uint64_t HvkAnim_AnimInfoArrayElem; //this should be a const pointer since it's to an animbnd
+    ChrCtrl_AnimationQueue_field0x20* field0x20;
     uint64_t padding_0[7]; //unknown pointers
     uint8_t data_1[0x10];
     uint8_t data_2[0x10];

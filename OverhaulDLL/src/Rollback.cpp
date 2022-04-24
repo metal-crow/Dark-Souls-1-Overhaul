@@ -739,7 +739,7 @@ void copy_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to, ChrCtrl_AnimationQu
 
     copy_ChrCtrl_AnimationQueue_field0x10(to->field0x10, from->field0x10);
     copy_hkaAnimatedSkeleton(to->HkaAnimatedSkeleton, from->HkaAnimatedSkeleton);
-    to->HvkAnim_AnimInfoArrayElem = from->HvkAnim_AnimInfoArrayElem;
+    copy_ChrCtrl_AnimationQueue_field0x20(to->field0x20, from->field0x20, to_game);
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
     to->data_3 = from->data_3;
@@ -761,8 +761,40 @@ ChrCtrl_AnimationQueue* init_ChrCtrl_AnimationQueue()
     }
     local_ChrCtrl_AnimationQueue->field0x10 = init_ChrCtrl_AnimationQueue_field0x10();
     local_ChrCtrl_AnimationQueue->HkaAnimatedSkeleton = init_hkaAnimatedSkeleton();
+    local_ChrCtrl_AnimationQueue->field0x20 = init_ChrCtrl_AnimationQueue_field0x20();
 
     return local_ChrCtrl_AnimationQueue;
+}
+
+void copy_ChrCtrl_AnimationQueue_field0x20(ChrCtrl_AnimationQueue_field0x20* to, ChrCtrl_AnimationQueue_field0x20* from, bool to_game)
+{
+    if (!to_game)
+    {
+        uint32_t field0x28_len = *(uint32_t*)(from->padding_0 + 0x30);
+        if (field0x28_len != 61)
+        {
+            FATALERROR("ChrCtrl_AnimationQueue_field0x20 arrays are of size %d. Expected 61.", field0x28_len);
+        }
+    }
+    memcpy(to->field0x8, from->field0x8, 0x30 * 64);
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(to->field0x18, from->field0x18, 0x30 * 64);
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    memcpy(to->field0x28, from->field0x28, 4 * 64);
+    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    memcpy(to->data_3, from->data_3, sizeof(to->data_3));
+}
+
+ChrCtrl_AnimationQueue_field0x20* init_ChrCtrl_AnimationQueue_field0x20()
+{
+    ChrCtrl_AnimationQueue_field0x20* local_ChrCtrl_AnimationQueue_field0x20 = (ChrCtrl_AnimationQueue_field0x20*)malloc_(sizeof(ChrCtrl_AnimationQueue_field0x20));
+
+    //the lengths seem to be constant 64 (61 + 3)
+    local_ChrCtrl_AnimationQueue_field0x20->field0x8 = malloc_(0x30 * 64);
+    local_ChrCtrl_AnimationQueue_field0x20->field0x18 = malloc_(0x30 * 64);
+    local_ChrCtrl_AnimationQueue_field0x20->field0x28 = (uint32_t*)malloc_(4 * 64);
+
+    return local_ChrCtrl_AnimationQueue_field0x20;
 }
 
 void copy_hkaAnimatedSkeleton(hkaAnimatedSkeleton* to, hkaAnimatedSkeleton* from)
@@ -905,42 +937,7 @@ ChrCtrl_AnimationQueue_field0x10* init_ChrCtrl_AnimationQueue_field0x10()
 void copy_ChrCtrl_AnimationQueueEntry(ChrCtrl_AnimationQueueEntry* to, ChrCtrl_AnimationQueueEntry* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-
-    if (to_game)
-    {
-        if (to->animEntryInfo == NULL && from->animEntryInfo != NULL)
-        {
-            to->animEntryInfo = (AnimationQueueEntry_AnimationInfo*)Game::game_malloc(sizeof(AnimationQueueEntry_AnimationInfo), 8, (void*)*(uint64_t*)(0x141C04F30)); //internal_heap_3
-            copy_AnimationQueueEntry_AnimationInfo(to->animEntryInfo, from->animEntryInfo);
-        }
-        else if (from->animEntryInfo == NULL)
-        {
-            //TODO need to free this to prevent memory leak
-            to->animEntryInfo = NULL;
-        }
-        else if (to->animEntryInfo != NULL && from->animEntryInfo != NULL)
-        {
-            copy_AnimationQueueEntry_AnimationInfo(to->animEntryInfo, from->animEntryInfo);
-        }
-    }
-    else
-    {
-        if (to->animEntryInfo == NULL && from->animEntryInfo != NULL)
-        {
-            to->animEntryInfo = init_AnimationQueueEntry_AnimationInfo();
-            copy_AnimationQueueEntry_AnimationInfo(to->animEntryInfo, from->animEntryInfo);
-        }
-        else if (from->animEntryInfo == NULL)
-        {
-            free(to->animEntryInfo);
-            to->animEntryInfo = NULL;
-        }
-        else if (to->animEntryInfo != NULL && from->animEntryInfo != NULL)
-        {
-            copy_AnimationQueueEntry_AnimationInfo(to->animEntryInfo, from->animEntryInfo);
-        }
-    }
-
+    to->HvkAnim_AnimInfoArrayElem = from->HvkAnim_AnimInfoArrayElem;
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
 }
 
@@ -948,26 +945,7 @@ ChrCtrl_AnimationQueueEntry* init_ChrCtrl_AnimationQueueEntry()
 {
     ChrCtrl_AnimationQueueEntry* local_AnimationQueueEntry = (ChrCtrl_AnimationQueueEntry*)malloc_(sizeof(ChrCtrl_AnimationQueueEntry));
 
-    local_AnimationQueueEntry->animEntryInfo = init_AnimationQueueEntry_AnimationInfo();
-
     return local_AnimationQueueEntry;
-}
-
-void copy_AnimationQueueEntry_AnimationInfo(AnimationQueueEntry_AnimationInfo* to, AnimationQueueEntry_AnimationInfo* from)
-{
-    //since this object is being allocated in-game as needed by us, we need to save everything in it. can't rely on stuff we don't care about being in there already
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-    to->hkaAnimationBinding = from->hkaAnimationBinding;
-    to->unk = from->unk;
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
-    to->unk2 = from->unk2;
-}
-
-AnimationQueueEntry_AnimationInfo* init_AnimationQueueEntry_AnimationInfo()
-{
-    AnimationQueueEntry_AnimationInfo* local_AnimationQueueEntry_AnimationInfo = (AnimationQueueEntry_AnimationInfo*)malloc_(sizeof(AnimationQueueEntry_AnimationInfo));
-
-    return local_AnimationQueueEntry_AnimationInfo;
 }
 
 void copy_AnimationQueue(AnimationQueue* to, AnimationQueue* from)
@@ -1002,12 +980,12 @@ void copy_AnimationQueue_Entry(AnimationQueue_Entry* to, AnimationQueue_Entry* f
     {
         FATALERROR("AnimationQueue_Entry->field0x10_size is %d, max supported is 8 entries", to->field0x10_size);
     }
-    if (to->field0x10 == NULL)
+    if (field0x10_len > 0 && to->field0x10 == NULL)
     {
         //need to manually alloc the array for the game
-        //to->field0x10 = (AnimationQueue_Entry_sub1_field0x10**)(**(*(falloc***)to->padding_1[0] + 0x50))(to->padding_1[0], field0x10_len * 8, 8);
-        //memset(to->field0x10, 0, field0x10_len * 8);
-        return;
+        ConsoleWrite("AnimationQueue_Entry->field0x10 alloc");
+        to->field0x10 = (AnimationQueue_Entry_sub1_field0x10**)(**(*(falloc***)to->padding_1[0] + 0x50))(to->padding_1[0], field0x10_len * 8, 8);
+        memset(to->field0x10, 0, field0x10_len * 8);
     }
 
     for (size_t i = 0; i < field0x10_len; i++)
@@ -1019,8 +997,8 @@ void copy_AnimationQueue_Entry(AnimationQueue_Entry* to, AnimationQueue_Entry* f
         if (to->field0x10[i] == NULL)
         {
             //need to manually alloc the entry for the game
-            //from->field0x10[i] = (AnimationQueue_Entry_sub1_field0x10*)(**(*(falloc***)to->padding_1[0] + 0x50))(to->padding_1[0], 2 * 8, 8);
-            break;
+            ConsoleWrite("AnimationQueue_Entry->field0x10 entry alloc");
+            from->field0x10[i] = (AnimationQueue_Entry_sub1_field0x10*)(**(*(falloc***)to->padding_1[0] + 0x50))(to->padding_1[0], 2 * 8, 8);
         }
         copy_AnimationQueue_Entry_sub1_field0x10(to->field0x10[i], from->field0x10[i]);
     }
