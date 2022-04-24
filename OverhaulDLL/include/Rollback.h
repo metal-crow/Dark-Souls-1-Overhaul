@@ -84,8 +84,6 @@ void copy_AnimationMediatorStateEntry(AnimationMediatorStateEntry* to, Animation
 AnimationMediatorStateEntry* init_AnimationMediatorStateEntry();
 void copy_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to, ChrCtrl_AnimationQueue* from, bool to_game);
 ChrCtrl_AnimationQueue* init_ChrCtrl_AnimationQueue();
-void copy_ChrCtrl_AnimationQueue_field0x20(ChrCtrl_AnimationQueue_field0x20* to, ChrCtrl_AnimationQueue_field0x20* from, bool to_game);
-ChrCtrl_AnimationQueue_field0x20* init_ChrCtrl_AnimationQueue_field0x20();
 void copy_hkaAnimatedSkeleton(hkaAnimatedSkeleton* to, hkaAnimatedSkeleton* from);
 hkaAnimatedSkeleton* init_hkaAnimatedSkeleton();
 void copy_hkaDefaultAnimationControl(hkaDefaultAnimationControl* to, hkaDefaultAnimationControl* from);
