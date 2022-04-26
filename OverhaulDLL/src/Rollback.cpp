@@ -974,21 +974,41 @@ void copy_AnimationQueue_Entry(AnimationQueue_Entry* to, AnimationQueue_Entry* f
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
-    to->field0x10_size = from->field0x10_size;
-    uint64_t field0x10_len = to->field0x10_size / 8;
-    if (field0x10_len > 8)
+    copy_AnimationQueue_Entry_sub1(&to->sub1, &from->sub1);
+    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    memcpy(to->data_3, from->data_3, sizeof(to->data_3));
+}
+
+AnimationQueue_Entry* init_AnimationQueue_Entry()
+{
+    AnimationQueue_Entry* local_AnimationQueue_Entry = (AnimationQueue_Entry*)malloc_(sizeof(AnimationQueue_Entry));
+
+    AnimationQueue_Entry_sub1* local_AnimationQueue_Entry_sub1 = init_AnimationQueue_Entry_sub1();
+    local_AnimationQueue_Entry->sub1 = *local_AnimationQueue_Entry_sub1;
+    free(local_AnimationQueue_Entry_sub1);
+
+    return local_AnimationQueue_Entry;
+}
+
+void copy_AnimationQueue_Entry_sub1(AnimationQueue_Entry_sub1* to, AnimationQueue_Entry_sub1* from)
+{
+    to->field0x10_cap = from->field0x10_cap;
+    to->unk = from->unk;
+    to->field0x10_len = from->field0x10_len;
+    if (to->field0x10_cap > 8)
     {
-        FATALERROR("AnimationQueue_Entry->field0x10_size is %d, max supported is 8 entries", to->field0x10_size);
-    }
-    if (field0x10_len > 0 && to->field0x10 == NULL)
-    {
-        //need to manually alloc the array for the game
-        ConsoleWrite("AnimationQueue_Entry->field0x10 alloc");
-        to->field0x10 = (AnimationQueue_Entry_sub1_field0x10**)(**(*(falloc***)to->padding_1[0] + 0x50))(to->padding_1[0], field0x10_len * 8, 8);
-        memset(to->field0x10, 0, field0x10_len * 8);
+        FATALERROR("AnimationQueue_Entry->field0x10_cap is %d, max supported is 8 entries", to->field0x10_cap);
     }
 
-    for (size_t i = 0; i < field0x10_len; i++)
+    if (to->field0x10_cap > 0 && to->field0x10 == NULL)
+    {
+        //need to manually alloc the array for the game
+        ConsoleWrite("AnimationQueue_Entry(%p)->field0x10 alloc", to);
+        to->field0x10 = (AnimationQueue_Entry_sub1_field0x10**)(*(falloc*)*(uint64_t*)(*((uint64_t*)to->padding_1[0]) + 0x50))(to->padding_1[0], (to->field0x10_cap) * 8, 8);
+        memset(to->field0x10, 0, to->field0x10_cap*8);
+    }
+
+    for (size_t i = 0; i < to->field0x10_len; i++)
     {
         if (from->field0x10[i] == NULL)
         {
@@ -998,25 +1018,23 @@ void copy_AnimationQueue_Entry(AnimationQueue_Entry* to, AnimationQueue_Entry* f
         {
             //need to manually alloc the entry for the game
             ConsoleWrite("AnimationQueue_Entry->field0x10 entry alloc");
-            from->field0x10[i] = (AnimationQueue_Entry_sub1_field0x10*)(**(*(falloc***)to->padding_1[0] + 0x50))(to->padding_1[0], 2 * 8, 8);
+            to->field0x10[i] = (AnimationQueue_Entry_sub1_field0x10*)(*(falloc*)*(uint64_t*)(*((uint64_t*)to->padding_1[0]) + 0x50))(to->padding_1[0], 2 * 8, 8);
         }
         copy_AnimationQueue_Entry_sub1_field0x10(to->field0x10[i], from->field0x10[i]);
     }
-    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
-    memcpy(to->data_3, from->data_3, sizeof(to->data_3));
 }
 
-AnimationQueue_Entry* init_AnimationQueue_Entry()
+AnimationQueue_Entry_sub1* init_AnimationQueue_Entry_sub1()
 {
-    AnimationQueue_Entry* local_AnimationQueue_Entry = (AnimationQueue_Entry*)malloc_(sizeof(AnimationQueue_Entry));
+    AnimationQueue_Entry_sub1* local_AnimationQueue_Entry_sub1 = (AnimationQueue_Entry_sub1*)malloc_(sizeof(AnimationQueue_Entry_sub1));
 
-    local_AnimationQueue_Entry->field0x10 = (AnimationQueue_Entry_sub1_field0x10**)malloc_(sizeof(AnimationQueue_Entry_sub1_field0x10*) * 8);
+    local_AnimationQueue_Entry_sub1->field0x10 = (AnimationQueue_Entry_sub1_field0x10**)malloc_(sizeof(AnimationQueue_Entry_sub1_field0x10*) * 8);
     for (size_t i = 0; i < 8; i++)
     {
-        local_AnimationQueue_Entry->field0x10[i] = (AnimationQueue_Entry_sub1_field0x10*)malloc_(sizeof(AnimationQueue_Entry_sub1_field0x10));
+        local_AnimationQueue_Entry_sub1->field0x10[i] = (AnimationQueue_Entry_sub1_field0x10*)malloc_(sizeof(AnimationQueue_Entry_sub1_field0x10));
     }
 
-    return local_AnimationQueue_Entry;
+    return local_AnimationQueue_Entry_sub1;
 }
 
 void copy_AnimationQueue_Entry_sub1_field0x10(AnimationQueue_Entry_sub1_field0x10* to, AnimationQueue_Entry_sub1_field0x10* from)

@@ -102,6 +102,8 @@ void copy_AnimationQueue(AnimationQueue* to, AnimationQueue* from);
 AnimationQueue* init_AnimationQueue();
 void copy_AnimationQueue_Entry(AnimationQueue_Entry* to, AnimationQueue_Entry* from);
 AnimationQueue_Entry* init_AnimationQueue_Entry();
+void copy_AnimationQueue_Entry_sub1(AnimationQueue_Entry_sub1* to, AnimationQueue_Entry_sub1* from);
+AnimationQueue_Entry_sub1* init_AnimationQueue_Entry_sub1();
 void copy_AnimationQueue_Entry_sub1_field0x10(AnimationQueue_Entry_sub1_field0x10* to, AnimationQueue_Entry_sub1_field0x10* from);
 
 #endif
