@@ -16,6 +16,8 @@ void* malloc_(size_t size)
     return out;
 }
 
+typedef void* falloc(uint64_t, uint64_t, uint32_t);
+
 extern "C" {
     uint64_t sendType1NetMessage_injection_return;
     void sendType1NetMessage_injection();
@@ -611,14 +613,58 @@ WalkAnim_Twist* init_WalkAnim_Twist()
 
 void copy_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* to, WalkAnim_Twist_Field0x228Elem* from)
 {
-    //TODO
+    to->field0x10_cap = from->field0x10_cap;
+    to->unk = from->unk;
+    to->field0x10_len = from->field0x10_len;
+    if (to->field0x10_cap > 8)
+    {
+        FATALERROR("WalkAnim_Twist_Field0x228Elem->field0x10_cap is %d, max supported is 8 entries", to->field0x10_cap);
+    }
+
+    if (to->field0x10_cap > 0 && to->field0x10 == NULL)
+    {
+        //need to manually alloc the array for the game
+        ConsoleWrite("WalkAnim_Twist_Field0x228Elem(%p)->field0x10 alloc", to);
+        to->field0x10 = (WalkAnim_Twist_Field0x228Elem_field0x10elem**)(*(falloc*)*(uint64_t*)(*((uint64_t*)to->padding_1[0]) + 0x50))(to->padding_1[0], (to->field0x10_cap) * 8, 8);
+        memset(to->field0x10, 0, to->field0x10_cap * 8);
+    }
+
+    //this array is allocated and also pre-populated with pointers in it's entries
+    for (size_t i = 0; i < to->field0x10_cap; i++)
+    {
+        if (from->field0x10[i] == NULL && to->field0x10[i] != NULL)
+        {
+            to->field0x10[i] = NULL;
+        }
+        if (to->field0x10[i] == NULL && from->field0x10[i] != NULL)
+        {
+            //need to manually alloc the entry for the game
+            ConsoleWrite("WalkAnim_Twist_Field0x228Elem->field0x10 entry alloc");
+            to->field0x10[i] = (WalkAnim_Twist_Field0x228Elem_field0x10elem*)(*(falloc*)*(uint64_t*)(*((uint64_t*)to->padding_1[0]) + 0x50))(to->padding_1[0], 4 * 4, 4);
+        }
+        if (to->field0x10[i] != NULL && from->field0x10[i] != NULL)
+        {
+            copy_WalkAnim_Twist_Field0x228Elem_field0x10elem(to->field0x10[i], from->field0x10[i]);
+        }
+    }
 }
 
 WalkAnim_Twist_Field0x228Elem* init_WalkAnim_Twist_Field0x228Elem()
 {
     WalkAnim_Twist_Field0x228Elem* local_WalkAnim_Twist_Field0x228Elem = (WalkAnim_Twist_Field0x228Elem*)malloc_(sizeof(WalkAnim_Twist_Field0x228Elem));
-    //TODO
+
+    local_WalkAnim_Twist_Field0x228Elem->field0x10 = (WalkAnim_Twist_Field0x228Elem_field0x10elem**)malloc_(sizeof(WalkAnim_Twist_Field0x228Elem_field0x10elem*) * 8);
+    for (size_t i = 0; i < 8; i++)
+    {
+        local_WalkAnim_Twist_Field0x228Elem->field0x10[i] = (WalkAnim_Twist_Field0x228Elem_field0x10elem*)malloc_(sizeof(WalkAnim_Twist_Field0x228Elem_field0x10elem));
+    }
+
     return local_WalkAnim_Twist_Field0x228Elem;
+}
+
+void copy_WalkAnim_Twist_Field0x228Elem_field0x10elem(WalkAnim_Twist_Field0x228Elem_field0x10elem* to, WalkAnim_Twist_Field0x228Elem_field0x10elem* from)
+{
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 }
 
 void copy_ActionCtrl(ActionCtrl* to, ActionCtrl* from)
@@ -968,8 +1014,6 @@ AnimationQueue* init_AnimationQueue()
     return local_AnimationQueue;
 }
 
-typedef void* falloc(uint64_t, uint64_t, uint32_t);
-
 void copy_AnimationQueue_Entry(AnimationQueue_Entry* to, AnimationQueue_Entry* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
@@ -1008,6 +1052,7 @@ void copy_AnimationQueue_Entry_sub1(AnimationQueue_Entry_sub1* to, AnimationQueu
         memset(to->field0x10, 0, to->field0x10_cap*8);
     }
 
+    //this array is allocated and not pre-populated with pointers in it's entries
     for (size_t i = 0; i < to->field0x10_len; i++)
     {
         if (from->field0x10[i] == NULL)

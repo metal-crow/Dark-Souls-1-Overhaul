@@ -69,6 +69,7 @@ void copy_WalkAnim_Twist(WalkAnim_Twist* to, WalkAnim_Twist* from);
 WalkAnim_Twist* init_WalkAnim_Twist();
 void copy_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* to, WalkAnim_Twist_Field0x228Elem* from);
 WalkAnim_Twist_Field0x228Elem* init_WalkAnim_Twist_Field0x228Elem();
+void copy_WalkAnim_Twist_Field0x228Elem_field0x10elem(WalkAnim_Twist_Field0x228Elem_field0x10elem* to, WalkAnim_Twist_Field0x228Elem_field0x10elem* from);
 void copy_ActionCtrl(ActionCtrl* to, ActionCtrl* from);
 ActionCtrl* init_ActionCtrl();
 void copy_ActionCtrl_0x30Substruct(ActionCtrl_0x30Substruct* to, ActionCtrl_0x30Substruct* from);

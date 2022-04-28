@@ -27,6 +27,7 @@ typedef struct HavokChara HavokChara;
 typedef struct EzState_detail_EzStateMachineImpl EzState_detail_EzStateMachineImpl;
 typedef struct ActionCtrl_0x30Substruct ActionCtrl_0x30Substruct;
 typedef struct ActionCtrl ActionCtrl;
+typedef struct WalkAnim_Twist_Field0x228Elem_field0x10elem WalkAnim_Twist_Field0x228Elem_field0x10elem;
 typedef struct WalkAnim_Twist_Field0x228Elem WalkAnim_Twist_Field0x228Elem;
 typedef struct WalkAnim_Twist WalkAnim_Twist;
 typedef struct ChrCtrl ChrCtrl;
@@ -347,21 +348,23 @@ static_assert(offsetof(ActionCtrl, data_1) == 0x70);
 static_assert(offsetof(ActionCtrl, data_2) == 0x548);
 static_assert(sizeof(ActionCtrl) == 0x560);
 
-struct WalkAnim_Twist_Field0x228Elem
+struct WalkAnim_Twist_Field0x228Elem_field0x10elem
 {
-    uint8_t padding_0[8];
-    void* data_0; //i don't know what this is
-    uint64_t* data_1; //TODO how long is this?
-    uint64_t data_2;
-    uint64_t data_3;
-    WalkAnim_Twist_Field0x228Elem* next;
+    uint32_t data_0[4];
 };
 
-static_assert(offsetof(WalkAnim_Twist_Field0x228Elem, data_0) == 8);
-static_assert(offsetof(WalkAnim_Twist_Field0x228Elem, data_1) == 0x10);
-static_assert(offsetof(WalkAnim_Twist_Field0x228Elem, data_2) == 0x18);
-static_assert(offsetof(WalkAnim_Twist_Field0x228Elem, data_3) == 0x20);
-static_assert(offsetof(WalkAnim_Twist_Field0x228Elem, next) == 0x28);
+static_assert(sizeof(WalkAnim_Twist_Field0x228Elem_field0x10elem) == 0x10);
+
+struct WalkAnim_Twist_Field0x228Elem
+{
+    uint64_t padding_1[2]; //pointer to unchanging values
+    WalkAnim_Twist_Field0x228Elem_field0x10elem** field0x10;
+    uint64_t field0x10_cap;
+    uint64_t unk;
+    uint64_t field0x10_len;
+};
+
+static_assert(offsetof(WalkAnim_Twist_Field0x228Elem, field0x10) == 0x10);
 static_assert(sizeof(WalkAnim_Twist_Field0x228Elem) == 0x30);
 
 struct WalkAnim_Twist
