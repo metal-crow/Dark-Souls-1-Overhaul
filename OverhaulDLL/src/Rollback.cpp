@@ -723,13 +723,77 @@ HavokChara* init_HavokChara()
 
 void copy_hkpCharacterProxy(hkpCharacterProxy* to, hkpCharacterProxy* from)
 {
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    to->data_0 = from->data_0;
+
+    to->field0x20_cap = from->field0x20_cap;
+    to->field0x20_len = from->field0x20_len;
+    if (to->field0x20_cap > 8)
+    {
+        FATALERROR("Got %d number of entries for hkpCharacterProxy->field0x20. Only support a max of 8.", from->field0x20_cap);
+    }
+    memcpy(to->field0x20, from->field0x20, 0x40 * to->field0x20_cap);
+
+    to->field0x30_cap = from->field0x30_cap;
+    to->field0x30_len = from->field0x30_len;
+    if (to->field0x30_cap > 8)
+    {
+        FATALERROR("Got %d number of entries for hkpCharacterProxy->field0x30. Only support a max of 8.", from->field0x30_cap);
+    }
+    memcpy(to->field0x30, from->field0x30, 8 * to->field0x30_cap);
+
+    //to->field0x40_cap = from->field0x40_cap;
+    //to->field0x40_len = from->field0x40_len;
+    //if (to->field0x40_cap > 8)
+    //{
+    //    FATALERROR("Got %d number of entries for hkpCharacterProxy->field0x40. Only support a max of 8.", from->field0x40_cap);
+    //}
+    //memcpy(to->field0x40, from->field0x40, X * to->field0x40_cap);
+
+    //to->field0x50_cap = from->field0x50_cap;
+    //to->field0x50_len = from->field0x50_len;
+    //if (to->field0x50_cap > 8)
+    //{
+    //    FATALERROR("Got %d number of entries for hkpCharacterProxy->field0x50. Only support a max of 8.", from->field0x50_cap);
+    //}
+    //memcpy(to->field0x50, from->field0x50, X * to->field0x50_cap);
+
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    copy_hkpSimpleShapePhantom(to->HkpSimpleShapePhantom, from->HkpSimpleShapePhantom);
+    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+
+    to->field0xc8_cap = from->field0xc8_cap;
+    to->field0xc8_len = from->field0xc8_len;
+    if (to->field0xc8_cap > 8)
+    {
+        FATALERROR("Got %d number of entries for hkpCharacterProxy->field0xc8. Only support a max of 8.", from->field0xc8_cap);
+    }
+    memcpy(to->field0xc8, from->field0xc8, 8 * to->field0xc8_cap);
+
+    memcpy(to->data_3, from->data_3, sizeof(to->data_3));
 }
 
 hkpCharacterProxy* init_hkpCharacterProxy()
 {
     hkpCharacterProxy* local_hkpCharacterProxy = (hkpCharacterProxy*)malloc_(sizeof(hkpCharacterProxy));
+
+    local_hkpCharacterProxy->field0x20 = (uint8_t*)malloc_(0x40 * 8);
+    local_hkpCharacterProxy->field0x30 = (uint64_t*)malloc_(8 * 8);
+    //local_hkpCharacterProxy->field0x40 = (uint8_t*)malloc_(X * 8);
+    //local_hkpCharacterProxy->field0x50 = (uint8_t*)malloc_(X * 8);
+    local_hkpCharacterProxy->HkpSimpleShapePhantom = init_hkpSimpleShapePhantom();
+    local_hkpCharacterProxy->field0xc8 = (uint64_t*)malloc_(8 * 8);
+
     return local_hkpCharacterProxy;
+}
+
+void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, hkpSimpleShapePhantom* from)
+{
+
+}
+
+hkpSimpleShapePhantom* init_hkpSimpleShapePhantom()
+{
+
 }
 
 void copy_AnimationMediator(AnimationMediator* to, AnimationMediator* from)

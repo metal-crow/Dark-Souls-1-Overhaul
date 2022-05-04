@@ -79,6 +79,8 @@ void copy_HavokChara(HavokChara* to, HavokChara* from);
 HavokChara* init_HavokChara();
 void copy_hkpCharacterProxy(hkpCharacterProxy* to, hkpCharacterProxy* from);
 hkpCharacterProxy* init_hkpCharacterProxy();
+void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, hkpSimpleShapePhantom* from);
+hkpSimpleShapePhantom* init_hkpSimpleShapePhantom();
 void copy_AnimationMediator(AnimationMediator* to, AnimationMediator* from);
 AnimationMediator* init_AnimationMediator();
 void copy_AnimationMediatorStateEntry(AnimationMediatorStateEntry* to, AnimationMediatorStateEntry* from);

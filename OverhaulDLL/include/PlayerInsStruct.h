@@ -22,6 +22,7 @@ typedef struct ChrCtrl_AnimationQueue ChrCtrl_AnimationQueue;
 typedef struct ChrCtrl_AnimationQueue_field0x20 ChrCtrl_AnimationQueue_field0x20;
 typedef struct AnimationMediatorStateEntry AnimationMediatorStateEntry;
 typedef struct AnimationMediator AnimationMediator;
+typedef struct hkpSimpleShapePhantom hkpSimpleShapePhantom;
 typedef struct hkpCharacterProxy hkpCharacterProxy;
 typedef struct HavokChara HavokChara;
 typedef struct EzState_detail_EzStateMachineImpl EzState_detail_EzStateMachineImpl;
@@ -230,7 +231,7 @@ struct ChrCtrl_AnimationQueue
     ChrCtrl_AnimationQueue_field0x10* field0x10;
     hkaAnimatedSkeleton* HkaAnimatedSkeleton;
     ChrCtrl_AnimationQueue_field0x20* field0x20;
-    uint64_t padding_0[7]; //unknown pointers
+    uint64_t padding_0[7]; //unimportant pointers. setting to null has no effect
     uint8_t data_1[0x10];
     uint8_t data_2[0x10];
     void* padding_2;
@@ -277,14 +278,49 @@ static_assert(offsetof(AnimationMediator, animationQueue) == 0x1460);
 static_assert(offsetof(AnimationMediator, data_0) == 0x1468);
 static_assert(sizeof(AnimationMediator) == 0x1490);
 
-struct hkpCharacterProxy
+struct hkpSimpleShapePhantom
 {
-    uint8_t padding_0[0x60]; //tbh i don't know what this really is. maybe important
-    uint8_t data_0[0x20];
-    uint8_t padding_1[0x70]; //tbh i don't know what this really is. maybe important
+
 };
 
-static_assert(offsetof(hkpCharacterProxy, data_0) == 0x60);
+static_assert(sizeof(hkpSimpleShapePhantom) == 0x1c0);
+
+struct hkpCharacterProxy
+{
+    uint64_t padding_0;
+    uint64_t data_0;
+    uint64_t padding_1[2];
+    uint8_t* field0x20; //each elem is 0x40 size. assuming it's just pure data
+    uint32_t field0x20_len;
+    uint32_t field0x20_cap;
+    uint64_t* field0x30; //each elem is 8 size
+    uint32_t field0x30_len;
+    uint32_t field0x30_cap;
+    void* field0x40; //each elem is ?? size. This appears to be unused
+    uint32_t field0x40_len;
+    uint32_t field0x40_cap;
+    void* field0x50; //each elem is ?? size. This appears to be unused
+    uint32_t field0x50_len;
+    uint32_t field0x50_cap;
+    uint8_t data_1[0x20];
+    hkpSimpleShapePhantom* HkpSimpleShapePhantom;
+    uint8_t data_2[0x40];
+    uint64_t* field0xc8; //each elem is 8 size
+    uint32_t field0xc8_len;
+    uint32_t field0xc8_cap;
+    uint8_t data_3[24];
+};
+
+static_assert(offsetof(hkpCharacterProxy, data_0) == 0x8);
+static_assert(offsetof(hkpCharacterProxy, field0x20) == 0x20);
+static_assert(offsetof(hkpCharacterProxy, field0x30) == 0x30);
+static_assert(offsetof(hkpCharacterProxy, field0x40) == 0x40);
+static_assert(offsetof(hkpCharacterProxy, field0x50) == 0x50);
+static_assert(offsetof(hkpCharacterProxy, data_1) == 0x60);
+static_assert(offsetof(hkpCharacterProxy, HkpSimpleShapePhantom) == 0x80);
+static_assert(offsetof(hkpCharacterProxy, data_2) == 0x88);
+static_assert(offsetof(hkpCharacterProxy, field0xc8) == 0xc8);
+static_assert(offsetof(hkpCharacterProxy, data_3) == 0xd8);
 static_assert(sizeof(hkpCharacterProxy) == 0xf0);
 
 struct HavokChara
