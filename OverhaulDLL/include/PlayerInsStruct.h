@@ -22,7 +22,10 @@ typedef struct ChrCtrl_AnimationQueue ChrCtrl_AnimationQueue;
 typedef struct ChrCtrl_AnimationQueue_field0x20 ChrCtrl_AnimationQueue_field0x20;
 typedef struct AnimationMediatorStateEntry AnimationMediatorStateEntry;
 typedef struct AnimationMediator AnimationMediator;
+typedef struct hkpCharacterProxy_field0x20elem hkpCharacterProxy_field0x20elem;
+typedef struct hkpRigidBody hkpRigidBody;
 typedef struct hkpSimpleShapePhantom hkpSimpleShapePhantom;
+typedef struct ChrInsProxyListener ChrInsProxyListener;
 typedef struct hkpCharacterProxy hkpCharacterProxy;
 typedef struct HavokChara HavokChara;
 typedef struct EzState_detail_EzStateMachineImpl EzState_detail_EzStateMachineImpl;
@@ -278,22 +281,47 @@ static_assert(offsetof(AnimationMediator, animationQueue) == 0x1460);
 static_assert(offsetof(AnimationMediator, data_0) == 0x1468);
 static_assert(sizeof(AnimationMediator) == 0x1490);
 
+struct hkpCharacterProxy_field0x20elem
+{
+    uint8_t data_0[0x20];
+    void* pointer_0; //this seems to be a static pointer
+    uint64_t data_1;
+    void* pointer_1; //this seems to be a static pointer
+    uint64_t data_2;
+};
+
+static_assert(sizeof(hkpCharacterProxy_field0x20elem) == 0x40);
+
+struct hkpRigidBody
+{
+
+};
+
+//static_assert(sizeof(hkpRigidBody) == 0x2c0);
+
 struct hkpSimpleShapePhantom
 {
 
 };
 
-static_assert(sizeof(hkpSimpleShapePhantom) == 0x1c0);
+//static_assert(sizeof(hkpSimpleShapePhantom) == 0x1c0);
+
+struct ChrInsProxyListener
+{
+    uint8_t data_0[0x30]; //unsure all of what is in here, but copying the vtable pointers won't hurt
+};
+
+static_assert(sizeof(ChrInsProxyListener) == 0x30);
 
 struct hkpCharacterProxy
 {
     uint64_t padding_0;
     uint64_t data_0;
     uint64_t padding_1[2];
-    uint8_t* field0x20; //each elem is 0x40 size. assuming it's just pure data
+    hkpCharacterProxy_field0x20elem* field0x20; //each elem is 0x40 size.
     uint32_t field0x20_len;
     uint32_t field0x20_cap;
-    uint64_t* field0x30; //each elem is 8 size
+    hkpRigidBody** field0x30; //each elem is a pointer
     uint32_t field0x30_len;
     uint32_t field0x30_cap;
     void* field0x40; //each elem is ?? size. This appears to be unused
@@ -305,7 +333,7 @@ struct hkpCharacterProxy
     uint8_t data_1[0x20];
     hkpSimpleShapePhantom* HkpSimpleShapePhantom;
     uint8_t data_2[0x40];
-    uint64_t* field0xc8; //each elem is 8 size
+    ChrInsProxyListener** field0xc8; //each elem is a pointer
     uint32_t field0xc8_len;
     uint32_t field0xc8_cap;
     uint8_t data_3[24];

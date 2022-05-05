@@ -725,50 +725,82 @@ void copy_hkpCharacterProxy(hkpCharacterProxy* to, hkpCharacterProxy* from)
 {
     to->data_0 = from->data_0;
 
-    to->field0x20_cap = from->field0x20_cap;
-    to->field0x20_len = from->field0x20_len;
+    if (from->field0x20 == NULL || from->field0x20_cap == 0)
+    {
+        to->field0x20_cap = 0;
+        to->field0x20_len = 0;
+    }
+    else
+    {
+        to->field0x20_cap = from->field0x20_cap;
+        to->field0x20_len = from->field0x20_len;
+    }
     if (to->field0x20_cap > 8)
     {
         FATALERROR("Got %d number of entries for hkpCharacterProxy->field0x20. Only support a max of 8.", from->field0x20_cap);
     }
-    memcpy(to->field0x20, from->field0x20, 0x40 * to->field0x20_cap);
+    for (size_t i = 0; i < to->field0x20_len; i++)
+    {
+        hkpCharacterProxy_field0x20elem* from_entry = from->field0x20 + sizeof(hkpCharacterProxy_field0x20elem)*i;
+        hkpCharacterProxy_field0x20elem* to_entry = to->field0x20 + sizeof(hkpCharacterProxy_field0x20elem)*i;
+        copy_hkpCharacterProxy_field0x20elem(to_entry, from_entry);
+    }
 
-    to->field0x30_cap = from->field0x30_cap;
-    to->field0x30_len = from->field0x30_len;
+    if (from->field0x30 == NULL || from->field0x30_cap == 0)
+    {
+        to->field0x30_cap = 0;
+        to->field0x30_len = 0;
+    }
+    else
+    {
+        to->field0x30_cap = from->field0x30_cap;
+        to->field0x30_len = from->field0x30_len;
+    }
     if (to->field0x30_cap > 8)
     {
         FATALERROR("Got %d number of entries for hkpCharacterProxy->field0x30. Only support a max of 8.", from->field0x30_cap);
     }
-    memcpy(to->field0x30, from->field0x30, 8 * to->field0x30_cap);
-
-    //to->field0x40_cap = from->field0x40_cap;
-    //to->field0x40_len = from->field0x40_len;
-    //if (to->field0x40_cap > 8)
-    //{
-    //    FATALERROR("Got %d number of entries for hkpCharacterProxy->field0x40. Only support a max of 8.", from->field0x40_cap);
-    //}
-    //memcpy(to->field0x40, from->field0x40, X * to->field0x40_cap);
-
-    //to->field0x50_cap = from->field0x50_cap;
-    //to->field0x50_len = from->field0x50_len;
-    //if (to->field0x50_cap > 8)
-    //{
-    //    FATALERROR("Got %d number of entries for hkpCharacterProxy->field0x50. Only support a max of 8.", from->field0x50_cap);
-    //}
-    //memcpy(to->field0x50, from->field0x50, X * to->field0x50_cap);
+    for (size_t i = 0; i < to->field0x30_cap; i++)
+    {
+        if (from->field0x30[i] == NULL)
+        {
+            to->field0x30[i] = NULL;
+        }
+        else
+        {
+            copy_hkpRigidBody(to->field0x30[i], from->field0x30[i]);
+        }
+    }
 
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     copy_hkpSimpleShapePhantom(to->HkpSimpleShapePhantom, from->HkpSimpleShapePhantom);
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
 
-    to->field0xc8_cap = from->field0xc8_cap;
-    to->field0xc8_len = from->field0xc8_len;
+    if (from->field0xc8 == NULL || from->field0xc8_cap == 0)
+    {
+        to->field0xc8_cap = 0;
+        to->field0xc8_len = 0;
+    }
+    else
+    {
+        to->field0xc8_cap = from->field0xc8_cap;
+        to->field0xc8_len = from->field0xc8_len;
+    }
     if (to->field0xc8_cap > 8)
     {
         FATALERROR("Got %d number of entries for hkpCharacterProxy->field0xc8. Only support a max of 8.", from->field0xc8_cap);
     }
-    memcpy(to->field0xc8, from->field0xc8, 8 * to->field0xc8_cap);
-
+    for (size_t i = 0; i < to->field0xc8_cap; i++)
+    {
+        if (from->field0xc8[i] == NULL)
+        {
+            to->field0xc8[i] = NULL;
+        }
+        else
+        {
+            copy_ChrInsProxyListener(to->field0xc8[i], from->field0xc8[i]);
+        }
+    }
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
 }
 
@@ -776,24 +808,76 @@ hkpCharacterProxy* init_hkpCharacterProxy()
 {
     hkpCharacterProxy* local_hkpCharacterProxy = (hkpCharacterProxy*)malloc_(sizeof(hkpCharacterProxy));
 
-    local_hkpCharacterProxy->field0x20 = (uint8_t*)malloc_(0x40 * 8);
-    local_hkpCharacterProxy->field0x30 = (uint64_t*)malloc_(8 * 8);
-    //local_hkpCharacterProxy->field0x40 = (uint8_t*)malloc_(X * 8);
-    //local_hkpCharacterProxy->field0x50 = (uint8_t*)malloc_(X * 8);
+    local_hkpCharacterProxy->field0x20 = (hkpCharacterProxy_field0x20elem*)malloc_(sizeof(hkpCharacterProxy_field0x20elem) * 8);
+    for (int i = 0; i < 8; i++)
+    {
+        hkpCharacterProxy_field0x20elem* local_hkpCharacterProxy_field0x20elem = init_hkpCharacterProxy_field0x20elem();
+        local_hkpCharacterProxy->field0x20[i] = *local_hkpCharacterProxy_field0x20elem;
+        free(local_hkpCharacterProxy_field0x20elem);
+    }
+    local_hkpCharacterProxy->field0x30 = (hkpRigidBody**)malloc_(sizeof(hkpRigidBody*) * 8);
+    for (int i = 0; i < 8; i++)
+    {
+        local_hkpCharacterProxy->field0x30[i] = init_hkpRigidBody();
+    }
     local_hkpCharacterProxy->HkpSimpleShapePhantom = init_hkpSimpleShapePhantom();
-    local_hkpCharacterProxy->field0xc8 = (uint64_t*)malloc_(8 * 8);
+    local_hkpCharacterProxy->field0xc8 = (ChrInsProxyListener**)malloc_(sizeof(ChrInsProxyListener*) * 8);
+    for (int i = 0; i < 8; i++)
+    {
+        local_hkpCharacterProxy->field0xc8[i] = init_ChrInsProxyListener();
+    }
 
     return local_hkpCharacterProxy;
 }
 
+void copy_hkpCharacterProxy_field0x20elem(hkpCharacterProxy_field0x20elem* to, hkpCharacterProxy_field0x20elem* from)
+{
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    to->pointer_0 = from->pointer_0;
+    to->data_1 = from->data_1;
+    to->pointer_1 = from->pointer_1;
+    to->data_2 = from->data_2;
+}
+
+hkpCharacterProxy_field0x20elem* init_hkpCharacterProxy_field0x20elem()
+{
+    hkpCharacterProxy_field0x20elem* local_hkpCharacterProxy_field0x20elem = (hkpCharacterProxy_field0x20elem*)malloc_(sizeof(hkpCharacterProxy_field0x20elem));
+
+    return local_hkpCharacterProxy_field0x20elem;
+}
+
+void copy_hkpRigidBody(hkpRigidBody* to, hkpRigidBody* from)
+{
+    //TODO
+}
+
+hkpRigidBody* init_hkpRigidBody()
+{
+    //TODO
+    return NULL;
+}
+
 void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, hkpSimpleShapePhantom* from)
 {
-
+    //TODO
 }
 
 hkpSimpleShapePhantom* init_hkpSimpleShapePhantom()
 {
+    //TODO
+    return NULL;
+}
 
+void copy_ChrInsProxyListener(ChrInsProxyListener* to, ChrInsProxyListener* from)
+{
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+}
+
+ChrInsProxyListener* init_ChrInsProxyListener()
+{
+    ChrInsProxyListener* local_ChrInsProxyListener = (ChrInsProxyListener*)malloc_(sizeof(ChrInsProxyListener));
+
+    return local_ChrInsProxyListener;
 }
 
 void copy_AnimationMediator(AnimationMediator* to, AnimationMediator* from)
