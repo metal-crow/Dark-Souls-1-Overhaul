@@ -294,21 +294,21 @@ static_assert(sizeof(hkpCharacterProxy_field0x20elem) == 0x40);
 
 struct hkpRigidBody
 {
-
+    uint8_t padding_0[0x2c0];
 };
 
-//static_assert(sizeof(hkpRigidBody) == 0x2c0);
+static_assert(sizeof(hkpRigidBody) == 0x2c0);
 
 struct hkpSimpleShapePhantom
 {
-
+    uint8_t padding_0[0x1c0];
 };
 
-//static_assert(sizeof(hkpSimpleShapePhantom) == 0x1c0);
+static_assert(sizeof(hkpSimpleShapePhantom) == 0x1c0);
 
 struct ChrInsProxyListener
 {
-    uint8_t data_0[0x30]; //unsure all of what is in here, but copying the vtable pointers won't hurt
+    uint8_t padding_0[0x30];
 };
 
 static_assert(sizeof(ChrInsProxyListener) == 0x30);
@@ -318,10 +318,10 @@ struct hkpCharacterProxy
     uint64_t padding_0;
     uint64_t data_0;
     uint64_t padding_1[2];
-    hkpCharacterProxy_field0x20elem* field0x20; //each elem is 0x40 size.
+    hkpCharacterProxy_field0x20elem* field0x20; //Ignore this, seems to not be important.
     uint32_t field0x20_len;
     uint32_t field0x20_cap;
-    hkpRigidBody** field0x30; //each elem is a pointer
+    hkpRigidBody** field0x30; //Ignore this, seems to not be important.
     uint32_t field0x30_len;
     uint32_t field0x30_cap;
     void* field0x40; //each elem is ?? size. This appears to be unused
@@ -333,7 +333,7 @@ struct hkpCharacterProxy
     uint8_t data_1[0x20];
     hkpSimpleShapePhantom* HkpSimpleShapePhantom;
     uint8_t data_2[0x40];
-    ChrInsProxyListener** field0xc8; //each elem is a pointer
+    ChrInsProxyListener** field0xc8; //Ignore this, seems to not be important.
     uint32_t field0xc8_len;
     uint32_t field0xc8_cap;
     uint8_t data_3[24];
