@@ -730,7 +730,13 @@ struct ChrIns
     float resistCurseTotal;
     uint8_t padding_10[0x10];
     EntityThrowAnimationStatus* throw_animation_info;
-    uint8_t padding_11[0x120]; //todo more in here to be saved
+    uint8_t data_1[0x18];
+    uint64_t padding_self;
+    uint8_t data_2[0x50];
+    uint64_t padding_dbgmenu[3];
+    uint64_t data_3[3];
+    uint8_t padding_str[0x28];
+    uint8_t data_4[0x58];
 };
 
 static_assert(offsetof(ChrIns, playerCtrl) == 0x60+8);
@@ -757,6 +763,10 @@ static_assert(offsetof(ChrIns, resistPlagueTotal) == 0x424+8);
 static_assert(offsetof(ChrIns, resistBleedingTotal) == 0x428+8);
 static_assert(offsetof(ChrIns, resistCurseTotal) == 0x42c+8);
 static_assert(offsetof(ChrIns, throw_animation_info) == 0x440+8);
+static_assert(offsetof(ChrIns, data_1) == 0x448+8);
+static_assert(offsetof(ChrIns, data_2) == 0x468+8);
+static_assert(offsetof(ChrIns, data_3) == 0x4d0+8);
+static_assert(offsetof(ChrIns, data_4) == 0x510+8);
 static_assert(sizeof(ChrIns) == 0x570);
 
 struct PlayerGameData_AttributeInfo

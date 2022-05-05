@@ -300,6 +300,10 @@ void copy_ChrIns(ChrIns* to, ChrIns* from, bool to_game)
     to->resistBleedingTotal = from->resistBleedingTotal;
     to->resistCurseTotal = from->resistCurseTotal;
     copy_EntityThrowAnimationStatus(to->throw_animation_info, from->throw_animation_info);
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    memcpy(to->data_3, from->data_3, sizeof(to->data_3));
+    memcpy(to->data_4, from->data_4, sizeof(to->data_4));
 }
 
 ChrIns* init_ChrIns()
