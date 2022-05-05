@@ -27,6 +27,7 @@ typedef struct hkpRigidBody hkpRigidBody;
 typedef struct hkpSimpleShapePhantom hkpSimpleShapePhantom;
 typedef struct ChrInsProxyListener ChrInsProxyListener;
 typedef struct hkpCharacterProxy hkpCharacterProxy;
+typedef struct HitIns HitIns;
 typedef struct HavokChara HavokChara;
 typedef struct EzState_detail_EzStateMachineImpl EzState_detail_EzStateMachineImpl;
 typedef struct ActionCtrl_0x30Substruct ActionCtrl_0x30Substruct;
@@ -351,6 +352,11 @@ static_assert(offsetof(hkpCharacterProxy, field0xc8) == 0xc8);
 static_assert(offsetof(hkpCharacterProxy, data_3) == 0xd8);
 static_assert(sizeof(hkpCharacterProxy) == 0xf0);
 
+struct HitIns
+{
+
+};
+
 struct HavokChara
 {
     uint8_t data_0[0x38];
@@ -358,7 +364,13 @@ struct HavokChara
     void* padding_cap[2]; //neither of these seem to do anything
     void* padding_physShapePhantomIns[2]; //neither of these seem to do anything
     uint8_t data_1[0x98];
-    uint8_t padding_0[0x190]; //tbh i don't know what this really is. maybe important
+    uint64_t padding_1;
+    uint8_t data_2[0xe8];
+    HitIns* hitIns;
+    uint8_t data_3[0x58];
+    uint64_t padding_2;
+    void* padding_3; //points to an offset into PlayerIns
+    uint8_t data_4[0x38];
 };
 
 static_assert(offsetof(HavokChara, data_0) == 0);
@@ -366,7 +378,12 @@ static_assert(offsetof(HavokChara, char_proxy) == 0x38);
 static_assert(offsetof(HavokChara, padding_cap) == 0x40);
 static_assert(offsetof(HavokChara, padding_physShapePhantomIns) == 0x50);
 static_assert(offsetof(HavokChara, data_1) == 0x60);
-static_assert(sizeof(HavokChara) == 0x288);
+static_assert(offsetof(HavokChara, data_2) == 0x100);
+static_assert(offsetof(HavokChara, hitIns) == 0x1e8);
+static_assert(offsetof(HavokChara, data_3) == 0x1f0);
+static_assert(offsetof(HavokChara, padding_3) == 0x250);
+static_assert(offsetof(HavokChara, data_4) == 0x258);
+static_assert(sizeof(HavokChara) == 0x290);
 
 struct EzState_detail_EzStateMachineImpl
 {
@@ -713,7 +730,7 @@ struct ChrIns
     float resistCurseTotal;
     uint8_t padding_10[0x10];
     EntityThrowAnimationStatus* throw_animation_info;
-    uint8_t padding_11[0x120];
+    uint8_t padding_11[0x120]; //todo more in here to be saved
 };
 
 static_assert(offsetof(ChrIns, playerCtrl) == 0x60+8);
