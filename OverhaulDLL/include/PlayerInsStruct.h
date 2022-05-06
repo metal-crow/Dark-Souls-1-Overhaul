@@ -388,8 +388,10 @@ static_assert(sizeof(HavokChara) == 0x290);
 struct EzState_detail_EzStateMachineImpl
 {
     uint8_t padding_0[24];
-    uint8_t data_0[16]; //the pointer in this is just a pointer to const data
-    uint8_t padding_1[0x88]; //i dunno what these pointers are, so hopefully they're unneeded
+    uint8_t data_0[16]; //the cur_state pointer in this is just a pointer to const data
+    uint64_t padding_1[1]; //i dunno what this pointer is, so hopefully its unneeded
+    uint64_t padding_1a[5]; //these seem to be null
+    uint8_t padding_1b[0x58]; //ezstate stuff, probably not needed
     uint8_t data_1[16];
     uint8_t padding_2[0x68];
     uint8_t data_2[8];
