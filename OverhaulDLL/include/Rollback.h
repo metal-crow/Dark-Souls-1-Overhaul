@@ -77,6 +77,8 @@ void copy_EzState_detail_EzStateMachineImpl(EzState_detail_EzStateMachineImpl* t
 EzState_detail_EzStateMachineImpl* init_EzState_detail_EzStateMachineImpl();
 void copy_HavokChara(HavokChara* to, HavokChara* from);
 HavokChara* init_HavokChara();
+void copy_HitIns(HitIns* to, HitIns* from);
+HitIns* init_HitIns();
 void copy_hkpCharacterProxy(hkpCharacterProxy* to, hkpCharacterProxy* from);
 hkpCharacterProxy* init_hkpCharacterProxy();
 void copy_AnimationMediator(AnimationMediator* to, AnimationMediator* from);

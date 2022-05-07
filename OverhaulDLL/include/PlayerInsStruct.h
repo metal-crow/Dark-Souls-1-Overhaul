@@ -357,8 +357,33 @@ static_assert(sizeof(hkpCharacterProxy) == 0xf0);
 
 struct HitIns
 {
+    uint64_t padding_0;
+    uint64_t data_0;
+    uint64_t padding_1; //pointer to ResCap, const ptr
+    uint8_t data_1[0x48];
 
+        uint64_t padding_2[2]; //just pointers to self
+        uint64_t data_2;
+        uint64_t padding_3; //pointer to FileCap, const ptr
+        void* unk1; //pointer to FrpgPhysSysIns. Do we need to save?
+
+        uint64_t padding_4[2]; //just pointers to self
+        uint64_t data_3;
+        uint64_t padding_5; //pointer to FileCap, const ptr
+        void* unk2; //pointer to FrpgPhysSysIns. Do we need to save?
+
+    uint64_t data_4;
+    uint64_t padding_6; //dbgnode
+    uint64_t data_5;
 };
+
+static_assert(offsetof(HitIns, data_0) == 8);
+static_assert(offsetof(HitIns, data_1) == 0x10+8);
+static_assert(offsetof(HitIns, data_2) == 0x60+0x10);
+static_assert(offsetof(HitIns, data_3) == 0x88+0x10);
+static_assert(offsetof(HitIns, data_4) == 0xb0);
+static_assert(offsetof(HitIns, data_5) == 0xc0);
+static_assert(sizeof(HitIns) == 0xc8);
 
 struct HavokChara
 {

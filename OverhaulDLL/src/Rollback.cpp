@@ -715,7 +715,7 @@ void copy_HavokChara(HavokChara* to, HavokChara* from)
     copy_hkpCharacterProxy(to->char_proxy, from->char_proxy);
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
-    //copy_HitIns(to->hitIns, from->hitIns);
+    copy_HitIns(to->hitIns, from->hitIns);
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
     memcpy(to->data_4, from->data_4, sizeof(to->data_4));
 }
@@ -725,9 +725,26 @@ HavokChara* init_HavokChara()
     HavokChara* local_HavokChara = (HavokChara*)malloc_(sizeof(HavokChara));
 
     local_HavokChara->char_proxy = init_hkpCharacterProxy();
-    //local_HavokChara->hitIns = init_HitIns();
+    local_HavokChara->hitIns = init_HitIns();
 
     return local_HavokChara;
+}
+
+void copy_HitIns(HitIns* to, HitIns* from)
+{
+    to->data_0 = from->data_0;
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    to->data_2 = from->data_2;
+    to->data_3 = from->data_3;
+    to->data_4 = from->data_4;
+    to->data_5 = from->data_5;
+}
+
+HitIns* init_HitIns()
+{
+    HitIns* local_HitIns = (HitIns*)malloc_(sizeof(HitIns));
+
+    return local_HitIns;
 }
 
 void copy_hkpCharacterProxy(hkpCharacterProxy* to, hkpCharacterProxy* from)
