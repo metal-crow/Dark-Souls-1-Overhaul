@@ -1033,6 +1033,20 @@ void copy_AnimationQueue_Entry(AnimationQueue_Entry* to, AnimationQueue_Entry* f
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     copy_AnimationQueue_Entry_sub1(&to->sub1, &from->sub1);
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+
+    size_t i = 0;
+    size_t from_len = ((uint64_t)from->chained_animations_array_end - (uint64_t)from->chained_animations_array_start) / 8;
+    size_t to_cap = ((uint64_t)from->chained_animations_array_capEnd - (uint64_t)from->chained_animations_array_start) / 8;
+    if (from_len > to_cap)
+    {
+        FATALERROR("AnimationQueue_Entry->chained_animations_array has a length of %d, but we can only output %d", from_len, to_cap);
+    }
+    for (i = 0; i < from_len; i++)
+    {
+        to->chained_animations_array_start[i] = from->chained_animations_array_start[i];
+    }
+    to->chained_animations_array_end = &to->chained_animations_array_start[i];
+
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
 }
 
@@ -1043,6 +1057,9 @@ AnimationQueue_Entry* init_AnimationQueue_Entry()
     AnimationQueue_Entry_sub1* local_AnimationQueue_Entry_sub1 = init_AnimationQueue_Entry_sub1();
     local_AnimationQueue_Entry->sub1 = *local_AnimationQueue_Entry_sub1;
     free(local_AnimationQueue_Entry_sub1);
+
+    local_AnimationQueue_Entry->chained_animations_array_start = (uint64_t*)malloc_(sizeof(uint64_t) * 16);
+    local_AnimationQueue_Entry->chained_animations_array_capEnd = &local_AnimationQueue_Entry->chained_animations_array_start[16];
 
     return local_AnimationQueue_Entry;
 }

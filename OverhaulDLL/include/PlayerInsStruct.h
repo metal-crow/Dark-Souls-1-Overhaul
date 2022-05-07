@@ -88,7 +88,10 @@ struct AnimationQueue_Entry
     uint8_t data_1[0x100];
     AnimationQueue_Entry_sub1 sub1;
     uint64_t data_2[1];
-    uint64_t padding_3[4]; //think these are just for anim blending
+    uint64_t padding_3;
+    uint64_t* chained_animations_array_start; //i believe these are pointers to static structs (or at least static in a session)
+    uint64_t* chained_animations_array_end;
+    uint64_t* chained_animations_array_capEnd;
     uint8_t data_3[24];
 };
 
