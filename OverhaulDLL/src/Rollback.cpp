@@ -286,6 +286,12 @@ void copy_ChrIns(ChrIns* to, ChrIns* from, bool to_game)
     to->curUsedItem = from->curUsedItem;
     copy_SpecialEffect(to->specialEffects, from->specialEffects, to_game);
     copy_QwcSpEffectEquipCtrl(to->qwcSpEffectEquipCtrl, from->qwcSpEffectEquipCtrl);
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    copy_ChrIns_field0x2c8(to->field0x2c8, from->field0x2c8);
+    memcpy(to->data_0a, from->data_0a, sizeof(to->data_0a));
+    copy_HitIns(to->hitins_1, from->hitins_1);
+    copy_HitIns(to->hitins_2, from->hitins_2);
+    to->data_0b = from->data_0b;
     to->curHp = from->curHp;
     to->maxHp = from->maxHp;
     to->curSp = from->curSp;
@@ -314,9 +320,26 @@ ChrIns* init_ChrIns()
     local_ChrIns->padManipulator = init_PadManipulator();
     local_ChrIns->specialEffects = init_SpecialEffect();
     local_ChrIns->qwcSpEffectEquipCtrl = init_QwcSpEffectEquipCtrl();
+    local_ChrIns->field0x2c8 = init_ChrIns_field0x2c8();
+    local_ChrIns->hitins_1 = init_HitIns();
+    local_ChrIns->hitins_2 = init_HitIns();
     local_ChrIns->throw_animation_info = init_EntityThrowAnimationStatus();
 
     return local_ChrIns;
+}
+
+void copy_ChrIns_field0x2c8(ChrIns_field0x2c8* to, ChrIns_field0x2c8* from)
+{
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    to->data_1 = from->data_1;
+    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    to->data_3 = from->data_3;
+}
+
+ChrIns_field0x2c8* init_ChrIns_field0x2c8()
+{
+    ChrIns_field0x2c8* local_ChrIns_field0x2c8 = (ChrIns_field0x2c8*)malloc_(sizeof(ChrIns_field0x2c8));
+    return local_ChrIns_field0x2c8;
 }
 
 void copy_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to, EntityThrowAnimationStatus* from)

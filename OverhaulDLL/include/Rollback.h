@@ -43,6 +43,8 @@ EquipMagicData* init_EquipMagicData();
 void copy_PlayerGameData_AttributeInfo(PlayerGameData_AttributeInfo* to, PlayerGameData_AttributeInfo* from);
 void copy_ChrIns(ChrIns* to, ChrIns* from, bool to_game);
 ChrIns* init_ChrIns();
+void copy_ChrIns_field0x2c8(ChrIns_field0x2c8* to, ChrIns_field0x2c8* from);
+ChrIns_field0x2c8* init_ChrIns_field0x2c8();
 void copy_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to, EntityThrowAnimationStatus* from);
 EntityThrowAnimationStatus* init_EntityThrowAnimationStatus();
 void copy_QwcSpEffectEquipCtrl(QwcSpEffectEquipCtrl* to, QwcSpEffectEquipCtrl* from);

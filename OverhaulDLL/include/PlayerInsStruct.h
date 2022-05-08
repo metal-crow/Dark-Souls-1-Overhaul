@@ -50,6 +50,7 @@ typedef struct SpecialEffect SpecialEffect;
 typedef struct QwcSpEffectEquipCtrl QwcSpEffectEquipCtrl;
 typedef struct ChrAttachSys ChrAttachSys;
 typedef struct EntityThrowAnimationStatus EntityThrowAnimationStatus;
+typedef struct ChrIns_field0x2c8 ChrIns_field0x2c8;
 typedef struct ChrIns ChrIns;
 typedef struct PlayerGameData_AttributeInfo PlayerGameData_AttributeInfo;
 typedef struct EquipInventoryData EquipInventoryData;
@@ -724,6 +725,24 @@ static_assert(offsetof(EntityThrowAnimationStatus, padding_1) == 0x58);
 static_assert(offsetof(EntityThrowAnimationStatus, data_1) == 0x60);
 static_assert(sizeof(EntityThrowAnimationStatus) == 0xb0);
 
+struct ChrIns_field0x2c8
+{
+    uint64_t padding_0;
+    uint8_t data_0[0x18];
+    uint64_t padding_1;
+    uint64_t data_1;
+    uint64_t padding_2;
+    uint8_t data_2[0x10];
+    uint64_t padding_3;
+    uint64_t data_3;
+};
+
+static_assert(offsetof(ChrIns_field0x2c8, data_0) == 8);
+static_assert(offsetof(ChrIns_field0x2c8, data_1) == 0x28);
+static_assert(offsetof(ChrIns_field0x2c8, data_2) == 0x38);
+static_assert(offsetof(ChrIns_field0x2c8, data_3) == 0x50);
+static_assert(sizeof(ChrIns_field0x2c8) == 0x58);
+
 struct ChrIns
 {
     uint8_t padding_0[8 + 0x60];
@@ -740,7 +759,12 @@ struct ChrIns
     uint8_t padding_5[8];
     SpecialEffect* specialEffects;
     QwcSpEffectEquipCtrl* qwcSpEffectEquipCtrl;
-    uint8_t padding_6[0x100];
+    uint8_t data_0[0x48];
+    ChrIns_field0x2c8* field0x2c8;
+    uint8_t data_0a[0x98];
+    HitIns* hitins_1;
+    HitIns* hitins_2;
+    uint64_t data_0b;
     ChrAttachSys chrattachsys;
     uint8_t padding_7[0x48];
     uint32_t curHp;
@@ -778,6 +802,12 @@ static_assert(offsetof(ChrIns, curSelectedMagicId) == 0x25c+8);
 static_assert(offsetof(ChrIns, curUsedItem) == 0x260+8);
 static_assert(offsetof(ChrIns, specialEffects) == 0x270+8);
 static_assert(offsetof(ChrIns, qwcSpEffectEquipCtrl) == 0x278+8);
+static_assert(offsetof(ChrIns, data_0) == 0x280+8);
+static_assert(offsetof(ChrIns, field0x2c8) == 0x2c8+8);
+static_assert(offsetof(ChrIns, data_0a) == 0x2d0+8);
+static_assert(offsetof(ChrIns, hitins_1) == 0x368+8);
+static_assert(offsetof(ChrIns, hitins_2) == 0x370+8);
+static_assert(offsetof(ChrIns, data_0b) == 0x378+8);
 static_assert(offsetof(ChrIns, chrattachsys) == 0x380+8);
 static_assert(offsetof(ChrIns, curHp) == 0x3e0+8);
 static_assert(offsetof(ChrIns, maxHp) == 0x3e4+8);
