@@ -104,7 +104,7 @@ void free_SpinJoint(SpinJoint* to);
 
 void copy_TurnAnim(TurnAnim* to, TurnAnim* from);
 TurnAnim* init_TurnAnim();
-void free_TurnAnim(TurnAnim* to);
+void free_TurnAnim(TurnAnim* to, bool freeself);
 
 void copy_ChrCtrl(ChrCtrl* to, ChrCtrl* from, bool to_game);
 ChrCtrl* init_ChrCtrl();
@@ -178,11 +178,11 @@ void free_ChrCtrl_AnimationQueue_field0x10(ChrCtrl_AnimationQueue_field0x10* to)
 
 void copy_ChrCtrl_AnimationQueueEntry(ChrCtrl_AnimationQueueEntry* to, ChrCtrl_AnimationQueueEntry* from, bool to_game);
 ChrCtrl_AnimationQueueEntry* init_ChrCtrl_AnimationQueueEntry();
-void free_ChrCtrl_AnimationQueueEntry(ChrCtrl_AnimationQueueEntry* to);
+void free_ChrCtrl_AnimationQueueEntry(ChrCtrl_AnimationQueueEntry* to, bool freeself);
 
 void copy_AnimationQueue(AnimationQueue* to, AnimationQueue* from);
 AnimationQueue* init_AnimationQueue();
-void copy_AnimationQueue(AnimationQueue* to);
+void free_AnimationQueue(AnimationQueue* to);
 
 void copy_AnimationQueue_Entry(AnimationQueue_Entry* to, AnimationQueue_Entry* from);
 AnimationQueue_Entry* init_AnimationQueue_Entry();

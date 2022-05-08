@@ -641,7 +641,7 @@ PlayerCtrl* init_PlayerCtrl()
 void free_PlayerCtrl(PlayerCtrl* to)
 {
     free_ChrCtrl(&to->chrCtrl, false);
-    free_TurnAnim(to->turnAnim);
+    free_TurnAnim(to->turnAnim, true);
     free_ArrowTurnAnim(to->arrowTurnAnim);
 
     free(to);
@@ -670,7 +670,7 @@ ArrowTurnAnim* init_ArrowTurnAnim()
 
 void free_ArrowTurnAnim(ArrowTurnAnim* to)
 {
-    free_TurnAnim(to->turnAnim, false);
+    free_TurnAnim(&to->turnAnim, false);
     free_SpinJoint(to->joint_spine_2);
     free_SpinJoint(to->joint_spine1_2);
 
@@ -721,7 +721,7 @@ TurnAnim* init_TurnAnim()
     return local_TurnAnim;
 }
 
-void free_TurnAnim(TurnAnim* to)
+void free_TurnAnim(TurnAnim* to, bool freeself)
 {
     free_SpinJoint(to->joint_UpperRoot);
     free_SpinJoint(to->joint_LowerRoot);
@@ -729,7 +729,10 @@ void free_TurnAnim(TurnAnim* to)
     free_SpinJoint(to->joint_spine_1);
     free_SpinJoint(to->joint_master);
 
-    free(to);
+    if (freeself)
+    {
+        free(to);
+    }
 }
 
 void copy_ChrCtrl(ChrCtrl* to, ChrCtrl* from, bool to_game)
@@ -805,7 +808,7 @@ void free_WalkAnim_Twist(WalkAnim_Twist* to)
     free_SpinJoint(to->Upper_Root_Joint);
     free_SpinJoint(to->master_joint);
     free_SpinJoint(to->neck_joint);
-    free_WalkAnim_Twist_Field0x228Elem(to->walkAnim_Twist_Field0x228Elem, false);
+    free_WalkAnim_Twist_Field0x228Elem(&to->walkAnim_Twist_Field0x228Elem, false);
 
     free(to);
 }
@@ -1031,7 +1034,7 @@ void free_AnimationMediator(AnimationMediator* to)
 {
     for (int i = 0; i < 31; i++)
     {
-        free_AnimationMediatorStateEntry(to->states_list[i], false);
+        free_AnimationMediatorStateEntry(&to->states_list[i], false);
     }
     free_AnimationQueue(to->animationQueue);
 
@@ -1105,7 +1108,7 @@ void free_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to)
 {
     for (size_t i = 0; i < 32; i++)
     {
-        free_ChrCtrl_AnimationQueueEntry(to->arry[i], false);
+        free_ChrCtrl_AnimationQueueEntry(&to->arry[i], false);
     }
     free(to->arry);
     free_ChrCtrl_AnimationQueue_field0x10(to->field0x10);
@@ -1214,7 +1217,7 @@ hkaDefaultAnimationControl* init_hkaDefaultAnimationControl()
 
 void free_hkaDefaultAnimationControl(hkaDefaultAnimationControl* to)
 {
-    free_hkaAnimationControl(to->HkaAnimationControl, false);
+    free_hkaAnimationControl(&to->HkaAnimationControl, false);
 
     free(to);
 }
@@ -1349,9 +1352,12 @@ ChrCtrl_AnimationQueueEntry* init_ChrCtrl_AnimationQueueEntry()
     return local_AnimationQueueEntry;
 }
 
-void free_ChrCtrl_AnimationQueueEntry(ChrCtrl_AnimationQueueEntry* to)
+void free_ChrCtrl_AnimationQueueEntry(ChrCtrl_AnimationQueueEntry* to, bool freeself)
 {
-    free(to);
+    if (freeself)
+    {
+        free(to);
+    }
 }
 
 void copy_AnimationQueue(AnimationQueue* to, AnimationQueue* from)
@@ -1374,7 +1380,7 @@ AnimationQueue* init_AnimationQueue()
     return local_AnimationQueue;
 }
 
-void copy_AnimationQueue(AnimationQueue* to)
+void free_AnimationQueue(AnimationQueue* to)
 {
     for (int i = 0; i < 6; i++)
     {
@@ -1423,7 +1429,7 @@ AnimationQueue_Entry* init_AnimationQueue_Entry()
 
 void free_AnimationQueue_Entry(AnimationQueue_Entry* to)
 {
-    free_AnimationQueue_Entry_sub1(to->sub1, false);
+    free_AnimationQueue_Entry_sub1(&to->sub1, false);
     free(to->chained_animations_array_start);
 
     free(to);
