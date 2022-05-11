@@ -10,6 +10,7 @@
 #include "Files.h"
 #include "sp/memory/injection/asm/x64.h"
 #include "ModNetworking.h"
+#include "Rollback.h"
 
 namespace Input {
 
@@ -165,13 +166,15 @@ DWORD WINAPI intercept_xinput_get_state(DWORD dwUserIndex, XINPUT_STATE *pState)
 
 void handle_input(XINPUT_GAMEPAD* xold, XINPUT_GAMEPAD* xcurrent, DIJOYSTATE2* djold, DIJOYSTATE2* djcurrent, uint8_t* kbold, uint8_t* kbcurrent, bool changed, int player) {
     static bool reset_lock_rotation = false;
-    if (changed) {
+    if (changed)
+    {
 
         if (Button::pressed(xold, xcurrent, XINPUT_GAMEPAD_DPAD_LEFT) ||
             Button::POVpressed(djold, djcurrent, DINPUT_GAMEPAD_DPAD_LEFT) ||
             Button::pressed(kbold, kbcurrent, DIK_LEFT))
         {
-            if (Files::saves_menu_is_open()) {
+            if (Files::saves_menu_is_open())
+            {
                 Files::save_file_index_pending_set_prev = true;
             }
         }
@@ -180,7 +183,8 @@ void handle_input(XINPUT_GAMEPAD* xold, XINPUT_GAMEPAD* xcurrent, DIJOYSTATE2* d
             Button::POVpressed(djold, djcurrent, DINPUT_GAMEPAD_DPAD_RIGHT) ||
             Button::pressed(kbold, kbcurrent, DIK_RIGHT))
         {
-            if (Files::saves_menu_is_open()) {
+            if (Files::saves_menu_is_open())
+            {
                 Files::save_file_index_pending_set_next = true;
             }
         }
@@ -189,7 +193,8 @@ void handle_input(XINPUT_GAMEPAD* xold, XINPUT_GAMEPAD* xcurrent, DIJOYSTATE2* d
         if (Button::pressed(xold, xcurrent, XINPUT_GAMEPAD_LEFT_SHOULDER) ||
             Button::pressed(djold, djcurrent, DINPUT_GAMEPAD_L2))
         {
-            if (Files::saves_menu_is_open()) {
+            if (Files::saves_menu_is_open())
+            {
                 Files::save_file_index_pending_set_prev = true;
             }
         }
@@ -198,7 +203,8 @@ void handle_input(XINPUT_GAMEPAD* xold, XINPUT_GAMEPAD* xcurrent, DIJOYSTATE2* d
         if (Button::pressed(xold, xcurrent, XINPUT_GAMEPAD_RIGHT_SHOULDER) ||
             Button::pressed(djold, djcurrent, DINPUT_GAMEPAD_R2))
         {
-            if (Files::saves_menu_is_open()) {
+            if (Files::saves_menu_is_open())
+            {
                 Files::save_file_index_pending_set_next = true;
             }
         }
@@ -208,7 +214,8 @@ void handle_input(XINPUT_GAMEPAD* xold, XINPUT_GAMEPAD* xcurrent, DIJOYSTATE2* d
             Button::pressed(djold, djcurrent, DINPUT_GAMEPAD_START) ||
             Button::pressed(kbold, kbcurrent, DIK_ESCAPE))
         {
-            if (Files::saves_menu_is_open()) {
+            if (Files::saves_menu_is_open())
+            {
                 Files::save_file_index_make_new = true;
             }
         }
@@ -248,6 +255,15 @@ void handle_input(XINPUT_GAMEPAD* xold, XINPUT_GAMEPAD* xcurrent, DIJOYSTATE2* d
                 Mod::user_selected_default_mode = ModMode::Legacy;
                 ConsoleWrite("Set prefer Legacy mode");
             }
+        }
+
+        if (Button::pressed(kbold, kbcurrent, DIK_F8))
+        {
+            Rollback::bsave = true;
+        }
+        if (Button::pressed(kbold, kbcurrent, DIK_F9))
+        {
+            Rollback::bload = true;
         }
     }
 }

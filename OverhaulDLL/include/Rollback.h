@@ -4,14 +4,17 @@
 
 #include <stdint.h>
 #include "PlayerInsStruct.h"
+#include "PadManStruct.h"
 #include <unordered_map>
 
 class Rollback
 {
 public:
     static void start();
-    static void save();
-    static void load();
+    static void GameStateSave();
+    static void GameStateLoad();
+    static void GameInputSave();
+    static void GameInputLoad();
 
     static bool bsave;
     static bool bload;
@@ -89,7 +92,9 @@ PadManipulator* init_PadManipulator();
 void free_PadManipulator(PadManipulator* to);
 
 void copy_NetworkManipulator(NetworkManipulator* to, NetworkManipulator* from);
+
 void copy_ChrManipulator(ChrManipulator* to, ChrManipulator* from);
+
 void copy_PlayerCtrl(PlayerCtrl* to, PlayerCtrl* from, bool to_game);
 PlayerCtrl* init_PlayerCtrl();
 void free_PlayerCtrl(PlayerCtrl* to);
@@ -119,11 +124,13 @@ WalkAnim_Twist_Field0x228Elem* init_WalkAnim_Twist_Field0x228Elem();
 void free_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* to, bool freeself);
 
 void copy_WalkAnim_Twist_Field0x228Elem_field0x10elem(WalkAnim_Twist_Field0x228Elem_field0x10elem* to, WalkAnim_Twist_Field0x228Elem_field0x10elem* from);
+
 void copy_ActionCtrl(ActionCtrl* to, ActionCtrl* from);
 ActionCtrl* init_ActionCtrl();
 void free_ActionCtrl(ActionCtrl* to);
 
 void copy_ActionCtrl_0x30Substruct(ActionCtrl_0x30Substruct* to, ActionCtrl_0x30Substruct* from);
+
 void copy_EzState_detail_EzStateMachineImpl(EzState_detail_EzStateMachineImpl* to, EzState_detail_EzStateMachineImpl* from);
 EzState_detail_EzStateMachineImpl* init_EzState_detail_EzStateMachineImpl();
 void free_EzState_detail_EzStateMachineImpl(EzState_detail_EzStateMachineImpl* to);

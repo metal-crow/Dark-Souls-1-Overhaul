@@ -117,7 +117,13 @@
     <ClCompile Include="src\UIFeatures.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\GameStateRollback.cpp">
+      <Filter>Source Files\Rollback</Filter>
+    </ClCompile>
     <ClCompile Include="src\Rollback.cpp">
+      <Filter>Source Files\Rollback</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameInputRollback.cpp">
       <Filter>Source Files\Rollback</Filter>
     </ClCompile>
   </ItemGroup>
@@ -183,6 +189,9 @@
       <Filter>Header Files\Rollback</Filter>
     </ClInclude>
     <ClInclude Include="include\PlayerInsStruct.h">
+      <Filter>Header Files\Rollback</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PadManStruct.h">
       <Filter>Header Files\Rollback</Filter>
     </ClInclude>
   </ItemGroup>
