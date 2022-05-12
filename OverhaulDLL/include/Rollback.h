@@ -6,6 +6,7 @@
 #include "PlayerInsStruct.h"
 #include "PadManStruct.h"
 #include <unordered_map>
+#include "DarkSoulsOverhaulMod.h"
 
 class Rollback
 {
@@ -21,9 +22,51 @@ public:
 
 private:
     static PlayerIns* saved_playerins;
+    static PadMan* saved_padman;
     static const uint64_t disableType18PacketEnforcement = 0x35b13b;
     static const uint64_t disableType18PacketSending = 0x5067f1;
 };
+
+inline void* malloc_(size_t size)
+{
+    void* out = malloc(size);
+    if (out == NULL)
+    {
+        FATALERROR("Malloc failure. Unable to allocate %d bytes.", size);
+    }
+    memset(out, 0, size);
+    return out;
+}
+
+void copy_PadMan(PadMan* to, PadMan* from);
+PadMan* init_PadMan();
+void free_PadMan(PadMan* to);
+
+void copy_PadDevice(PadDevice* to, PadDevice* from);
+PadDevice* init_PadDevice();
+void free_PadDevice(PadDevice* to);
+
+void copy_VirtualMultiDevice(VirtualMultiDevice* to, VirtualMultiDevice* from);
+VirtualMultiDevice* init_VirtualMultiDevice();
+void free_VirtualMultiDevice(VirtualMultiDevice* to);
+
+void copy_DLUserInputDeviceImpl(DLUserInputDeviceImpl* to, DLUserInputDeviceImpl* from);
+DLUserInputDeviceImpl* init_DLUserInputDeviceImpl();
+void free_DLUserInputDeviceImpl(DLUserInputDeviceImpl* to, bool freeself);
+
+void copy_DLUserInputDevice(DLUserInputDevice* to, DLUserInputDevice* from);
+DLUserInputDevice* init_DLUserInputDevice();
+void free_DLUserInputDevice(DLUserInputDevice* to, bool freeself);
+
+void copy_VirtualInputData(VirtualInputData* to, VirtualInputData* from);
+VirtualInputData* init_VirtualInputData();
+void free_VirtualInputData(VirtualInputData* to, bool freeself);
+
+void copy_DynamicBitset(DynamicBitset* to, DynamicBitset* from);
+DynamicBitset* init_DynamicBitset();
+void free_DynamicBitset(DynamicBitset* to, bool freeself);
+
+/*======================================================================*/
 
 void copy_PlayerIns(PlayerIns* to, PlayerIns* from, bool to_game);
 PlayerIns* init_PlayerIns();

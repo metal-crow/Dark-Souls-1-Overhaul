@@ -1,17 +1,6 @@
 #include "Rollback.h"
 #include "DarkSoulsOverhaulMod.h"
 
-void* malloc_(size_t size)
-{
-    void* out = malloc(size);
-    if (out == NULL)
-    {
-        FATALERROR("Malloc failure. Unable to allocate %d bytes.", size);
-    }
-    memset(out, 0, size);
-    return out;
-}
-
 typedef void* falloc(uint64_t, uint64_t, uint32_t);
 
 void Rollback::GameStateSave()

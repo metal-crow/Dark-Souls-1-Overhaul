@@ -13,6 +13,7 @@ extern "C" {
 }
 
 PlayerIns* Rollback::saved_playerins = NULL;
+PadMan* Rollback::saved_padman = NULL;
 
 bool Rollback::bsave = false;
 bool Rollback::bload = false;
@@ -53,6 +54,7 @@ void Rollback::start()
 
     //TMP init out copy of the playerins struct, for saving/restoring with rollback
     Rollback::saved_playerins = init_PlayerIns();
+    Rollback::saved_padman = init_PadMan();
 
     //TMP save/restore with a hotkey
     MainLoop::setup_mainloop_callback(rollback_test, NULL, "rollback_test");
