@@ -61,10 +61,16 @@ static_assert(sizeof(DLUserInputDevice) == 0x88);
 struct DLUserInputDeviceImpl
 {
     DLUserInputDevice base;
-    uint8_t padding_0[0xd0];
+    uint8_t padding_0[0x60];
+    VirtualAnalogKeyInfo_float VirtAnalogKeyInfo_1;
+    VirtualAnalogKeyInfo_float VirtAnalogKeyInfo_2;
+    uint8_t padding_1[32];
     VirtualInputData VirtInputData;
 };
 
+static_assert(offsetof(DLUserInputDeviceImpl, VirtAnalogKeyInfo_1) == 0xe8);
+static_assert(offsetof(DLUserInputDeviceImpl, VirtAnalogKeyInfo_2) == 0x110);
+static_assert(offsetof(DLUserInputDeviceImpl, VirtInputData) == 0x158);
 static_assert(sizeof(DLUserInputDeviceImpl) == 0x1a8);
 
 struct VirtualMultiDevice

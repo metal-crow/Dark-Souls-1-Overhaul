@@ -77,6 +77,8 @@ void free_VirtualMultiDevice(VirtualMultiDevice* to)
 void copy_DLUserInputDeviceImpl(DLUserInputDeviceImpl* to, DLUserInputDeviceImpl* from)
 {
     copy_DLUserInputDevice(&to->base, &from->base);
+    copy_VirtualAnalogKeyInfo_float(&to->VirtAnalogKeyInfo_1, &from->VirtAnalogKeyInfo_1);
+    copy_VirtualAnalogKeyInfo_float(&to->VirtAnalogKeyInfo_2, &from->VirtAnalogKeyInfo_2);
     copy_VirtualInputData(&to->VirtInputData, &from->VirtInputData);
 }
 
@@ -88,6 +90,14 @@ DLUserInputDeviceImpl* init_DLUserInputDeviceImpl()
     local_DLUserInputDeviceImpl->base = *local_DLUserInputDevice;
     free(local_DLUserInputDevice);
 
+    VirtualAnalogKeyInfo_float* local_VirtualAnalogKeyInfo_float1 = init_VirtualAnalogKeyInfo_float();
+    local_DLUserInputDeviceImpl->VirtAnalogKeyInfo_1 = *local_VirtualAnalogKeyInfo_float1;
+    free(local_VirtualAnalogKeyInfo_float1);
+
+    VirtualAnalogKeyInfo_float* local_VirtualAnalogKeyInfo_float2 = init_VirtualAnalogKeyInfo_float();
+    local_DLUserInputDeviceImpl->VirtAnalogKeyInfo_2 = *local_VirtualAnalogKeyInfo_float2;
+    free(local_VirtualAnalogKeyInfo_float2);
+
     VirtualInputData* local_VirtualInputData = init_VirtualInputData();
     local_DLUserInputDeviceImpl->VirtInputData = *local_VirtualInputData;
     free(local_VirtualInputData);
@@ -98,6 +108,8 @@ DLUserInputDeviceImpl* init_DLUserInputDeviceImpl()
 void free_DLUserInputDeviceImpl(DLUserInputDeviceImpl* to, bool freeself)
 {
     free_DLUserInputDevice(&to->base, false);
+    free_VirtualAnalogKeyInfo_float(&to->VirtAnalogKeyInfo_1, false);
+    free_VirtualAnalogKeyInfo_float(&to->VirtAnalogKeyInfo_2, false);
     free_VirtualInputData(&to->VirtInputData, false);
 
     if (freeself)
