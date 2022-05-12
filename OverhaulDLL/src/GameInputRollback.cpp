@@ -77,6 +77,7 @@ void free_VirtualMultiDevice(VirtualMultiDevice* to)
 void copy_DLUserInputDeviceImpl(DLUserInputDeviceImpl* to, DLUserInputDeviceImpl* from)
 {
     copy_DLUserInputDevice(&to->base, &from->base);
+    copy_VirtualInputData(&to->VirtInputData, &from->VirtInputData);
 }
 
 DLUserInputDeviceImpl* init_DLUserInputDeviceImpl()
@@ -87,12 +88,17 @@ DLUserInputDeviceImpl* init_DLUserInputDeviceImpl()
     local_DLUserInputDeviceImpl->base = *local_DLUserInputDevice;
     free(local_DLUserInputDevice);
 
+    VirtualInputData* local_VirtualInputData = init_VirtualInputData();
+    local_DLUserInputDeviceImpl->VirtInputData = *local_VirtualInputData;
+    free(local_VirtualInputData);
+
     return local_DLUserInputDeviceImpl;
 
 }
 void free_DLUserInputDeviceImpl(DLUserInputDeviceImpl* to, bool freeself)
 {
     free_DLUserInputDevice(&to->base, false);
+    free_VirtualInputData(&to->VirtInputData, false);
 
     if (freeself)
     {
@@ -128,10 +134,7 @@ void free_DLUserInputDevice(DLUserInputDevice* to, bool freeself)
 
 void copy_VirtualInputData(VirtualInputData* to, VirtualInputData* from)
 {
-    for (size_t i = 0; i < 0x80; i++)
-    {
-        to->analogSticksAndPad[i] = from->analogSticksAndPad[i];
-    }
+    copy_VirtualAnalogKeyInfo_float(&to->VirAnalogKeyInfo, &from->VirAnalogKeyInfo);
     copy_DynamicBitset(&to->keys, &from->keys);
 }
 
@@ -139,7 +142,9 @@ VirtualInputData* init_VirtualInputData()
 {
     VirtualInputData* local_VirtualInputData = (VirtualInputData*)malloc_(sizeof(VirtualInputData));
 
-    local_VirtualInputData->analogSticksAndPad = (float*)malloc_(sizeof(float) * 0x80);
+    VirtualAnalogKeyInfo_float* local_VirtualAnalogKeyInfo_float = init_VirtualAnalogKeyInfo_float();
+    local_VirtualInputData->VirAnalogKeyInfo = *local_VirtualAnalogKeyInfo_float;
+    free(local_VirtualAnalogKeyInfo_float);
 
     DynamicBitset* local_DynamicBitset = init_DynamicBitset();
     local_VirtualInputData->keys = *local_DynamicBitset;
@@ -150,7 +155,7 @@ VirtualInputData* init_VirtualInputData()
 }
 void free_VirtualInputData(VirtualInputData* to, bool freeself)
 {
-    free(to->analogSticksAndPad);
+    free_VirtualAnalogKeyInfo_float(&to->VirAnalogKeyInfo, false);
     free_DynamicBitset(&to->keys, false);
 
     if (freeself)
@@ -158,6 +163,34 @@ void free_VirtualInputData(VirtualInputData* to, bool freeself)
         free(to);
     }
 }
+
+void copy_VirtualAnalogKeyInfo_float(VirtualAnalogKeyInfo_float* to, VirtualAnalogKeyInfo_float* from)
+{
+    for (size_t i = 0; i < 0x80; i++)
+    {
+        to->analogSticksAndPad[i] = from->analogSticksAndPad[i];
+    }
+}
+
+VirtualAnalogKeyInfo_float* init_VirtualAnalogKeyInfo_float()
+{
+    VirtualAnalogKeyInfo_float* local_VirtualAnalogKeyInfo_float = (VirtualAnalogKeyInfo_float*)malloc_(sizeof(VirtualAnalogKeyInfo_float));
+
+    local_VirtualAnalogKeyInfo_float->analogSticksAndPad = (float*)malloc_(sizeof(float) * 0x80);
+
+    return local_VirtualAnalogKeyInfo_float;
+}
+
+void free_VirtualAnalogKeyInfo_float(VirtualAnalogKeyInfo_float* to, bool freeself)
+{
+    free(to->analogSticksAndPad);
+
+    if (freeself)
+    {
+        free(to);
+    }
+}
+
 
 void copy_DynamicBitset(DynamicBitset* to, DynamicBitset* from)
 {

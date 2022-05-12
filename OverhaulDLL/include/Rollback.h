@@ -62,6 +62,10 @@ void copy_VirtualInputData(VirtualInputData* to, VirtualInputData* from);
 VirtualInputData* init_VirtualInputData();
 void free_VirtualInputData(VirtualInputData* to, bool freeself);
 
+void copy_VirtualAnalogKeyInfo_float(VirtualAnalogKeyInfo_float* to, VirtualAnalogKeyInfo_float* from);
+VirtualAnalogKeyInfo_float* init_VirtualAnalogKeyInfo_float();
+void free_VirtualAnalogKeyInfo_float(VirtualAnalogKeyInfo_float* to, bool freeself);
+
 void copy_DynamicBitset(DynamicBitset* to, DynamicBitset* from);
 DynamicBitset* init_DynamicBitset();
 void free_DynamicBitset(DynamicBitset* to, bool freeself);

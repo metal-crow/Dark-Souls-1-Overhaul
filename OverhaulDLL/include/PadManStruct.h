@@ -14,6 +14,7 @@ typedef struct VirtualMultiDevice VirtualMultiDevice;
 typedef struct DLUserInputDeviceImpl DLUserInputDeviceImpl;
 typedef struct DLUserInputDevice DLUserInputDevice;
 typedef struct VirtualInputData VirtualInputData;
+typedef struct VirtualAnalogKeyInfo_float VirtualAnalogKeyInfo_float;
 typedef struct DynamicBitset DynamicBitset;
 
 struct DynamicBitset
@@ -26,15 +27,24 @@ struct DynamicBitset
 static_assert(offsetof(DynamicBitset, inputKeys) == 0x10);
 static_assert(sizeof(DynamicBitset) == 0x20);
 
+struct VirtualAnalogKeyInfo_float
+{
+    uint64_t padding_0[2];
+    float* analogSticksAndPad;
+    uint64_t padding_1[2];
+};
+
+static_assert(offsetof(VirtualAnalogKeyInfo_float, analogSticksAndPad) == 0x10);
+static_assert(sizeof(VirtualAnalogKeyInfo_float) == 0x28);
+
 struct VirtualInputData
 {
-    uint8_t padding_0[0x18];
-    float* analogSticksAndPad;
-    uint8_t padding_1[0x10];
+    uint64_t padding_0;
+    VirtualAnalogKeyInfo_float VirAnalogKeyInfo;
     DynamicBitset keys;
 };
 
-static_assert(offsetof(VirtualInputData, analogSticksAndPad) == 0x18);
+static_assert(offsetof(VirtualInputData, VirAnalogKeyInfo) == 0x8);
 static_assert(offsetof(VirtualInputData, keys) == 0x30);
 static_assert(sizeof(VirtualInputData) == 0x50);
 
@@ -51,7 +61,8 @@ static_assert(sizeof(DLUserInputDevice) == 0x88);
 struct DLUserInputDeviceImpl
 {
     DLUserInputDevice base;
-    uint8_t padding_0[0x120];
+    uint8_t padding_0[0xd0];
+    VirtualInputData VirtInputData;
 };
 
 static_assert(sizeof(DLUserInputDeviceImpl) == 0x1a8);
