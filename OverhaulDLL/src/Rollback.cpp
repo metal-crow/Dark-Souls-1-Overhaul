@@ -15,20 +15,39 @@ extern "C" {
 PlayerIns* Rollback::saved_playerins = NULL;
 PadMan* Rollback::saved_padman = NULL;
 
-bool Rollback::bsave = false;
-bool Rollback::bload = false;
+bool Rollback::gsave = false;
+bool Rollback::gload = false;
 bool rollback_test(void* unused)
 {
-    if (Rollback::bsave)
+    if (Rollback::gsave)
     {
         Rollback::GameStateSave();
-        Rollback::bsave = false;
+        Rollback::gsave = false;
     }
 
-    if (Rollback::bload)
+    if (Rollback::gload)
     {
         Rollback::GameStateLoad();
-        Rollback::bload = false;
+        Rollback::gload = false;
+    }
+
+    return true;
+}
+
+bool Rollback::isave = false;
+bool Rollback::iload = false;
+bool input_test(void* unused)
+{
+    if (Rollback::isave)
+    {
+        Rollback::GameInputSave();
+        Rollback::isave = false;
+    }
+
+    if (Rollback::iload)
+    {
+        Rollback::GameInputLoad();
+        Rollback::iload = false;
     }
 
     return true;
@@ -58,4 +77,5 @@ void Rollback::start()
 
     //TMP save/restore with a hotkey
     MainLoop::setup_mainloop_callback(rollback_test, NULL, "rollback_test");
+    MainLoop::setup_mainloop_callback(input_test, NULL, "input_test");
 }

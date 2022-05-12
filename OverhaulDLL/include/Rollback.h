@@ -17,8 +17,10 @@ public:
     static void GameInputSave();
     static void GameInputLoad();
 
-    static bool bsave;
-    static bool bload;
+    static bool gsave;
+    static bool gload;
+    static bool isave;
+    static bool iload;
 
 private:
     static PlayerIns* saved_playerins;
