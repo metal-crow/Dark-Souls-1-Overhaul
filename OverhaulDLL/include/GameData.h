@@ -151,6 +151,8 @@ public:
 
     static uint64_t frpg_net_man;
 
+    static uint64_t pad_man;
+
     static const uint64_t calculate_attack_damage_offset = 0x2a8ead6;
 
     static const uint64_t char_loaded_injection_offset = 0x24D8D0;

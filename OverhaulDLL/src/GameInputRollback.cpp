@@ -2,12 +2,13 @@
 
 void Rollback::GameInputSave()
 {
-
+    //we pre-allocate a static padman on boot, so we can assume all pointers are set up
+    copy_PadMan(Rollback::saved_padman, (PadMan*)Game::pad_man);
 }
 
 void Rollback::GameInputLoad()
 {
-
+    copy_PadMan((PadMan*)Game::pad_man, Rollback::saved_padman);
 }
 
 void copy_PadMan(PadMan* to, PadMan* from)

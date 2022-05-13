@@ -57,6 +57,8 @@ uint64_t Game::unknown_global_struct_141d283a8 = NULL;
 
 uint64_t Game::frpg_net_man = NULL;
 
+uint64_t Game::pad_man = NULL;
+
 // Player character status (loading, human, co-op, invader, hollow)
 sp::mem::pointer<int32_t> Game::player_char_status;
 
@@ -145,6 +147,8 @@ void Game::init()
     Game::unknown_global_struct_141d283a8 = 0x141d283a8;
 
     Game::frpg_net_man = 0x141d27d60;
+
+    Game::pad_man = 0x141d06eb0;
 }
 
 void Game::injections_init()
