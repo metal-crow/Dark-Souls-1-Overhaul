@@ -34,6 +34,7 @@ void free_PadMan(PadMan* to)
 void copy_PadDevice(PadDevice* to, PadDevice* from)
 {
     copy_VirtualMultiDevice(to->VirtMultiDevice, from->VirtMultiDevice);
+    copy_KeyboardDevice(to->KeybrdDevice, from->KeybrdDevice);
 }
 
 PadDevice* init_PadDevice()
@@ -41,13 +42,32 @@ PadDevice* init_PadDevice()
     PadDevice* local_PadDevice = (PadDevice*)malloc_(sizeof(PadDevice));
 
     local_PadDevice->VirtMultiDevice = init_VirtualMultiDevice();
+    local_PadDevice->KeybrdDevice = init_KeyboardDevice();
 
     return local_PadDevice;
 }
 void free_PadDevice(PadDevice* to)
 {
     free_VirtualMultiDevice(to->VirtMultiDevice);
+    free_KeyboardDevice(to->KeybrdDevice);
 
+    free(to);
+}
+
+void copy_KeyboardDevice(KeyboardDevice* to, KeyboardDevice* from)
+{
+    memcpy(to->key_states, from->key_states, sizeof(to->key_states));
+}
+
+KeyboardDevice* init_KeyboardDevice()
+{
+    KeyboardDevice* local_KeyboardDevice = (KeyboardDevice*)malloc_(sizeof(KeyboardDevice));
+
+    return local_KeyboardDevice;
+}
+
+void free_KeyboardDevice(KeyboardDevice* to)
+{
     free(to);
 }
 
@@ -178,10 +198,7 @@ void free_VirtualInputData(VirtualInputData* to, bool freeself)
 
 void copy_VirtualAnalogKeyInfo_float(VirtualAnalogKeyInfo_float* to, VirtualAnalogKeyInfo_float* from)
 {
-    for (size_t i = 0; i < 0x80; i++)
-    {
-        to->analogSticksAndPad[i] = from->analogSticksAndPad[i];
-    }
+    memcpy(to->analogSticksAndPad, from->analogSticksAndPad, sizeof(float) * 0x80);
 }
 
 VirtualAnalogKeyInfo_float* init_VirtualAnalogKeyInfo_float()
@@ -206,10 +223,7 @@ void free_VirtualAnalogKeyInfo_float(VirtualAnalogKeyInfo_float* to, bool freese
 
 void copy_DynamicBitset(DynamicBitset* to, DynamicBitset* from)
 {
-    for (size_t i = 0; i < 32; i++)
-    {
-        to->inputKeys[i] = from->inputKeys[i];
-    }
+    memcpy(to->inputKeys, from->inputKeys, sizeof(uint32_t) * 32);
 }
 
 DynamicBitset* init_DynamicBitset()

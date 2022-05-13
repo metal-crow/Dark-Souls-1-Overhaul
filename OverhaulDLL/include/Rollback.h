@@ -48,6 +48,10 @@ void copy_PadDevice(PadDevice* to, PadDevice* from);
 PadDevice* init_PadDevice();
 void free_PadDevice(PadDevice* to);
 
+void copy_KeyboardDevice(KeyboardDevice* to, KeyboardDevice* from);
+KeyboardDevice* init_KeyboardDevice();
+void free_KeyboardDevice(KeyboardDevice* to);
+
 void copy_VirtualMultiDevice(VirtualMultiDevice* to, VirtualMultiDevice* from);
 VirtualMultiDevice* init_VirtualMultiDevice();
 void free_VirtualMultiDevice(VirtualMultiDevice* to);

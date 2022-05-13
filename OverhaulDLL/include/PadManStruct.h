@@ -10,6 +10,7 @@
 
 typedef struct PadMan PadMan;
 typedef struct PadDevice PadDevice;
+typedef struct KeyboardDevice KeyboardDevice;
 typedef struct VirtualMultiDevice VirtualMultiDevice;
 typedef struct DLUserInputDeviceImpl DLUserInputDeviceImpl;
 typedef struct DLUserInputDevice DLUserInputDevice;
@@ -81,14 +82,27 @@ struct VirtualMultiDevice
 
 static_assert(sizeof(VirtualMultiDevice) == 0x1c8);
 
+struct KeyboardDevice
+{
+    uint8_t padding_0[0x1b8];
+    uint8_t key_states[256];
+    uint8_t padding_1[2];
+};
+
+static_assert(offsetof(KeyboardDevice, key_states) == 0x1b8);
+static_assert(sizeof(KeyboardDevice) == 0x2ba);
+
 struct PadDevice
 {
     uint64_t padding_0;
     VirtualMultiDevice* VirtMultiDevice;
-    uint8_t padding_1[0x38];
+    uint64_t padding_1[2];
+    KeyboardDevice* KeybrdDevice;
+    uint8_t padding_2[0x20];
 };
 
 static_assert(offsetof(PadDevice, VirtMultiDevice) == 0x8);
+static_assert(offsetof(PadDevice, KeybrdDevice) == 0x20);
 static_assert(sizeof(PadDevice) == 0x48);
 
 struct PadMan
