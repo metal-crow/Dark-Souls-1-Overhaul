@@ -12,19 +12,34 @@ class Rollback
 {
 public:
     static void start();
+
     static void GameStateSave();
     static void GameStateLoad();
+
     static void GameInputSave();
     static void GameInputLoad();
+
+    static void NetcodeFix();
 
     static bool gsave;
     static bool gload;
     static bool isave;
     static bool iload;
 
+    static bool rollbackEnabled;
+
 private:
+
     static PlayerIns* saved_playerins;
     static PadMan* saved_padman;
+
+    static const uint64_t sendType1NetMessage_offset = 0x5031f0;
+    static const uint64_t readparseType1NetMessage_offset = 0x503440;
+    static const uint64_t send_generalplayerinfo_offset = 0x3980e0;
+    static const uint64_t Read_GeneralPlayerData_offset = 0x395de0;
+    static const uint64_t sendType10NetMessage_1_offset = 0x5059e0;
+    static const uint64_t sendType10NetMessage_2_offset = 0x5058b0;
+    static const uint64_t readparseType10NetMessage_offset = 0x505b50;
     static const uint64_t disableType18PacketEnforcement = 0x35b13b;
     static const uint64_t disableType18PacketSending = 0x5067f1;
 };
