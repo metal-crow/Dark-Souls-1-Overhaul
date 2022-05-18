@@ -40,6 +40,14 @@ private:
     static const uint64_t sendType10NetMessage_1_offset = 0x5059e0;
     static const uint64_t sendType10NetMessage_2_offset = 0x5058b0;
     static const uint64_t readparseType10NetMessage_offset = 0x505b50;
+    static const uint64_t sendType11NetMessage_1_offset = 0x505db0;
+    static const uint64_t sendType11NetMessage_2_offset = 0x505d30;
+    static const uint64_t sendType11NetMessage_3_offset = 0x505e60;
+    static const uint64_t readparseType11NetMessage_offset = 0x505f20;
+    static const uint64_t sendType16NetMessage_offset = 0x5056a0;
+    static const uint64_t readparseType16NetMessage_offset = 0x505700;
+    static const uint64_t readparseType17NetMessage_offset = 0x5062d0;
+
     static const uint64_t disableType18PacketEnforcement = 0x35b13b;
     static const uint64_t disableType18PacketSending = 0x5067f1;
 };

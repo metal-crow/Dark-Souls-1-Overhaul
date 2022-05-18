@@ -30,6 +30,30 @@ extern "C" {
     uint64_t readparseType10NetMessage_return;
     void readparseType10NetMessage_injection();
     bool readparseType10NetMessage_helper();
+
+    uint64_t sendType11NetMessage_1_return;
+    uint64_t sendType11NetMessage_2_return;
+    uint64_t sendType11NetMessage_3_return;
+    void sendType11NetMessage_1_injection();
+    void sendType11NetMessage_2_injection();
+    void sendType11NetMessage_3_injection();
+    bool sendType11NetMessage_helper();
+
+    uint64_t readparseType11NetMessage_return;
+    void readparseType11NetMessage_injection();
+    bool readparseType11NetMessage_helper();
+
+    uint64_t sendType16NetMessage_return;
+    void sendType16NetMessage_injection();
+    bool sendType16NetMessage_helper();
+
+    uint64_t readparseType16NetMessage_return;
+    void readparseType16NetMessage_injection();
+    bool readparseType16NetMessage_helper();
+
+    uint64_t readparseType17NetMessage_return;
+    void readparseType17NetMessage_injection();
+    bool readparseType17NetMessage_helper();
 }
 
 void Rollback::NetcodeFix()
@@ -61,6 +85,33 @@ void Rollback::NetcodeFix()
     //Disable recv
     write_address = (uint8_t*)(Rollback::readparseType10NetMessage_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &readparseType10NetMessage_return, 5, &readparseType10NetMessage_injection);
+
+    /* Type 11 Packet */
+    //Disable sending
+    write_address = (uint8_t*)(Rollback::sendType11NetMessage_1_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &sendType11NetMessage_1_return, 5, &sendType11NetMessage_1_injection);
+    write_address = (uint8_t*)(Rollback::sendType11NetMessage_2_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &sendType11NetMessage_2_return, 2, &sendType11NetMessage_2_injection);
+    write_address = (uint8_t*)(Rollback::sendType11NetMessage_3_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &sendType11NetMessage_3_return, 1, &sendType11NetMessage_3_injection);
+    //Disable recv
+    write_address = (uint8_t*)(Rollback::readparseType11NetMessage_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &readparseType11NetMessage_return, 0, &readparseType11NetMessage_injection);
+
+    /* Type 16 Packet */
+    //Disable sending
+    write_address = (uint8_t*)(Rollback::sendType16NetMessage_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &sendType16NetMessage_return, 2, &sendType16NetMessage_injection);
+    //Disable recv
+    write_address = (uint8_t*)(Rollback::readparseType16NetMessage_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &readparseType16NetMessage_return, 1, &readparseType16NetMessage_injection);
+
+    /* Type 17 Packet */
+    //Disable sending
+
+    //Disable recv
+    write_address = (uint8_t*)(Rollback::readparseType17NetMessage_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &readparseType17NetMessage_return, 5, &readparseType17NetMessage_injection);
 
     /* Type 18 Packet */
     // normally, type18 packet receipt is the only way to do damage to another player
@@ -136,6 +187,54 @@ bool sendType10NetMessage2_helper()
 }
 
 bool readparseType10NetMessage_helper()
+{
+    if (Rollback::rollbackEnabled)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool sendType11NetMessage_helper()
+{
+    if (Rollback::rollbackEnabled)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool readparseType11NetMessage_helper()
+{
+    if (Rollback::rollbackEnabled)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool sendType16NetMessage_helper()
+{
+    if (Rollback::rollbackEnabled)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool readparseType16NetMessage_helper()
 {
     if (Rollback::rollbackEnabled)
     {
