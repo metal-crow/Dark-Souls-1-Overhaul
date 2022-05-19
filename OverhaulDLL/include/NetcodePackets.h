@@ -29,10 +29,10 @@ struct MainPacket
     uint32_t ezStatePassiveState;
     int16_t curHp;
     int16_t maxHp_mod;
+    uint32_t walkanimtwist_unk;
+    float rotation; //just use the normal rotation for this, not the weird version the game uses
     uint32_t type1_unk1;
-    uint32_t rotation;
-    uint32_t type1_unk2;
-    uint32_t type1_unk3;
+    uint8_t type1_unk2;
     //Type 10
     int32_t player_num;
     uint8_t player_sex;

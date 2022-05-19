@@ -107,9 +107,57 @@ bool getNetMessage_helper(uint32_t type)
     }
 }
 
+typedef uint32_t get_AnimationData_FUNC(ActionCtrl* actionctrl, uint32_t i);
+get_AnimationData_FUNC* get_AnimationData = (get_AnimationData_FUNC*)0x140385d00;
+
+typedef uint32_t PlayerCtrl_Get_WalkAnimTwist_unk_FUNC(PlayerCtrl* playerctrl);
+PlayerCtrl_Get_WalkAnimTwist_unk_FUNC* PlayerCtrl_Get_WalkAnimTwist_unk = (PlayerCtrl_Get_WalkAnimTwist_unk_FUNC*)0x14037c4a0;
+
+typedef uint32_t FUN_14050ff50_FUNC(float param_1, void* param_2, byte param_3, int param_4, byte param_5);
+FUN_14050ff50_FUNC* FUN_14050ff50 = (FUN_14050ff50_FUNC*)0x14050ff50;
+
 void send_generalplayerinfo_helper()
 {
-    //TODO send
+    MainPacket pkt;
+
+    auto playerins_o = Game::get_PlayerIns();
+    if (!playerins_o.has_value())
+    {
+        ConsoleWrite("ERROR: Tried to get playerins for send_generalplayerinfo_helper, but unable to.");
+        return;
+    }
+    PlayerIns* playerins = (PlayerIns*)playerins_o.value();
+
+    //Load Type 1
+    pkt.position_x = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x10);
+    pkt.position_z = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x14);
+    pkt.position_y = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x18);
+    pkt.ezStateActiveState = get_AnimationData(playerins->chrins.playerCtrl->chrCtrl.actionctrl, 1);
+    pkt.ezStatePassiveState = get_AnimationData(playerins->chrins.playerCtrl->chrCtrl.actionctrl, 0);
+    pkt.curHp = playerins->chrins.curHp;
+    int32_t maxHp_mod = (playerins->chrins.curHp * 0xff) / playerins->chrins.maxHp;
+    if (maxHp_mod < 0)
+    {
+        pkt.maxHp_mod = 0;
+    }
+    else
+    {
+        pkt.maxHp_mod = (int16_t)maxHp_mod;
+    }
+    pkt.walkanimtwist_unk = PlayerCtrl_Get_WalkAnimTwist_unk(playerins->chrins.playerCtrl);
+    pkt.rotation = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4);
+
+    uint32_t type1_unk1 = FUN_14050ff50(*(float*)(((uint64_t)playerins) + 0x954), NULL, 0xd, 5, 1);
+    pkt.type1_unk1 = pkt.type1_unk1 & 0xffffe000;
+    pkt.type1_unk1 = pkt.type1_unk1 | type1_unk1 & 0x1fff;
+    type1_unk1 = FUN_14050ff50(*(float*)(((uint64_t)playerins) + 0x958), NULL, 0xd, 5, 1);
+    pkt.type1_unk1 = pkt.type1_unk1 & 0xfc001fff;
+    pkt.type1_unk1 = pkt.type1_unk1 | (type1_unk1 & 0x1fff) << 0xd;
+
+    pkt.type1_unk2 = *(uint8_t*)(((uint64_t)playerins) + 0x94c);
+
+    //Load Type 10
+
 }
 
 void Read_GeneralPlayerData_helper()
