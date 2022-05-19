@@ -63,6 +63,7 @@
     <ClInclude Include="include\InvisibleBackstabAttackFix.h" />
     <ClInclude Include="include\MainLoop.h" />
     <ClInclude Include="include\ModNetworking.h" />
+    <ClInclude Include="include\NetcodePackets.h" />
     <ClInclude Include="include\PadManStruct.h" />
     <ClInclude Include="include\RCEFix.h" />
     <ClInclude Include="include\Rollback.h" />

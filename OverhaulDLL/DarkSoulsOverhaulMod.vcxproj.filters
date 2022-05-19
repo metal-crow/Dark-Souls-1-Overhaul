@@ -197,6 +197,9 @@
     <ClInclude Include="include\PadManStruct.h">
       <Filter>Header Files\Rollback</Filter>
     </ClInclude>
+    <ClInclude Include="include\NetcodePackets.h">
+      <Filter>Header Files\Rollback</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="d3d11-wrapper\src\d3d11\exports.def">

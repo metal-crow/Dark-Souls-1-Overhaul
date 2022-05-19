@@ -1,4 +1,5 @@
 #include "Rollback.h"
+#include "NetcodePackets.h"
 #include "SP/memory.h"
 #include "SP/memory/injection/asm/x64.h"
 
