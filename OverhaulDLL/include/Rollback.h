@@ -33,23 +33,11 @@ private:
     static PlayerIns* saved_playerins;
     static PadMan* saved_padman;
 
-    static const uint64_t sendType1NetMessage_offset = 0x5031f0;
-    static const uint64_t readparseType1NetMessage_offset = 0x503440;
+    static const uint64_t sendNetMessage_offset = 0x5096d0;
+    static const uint64_t getNetMessage_offset = 0x509560;
     static const uint64_t send_generalplayerinfo_offset = 0x3980e0;
     static const uint64_t Read_GeneralPlayerData_offset = 0x395de0;
-    static const uint64_t sendType10NetMessage_1_offset = 0x5059e0;
-    static const uint64_t sendType10NetMessage_2_offset = 0x5058b0;
-    static const uint64_t readparseType10NetMessage_offset = 0x505b50;
-    static const uint64_t sendType11NetMessage_1_offset = 0x505db0;
-    static const uint64_t sendType11NetMessage_2_offset = 0x505d30;
-    static const uint64_t sendType11NetMessage_3_offset = 0x505e60;
-    static const uint64_t readparseType11NetMessage_offset = 0x505f20;
-    static const uint64_t sendType16NetMessage_offset = 0x5056a0;
-    static const uint64_t readparseType16NetMessage_offset = 0x505700;
-    static const uint64_t readparseType17NetMessage_offset = 0x5062d0;
-
     static const uint64_t disableType18PacketEnforcement = 0x35b13b;
-    static const uint64_t disableType18PacketSending = 0x5067f1;
 };
 
 inline void* malloc_(size_t size)
