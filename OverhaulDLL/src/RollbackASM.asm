@@ -106,7 +106,7 @@ add     rsp, 10h
 ;check if we abort this call or not
 test    eax, eax
 jnz     normal
-xor     al, al ;aborting call, so return false
+xor     eax, eax ;aborting call, so return 0 bytes
 ret
 
 ;original code
