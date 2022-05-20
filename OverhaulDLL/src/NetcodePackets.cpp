@@ -122,6 +122,9 @@ compress_gamedata_flags_FUNC* compress_gamedata_flags = (compress_gamedata_flags
 typedef uint32_t get_currently_selected_magic_id_FUNC(PlayerIns* playerins);
 get_currently_selected_magic_id_FUNC* get_currently_selected_magic_id = (get_currently_selected_magic_id_FUNC*)0x140360650;
 
+typedef bool sendNetMessageToAllPlayers_FUNC(uint64_t sessionMan, uint32_t type, void* data, int size);
+sendNetMessageToAllPlayers_FUNC* sendNetMessageToAllPlayers = (sendNetMessageToAllPlayers_FUNC*)0x1405098a0;
+
 void send_generalplayerinfo_helper()
 {
     MainPacket pkt;
@@ -192,6 +195,9 @@ void send_generalplayerinfo_helper()
 
     //Load Type 34
     //TODO this is a bit complicated
+
+    //send out packet
+    sendNetMessageToAllPlayers(*(uint64_t*)Game::session_man_imp, Rollback::RollbackSinglePacketType, &pkt, sizeof(pkt));
 }
 
 void Read_GeneralPlayerData_helper()

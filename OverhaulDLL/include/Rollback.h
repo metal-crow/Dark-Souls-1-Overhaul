@@ -28,6 +28,7 @@ public:
 
     static bool rollbackEnabled;
 
+    static const uint32_t RollbackSinglePacketType = 2; //this is unused, and passes the checks the game does on the type
 private:
 
     static PlayerIns* saved_playerins;
@@ -38,6 +39,7 @@ private:
     static const uint64_t send_generalplayerinfo_offset = 0x3980e0;
     static const uint64_t Read_GeneralPlayerData_offset = 0x395de0;
     static const uint64_t disableType18PacketEnforcement = 0x35b13b;
+
 };
 
 inline void* malloc_(size_t size)
