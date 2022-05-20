@@ -37,9 +37,12 @@ struct MainPacket
     int32_t player_num;
     uint8_t player_sex;
     uint8_t covenantId;
-    uint16_t type10_unk1;
     uint32_t equipment_array[20];
-    float type10_unk2[5];
+    float type10_unk1;
+    float type10_unk2;
+    float type10_unk3;
+    float type10_unk4;
+    float type10_unk5;
     //Type 11
     uint16_t flags;
     uint16_t node_num; //TODO is this just player_num?

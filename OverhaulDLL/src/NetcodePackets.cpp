@@ -116,6 +116,12 @@ PlayerCtrl_Get_WalkAnimTwist_unk_FUNC* PlayerCtrl_Get_WalkAnimTwist_unk = (Playe
 typedef uint32_t FUN_14050ff50_FUNC(float param_1, void* param_2, byte param_3, int param_4, byte param_5);
 FUN_14050ff50_FUNC* FUN_14050ff50 = (FUN_14050ff50_FUNC*)0x14050ff50;
 
+typedef uint16_t compress_gamedata_flags_FUNC(uint64_t equipgamedata);
+compress_gamedata_flags_FUNC* compress_gamedata_flags = (compress_gamedata_flags_FUNC*)0x140747900;
+
+typedef uint32_t get_currently_selected_magic_id_FUNC(PlayerIns* playerins);
+get_currently_selected_magic_id_FUNC* get_currently_selected_magic_id = (get_currently_selected_magic_id_FUNC*)0x140360650;
+
 void send_generalplayerinfo_helper()
 {
     MainPacket pkt;
@@ -157,7 +163,35 @@ void send_generalplayerinfo_helper()
     pkt.type1_unk2 = *(uint8_t*)(((uint64_t)playerins) + 0x94c);
 
     //Load Type 10
+    uint64_t playergamedata = *(uint64_t*)(*(uint64_t*)(Game::game_data_man) + 0x10);
+    uint64_t attribs = playergamedata + 0x10;
+    uint64_t equipgamedata = playergamedata + 0x280;
+    pkt.player_num = *(int32_t*)(attribs + 0);
+    pkt.player_sex = *(uint8_t*)(attribs + 0xba);
+    pkt.covenantId = *(uint8_t*)(attribs + 0x103);
+    for (int i = 0; i < 0x14; i++)
+    {
+        pkt.equipment_array[i] = Game::get_equipped_inventory((uint64_t)playerins, (InventorySlots)i);
+    }
+    pkt.type10_unk1 = *(float*)(equipgamedata + 0x108);
+    pkt.type10_unk2 = *(float*)(equipgamedata + 0x10C);
+    pkt.type10_unk3 = *(float*)(equipgamedata + 0x110);
+    pkt.type10_unk4 = *(float*)(equipgamedata + 0x114);
+    pkt.type10_unk5 = *(float*)(equipgamedata + 0x118);
 
+    //Load Type 11
+    pkt.flags = compress_gamedata_flags(equipgamedata);
+    pkt.node_num = (uint16_t)(*(uint32_t*)(((uint64_t)(&playerins->chrins)) + 0xdc));
+
+    //Load Type 16
+    //TODO need runtime debugging here
+
+    //Load Type 17
+    pkt.curSelectedMagicId = get_currently_selected_magic_id(playerins);
+    pkt.curUsingItemId = (playerins->chrins).curUsedItem.itemId;
+
+    //Load Type 34
+    //TODO this is a bit complicated
 }
 
 void Read_GeneralPlayerData_helper()
