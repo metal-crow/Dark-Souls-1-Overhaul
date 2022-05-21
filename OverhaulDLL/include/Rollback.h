@@ -4,6 +4,7 @@
 
 #include <stdint.h>
 #include "PlayerInsStruct.h"
+#include "NetcodePackets.h"
 #include "PadManStruct.h"
 #include <unordered_map>
 #include "DarkSoulsOverhaulMod.h"
@@ -20,6 +21,8 @@ public:
     static void GameInputLoad();
 
     static void NetcodeFix();
+
+    static void LoadRemotePlayerPacket(MainPacket* pkt);
 
     static bool gsave;
     static bool gload;

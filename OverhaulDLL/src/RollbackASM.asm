@@ -187,6 +187,7 @@ push    r9
 push    r10
 push    r11
 sub     rsp, 28h
+;NetworkManipulator is passed in implicitly as rcx
 call    Read_GeneralPlayerData_helper
 add     rsp, 28h
 pop     r11

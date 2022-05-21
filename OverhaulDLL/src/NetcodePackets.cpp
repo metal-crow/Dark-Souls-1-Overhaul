@@ -19,7 +19,7 @@ extern "C" {
 
     uint64_t Read_GeneralPlayerData_return;
     void Read_GeneralPlayerData_injection();
-    void Read_GeneralPlayerData_helper();
+    void Read_GeneralPlayerData_helper(uint64_t NetworkManipulator);
 }
 
 void Rollback::NetcodeFix()
@@ -125,6 +125,9 @@ get_currently_selected_magic_id_FUNC* get_currently_selected_magic_id = (get_cur
 typedef bool sendNetMessageToAllPlayers_FUNC(uint64_t sessionMan, uint32_t type, void* data, int size);
 sendNetMessageToAllPlayers_FUNC* sendNetMessageToAllPlayers = (sendNetMessageToAllPlayers_FUNC*)0x1405098a0;
 
+typedef uint32_t getNetMessage_FUNC(uint64_t session_man, uint64_t ConnectedPlayerData, uint32_t type, void* data_out, int max_size);
+getNetMessage_FUNC* getNetMessage = (getNetMessage_FUNC*)0x140509560;
+
 void send_generalplayerinfo_helper()
 {
     MainPacket pkt;
@@ -200,7 +203,20 @@ void send_generalplayerinfo_helper()
     sendNetMessageToAllPlayers(*(uint64_t*)Game::session_man_imp, Rollback::RollbackSinglePacketType, &pkt, sizeof(pkt));
 }
 
-void Read_GeneralPlayerData_helper()
+void Read_GeneralPlayerData_helper(uint64_t NetworkManipulator)
 {
-    //TODO recv
+    //read in packet for the given connected player
+    MainPacket pkt;
+
+    uint64_t GeneralPlayerData = *(uint64_t*)(NetworkManipulator + 0x270);
+    uint64_t ConnectedPlayerData = GeneralPlayerData + 0x30;
+    getNetMessage(*(uint64_t*)Game::session_man_imp, ConnectedPlayerData, Rollback::RollbackSinglePacketType, &pkt, sizeof(pkt));
+
+    //temporary, will use this with GGPO later
+    Rollback::LoadRemotePlayerPacket(&pkt);
+}
+
+void Rollback::LoadRemotePlayerPacket(MainPacket* pkt)
+{
+    //TODO need to runtime debug for these
 }
