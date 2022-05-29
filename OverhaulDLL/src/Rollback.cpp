@@ -13,6 +13,9 @@ PadMan* Rollback::saved_padman = NULL;
 bool Rollback::gsave = false;
 bool Rollback::gload = false;
 
+typedef void MoveMapStep_Step_13_FUNC(void* MoveMapStep, float frame_delta_in_seconds);
+MoveMapStep_Step_13_FUNC* MoveMapStep_Step_13 = (MoveMapStep_Step_13_FUNC*)0x14024ddd0;
+
 bool rollback_test(void* unused)
 {
     if (Rollback::gsave)
@@ -24,6 +27,13 @@ bool rollback_test(void* unused)
     if (Rollback::gload)
     {
         Rollback::GameStateLoad();
+        auto movemapstep_o = Game::get_MoveMapStep();
+        if (!movemapstep_o.has_value())
+        {
+            ConsoleWrite("!movemapstep_o.has_value()");
+            return true;
+        }
+        MoveMapStep_Step_13(movemapstep_o.value(), 0.016666668f);
         Rollback::gload = false;
     }
 
@@ -43,6 +53,13 @@ bool input_test(void* unused)
     if (Rollback::iload)
     {
         Rollback::GameInputLoad();
+        auto movemapstep_o = Game::get_MoveMapStep();
+        if (!movemapstep_o.has_value())
+        {
+            ConsoleWrite("!movemapstep_o.has_value()");
+            return true;
+        }
+        MoveMapStep_Step_13(movemapstep_o.value(), 0.016666668f);
         Rollback::iload = false;
     }
 

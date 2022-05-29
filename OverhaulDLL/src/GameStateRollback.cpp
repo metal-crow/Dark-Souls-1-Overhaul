@@ -272,9 +272,11 @@ void copy_PlayerGameData_AttributeInfo(PlayerGameData_AttributeInfo* to, PlayerG
 
 void copy_ChrIns(ChrIns* to, ChrIns* from, bool to_game)
 {
+    copy_ChrIns_field0x18(to->field0x18, from->field0x18);
     copy_PlayerCtrl(to->playerCtrl, from->playerCtrl, to_game);
     copy_PadManipulator(to->padManipulator, from->padManipulator);
     to->CharaInitParamID = from->CharaInitParamID;
+    memcpy(to->data_5, from->data_5, sizeof(to->data_5));
     to->lowerThrowAnim = from->lowerThrowAnim;
     to->upperThrowAnim = from->upperThrowAnim;
     to->curSelectedMagicId = from->curSelectedMagicId;
@@ -311,6 +313,7 @@ ChrIns* init_ChrIns()
 {
     ChrIns* local_ChrIns = (ChrIns*)malloc_(sizeof(ChrIns));
 
+    local_ChrIns->field0x18 = init_ChrIns_field0x18();
     local_ChrIns->playerCtrl = init_PlayerCtrl();
     local_ChrIns->padManipulator = init_PadManipulator();
     local_ChrIns->specialEffects = init_SpecialEffect();
@@ -325,6 +328,7 @@ ChrIns* init_ChrIns()
 
 void free_ChrIns(ChrIns* to, bool freeself)
 {
+    free_ChrIns_field0x18(to->field0x18);
     free_PlayerCtrl(to->playerCtrl);
     free_PadManipulator(to->padManipulator);
     free_SpecialEffect(to->specialEffects);
@@ -338,6 +342,22 @@ void free_ChrIns(ChrIns* to, bool freeself)
     {
         free(to);
     }
+}
+
+void copy_ChrIns_field0x18(ChrIns_field0x18* to, ChrIns_field0x18* from)
+{
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+}
+
+ChrIns_field0x18* init_ChrIns_field0x18()
+{
+    ChrIns_field0x18* local_ChrIns_field0x18 = (ChrIns_field0x18*)malloc_(sizeof(ChrIns_field0x18));
+    return local_ChrIns_field0x18;
+}
+
+void free_ChrIns_field0x18(ChrIns_field0x18* to)
+{
+    free(to);
 }
 
 void copy_ChrIns_field0x2c8(ChrIns_field0x2c8* to, ChrIns_field0x2c8* from)

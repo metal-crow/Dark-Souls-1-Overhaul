@@ -51,6 +51,7 @@ typedef struct QwcSpEffectEquipCtrl QwcSpEffectEquipCtrl;
 typedef struct ChrAttachSys ChrAttachSys;
 typedef struct EntityThrowAnimationStatus EntityThrowAnimationStatus;
 typedef struct ChrIns_field0x2c8 ChrIns_field0x2c8;
+typedef struct ChrIns_field0x18 ChrIns_field0x18;
 typedef struct ChrIns ChrIns;
 typedef struct PlayerGameData_AttributeInfo PlayerGameData_AttributeInfo;
 typedef struct EquipInventoryData EquipInventoryData;
@@ -743,14 +744,24 @@ static_assert(offsetof(ChrIns_field0x2c8, data_2) == 0x38);
 static_assert(offsetof(ChrIns_field0x2c8, data_3) == 0x50);
 static_assert(sizeof(ChrIns_field0x2c8) == 0x58);
 
+struct ChrIns_field0x18
+{
+    uint8_t data_0[0x80];
+};
+
+static_assert(sizeof(ChrIns_field0x18) == 0x80);
+
 struct ChrIns
 {
-    uint8_t padding_0[8 + 0x60];
+    uint8_t padding_0[8 + 0x18];
+    ChrIns_field0x18* field0x18;
+    uint8_t padding_0a[0x40];
     PlayerCtrl* playerCtrl;
     PadManipulator* padManipulator;
     uint8_t padding_1[0x54];
     int32_t CharaInitParamID;
-    uint8_t padding_3[0xac];
+    uint8_t padding_3[0x9c];
+    uint8_t data_5[0x10];
     ChrIns_AnimationMediatorStateInfo lowerThrowAnim;
     ChrIns_AnimationMediatorStateInfo upperThrowAnim;
     uint8_t padding_4[0xd8];
@@ -793,9 +804,11 @@ struct ChrIns
     uint8_t data_4[0x58];
 };
 
+static_assert(offsetof(ChrIns, field0x18) == 0x18+8);
 static_assert(offsetof(ChrIns, playerCtrl) == 0x60+8);
 static_assert(offsetof(ChrIns, padManipulator) == 0x68+8);
 static_assert(offsetof(ChrIns, CharaInitParamID) == 0xc4+8);
+static_assert(offsetof(ChrIns, data_5) == 0x164 + 8);
 static_assert(offsetof(ChrIns, lowerThrowAnim) == 0x174+8);
 static_assert(offsetof(ChrIns, upperThrowAnim) == 0x17c+8);
 static_assert(offsetof(ChrIns, curSelectedMagicId) == 0x25c+8);

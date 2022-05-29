@@ -153,6 +153,8 @@ public:
 
     static uint64_t pad_man;
 
+    static uint64_t frpg_system;
+
     static const uint64_t calculate_attack_damage_offset = 0x2a8ead6;
 
     static const uint64_t char_loaded_injection_offset = 0x24D8D0;
@@ -327,6 +329,8 @@ public:
     static void* game_malloc(size_t size, size_t alignment, void* heap);
 
     static void game_free(void* p, size_t size);
+
+	static std::optional<void*> get_MoveMapStep();
 
     /*
      * Help speedup some functions by, whenever we're loaded into an area,

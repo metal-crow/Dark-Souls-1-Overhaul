@@ -59,6 +59,8 @@ uint64_t Game::frpg_net_man = NULL;
 
 uint64_t Game::pad_man = NULL;
 
+uint64_t Game::frpg_system = NULL;
+
 // Player character status (loading, human, co-op, invader, hollow)
 sp::mem::pointer<int32_t> Game::player_char_status;
 
@@ -149,6 +151,8 @@ void Game::init()
     Game::frpg_net_man = 0x141d27d60;
 
     Game::pad_man = 0x141d06eb0;
+
+    Game::frpg_system = 0x141c04e28;
 }
 
 void Game::injections_init()
@@ -273,6 +277,7 @@ static void** player_animationMediator_cache = NULL;
 static void** host_player_gamedata_cache = NULL;
 static bool* display_name_cache = NULL;
 static int32_t** MP_AreaID_cache = NULL;
+static void** MoveMapStep_cache = NULL;
 
 void Game::preload_function_caches() {
     ConsoleWrite("Cache loading");
@@ -329,6 +334,8 @@ void Game::preload_function_caches() {
     Game::get_host_player_gamedata();
     MP_AreaID_cache = NULL;
     Game::get_MP_AreaID_ptr();
+    MoveMapStep_cache = NULL;
+    Game::get_MoveMapStep();
 
     Sleep(10);
     //this pointer is a bit late to resolve on load
@@ -1514,4 +1521,23 @@ InGame_Free_FUNC* InGame_Free = (InGame_Free_FUNC*)0x1410e0a9c;
 void Game::game_free(void* p, size_t size)
 {
     return InGame_Free(p, size);
+}
+
+std::optional<void*> Game::get_MoveMapStep()
+{
+    if (MoveMapStep_cache)
+    {
+        return *MoveMapStep_cache;
+    }
+
+    sp::mem::pointer MoveMapStep = sp::mem::pointer<void*>((void*)(Game::frpg_system), { 0x8, 0x20, 0x58, 0x20, 0xa0, 0x38, 0x20 });
+    if (MoveMapStep.resolve() == NULL)
+    {
+        return std::nullopt;
+    }
+    else
+    {
+        MoveMapStep_cache = MoveMapStep.resolve();
+        return *MoveMapStep_cache;
+    }
 }

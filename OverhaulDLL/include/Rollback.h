@@ -136,6 +136,10 @@ void copy_ChrIns(ChrIns* to, ChrIns* from, bool to_game);
 ChrIns* init_ChrIns();
 void free_ChrIns(ChrIns* to, bool freeself);
 
+void copy_ChrIns_field0x18(ChrIns_field0x18* to, ChrIns_field0x18* from);
+ChrIns_field0x18* init_ChrIns_field0x18();
+void free_ChrIns_field0x18(ChrIns_field0x18* to);
+
 void copy_ChrIns_field0x2c8(ChrIns_field0x2c8* to, ChrIns_field0x2c8* from);
 ChrIns_field0x2c8* init_ChrIns_field0x2c8();
 void free_ChrIns_field0x2c8(ChrIns_field0x2c8* to);
