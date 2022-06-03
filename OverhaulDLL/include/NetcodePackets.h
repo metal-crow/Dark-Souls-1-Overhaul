@@ -28,7 +28,7 @@ struct MainPacket
     uint32_t ezStateActiveState;
     uint32_t ezStatePassiveState;
     int16_t curHp;
-    int16_t maxHp_mod;
+    int16_t maxHp; //just use the normal max hp for this
     uint32_t walkanimtwist_unk;
     float rotation; //just use the normal rotation for this, not the weird version the game uses
     uint32_t type1_unk1;

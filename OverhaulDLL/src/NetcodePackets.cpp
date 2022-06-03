@@ -133,7 +133,7 @@ void send_generalplayerinfo_helper()
     MainPacket pkt;
 
     auto playerins_o = Game::get_PlayerIns();
-    if (!playerins_o.has_value())
+    if (!playerins_o.has_value() || playerins_o.value() == NULL)
     {
         ConsoleWrite("ERROR: Tried to get playerins for send_generalplayerinfo_helper, but unable to.");
         return;
@@ -147,15 +147,7 @@ void send_generalplayerinfo_helper()
     pkt.ezStateActiveState = get_AnimationData(playerins->chrins.playerCtrl->chrCtrl.actionctrl, 1);
     pkt.ezStatePassiveState = get_AnimationData(playerins->chrins.playerCtrl->chrCtrl.actionctrl, 0);
     pkt.curHp = playerins->chrins.curHp;
-    int32_t maxHp_mod = (playerins->chrins.curHp * 0xff) / playerins->chrins.maxHp;
-    if (maxHp_mod < 0)
-    {
-        pkt.maxHp_mod = 0;
-    }
-    else
-    {
-        pkt.maxHp_mod = (int16_t)maxHp_mod;
-    }
+    pkt.maxHp = playerins->chrins.curHp;
     pkt.walkanimtwist_unk = PlayerCtrl_Get_WalkAnimTwist_unk(playerins->chrins.playerCtrl);
     pkt.rotation = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4);
 
@@ -216,7 +208,55 @@ void Read_GeneralPlayerData_helper(uint64_t NetworkManipulator)
     Rollback::LoadRemotePlayerPacket(&pkt);
 }
 
+typedef void PlayerIns_SetHp_FUNC(void* playerins, uint64_t curHp);
+PlayerIns_SetHp_FUNC* PlayerIns_SetHp = (PlayerIns_SetHp_FUNC*)0x1403206c0;
+
+typedef void ChrAsm_Set_Equipped_Items_FromNetwork_FUNC(void* EquipGameData, uint32_t index, uint32_t given_item_id, int param_4, bool param_5);
+ChrAsm_Set_Equipped_Items_FromNetwork_FUNC* ChrAsm_Set_Equipped_Items_FromNetwork = (ChrAsm_Set_Equipped_Items_FromNetwork_FUNC*)0x140743b60;
+
+typedef void set_playergamedata_flags_FUNC(void* EquipGameData, uint16_t net_data);
+set_playergamedata_flags_FUNC* set_playergamedata_flags = (set_playergamedata_flags_FUNC*)0x140747870;
+
 void Rollback::LoadRemotePlayerPacket(MainPacket* pkt)
 {
-    //TODO need to runtime debug for these
+    auto playerins_o = Game::get_connected_player(0);// player_id);
+    if (!playerins_o.has_value())
+    {
+        ConsoleWrite("ERROR: Tried to get playerins for LoadRemotePlayerPacket, but unable to.");
+        return;
+    }
+    PlayerIns* playerins = (PlayerIns*)playerins_o.value();
+
+    //Type 1
+    //TODO need to runtime debug
+    playerins->chrins.maxHp = pkt->maxHp;
+    *(uint32_t*)((uint64_t)(&playerins->playergamedata->attribs) + 8) = pkt->maxHp;
+
+    PlayerIns_SetHp(playerins, pkt->curHp);
+    //if ((0 < uVar14) && (uVar7 == 0)) {
+    //thunk_FUN_1421710bc(pNVar2);
+    //}
+    *(uint32_t*)((uint64_t)(&playerins->playergamedata->attribs) + 4) = pkt->curHp;
+
+    //Type 10
+    if (*(uint32_t*)((uint64_t)(&playerins->playergamedata->attribs) + 0) != pkt->player_num)
+    {
+        FATALERROR("Remote player attribs playernum doesn't match the packet playernum.");
+        return;
+    }
+    *(uint8_t*)((uint64_t)(&playerins->playergamedata->attribs) + 0xba) = pkt->player_sex;
+    *(uint8_t*)((uint64_t)(&playerins->playergamedata->attribs) + 0x103) = pkt->covenantId;
+    for (uint32_t i = 0; i < 20; i++)
+    {
+        ChrAsm_Set_Equipped_Items_FromNetwork(&playerins->playergamedata->equipGameData, i, pkt->equipment_array[i], -1, false);
+    }
+    uint64_t equipgamedata = (uint64_t)&playerins->playergamedata->equipGameData;
+    *(float*)(equipgamedata + 0x108) = pkt->type10_unk1;
+    *(float*)(equipgamedata + 0x10C) = pkt->type10_unk2;
+    *(float*)(equipgamedata + 0x110) = pkt->type10_unk3;
+    *(float*)(equipgamedata + 0x114) = pkt->type10_unk4;
+    *(float*)(equipgamedata + 0x118) = pkt->type10_unk5;
+
+    //Type 11
+    set_playergamedata_flags((void*)equipgamedata, pkt->flags);
 }
