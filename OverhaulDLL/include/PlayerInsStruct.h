@@ -972,9 +972,9 @@ struct ChrAsm
     uint32_t equipped_weapon_style;
     uint32_t l_hand_equipped_index;
     uint32_t r_hand_equipped_index;
-    uint8_t padding_1[0x10];
+    uint8_t data_0[0x10];
     uint32_t equip_items[20];
-    uint8_t padding_2[0xc];
+    uint8_t data_1[0xc];
 };
 
 static_assert(offsetof(ChrAsm, equipped_weapon_style) == 0x8);

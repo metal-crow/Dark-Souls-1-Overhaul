@@ -75,7 +75,9 @@ void copy_ChrAsm(ChrAsm* to, ChrAsm* from)
     to->equipped_weapon_style = from->equipped_weapon_style;
     to->l_hand_equipped_index = from->equipped_weapon_style;
     to->r_hand_equipped_index = from->r_hand_equipped_index;
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(to->equip_items, from->equip_items, sizeof(to->equip_items));
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
 }
 
 ChrAsm* init_ChrAsm()
