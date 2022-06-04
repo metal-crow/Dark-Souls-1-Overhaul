@@ -179,7 +179,6 @@ void send_generalplayerinfo_helper()
 
     //Load Type 11
     pkt.flags = compress_gamedata_flags(equipgamedata);
-    pkt.node_num = (uint16_t)(*(uint32_t*)(((uint64_t)(&playerins->chrins)) + 0xdc));
 
     //Load Type 16
     //TODO need runtime debugging here
@@ -195,17 +194,27 @@ void send_generalplayerinfo_helper()
     sendNetMessageToAllPlayers(*(uint64_t*)Game::session_man_imp, Rollback::RollbackSinglePacketType, &pkt, sizeof(pkt));
 }
 
+typedef PlayerIns* getPlayerInsForConnectedPlayerData_FUNC(void* worldchrman, void* ConnectedPlayerData);
+getPlayerInsForConnectedPlayerData_FUNC* getPlayerInsForConnectedPlayerData = (getPlayerInsForConnectedPlayerData_FUNC*)0x140372710;
+
 void Read_GeneralPlayerData_helper(uint64_t NetworkManipulator)
 {
     //read in packet for the given connected player
     MainPacket pkt;
+    PlayerIns* playerins;
 
     uint64_t GeneralPlayerData = *(uint64_t*)(NetworkManipulator + 0x270);
     uint64_t ConnectedPlayerData = GeneralPlayerData + 0x30;
     getNetMessage(*(uint64_t*)Game::session_man_imp, ConnectedPlayerData, Rollback::RollbackSinglePacketType, &pkt, sizeof(pkt));
 
+    playerins = getPlayerInsForConnectedPlayerData(*(void**)Game::world_chr_man_imp, (void*)ConnectedPlayerData);
+    if (playerins == NULL)
+    {
+        FATALERROR("Unable to get PlayerIns for the ConnectedPlayerData %p", ConnectedPlayerData);
+    }
+
     //temporary, will use this with GGPO later
-    Rollback::LoadRemotePlayerPacket(&pkt);
+    Rollback::LoadRemotePlayerPacket(&pkt, playerins);
 }
 
 typedef void PlayerIns_SetHp_FUNC(void* playerins, uint64_t curHp);
@@ -229,16 +238,8 @@ putAttackerIntoThrowAnimation_FUNC* putAttackerIntoThrowAnimation = (putAttacker
 typedef void putDefenderIntoThrowAnimation_FUNC(uint64_t param_1, byte param_2);
 putDefenderIntoThrowAnimation_FUNC* putDefenderIntoThrowAnimation = (putDefenderIntoThrowAnimation_FUNC*)0x1403ad760;
 
-void Rollback::LoadRemotePlayerPacket(MainPacket* pkt)
+void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins)
 {
-    auto playerins_o = Game::get_connected_player(0);// player_id);
-    if (!playerins_o.has_value())
-    {
-        ConsoleWrite("ERROR: Tried to get playerins for LoadRemotePlayerPacket, but unable to.");
-        return;
-    }
-    PlayerIns* playerins = (PlayerIns*)playerins_o.value();
-
     //Type 1
     //TODO need to runtime debug
     playerins->chrins.maxHp = pkt->maxHp;
@@ -251,11 +252,7 @@ void Rollback::LoadRemotePlayerPacket(MainPacket* pkt)
     *(uint32_t*)((uint64_t)(&playerins->playergamedata->attribs) + 4) = pkt->curHp;
 
     //Type 10
-    if (*(uint32_t*)((uint64_t)(&playerins->playergamedata->attribs) + 0) != pkt->player_num)
-    {
-        FATALERROR("Remote player attribs playernum doesn't match the packet playernum.");
-        return;
-    }
+    *(uint32_t*)((uint64_t)(&playerins->playergamedata->attribs) + 0) = pkt->player_num;
     *(uint8_t*)((uint64_t)(&playerins->playergamedata->attribs) + 0xba) = pkt->player_sex;
     *(uint8_t*)((uint64_t)(&playerins->playergamedata->attribs) + 0x103) = pkt->covenantId;
     for (uint32_t i = 0; i < 20; i++)
@@ -340,4 +337,7 @@ void Rollback::LoadRemotePlayerPacket(MainPacket* pkt)
         putAttackerIntoThrowAnimation(attacker_throw_info);
         putDefenderIntoThrowAnimation(defender_throw_info, 1);
     }
+
+    //Type 17
+
 }

@@ -22,7 +22,7 @@ public:
 
     static void NetcodeFix();
 
-    static void LoadRemotePlayerPacket(MainPacket* pkt);
+    static void LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* player);
 
     static bool gsave;
     static bool gload;

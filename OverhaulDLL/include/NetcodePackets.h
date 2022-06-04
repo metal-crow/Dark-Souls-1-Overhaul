@@ -45,14 +45,13 @@ struct MainPacket
     float type10_unk5;
     //Type 11
     uint16_t flags;
-    uint16_t node_num; //TODO is this just player_num?
     //Type 16
     PosRotFloatVec attacker_position;
     PosRotFloatVec defender_position;
     uint16_t entitynum_defender;
     uint16_t entitynum_attacker;
-    uint32_t throw_id;
-    uint32_t type16_unk1;
+    uint32_t throw_id; //if this is -1, don't use any of these vals
+    uint8_t type16_unk1;
     //Type 17
     uint16_t curSelectedMagicId;
     uint32_t curUsingItemId;
