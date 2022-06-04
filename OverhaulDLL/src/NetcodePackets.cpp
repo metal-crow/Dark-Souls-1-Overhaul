@@ -217,6 +217,18 @@ ChrAsm_Set_Equipped_Items_FromNetwork_FUNC* ChrAsm_Set_Equipped_Items_FromNetwor
 typedef void set_playergamedata_flags_FUNC(void* EquipGameData, uint16_t net_data);
 set_playergamedata_flags_FUNC* set_playergamedata_flags = (set_playergamedata_flags_FUNC*)0x140747870;
 
+typedef ChrIns* getEntity_FUNC(uint64_t WorldChrMan, uint32_t entityNum);
+getEntity_FUNC* getEntity = (getEntity_FUNC*)0x1425a71a3;
+
+typedef void* getThrowParamFromThrowId_FUNC(uint32_t throw_id);
+getThrowParamFromThrowId_FUNC* getThrowParamFromThrowId = (getThrowParamFromThrowId_FUNC*)0x140534b20;
+
+typedef void putAttackerIntoThrowAnimation_FUNC(uint64_t param_1);
+putAttackerIntoThrowAnimation_FUNC* putAttackerIntoThrowAnimation = (putAttackerIntoThrowAnimation_FUNC*)0x1403ad660;
+
+typedef void putDefenderIntoThrowAnimation_FUNC(uint64_t param_1, byte param_2);
+putDefenderIntoThrowAnimation_FUNC* putDefenderIntoThrowAnimation = (putDefenderIntoThrowAnimation_FUNC*)0x1403ad760;
+
 void Rollback::LoadRemotePlayerPacket(MainPacket* pkt)
 {
     auto playerins_o = Game::get_connected_player(0);// player_id);
@@ -259,4 +271,73 @@ void Rollback::LoadRemotePlayerPacket(MainPacket* pkt)
 
     //Type 11
     set_playergamedata_flags((void*)equipgamedata, pkt->flags);
+
+    //Type 16
+    if (pkt->throw_id != -1)
+    {
+        ChrIns* attacker = getEntity(*(uint64_t*)Game::world_chr_man_imp, pkt->entitynum_attacker);
+        ChrIns* defender = getEntity(*(uint64_t*)Game::world_chr_man_imp, pkt->entitynum_defender);
+        uint64_t attacker_throw_info = (uint64_t)attacker->throw_animation_info;
+        uint64_t defender_throw_info = (uint64_t)defender->throw_animation_info;
+
+        //position
+        *(float*)((uint64_t)(attacker->playerCtrl->chrCtrl.actionctrl) + 0x4e0 + 0) = pkt->attacker_position.X;
+        *(float*)((uint64_t)(attacker->playerCtrl->chrCtrl.actionctrl) + 0x4e0 + 4) = pkt->attacker_position.Y;
+        *(float*)((uint64_t)(attacker->playerCtrl->chrCtrl.actionctrl) + 0x4e0 + 8) = pkt->attacker_position.Z;
+        *(float*)((uint64_t)(attacker->playerCtrl->chrCtrl.actionctrl) + 0x4e0 + 0xc) = 1;
+
+        *(float*)((uint64_t)(defender->playerCtrl->chrCtrl.actionctrl) + 0x4e0 + 0) = pkt->defender_position.X;
+        *(float*)((uint64_t)(defender->playerCtrl->chrCtrl.actionctrl) + 0x4e0 + 4) = pkt->defender_position.Y;
+        *(float*)((uint64_t)(defender->playerCtrl->chrCtrl.actionctrl) + 0x4e0 + 8) = pkt->defender_position.Z;
+        *(float*)((uint64_t)(defender->playerCtrl->chrCtrl.actionctrl) + 0x4e0 + 0xc) = 1;
+
+        *(float*)(attacker_throw_info + 0x70 + 0) = pkt->attacker_position.X;
+        *(float*)(attacker_throw_info + 0x70 + 4) = pkt->attacker_position.Z;
+        *(float*)(attacker_throw_info + 0x70 + 8) = pkt->attacker_position.Y;
+        *(float*)(attacker_throw_info + 0x70 + 0xc) = 1;
+
+        *(float*)(defender_throw_info + 0x70 + 0) = pkt->defender_position.X;
+        *(float*)(defender_throw_info + 0x70 + 4) = pkt->defender_position.Z;
+        *(float*)(defender_throw_info + 0x70 + 8) = pkt->defender_position.Y;
+        *(float*)(defender_throw_info + 0x70 + 0xc) = 1;
+
+        //rotation
+        *(float*)((uint64_t)(attacker->playerCtrl->chrCtrl.actionctrl) + 0x500 + 0) = 0;
+        *(float*)((uint64_t)(attacker->playerCtrl->chrCtrl.actionctrl) + 0x500 + 4) = pkt->attacker_position.Rotation;
+        *(float*)((uint64_t)(attacker->playerCtrl->chrCtrl.actionctrl) + 0x500 + 8) = 0;
+        *(float*)((uint64_t)(attacker->playerCtrl->chrCtrl.actionctrl) + 0x500 + 0xc) = 0;
+
+        *(float*)((uint64_t)(defender->playerCtrl->chrCtrl.actionctrl) + 0x500 + 0) = 0;
+        *(float*)((uint64_t)(defender->playerCtrl->chrCtrl.actionctrl) + 0x500 + 4) = pkt->defender_position.Rotation;
+        *(float*)((uint64_t)(defender->playerCtrl->chrCtrl.actionctrl) + 0x500 + 8) = 0;
+        *(float*)((uint64_t)(defender->playerCtrl->chrCtrl.actionctrl) + 0x500 + 0xc) = 0;
+
+        //override_nonthrow_positionAndRotation
+        *(uint8_t*)((uint64_t)(attacker->playerCtrl->chrCtrl.actionctrl) + 0x520) = 1;
+        *(uint8_t*)((uint64_t)(defender->playerCtrl->chrCtrl.actionctrl) + 0x520) = 1;
+
+        //unknown
+        *(uint8_t*)(attacker_throw_info + 0x28) = 1;
+        *(uint8_t*)(defender_throw_info + 0x28) = 1;
+
+        //throw state
+        *(uint8_t*)(attacker_throw_info + 0x20) = 1;
+        *(uint8_t*)(defender_throw_info + 0x20) = 2;
+
+        //throw_id
+        *(uint32_t*)(attacker_throw_info + 0x10 + 8) = pkt->throw_id;
+        *(uint32_t*)(defender_throw_info + 0x10 + 8) = pkt->throw_id;
+
+        //throw paramdef
+        *(void**)(attacker_throw_info + 0x10 + 0) = getThrowParamFromThrowId(pkt->throw_id);
+        *(void**)(defender_throw_info + 0x10 + 0) = getThrowParamFromThrowId(pkt->throw_id);
+
+        //ThrowPairHandle
+        *(uint32_t*)(attacker_throw_info + 0x24) = *(uint32_t*)(uint64_t)(defender + 8);
+        *(uint32_t*)(defender_throw_info + 0x24) = *(uint32_t*)(uint64_t)(attacker + 8);
+
+        //putIntoThrowAnimation
+        putAttackerIntoThrowAnimation(attacker_throw_info);
+        putDefenderIntoThrowAnimation(defender_throw_info, 1);
+    }
 }
