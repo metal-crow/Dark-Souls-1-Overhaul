@@ -128,6 +128,9 @@ sendNetMessageToAllPlayers_FUNC* sendNetMessageToAllPlayers = (sendNetMessageToA
 typedef uint32_t getNetMessage_FUNC(uint64_t session_man, uint64_t ConnectedPlayerData, uint32_t type, void* data_out, int max_size);
 getNetMessage_FUNC* getNetMessage = (getNetMessage_FUNC*)0x140509560;
 
+typedef void GetTimestamp_FUNC(void* timestamp_out);
+GetTimestamp_FUNC* GetTimestamp = (GetTimestamp_FUNC*)0x140d98ef0;
+
 void send_generalplayerinfo_helper()
 {
     MainPacket pkt;
@@ -189,6 +192,9 @@ void send_generalplayerinfo_helper()
 
     //Load Type 34
     //TODO this is a bit complicated
+    uint64_t timestamp_data[2];
+    GetTimestamp(&timestamp_data);
+    pkt.timestamp = (timestamp_data[0] / 10000 >> 4);
 
     //send out packet
     sendNetMessageToAllPlayers(*(uint64_t*)Game::session_man_imp, Rollback::RollbackSinglePacketType, &pkt, sizeof(pkt));
