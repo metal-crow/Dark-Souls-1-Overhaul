@@ -238,6 +238,9 @@ putAttackerIntoThrowAnimation_FUNC* putAttackerIntoThrowAnimation = (putAttacker
 typedef void putDefenderIntoThrowAnimation_FUNC(uint64_t param_1, byte param_2);
 putDefenderIntoThrowAnimation_FUNC* putDefenderIntoThrowAnimation = (putDefenderIntoThrowAnimation_FUNC*)0x1403ad760;
 
+typedef void Apply_SpeffectSync_FromNetwork_FUNC(void* chrins, uint32_t speffect_id, uint32_t timestamp, float const);
+Apply_SpeffectSync_FromNetwork_FUNC* Apply_SpeffectSync_FromNetwork = (Apply_SpeffectSync_FromNetwork_FUNC*)0x142683b72;
+
 void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins)
 {
     //Type 1
@@ -339,5 +342,16 @@ void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins)
     }
 
     //Type 17
+    (playerins->chrins).curSelectedMagicId = pkt->curSelectedMagicId;
+    if (pkt->curUsingItemId != -1)
+    {
+        (playerins->chrins).curUsedItem.itemId = pkt->curUsingItemId;
+        (playerins->chrins).curUsedItem.amountUsed = 1;
+    }
 
+    // Type 34
+    if (pkt->spEffectToApply != -1)
+    {
+        Apply_SpeffectSync_FromNetwork(playerins, ((pkt->spEffectToApply << 15) >> 15), pkt->timestamp & 0x3fffffff, 1.0f);
+    }
 }
