@@ -61,6 +61,8 @@ uint64_t Game::pad_man = NULL;
 
 uint64_t Game::frpg_system = NULL;
 
+uint64_t Game::damage_man = NULL;
+
 // Player character status (loading, human, co-op, invader, hollow)
 sp::mem::pointer<int32_t> Game::player_char_status;
 
@@ -153,6 +155,8 @@ void Game::init()
     Game::pad_man = 0x141d06eb0;
 
     Game::frpg_system = 0x141c04e28;
+
+    Game::damage_man = 0x141d173c0;
 }
 
 void Game::injections_init()

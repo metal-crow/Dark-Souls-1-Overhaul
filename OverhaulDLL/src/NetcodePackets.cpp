@@ -194,7 +194,7 @@ void send_generalplayerinfo_helper()
     //TODO this is a bit complicated
     uint64_t timestamp_data[2];
     GetTimestamp(&timestamp_data);
-    pkt.timestamp = (timestamp_data[0] / 10000 >> 4);
+    pkt.timestamp = (uint32_t)(timestamp_data[0] / 10000 >> 4);
 
     //send out packet
     sendNetMessageToAllPlayers(*(uint64_t*)Game::session_man_imp, Rollback::RollbackSinglePacketType, &pkt, sizeof(pkt));

@@ -13,8 +13,16 @@ PadMan* Rollback::saved_padman = NULL;
 bool Rollback::gsave = false;
 bool Rollback::gload = false;
 
-typedef void MoveMapStep_Step_13_FUNC(void* MoveMapStep, float frame_delta_in_seconds);
-MoveMapStep_Step_13_FUNC* MoveMapStep_Step_13 = (MoveMapStep_Step_13_FUNC*)0x14024ddd0;
+typedef void Step_Chr_FUNC(void* movemapstep, float frame_time, byte param_3);
+Step_Chr_FUNC* Step_Chr = (Step_Chr_FUNC*)0x14024f7f0;
+
+typedef void Step_Bullet_FUNC(void* bulletman, float frame_time);
+Step_Bullet_FUNC* Step_Bullet = (Step_Bullet_FUNC*)0x140428e40;
+
+typedef void Step_DamageMan_FUNC(void* damageman, float frame_time);
+Step_DamageMan_FUNC* Step_DamageMan = (Step_DamageMan_FUNC*)0x1403c97c0;
+
+static const float FRAMETIME = 0.0166667f;
 
 bool rollback_test(void* unused)
 {
@@ -33,7 +41,9 @@ bool rollback_test(void* unused)
             ConsoleWrite("!movemapstep_o.has_value()");
             return true;
         }
-        MoveMapStep_Step_13(movemapstep_o.value(), 0.016666668f);
+        Step_Chr(movemapstep_o.value(), FRAMETIME, 1);
+        Step_Bullet(*(void**)Game::bullet_man, FRAMETIME);
+        Step_DamageMan(*(void**)Game::damage_man, FRAMETIME);
         Rollback::gload = false;
     }
 
@@ -59,7 +69,9 @@ bool input_test(void* unused)
             ConsoleWrite("!movemapstep_o.has_value()");
             return true;
         }
-        MoveMapStep_Step_13(movemapstep_o.value(), 0.016666668f);
+        Step_Chr(movemapstep_o.value(), FRAMETIME, 1);
+        Step_Bullet(*(void**)Game::bullet_man, FRAMETIME);
+        Step_DamageMan(*(void**)Game::damage_man, FRAMETIME);
         Rollback::iload = false;
     }
 
