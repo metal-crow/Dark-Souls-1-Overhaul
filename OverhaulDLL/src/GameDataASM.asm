@@ -101,6 +101,23 @@ stop_durability_damage_hook PROC
 stop_durability_damage_hook ENDP
 
 
+EXTERN grab_movemapstep_return: qword
+EXTERN grab_movemapstep_value: qword
+
+PUBLIC grab_movemapstep_injection
+grab_movemapstep_injection PROC
+mov qword ptr [grab_movemapstep_value], rcx
+;original code
+mov     [rsp+8], rcx
+push    rbx
+push    rbp
+push    rsi
+push    rdi
+push    r14
+sub     rsp, 30h
+jmp     grab_movemapstep_return
+grab_movemapstep_injection ENDP
+
 _TEXT    ENDS
 
 END

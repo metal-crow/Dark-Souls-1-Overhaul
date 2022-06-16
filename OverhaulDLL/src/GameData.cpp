@@ -79,6 +79,10 @@ extern "C" {
 
     uint64_t gui_hpbar_max_injection_return;
     void gui_hpbar_max_injection();
+
+    uint64_t grab_movemapstep_return;
+    void grab_movemapstep_injection();
+    uint64_t grab_movemapstep_value;
 }
 
 // Flag to determine if a character have been loaded since the game was launched (useful if player had a character loaded but returned to main menu)
@@ -178,6 +182,10 @@ void Game::injections_init()
     //inject the code that saves the HP Bar UI element pointer
     write_address = (uint8_t*)(Game::gui_hpbar_max_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &gui_hpbar_max_injection_return, 7, &gui_hpbar_max_injection);
+
+    //inject the code to save the movemapstep pointer (using the pointer chain from frpg_system is sometimes unreliable)
+    write_address = (uint8_t*)(Game::MoveMapStep_New_injection_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &grab_movemapstep_return, 1, &grab_movemapstep_injection);
 }
 
 static bool character_reload_run = false;
@@ -281,7 +289,6 @@ static void** player_animationMediator_cache = NULL;
 static void** host_player_gamedata_cache = NULL;
 static bool* display_name_cache = NULL;
 static int32_t** MP_AreaID_cache = NULL;
-static void** MoveMapStep_cache = NULL;
 
 void Game::preload_function_caches() {
     ConsoleWrite("Cache loading");
@@ -338,8 +345,6 @@ void Game::preload_function_caches() {
     Game::get_host_player_gamedata();
     MP_AreaID_cache = NULL;
     Game::get_MP_AreaID_ptr();
-    MoveMapStep_cache = NULL;
-    Game::get_MoveMapStep();
 
     Sleep(10);
     //this pointer is a bit late to resolve on load
@@ -1527,21 +1532,10 @@ void Game::game_free(void* p, size_t size)
     return InGame_Free(p, size);
 }
 
-std::optional<void*> Game::get_MoveMapStep()
+void* Game::get_MoveMapStep()
 {
-    if (MoveMapStep_cache)
-    {
-        return *MoveMapStep_cache;
-    }
+    //this pointer breaks when debug is enabled, so it's unreliable
+    //sp::mem::pointer MoveMapStep = sp::mem::pointer<void*>((void*)(Game::frpg_system), { 0x8, 0x20, 0x58, 0x20, 0xa0, 0x38, 0x20 });
 
-    sp::mem::pointer MoveMapStep = sp::mem::pointer<void*>((void*)(Game::frpg_system), { 0x8, 0x20, 0x58, 0x20, 0xa0, 0x38, 0x20 });
-    if (MoveMapStep.resolve() == NULL)
-    {
-        return std::nullopt;
-    }
-    else
-    {
-        MoveMapStep_cache = MoveMapStep.resolve();
-        return *MoveMapStep_cache;
-    }
+    return (void*)grab_movemapstep_value;
 }

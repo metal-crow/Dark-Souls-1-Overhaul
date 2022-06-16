@@ -22,7 +22,7 @@ Step_Bullet_FUNC* Step_Bullet = (Step_Bullet_FUNC*)0x140428e40;
 typedef void Step_DamageMan_FUNC(void* damageman, float frame_time);
 Step_DamageMan_FUNC* Step_DamageMan = (Step_DamageMan_FUNC*)0x1403c97c0;
 
-static const float FRAMETIME = 0.0166667f;
+static const float FRAMETIME = 0.01666666666f;
 
 bool rollback_test(void* unused)
 {

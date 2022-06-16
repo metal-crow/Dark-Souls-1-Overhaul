@@ -164,6 +164,8 @@ public:
 
     static const uint64_t gui_hpbar_max_injection_offset = 0x676ed7;
 
+    static const uint64_t MoveMapStep_New_injection_offset = 0x24cd20;
+
     // Player character status (loading, human, co-op, invader, hollow)
     static sp::mem::pointer<int32_t> player_char_status;
 
@@ -332,7 +334,7 @@ public:
 
     static void game_free(void* p, size_t size);
 
-	static std::optional<void*> get_MoveMapStep();
+	static void* get_MoveMapStep();
 
     /*
      * Help speedup some functions by, whenever we're loaded into an area,
