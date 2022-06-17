@@ -338,6 +338,8 @@ public:
 
 	static void* get_MoveMapStep();
 
+	static void Step_GameSimulation(bool renderFrame = false);
+
     /*
      * Help speedup some functions by, whenever we're loaded into an area,
      * preload/preresolve some pointers and values so they can be much more quickly read when we need them
