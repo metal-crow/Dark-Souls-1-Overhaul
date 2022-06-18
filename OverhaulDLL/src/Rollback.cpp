@@ -65,3 +65,39 @@ void Rollback::start()
     MainLoop::setup_mainloop_callback(rollback_test, NULL, "rollback_test");
     MainLoop::setup_mainloop_callback(input_test, NULL, "input_test");
 }
+
+void Rollback::GameStateSave()
+{
+    auto player_o = Game::get_PlayerIns();
+    if (!player_o.has_value())
+    {
+        return;
+    }
+    PlayerIns* player = (PlayerIns*)player_o.value();
+
+    //we pre-allocate a static playerins on boot, so we can assume all pointers are set up
+    copy_PlayerIns(Rollback::saved_playerins, player, false);
+}
+
+void Rollback::GameStateLoad()
+{
+    auto player_o = Game::get_PlayerIns();
+    if (!player_o.has_value())
+    {
+        return;
+    }
+    PlayerIns* player = (PlayerIns*)player_o.value();
+
+    copy_PlayerIns(player, Rollback::saved_playerins, true);
+}
+
+void Rollback::GameInputSave()
+{
+    //we pre-allocate a static padman on boot, so we can assume all pointers are set up
+    copy_PadMan(Rollback::saved_padman, *(PadMan**)Game::pad_man);
+}
+
+void Rollback::GameInputLoad()
+{
+    copy_PadMan(*(PadMan**)Game::pad_man, Rollback::saved_padman);
+}

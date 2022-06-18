@@ -6,6 +6,7 @@
 // See the ghidra repo for more specific info about what is in that blob, if it's even known
 
 #include <stddef.h>
+#include <stdint.h>
 
 typedef struct AnimationQueue_Entry_sub1_field0x10 AnimationQueue_Entry_sub1_field0x10;
 typedef struct AnimationQueue_Entry_sub1 AnimationQueue_Entry_sub1;

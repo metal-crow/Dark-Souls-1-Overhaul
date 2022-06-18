@@ -1,32 +1,7 @@
+#include "PlayerInsStructFunctions.h"
 #include "Rollback.h"
-#include "DarkSoulsOverhaulMod.h"
 
 typedef void* falloc(uint64_t, uint64_t, uint32_t);
-
-void Rollback::GameStateSave()
-{
-    auto player_o = Game::get_PlayerIns();
-    if (!player_o.has_value())
-    {
-        return;
-    }
-    PlayerIns* player = (PlayerIns*)player_o.value();
-
-    //we pre-allocate a static playerins on boot, so we can assume all pointers are set up
-    copy_PlayerIns(Rollback::saved_playerins, player, false);
-}
-
-void Rollback::GameStateLoad()
-{
-    auto player_o = Game::get_PlayerIns();
-    if (!player_o.has_value())
-    {
-        return;
-    }
-    PlayerIns* player = (PlayerIns*)player_o.value();
-
-    copy_PlayerIns(player, Rollback::saved_playerins, true);
-}
 
 void copy_PlayerIns(PlayerIns* to, PlayerIns* from, bool to_game)
 {
@@ -110,7 +85,7 @@ void copy_ProEquipCtrl(ProEquipCtrl* to, ProEquipCtrl* from, bool to_game)
 ProEquipCtrl* init_ProEquipCtrl()
 {
     ProEquipCtrl* local_ProEquipCtrl = (ProEquipCtrl*)malloc_(sizeof(ProEquipCtrl));
-    uint32_t* local_ProEquipCtrl_equipped_armors_ids = (uint32_t*)malloc_(sizeof(uint32_t)*5);
+    uint32_t* local_ProEquipCtrl_equipped_armors_ids = (uint32_t*)malloc_(sizeof(uint32_t) * 5);
 
     local_ProEquipCtrl->spEffectList = init_SpecialEffect();
     local_ProEquipCtrl->equipped_armors_ids = local_ProEquipCtrl_equipped_armors_ids;
@@ -142,7 +117,7 @@ void copy_WeaponEquipCtrl(WeaponEquipCtrl* to, WeaponEquipCtrl* from, bool to_ga
 WeaponEquipCtrl* init_WeaponEquipCtrl()
 {
     WeaponEquipCtrl* local_WeaponEquipCtrl = (WeaponEquipCtrl*)malloc_(sizeof(WeaponEquipCtrl));
-    uint32_t* local_WeaponEquipCtrl_equipped_weapons_ids = (uint32_t*)malloc_(sizeof(uint32_t)*2);
+    uint32_t* local_WeaponEquipCtrl_equipped_weapons_ids = (uint32_t*)malloc_(sizeof(uint32_t) * 2);
 
     local_WeaponEquipCtrl->spEffectList = init_SpecialEffect();
     local_WeaponEquipCtrl->equipped_weapons_ids = local_WeaponEquipCtrl_equipped_weapons_ids;
@@ -174,7 +149,7 @@ void copy_RingEquipCtrl(RingEquipCtrl* to, RingEquipCtrl* from, bool to_game)
 RingEquipCtrl* init_RingEquipCtrl()
 {
     RingEquipCtrl* local_RingEquipCtrl = (RingEquipCtrl*)malloc_(sizeof(RingEquipCtrl));
-    uint32_t* local_RingEquipCtrl_equipped_rings_ids = (uint32_t*)malloc_(sizeof(uint32_t)*2);
+    uint32_t* local_RingEquipCtrl_equipped_rings_ids = (uint32_t*)malloc_(sizeof(uint32_t) * 2);
 
     local_RingEquipCtrl->spEffectList = init_SpecialEffect();
     local_RingEquipCtrl->equipped_rings_ids = local_RingEquipCtrl_equipped_rings_ids;
@@ -417,7 +392,7 @@ void copy_QwcSpEffectEquipCtrl(QwcSpEffectEquipCtrl* to, QwcSpEffectEquipCtrl* f
 QwcSpEffectEquipCtrl* init_QwcSpEffectEquipCtrl()
 {
     QwcSpEffectEquipCtrl* local_QwcSpEffectEquipCtrl = (QwcSpEffectEquipCtrl*)malloc_(sizeof(QwcSpEffectEquipCtrl));
-    uint32_t* local_QwcSpEffectEquipCtrl_arry = (uint32_t*)malloc_(sizeof(uint32_t)*64);
+    uint32_t* local_QwcSpEffectEquipCtrl_arry = (uint32_t*)malloc_(sizeof(uint32_t) * 64);
 
     local_QwcSpEffectEquipCtrl->arry = local_QwcSpEffectEquipCtrl_arry;
 
@@ -1404,7 +1379,7 @@ void copy_AnimationQueue_Entry_sub1(AnimationQueue_Entry_sub1* to, AnimationQueu
         //need to manually alloc the array for the game
         ConsoleWrite("AnimationQueue_Entry(%p)->field0x10 alloc", to);
         to->field0x10 = (AnimationQueue_Entry_sub1_field0x10**)(*(falloc*)*(uint64_t*)(*((uint64_t*)to->padding_1[0]) + 0x50))(to->padding_1[0], (to->field0x10_cap) * 8, 8);
-        memset(to->field0x10, 0, to->field0x10_cap*8);
+        memset(to->field0x10, 0, to->field0x10_cap * 8);
     }
 
     //this array is allocated and not pre-populated with pointers in it's entries

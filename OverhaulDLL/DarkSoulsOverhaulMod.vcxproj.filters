@@ -117,16 +117,16 @@
     <ClCompile Include="src\UIFeatures.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GameStateRollback.cpp">
-      <Filter>Source Files\Rollback</Filter>
-    </ClCompile>
     <ClCompile Include="src\Rollback.cpp">
       <Filter>Source Files\Rollback</Filter>
     </ClCompile>
-    <ClCompile Include="src\GameInputRollback.cpp">
+    <ClCompile Include="src\NetcodePackets.cpp">
       <Filter>Source Files\Rollback</Filter>
     </ClCompile>
-    <ClCompile Include="src\NetcodePackets.cpp">
+    <ClCompile Include="src\PlayerInsStructFunctions.cpp">
+      <Filter>Source Files\Rollback</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PadManStructFunctions.cpp">
       <Filter>Source Files\Rollback</Filter>
     </ClCompile>
   </ItemGroup>
@@ -198,6 +198,15 @@
       <Filter>Header Files\Rollback</Filter>
     </ClInclude>
     <ClInclude Include="include\NetcodePackets.h">
+      <Filter>Header Files\Rollback</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BulletManStruct.h">
+      <Filter>Header Files\Rollback</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PlayerInsStructFunctions.h">
+      <Filter>Header Files\Rollback</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PadManStructFunctions.h">
       <Filter>Header Files\Rollback</Filter>
     </ClInclude>
   </ItemGroup>
