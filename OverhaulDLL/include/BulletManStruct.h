@@ -17,17 +17,61 @@ typedef struct BulletIns_Field0x58 BulletIns_Field0x58;
 typedef struct BulletMan_Field0x20 BulletMan_Field0x20;
 typedef struct BulletParamInfo BulletParamInfo;
 typedef struct BulletIns_Field0x90_Field0x1a0 BulletIns_Field0x90_Field0x1a0;
+typedef struct BulletState BulletState;
+typedef struct BulletFlyState BulletFlyState;
+typedef struct TargetingSystemBase TargetingSystemBase;
+typedef struct BulletTargetingSystemOwner BulletTargetingSystemOwner;
+typedef struct BulletIns_FollowupBullet BulletIns_FollowupBullet;
 
-struct BulletIns
+struct BulletIns_FollowupBullet
 {
     uint64_t padding_0;
-    uint8_t data_0[0x50];
-    uint64_t padding_1;
-
+    uint64_t padding_1[5]; //unknown
 };
-static_assert(offsetof(BulletIns, data_0) == 0x8);
+static_assert(sizeof(BulletIns_FollowupBullet) == 0x30);
 
-static_assert(sizeof(BulletIns) == 0x360);
+struct BulletTargetingSystemOwner
+{
+    uint64_t padding_0[2];
+    uint8_t data_0[32];
+};
+static_assert(offsetof(BulletTargetingSystemOwner, data_0) == 0x10);
+static_assert(sizeof(BulletTargetingSystemOwner) == 0x30);
+
+struct TargetingSystemBase
+{
+    uint64_t padding_0;
+    uint64_t padding_1[2]; //the two owners here are already saved from BulletIns
+    uint64_t padding_2; //targeting isn't really needed
+    uint64_t padding_3; //unknown
+    uint8_t data_0[8+16];
+    uint64_t padding_4; //unknown
+    uint64_t data_1;
+};
+static_assert(offsetof(TargetingSystemBase, data_0) == 0x28);
+static_assert(offsetof(TargetingSystemBase, data_1) == 0x48);
+static_assert(sizeof(TargetingSystemBase) == 0x50);
+
+struct BulletParamInfo
+{
+    uint8_t data_0[0x10];
+};
+static_assert(sizeof(BulletParamInfo) == 0x10);
+
+struct BulletState
+{
+    uint64_t padding_0;
+    BulletParamInfo paramInfo;
+    uint64_t data_0;
+};
+static_assert(sizeof(BulletState) == 0x20);
+
+struct BulletFlyState
+{
+    BulletState state;
+    uint64_t data_0;
+};
+static_assert(sizeof(BulletFlyState) == 0x28);
 
 struct BulletIns_Field0x90_Field0x1a0
 {
@@ -37,28 +81,57 @@ struct BulletIns_Field0x90_Field0x1a0
     uint64_t unknown2; //unknown
     uint8_t data_2[0x50];
     uint64_t unknown3; //unknown
-    uint8_t data_3[0x20+0x18];
+    uint8_t data_3[0x20 + 0x18];
     uint64_t unknown4; //unknown
-    uint8_t data_4[0x30+0x30+8];
+    uint8_t data_4[0x30 + 0x30 + 8];
     void* unknown5; //unknown
     uint8_t data_5[0x10];
 };
 static_assert(offsetof(BulletIns_Field0x90_Field0x1a0, data_1) == 0x28);
 static_assert(offsetof(BulletIns_Field0x90_Field0x1a0, unknown2) == 0x40);
 static_assert(offsetof(BulletIns_Field0x90_Field0x1a0, data_2) == 0x48);
-static_assert(offsetof(BulletIns_Field0x90_Field0x1a0, unknown3) == 0x90+8);
-static_assert(offsetof(BulletIns_Field0x90_Field0x1a0, data_3) == 0x90+0x10);
+static_assert(offsetof(BulletIns_Field0x90_Field0x1a0, unknown3) == 0x90 + 8);
+static_assert(offsetof(BulletIns_Field0x90_Field0x1a0, data_3) == 0x90 + 0x10);
 static_assert(offsetof(BulletIns_Field0x90_Field0x1a0, unknown4) == 0xd8);
 static_assert(offsetof(BulletIns_Field0x90_Field0x1a0, data_4) == 0xe0);
 static_assert(offsetof(BulletIns_Field0x90_Field0x1a0, unknown5) == 0x148);
 static_assert(offsetof(BulletIns_Field0x90_Field0x1a0, data_5) == 0x150);
 static_assert(sizeof(BulletIns_Field0x90_Field0x1a0) == 0x160);
 
-struct BulletParamInfo
+struct BulletIns
 {
-    uint8_t data_0[0x10];
+    uint64_t padding_0;
+    uint8_t data_0[0x50];
+    BulletIns_FollowupBullet FollowupBullet;
+    uint64_t data_1;
+    BulletIns_Field0x90_Field0x1a0 owner;
+    uint8_t data_2[24];
+    BulletTargetingSystemOwner bulletTargetingSystemOwner;
+    TargetingSystemBase targetingSystemBase;
+    uint8_t data_3[0x50];
+    BulletState bulletState;
+    uint64_t data_4;
+    BulletFlyState bulletFlyState;
+    BulletState bulletExplosionState;
+    BulletIns* previous_bullet_in_use;
+    uint64_t padding_1; //unknown
+    uint64_t data_5;
 };
-static_assert(sizeof(BulletParamInfo) == 0x10);
+static_assert(offsetof(BulletIns, data_0) == 0x8);
+static_assert(offsetof(BulletIns, FollowupBullet) == 0x58);
+static_assert(offsetof(BulletIns, data_1) == 0x88);
+static_assert(offsetof(BulletIns, owner) == 0x90);
+static_assert(offsetof(BulletIns, data_2) == 0x1f0);
+static_assert(offsetof(BulletIns, bulletTargetingSystemOwner) == 0x208);
+static_assert(offsetof(BulletIns, targetingSystemBase) == 0x238);
+static_assert(offsetof(BulletIns, data_3) == 0x288);
+static_assert(offsetof(BulletIns, bulletState) == 0x2d8);
+static_assert(offsetof(BulletIns, data_4) == 0x2f8);
+static_assert(offsetof(BulletIns, bulletFlyState) == 0x300);
+static_assert(offsetof(BulletIns, bulletExplosionState) == 0x328);
+static_assert(offsetof(BulletIns, previous_bullet_in_use) == 0x348);
+static_assert(offsetof(BulletIns, data_5) == 0x358);
+static_assert(sizeof(BulletIns) == 0x360);
 
 struct BulletMan_Field0x20
 {

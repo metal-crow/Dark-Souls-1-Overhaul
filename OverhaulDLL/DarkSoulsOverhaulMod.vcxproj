@@ -53,6 +53,7 @@
     <ClInclude Include="d3d11-wrapper\include\d3d11\main.h" />
     <ClInclude Include="d3d11-wrapper\include\dllmain.h" />
     <ClInclude Include="include\BulletManStruct.h" />
+    <ClInclude Include="include\BulletManStructFunctions.h" />
     <ClInclude Include="include\CustomInvasionTypes.h" />
     <ClInclude Include="include\AntiAntiCheat.h" />
     <ClInclude Include="include\CrashHandler.h" />
