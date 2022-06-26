@@ -10,6 +10,7 @@
     <ClCompile Include="d3d11-wrapper\src\d3d11\d3d11.cpp" />
     <ClCompile Include="d3d11-wrapper\src\d3d11\exports_.cpp" />
     <ClCompile Include="d3d11-wrapper\src\dllmain.cpp" />
+    <ClCompile Include="src\BulletManStructFunctions.cpp" />
     <ClCompile Include="src\CustomInvasionTypes.cpp" />
     <ClCompile Include="src\AnimationEdits.cpp" />
     <ClCompile Include="src\AntiAntiCheat.cpp" />

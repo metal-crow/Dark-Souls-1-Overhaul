@@ -168,7 +168,7 @@ struct BulletMan_field0x78Elem
 };
 static_assert(sizeof(BulletMan_field0x78Elem) == 0x30);
 
-struct Bulletman
+struct BulletMan
 {
     BulletIns* bulletins_arry; //length == 128
     uint64_t data_0[3]; //includes pointers to offsets in above
@@ -180,23 +180,24 @@ struct Bulletman
     uint64_t data_3;
     uint64_t padding_1;
     BulletMan_field0x78Elem** field0x78; //variable length
-    uint64_t data_4[2]; //includes pointers to offsets in above
+    BulletMan_field0x78Elem** field0x78_next;
+    BulletMan_field0x78Elem** field0x78_end;
     uint64_t padding_2[3];
     uint64_t data_5[2];
 };
-static_assert(offsetof(Bulletman, bulletins_arry) == 0);
-static_assert(offsetof(Bulletman, data_0) == 8);
-static_assert(offsetof(Bulletman, field0x20) == 0x20);
-static_assert(offsetof(Bulletman, data_1) == 0x28);
-static_assert(offsetof(Bulletman, field0x40) == 0x40);
-static_assert(offsetof(Bulletman, data_2) == 0x48);
-static_assert(offsetof(Bulletman, padding_0) == 0x60);
-static_assert(offsetof(Bulletman, data_3) == 0x68);
-static_assert(offsetof(Bulletman, padding_1) == 0x70);
-static_assert(offsetof(Bulletman, field0x78) == 0x78);
-static_assert(offsetof(Bulletman, data_4) == 0x80);
-static_assert(offsetof(Bulletman, padding_2) == 0x90);
-static_assert(offsetof(Bulletman, data_5) == 0xa8);
-static_assert(sizeof(Bulletman) == 0xb8);
+static_assert(offsetof(BulletMan, bulletins_arry) == 0);
+static_assert(offsetof(BulletMan, data_0) == 8);
+static_assert(offsetof(BulletMan, field0x20) == 0x20);
+static_assert(offsetof(BulletMan, data_1) == 0x28);
+static_assert(offsetof(BulletMan, field0x40) == 0x40);
+static_assert(offsetof(BulletMan, data_2) == 0x48);
+static_assert(offsetof(BulletMan, padding_0) == 0x60);
+static_assert(offsetof(BulletMan, data_3) == 0x68);
+static_assert(offsetof(BulletMan, padding_1) == 0x70);
+static_assert(offsetof(BulletMan, field0x78) == 0x78);
+static_assert(offsetof(BulletMan, data_4) == 0x80);
+static_assert(offsetof(BulletMan, padding_2) == 0x90);
+static_assert(offsetof(BulletMan, data_5) == 0xa8);
+static_assert(sizeof(BulletMan) == 0xb8);
 
 #endif

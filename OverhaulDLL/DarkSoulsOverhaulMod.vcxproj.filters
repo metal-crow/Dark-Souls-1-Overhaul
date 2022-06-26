@@ -129,6 +129,9 @@
     <ClCompile Include="src\PadManStructFunctions.cpp">
       <Filter>Source Files\Rollback</Filter>
     </ClCompile>
+    <ClCompile Include="src\BulletManStructFunctions.cpp">
+      <Filter>Source Files\Rollback</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3d11-wrapper\include\d3d11\exports.h">
