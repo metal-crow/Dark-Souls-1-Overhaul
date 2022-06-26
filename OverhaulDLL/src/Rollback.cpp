@@ -60,6 +60,7 @@ void Rollback::start()
     //TMP init out copy of the playerins struct, for saving/restoring with rollback
     Rollback::saved_playerins = init_PlayerIns();
     Rollback::saved_padman = init_PadMan();
+    Rollback::saved_bulletman = init_BulletMan();
 
     //TMP save/restore with a hotkey
     MainLoop::setup_mainloop_callback(rollback_test, NULL, "rollback_test");
@@ -77,6 +78,7 @@ void Rollback::GameStateSave()
 
     //we pre-allocate a static playerins on boot, so we can assume all pointers are set up
     copy_PlayerIns(Rollback::saved_playerins, player, false);
+    copy_BulletMan(Rollback::saved_bulletman, *(BulletMan**)Game::bullet_man, false);
 }
 
 void Rollback::GameStateLoad()
@@ -89,6 +91,7 @@ void Rollback::GameStateLoad()
     PlayerIns* player = (PlayerIns*)player_o.value();
 
     copy_PlayerIns(player, Rollback::saved_playerins, true);
+    copy_BulletMan(*(BulletMan**)Game::bullet_man, Rollback::saved_bulletman, true);
 }
 
 void Rollback::GameInputSave()

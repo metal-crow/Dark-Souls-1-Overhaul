@@ -9,6 +9,7 @@
 
 #include "PlayerInsStructFunctions.h"
 #include "PadManStructFunctions.h"
+#include "BulletManStructFunctions.h"
 
 #include "NetcodePackets.h"
 
@@ -39,6 +40,7 @@ private:
 
     static PlayerIns* saved_playerins;
     static PadMan* saved_padman;
+    static BulletMan* saved_bulletman;
 
     static const uint64_t sendNetMessage_offset = 0x5096d0;
     static const uint64_t getNetMessage_offset = 0x509560;

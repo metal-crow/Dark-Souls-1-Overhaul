@@ -137,7 +137,8 @@ BulletIns* init_BulletIns()
 
     //1 recursion level deep
     local_BulletIns->previous_bullet_in_use = (BulletIns*)malloc_(sizeof(BulletIns));
-    
+    local_BulletIns->previous_bullet_in_use->previous_bullet_in_use = NULL;
+
     return local_BulletIns;
 }
 
