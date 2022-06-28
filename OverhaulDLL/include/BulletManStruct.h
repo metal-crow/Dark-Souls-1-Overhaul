@@ -113,7 +113,7 @@ struct BulletIns
     uint64_t data_4;
     BulletFlyState bulletFlyState;
     BulletState bulletExplosionState;
-    BulletIns* previous_bullet_in_use;
+    void* padding_previous_bullet_in_use;
     uint64_t padding_1; //unknown
     uint64_t data_5;
 };
@@ -129,7 +129,7 @@ static_assert(offsetof(BulletIns, bulletState) == 0x2d8);
 static_assert(offsetof(BulletIns, data_4) == 0x2f8);
 static_assert(offsetof(BulletIns, bulletFlyState) == 0x300);
 static_assert(offsetof(BulletIns, bulletExplosionState) == 0x328);
-static_assert(offsetof(BulletIns, previous_bullet_in_use) == 0x348);
+static_assert(offsetof(BulletIns, padding_previous_bullet_in_use) == 0x348);
 static_assert(offsetof(BulletIns, data_5) == 0x358);
 static_assert(sizeof(BulletIns) == 0x360);
 
@@ -180,8 +180,8 @@ struct BulletMan
     uint64_t data_3;
     uint64_t padding_1;
     BulletMan_field0x78Elem** field0x78; //variable length
-    BulletMan_field0x78Elem** field0x78_next;
-    BulletMan_field0x78Elem** field0x78_end;
+    uint64_t field0x78_next;
+    uint64_t field0x78_end;
     uint64_t padding_2[3];
     uint64_t data_5[2];
 };
@@ -195,7 +195,8 @@ static_assert(offsetof(BulletMan, padding_0) == 0x60);
 static_assert(offsetof(BulletMan, data_3) == 0x68);
 static_assert(offsetof(BulletMan, padding_1) == 0x70);
 static_assert(offsetof(BulletMan, field0x78) == 0x78);
-static_assert(offsetof(BulletMan, data_4) == 0x80);
+static_assert(offsetof(BulletMan, field0x78_next) == 0x80);
+static_assert(offsetof(BulletMan, field0x78_end) == 0x88);
 static_assert(offsetof(BulletMan, padding_2) == 0x90);
 static_assert(offsetof(BulletMan, data_5) == 0xa8);
 static_assert(sizeof(BulletMan) == 0xb8);

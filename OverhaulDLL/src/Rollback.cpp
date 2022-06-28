@@ -9,6 +9,7 @@ bool Rollback::rollbackEnabled = false;
 
 PlayerIns* Rollback::saved_playerins = NULL;
 PadMan* Rollback::saved_padman = NULL;
+BulletMan* Rollback::saved_bulletman = NULL;
 
 bool Rollback::gsave = false;
 bool Rollback::gload = false;

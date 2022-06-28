@@ -27,10 +27,14 @@ void copy_BulletMan(BulletMan* to, BulletMan* from, bool to_game)
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
     to->data_3 = from->data_3;
 
-    size_t field0x78_len = (from->field0x78_end - from->field0x78)/8;
+    size_t field0x78_len = 0;
+    if (from->field0x78 != NULL && from->field0x78_end != NULL)
+    {
+        field0x78_len = (from->field0x78_end - (uint64_t)from->field0x78) / 8;
+    }
     if (field0x78_len > 3)
     {
-        FATALERROR("BulletMan->field0x78 array is longer then 3 elements. %d", field0x78_len);
+        FATALERROR("BulletMan->field0x78 array is longer then 3 elements. end=%x start=%x len=%d", from->field0x78_end, from->field0x78, field0x78_len);
     }
     for (size_t i = 0; i < field0x78_len; i++)
     {
@@ -119,13 +123,6 @@ void copy_BulletIns(BulletIns* to, BulletIns* from, bool to_game)
     to->data_4 = from->data_4;
     copy_BulletFlyState(&to->bulletFlyState, &from->bulletFlyState, to_game);
     copy_BulletState(&to->bulletExplosionState, &from->bulletExplosionState, to_game);
-
-    if (to->previous_bullet_in_use == NULL || from->previous_bullet_in_use == NULL)
-    {
-        FATALERROR("Unable to recursivly copy previous_bullet_in_use. Out of room.");
-    }
-    copy_BulletIns(to->previous_bullet_in_use, from->previous_bullet_in_use, to_game);
-
     to->data_5 = from->data_5;
 }
 
@@ -135,17 +132,11 @@ BulletIns* init_BulletIns()
 
     //none of the substruct have pointers, so can save some code here
 
-    //1 recursion level deep
-    local_BulletIns->previous_bullet_in_use = (BulletIns*)malloc_(sizeof(BulletIns));
-    local_BulletIns->previous_bullet_in_use->previous_bullet_in_use = NULL;
-
     return local_BulletIns;
 }
 
 void free_BulletIns(BulletIns* to, bool freeself)
 {
-    free(to->previous_bullet_in_use);
-
     if (freeself)
     {
         free(to);
