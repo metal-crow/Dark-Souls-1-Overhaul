@@ -144,8 +144,9 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
 */
 DWORD WINAPI on_process_attach_async(LPVOID lpParam)
 {
+#ifdef DEBUG
     set_crash_handlers();
-
+#endif
     Menu::Saves::init_custom_saves();
     AntiCheat::start();
     Game::set_gui_hpbar_max();

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
@@ -16,14 +20,18 @@
     <ClCompile Include="src\AntiAntiCheat.cpp" />
     <ClCompile Include="src\AntiCheat\AntiCheat.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\Authors.cpp" />
     <ClCompile Include="src\BloodborneRallySystem.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\CrashHandler.cpp" />
     <ClCompile Include="src\DarkSoulsOverhaulMod.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\DeadAngles.cpp" />
@@ -33,6 +41,7 @@
     <ClCompile Include="src\FixAnkles.cpp" />
     <ClCompile Include="src\GameData.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\PadManStructFunctions.cpp" />
     <ClCompile Include="src\InvisibleBackstabAttackFix.cpp" />
@@ -82,34 +91,50 @@
     <None Include="include\AnimationEdits.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ExcludedFromBuild>
     </None>
     <None Include="include\AntiCheat.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ExcludedFromBuild>
     </None>
     <None Include="include\BloodborneRallySystem.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ExcludedFromBuild>
     </None>
     <None Include="include\Files.h" />
     <None Include="include\GameData.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ExcludedFromBuild>
     </None>
     <None Include="include\Menu\SavedCharacters.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ExcludedFromBuild>
     </None>
     <None Include="include\ModData.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ExcludedFromBuild>
     </None>
     <None Include="include\PhantomUnshackle.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ExcludedFromBuild>
     </None>
     <None Include="include\InputUtil.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ExcludedFromBuild>
     </None>
   </ItemGroup>
@@ -162,6 +187,13 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
     <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
@@ -171,8 +203,17 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)\$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\build\</IntDir>
+    <TargetName>d3d11</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)\$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\build\</IntDir>
@@ -187,6 +228,29 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;DARKSOULSOVERHAULMOD_EXPORTS;WRAPPER_ON_PROCESS_ATTACH=on_process_attach;WRAPPER_ON_PROCESS_DETACH=on_process_detach;WRAPPER_ON_THREAD_ATTACH=on_thread_attach;WRAPPER_ON_THREAD_DETACH=on_thread_detach;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>include;lib/Cpp-Utilities/include;lib/Dark-Souls-Game-Files-Lib/include;lib;d3d11-wrapper/include;d3d11-wrapper/lib;d3d11-wrapper/lib/inih;d3d11-wrapper/lib/inih/cpp;lib/StackWalker/include;ui;lib/Google-Cloud-Cpp/include;lib/steam</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>lib;d3d11-wrapper/lib;lib/StackWalker/lib;lib/Google-Cloud-Cpp/lib;lib/steam/lib</AdditionalLibraryDirectories>
+      <ModuleDefinitionFile>d3d11-wrapper/src/d3d11/exports.def</ModuleDefinitionFile>
+      <AdditionalDependencies>normaliz.lib;ws2_32.lib;wsock32.lib;crypt32.lib;crc32c/crc32c.lib;zlib/zlib.lib;boringssl/crypto.lib;boringssl/ssl.lib;absl/numeric/int128.lib;absl/time/internal/cctz/time_zone.lib;absl/time/internal/cctz/civil_time.lib;absl/time/time.lib;absl/base/throw_delegate.lib;absl/base/raw_logging_internal.lib;absl/strings/str_format_internal.lib;absl/strings/internal.lib;absl/strings/strings.lib;absl/types/bad_optional_access.lib;curl.lib;storage_client.lib;google_cloud_cpp_common.lib;quickstart.lib;StackWalker.lib;sp_utils_x64.lib;XInput.lib;DsGameFiles.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;steam_api64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>DEBUG;DARKSOULSOVERHAULMOD_EXPORTS;WRAPPER_ON_PROCESS_ATTACH=on_process_attach;WRAPPER_ON_PROCESS_DETACH=on_process_detach;WRAPPER_ON_THREAD_ATTACH=on_thread_attach;WRAPPER_ON_THREAD_DETACH=on_thread_detach;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>include;lib/Cpp-Utilities/include;lib/Dark-Souls-Game-Files-Lib/include;lib;d3d11-wrapper/include;d3d11-wrapper/lib;d3d11-wrapper/lib/inih;d3d11-wrapper/lib/inih/cpp;lib/StackWalker/include;ui;lib/Google-Cloud-Cpp/include;lib/steam</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
