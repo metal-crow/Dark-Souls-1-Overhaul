@@ -432,10 +432,8 @@ void free_SpecialEffect(SpecialEffect* to)
 
 static const size_t max_preallocated_SpecialEffect_Info = 64;
 
-void copy_SpecialEffect_Info(SpecialEffect_Info* to, SpecialEffect_Info* from_, bool to_game)
+void copy_SpecialEffect_Info(SpecialEffect_Info* to, SpecialEffect_Info* from, bool to_game)
 {
-    SpecialEffect_Info* from = from_;
-
     if (!to_game)
     {
         size_t to_index = 0;
@@ -451,7 +449,7 @@ void copy_SpecialEffect_Info(SpecialEffect_Info* to, SpecialEffect_Info* from_, 
 
             if (from->next != NULL)
             {
-                to->next = to + sizeof(SpecialEffect_Info);
+                to->next = (SpecialEffect_Info*)((uint64_t)(to) + sizeof(SpecialEffect_Info));
             }
             else
             {
@@ -460,7 +458,7 @@ void copy_SpecialEffect_Info(SpecialEffect_Info* to, SpecialEffect_Info* from_, 
             //don't need to handle prev since it should just be as expected
 
             from = from->next;
-            to += sizeof(SpecialEffect_Info);
+            to = (SpecialEffect_Info*)((uint64_t)(to) + sizeof(SpecialEffect_Info));
             to_index += 1;
         }
     }
@@ -474,12 +472,9 @@ void copy_SpecialEffect_Info(SpecialEffect_Info* to, SpecialEffect_Info* from_, 
             //handle if the game's list isn't long enough, and we need to alloc more slots
             if (from->next != NULL && to->next == NULL)
             {
-                ConsoleWrite("Out of space on game side for SpecialEffect_Info");
-                break;
-                //TODO handle game mallocing
-                //to->next = (SpecialEffect_Info*)Game::game_malloc(sizeof(SpecialEffect_Info), 8, (void*)*(uint64_t*)(0x141C04F30)); //internal_heap_3
-                //to->next->next = NULL;
-                //to->next->prev = to;
+                to->next = (SpecialEffect_Info*)Game::game_malloc(sizeof(SpecialEffect_Info), 8, (void*)*(uint64_t*)(0x141C04F30)); //internal_heap_3
+                to->next->next = NULL;
+                to->next->prev = to;
             }
 
             //handle if the game's list is too long, and we need to free it's extra slots
@@ -490,8 +485,7 @@ void copy_SpecialEffect_Info(SpecialEffect_Info* to, SpecialEffect_Info* from_, 
                 while (entry_to_free)
                 {
                     SpecialEffect_Info* next = entry_to_free->next;
-                    //TODO handle game freeing
-                    //Game::game_free(entry_to_free, sizeof(SpecialEffect_Info));
+                    Game::game_free(entry_to_free, sizeof(SpecialEffect_Info));
                     entry_to_free = next;
                 }
                 break;
