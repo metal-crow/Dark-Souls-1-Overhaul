@@ -27,18 +27,24 @@ void copy_BulletMan(BulletMan* to, BulletMan* from, bool to_game)
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
     to->data_3 = from->data_3;
 
-    size_t field0x78_len = 0;
     if (from->field0x78 != NULL && from->field0x78_end != NULL)
     {
-        field0x78_len = (from->field0x78_end - (uint64_t)from->field0x78) / 8;
+        size_t field0x78_len = (from->field0x78_end - (uint64_t)from->field0x78) / 8;
+        if (field0x78_len > 3)
+        {
+            FATALERROR("BulletMan->field0x78 array is longer then 3 elements. end=%x start=%x len=%d", from->field0x78_end, from->field0x78, field0x78_len);
+        }
+        for (size_t i = 0; i < field0x78_len; i++)
+        {
+            copy_BulletMan_field0x78Elem(to->field0x78[i], from->field0x78[i], to_game);
+        }
     }
-    if (field0x78_len > 3)
+    else
     {
-        FATALERROR("BulletMan->field0x78 array is longer then 3 elements. end=%x start=%x len=%d", from->field0x78_end, from->field0x78, field0x78_len);
-    }
-    for (size_t i = 0; i < field0x78_len; i++)
-    {
-        copy_BulletMan_field0x78Elem(to->field0x78[i], from->field0x78[i], to_game);
+        if (to_game)
+        {
+            to->field0x78 = NULL;
+        }
     }
     to->field0x78_next = from->field0x78_next;
     to->field0x78_end = from->field0x78_end;
