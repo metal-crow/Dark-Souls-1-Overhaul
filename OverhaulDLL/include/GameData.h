@@ -336,6 +336,8 @@ public:
 
     static void game_free(void* p, size_t size);
 
+    static void game_free_alt(void* p);
+
 	static void* get_MoveMapStep();
 
 	static void Step_GameSimulation(bool renderFrame = false);

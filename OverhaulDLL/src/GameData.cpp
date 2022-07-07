@@ -1536,6 +1536,19 @@ void Game::game_free(void* p, size_t size)
     return InGame_Free(p, size);
 }
 
+typedef uint64_t* FUN_140cbede0_FUNC(void* p);
+FUN_140cbede0_FUNC* FUN_140cbede0 = (FUN_140cbede0_FUNC*)0x140cbede0;
+
+typedef void heapObjFreeFunc(void* heapObj, void* p);
+
+void Game::game_free_alt(void* p)
+{
+    uint64_t* heapObj = FUN_140cbede0(p);
+    uint64_t heapObjVtable = *heapObj;
+    heapObjFreeFunc* freeFunc = (heapObjFreeFunc*)*(uint64_t*)(heapObjVtable + 0x68);
+    freeFunc(heapObj, p);
+}
+
 void* Game::get_MoveMapStep()
 {
     //this pointer breaks when debug is enabled, so it's unreliable

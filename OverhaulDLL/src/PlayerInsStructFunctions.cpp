@@ -485,7 +485,7 @@ void copy_SpecialEffect_Info(SpecialEffect_Info* to, SpecialEffect_Info* from, b
                 while (entry_to_free)
                 {
                     SpecialEffect_Info* next = entry_to_free->next;
-                    Game::game_free(entry_to_free, sizeof(SpecialEffect_Info));
+                    Game::game_free_alt(entry_to_free);
                     entry_to_free = next;
                 }
                 break;
