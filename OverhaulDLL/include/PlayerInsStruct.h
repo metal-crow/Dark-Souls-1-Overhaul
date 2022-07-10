@@ -397,7 +397,7 @@ struct HavokChara
     uint8_t data_1[0x98];
     uint64_t padding_1;
     uint8_t data_2[0xe8];
-    HitIns* hitIns;
+    HitIns* padding_hitIns;
     uint8_t data_3[0x58];
     uint64_t padding_2;
     void* padding_3; //points to an offset into PlayerIns
@@ -410,7 +410,7 @@ static_assert(offsetof(HavokChara, padding_cap) == 0x40);
 static_assert(offsetof(HavokChara, padding_physShapePhantomIns) == 0x50);
 static_assert(offsetof(HavokChara, data_1) == 0x60);
 static_assert(offsetof(HavokChara, data_2) == 0x100);
-static_assert(offsetof(HavokChara, hitIns) == 0x1e8);
+static_assert(offsetof(HavokChara, padding_hitIns) == 0x1e8);
 static_assert(offsetof(HavokChara, data_3) == 0x1f0);
 static_assert(offsetof(HavokChara, padding_3) == 0x250);
 static_assert(offsetof(HavokChara, data_4) == 0x258);

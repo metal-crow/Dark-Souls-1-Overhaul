@@ -119,7 +119,7 @@ void copy_EzState_detail_EzStateMachineImpl(EzState_detail_EzStateMachineImpl* t
 EzState_detail_EzStateMachineImpl* init_EzState_detail_EzStateMachineImpl();
 void free_EzState_detail_EzStateMachineImpl(EzState_detail_EzStateMachineImpl* to);
 
-void copy_HavokChara(HavokChara* to, HavokChara* from);
+void copy_HavokChara(HavokChara* to, HavokChara* from, bool to_game);
 HavokChara* init_HavokChara();
 void free_HavokChara(HavokChara* to);
 

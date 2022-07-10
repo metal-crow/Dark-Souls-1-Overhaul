@@ -663,7 +663,7 @@ void copy_ChrCtrl(ChrCtrl* to, ChrCtrl* from, bool to_game)
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     copy_ChrCtrl_AnimationQueue(to->animationQueue, from->animationQueue, to_game);
     copy_AnimationMediator(to->animationMediator, from->animationMediator);
-    copy_HavokChara(to->havokChara, from->havokChara);
+    copy_HavokChara(to->havokChara, from->havokChara, to_game);
     copy_ActionCtrl(to->actionctrl, from->actionctrl);
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
@@ -857,13 +857,12 @@ void free_EzState_detail_EzStateMachineImpl(EzState_detail_EzStateMachineImpl* t
     free(to);
 }
 
-void copy_HavokChara(HavokChara* to, HavokChara* from)
+void copy_HavokChara(HavokChara* to, HavokChara* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     copy_hkpCharacterProxy(to->char_proxy, from->char_proxy);
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
-    copy_HitIns(to->hitIns, from->hitIns);
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
     memcpy(to->data_4, from->data_4, sizeof(to->data_4));
 }
@@ -873,7 +872,6 @@ HavokChara* init_HavokChara()
     HavokChara* local_HavokChara = (HavokChara*)malloc_(sizeof(HavokChara));
 
     local_HavokChara->char_proxy = init_hkpCharacterProxy();
-    local_HavokChara->hitIns = init_HitIns();
 
     return local_HavokChara;
 }
@@ -881,7 +879,7 @@ HavokChara* init_HavokChara()
 void free_HavokChara(HavokChara* to)
 {
     free_hkpCharacterProxy(to->char_proxy);
-    free_HitIns(to->hitIns);
+    free_HitIns(to->padding_hitIns);
 
     free(to);
 }
