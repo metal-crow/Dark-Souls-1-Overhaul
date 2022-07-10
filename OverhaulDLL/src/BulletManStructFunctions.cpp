@@ -46,8 +46,8 @@ void copy_BulletMan(BulletMan* to, BulletMan* from, bool to_game)
             to->field0x78 = NULL;
         }
     }
-    to->field0x78_next = from->field0x78_next;
-    to->field0x78_end = from->field0x78_end;
+    to->field0x78_next = (uint64_t)(to->field0x78) + (from->field0x78_next - (uint64_t)from->field0x78); //convert to offset and then to pointer
+    to->field0x78_end = (uint64_t)(to->field0x78) + (from->field0x78_end - (uint64_t)from->field0x78);
 
     memcpy(to->data_5, from->data_5, sizeof(to->data_5));
 }
