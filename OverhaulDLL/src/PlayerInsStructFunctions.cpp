@@ -664,7 +664,7 @@ void copy_ChrCtrl(ChrCtrl* to, ChrCtrl* from, bool to_game)
     copy_ChrCtrl_AnimationQueue(to->animationQueue, from->animationQueue, to_game);
     copy_AnimationMediator(to->animationMediator, from->animationMediator);
     copy_HavokChara(to->havokChara, from->havokChara, to_game);
-    copy_ActionCtrl(to->actionctrl, from->actionctrl);
+    copy_ActionCtrl(to->actionctrl, from->actionctrl, to_game);
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
     copy_WalkAnim_Twist(to->walkAnim_Twist, from->walkAnim_Twist);
@@ -806,11 +806,11 @@ void copy_WalkAnim_Twist_Field0x228Elem_field0x10elem(WalkAnim_Twist_Field0x228E
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 }
 
-void copy_ActionCtrl(ActionCtrl* to, ActionCtrl* from)
+void copy_ActionCtrl(ActionCtrl* to, ActionCtrl* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-    copy_ActionCtrl_0x30Substruct(&to->passive_state, &from->passive_state);
-    copy_ActionCtrl_0x30Substruct(&to->active_state, &from->active_state);
+    copy_ActionCtrl_0x30Substruct(&to->passive_state, &from->passive_state, to_game);
+    copy_ActionCtrl_0x30Substruct(&to->active_state, &from->active_state, to_game);
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
 }
@@ -833,28 +833,91 @@ void free_ActionCtrl(ActionCtrl* to)
     free(to);
 }
 
-void copy_ActionCtrl_0x30Substruct(ActionCtrl_0x30Substruct* to, ActionCtrl_0x30Substruct* from)
+void copy_ActionCtrl_0x30Substruct(ActionCtrl_0x30Substruct* to, ActionCtrl_0x30Substruct* from, bool to_game)
 {
-    copy_EzState_detail_EzStateMachineImpl(to->EzStateMachineImpl, from->EzStateMachineImpl);
+    copy_EzState_detail_EzStateMachineImpl(to->EzStateMachineImpl, from->EzStateMachineImpl, to_game);
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 }
 
-void copy_EzState_detail_EzStateMachineImpl(EzState_detail_EzStateMachineImpl* to, EzState_detail_EzStateMachineImpl* from)
+void copy_EzState_detail_EzStateMachineImpl(EzState_detail_EzStateMachineImpl* to, EzState_detail_EzStateMachineImpl* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+
+    if (from->unk2 != NULL) { FATALERROR("EzState_detail_EzStateMachineImpl->unk2 = %p, not null", from->unk2); }
+
+    if (from->padding_unk3[1] != NULL) { FATALERROR("EzState_detail_EzStateMachineImpl->field0x38.arry = %p, not null", from->padding_unk3[1]); }
+
+    copy_EzStateRegisterSet(&to->EzStateRegisterSet1, &from->EzStateRegisterSet1, to_game);
+
+    if (from->unk4 != NULL) { FATALERROR("EzState_detail_EzStateMachineImpl->unk4 = %p, not null", from->unk4); }
+
+    copy_EzStateRegisterSet(&to->EzStateRegisterSet2, &from->EzStateRegisterSet2, to_game);
+
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+
+    if (from->padding_MessageQueue[3] != NULL) { FATALERROR("EzState_detail_EzStateMachineImpl->MessageQueue.arry = %p, not null", from->padding_MessageQueue[3]); }
+
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
 }
 
 EzState_detail_EzStateMachineImpl* init_EzState_detail_EzStateMachineImpl()
 {
     EzState_detail_EzStateMachineImpl* local_EzState_detail_EzStateMachineImpl = (EzState_detail_EzStateMachineImpl*)malloc_(sizeof(EzState_detail_EzStateMachineImpl));
+
+    EzStateRegisterSet* local_EzStateRegisterSet = init_EzStateRegisterSet();
+    local_EzState_detail_EzStateMachineImpl->EzStateRegisterSet1 = *local_EzStateRegisterSet;
+    free(local_EzStateRegisterSet);
+
+    local_EzStateRegisterSet = init_EzStateRegisterSet();
+    local_EzState_detail_EzStateMachineImpl->EzStateRegisterSet2 = *local_EzStateRegisterSet;
+    free(local_EzStateRegisterSet);
+
     return local_EzState_detail_EzStateMachineImpl;
 }
 
 void free_EzState_detail_EzStateMachineImpl(EzState_detail_EzStateMachineImpl* to)
 {
+    free_EzStateRegisterSet(&to->EzStateRegisterSet1, false);
+    free_EzStateRegisterSet(&to->EzStateRegisterSet2, false);
+
     free(to);
+}
+
+void copy_EzStateRegisterSet(EzStateRegisterSet* to, EzStateRegisterSet* from, bool to_game)
+{
+    if (!to_game)
+    {
+        size_t arry_size = (from->arry_cur - (uint64_t)from->arry) / sizeof(EzStateRegister);
+        if (arry_size != 8)
+        {
+            FATALERROR("EzStateRegisterSet (%p) has a size of %d, not 8", from, arry_size);
+        }
+    }
+    for (size_t i = 0; i < 8; i++)
+    {
+        memcpy(to->arry[i].data_0, from->arry[i].data_0, sizeof(EzStateRegister));
+    }
+    //don't need to save arry_cur and end, since they shouldn't change
+}
+
+EzStateRegisterSet* init_EzStateRegisterSet()
+{
+    EzStateRegisterSet* local_EzStateRegisterSet = (EzStateRegisterSet*)malloc_(sizeof(EzStateRegisterSet));
+
+    //array size is const 8
+    local_EzStateRegisterSet->arry = (EzStateRegister*)malloc_(8 * sizeof(EzStateRegister));
+
+    return local_EzStateRegisterSet;
+}
+
+void free_EzStateRegisterSet(EzStateRegisterSet* to, bool freeself)
+{
+    free(to->arry);
+
+    if (freeself)
+    {
+        free(to);
+    }
 }
 
 void copy_HavokChara(HavokChara* to, HavokChara* from, bool to_game)

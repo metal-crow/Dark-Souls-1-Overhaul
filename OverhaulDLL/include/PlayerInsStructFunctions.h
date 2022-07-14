@@ -109,15 +109,19 @@ void free_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* to, bool 
 
 void copy_WalkAnim_Twist_Field0x228Elem_field0x10elem(WalkAnim_Twist_Field0x228Elem_field0x10elem* to, WalkAnim_Twist_Field0x228Elem_field0x10elem* from);
 
-void copy_ActionCtrl(ActionCtrl* to, ActionCtrl* from);
+void copy_ActionCtrl(ActionCtrl* to, ActionCtrl* from, bool to_game);
 ActionCtrl* init_ActionCtrl();
 void free_ActionCtrl(ActionCtrl* to);
 
-void copy_ActionCtrl_0x30Substruct(ActionCtrl_0x30Substruct* to, ActionCtrl_0x30Substruct* from);
+void copy_ActionCtrl_0x30Substruct(ActionCtrl_0x30Substruct* to, ActionCtrl_0x30Substruct* from, bool to_game);
 
-void copy_EzState_detail_EzStateMachineImpl(EzState_detail_EzStateMachineImpl* to, EzState_detail_EzStateMachineImpl* from);
+void copy_EzState_detail_EzStateMachineImpl(EzState_detail_EzStateMachineImpl* to, EzState_detail_EzStateMachineImpl* from, bool to_game);
 EzState_detail_EzStateMachineImpl* init_EzState_detail_EzStateMachineImpl();
 void free_EzState_detail_EzStateMachineImpl(EzState_detail_EzStateMachineImpl* to);
+
+void copy_EzStateRegisterSet(EzStateRegisterSet* to, EzStateRegisterSet* from, bool to_game);
+EzStateRegisterSet* init_EzStateRegisterSet();
+void free_EzStateRegisterSet(EzStateRegisterSet* to, bool freeself);
 
 void copy_HavokChara(HavokChara* to, HavokChara* from, bool to_game);
 HavokChara* init_HavokChara();

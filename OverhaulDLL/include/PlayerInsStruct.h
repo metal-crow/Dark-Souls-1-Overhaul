@@ -31,6 +31,8 @@ typedef struct hkpCharacterProxy hkpCharacterProxy;
 typedef struct HitIns HitIns;
 typedef struct HavokChara HavokChara;
 typedef struct EzState_detail_EzStateMachineImpl EzState_detail_EzStateMachineImpl;
+typedef struct EzStateRegister EzStateRegister;
+typedef struct EzStateRegisterSet EzStateRegisterSet;
 typedef struct ActionCtrl_0x30Substruct ActionCtrl_0x30Substruct;
 typedef struct ActionCtrl ActionCtrl;
 typedef struct WalkAnim_Twist_Field0x228Elem_field0x10elem WalkAnim_Twist_Field0x228Elem_field0x10elem;
@@ -416,21 +418,52 @@ static_assert(offsetof(HavokChara, padding_3) == 0x250);
 static_assert(offsetof(HavokChara, data_4) == 0x258);
 static_assert(sizeof(HavokChara) == 0x290);
 
+struct EzStateRegister
+{
+    uint8_t data_0[0x10];
+};
+
+static_assert(sizeof(EzStateRegister) == 0x10);
+
+struct EzStateRegisterSet
+{
+    uint64_t padding_0[2];
+    EzStateRegister* arry;
+    uint64_t arry_cur;
+    uint64_t arry_end;
+};
+
+static_assert(sizeof(EzStateRegisterSet) == 0x28);
+
 struct EzState_detail_EzStateMachineImpl
 {
-    uint8_t padding_0[24];
+    uint8_t padding_0[0x18];
     uint8_t data_0[16]; //the cur_state pointer in this is just a pointer to const data
-    uint64_t padding_1[1]; //i dunno what this pointer is, so hopefully its unneeded
-    uint64_t padding_1a[5]; //these seem to be null
-    uint8_t padding_1b[0x58]; //ezstate stuff, probably not needed
+    uint64_t padding_1;
+    uint64_t unk2; //always null?
+    uint64_t padding_unk3[4]; //always null?
+    EzStateRegisterSet EzStateRegisterSet1;
+    uint64_t unk4; //always null?
+    EzStateRegisterSet EzStateRegisterSet2;
     uint8_t data_1[16];
-    uint8_t padding_2[0x68];
-    uint8_t data_2[8];
+    uint64_t padding_unk5[4]; //nothing in the class it points to
+    uint64_t padding_MessageQueue[6]; //always null?
+    uint64_t padding_ActionEnv;
+    uint8_t data_2[24];
 };
 
 static_assert(offsetof(EzState_detail_EzStateMachineImpl, data_0) == 0x18);
+static_assert(offsetof(EzState_detail_EzStateMachineImpl, padding_1) == 0x28);
+static_assert(offsetof(EzState_detail_EzStateMachineImpl, unk2) == 0x30);
+static_assert(offsetof(EzState_detail_EzStateMachineImpl, padding_unk3) == 0x38);
+static_assert(offsetof(EzState_detail_EzStateMachineImpl, EzStateRegisterSet1) == 0x58);
+static_assert(offsetof(EzState_detail_EzStateMachineImpl, unk4) == 0x80);
+static_assert(offsetof(EzState_detail_EzStateMachineImpl, EzStateRegisterSet2) == 0x88);
 static_assert(offsetof(EzState_detail_EzStateMachineImpl, data_1) == 0xb0);
-static_assert(offsetof(EzState_detail_EzStateMachineImpl, data_2) == 0x128);
+static_assert(offsetof(EzState_detail_EzStateMachineImpl, padding_unk5) == 0xc0);
+static_assert(offsetof(EzState_detail_EzStateMachineImpl, padding_MessageQueue) == 0xe0);
+static_assert(offsetof(EzState_detail_EzStateMachineImpl, padding_ActionEnv) == 0x110);
+static_assert(offsetof(EzState_detail_EzStateMachineImpl, data_2) == 0x118);
 static_assert(sizeof(EzState_detail_EzStateMachineImpl) == 0x130);
 
 struct ActionCtrl_0x30Substruct
