@@ -1557,6 +1557,9 @@ void* Game::get_MoveMapStep()
     return (void*)grab_movemapstep_value;
 }
 
+typedef void Step_MapArea_MapAreaObjects_and_NearbyMapAreas_FUNC(void* FieldArea, float frame_time, uint32_t param_3, uint8_t param_4, uint8_t param_5);
+Step_MapArea_MapAreaObjects_and_NearbyMapAreas_FUNC* Step_MapArea_MapAreaObjects_and_NearbyMapAreas = (Step_MapArea_MapAreaObjects_and_NearbyMapAreas_FUNC*)0x1403cc540;
+
 typedef void Step_Chr_FUNC(void* movemapstep, float frame_time, byte param_3);
 Step_Chr_FUNC* Step_Chr = (Step_Chr_FUNC*)0x14024f7f0;
 
@@ -1579,15 +1582,18 @@ static const float FRAMETIME = 0.01666666666f;
 
 void Game::Step_GameSimulation(bool renderFrame)
 {
+    void* MoveMapStep = Game::get_MoveMapStep();
     if (!renderFrame)
     {
-        Step_Chr(Game::get_MoveMapStep(), FRAMETIME, 1);
+        void* FieldArea = *(void**)(((uint64_t)MoveMapStep) + 0x60);
+        Step_MapArea_MapAreaObjects_and_NearbyMapAreas(FieldArea, FRAMETIME, 1, 1, 0);
+        Step_Chr(MoveMapStep, FRAMETIME, 1);
         Step_Bullet(*(void**)Game::bullet_man, FRAMETIME);
         Step_DamageMan(*(void**)Game::damage_man, FRAMETIME);
     }
     else
     {
-        MoveMapStep_Step_13(Game::get_MoveMapStep(), FRAMETIME);
+        MoveMapStep_Step_13(MoveMapStep, FRAMETIME);
     }
     Step_Havok(*(void**)Game::frpg_havok_man_imp, FRAMETIME);
     FinishStep_Havok(*(void**)Game::frpg_havok_man_imp);
