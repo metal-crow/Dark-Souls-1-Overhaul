@@ -25,7 +25,13 @@ bool rollback_test(void* unused)
     if (Rollback::gload)
     {
         Rollback::GameStateLoad();
+
+        //set and unset this flag before stepping to clean or reset the player or something. it prevents an animation bug
+        uint64_t pi = (uint64_t)Game::get_PlayerIns().value();
+        *(uint8_t*)(pi + 0x526) |= 0x10;
         Game::Step_GameSimulation();
+        *(uint8_t*)(pi + 0x526) &= ~0x10;
+
         Rollback::gload = false;
     }
 
