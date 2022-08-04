@@ -7,6 +7,9 @@ void copy_PlayerIns(PlayerIns* to, PlayerIns* from, bool to_game)
 {
     copy_ChrIns(&to->chrins, &from->chrins, to_game);
     copy_PlayerGameData(to->playergamedata, from->playergamedata);
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    to->data_2 = from->data_2;
     copy_RingEquipCtrl(to->ringequipctrl, from->ringequipctrl, to_game);
     copy_WeaponEquipCtrl(to->weaponequipctrl, from->weaponequipctrl, to_game);
     copy_ProEquipCtrl(to->proequipctrl, from->proequipctrl, to_game);

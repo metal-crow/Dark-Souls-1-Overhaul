@@ -1022,7 +1022,13 @@ struct PlayerIns
     ChrIns chrins;
     uint8_t padding_0[8];
     PlayerGameData* playergamedata;
-    uint8_t padding_1[0x268];
+    uint8_t padding_1a[0x50];
+    uint8_t data_0[0x1d0];
+    uint64_t padding_1b;
+    uint8_t data_1[16];
+    uint8_t padding_1c[24];
+    uint64_t data_2;
+    uint64_t padding_1d[2];
     RingEquipCtrl* ringequipctrl;
     WeaponEquipCtrl* weaponequipctrl;
     ProEquipCtrl* proequipctrl;
@@ -1038,6 +1044,13 @@ struct PlayerIns
 
 static_assert(offsetof(PlayerIns, chrins) == 0x0);
 static_assert(offsetof(PlayerIns, playergamedata) == 0x578);
+static_assert(offsetof(PlayerIns, padding_1a) == 0x580);
+static_assert(offsetof(PlayerIns, data_0) == 0x5d0);
+static_assert(offsetof(PlayerIns, padding_1b) == 0x7a0);
+static_assert(offsetof(PlayerIns, data_1) == 0x7a8);
+static_assert(offsetof(PlayerIns, padding_1c) == 0x7b8);
+static_assert(offsetof(PlayerIns, data_2) == 0x7d0);
+static_assert(offsetof(PlayerIns, padding_1d) == 0x7d8);
 static_assert(offsetof(PlayerIns, ringequipctrl) == 0x7e8);
 static_assert(offsetof(PlayerIns, weaponequipctrl) == 0x7f0);
 static_assert(offsetof(PlayerIns, proequipctrl) == 0x7f8);
