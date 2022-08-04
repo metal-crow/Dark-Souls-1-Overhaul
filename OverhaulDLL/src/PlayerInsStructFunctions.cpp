@@ -18,6 +18,12 @@ void copy_PlayerIns(PlayerIns* to, PlayerIns* from, bool to_game)
     to->itemId = from->itemId;
     to->override_equipped_magicId = from->override_equipped_magicId;
     copy_ChrAsm(to->chrasm, from->chrasm);
+    copy_ChrAsmModelRes(to->chrAsmModelRes, from->chrAsmModelRes, to_game);
+    copy_ChrAsmModel(to->chrAsmModel, from->chrAsmModel, to_game);
+    memcpy(to->data_3, from->data_3, sizeof(to->data_3));
+    memcpy(to->data_4, from->data_4, sizeof(to->data_4));
+    memcpy(to->data_5, from->data_5, sizeof(to->data_5));
+    memcpy(to->data_6, from->data_6, sizeof(to->data_6));
 }
 
 PlayerIns* init_PlayerIns()
@@ -32,6 +38,8 @@ PlayerIns* init_PlayerIns()
     local_PlayerIns->weaponequipctrl = init_WeaponEquipCtrl();
     local_PlayerIns->proequipctrl = init_ProEquipCtrl();
     local_PlayerIns->chrasm = init_ChrAsm();
+    local_PlayerIns->chrAsmModelRes = init_ChrAsmModelRes();
+    local_PlayerIns->chrAsmModel = init_ChrAsmModel();
 
     return local_PlayerIns;
 }
@@ -44,6 +52,8 @@ void free_PlayerIns(PlayerIns* to)
     free_WeaponEquipCtrl(to->weaponequipctrl);
     free_ProEquipCtrl(to->proequipctrl);
     free_ChrAsm(to->chrasm);
+    free_ChrAsmModelRes(to->chrAsmModelRes);
+    free_ChrAsmModel(to->chrAsmModel);
 
     free(to);
 }
@@ -65,6 +75,45 @@ ChrAsm* init_ChrAsm()
 }
 
 void free_ChrAsm(ChrAsm* to)
+{
+    free(to);
+}
+
+void copy_ChrAsmModelRes(ChrAsmModelRes* to, ChrAsmModelRes* from, bool to_game)
+{
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(to->arry, from->arry, sizeof(to->arry));
+}
+
+ChrAsmModelRes* init_ChrAsmModelRes()
+{
+    ChrAsmModelRes* local_ChrAsmModelRes = (ChrAsmModelRes*)malloc_(sizeof(ChrAsmModelRes));
+    return local_ChrAsmModelRes;
+}
+
+void free_ChrAsmModelRes(ChrAsmModelRes* to)
+{
+    free(to);
+}
+
+void copy_ChrAsmModel(ChrAsmModel* to, ChrAsmModel* from, bool to_game)
+{
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    memcpy(to->data_3, from->data_3, sizeof(to->data_3));
+    memcpy(to->data_4, from->data_4, sizeof(to->data_4));
+    memcpy(to->data_5, from->data_5, sizeof(to->data_5));
+    to->data_6 = from->data_6;
+}
+
+ChrAsmModel* init_ChrAsmModel()
+{
+    ChrAsmModel* local_ChrAsmModel = (ChrAsmModel*)malloc_(sizeof(ChrAsmModel));
+    return local_ChrAsmModel;
+}
+
+void free_ChrAsmModel(ChrAsmModel* to)
 {
     free(to);
 }

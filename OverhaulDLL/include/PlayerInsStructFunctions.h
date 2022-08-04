@@ -13,6 +13,14 @@ void copy_ChrAsm(ChrAsm* to, ChrAsm* from);
 ChrAsm* init_ChrAsm();
 void free_ChrAsm(ChrAsm* to);
 
+void copy_ChrAsmModelRes(ChrAsmModelRes* to, ChrAsmModelRes* from, bool to_game);
+ChrAsmModelRes* init_ChrAsmModelRes();
+void free_ChrAsmModelRes(ChrAsmModelRes* to);
+
+void copy_ChrAsmModel(ChrAsmModel* to, ChrAsmModel* from, bool to_game);
+ChrAsmModel* init_ChrAsmModel();
+void free_ChrAsmModel(ChrAsmModel* to);
+
 void copy_ProEquipCtrl(ProEquipCtrl* to, ProEquipCtrl* from, bool to_game);
 ProEquipCtrl* init_ProEquipCtrl();
 void free_ProEquipCtrl(ProEquipCtrl* to);

@@ -66,6 +66,9 @@ typedef struct PlayerGameData_ChrProperties PlayerGameData_ChrProperties;
 typedef struct PlayerGameData PlayerGameData;
 typedef struct RingEquipCtrl RingEquipCtrl;
 typedef struct WeaponEquipCtrl WeaponEquipCtrl;
+typedef struct ChrAsmModel ChrAsmModel;
+typedef struct ChrAsmModelRes_Elem ChrAsmModelRes_Elem;
+typedef struct ChrAsmModelRes ChrAsmModelRes;
 typedef struct ProEquipCtrl ProEquipCtrl;
 typedef struct ChrAsm ChrAsm;
 typedef struct PlayerIns PlayerIns;
@@ -1017,6 +1020,61 @@ static_assert(offsetof(ChrAsm, r_hand_equipped_index) == 0x10);
 static_assert(offsetof(ChrAsm, equip_items) == 0x24);
 static_assert(sizeof(ChrAsm) == 0x80);
 
+struct ChrAsmModelRes_Elem
+{
+    uint8_t data_0[0x50];
+};
+
+static_assert(sizeof(ChrAsmModelRes_Elem) == 0x50);
+
+struct ChrAsmModelRes
+{
+    uint64_t padding_0;
+    uint8_t data_0[0x28];
+    ChrAsmModelRes_Elem arry[14];
+};
+
+static_assert(offsetof(ChrAsmModelRes, data_0) == 8);
+static_assert(offsetof(ChrAsmModelRes, arry) == 0x30);
+static_assert(sizeof(ChrAsmModelRes) == 0x490);
+
+struct ChrAsmModel
+{
+    uint64_t padding_0;
+    uint8_t data_0[0x10];
+    uint64_t padding_1;
+    uint8_t data_1[0x30];
+    uint8_t padding_2[0x18];
+    uint8_t data_2[0x18];
+    uint64_t unk1;
+    uint64_t unk2;
+    uint64_t unk3;
+    uint8_t data_3[0x30];
+    uint64_t unk4;
+    uint8_t data_4[0x80];
+    uint64_t padding_3; //duplicate pointer from parent
+    uint64_t data_5[13]; //pointer to FileCaps, const ptrs
+    uint64_t padding_4;
+    uint64_t data_6;
+};
+
+static_assert(offsetof(ChrAsmModel, data_0) == 0x8);
+static_assert(offsetof(ChrAsmModel, padding_1) == 0x18);
+static_assert(offsetof(ChrAsmModel, data_1) == 0x20);
+static_assert(offsetof(ChrAsmModel, padding_2) == 0x50);
+static_assert(offsetof(ChrAsmModel, data_2) == 0x68);
+static_assert(offsetof(ChrAsmModel, unk1) == 0x80);
+static_assert(offsetof(ChrAsmModel, unk2) == 0x88);
+static_assert(offsetof(ChrAsmModel, unk3) == 0x90);
+static_assert(offsetof(ChrAsmModel, data_3) == 0x98);
+static_assert(offsetof(ChrAsmModel, unk4) == 0xc8);
+static_assert(offsetof(ChrAsmModel, data_4) == 0xd0);
+static_assert(offsetof(ChrAsmModel, padding_3) == 0x150);
+static_assert(offsetof(ChrAsmModel, data_5) == 0x158);
+static_assert(offsetof(ChrAsmModel, padding_4) == 0x1c0);
+static_assert(offsetof(ChrAsmModel, data_6) == 0x1c8);
+static_assert(sizeof(ChrAsmModel) == 0x1d0);
+
 struct PlayerIns
 {
     ChrIns chrins;
@@ -1039,7 +1097,16 @@ struct PlayerIns
     uint32_t override_equipped_magicId;
     uint8_t padding_3[0x24];
     ChrAsm* chrasm;
-    uint8_t padding_4[0x188];
+    ChrAsmModelRes* chrAsmModelRes;
+    ChrAsmModel* chrAsmModel;
+    uint64_t padding_4;
+    uint8_t data_3[24];
+    uint64_t padding_5;
+    uint8_t data_4[0x50];
+    uint8_t unk_BulletIns_FollowupBullet[0x30];
+    uint8_t data_5[0xb0];
+    uint64_t padding_6;
+    uint8_t data_6[24];
 };
 
 static_assert(offsetof(PlayerIns, chrins) == 0x0);
@@ -1059,6 +1126,17 @@ static_assert(offsetof(PlayerIns, curUsedItem) == 0x80c);
 static_assert(offsetof(PlayerIns, itemId) == 0x814);
 static_assert(offsetof(PlayerIns, override_equipped_magicId) == 0x818);
 static_assert(offsetof(PlayerIns, chrasm) == 0x840);
+static_assert(offsetof(PlayerIns, chrAsmModelRes) == 0x848);
+static_assert(offsetof(PlayerIns, chrAsmModel) == 0x850);
+static_assert(offsetof(PlayerIns, padding_4) == 0x858);
+static_assert(offsetof(PlayerIns, data_3) == 0x860);
+static_assert(offsetof(PlayerIns, padding_5) == 0x878);
+static_assert(offsetof(PlayerIns, data_4) == 0x880);
+static_assert(offsetof(PlayerIns, unk_BulletIns_FollowupBullet) == 0x8d0);
+static_assert(offsetof(PlayerIns, data_5) == 0x900);
+static_assert(offsetof(PlayerIns, padding_6) == 0x9b0);
+static_assert(offsetof(PlayerIns, data_6) == 0x9b8);
+
 static_assert(sizeof(PlayerIns) == 0x9d0);
 
 #endif
