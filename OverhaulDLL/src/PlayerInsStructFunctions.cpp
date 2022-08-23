@@ -1278,7 +1278,7 @@ void copy_hkaAnimationControl(hkaAnimationControl* to, hkaAnimationControl* from
     to->field0x28_cap = from->field0x28_cap;
     memcpy(to->field0x28, from->field0x28, to->field0x28_len);
 
-    copy_hkaAnimationBinding(to->HkaAnimationBinding, from->HkaAnimationBinding);
+    to->HkaAnimationBinding = from->HkaAnimationBinding;
 
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
 }
@@ -1289,7 +1289,6 @@ hkaAnimationControl* init_hkaAnimationControl()
 
     local_hkaAnimationControl->field0x18 = (uint8_t*)malloc_(sizeof(uint8_t) * 64);
     local_hkaAnimationControl->field0x28 = (uint8_t*)malloc_(sizeof(uint8_t) * 64);
-    local_hkaAnimationControl->HkaAnimationBinding = init_hkaAnimationBinding();
 
     return local_hkaAnimationControl;
 }
@@ -1298,29 +1297,11 @@ void free_hkaAnimationControl(hkaAnimationControl* to, bool freeself)
 {
     free(to->field0x18);
     free(to->field0x28);
-    free(to->HkaAnimationBinding);
 
     if (freeself)
     {
         free(to);
     }
-}
-
-void copy_hkaAnimationBinding(hkaAnimationBinding* to, hkaAnimationBinding* from)
-{
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-}
-
-hkaAnimationBinding* init_hkaAnimationBinding()
-{
-    hkaAnimationBinding* local_hkaAnimationBinding = (hkaAnimationBinding*)malloc_(sizeof(hkaAnimationBinding));
-
-    return local_hkaAnimationBinding;
-}
-
-void free_hkaAnimationBinding(hkaAnimationBinding* to)
-{
-    free(to);
 }
 
 void copy_ChrCtrl_AnimationQueue_field0x10(ChrCtrl_AnimationQueue_field0x10* to, ChrCtrl_AnimationQueue_field0x10* from)
@@ -1377,6 +1358,7 @@ void free_ChrCtrl_AnimationQueue_field0x10(ChrCtrl_AnimationQueue_field0x10* to)
 void copy_ChrCtrl_AnimationQueueEntry(ChrCtrl_AnimationQueueEntry* to, ChrCtrl_AnimationQueueEntry* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    copy_hkaDefaultAnimationControl(to->defaultAnimationControl, from->defaultAnimationControl);
     to->HvkAnim_AnimInfoArrayElem = from->HvkAnim_AnimInfoArrayElem;
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
 }
@@ -1385,11 +1367,15 @@ ChrCtrl_AnimationQueueEntry* init_ChrCtrl_AnimationQueueEntry()
 {
     ChrCtrl_AnimationQueueEntry* local_AnimationQueueEntry = (ChrCtrl_AnimationQueueEntry*)malloc_(sizeof(ChrCtrl_AnimationQueueEntry));
 
+    local_AnimationQueueEntry->defaultAnimationControl = init_hkaDefaultAnimationControl();
+
     return local_AnimationQueueEntry;
 }
 
 void free_ChrCtrl_AnimationQueueEntry(ChrCtrl_AnimationQueueEntry* to, bool freeself)
 {
+    free(to->defaultAnimationControl);
+
     if (freeself)
     {
         free(to);

@@ -18,7 +18,6 @@ typedef struct ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem ChrCtrl_Anima
 typedef struct hkaAnimatedSkeleton hkaAnimatedSkeleton;
 typedef struct hkaDefaultAnimationControl hkaDefaultAnimationControl;
 typedef struct hkaAnimationControl hkaAnimationControl;
-typedef struct hkaAnimationBinding hkaAnimationBinding;
 typedef struct ChrCtrl_AnimationQueue ChrCtrl_AnimationQueue;
 typedef struct ChrCtrl_AnimationQueue_field0x20 ChrCtrl_AnimationQueue_field0x20;
 typedef struct AnimationMediatorStateEntry AnimationMediatorStateEntry;
@@ -123,11 +122,13 @@ static_assert(sizeof(AnimationQueue) == 0x40);
 struct ChrCtrl_AnimationQueueEntry
 {
     uint8_t data_0[8];
-    uint64_t padding_0[3];
+    hkaDefaultAnimationControl* defaultAnimationControl;
+    uint64_t padding_0[2];
     uint64_t HvkAnim_AnimInfoArrayElem; //this should be a const pointer since it's to an animbnd
     uint8_t data_1[0x50];
 };
 
+static_assert(offsetof(ChrCtrl_AnimationQueueEntry, defaultAnimationControl) == 0x8);
 static_assert(offsetof(ChrCtrl_AnimationQueueEntry, HvkAnim_AnimInfoArrayElem) == 0x20);
 static_assert(offsetof(ChrCtrl_AnimationQueueEntry, data_1) == 0x28);
 static_assert(sizeof(ChrCtrl_AnimationQueueEntry) == 0x78);
@@ -145,7 +146,7 @@ struct ChrCtrl_AnimationQueue_field0x10
     uint32_t array2_len;
     ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem** arry1; //this points to elements in arry2
     ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem* arry2;
-    uint64_t padding_0[2];
+    uint64_t padding_0[2]; //pointer to unchanging string (always c0000 for the PC), and ptr to parent
 };
 
 static_assert(offsetof(ChrCtrl_AnimationQueue_field0x10, array1_len) == 0x0);
@@ -153,15 +154,6 @@ static_assert(offsetof(ChrCtrl_AnimationQueue_field0x10, array2_len) == 0x4);
 static_assert(offsetof(ChrCtrl_AnimationQueue_field0x10, arry1) == 0x8);
 static_assert(offsetof(ChrCtrl_AnimationQueue_field0x10, arry2) == 0x10);
 static_assert(sizeof(ChrCtrl_AnimationQueue_field0x10) == 0x28);
-
-struct hkaAnimationBinding
-{
-    uint64_t padding_0;
-    uint8_t data_0[16];
-    uint64_t padding_1;
-};
-
-static_assert(sizeof(hkaAnimationBinding) == 0x20);
 
 struct hkaAnimationControl
 {
@@ -173,7 +165,7 @@ struct hkaAnimationControl
     uint8_t* field0x28;
     uint32_t field0x28_len;
     uint32_t field0x28_cap;
-    hkaAnimationBinding* HkaAnimationBinding;
+    uint64_t HkaAnimationBinding; //static ptr
     uint64_t padding_1;
     uint32_t data_1[3];
 };

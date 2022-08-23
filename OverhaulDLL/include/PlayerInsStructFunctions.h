@@ -171,10 +171,6 @@ void copy_hkaAnimationControl(hkaAnimationControl* to, hkaAnimationControl* from
 hkaAnimationControl* init_hkaAnimationControl();
 void free_hkaAnimationControl(hkaAnimationControl* to, bool freeself);
 
-void copy_hkaAnimationBinding(hkaAnimationBinding* to, hkaAnimationBinding* from);
-hkaAnimationBinding* init_hkaAnimationBinding();
-void free_hkaAnimationBinding(hkaAnimationBinding* to);
-
 void copy_ChrCtrl_AnimationQueue_field0x10(ChrCtrl_AnimationQueue_field0x10* to, ChrCtrl_AnimationQueue_field0x10* from);
 ChrCtrl_AnimationQueue_field0x10* init_ChrCtrl_AnimationQueue_field0x10();
 void free_ChrCtrl_AnimationQueue_field0x10(ChrCtrl_AnimationQueue_field0x10* to);
