@@ -1025,6 +1025,7 @@ void copy_hkpCharacterProxy(hkpCharacterProxy* to, hkpCharacterProxy* from)
 {
     to->data_0 = from->data_0;
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    copy_hkpSimpleShapePhantom(to->HkpSimpleShapePhantom, from->HkpSimpleShapePhantom);
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
 }
@@ -1033,10 +1034,50 @@ hkpCharacterProxy* init_hkpCharacterProxy()
 {
     hkpCharacterProxy* local_hkpCharacterProxy = (hkpCharacterProxy*)malloc_(sizeof(hkpCharacterProxy));
 
+    local_hkpCharacterProxy->HkpSimpleShapePhantom = init_hkpSimpleShapePhantom();
+
     return local_hkpCharacterProxy;
 }
 
 void free_hkpCharacterProxy(hkpCharacterProxy* to)
+{
+    free_hkpSimpleShapePhantom(to->HkpSimpleShapePhantom);
+    free(to);
+}
+
+void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, hkpSimpleShapePhantom* from)
+{
+    copy_hkpSimpleShapePhantom_field0x30(to->field0x30, from->field0x30);
+}
+
+hkpSimpleShapePhantom* init_hkpSimpleShapePhantom()
+{
+    hkpSimpleShapePhantom* local_hkpSimpleShapePhantom = (hkpSimpleShapePhantom*)malloc_(sizeof(hkpSimpleShapePhantom));
+
+    local_hkpSimpleShapePhantom->field0x30 = init_hkpSimpleShapePhantom_field0x30();
+
+    return local_hkpSimpleShapePhantom;
+}
+
+void free_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to)
+{
+    free_hkpSimpleShapePhantom_field0x30(to->field0x30);
+    free(to);
+}
+
+void copy_hkpSimpleShapePhantom_field0x30(hkpSimpleShapePhantom_field0x30* to, hkpSimpleShapePhantom_field0x30* from)
+{
+    memcpy(to->position, from->position, sizeof(to->position));
+}
+
+hkpSimpleShapePhantom_field0x30* init_hkpSimpleShapePhantom_field0x30()
+{
+    hkpSimpleShapePhantom_field0x30* local_hkpSimpleShapePhantom_field0x30 = (hkpSimpleShapePhantom_field0x30*)malloc_(sizeof(hkpSimpleShapePhantom_field0x30));
+
+    return local_hkpSimpleShapePhantom_field0x30;
+}
+
+void free_hkpSimpleShapePhantom_field0x30(hkpSimpleShapePhantom_field0x30* to)
 {
     free(to);
 }

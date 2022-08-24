@@ -24,6 +24,7 @@ typedef struct AnimationMediatorStateEntry AnimationMediatorStateEntry;
 typedef struct AnimationMediator AnimationMediator;
 typedef struct hkpCharacterProxy_field0x20elem hkpCharacterProxy_field0x20elem;
 typedef struct hkpRigidBody hkpRigidBody;
+typedef struct hkpSimpleShapePhantom_field0x30 hkpSimpleShapePhantom_field0x30;
 typedef struct hkpSimpleShapePhantom hkpSimpleShapePhantom;
 typedef struct ChrInsProxyListener ChrInsProxyListener;
 typedef struct hkpCharacterProxy hkpCharacterProxy;
@@ -303,9 +304,19 @@ struct hkpRigidBody
 
 static_assert(sizeof(hkpRigidBody) == 0x2c0);
 
+struct hkpSimpleShapePhantom_field0x30
+{
+    uint8_t padding_0[0x30];
+    float position[4];
+};
+
+//we don't know the actual size of the hkpSimpleShapePhantom_field0x30
+
 struct hkpSimpleShapePhantom
 {
-    uint8_t padding_0[0x1c0];
+    uint8_t padding_0[0x30];
+    hkpSimpleShapePhantom_field0x30* field0x30;
+    uint8_t padding_1[0x188];
 };
 
 static_assert(sizeof(hkpSimpleShapePhantom) == 0x1c0);

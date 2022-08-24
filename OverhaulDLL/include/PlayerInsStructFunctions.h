@@ -143,6 +143,14 @@ void copy_hkpCharacterProxy(hkpCharacterProxy* to, hkpCharacterProxy* from);
 hkpCharacterProxy* init_hkpCharacterProxy();
 void free_hkpCharacterProxy(hkpCharacterProxy* to);
 
+void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, hkpSimpleShapePhantom* from);
+hkpSimpleShapePhantom* init_hkpSimpleShapePhantom();
+void free_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to);
+
+void copy_hkpSimpleShapePhantom_field0x30(hkpSimpleShapePhantom_field0x30* to, hkpSimpleShapePhantom_field0x30* from);
+hkpSimpleShapePhantom_field0x30* init_hkpSimpleShapePhantom_field0x30();
+void free_hkpSimpleShapePhantom_field0x30(hkpSimpleShapePhantom_field0x30* to);
+
 void copy_AnimationMediator(AnimationMediator* to, AnimationMediator* from);
 AnimationMediator* init_AnimationMediator();
 void free_AnimationMediator(AnimationMediator* to);
