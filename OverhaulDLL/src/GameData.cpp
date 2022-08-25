@@ -154,17 +154,17 @@ void Game::init()
 
     Game::bullet_man = Game::ds1_base + 0x1d177e8;
 
-    Game::unknown_global_struct_141d283a8 = 0x141d283a8;
+    Game::unknown_global_struct_141d283a8 = Game::ds1_base + 0x1d283a8;
 
-    Game::frpg_net_man = 0x141d27d60;
+    Game::frpg_net_man = Game::ds1_base + 0x1d27d60;
 
-    Game::pad_man = 0x141d06eb0;
+    Game::pad_man = Game::ds1_base + 0x1d06eb0;
 
-    Game::frpg_system = 0x141c04e28;
+    Game::frpg_system = Game::ds1_base + 0x1c04e28;
 
-    Game::damage_man = 0x141d173c0;
+    Game::damage_man = Game::ds1_base + 0x1d173c0;
 
-    Game::frpg_havok_man_imp = 0x141d10880;
+    Game::frpg_havok_man_imp = Game::ds1_base + 0x1d10880;
 }
 
 void Game::injections_init()
