@@ -24,7 +24,9 @@ bool rollback_test(void* unused)
 
     if (Rollback::gload)
     {
+        Game::SuspendThreads();
         Rollback::GameStateLoad();
+        Game::ResumeThreads();
         Game::Step_GameSimulation();
 
         Rollback::gload = false;

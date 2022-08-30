@@ -168,6 +168,8 @@ public:
 
     static const uint64_t MoveMapStep_New_injection_offset = 0x24cd20;
 
+    static const uint64_t InitAndStart_DLThread_injection_offset = 0xcc20bc;
+
     // Player character status (loading, human, co-op, invader, hollow)
     static sp::mem::pointer<int32_t> player_char_status;
 
@@ -341,6 +343,10 @@ public:
 	static void* get_MoveMapStep();
 
 	static void Step_GameSimulation(bool renderFrame = false);
+
+    static void SuspendThreads();
+
+    static void ResumeThreads();
 
     /*
      * Help speedup some functions by, whenever we're loaded into an area,

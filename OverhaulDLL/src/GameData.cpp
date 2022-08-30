@@ -85,6 +85,10 @@ extern "C" {
     uint64_t grab_movemapstep_return;
     void grab_movemapstep_injection();
     uint64_t grab_movemapstep_value;
+
+    uint64_t grab_thread_handle_return;
+    void grab_thread_handle_injection();
+    void grab_thread_handle_helper(HANDLE);
 }
 
 // Flag to determine if a character have been loaded since the game was launched (useful if player had a character loaded but returned to main menu)
@@ -190,6 +194,10 @@ void Game::injections_init()
     //inject the code to save the movemapstep pointer (using the pointer chain from frpg_system is sometimes unreliable)
     write_address = (uint8_t*)(Game::MoveMapStep_New_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &grab_movemapstep_return, 1, &grab_movemapstep_injection);
+
+    //inject code to save the handles of DLThreads dark souls starts, so they can be paused/resumed
+    write_address = (uint8_t*)(Game::InitAndStart_DLThread_injection_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &grab_thread_handle_return, 3, &grab_thread_handle_injection);
 }
 
 static bool character_reload_run = false;
@@ -255,6 +263,15 @@ bool Game::on_character_load(void* unused)
     return true;
 }
 
+std::vector<HANDLE> thread_handles;
+
+void grab_thread_handle_helper(HANDLE h)
+{
+    if (h != NULL)
+    {
+        thread_handles.push_back(h);
+    }
+}
 
 static bool resolve_current_player_animation_speed();
 
@@ -1597,4 +1614,20 @@ void Game::Step_GameSimulation(bool renderFrame)
     }
     Step_Havok(*(void**)Game::frpg_havok_man_imp, FRAMETIME);
     FinishStep_Havok(*(void**)Game::frpg_havok_man_imp);
+}
+
+void Game::SuspendThreads()
+{
+    for (size_t i = 0; i < thread_handles.size(); i++)
+    {
+        SuspendThread(thread_handles[i]);
+    }
+}
+
+void Game::ResumeThreads()
+{
+    for (size_t i = 0; i < thread_handles.size(); i++)
+    {
+        ResumeThread(thread_handles[i]);
+    }
 }
