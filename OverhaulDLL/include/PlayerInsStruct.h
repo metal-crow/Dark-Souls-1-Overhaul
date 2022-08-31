@@ -927,15 +927,35 @@ struct EquipItemData
 static_assert(offsetof(EquipItemData, quickbar) == 0x18);
 static_assert(sizeof(EquipItemData) == 0x30);
 
+struct ChrAsm
+{
+    uint8_t padding_0[8];
+    uint32_t equipped_weapon_style;
+    uint32_t l_hand_equipped_index;
+    uint32_t r_hand_equipped_index;
+    uint8_t data_0[0x10];
+    uint32_t equip_items[20];
+    uint8_t data_1[0xc];
+};
+
+static_assert(offsetof(ChrAsm, equipped_weapon_style) == 0x8);
+static_assert(offsetof(ChrAsm, l_hand_equipped_index) == 0xc);
+static_assert(offsetof(ChrAsm, r_hand_equipped_index) == 0x10);
+static_assert(offsetof(ChrAsm, equip_items) == 0x24);
+static_assert(sizeof(ChrAsm) == 0x80);
+
 struct EquipGameData
 {
-    uint8_t padding_0[0x120];
+    uint8_t padding_0[0x80];
+    ChrAsm chrasm;
+    uint8_t padding_0a[0x20];
     EquipInventoryData equippedInventory;
     EquipMagicData* equipMagicData;
     EquipItemData equippedItemsInQuickbar;
     uint8_t padding_1[0x48];
 };
 
+static_assert(offsetof(EquipGameData, chrasm) == 0x80);
 static_assert(offsetof(EquipGameData, equippedInventory) == 0x120);
 static_assert(offsetof(EquipGameData, equipMagicData) == 0x198);
 static_assert(offsetof(EquipGameData, equippedItemsInQuickbar) == 0x1a0);
@@ -1005,23 +1025,6 @@ static_assert(offsetof(ProEquipCtrl, spEffectList) == 0x10);
 static_assert(offsetof(ProEquipCtrl, equipped_armors_ids) == 0x18);
 static_assert(offsetof(ProEquipCtrl, array_len) == 0x20);
 static_assert(sizeof(ProEquipCtrl) == 0x30);
-
-struct ChrAsm
-{
-    uint8_t padding_0[8];
-    uint32_t equipped_weapon_style;
-    uint32_t l_hand_equipped_index;
-    uint32_t r_hand_equipped_index;
-    uint8_t data_0[0x10];
-    uint32_t equip_items[20];
-    uint8_t data_1[0xc];
-};
-
-static_assert(offsetof(ChrAsm, equipped_weapon_style) == 0x8);
-static_assert(offsetof(ChrAsm, l_hand_equipped_index) == 0xc);
-static_assert(offsetof(ChrAsm, r_hand_equipped_index) == 0x10);
-static_assert(offsetof(ChrAsm, equip_items) == 0x24);
-static_assert(sizeof(ChrAsm) == 0x80);
 
 struct ChrAsmModelRes_Elem
 {

@@ -249,6 +249,7 @@ void copy_PlayerGameData_ChrProperties(PlayerGameData_ChrProperties* to, PlayerG
 
 void copy_EquipGameData(EquipGameData* to, EquipGameData* from)
 {
+    copy_ChrAsm(&to->chrasm, &from->chrasm);
     copy_EquipMagicData(to->equipMagicData, from->equipMagicData);
     copy_EquipItemData(&to->equippedItemsInQuickbar, &from->equippedItemsInQuickbar);
 }
