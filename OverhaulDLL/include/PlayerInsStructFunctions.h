@@ -17,6 +17,10 @@ void copy_ChrAsmModelRes(ChrAsmModelRes* to, ChrAsmModelRes* from, bool to_game)
 ChrAsmModelRes* init_ChrAsmModelRes();
 void free_ChrAsmModelRes(ChrAsmModelRes* to);
 
+void copy_ChrAsmModelRes_Elem(ChrAsmModelRes_Elem* to, ChrAsmModelRes_Elem* from, bool to_game);
+ChrAsmModelRes_Elem* init_ChrAsmModelRes_Elem();
+void free_ChrAsmModelRes_Elem(ChrAsmModelRes_Elem* to, bool freeself);
+
 void copy_ChrAsmModel(ChrAsmModel* to, ChrAsmModel* from, bool to_game);
 ChrAsmModel* init_ChrAsmModel();
 void free_ChrAsmModel(ChrAsmModel* to);

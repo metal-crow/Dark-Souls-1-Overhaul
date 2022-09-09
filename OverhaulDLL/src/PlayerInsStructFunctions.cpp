@@ -82,18 +82,53 @@ void free_ChrAsm(ChrAsm* to)
 void copy_ChrAsmModelRes(ChrAsmModelRes* to, ChrAsmModelRes* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-    memcpy(to->arry, from->arry, sizeof(to->arry));
+    for (size_t i = 0; i < 14; i++)
+    {
+        copy_ChrAsmModelRes_Elem(&to->arry[i], &from->arry[i], to_game);
+    }
 }
 
 ChrAsmModelRes* init_ChrAsmModelRes()
 {
     ChrAsmModelRes* local_ChrAsmModelRes = (ChrAsmModelRes*)malloc_(sizeof(ChrAsmModelRes));
+
+    for (size_t i = 0; i < 14; i++)
+    {
+        ChrAsmModelRes_Elem* local_elem = init_ChrAsmModelRes_Elem();
+        local_ChrAsmModelRes->arry[i] = *local_elem;
+        free(local_elem);
+    }
+
     return local_ChrAsmModelRes;
 }
 
 void free_ChrAsmModelRes(ChrAsmModelRes* to)
 {
+    for (size_t i = 0; i < 14; i++)
+    {
+        free_ChrAsmModelRes_Elem(&to->arry[i], false);
+    }
     free(to);
+}
+
+void copy_ChrAsmModelRes_Elem(ChrAsmModelRes_Elem* to, ChrAsmModelRes_Elem* from, bool to_game)
+{
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+}
+
+ChrAsmModelRes_Elem* init_ChrAsmModelRes_Elem()
+{
+    ChrAsmModelRes_Elem* local_ChrAsmModelRes_Elem = (ChrAsmModelRes_Elem*)malloc_(sizeof(ChrAsmModelRes_Elem));
+    return local_ChrAsmModelRes_Elem;
+}
+
+void free_ChrAsmModelRes_Elem(ChrAsmModelRes_Elem* to, bool freeself)
+{
+    if (freeself)
+    {
+        free(to);
+    }
 }
 
 void copy_ChrAsmModel(ChrAsmModel* to, ChrAsmModel* from, bool to_game)

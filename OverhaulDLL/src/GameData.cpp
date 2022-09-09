@@ -89,6 +89,10 @@ extern "C" {
     uint64_t grab_thread_handle_return;
     void grab_thread_handle_injection();
     void grab_thread_handle_helper(HANDLE);
+
+    uint64_t grab_destruct_thread_handle_return;
+    void grab_destruct_thread_handle_injection();
+    void grab_destruct_thread_handle_helper(HANDLE);
 }
 
 // Flag to determine if a character have been loaded since the game was launched (useful if player had a character loaded but returned to main menu)
@@ -198,6 +202,9 @@ void Game::injections_init()
     //inject code to save the handles of DLThreads dark souls starts, so they can be paused/resumed
     write_address = (uint8_t*)(Game::InitAndStart_DLThread_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &grab_thread_handle_return, 3, &grab_thread_handle_injection);
+    //remove the handles when they get destroyed
+    write_address = (uint8_t*)(Game::Destruct_DLThread_injection_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &grab_destruct_thread_handle_return, 1, &grab_destruct_thread_handle_injection);
 }
 
 static bool character_reload_run = false;
@@ -263,13 +270,21 @@ bool Game::on_character_load(void* unused)
     return true;
 }
 
-std::vector<HANDLE> thread_handles;
+std::unordered_set<HANDLE> thread_handles;
 
 void grab_thread_handle_helper(HANDLE h)
 {
     if (h != NULL)
     {
-        thread_handles.push_back(h);
+        thread_handles.emplace(h);
+    }
+}
+
+void grab_destruct_thread_handle_helper(HANDLE h)
+{
+    if (h != NULL)
+    {
+        thread_handles.erase(h);
     }
 }
 
@@ -1618,16 +1633,32 @@ void Game::Step_GameSimulation(bool renderFrame)
 
 void Game::SuspendThreads()
 {
-    for (size_t i = 0; i < thread_handles.size(); i++)
+    for (const auto& handle : thread_handles)
     {
-        SuspendThread(thread_handles[i]);
+        DWORD out;
+        do
+        {
+            out = SuspendThread(handle);
+        } while (out != (DWORD)-1 && out > 0);
+        if (out == (DWORD)-1)
+        {
+            FATALERROR("Unable to suspend thread correctly. Error=%x", GetLastError());
+        }
     }
 }
 
 void Game::ResumeThreads()
 {
-    for (size_t i = 0; i < thread_handles.size(); i++)
+    for (const auto& handle : thread_handles)
     {
-        ResumeThread(thread_handles[i]);
+        DWORD out;
+        do
+        {
+            out = ResumeThread(handle);
+        } while (out != (DWORD)-1 && out > 0);
+        if (out == (DWORD)-1)
+        {
+            FATALERROR("Unable to resume thread correctly. Error=%x", GetLastError());
+        }
     }
 }

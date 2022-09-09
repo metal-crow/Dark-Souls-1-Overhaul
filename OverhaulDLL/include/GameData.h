@@ -170,6 +170,8 @@ public:
 
     static const uint64_t InitAndStart_DLThread_injection_offset = 0xcc20bc;
 
+    static const uint64_t Destruct_DLThread_injection_offset = 0xcc2180;
+
     // Player character status (loading, human, co-op, invader, hollow)
     static sp::mem::pointer<int32_t> player_char_status;
 
