@@ -1028,8 +1028,7 @@ static_assert(sizeof(ProEquipCtrl) == 0x30);
 
 struct ChrAsmModelRes_Elem
 {
-    uint8_t data_0[8];
-    uint64_t padding_1;
+    uint8_t data_0[0x10];
     uint8_t data_1[0x40];
 };
 
