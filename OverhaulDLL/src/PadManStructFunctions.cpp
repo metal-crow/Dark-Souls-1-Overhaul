@@ -25,7 +25,9 @@ void free_PadMan(PadMan* to)
 void copy_PadDevice(PadDevice* to, PadDevice* from)
 {
     copy_VirtualMultiDevice(to->VirtMultiDevice, from->VirtMultiDevice);
-    copy_KeyboardDevice(to->KeybrdDevice, from->KeybrdDevice);
+    copy_PadDevice_UserInput(to->padDevice_UserInput, from->padDevice_UserInput);
+    copy_MouseDevice(to->mouseDevice, from->mouseDevice);
+    copy_KeyboardDevice(to->keyboardDevice, from->keyboardDevice);
 }
 
 PadDevice* init_PadDevice()
@@ -33,32 +35,94 @@ PadDevice* init_PadDevice()
     PadDevice* local_PadDevice = (PadDevice*)malloc_(sizeof(PadDevice));
 
     local_PadDevice->VirtMultiDevice = init_VirtualMultiDevice();
-    local_PadDevice->KeybrdDevice = init_KeyboardDevice();
+    local_PadDevice->padDevice_UserInput = init_PadDevice_UserInput();
+    local_PadDevice->mouseDevice = init_MouseDevice();
+    local_PadDevice->keyboardDevice = init_KeyboardDevice();
 
     return local_PadDevice;
 }
 void free_PadDevice(PadDevice* to)
 {
     free_VirtualMultiDevice(to->VirtMultiDevice);
-    free_KeyboardDevice(to->KeybrdDevice);
+    free_PadDevice_UserInput(to->padDevice_UserInput);
+    free_MouseDevice(to->mouseDevice);
+    free_KeyboardDevice(to->keyboardDevice);
 
     free(to);
 }
 
 void copy_KeyboardDevice(KeyboardDevice* to, KeyboardDevice* from)
 {
-    memcpy(to->key_states, from->key_states, sizeof(to->key_states));
+    copy_DLUserInputDeviceImpl(&to->base, &from->base);
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 }
 
 KeyboardDevice* init_KeyboardDevice()
 {
     KeyboardDevice* local_KeyboardDevice = (KeyboardDevice*)malloc_(sizeof(KeyboardDevice));
 
+    DLUserInputDeviceImpl* local_DLUserInputDeviceImpl = init_DLUserInputDeviceImpl();
+    local_KeyboardDevice->base = *local_DLUserInputDeviceImpl;
+    free(local_DLUserInputDeviceImpl);
+
     return local_KeyboardDevice;
 }
 
 void free_KeyboardDevice(KeyboardDevice* to)
 {
+    free_DLUserInputDeviceImpl(&to->base, false);
+
+    free(to);
+}
+
+void copy_MouseDevice(MouseDevice* to, MouseDevice* from)
+{
+    copy_DLUserInputDeviceImpl(&to->base, &from->base);
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+}
+
+MouseDevice* init_MouseDevice()
+{
+    MouseDevice* local_MouseDevice = (MouseDevice*)malloc_(sizeof(MouseDevice));
+
+    DLUserInputDeviceImpl* local_DLUserInputDeviceImpl = init_DLUserInputDeviceImpl();
+    local_MouseDevice->base = *local_DLUserInputDeviceImpl;
+    free(local_DLUserInputDeviceImpl);
+
+    return local_MouseDevice;
+}
+
+void free_MouseDevice(MouseDevice* to)
+{
+    free_DLUserInputDeviceImpl(&to->base, false);
+
+    free(to);
+}
+
+void copy_PadDevice_UserInput(PadDevice_UserInput* to, PadDevice_UserInput* from)
+{
+    copy_DLUserInputDeviceImpl(&to->base, &from->base);
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    to->data_2 = from->data_2;
+}
+
+PadDevice_UserInput* init_PadDevice_UserInput()
+{
+    PadDevice_UserInput* local_PadDevice_UserInput = (PadDevice_UserInput*)malloc_(sizeof(PadDevice_UserInput));
+
+    DLUserInputDeviceImpl* local_DLUserInputDeviceImpl = init_DLUserInputDeviceImpl();
+    local_PadDevice_UserInput->base = *local_DLUserInputDeviceImpl;
+    free(local_DLUserInputDeviceImpl);
+
+    return local_PadDevice_UserInput;
+}
+
+void free_PadDevice_UserInput(PadDevice_UserInput* to)
+{
+    free_DLUserInputDeviceImpl(&to->base, false);
+
     free(to);
 }
 

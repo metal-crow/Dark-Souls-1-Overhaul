@@ -10,6 +10,8 @@
 
 typedef struct PadMan PadMan;
 typedef struct PadDevice PadDevice;
+typedef struct PadDevice_UserInput PadDevice_UserInput;
+typedef struct MouseDevice MouseDevice;
 typedef struct KeyboardDevice KeyboardDevice;
 typedef struct VirtualMultiDevice VirtualMultiDevice;
 typedef struct DLUserInputDeviceImpl DLUserInputDeviceImpl;
@@ -82,27 +84,60 @@ struct VirtualMultiDevice
 
 static_assert(sizeof(VirtualMultiDevice) == 0x1c8);
 
+struct PadDevice_UserInput
+{
+    DLUserInputDeviceImpl base;
+    uint8_t data_0[24];
+    uint64_t padding_0[2];
+    uint8_t padding_1[0x40];
+    uint8_t data_1[0x1f8];
+    uint64_t padding_2[5];
+    uint64_t data_2;
+};
+
+static_assert(offsetof(PadDevice_UserInput, data_0) == 0x1a8);
+static_assert(offsetof(PadDevice_UserInput, data_1) == 0x210);
+static_assert(offsetof(PadDevice_UserInput, data_2) == 0x430);
+static_assert(sizeof(PadDevice_UserInput) == 0x438);
+
+struct MouseDevice
+{
+    DLUserInputDeviceImpl base;
+    uint64_t padding_0[2];
+    uint8_t data_0[20];
+    uint32_t padding_1;
+    uint8_t data_1[12];
+};
+
+static_assert(offsetof(MouseDevice, data_0) == 0x1b8);
+static_assert(offsetof(MouseDevice, data_1) == 0x1d0);
+static_assert(sizeof(MouseDevice) == 0x1E0);
+
 struct KeyboardDevice
 {
-    uint8_t padding_0[0x1b8];
-    uint8_t key_states[256];
+    DLUserInputDeviceImpl base;
+    uint64_t padding_0[2];
+    uint8_t data_0[256];
     uint8_t padding_1[2];
 };
 
-static_assert(offsetof(KeyboardDevice, key_states) == 0x1b8);
-static_assert(sizeof(KeyboardDevice) == 0x2ba);
+static_assert(offsetof(KeyboardDevice, data_0) == 0x1b8);
+static_assert(sizeof(KeyboardDevice) == 0x2c0);
 
 struct PadDevice
 {
     uint64_t padding_0;
     VirtualMultiDevice* VirtMultiDevice;
-    uint64_t padding_1[2];
-    KeyboardDevice* KeybrdDevice;
+    PadDevice_UserInput* padDevice_UserInput;
+    MouseDevice* mouseDevice;
+    KeyboardDevice* keyboardDevice;
     uint8_t padding_2[0x20];
 };
 
 static_assert(offsetof(PadDevice, VirtMultiDevice) == 0x8);
-static_assert(offsetof(PadDevice, KeybrdDevice) == 0x20);
+static_assert(offsetof(PadDevice, padDevice_UserInput) == 0x10);
+static_assert(offsetof(PadDevice, mouseDevice) == 0x18);
+static_assert(offsetof(PadDevice, keyboardDevice) == 0x20);
 static_assert(sizeof(PadDevice) == 0x48);
 
 struct PadMan

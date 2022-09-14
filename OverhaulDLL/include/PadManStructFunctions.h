@@ -17,6 +17,14 @@ void copy_KeyboardDevice(KeyboardDevice* to, KeyboardDevice* from);
 KeyboardDevice* init_KeyboardDevice();
 void free_KeyboardDevice(KeyboardDevice* to);
 
+void copy_MouseDevice(MouseDevice* to, MouseDevice* from);
+MouseDevice* init_MouseDevice();
+void free_MouseDevice(MouseDevice* to);
+
+void copy_PadDevice_UserInput(PadDevice_UserInput* to, PadDevice_UserInput* from);
+PadDevice_UserInput* init_PadDevice_UserInput();
+void free_PadDevice_UserInput(PadDevice_UserInput* to);
+
 void copy_VirtualMultiDevice(VirtualMultiDevice* to, VirtualMultiDevice* from);
 VirtualMultiDevice* init_VirtualMultiDevice();
 void free_VirtualMultiDevice(VirtualMultiDevice* to);
