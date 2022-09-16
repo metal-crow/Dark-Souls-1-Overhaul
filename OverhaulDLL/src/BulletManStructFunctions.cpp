@@ -129,6 +129,7 @@ void copy_BulletIns(BulletIns* to, BulletIns* from, bool to_game)
     to->data_4 = from->data_4;
     copy_BulletFlyState(&to->bulletFlyState, &from->bulletFlyState, to_game);
     copy_BulletState(&to->bulletExplosionState, &from->bulletExplosionState, to_game);
+    to->padding_previous_bullet_in_use = NULL;
     to->data_5 = from->data_5;
 }
 
