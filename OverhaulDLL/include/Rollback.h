@@ -10,6 +10,7 @@
 #include "PlayerInsStructFunctions.h"
 #include "PadManStructFunctions.h"
 #include "BulletManStructFunctions.h"
+#include "SfxManStructFunctions.h"
 
 #include "NetcodePackets.h"
 

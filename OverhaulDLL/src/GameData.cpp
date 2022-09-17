@@ -65,6 +65,8 @@ uint64_t Game::damage_man = NULL;
 
 uint64_t Game::frpg_havok_man_imp = NULL;
 
+uint64_t Game::sfx_man = NULL;
+
 // Player character status (loading, human, co-op, invader, hollow)
 sp::mem::pointer<int32_t> Game::player_char_status;
 
@@ -173,6 +175,8 @@ void Game::init()
     Game::damage_man = Game::ds1_base + 0x1d173c0;
 
     Game::frpg_havok_man_imp = Game::ds1_base + 0x1d10880;
+
+    Game::sfx_man = Game::ds1_base + 0x1d19ab8;
 }
 
 void Game::injections_init()

@@ -132,6 +132,9 @@
     <ClCompile Include="src\BulletManStructFunctions.cpp">
       <Filter>Source Files\Rollback</Filter>
     </ClCompile>
+    <ClCompile Include="src\SfxManStructFunctions.cpp">
+      <Filter>Source Files\Rollback</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3d11-wrapper\include\d3d11\exports.h">
@@ -213,6 +216,12 @@
       <Filter>Header Files\Rollback</Filter>
     </ClInclude>
     <ClInclude Include="include\BulletManStructFunctions.h">
+      <Filter>Header Files\Rollback</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SfxManStruct.h">
+      <Filter>Header Files\Rollback</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SfxManStructFunctions.h">
       <Filter>Header Files\Rollback</Filter>
     </ClInclude>
   </ItemGroup>

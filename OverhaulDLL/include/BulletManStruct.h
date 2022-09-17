@@ -114,7 +114,7 @@ struct BulletIns
     BulletFlyState bulletFlyState;
     BulletState bulletExplosionState;
     void* padding_previous_bullet_in_use;
-    uint64_t padding_1; //unknown
+    uint64_t padding_1;
     uint64_t data_5;
 };
 static_assert(offsetof(BulletIns, data_0) == 0x8);
