@@ -92,6 +92,15 @@ void free_class_1415002c8(class_1415002c8* to)
 
 static const size_t max_preallocated_class_14152d360 = 256;
 
+typedef uint64_t FUN_140f5f6c0_FUNC(uint64_t p);
+FUN_140f5f6c0_FUNC* FUN_140f5f6c0 = (FUN_140f5f6c0_FUNC*)0x140f5f6c0;
+
+typedef void* smallObject_internal_malloc_FUNC(uint64_t heap, uint64_t size, uint64_t align);
+smallObject_internal_malloc_FUNC* smallObject_internal_malloc = (smallObject_internal_malloc_FUNC*)0x140cbe4f0;
+
+typedef void* smallObject_internal_dealloc_FUNC(uint64_t heap, void* obj, uint64_t size, uint64_t align);
+smallObject_internal_dealloc_FUNC* smallObject_internal_dealloc = (smallObject_internal_dealloc_FUNC*)0x140cbe790;
+
 void copy_class_14152d360(class_14152d360* to, class_14152d360* from, bool to_game)
 {
     if (!to_game)
@@ -129,8 +138,8 @@ void copy_class_14152d360(class_14152d360* to, class_14152d360* from, bool to_ga
             //handle if the game's list isn't long enough, and we need to alloc more slots
             if (from->next != NULL && to->next == NULL)
             {
-                //TODO alloc
-                to->next = (class_14152d360*)Game::game_malloc(sizeof(class_14152d360), 8, (void*)*(uint64_t*)(0x141C04F30)); //internal_heap_3
+                uint64_t heap = FUN_140f5f6c0(0x141c03470);
+                to->next = (class_14152d360*)smallObject_internal_malloc(heap, sizeof(class_14152d360), 0x10);
                 to->next->next = NULL;
             }
 
@@ -141,9 +150,9 @@ void copy_class_14152d360(class_14152d360* to, class_14152d360* from, bool to_ga
                 to->next = NULL;
                 while (entry_to_free)
                 {
-                    //TODO free
                     class_14152d360* next = entry_to_free->next;
-                    Game::game_free_alt(entry_to_free);
+                    uint64_t heap = FUN_140f5f6c0(0x141c03470);
+                    smallObject_internal_dealloc(heap, entry_to_free, sizeof(class_14152d360), 0x10);
                     entry_to_free = next;
                 }
                 break;
