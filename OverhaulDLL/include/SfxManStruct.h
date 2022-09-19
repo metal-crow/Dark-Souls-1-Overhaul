@@ -17,21 +17,32 @@ typedef struct class_14152d360 class_14152d360;
 struct class_14152d360
 {
     //inline class_14150b808 here since this class is a linked list array and we can't handle inheritance in our basic copy functions
-    uint8_t padding_0[8];
-    uint8_t unk1[0x38];
-    class_14152d360* next;
-    uint8_t unk2[24];
-
-    uint8_t unk3[0x100-0x60];
+        uint64_t padding_0;
+        uint64_t unk1;
+        uint8_t data_0[24];
+        uint64_t padding_1;
+        uint64_t unk2[2];
+        class_14152d360* next;
+        uint64_t unk2a[3];
+    //end inline
+    uint8_t data_1[0x80];
+    uint64_t unk3;
+    uint64_t data_2;
+    uint64_t unk4;
+    uint64_t data_3;
 };
 static_assert(offsetof(class_14152d360, next) == 0x40);
+static_assert(offsetof(class_14152d360, data_1) == 0x60);
+static_assert(offsetof(class_14152d360, data_2) == 0xe8);
 static_assert(sizeof(class_14152d360) == 0x100);
 
 struct class_1415002c8
 {
-    uint8_t padding_0[8];
-    uint8_t unk1[16];
+    uint64_t padding_0;
+    uint64_t unk1;
+    uint64_t padding_1;
     class_14152d360* Class_14152d360;
+
     uint8_t unk2[0x210 - 0x20];
 };
 static_assert(offsetof(class_1415002c8, Class_14152d360) == 0x18);

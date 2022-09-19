@@ -113,7 +113,10 @@ void copy_class_14152d360(class_14152d360* to, class_14152d360* from, bool to_ga
                 ConsoleWrite("Unable to recursivly copy class_14152d360 from the game. Out of space.");
                 break;
             }
-            //TODO copy
+            memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+            memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+            to->data_2 = from->data_2;
+            to->data_3 = from->data_3;
 
             if (from->next != NULL)
             {
@@ -133,7 +136,10 @@ void copy_class_14152d360(class_14152d360* to, class_14152d360* from, bool to_ga
     {
         while (from)
         {
-            //TODO copy
+            memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+            memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+            to->data_2 = from->data_2;
+            to->data_3 = from->data_3;
 
             //handle if the game's list isn't long enough, and we need to alloc more slots
             if (from->next != NULL && to->next == NULL)
