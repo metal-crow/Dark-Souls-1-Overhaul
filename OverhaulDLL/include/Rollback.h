@@ -42,7 +42,7 @@ private:
     static PlayerIns* saved_playerins;
     static PadMan* saved_padman;
     static BulletMan* saved_bulletman;
-    static SfxMan* saved_sfxman;
+    static class_14152d360* saved_sfxobjs;
 
     static const uint64_t sendNetMessage_offset = 0x5096d0;
     static const uint64_t getNetMessage_offset = 0x509560;

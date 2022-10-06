@@ -1,95 +1,6 @@
 #include "SfxManStructFunctions.h"
 #include "Rollback.h"
 
-void copy_SfxMan(SfxMan* to, SfxMan* from, bool to_game)
-{
-    copy_frpgFxManagerBase(to->FrpgFxManagerBase, from->FrpgFxManagerBase, to_game);
-}
-
-SfxMan* init_SfxMan()
-{
-    SfxMan* local_SfxMan = (SfxMan*)malloc_(sizeof(SfxMan));
-
-    local_SfxMan->FrpgFxManagerBase = init_frpgFxManagerBase();
-
-    return local_SfxMan;
-}
-
-void free_SfxMan(SfxMan* to)
-{
-    free_frpgFxManagerBase(to->FrpgFxManagerBase);
-
-    free(to);
-}
-
-void copy_frpgFxManagerBase(frpgFxManagerBase* to, frpgFxManagerBase* from, bool to_game)
-{
-    copy_FXHGManagerBase(&to->base, &from->base, to_game);
-}
-
-frpgFxManagerBase* init_frpgFxManagerBase()
-{
-    frpgFxManagerBase* local_frpgFxManagerBase = (frpgFxManagerBase*)malloc_(sizeof(frpgFxManagerBase));
-
-    FXHGManagerBase* local_FXHGManagerBase = init_FXHGManagerBase();
-    local_frpgFxManagerBase->base = *local_FXHGManagerBase;
-    free(local_FXHGManagerBase);
-
-    return local_frpgFxManagerBase;
-}
-
-void free_frpgFxManagerBase(frpgFxManagerBase* to)
-{
-    free_FXHGManagerBase(&to->base, false);
-
-    free(to);
-}
-
-void copy_FXHGManagerBase(FXHGManagerBase* to, FXHGManagerBase* from, bool to_game)
-{
-    copy_class_1415002c8(to->Class_1415002c8, from->Class_1415002c8, to_game);
-}
-
-FXHGManagerBase* init_FXHGManagerBase()
-{
-    FXHGManagerBase* local_FXHGManagerBase = (FXHGManagerBase*)malloc_(sizeof(FXHGManagerBase));
-
-    local_FXHGManagerBase->Class_1415002c8 = init_class_1415002c8();
-
-    return local_FXHGManagerBase;
-}
-
-void free_FXHGManagerBase(FXHGManagerBase* to, bool freeself)
-{
-    free_class_1415002c8(to->Class_1415002c8);
-
-    if (freeself)
-    {
-        free(to);
-    }
-}
-
-void copy_class_1415002c8(class_1415002c8* to, class_1415002c8* from, bool to_game)
-{
-    copy_class_14152d360(to->Class_14152d360, from->Class_14152d360, to_game);
-}
-
-class_1415002c8* init_class_1415002c8()
-{
-    class_1415002c8* local_class_1415002c8 = (class_1415002c8*)malloc_(sizeof(class_1415002c8));
-
-    local_class_1415002c8->Class_14152d360 = init_class_14152d360();
-
-    return local_class_1415002c8;
-}
-
-void free_class_1415002c8(class_1415002c8* to)
-{
-    free_class_14152d360(to->Class_14152d360);
-
-    free(to);
-}
-
 static const size_t max_preallocated_class_14152d360 = 256;
 
 typedef uint64_t FUN_140f5f6c0_FUNC(uint64_t p);
@@ -113,10 +24,7 @@ void copy_class_14152d360(class_14152d360* to, class_14152d360* from, bool to_ga
                 ConsoleWrite("Unable to recursivly copy class_14152d360 from the game. Out of space.");
                 break;
             }
-            memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-            memcpy(to->data_1, from->data_1, sizeof(to->data_1));
-            to->data_2 = from->data_2;
-            to->data_3 = from->data_3;
+            copy_class_14152d360_asObj(to, from, to_game);
 
             if (from->next != NULL)
             {
@@ -136,10 +44,7 @@ void copy_class_14152d360(class_14152d360* to, class_14152d360* from, bool to_ga
     {
         while (from)
         {
-            memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-            memcpy(to->data_1, from->data_1, sizeof(to->data_1));
-            to->data_2 = from->data_2;
-            to->data_3 = from->data_3;
+            copy_class_14152d360_asObj(to, from, to_game);
 
             //handle if the game's list isn't long enough, and we need to alloc more slots
             if (from->next != NULL && to->next == NULL)
@@ -170,15 +75,119 @@ void copy_class_14152d360(class_14152d360* to, class_14152d360* from, bool to_ga
     }
 }
 
+void copy_class_14152d360_asObj(class_14152d360* to, class_14152d360* from, bool to_game)
+{
+    to->vtable = 0x14152d360;
+    to->field0x8 = NULL;
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    to->parent = NULL;
+    to->unk1 = NULL;
+    to->unk2 = NULL;
+    if (from->field0x48 != NULL)
+    {
+        if (to->field0x48 == NULL)
+        {
+            if (to_game)
+            {
+                uint64_t heap = FUN_140f5f6c0(0x141c03470);
+                to->field0x48 = (class_14150b808_field0x48*)smallObject_internal_malloc(heap, sizeof(class_14150b808_field0x48), 8);
+            }
+            else
+            {
+                to->field0x48 = init_class_14150b808_field0x48();
+            }
+        }
+        copy_class_14150b808_field0x48(to->field0x48, from->field0x48, to_game);
+    }
+    else if (from->field0x48 == NULL && to->field0x48 != NULL)
+    {
+        if (to_game)
+        {
+            uint64_t heap = FUN_140f5f6c0(0x141c03470);
+            smallObject_internal_dealloc(heap, to->field0x48, sizeof(class_14150b808_field0x48), 8);
+        }
+        else
+        {
+            free_class_14150b808_field0x48(to->field0x48);
+        }
+        to->field0x48 = NULL;
+    }
+    to->unk3 = NULL;
+    to->unk4 = NULL;
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    to->unk5 = NULL;
+    to->data_2 = from->data_2;
+    to->field0xf0 = NULL;
+    to->data_3 = from->data_3;
+}
+
 class_14152d360* init_class_14152d360()
 {
     //this is a linked list, so pre-allocate a max of 256 for the classes
-    class_14152d360* local_class_14152d360 = (class_14152d360*)malloc_(sizeof(class_14152d360)*max_preallocated_class_14152d360);
+    class_14152d360* local_class_14152d360 = init_class_14152d360_asObj();
+
+    class_14152d360* head = local_class_14152d360;
+    for (int i = 1; i < max_preallocated_class_14152d360; i++)
+    {
+        head->next = init_class_14152d360_asObj();
+        head = head->next;
+    }
+
+    return local_class_14152d360;
+}
+
+class_14152d360* init_class_14152d360_asObj()
+{
+    class_14152d360* local_class_14152d360 = (class_14152d360*)malloc_(sizeof(class_14152d360));
+
+    local_class_14152d360->field0x48 = NULL; //alloc'd as needed
+    local_class_14152d360->next = NULL;
 
     return local_class_14152d360;
 }
 
 void free_class_14152d360(class_14152d360* to)
+{
+    if (to == NULL)
+    {
+        return;
+    }
+    free_class_14152d360(to->next);
+    free_class_14150b808_field0x48(to->field0x48);
+    free(to);
+}
+
+void copy_class_14150b808_field0x48(class_14150b808_field0x48* to, class_14150b808_field0x48* from, bool to_game)
+{
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    to->self_class_1415262e0 = (uint64_t)to + 0xe0;
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    to->unk1 = from->unk1;
+    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    to->unk2 = NULL;
+    to->unk3 = NULL;
+    to->unk4 = from->unk4;
+    to->unk5 = from->unk5;
+    memset(to->padding_0, 0, sizeof(to->padding_0));
+    //leave parent ptr alone
+    to->unk6 = NULL;
+    to->vtable = 0x1415262e0;
+    to->unk7 = from->unk7;
+    to->unk8 = NULL;
+    to->unk9 = NULL;
+    to->unk10 = NULL;
+    to->unk11 = NULL;
+    memcpy(to->data_3, from->data_3, sizeof(to->data_3));
+}
+
+class_14150b808_field0x48* init_class_14150b808_field0x48()
+{
+    class_14150b808_field0x48* local_class_14150b808_field0x48 = (class_14150b808_field0x48*)malloc_(sizeof(class_14150b808_field0x48));
+
+    return local_class_14150b808_field0x48;
+}
+
+void free_class_14150b808_field0x48(class_14150b808_field0x48* to)
 {
     free(to);
 }

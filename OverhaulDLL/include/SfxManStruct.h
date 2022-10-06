@@ -13,66 +13,101 @@ typedef struct frpgFxManagerBase frpgFxManagerBase;
 typedef struct FXHGManagerBase FXHGManagerBase;
 typedef struct class_1415002c8 class_1415002c8;
 typedef struct class_14152d360 class_14152d360;
+typedef struct class_14150b808_field0x48 class_14150b808_field0x48;
+
+struct class_14150b808_field0x48
+{
+    uint8_t data_0[0x58];
+    uint64_t self_class_1415262e0; //&self + 0xe0
+    uint8_t data_1[16];
+    void* unk1;
+    uint8_t data_2[16];
+    void* unk2; //can be nulled without error
+    void* unk3; //can be nulled without error
+    void* unk4;
+    void* unk5;
+    uint8_t padding_0[0x28]; //wstring, set to null
+    class_14152d360* parent;
+    uint64_t unk6; //can be nulled without error
+    uint64_t vtable; //0x1415262e0
+    void* unk7;
+    void* unk8; //can be nulled without error
+    void* unk9; //can be nulled without error
+    void* unk10; //can be nulled without error
+    void* unk11; //can be nulled without error
+    uint8_t data_3[28];
+};
+static_assert(offsetof(class_14150b808_field0x48, data_1) == 0x60);
+static_assert(offsetof(class_14150b808_field0x48, unk1) == 0x70);
+static_assert(offsetof(class_14150b808_field0x48, data_2) == 0x78);
+static_assert(offsetof(class_14150b808_field0x48, unk2) == 0x88);
+static_assert(offsetof(class_14150b808_field0x48, unk3) == 0x90);
+static_assert(offsetof(class_14150b808_field0x48, unk4) == 0x98);
+static_assert(offsetof(class_14150b808_field0x48, unk5) == 0xa0);
+static_assert(offsetof(class_14150b808_field0x48, parent) == 0xd0);
+static_assert(offsetof(class_14150b808_field0x48, unk6) == 0xd8);
+static_assert(offsetof(class_14150b808_field0x48, unk7) == 0xe0+8);
+static_assert(offsetof(class_14150b808_field0x48, data_3) == 0xe0+0x30);
+static_assert(sizeof(class_14150b808_field0x48) == 0x130);
 
 struct class_14152d360
 {
     //inline class_14150b808 here since this class is a linked list array and we can't handle inheritance in our basic copy functions
-        uint64_t padding_0;
-        uint64_t unk1;
+        uint64_t vtable;
+        void* field0x8; //can be nulled without error
         uint8_t data_0[24];
-        uint64_t padding_1;
-        uint64_t unk2[2];
+        void* parent;
+        uint64_t unk1; //always null
+        uint64_t unk2; //can be nulled without error
         class_14152d360* next;
-        uint64_t unk2a[3];
+        class_14150b808_field0x48* field0x48;
+        uint64_t unk3; //can be nulled without error
+        uint64_t unk4; //always null
     //end inline
     uint8_t data_1[0x80];
-    uint64_t unk3;
+    uint64_t unk5; //can be nulled without error
     uint64_t data_2;
-    uint64_t unk4;
+    void* field0xf0; //can be nulled without error
     uint64_t data_3;
 };
+static_assert(offsetof(class_14152d360, field0x8) == 0x8);
+static_assert(offsetof(class_14152d360, data_0) == 0x10);
+static_assert(offsetof(class_14152d360, unk1) == 0x30);
+static_assert(offsetof(class_14152d360, unk2) == 0x38);
 static_assert(offsetof(class_14152d360, next) == 0x40);
+static_assert(offsetof(class_14152d360, field0x48) == 0x48);
+static_assert(offsetof(class_14152d360, unk3) == 0x50);
+static_assert(offsetof(class_14152d360, unk4) == 0x58);
 static_assert(offsetof(class_14152d360, data_1) == 0x60);
+static_assert(offsetof(class_14152d360, unk5) == 0xe0);
 static_assert(offsetof(class_14152d360, data_2) == 0xe8);
+static_assert(offsetof(class_14152d360, field0xf0) == 0xf0);
 static_assert(sizeof(class_14152d360) == 0x100);
 
 struct class_1415002c8
 {
-    uint64_t padding_0;
-    uint64_t unk1;
-    uint64_t padding_1;
+    uint64_t padding_0[3];
     class_14152d360* Class_14152d360;
-
-    uint8_t unk2[0x210 - 0x20];
 };
 static_assert(offsetof(class_1415002c8, Class_14152d360) == 0x18);
-static_assert(sizeof(class_1415002c8) == 0x210);
 
 struct FXHGManagerBase
 {
     uint64_t padding_0;
     class_1415002c8* Class_1415002c8;
-    uint8_t unk1[0x30];
 };
 static_assert(offsetof(FXHGManagerBase, Class_1415002c8) == 8);
-static_assert(sizeof(FXHGManagerBase) == 0x40);
 
 struct frpgFxManagerBase
 {
     FXHGManagerBase base;
-    uint8_t unk1[0xa8 - 0x40];
 };
-static_assert(sizeof(frpgFxManagerBase) == 0xa8);
 
 struct SfxMan
 {
-    uint8_t padding_0[8];
-    uint64_t unk1;
+    uint8_t padding_0[16];
     frpgFxManagerBase* FrpgFxManagerBase;
-    uint64_t padding_1;
-    uint8_t unk2[0x340];
 };
 static_assert(offsetof(SfxMan, FrpgFxManagerBase) == 0x10);
-static_assert(sizeof(SfxMan) == 0x360);
 
 #endif
