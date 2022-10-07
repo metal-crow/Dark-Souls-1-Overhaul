@@ -303,7 +303,7 @@ bool IsP2PPacketAvailable_Replacement_injection_helper(uint32 *pcubMsgSize, int 
     bool is_available = false;
     if (nChannel != 0)
     {
-        ConsoleWrite("WARNING: Why the fuck is Dark Souls not using channel 0. Please report me.");
+        ConsoleWrite("WARNING: Why the fuck is Dark Souls not sending on channel 0. Please report me.");
         nChannel = 0;
     }
 
@@ -320,8 +320,11 @@ bool IsP2PPacketAvailable_Replacement_injection_helper(uint32 *pcubMsgSize, int 
         messages.push(new_message);
         is_available |= true;
     }
-
-    is_available |= ModNetworking::SteamNetworking->IsP2PPacketAvailable(pcubMsgSize, nChannel);
+    //Otherwise fall back to the Networking interface (this fallback order is important. NetworkingMessages, then old Networking)
+    else
+    {
+        is_available |= ModNetworking::SteamNetworking->IsP2PPacketAvailable(pcubMsgSize, nChannel);
+    }
 
     return is_available;
 }
@@ -329,33 +332,32 @@ bool IsP2PPacketAvailable_Replacement_injection_helper(uint32 *pcubMsgSize, int 
 //ReadP2PPacket/ReceiveMessagesOnChannel
 bool ReadP2PPacket_Replacement_injection_helper(void *pubDest, uint32 cubDest, uint32 *pcubMsgSize, CSteamID *psteamIDRemote, int nChannel)
 {
-    if (SteamNetworkingMessages_Supported(*psteamIDRemote))
+    if (nChannel != 0)
+    {
+        ConsoleWrite("WARNING: Why the fuck is Dark Souls not reading on channel 0. Please report me.");
+    }
+
+    //If we have a packet from the NetworkingMessages interface to return, return it
+    if (messages.size() > 0 && nChannel == 0)
     {
         //fill out the given args from the saved network message struct
-        if (messages.size() > 0 && nChannel == 0)
-        {
-            SteamNetworkingMessage_t* cur_message = messages.front();
-            messages.pop();
+        SteamNetworkingMessage_t* cur_message = messages.front();
+        messages.pop();
 
-            memcpy_s(pubDest, cubDest, cur_message->m_pData, cur_message->m_cbSize);
-            if (pcubMsgSize != nullptr)
-            {
-                *pcubMsgSize = cur_message->m_cbSize;
-            }
-            if (psteamIDRemote != nullptr)
-            {
-                *psteamIDRemote = cur_message->m_identityPeer.GetSteamID();
-            }
-
-            cur_message->Release();
-            return true;
-        }
-        else
+        memcpy_s(pubDest, cubDest, cur_message->m_pData, cur_message->m_cbSize);
+        if (pcubMsgSize != nullptr)
         {
-            ConsoleWrite("WARNING: ReadP2PPacket called but we didn't have a message to read or the channel was incorrect. messages size=%d, channel=%d", messages.size(), nChannel);
-            return false;
+            *pcubMsgSize = cur_message->m_cbSize;
         }
+        if (psteamIDRemote != nullptr)
+        {
+            *psteamIDRemote = cur_message->m_identityPeer.GetSteamID();
+        }
+
+        cur_message->Release();
+        return true;
     }
+    //otherwise see if there's a message from the Networking interface and return that
     else
     {
         return ModNetworking::SteamNetworking->ReadP2PPacket(pubDest, cubDest, pcubMsgSize, psteamIDRemote, nChannel);
@@ -512,6 +514,13 @@ bool GuestAwaitIncomingLobbyData(void* unused);
 //This is called only when the local user joins a lobby. Not when anyone else we're connected to does.
 void ModNetworking::LobbyEnterCallback(LobbyEnter_t* pCallback)
 {
+    //Painted Worlds fix
+    if (strlen(ModNetworking::SteamMatchmaking->GetLobbyData(pCallback->m_ulSteamIDLobby, "PaintedWorlds")) != 0)
+    {
+        ConsoleWrite("Ignore PaintedWorlds prejoin lobby");
+        return;
+    }
+
     CSteamID lobbyowner = ModNetworking::SteamMatchmaking->GetLobbyOwner(pCallback->m_ulSteamIDLobby);
     CSteamID selfsteamid = ModNetworking::SteamUser->GetSteamID();
     ModNetworking::currentLobby = pCallback->m_ulSteamIDLobby;
@@ -545,6 +554,13 @@ void ModNetworking::LobbyEnterCallback(LobbyEnter_t* pCallback)
 
 void ModNetworking::LobbyDataUpdateCallback(LobbyDataUpdate_t* pCallback)
 {
+    //Painted Worlds fix
+    if (strlen(ModNetworking::SteamMatchmaking->GetLobbyData(pCallback->m_ulSteamIDLobby, "PaintedWorlds")) != 0)
+    {
+        ConsoleWrite("Ignore PaintedWorlds prejoin lobby");
+        return;
+    }
+
     CSteamID lobbyowner = ModNetworking::SteamMatchmaking->GetLobbyOwner(pCallback->m_ulSteamIDLobby);
     CSteamID selfsteamid = ModNetworking::SteamUser->GetSteamID();
 
@@ -792,6 +808,13 @@ bool GuestAwaitIncomingGuestMemberData(void* data_a);
 //This is called when another user has joined/left the lobby.
 void ModNetworking::LobbyChatUpdateCallback(LobbyChatUpdate_t* pCallback)
 {
+    //Painted Worlds fix
+    if (strlen(ModNetworking::SteamMatchmaking->GetLobbyData(pCallback->m_ulSteamIDLobby, "PaintedWorlds")) != 0)
+    {
+        ConsoleWrite("Ignore PaintedWorlds prejoin lobby");
+        return;
+    }
+
     CSteamID lobbyowner = ModNetworking::SteamMatchmaking->GetLobbyOwner(pCallback->m_ulSteamIDLobby);
     CSteamID selfsteamid = ModNetworking::SteamUser->GetSteamID();
     ModNetworking::incoming_guest_to_not_accept = 0; //make sure a reconnecting user has another chance (this is reset on both leave and join)
@@ -803,7 +826,7 @@ void ModNetworking::LobbyChatUpdateCallback(LobbyChatUpdate_t* pCallback)
     // Need to handle the case where they don't set any member data, and thus are a non-mod user and we must disconnect them from this lobby
     if (lobbyowner == selfsteamid && pCallback->m_rgfChatMemberStateChange == EChatMemberStateChange::k_EChatMemberStateChangeEntered && pCallback->m_ulSteamIDUserChanged != selfsteamid.ConvertToUint64())
     {
-        ConsoleWrite("H2. Host saw user connect. Start waiting for incoming guest member data");
+        ConsoleWrite("H2. Host saw user %llx connect. Start waiting for incoming guest member data", pCallback->m_ulSteamIDUserChanged);
         AwaitIncomingUserMemberData_Struct* data = (AwaitIncomingUserMemberData_Struct*)malloc(sizeof(AwaitIncomingUserMemberData_Struct));
         data->start_time = Game::get_accurate_time();
         data->steamid = pCallback->m_ulSteamIDUserChanged;
@@ -813,7 +836,7 @@ void ModNetworking::LobbyChatUpdateCallback(LobbyChatUpdate_t* pCallback)
     // H4. Host: Handle the case where the guest disconnects on their own
     if (lobbyowner == selfsteamid && pCallback->m_rgfChatMemberStateChange == EChatMemberStateChange::k_EChatMemberStateChangeLeft && pCallback->m_ulSteamIDUserChanged != selfsteamid.ConvertToUint64())
     {
-        ConsoleWrite("H4. Guest d/c'd on their own.");
+        ConsoleWrite("H4. Guest %llx d/c'd on their own.", pCallback->m_ulSteamIDUserChanged);
 
         host_get_guest_response_mtx.lock();
         ModNetworking::new_guest_incoming = false;
@@ -941,7 +964,7 @@ bool HostAwaitIncomingGuestMemberData(void* data_a)
 
     //Let guests know the host approves this user
     approveduser = std::to_string(data->steamid);
-    ConsoleWrite("H4. Host update lobby user approval = %s", approveduser.c_str());
+    ConsoleWrite("H4. Host update lobby user approval = %llx", data->steamid);
     ModNetworking::SteamMatchmaking->SetLobbyData(ModNetworking::currentLobby, MOD_LOBBY_USERAPPROVED_KEY, approveduser.c_str());
 
     //We now know this user's API, so we can send the queued packets
