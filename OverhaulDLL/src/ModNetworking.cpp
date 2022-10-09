@@ -292,6 +292,7 @@ void ModNetworking::SteamNetworkingMessagesSessionRequestCallback(SteamNetworkin
         return;
     }
 
+    ConsoleWrite("AcceptSessionWithUser %llx", user.ConvertToUint64());
     ModNetworking::SteamNetMessages->AcceptSessionWithUser(pCallback->m_identityRemote);
 }
 
@@ -303,7 +304,7 @@ bool IsP2PPacketAvailable_Replacement_injection_helper(uint32 *pcubMsgSize, int 
     bool is_available = false;
     if (nChannel != 0)
     {
-        ConsoleWrite("WARNING: Why the fuck is Dark Souls not sending on channel 0. Please report me.");
+        ConsoleWrite("WARNING: Why the fuck is Dark Souls not checking on channel 0. Please report me.");
         nChannel = 0;
     }
 
@@ -367,6 +368,11 @@ bool ReadP2PPacket_Replacement_injection_helper(void *pubDest, uint32 cubDest, u
 //SendP2PPacket/SendMessageToUser
 bool SendP2PPacket_Replacement_injection_helper(CSteamID steamIDRemote, const void *pubData, uint32 cubData, EP2PSend eP2PSendType, int nChannel)
 {
+    if (nChannel != 0)
+    {
+        ConsoleWrite("WARNING: Why the fuck is Dark Souls not sending on channel 0. Please report me.");
+    }
+
     // Handle disconnecting a user
     if (ModNetworking::incoming_guest_to_not_accept != 0 && ModNetworking::incoming_guest_to_not_accept == steamIDRemote.ConvertToUint64())
     {
@@ -425,6 +431,7 @@ bool SendP2PPacket_Replacement_injection_helper(CSteamID steamIDRemote, const vo
 //CloseP2PSessionWithUser/CloseSessionWithUser
 bool CloseP2PSessionWithUser_Replacement_injection_helper(CSteamID steamIDRemote)
 {
+    ConsoleWrite("Closing session with %llx", steamIDRemote.ConvertToUint64());
     if (SteamNetworkingMessages_Supported(steamIDRemote))
     {
         SteamNetworkingIdentity remote;
@@ -471,12 +478,33 @@ static std::mutex host_get_guest_response_mtx;
 
 bool AcceptP2PSessionWithUser_injection_helper(uint64_t incoming_steamid)
 {
+    //Check if we want to d/c them
     if (ModNetworking::incoming_guest_to_not_accept != 0 && incoming_steamid == ModNetworking::incoming_guest_to_not_accept)
     {
         ConsoleWrite("Denying connection to d/c'd user %llx", incoming_steamid);
         return false;
     }
-    return true;
+
+    CSteamID id;
+    id.SetFromUint64(incoming_steamid);
+
+    //Check they're not blocked
+    EFriendRelationship relation = ModNetworking::SteamFriends->GetFriendRelationship(id);
+    if (relation == EFriendRelationship::k_EFriendRelationshipIgnored)
+    {
+        return false;
+    }
+
+    //Check they're in the lobby with us
+    if (!ModNetworking::SteamFriends->IsUserInSource(id, ModNetworking::currentLobby))
+    {
+        return false;
+    }
+
+    //If we're getting this callback, they're trying to connect with the Networking api, so we should just accept them using that
+    //It also means we can immediatly tell they're non-mod, but since this callback doesn't get hit anyway not going to bother with that
+    ConsoleWrite("AcceptP2PSessionWithUser %llx", incoming_steamid);
+    return ModNetworking::SteamNetworking->AcceptP2PSessionWithUser(id);
 }
 
 void HostForceDisconnectGuest(uint64_t steamid, const wchar_t* dc_reason, bool use_old_api = false)
