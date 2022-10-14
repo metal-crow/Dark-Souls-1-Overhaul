@@ -181,6 +181,7 @@ bool SteamNetworkingMessages_Supported(CSteamID steamIDRemote)
     //this should never happen, but just in case
     if (SteamAPIStatusKnown_Users.count(steamIDRemote.ConvertToUint64()) == 0)
     {
+        FATALERROR("Called SteamNetworkingMessages_Supported for player %llx, but we don't know them", steamIDRemote.ConvertToUint64());
         return false;
     }
     return SteamAPIStatusKnown_Users[steamIDRemote.ConvertToUint64()];
@@ -431,7 +432,14 @@ bool SendP2PPacket_Replacement_injection_helper(CSteamID steamIDRemote, const vo
 //CloseP2PSessionWithUser/CloseSessionWithUser
 bool CloseP2PSessionWithUser_Replacement_injection_helper(CSteamID steamIDRemote)
 {
-    ConsoleWrite("Closing session with %llx", steamIDRemote.ConvertToUint64());
+    //In theory we should never still have the user saved when the game hits this, so just return that we already closed them
+    if (SteamAPIStatusKnown_Users.count(steamIDRemote.ConvertToUint64()) == 0)
+    {
+        return true;
+    }
+
+    //Have this just in case
+    ConsoleWrite("Dark Souls manually closing session with %llx", steamIDRemote.ConvertToUint64());
     if (SteamNetworkingMessages_Supported(steamIDRemote))
     {
         SteamNetworkingIdentity remote;
@@ -869,6 +877,20 @@ void ModNetworking::LobbyChatUpdateCallback(LobbyChatUpdate_t* pCallback)
         host_get_guest_response_mtx.lock();
         ModNetworking::new_guest_incoming = false;
         host_get_guest_response_mtx.unlock();
+
+        //Close the session before we erase the user so we do the right closure
+        if (SteamNetworkingMessages_Supported(pCallback->m_ulSteamIDUserChanged))
+        {
+            SteamNetworkingIdentity remote;
+            remote.SetSteamID64(pCallback->m_ulSteamIDUserChanged);
+            ModNetworking::SteamNetMessages->CloseSessionWithUser(remote);
+        }
+        else
+        {
+            CSteamID remote;
+            remote.SetFromUint64(pCallback->m_ulSteamIDUserChanged);
+            ModNetworking::SteamNetworking->CloseP2PSessionWithUser(remote);
+        }
 
         SteamAPIStatusKnown_Users.erase(pCallback->m_ulSteamIDUserChanged); //remove the user from the known list
         RemoveQueuedPackets(pCallback->m_ulSteamIDUserChanged); //get rid of the queued packets for this user since we don't need them anymore
