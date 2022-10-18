@@ -124,36 +124,21 @@ void copy_class_14152d360_asObj(class_14152d360* to, class_14152d360* from, bool
 class_14152d360* init_class_14152d360()
 {
     //this is a linked list, so pre-allocate a max of 256 for the classes
-    class_14152d360* local_class_14152d360 = init_class_14152d360_asObj();
+    class_14152d360* local_class_14152d360 = (class_14152d360*)malloc_(sizeof(class_14152d360)*max_preallocated_class_14152d360);
 
-    class_14152d360* head = local_class_14152d360;
-    for (int i = 1; i < max_preallocated_class_14152d360; i++)
-    {
-        head->next = init_class_14152d360_asObj();
-        head = head->next;
-    }
-
-    return local_class_14152d360;
-}
-
-class_14152d360* init_class_14152d360_asObj()
-{
-    class_14152d360* local_class_14152d360 = (class_14152d360*)malloc_(sizeof(class_14152d360));
-
-    local_class_14152d360->field0x48 = NULL; //alloc'd as needed
-    local_class_14152d360->next = NULL;
+    //field0x48 must be dynamically alloc'd, since it can be null
 
     return local_class_14152d360;
 }
 
 void free_class_14152d360(class_14152d360* to)
 {
-    if (to == NULL)
+    class_14152d360* head = to;
+    for (size_t i = 0; i < max_preallocated_class_14152d360; i++)
     {
-        return;
+        free_class_14150b808_field0x48(to->field0x48);
+        head = (class_14152d360*)((uint64_t)(head)+sizeof(class_14152d360));
     }
-    free_class_14152d360(to->next);
-    free_class_14150b808_field0x48(to->field0x48);
     free(to);
 }
 
