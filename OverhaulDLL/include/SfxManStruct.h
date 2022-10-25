@@ -14,6 +14,8 @@ typedef struct FXHGManagerBase FXHGManagerBase;
 typedef struct class_1415002c8 class_1415002c8;
 typedef struct class_14152d360 class_14152d360;
 typedef struct class_14150b808_field0x48 class_14150b808_field0x48;
+typedef struct class_14152d360_field0xe0 class_14152d360_field0xe0;
+typedef struct class_14150b808_field0xf0 class_14150b808_field0xf0;
 
 struct class_14150b808_field0x48
 {
@@ -23,7 +25,7 @@ struct class_14150b808_field0x48
     void* unk1;
     uint8_t data_2[16];
     void* unk2; //can be nulled without error
-    void* unk3; //can be nulled without error
+    class_14150b808_field0x48* next; //this is p much always null, probably safe to ignore
     void* unk4;
     void* unk5;
     uint8_t padding_0[0x28]; //wstring, set to null
@@ -41,7 +43,7 @@ static_assert(offsetof(class_14150b808_field0x48, data_1) == 0x60);
 static_assert(offsetof(class_14150b808_field0x48, unk1) == 0x70);
 static_assert(offsetof(class_14150b808_field0x48, data_2) == 0x78);
 static_assert(offsetof(class_14150b808_field0x48, unk2) == 0x88);
-static_assert(offsetof(class_14150b808_field0x48, unk3) == 0x90);
+static_assert(offsetof(class_14150b808_field0x48, next) == 0x90);
 static_assert(offsetof(class_14150b808_field0x48, unk4) == 0x98);
 static_assert(offsetof(class_14150b808_field0x48, unk5) == 0xa0);
 static_assert(offsetof(class_14150b808_field0x48, parent) == 0xd0);
@@ -60,14 +62,14 @@ struct class_14152d360
         uint64_t unk1; //always null
         uint64_t unk2; //can be nulled without error
         class_14152d360* next;
-        class_14150b808_field0x48* field0x48;
-        uint64_t unk3; //can be nulled without error
+        class_14150b808_field0x48* field0x48_head;
+        class_14150b808_field0x48* field0x48_tail;
         uint64_t unk4; //always null
     //end inline
     uint8_t data_1[0x80];
-    uint64_t unk5; //can be nulled without error
+    class_14152d360_field0xe0* field0xe0;
     uint64_t data_2;
-    void* field0xf0; //can be nulled without error
+    class_14150b808_field0xf0* field0xf0;
     uint64_t data_3;
 };
 static_assert(offsetof(class_14152d360, field0x8) == 0x8);
@@ -75,11 +77,11 @@ static_assert(offsetof(class_14152d360, data_0) == 0x10);
 static_assert(offsetof(class_14152d360, unk1) == 0x30);
 static_assert(offsetof(class_14152d360, unk2) == 0x38);
 static_assert(offsetof(class_14152d360, next) == 0x40);
-static_assert(offsetof(class_14152d360, field0x48) == 0x48);
-static_assert(offsetof(class_14152d360, unk3) == 0x50);
+static_assert(offsetof(class_14152d360, field0x48_head) == 0x48);
+static_assert(offsetof(class_14152d360, field0x48_tail) == 0x50);
 static_assert(offsetof(class_14152d360, unk4) == 0x58);
 static_assert(offsetof(class_14152d360, data_1) == 0x60);
-static_assert(offsetof(class_14152d360, unk5) == 0xe0);
+static_assert(offsetof(class_14152d360, field0xe0) == 0xe0);
 static_assert(offsetof(class_14152d360, data_2) == 0xe8);
 static_assert(offsetof(class_14152d360, field0xf0) == 0xf0);
 static_assert(sizeof(class_14152d360) == 0x100);

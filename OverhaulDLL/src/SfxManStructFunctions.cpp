@@ -83,41 +83,48 @@ void copy_class_14152d360_asObj(class_14152d360* to, class_14152d360* from, bool
     to->parent = NULL;
     to->unk1 = NULL;
     to->unk2 = NULL;
-    if (from->field0x48 != NULL)
+    if (from->field0x48_head != NULL)
     {
-        if (to->field0x48 == NULL)
+        if (to->field0x48_head == NULL)
         {
             if (to_game)
             {
                 uint64_t heap = FUN_140f5f6c0(0x141c03470);
-                to->field0x48 = (class_14150b808_field0x48*)smallObject_internal_malloc(heap, sizeof(class_14150b808_field0x48), 8);
+                to->field0x48_head = (class_14150b808_field0x48*)smallObject_internal_malloc(heap, sizeof(class_14150b808_field0x48), 8);
             }
             else
             {
-                to->field0x48 = init_class_14150b808_field0x48();
+                to->field0x48_head = init_class_14150b808_field0x48();
             }
         }
-        copy_class_14150b808_field0x48(to->field0x48, from->field0x48, to_game);
+        copy_class_14150b808_field0x48(to->field0x48_head, from->field0x48_head, to_game);
+        class_14150b808_field0x48* tail = to->field0x48_head;
+        while (tail->next != NULL)
+        {
+            tail = tail->next;
+        }
+        to->field0x48_tail = tail;
     }
-    else if (from->field0x48 == NULL && to->field0x48 != NULL)
+    else if (from->field0x48_head == NULL && to->field0x48_head != NULL)
     {
         if (to_game)
         {
             uint64_t heap = FUN_140f5f6c0(0x141c03470);
-            smallObject_internal_dealloc(heap, to->field0x48, sizeof(class_14150b808_field0x48), 8);
+            smallObject_internal_dealloc(heap, to->field0x48_head, sizeof(class_14150b808_field0x48), 8);
         }
         else
         {
-            free_class_14150b808_field0x48(to->field0x48);
+            free_class_14150b808_field0x48(to->field0x48_head);
         }
-        to->field0x48 = NULL;
+        to->field0x48_head = NULL;
+        to->field0x48_tail = NULL;
     }
-    to->unk3 = NULL;
+
     to->unk4 = NULL;
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
-    to->unk5 = NULL;
+    to->field0xe0 = NULL; //TODO
     to->data_2 = from->data_2;
-    to->field0xf0 = NULL;
+    to->field0xf0 = NULL; //TODO
     to->data_3 = from->data_3;
 }
 
@@ -136,7 +143,7 @@ void free_class_14152d360(class_14152d360* to)
     class_14152d360* head = to;
     for (size_t i = 0; i < max_preallocated_class_14152d360; i++)
     {
-        free_class_14150b808_field0x48(to->field0x48);
+        free_class_14150b808_field0x48(to->field0x48_head);
         head = (class_14152d360*)((uint64_t)(head)+sizeof(class_14152d360));
     }
     free(to);
@@ -150,7 +157,7 @@ void copy_class_14150b808_field0x48(class_14150b808_field0x48* to, class_14150b8
     to->unk1 = from->unk1;
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
     to->unk2 = NULL;
-    to->unk3 = NULL;
+    to->next = NULL;
     to->unk4 = from->unk4;
     to->unk5 = from->unk5;
     memset(to->padding_0, 0, sizeof(to->padding_0));
