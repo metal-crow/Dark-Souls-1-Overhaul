@@ -112,6 +112,8 @@ You can also edit the file while the game is running, and reloading your save wi
 
 * Basic update check system
 
+* Compatable with [Painted Worlds](https://www.nexusmods.com/darksoulsremastered/mods/527)
+
 ### Overhaul
 
 * Gestures can be canceled via rolling
