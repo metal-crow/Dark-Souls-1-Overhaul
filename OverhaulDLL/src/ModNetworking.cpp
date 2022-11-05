@@ -181,7 +181,8 @@ bool SteamNetworkingMessages_Supported(CSteamID steamIDRemote)
     //this should never happen, but just in case
     if (SteamAPIStatusKnown_Users.count(steamIDRemote.ConvertToUint64()) == 0)
     {
-        FATALERROR("Called SteamNetworkingMessages_Supported for player %llx, but we don't know them", steamIDRemote.ConvertToUint64());
+        //TODO this will trigger after a player leaves, haven't fixed yet
+        ConsoleWrite("Called SteamNetworkingMessages_Supported for player %llx, but we don't know them", steamIDRemote.ConvertToUint64());
         return false;
     }
     return SteamAPIStatusKnown_Users[steamIDRemote.ConvertToUint64()];
