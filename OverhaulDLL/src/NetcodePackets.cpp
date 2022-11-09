@@ -131,6 +131,9 @@ getNetMessage_FUNC* getNetMessage = (getNetMessage_FUNC*)0x140509560;
 typedef void GetTimestamp_FUNC(void* timestamp_out);
 GetTimestamp_FUNC* GetTimestamp = (GetTimestamp_FUNC*)0x140d98ef0;
 
+typedef uint16_t GetEntityNumForThrow_FUNC(void* WorldChrManImp, void* playerIns);
+GetEntityNumForThrow_FUNC* GetEntityNumForThrow = (GetEntityNumForThrow_FUNC*)0x143576922;
+
 void send_generalplayerinfo_helper()
 {
     MainPacket pkt;
@@ -151,7 +154,7 @@ void send_generalplayerinfo_helper()
     pkt.ezStatePassiveState = get_AnimationData(playerins->chrins.playerCtrl->chrCtrl.actionctrl, 0);
     pkt.curHp = playerins->chrins.curHp;
     pkt.maxHp = playerins->chrins.curHp;
-    pkt.walkanimtwist_unk = PlayerCtrl_Get_WalkAnimTwist_unk(playerins->chrins.playerCtrl);
+    pkt.movementTypeAnimation = PlayerCtrl_Get_WalkAnimTwist_unk(playerins->chrins.playerCtrl);
     pkt.rotation = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4);
 
     uint32_t type1_unk1 = FUN_14050ff50(*(float*)(((uint64_t)playerins) + 0x954), NULL, 0xd, 5, 1);
@@ -184,17 +187,37 @@ void send_generalplayerinfo_helper()
     pkt.flags = compress_gamedata_flags(equipgamedata);
 
     //Load Type 16
-    //TODO need runtime debugging here
+    uint64_t cur_throw = **(uint64_t**)((*(uint64_t*)Game::throw_man) + 0x68);
+    pkt.attacker_position = *(PosRotFloatVec*)(*(uint64_t*)(cur_throw + 0) + 0x70);
+    pkt.defender_position = *(PosRotFloatVec*)(*(uint64_t*)(cur_throw + 8) + 0x70);
+    pkt.entitynum_defender = GetEntityNumForThrow(*(void**)Game::world_chr_man_imp, (*(PlayerIns**)(*(uint64_t*)(cur_throw + 8) + 0x8)));
+    pkt.entitynum_attacker = GetEntityNumForThrow(*(void**)Game::world_chr_man_imp, (*(PlayerIns**)(*(uint64_t*)(cur_throw + 0) + 0x8)));
+    pkt.throw_id = *(uint16_t*)(cur_throw + 0x10);
 
     //Load Type 17
     pkt.curSelectedMagicId = get_currently_selected_magic_id(playerins);
     pkt.curUsingItemId = (playerins->chrins).curUsedItem.itemId;
 
     //Load Type 34
-    //TODO this is a bit complicated
-    uint64_t timestamp_data[2];
-    GetTimestamp(&timestamp_data);
-    pkt.timestamp = (uint32_t)(timestamp_data[0] / 10000 >> 4);
+    //need to have this a list of all speffects currently applied to the PC
+    //don't need timestamp because we'll refresh every packet
+    SpecialEffect_Info* specialEffectInfo = playerins->chrins.specialEffects->specialEffect_Info;
+    size_t i = 0;
+    while (specialEffectInfo != NULL)
+    {
+        uint32_t specialEffectInfo_id = *(uint32_t*)((uint64_t)specialEffectInfo + 0x30);
+        if (i >= sizeof(pkt.spEffectToApply) / sizeof(uint32_t))
+        {
+            FATALERROR("pkt.spEffectToApply size of 15 is insufficent.");
+        }
+        pkt.spEffectToApply[i] = specialEffectInfo_id;
+        i++;
+        specialEffectInfo = specialEffectInfo->next;
+    }
+    for (; i < sizeof(pkt.spEffectToApply) / sizeof(uint32_t); i++)
+    {
+        pkt.spEffectToApply[i] = -1;
+    }
 
     //send out packet
     sendNetMessageToAllPlayers(*(uint64_t*)Game::session_man_imp, Rollback::RollbackSinglePacketType, &pkt, sizeof(pkt));
@@ -247,18 +270,22 @@ putDefenderIntoThrowAnimation_FUNC* putDefenderIntoThrowAnimation = (putDefender
 typedef void Apply_SpeffectSync_FromNetwork_FUNC(void* chrins, uint32_t speffect_id, uint32_t timestamp, float const);
 Apply_SpeffectSync_FromNetwork_FUNC* Apply_SpeffectSync_FromNetwork = (Apply_SpeffectSync_FromNetwork_FUNC*)0x142683b72;
 
+typedef void ActionCtrl_ApplyEzState_FUNC(ActionCtrl* actionctrl, uint32_t unk, uint32_t ezState);
+ActionCtrl_ApplyEzState_FUNC* ActionCtrl_ApplyEzState = (ActionCtrl_ApplyEzState_FUNC*)0x140385d80;
+
 void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins)
 {
     //Type 1
-    //TODO need to runtime debug
+    *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x10) = pkt->position_x;
+    *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x14) = pkt->position_z;
+    *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x18) = pkt->position_y;
+    ActionCtrl_ApplyEzState(playerins->chrins.playerCtrl->chrCtrl.actionctrl, 0x0, pkt->ezStatePassiveState);
+    ActionCtrl_ApplyEzState(playerins->chrins.playerCtrl->chrCtrl.actionctrl, 0x1, pkt->ezStateActiveState);
+    PlayerIns_SetHp(playerins, pkt->curHp);
+    *(uint32_t*)((uint64_t)(&playerins->playergamedata->attribs) + 4) = pkt->curHp;
     playerins->chrins.maxHp = pkt->maxHp;
     *(uint32_t*)((uint64_t)(&playerins->playergamedata->attribs) + 8) = pkt->maxHp;
-
-    PlayerIns_SetHp(playerins, pkt->curHp);
-    //if ((0 < uVar14) && (uVar7 == 0)) {
-    //thunk_FUN_1421710bc(pNVar2);
-    //}
-    *(uint32_t*)((uint64_t)(&playerins->playergamedata->attribs) + 4) = pkt->curHp;
+    
 
     //Type 10
     *(uint32_t*)((uint64_t)(&playerins->playergamedata->attribs) + 0) = pkt->player_num;
@@ -356,8 +383,15 @@ void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins)
     }
 
     // Type 34
-    if (pkt->spEffectToApply != -1)
+    //remove all old speffects, and apply these as new ones
+    uint64_t timestamp_data[2];
+    GetTimestamp(&timestamp_data);
+    uint32_t timestamp = (uint32_t)(timestamp_data[0] / 10000 >> 4);
+    for (size_t i = 0; i < sizeof(pkt->spEffectToApply) / sizeof(uint32_t); i++)
     {
-        Apply_SpeffectSync_FromNetwork(playerins, ((pkt->spEffectToApply << 15) >> 15), pkt->timestamp & 0x3fffffff, 1.0f);
+        if (pkt->spEffectToApply[i] != -1)
+        {
+            Apply_SpeffectSync_FromNetwork(playerins, ((pkt->spEffectToApply[i] << 15) >> 15), timestamp & 0x3fffffff, 1.0f);
+        }
     }
 }

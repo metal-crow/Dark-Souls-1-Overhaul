@@ -662,7 +662,7 @@ static_assert(sizeof(ChrManipulator) == 0x230);
 
 struct NetworkManipulator
 {
-    //this is probably used in place of PadManipulator in PlayerIns for remote PCs. need to verify
+    //TODO this is used in place of PadManipulator in PlayerIns for remote PCs. Need to determine how to differentiate
 };
 
 struct PadManipulator

@@ -32,7 +32,8 @@ std::vector<std::string> Mod::authors = {
     "jellybaby34",
     "SiriusTextra",
     "Hillo",
-    "Verideth"
+    "Verideth",
+    "ChurchGuard"
     // Apologies in advance to anyone I forgot, just let me know so I can add you to the list
     //     -Sean
 };

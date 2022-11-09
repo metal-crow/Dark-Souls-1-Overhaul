@@ -29,7 +29,7 @@ struct MainPacket
     uint32_t ezStatePassiveState;
     int16_t curHp;
     int16_t maxHp; //just use the normal max hp for this
-    uint32_t walkanimtwist_unk;
+    uint32_t movementTypeAnimation;
     float rotation; //just use the normal rotation for this, not the weird version the game uses
     uint32_t type1_unk1;
     uint8_t type1_unk2;
@@ -51,13 +51,11 @@ struct MainPacket
     uint16_t entitynum_defender;
     uint16_t entitynum_attacker;
     uint32_t throw_id; //if this is -1, don't use any of these vals
-    uint8_t type16_unk1;
     //Type 17
     uint16_t curSelectedMagicId;
     uint32_t curUsingItemId;
     //Type 34
-    uint32_t spEffectToApply; //apply to the playerid that sent this
-    uint32_t timestamp;
+    uint32_t spEffectToApply[15]; //apply to the playerid that sent this
 };
 #pragma pack(pop)
 
