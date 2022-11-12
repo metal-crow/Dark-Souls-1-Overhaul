@@ -1,10 +1,10 @@
 _DATA SEGMENT
 
-get_EzMenuEzMenuDlgObj_for_namedObj   dq  140ED2440h
+get_EzMenuEzMenuDlgObj_for_namedObj   dq  140ed6020h
 MenuDlgObjStr   dw  "i","c","o","n","_","l","e","v","e","l","s","y","n","c",0 ;unicode
-FloatingMultiplayHpBar_ShowIcon   dq  140ED81D0h
-FUN_14031ff30   dq  14031ff30h
-loc_1406F352A   dq  1406F352Ah
+FloatingMultiplayHpBar_ShowIcon   dq  140edbdb0h
+FUN_14031ff30   dq  140322180h
+loc_1406F352A   dq  1406f5e3ah
 
 _DATA ENDS
 

@@ -15,9 +15,9 @@ weapon_toggle_injection PROC
 mov  qword ptr [beforehit_time], 0 ; Fake we got hit infinite time ago, to drop rally
 
 ;original code
-mov  r9, 140193F80h
+mov  r9, 140195870h
 mov  edx, 1
-mov  rcx, 141D068F8h
+mov  rcx, 141c6a8e8h
 mov  rcx, QWORD PTR [rcx]
 jmp  weapon_toggle_injection_return
 
@@ -113,8 +113,7 @@ main_rally_injection PROC
 
 ;original code
 mov     edx, [rbx+3E8h]
-push    rbx
-pop     rcx
+MOV     RCX,RBX
 add     edx, edi
 
 ;save temp registers

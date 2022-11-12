@@ -1,6 +1,6 @@
 _DATA SEGMENT
 
-sub_140BCEDB0   dq  140BCEDB0h
+sub_140bd35b0   dq  140bd35b0h
 
 _DATA ENDS
 
@@ -55,7 +55,7 @@ add     rsp, 10h
 ;original code
 lea     rdx, [rsp+24h]
 mov     rcx, rbx
-call    qword ptr [sub_140BCEDB0]
+call    qword ptr [sub_140bd35b0]
 
 jmp     game_write_playerdata_to_flatbuffer_injection_return
 

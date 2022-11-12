@@ -111,9 +111,6 @@
     <ClCompile Include="src\CustomInvasionTypes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RCEFix.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\UIFeatures.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -186,9 +183,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\CustomInvasionTypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\RCEFix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\UIFeatures.h">
@@ -327,9 +321,6 @@
       <Filter>Source Files</Filter>
     </MASM>
     <MASM Include="src\CustomInvasionTypesASM.asm">
-      <Filter>Source Files</Filter>
-    </MASM>
-    <MASM Include="src\RCEFixASM.asm">
       <Filter>Source Files</Filter>
     </MASM>
     <MASM Include="src\UIFeaturesASM.asm">

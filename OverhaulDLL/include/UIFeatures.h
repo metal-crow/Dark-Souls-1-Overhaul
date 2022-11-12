@@ -11,11 +11,11 @@ public:
     static void start();
 
 private:
-    static const uint64_t Increase_FrpgMenuDlgFloatingPCGauge_class_size_offset1 = 0x6f4423;
-    static const uint64_t Increase_FrpgMenuDlgFloatingPCGauge_class_size_offset2 = 0x6f444a;
-    static const uint64_t Null_New_IconObj_FrpgMenuDlgFloatingPCGauge_offset = 0x6f318e;
-    static const uint64_t Insert_IconObj_FrpgMenuDlgFloatingPCGauge_offset = 0x6f343a;
-    static const uint64_t Render_InsertedIconObj_FrpgMenuDlgFloatingPCGauge_offset = 0x6f3510;
+    static const uint64_t Increase_FrpgMenuDlgFloatingPCGauge_class_size_offset1 = 0x6f6d33;
+    static const uint64_t Increase_FrpgMenuDlgFloatingPCGauge_class_size_offset2 = 0x6f6d5a;
+    static const uint64_t Null_New_IconObj_FrpgMenuDlgFloatingPCGauge_offset = 0x6f5a9e;
+    static const uint64_t Insert_IconObj_FrpgMenuDlgFloatingPCGauge_offset = 0x6f5d4a;
+    static const uint64_t Render_InsertedIconObj_FrpgMenuDlgFloatingPCGauge_offset = 0x6f5e20;
 };
 
 #endif

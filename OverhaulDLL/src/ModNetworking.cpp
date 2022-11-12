@@ -161,12 +161,6 @@ void ModNetworking::start()
 }
 
 /*
- * ===========ROLLBACK NETCODE SECTION
- */
-int64_t ModNetworking::timer_offset = 0;
-
-
-/*
  * ===========ISteamNetworkingMessages REPLACEMENT SECTION
  */
 

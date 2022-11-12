@@ -99,11 +99,11 @@ private:
     static void UnloadIndividualParams(std::vector<IndividualParams> i_params, std::vector<IndividualSoloParams> is_params);
     static void ReloadParamFile(ParamBNDs paramfile);
 
-    static const uint64_t CalcCorrectGraph_injection_offset = 0x2de08d;
-    static const uint64_t get_ParamResCap_from_ParamMan_injection_offset = 0x52fc50;
-    static const uint64_t call_SetHostPlayerIns_offset = 0x357be5;
-    static const uint64_t reload_chrctrl_location1_offset = 0x379177;
-    static const uint64_t reload_chrctrl_location2_offset = 0x37c898;
+    static const uint64_t CalcCorrectGraph_injection_offset = 0x2dfb8d;
+    static const uint64_t get_ParamResCap_from_ParamMan_injection_offset = 0x5322d0;
+    static const uint64_t call_SetHostPlayerIns_offset = 0x35725d;
+    static const uint64_t reload_chrctrl_location1_offset = 0x378837;
+    static const uint64_t reload_chrctrl_location2_offset = 0x37bf58;
 };
 
 #endif

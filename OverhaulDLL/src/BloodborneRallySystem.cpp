@@ -42,7 +42,7 @@ extern "C" {
     void set_rally_sfx_lhand();
     uint32_t RALLY_CAPABLE_WEAPON_EFFECT_ID_LHAND = 92002; //weapon can perform rally indicator
 
-    uint64_t lua_SetEventSpecialEffect_2 = 0x1404ACE60;
+    uint64_t lua_SetEventSpecialEffect_2 = 0x1404ad880;
 }
 
 bool Apply_rally_capable_sfx_and_starting_hp(void*);
@@ -61,7 +61,7 @@ void BloodborneRally::start() {
     // Inject function to perform the main rally code
     write_address = (uint8_t*)(BloodborneRally::main_rally_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &main_rally_injection_return, 2, &main_rally_injection, true);
-    main_rally_injection_return = 0x140320848; //use as the jmp we're overwriting
+    main_rally_injection_return = 0x140322a98; //use as the jmp we're overwriting
 
     // Start new callback dedicated to applying rally-capable weapon sfx and setting the starting HP
     MainLoop::setup_mainloop_callback(Apply_rally_capable_sfx_and_starting_hp, NULL, "Apply_rally_capable_sfx_and_starting_hp");

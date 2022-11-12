@@ -1,6 +1,6 @@
 _DATA SEGMENT
 
-sub_1404358C0   dq  1404358C0h
+sub_1404363c0   dq  1404363c0h
 
 _DATA ENDS
 
@@ -69,7 +69,7 @@ disable_whiff_animations_injection PROC
 mov     esi, [rdi+80h]
 add     esi, 28h
 mov     edx, esi
-call    qword ptr [sub_1404358C0]
+call    qword ptr [sub_1404363c0]
 
 ;don't save/restore rax since it's the return val
 sub     rsp, 10h

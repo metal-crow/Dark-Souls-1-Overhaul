@@ -357,13 +357,13 @@ DWORD WINAPI Files::intercept_set_file_pointer(HANDLE hFile, LONG lDistanceToMov
 }
 #endif
 
-static const uint64_t archives_n_savegame_write_offset = 0xD015FF;
-static const uint64_t savegame_n_config_write_offset = 0xD009DF;
+static const uint64_t archives_n_savegame_write_offset = 0xd051df;
+static const uint64_t savegame_n_config_write_offset = 0xd045bf;
 
-static const uint64_t private_profile_get_offset_1 = 0x1B5119;
-static const uint64_t private_profile_get_offset_2 = 0x1B5267;
+static const uint64_t private_profile_get_offset_1 = 0x1b6a09;
+static const uint64_t private_profile_get_offset_2 = 0x1b6b57;
 
-static const uint64_t private_profile_write_offset = 0x1B55D6;
+static const uint64_t private_profile_write_offset = 0x1b6ec6;
 
 extern "C" {
     uint64_t archives_n_savegame_write_inject_return;

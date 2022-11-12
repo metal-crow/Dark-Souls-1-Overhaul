@@ -27,7 +27,7 @@ void EquipmentUnlock::start() {
 }
 
 typedef bool ok_to_enter_equipment_menu_FUNC(void* playerins);
-ok_to_enter_equipment_menu_FUNC* ok_to_enter_equipment_menu = (ok_to_enter_equipment_menu_FUNC*)0x140361a80;
+ok_to_enter_equipment_menu_FUNC* ok_to_enter_equipment_menu = (ok_to_enter_equipment_menu_FUNC*)0x140361140;
 
 //return true if the change is allowed, false otherwise
 bool equipment_change_unlock_injection_helper(InventorySlots menu_slot)

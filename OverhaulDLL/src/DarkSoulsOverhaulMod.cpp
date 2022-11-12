@@ -27,7 +27,6 @@
 #include "MainLoop.h"
 #include "FileReloading.h"
 #include "CustomInvasionTypes.h"
-#include "RCEFix.h"
 #include "UIFeatures.h"
 #include "Rollback.h"
 
@@ -102,7 +101,6 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
 
     Game::init();
     AntiAntiCheat::start();
-    RCEFix::start();
     Game::injections_init(); //only do injections after we disable the built in code checking
 
     CreateThread(NULL,  // Default security attributes
@@ -148,7 +146,7 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     set_crash_handlers();
 #endif
     Menu::Saves::init_custom_saves();
-    AntiCheat::start();
+    //AntiCheat::start();
     Game::set_gui_hpbar_max();
     Game::stopDurabilityDamage(Mod::stop_durability_damage);
     BloodborneRally::start();

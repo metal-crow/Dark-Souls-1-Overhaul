@@ -39,18 +39,14 @@ public:
 
     static void start();
 
-    static std::unordered_map<uint16_t, AnimationStateTypesEnum> STATEIDS_TO_ROLLBACK;
-
-    static bool SetAnimationTimeOffset(void * time_offset_arg);
-
 private:
     static void alter_animation_parameters();
 
     static void disable_whiff_animations();
 
 private:
-    static const uint64_t animation_entry_set_offset = 0x43E281; //Triggered when an animation entry in the table has it's speed set
-    static const uint64_t animation_whiff_set_offset = 0x386CC4;
+    static const uint64_t animation_entry_set_offset = 0x43ed81; //Triggered when an animation entry in the table has it's speed set
+    static const uint64_t animation_whiff_set_offset = 0x386384;
 };
 
 #endif

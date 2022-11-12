@@ -1,6 +1,6 @@
 _DATA SEGMENT
 
-aUnnamed_1      dq  1414A1F20h
+aUnnamed_1      dq  1414a5f80h
 
 _DATA ENDS
 
@@ -41,7 +41,7 @@ push    rsi
 push    rdi
 push    r14
 sub     rsp, 60h
-mov     rax, qword ptr [141B47800h]
+mov     rax, qword ptr [141aab820h]
 
 jmp     char_loaded_injection_return
 

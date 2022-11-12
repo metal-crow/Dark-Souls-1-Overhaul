@@ -11,7 +11,7 @@ class FixAnkles
 public:
     static void start();
 private:
-    static const uint64_t set_foot_ikvalue_injection_offset = 0x29eae9;
+    static const uint64_t set_foot_ikvalue_injection_offset = 0x2a0409;
 };
 
 #endif

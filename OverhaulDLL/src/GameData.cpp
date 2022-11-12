@@ -148,39 +148,39 @@ void Game::init()
 
     Game::saves_enabled = sp::mem::pointer<uint8_t>((void*)((uint64_t)saves_enabled_sp + *(uint32_t*)((uint64_t)saves_enabled_sp + 3) + 7), { 0xB70 });
 
-    Game::game_data_man = Game::ds1_base + 0x1D278F0;
+    Game::game_data_man = Game::ds1_base + 0x1c8a530;
 
-    Game::world_chr_man_imp = Game::ds1_base + 0x1d151b0;
+    Game::world_chr_man_imp = Game::ds1_base + 0x1c77e50;
 
     Game::player_char_status = sp::mem::pointer<int32_t>((void*)(Game::world_chr_man_imp), { 0x68, 0xD4 });
 
-    Game::param_man = Game::ds1_base + 0x1d1b098;
+    Game::param_man = Game::ds1_base + 0x1c7dd38;
 
-    Game::solo_param_man = Game::ds1_base + 0x1d1b360;
+    Game::solo_param_man = Game::ds1_base + 0x1c7e000;
 
-    Game::file_man = Game::ds1_base + 0x1d1e4f8;
+    Game::file_man = Game::ds1_base + 0x1c81198;
 
-    Game::session_man_imp = Game::ds1_base + 0x1d1a370;
+    Game::session_man_imp = Game::ds1_base + 0x1c7d010;
 
-    Game::menu_man = Game::ds1_base + 0x1d26168;
+    Game::menu_man = Game::ds1_base + 0x1c88d98;
 
-    Game::bullet_man = Game::ds1_base + 0x1d177e8;
+    Game::bullet_man = Game::ds1_base + 0x1c7a488;
 
-    Game::unknown_global_struct_141d283a8 = Game::ds1_base + 0x1d283a8;
+    Game::unknown_global_struct_141d283a8 = Game::ds1_base + 0x1c8b038;
 
-    Game::frpg_net_man = Game::ds1_base + 0x1d27d60;
+    Game::frpg_net_man = Game::ds1_base + 0x1c8a9a0;
 
-    Game::pad_man = Game::ds1_base + 0x1d06eb0;
+    Game::pad_man = Game::ds1_base + 0x1c6aea0;
 
-    Game::frpg_system = Game::ds1_base + 0x1c04e28;
+    Game::frpg_system = Game::ds1_base + 0x1b68e18;
 
-    Game::damage_man = Game::ds1_base + 0x1d173c0;
+    Game::damage_man = Game::ds1_base + 0x1c7a050;
 
-    Game::frpg_havok_man_imp = Game::ds1_base + 0x1d10880;
+    Game::frpg_havok_man_imp = Game::ds1_base + 0x1c74870;
 
-    Game::sfx_man = Game::ds1_base + 0x1d19ab8;
+    Game::sfx_man = Game::ds1_base + 0x1c7c758;
 
-    Game::throw_man = Game::ds1_base + 0x1d16e40;
+    Game::throw_man = Game::ds1_base + 0x1c79ad0;
 }
 
 void Game::injections_init()
@@ -414,7 +414,7 @@ void Game::stopDurabilityDamage(bool enable) {
 
         ConsoleWrite("Disabling durability damage...");
 
-        uint64_t InfDur1AOB = Game::ds1_base + 0x74bb07;
+        uint64_t InfDur1AOB = Game::ds1_base + 0x74e7e7;
 
         // A conditional (and therefore relative) jump was overwritten by inject_jmp_14b. Calculate absolute address of the jump target
         // This allows the stop_durability_damage_hook procedure to correctly replicate the instructions overwritten by the trampoline
@@ -456,63 +456,6 @@ void Game::stopDurabilityDamage(bool enable) {
     }
 }
 
-// Check if dim lava mod is currently active
-#if 0
-bool Game::dim_lava_enabled()
-{
-    if (Game::lava_luminosity == NULL)
-        Game::lava_luminosity = (uint8_t*)aob_scan("66 66 26 40 00 00 80 3F 00 00 80 3F 00 00 80 3F 00 00 80 3F 00 00 80 40");
-
-    if (Game::lava_luminosity == NULL)
-    {
-        // Unable to find lava brightness effects in memory
-        set_error(ERROR_FILE_NOT_FOUND);
-        return false;
-    }
-
-    uint8_t check_lava[4] = { 0x66, 0x66, 0x26, 0x40 };
-    for (int i = 0; i < 4; i++)
-        if (check_lava[i] != Game::lava_luminosity[i])
-            return true;
-
-    return false;
-}
-
-// Dim lava effects or restore default lava visuals
-void Game::enable_dim_lava(bool dim)
-{
-    if (dim != Game::dim_lava_enabled() && Game::lava_luminosity != NULL)
-    {
-        uint8_t patch_bytes[4];
-
-        if (dim)
-        {
-            // Dim lava effects
-            patch_bytes[0] = 0xD6, patch_bytes[1] = 0xCC, patch_bytes[2] = 0x4C, patch_bytes[3] = 0x3E;
-            apply_byte_patch(Game::lava_luminosity, patch_bytes, 4);
-
-            patch_bytes[0] = 0x00, patch_bytes[0] = 0x00, patch_bytes[0] = 0x80, patch_bytes[0] = 0x3F;
-            apply_byte_patch(Game::lava_luminosity + 0xAE0, patch_bytes, 4);
-            apply_byte_patch(Game::lava_luminosity + 0x1050, patch_bytes, 4);
-        }
-        else
-        {
-            // Restore default lava effects
-            patch_bytes[0] = 0x66, patch_bytes[1] = 0x66, patch_bytes[2] = 0x26, patch_bytes[3] = 0x40;
-            apply_byte_patch(Game::lava_luminosity, patch_bytes, 4);
-
-            patch_bytes[0] = 0x00, patch_bytes[0] = 0x00, patch_bytes[0] = 0x30, patch_bytes[0] = 0x40;
-            apply_byte_patch(Game::lava_luminosity + 0xAE0, patch_bytes, 4);
-
-            patch_bytes[0] = 0x00, patch_bytes[0] = 0x00, patch_bytes[0] = 0x80, patch_bytes[0] = 0x40;
-            apply_byte_patch(Game::lava_luminosity + 0x1050, patch_bytes, 4);
-        }
-    }
-    else if (Game::lava_luminosity == NULL)
-        set_error(ERROR_FILE_NOT_FOUND);
-}
-#endif
-
 // Returns multiplayer node count as an int (or -1 if player is not online)
 int Game::get_node_count()
 {
@@ -525,55 +468,7 @@ int Game::get_node_count()
     return *node_count_ptr.resolve();
 }
 
-// Additional HUD elements
-#if 0
-bool Hud::get_show_compass_radial()
-{
-    return !!*(uint8_t*)((uint32_t)Game::ds1_base + 0xF7851B);
-}
-
-void Hud::set_show_compass_radial(bool enable)
-{
-    *(uint8_t*)((uint32_t)Game::ds1_base + 0xF7851B) = enable;
-}
-
-bool Hud::get_show_compass_bar()
-{
-    return !!*(uint8_t*)((uint32_t)Game::ds1_base + 0xF78525);
-}
-
-void Hud::set_show_compass_bar(bool enable)
-{
-    *(uint8_t*)((uint32_t)Game::ds1_base + 0xF78525) = enable;
-}
-
-bool Hud::get_show_elevation_meter()
-{
-    return !!*(uint8_t*)((uint32_t)Game::ds1_base + 0xF78524);
-}
-
-void Hud::set_show_elevation_meter(bool enable)
-{
-    *(uint8_t*)((uint32_t)Game::ds1_base + 0xF78524) = enable;
-}
-
-bool Hud::get_show_node_graph()
-{
-    return Mod::hud_node_graph_pref;
-    // return !!*(uint8_t*)((uint32_t)Game::ds1_base + 0x??);
-}
-
-void Hud::set_show_node_graph(bool enable, bool game_flag_only)
-{
-    if (!game_flag_only) {
-        Mod::hud_node_graph_pref = enable;
-    }
-    sp::mem::pointer node_graph_ptr = sp::mem::pointer<uint8_t>((uint8_t*)ds1_base + 0xF7F77C, { 0x2C, 0x778, 0x90 });
-    node_graph_ptr.write((uint8_t)enable);
-}
-#endif
-
-static const uint64_t disable_low_fps_disconnect_offset = 0x778B29;
+static const uint64_t disable_low_fps_disconnect_offset = 0x77c269;
 
 // Disables automatic game disconnection when low framerate is detected
 void Game::disable_low_fps_disconnect(bool enable)
@@ -883,7 +778,7 @@ float Game::current_hpbar_max = 0;
 const float overhaul_hpbar_max = 5267.0;
 const float corrected_vanilla_hpbar_max = 2633.0;
 const float original_vanilla_hpbar_max = 1900.0;
-static const uint64_t gui_hpbar_value_offset = 0x676ECD;
+static const uint64_t gui_hpbar_value_offset = 0x6797cd;
 
 extern "C" {
     uint64_t Gui_HP_bar_UI_ptr = NULL;
@@ -926,7 +821,7 @@ std::optional<uint32_t> Game::left_hand_weapon() {
         return *left_hand_weapon_ptr_cache;
     }
 
-    sp::mem::pointer weapon = sp::mem::pointer<uint32_t>((void*)(Game::ds1_base + 0x1ACD758), { 0x28, 0x250, 0x2F8, 0x18, 0x0 });
+    sp::mem::pointer weapon = sp::mem::pointer<uint32_t>((void*)(Game::ds1_base + 0x1a31768), { 0x28, 0x250, 0x2F8, 0x18, 0x0 });
     if (weapon.resolve() == NULL) {
         return std::nullopt;
     }
@@ -942,7 +837,7 @@ std::optional<uint32_t> Game::right_hand_weapon() {
         return *right_hand_weapon_ptr_cache;
     }
 
-    sp::mem::pointer weapon = sp::mem::pointer<uint32_t>((void*)(Game::ds1_base+0x1ACD758), { 0x28, 0x250, 0x2F8, 0x18, 0x4 });
+    sp::mem::pointer weapon = sp::mem::pointer<uint32_t>((void*)(Game::ds1_base + 0x1a31768), { 0x28, 0x250, 0x2F8, 0x18, 0x4 });
     if (weapon.resolve() == NULL) {
         return std::nullopt;
     }
@@ -1058,7 +953,7 @@ std::optional<int32_t*> Game::get_saved_chars_menu_flag() {
         return saved_chars_menu_flag_cache;
     }
 
-    sp::mem::pointer saved_chars_menu_flag = sp::mem::pointer<int32_t>((void*)(Game::ds1_base + 0x1D26168), { 0xA4 });
+    sp::mem::pointer saved_chars_menu_flag = sp::mem::pointer<int32_t>((void*)(Game::menu_man), { 0xA4 });
     if (saved_chars_menu_flag.resolve() == NULL) {
         return std::nullopt;
     }
@@ -1075,7 +970,7 @@ std::optional<int32_t*> Game::get_main_menu_flag()
         return main_menu_flag_cache;
     }
 
-    sp::mem::pointer main_menu_flag = sp::mem::pointer<int32_t>((void*)(Game::ds1_base + 0x1D26168), { 0x80 });
+    sp::mem::pointer main_menu_flag = sp::mem::pointer<int32_t>((void*)(Game::menu_man), { 0x80 });
     if (main_menu_flag.resolve() == NULL)
     {
         return std::nullopt;
@@ -1092,7 +987,7 @@ std::optional<uint8_t*> Game::get_saved_chars_preview_data() {
         return saved_chars_preview_data_cache;
     }
 
-    sp::mem::pointer saved_chars_preview_data = sp::mem::pointer<uint8_t>((void*)(Game::ds1_base + 0x1D278F0), { 0x60, 0x10 });
+    sp::mem::pointer saved_chars_preview_data = sp::mem::pointer<uint8_t>((void*)(Game::game_data_man), { 0x60, 0x10 });
     if (saved_chars_preview_data.resolve() == NULL) {
         return std::nullopt;
     }
@@ -1387,19 +1282,14 @@ uint64_t Game::get_accurate_time()
     return time;
 }
 
-uint64_t Game::get_synced_time()
-{
-    return Game::get_accurate_time() + ModNetworking::timer_offset;
-}
-
 //convert the time we get from accurate/synced time (unit of 100ns) to the amount required for the animation entry offset value (unit of seconds)
 float Game::convert_time_to_offset(uint64_t time)
 {
     return time / 10000000.0f;
 }
 
-typedef void FUN_1406e8a60_Typedef(uint64_t unk, const wchar_t* str);
-FUN_1406e8a60_Typedef* FUN_1406e8a60 = (FUN_1406e8a60_Typedef*)0x1406e8a60;
+typedef void create_popup_window_msg_Typedef(uint64_t unk, const wchar_t* str);
+create_popup_window_msg_Typedef* create_popup_window_msg = (create_popup_window_msg_Typedef*)0x1406eb370;
 
 //This is mostly copied from the debug code that creates a test message. Function 1406e9840
 void Game::show_popup_message(const wchar_t* msg)
@@ -1424,7 +1314,7 @@ void Game::show_popup_message(const wchar_t* msg)
                 *(uint32_t*)(pcVar7 + 0x38) = 0x7;
                 *(uint8_t*)(pcVar7 + 0x30) = 1;
             }
-            FUN_1406e8a60(pcVar3, msg);
+            create_popup_window_msg(pcVar3, msg);
             *(uint16_t*)(pcVar7 + 0x30) = 0x101;
             *(uint32_t*)(pcVar3 + 0x8) = *(uint32_t*)(pcVar3 + 0x150);
             break;
@@ -1434,7 +1324,7 @@ void Game::show_popup_message(const wchar_t* msg)
 }
 
 typedef bool Create_BannerMessage_Func_Typedef(uint64_t menuman_banner, uint32_t banner_type, const wchar_t* str);
-Create_BannerMessage_Func_Typedef* Create_BannerMessage_Func = (Create_BannerMessage_Func_Typedef*)0x14071cf90;
+Create_BannerMessage_Func_Typedef* Create_BannerMessage_Func = (Create_BannerMessage_Func_Typedef*)0x14071fc60;
 
 void Game::show_banner_message(const wchar_t* msg)
 {
@@ -1561,7 +1451,7 @@ std::optional<int32_t*> Game::get_MP_AreaID_ptr()
 }
 
 typedef void* InGame_Malloc_FUNC(size_t size, size_t alignment, void* heap);
-InGame_Malloc_FUNC* InGame_Malloc = (InGame_Malloc_FUNC*)0x140cc0230;
+InGame_Malloc_FUNC* InGame_Malloc = (InGame_Malloc_FUNC*)0x140cc3e10;
 
 void* Game::game_malloc(size_t size, size_t alignment, void* heap)
 {
@@ -1569,7 +1459,7 @@ void* Game::game_malloc(size_t size, size_t alignment, void* heap)
 }
 
 typedef void InGame_Free_FUNC(void* p, size_t size);
-InGame_Free_FUNC* InGame_Free = (InGame_Free_FUNC*)0x1410e0a9c;
+InGame_Free_FUNC* InGame_Free = (InGame_Free_FUNC*)0x1410e3f6c;
 
 void Game::game_free(void* p, size_t size)
 {
@@ -1577,7 +1467,7 @@ void Game::game_free(void* p, size_t size)
 }
 
 typedef uint64_t* FUN_140cbede0_FUNC(void* p);
-FUN_140cbede0_FUNC* FUN_140cbede0 = (FUN_140cbede0_FUNC*)0x140cbede0;
+FUN_140cbede0_FUNC* FUN_140cbede0 = (FUN_140cbede0_FUNC*)0x140cc29c0;
 
 typedef void heapObjFreeFunc(void* heapObj, void* p);
 
@@ -1598,25 +1488,25 @@ void* Game::get_MoveMapStep()
 }
 
 typedef void Step_MapArea_MapAreaObjects_and_NearbyMapAreas_FUNC(void* FieldArea, float frame_time, uint32_t param_3, uint8_t param_4, uint8_t param_5);
-Step_MapArea_MapAreaObjects_and_NearbyMapAreas_FUNC* Step_MapArea_MapAreaObjects_and_NearbyMapAreas = (Step_MapArea_MapAreaObjects_and_NearbyMapAreas_FUNC*)0x1403cc540;
+Step_MapArea_MapAreaObjects_and_NearbyMapAreas_FUNC* Step_MapArea_MapAreaObjects_and_NearbyMapAreas = (Step_MapArea_MapAreaObjects_and_NearbyMapAreas_FUNC*)0x1403cbb50;
 
 typedef void Step_Chr_FUNC(void* movemapstep, float frame_time, byte param_3);
-Step_Chr_FUNC* Step_Chr = (Step_Chr_FUNC*)0x14024f7f0;
+Step_Chr_FUNC* Step_Chr = (Step_Chr_FUNC*)0x1402510d0;
 
 typedef void Step_Bullet_FUNC(void* bulletman, float frame_time);
-Step_Bullet_FUNC* Step_Bullet = (Step_Bullet_FUNC*)0x140428e40;
+Step_Bullet_FUNC* Step_Bullet = (Step_Bullet_FUNC*)0x140429940;
 
 typedef void Step_DamageMan_FUNC(void* damageman, float frame_time);
-Step_DamageMan_FUNC* Step_DamageMan = (Step_DamageMan_FUNC*)0x1403c97c0;
+Step_DamageMan_FUNC* Step_DamageMan = (Step_DamageMan_FUNC*)0x1403c8dd0;
 
 typedef void Step_Havok_FUNC(void* FrpgHavokManImp, float frame_time);
-Step_Havok_FUNC* Step_Havok = (Step_Havok_FUNC*)0x1402a18b0;
+Step_Havok_FUNC* Step_Havok = (Step_Havok_FUNC*)0x142f9d251;
 
 typedef void FinishStep_Havok_FUNC(void* FrpgHavokManImp);
-FinishStep_Havok_FUNC* FinishStep_Havok = (FinishStep_Havok_FUNC*)0x1402a19b0;
+FinishStep_Havok_FUNC* FinishStep_Havok = (FinishStep_Havok_FUNC*)0x1402a32d0;
 
 typedef void MoveMapStep_Step_13_FUNC(void* movemapstep, float frame_time);
-MoveMapStep_Step_13_FUNC* MoveMapStep_Step_13 = (MoveMapStep_Step_13_FUNC*)0x14024ddd0;
+MoveMapStep_Step_13_FUNC* MoveMapStep_Step_13 = (MoveMapStep_Step_13_FUNC*)0x14024f6b0;
 
 static const float FRAMETIME = 0.01666666666f;
 

@@ -1,6 +1,6 @@
 _DATA   SEGMENT
 
-LAB_140e27327   dq  140e27327h
+LAB_140e2af07   dq  140e2af07h
 
 _DATA   ENDS
 
@@ -69,7 +69,7 @@ add     rsp, 10h
 exit:
 cmp     eax, 8007001Eh
 jz      continue
-jmp     qword ptr [LAB_140e27327]
+jmp     qword ptr [LAB_140e2af07]
 continue:
 mov     rcx, [rbx+1B0h]
 jmp     IDirectInputDevice8GetDeviceState_Keyboard_injection_return

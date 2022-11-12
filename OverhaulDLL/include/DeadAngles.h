@@ -11,7 +11,7 @@ class DeadAngles
 public:
     static void start();
 private:
-    static const uint64_t main_dead_angle_injection_offset = 0x2E8AB4E;
+    static const uint64_t main_dead_angle_injection_offset = 0x2ee475e;
 };
 
 #endif

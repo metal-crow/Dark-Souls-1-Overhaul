@@ -13,8 +13,9 @@ typedef struct CustomSpellPacketData_Struct {
     float pos_y;
     float pos_z;
     const uint32_t padding_b[3] = { 0,0,0 };
-    const uint8_t include_last_2_vals = 0; //must be at +40
 } CustomSpellPacketData;
+
+static_assert(sizeof(CustomSpellPacketData) == 40);
 
 extern "C" {
     uint64_t homing_spell_trigger_injection_return;
@@ -52,7 +53,7 @@ void SpellDesync::start() {
 
     //inject into the type1 packet parsing function and handle if we detect a magic specific packet
     write_address = (uint8_t*)(SpellDesync::type1_p2pPacket_parsing_injection_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &type1_p2pPacket_parse_injection_return, 4, &type1_p2pPacket_parse_injection);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &type1_p2pPacket_parse_injection_return, 0, &type1_p2pPacket_parse_injection);
 
     //inject into the function that determines if the homing bullet should be fired, and sets the target id to fire it
     write_address = (uint8_t*)(SpellDesync::homing_spell_checkIfTriggered_injection_offset + Game::ds1_base);
@@ -61,7 +62,7 @@ void SpellDesync::start() {
 
 
 typedef bool sendType1NetMessage_Typedef(CustomSpellPacketData* data);
-sendType1NetMessage_Typedef* sendType1NetMessage = (sendType1NetMessage_Typedef*)0x1405031f0;
+sendType1NetMessage_Typedef* sendType1NetMessage = (sendType1NetMessage_Typedef*)0x1405042c0;
 
 // Send out the custom packet which says a homing bullet has been fired (i.e the actual HSM orb has left the caster and is mid-air).
 // By entering this function we know the owner of the bullet is the PC and the target is another entity

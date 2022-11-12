@@ -95,13 +95,13 @@ typedef uint32_t Calculate_MaxMP_From_Att_FUNC(uint32_t att);
 typedef uint32_t Calculate_MaxSP_From_End_FUNC(uint32_t end);
 
 // No need to specify calling convention, it's always the same on x64: https://docs.microsoft.com/en-us/cpp/build/x64-calling-convention?view=msvc-160
-Find_ResCap_FUNC* Find_ResCap = (Find_ResCap_FUNC*)0x140516410;
-Unload_ResCap_FUNC* Unload_ResCap = (Unload_ResCap_FUNC*)0x140516600;
-ParambndFileCap_Load_FUNC* ParambndFileCap_Load = (ParambndFileCap_Load_FUNC*)0x14059dfa0;
-Force_PlayerReload_FUNC* Force_PlayerReload = (Force_PlayerReload_FUNC*)0x1403712a0;
-Calculate_MaxHP_From_Vit_FUNC* Calculate_MaxHP_From_Vit = (Calculate_MaxHP_From_Vit_FUNC*)0x1402ddea0;
-Calculate_MaxMP_From_Att_FUNC* Calculate_MaxMP_From_Att = (Calculate_MaxMP_From_Att_FUNC*)0x1402ddf60;
-Calculate_MaxSP_From_End_FUNC* Calculate_MaxSP_From_End = (Calculate_MaxSP_From_End_FUNC*)0x1402de1d0;
+Find_ResCap_FUNC* Find_ResCap = (Find_ResCap_FUNC*)0x140518a10;
+Unload_ResCap_FUNC* Unload_ResCap = (Unload_ResCap_FUNC*)0x140518c00;
+ParambndFileCap_Load_FUNC* ParambndFileCap_Load = (ParambndFileCap_Load_FUNC*)0x1405a08a0;
+Force_PlayerReload_FUNC* Force_PlayerReload = (Force_PlayerReload_FUNC*)0x140370920;
+Calculate_MaxHP_From_Vit_FUNC* Calculate_MaxHP_From_Vit = (Calculate_MaxHP_From_Vit_FUNC*)0x1402df9a0;
+Calculate_MaxMP_From_Att_FUNC* Calculate_MaxMP_From_Att = (Calculate_MaxMP_From_Att_FUNC*)0x1402dfa60;
+Calculate_MaxSP_From_End_FUNC* Calculate_MaxSP_From_End = (Calculate_MaxSP_From_End_FUNC*)0x1402dfcd0;
 
 /* --------------------------------------------------------------------- */
 

@@ -16,9 +16,9 @@ class PhantomUnshackle {
 public:
     static void start();
 private:
-    static const uint64_t mp_zone_changing_injection_offset = 0x324B0C;
-    static const uint64_t mp_zone_neg2_force_offset = 0x324B97;
-    static const uint64_t mp_zone_neg2_force_offset_part2 = 0x325490;
+    static const uint64_t mp_zone_changing_injection_offset = 0x326cbc;
+    static const uint64_t mp_zone_neg2_force_offset = 0x326d47;
+    static const uint64_t mp_zone_neg2_force_offset_part2 = 0x327640;
 };
 
 #endif

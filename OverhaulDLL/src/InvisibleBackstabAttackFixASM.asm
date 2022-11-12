@@ -1,9 +1,9 @@
 _DATA SEGMENT
 
-sendType16NetMessage    dq  1405056A0h
-WorldChrManImp          dq  141d151b0h
-send_PlayerGeneralInfo  dq  1403980e0h
-set_ezStateActiveState  dq  1405032D0h
+sendType16NetMessage    dq  140506f50h
+WorldChrManImp          dq  141c77e50h
+send_PlayerGeneralInfo  dq  1403976e0h
+set_ezStateActiveState  dq  1405043a0h
 
 _DATA ENDS
 

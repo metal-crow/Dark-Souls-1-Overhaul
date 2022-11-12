@@ -163,18 +163,18 @@ public:
 
     static uint64_t throw_man;
 
-    static const uint64_t calculate_attack_damage_offset = 0x2a8ead6;
+    static const uint64_t calculate_attack_damage_offset = 0x2f11bf2;
 
-    static const uint64_t char_loaded_injection_offset = 0x24D8D0;
-    static const uint64_t char_loading_injection_offset = 0x278FC0;
+    static const uint64_t char_loaded_injection_offset = 0x24f1b0;
+    static const uint64_t char_loading_injection_offset = 0x27a870;
 
-    static const uint64_t gui_hpbar_max_injection_offset = 0x676ed7;
+    static const uint64_t gui_hpbar_max_injection_offset = 0x6797d7;
 
-    static const uint64_t MoveMapStep_New_injection_offset = 0x24cd20;
+    static const uint64_t MoveMapStep_New_injection_offset = 0x24e600;
 
-    static const uint64_t InitAndStart_DLThread_injection_offset = 0xcc20bc;
+    static const uint64_t InitAndStart_DLThread_injection_offset = 0xcc5c9c;
 
-    static const uint64_t Destruct_DLThread_injection_offset = 0xcc2180;
+    static const uint64_t Destruct_DLThread_injection_offset = 0xcc5d60;
 
     // Player character status (loading, human, co-op, invader, hollow)
     static sp::mem::pointer<int32_t> player_char_status;
@@ -319,8 +319,6 @@ public:
 	static bool set_display_name(bool useSteam);
 
 	static uint64_t get_accurate_time();
-
-	static uint64_t get_synced_time();
 
 	static float convert_time_to_offset(uint64_t time);
 

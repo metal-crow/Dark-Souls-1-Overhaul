@@ -1,6 +1,6 @@
 _DATA SEGMENT
 
-sub_1404260A0   dq  1404260A0h
+sub_140426ba0   dq  140426ba0h
 
 _DATA ENDS
 
@@ -93,9 +93,8 @@ ret
 ;original code
 normal_exit:
 movups  xmm0, [rsp+30h]
-mov     byte ptr [rbx+28h], 0
-movzx   eax, sil
-movups  xmm1, xmmword ptr [rsp+40h]
+movzx   eax,bpl
+movups  xmm1, [rsp+40h]
 
 jmp     type1_p2pPacket_parse_injection_return
 
@@ -114,7 +113,7 @@ homing_spell_checkIfTriggered_injection PROC
 movaps  xmm2, xmm6
 lea     rdx, [rsp+20h]
 mov     rcx, rbx
-call    qword ptr [sub_1404260A0]
+call    qword ptr [sub_140426ba0]
 
 ;call the helper
 sub     rsp, 8

@@ -1,6 +1,6 @@
 _DATA SEGMENT
 
-abort_enter dq 14062E70Fh
+abort_enter dq 14063100fh
 
 _DATA ENDS
 

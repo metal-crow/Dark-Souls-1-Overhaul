@@ -18,7 +18,7 @@ public:
     static const uint32_t AllAreasAndInfiniteUpwardsInvadingOrbSpEffect_Red = 90;
     static const uint32_t AllAreasAndInfiniteUpwardsInvadingOrbSpEffect_Blue = 93;
 private:
-    static const uint64_t Send_Type17_GeneralRequestTask_offset = 0xbcce19;
+    static const uint64_t Send_Type17_GeneralRequestTask_offset = 0xbd1739;
 };
 
 #endif

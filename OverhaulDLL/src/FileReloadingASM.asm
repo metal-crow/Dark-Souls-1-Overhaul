@@ -1,7 +1,7 @@
 _DATA SEGMENT
 
-sub_140527330   dq  140527330h
-label_1402de1b5 dq  1402de1b5h
+sub_1405299b0   dq  1405299b0h
+label_1402dfbae dq  1402dfbaeh
 
 _DATA ENDS
 
@@ -14,7 +14,7 @@ CalcCorrectGraph_injection PROC
 ;original code
 mov     [rsp+28h], rbx
 movaps  xmm6, xmm0
-call    qword ptr [sub_140527330]
+call    qword ptr [sub_1405299b0]
 mov     rdx, [rsp+28h]
 
 ;check the returned result isn't null
@@ -22,7 +22,7 @@ test    rdx, rdx
 jz      funcAbort
 jmp     CalcCorrectGraph_injection_return
 funcAbort:
-jmp     qword ptr [label_1402de1b5]
+jmp     qword ptr [label_1402dfbae]
 CalcCorrectGraph_injection ENDP
 
 

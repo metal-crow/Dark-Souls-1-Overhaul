@@ -21,7 +21,7 @@
 #include <ctime>
 #include <string>
 
-uint64_t panic_debug_offset = 0xd4ff86;
+uint64_t panic_debug_offset = 0xd53b66;
 extern "C" {
     uint64_t panic_debug_return;
     void panic_debug_injection();

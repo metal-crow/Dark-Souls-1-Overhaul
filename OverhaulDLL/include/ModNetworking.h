@@ -11,25 +11,6 @@
 #pragma warning( pop )
 #include "ModData.h"
 
-class TimerClientInfo
-{
-public:
-    TimerClientInfo()
-    {
-        timeOfLastResync = 0;
-        timePingPacketSent = 0;
-        packetDelay = 0;
-        waitingForPingResponse = false;
-        lastAidCount = 0xff;
-    };
-    uint64_t timeOfLastResync;
-    uint64_t timePingPacketSent;
-    uint64_t packetDelay;
-    bool waitingForPingResponse;
-    //state indicator for what animation we've received (the most sig 3 bits in the type1 packet)
-    uint8_t lastAidCount;
-};
-
 class ModNetworking
 {
 public:
@@ -70,17 +51,14 @@ public:
     static uint64_t incoming_guest_to_not_accept;
     static bool new_guest_incoming;
 
-    //info for clock synchronization
-    static int64_t timer_offset;
-    static std::unordered_map<uint64_t, TimerClientInfo> hostTimerSyncronizationData; //key: steamid
 private:
-    static const uint64_t AcceptP2PSessionWithUser_injection_offset = 0x10b3846;
-    static const uint64_t IsP2PPacketAvailable_1_injection_offset = 0x10b6cc0;
-    static const uint64_t IsP2PPacketAvailable_2_injection_offset = 0x10b6d45;
-    static const uint64_t ReadP2PPacket_injection_offset = 0x10b52fd;
-    static const uint64_t SendP2PPacket_voice_injection_offset = 0x10b7d24;
-    static const uint64_t SendP2PPacket_injection_offset = 0x10BA437;
-    static const uint64_t CloseP2PSessionWithUser_Replacement_injection_offset = 0x10baaa5;
+    static const uint64_t AcceptP2PSessionWithUser_injection_offset = 0x10b6ce0;
+    static const uint64_t IsP2PPacketAvailable_1_injection_offset = 0x10ba160;
+    static const uint64_t IsP2PPacketAvailable_2_injection_offset = 0x10ba1ee;
+    static const uint64_t ReadP2PPacket_injection_offset = 0x10b879d;
+    static const uint64_t SendP2PPacket_voice_injection_offset = 0x10bb1d4;
+    static const uint64_t SendP2PPacket_injection_offset = 0x10bd8e7;
+    static const uint64_t CloseP2PSessionWithUser_Replacement_injection_offset = 0x10bdf55;
 };
 
 #endif

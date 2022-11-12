@@ -53,7 +53,6 @@
     <ClCompile Include="src\PhantomUnshackle.cpp" />
     <ClCompile Include="src\InputUtil.cpp" />
     <ClCompile Include="src\PlayerInsStructFunctions.cpp" />
-    <ClCompile Include="src\RCEFix.cpp" />
     <ClCompile Include="src\Rollback.cpp" />
     <ClCompile Include="src\SfxManStructFunctions.cpp" />
     <ClCompile Include="src\SpellDesyncFixes.cpp" />
@@ -80,7 +79,6 @@
     <ClInclude Include="include\PadManStruct.h" />
     <ClInclude Include="include\PadManStructFunctions.h" />
     <ClInclude Include="include\PlayerInsStructFunctions.h" />
-    <ClInclude Include="include\RCEFix.h" />
     <ClInclude Include="include\Rollback.h" />
     <ClInclude Include="include\PlayerInsStruct.h" />
     <ClInclude Include="include\SfxManStruct.h" />
@@ -167,7 +165,6 @@
     <MASM Include="src\ModNetworking_ASM.asm" />
     <MASM Include="src\PhantomUnshackleASM.asm" />
     <MASM Include="src\InputUtilASM.asm" />
-    <MASM Include="src\RCEFixASM.asm" />
     <MASM Include="src\RollbackASM.asm" />
     <MASM Include="src\SpellDesyncFixesASM.asm" />
     <MASM Include="src\UIFeaturesASM.asm" />

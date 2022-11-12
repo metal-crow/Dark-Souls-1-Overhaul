@@ -1,6 +1,6 @@
 _DATA   SEGMENT
 
-private_profile_write_inject_return2 dq 1401B55FEh
+private_profile_write_inject_return2 dq 1401b6ee5h
 
 _DATA   ENDS
 

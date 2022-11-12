@@ -38,43 +38,6 @@ static const std::unordered_map<int32_t, std::tuple<float, float>> ANIMATIONS_TO
     { 6418, {1.2f,  0.0f}}, { 6518, {1.2f,  0.0f}},  //lightning spear throwing animation
 };
 
-std::unordered_map<uint16_t, AnimationStateTypesEnum> AnimationEdits::STATEIDS_TO_ROLLBACK = {
-    //dodges
-    {32, Upper_SpecialAttack},
-    {33, Upper_SpecialAttack},
-    {34, Upper_SpecialAttack},
-    {35, Upper_SpecialAttack},
-    {36, Upper_SpecialAttack},
-    {38, Upper_SpecialAttack},
-    {94, Upper_SpecialAttack},
-    {95, Upper_SpecialAttack},
-    {96, Upper_SpecialAttack},
-    {97, Upper_SpecialAttack},
-    {98, Upper_SpecialAttack},
-    {100, Upper_SpecialAttack},
-    //weapon attacks
-    {41, Upper_SpecialAttack},
-    {45, Upper_SpecialAttack},
-    {46, Upper_SpecialAttack},
-    {48, Upper_SpecialAttack},
-    {49, Upper_SpecialAttack},
-    {53, Upper_SpecialAttack},
-    {55, Upper_SpecialAttack},
-    {59, Upper_SpecialAttack},
-    {60, Upper_SpecialAttack},
-    {89, Upper_SpecialAttack},
-    {90, Upper_SpecialAttack},
-    {103, Upper_SpecialAttack},
-    {107, Upper_SpecialAttack},
-    {109, Upper_SpecialAttack},
-    {110, Upper_SpecialAttack},
-    {113, Upper_SpecialAttack},
-    {115, Upper_SpecialAttack},
-    {116, Upper_SpecialAttack},
-    {86, Upper_SpecialAttack}, //Left Hand Special Move
-    //TODO spell attacks
-};
-
 
 extern "C" {
     uint64_t animation_entry_set_return;
@@ -88,29 +51,6 @@ void AnimationEdits::alter_animation_parameters()
 
     uint8_t *write_address = (uint8_t*)(AnimationEdits::animation_entry_set_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &animation_entry_set_return, 1, &animation_entry_set_injection);
-}
-
-bool AnimationEdits::SetAnimationTimeOffset(void* time_offset_arg)
-{
-    SetAnimationTimeOffsetArg* time_offset = (SetAnimationTimeOffsetArg*)time_offset_arg;
-
-    //wait 2 frames for the animation to be loaded in and the "true offset" to be available
-    if (time_offset->frameStart + 1 >= Game::get_frame_count())
-    {
-        return true;
-    }
-
-    //set the animations new offset
-    float startingOffset = Game::convert_time_to_offset(Game::get_synced_time() - time_offset->timeAnimationTriggered);
-    //ConsoleWrite("Setting %lld to offset %f", Game::get_animation_mediator_state_animation(time_offset->animationMediatorPtr, AnimationEdits::STATEIDS_TO_ROLLBACK[time_offset->animationState]), startingOffset);
-    bool res = Game::set_animation_currentProgress(time_offset->animationMediatorPtr, AnimationEdits::STATEIDS_TO_ROLLBACK[time_offset->animationState], startingOffset);
-    if (!res)
-    {
-        return true;
-    }
-
-    free(time_offset_arg);
-    return false;
 }
 
 typedef struct SpeedAlterStruct_ {
