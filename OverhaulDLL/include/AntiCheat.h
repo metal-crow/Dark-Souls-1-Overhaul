@@ -21,12 +21,12 @@ namespace AntiCheat {
 void start();
 
 static const uint64_t NpcGuard_offset = 0x2e191ae;
-static const uint64_t BossGuard_offset = 0x3206C5;
-static const uint64_t TeleBackstab_getBSAnimation_offset = 0x3AD0E3;
-static const uint64_t TeleBackstab_setPlayerLocation_offset = 0x2B9A6A;
-static const uint64_t NameCrash_prevention_offset = 0x75E101;
-static const uint64_t ReadParseType18_packet_offset = 0x6e066b;
-static const uint64_t ReadParseType35_packet_offset = 0x0221de33;
+static const uint64_t BossGuard_offset = 0x322915;
+static const uint64_t TeleBackstab_getBSAnimation_offset = 0x3ac6f3;
+static const uint64_t TeleBackstab_setPlayerLocation_offset = 0x2bb56a;
+static const uint64_t NameCrash_prevention_offset = 0x761041;
+static const uint64_t ReadParseType18_packet_offset = 0x23b4342;
+static const uint64_t ReadParseType35_packet_offset = 0x2a5ec57;
 
 } // namespace AntiCheat
 

@@ -143,14 +143,10 @@
     <None Include="d3d11-wrapper\src\d3d11\exports.def" />
   </ItemGroup>
   <ItemGroup>
+    <MASM Include="src\AntiCheatASM.asm" />
     <MASM Include="src\CustomInvasionTypesASM.asm" />
     <MASM Include="src\AnimationEditsASM.asm" />
     <MASM Include="src\AntiAntiCheatASM.asm" />
-    <MASM Include="src\AntiCheat\BadSpeffectProtectASM.asm" />
-    <MASM Include="src\AntiCheat\BossGuardASM.asm" />
-    <MASM Include="src\AntiCheat\NameCrashPreventASM.asm" />
-    <MASM Include="src\AntiCheat\NpcGuardASM.asm" />
-    <MASM Include="src\AntiCheat\TeleBackstabProtectASM.asm" />
     <MASM Include="src\BloodborneRallySystemASM.asm" />
     <MASM Include="src\CrashHandlerASM.asm" />
     <MASM Include="src\DeadAnglesASM.asm" />

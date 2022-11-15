@@ -19,9 +19,6 @@
     <Filter Include="Resource Files\wrapper\d3d11">
       <UniqueIdentifier>{daf1dec0-ad77-4675-afa2-a4adc0cb06cf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\AntiCheat">
-      <UniqueIdentifier>{abe89458-8d94-4792-abc6-7e222f067671}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Menu">
       <UniqueIdentifier>{784465a6-1537-45bb-9608-32c0b68c0909}</UniqueIdentifier>
     </Filter>
@@ -62,9 +59,6 @@
     </ClCompile>
     <ClCompile Include="src\PhantomUnshackle.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\AntiCheat\AntiCheat.cpp">
-      <Filter>Source Files\AntiCheat</Filter>
     </ClCompile>
     <ClCompile Include="src\Menu\SavedCharacters.cpp">
       <Filter>Source Files\Menu</Filter>
@@ -131,6 +125,9 @@
     </ClCompile>
     <ClCompile Include="src\SfxManStructFunctions.cpp">
       <Filter>Source Files\Rollback</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AntiCheat\AntiCheat.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -257,9 +254,6 @@
     <MASM Include="src\BloodborneRallySystemASM.asm">
       <Filter>Source Files</Filter>
     </MASM>
-    <MASM Include="src\AntiCheat\NpcGuardASM.asm">
-      <Filter>Source Files\AntiCheat</Filter>
-    </MASM>
     <MASM Include="src\DeadAnglesASM.asm">
       <Filter>Source Files</Filter>
     </MASM>
@@ -269,12 +263,6 @@
     <MASM Include="src\AnimationEditsASM.asm">
       <Filter>Source Files</Filter>
     </MASM>
-    <MASM Include="src\AntiCheat\TeleBackstabProtectASM.asm">
-      <Filter>Source Files\AntiCheat</Filter>
-    </MASM>
-    <MASM Include="src\AntiCheat\BossGuardASM.asm">
-      <Filter>Source Files\AntiCheat</Filter>
-    </MASM>
     <MASM Include="src\PhantomUnshackleASM.asm">
       <Filter>Source Files</Filter>
     </MASM>
@@ -283,9 +271,6 @@
     </MASM>
     <MASM Include="src\Menu\SavedCharactersASM.asm">
       <Filter>Source Files\Menu</Filter>
-    </MASM>
-    <MASM Include="src\AntiCheat\NameCrashPreventASM.asm">
-      <Filter>Source Files\AntiCheat</Filter>
     </MASM>
     <MASM Include="src\InvisibleBackstabAttackFixASM.asm">
       <Filter>Source Files</Filter>
@@ -314,9 +299,6 @@
     <MASM Include="src\MainLoopASM.asm">
       <Filter>Source Files</Filter>
     </MASM>
-    <MASM Include="src\AntiCheat\BadSpeffectProtectASM.asm">
-      <Filter>Source Files\AntiCheat</Filter>
-    </MASM>
     <MASM Include="src\FileReloadingASM.asm">
       <Filter>Source Files</Filter>
     </MASM>
@@ -328,6 +310,9 @@
     </MASM>
     <MASM Include="src\RollbackASM.asm">
       <Filter>Source Files\Rollback</Filter>
+    </MASM>
+    <MASM Include="src\AntiCheatASM.asm">
+      <Filter>Source Files</Filter>
     </MASM>
   </ItemGroup>
   <ItemGroup>

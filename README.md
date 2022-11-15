@@ -45,7 +45,7 @@ __Overhaul__ mode can be switched on to get the full suite of improvements this 
 	
 ### Legacy
 
-* NPCs can no longer be killed by hackers
+* NPCs and bosses can no longer be killed by hackers
 
 * Hackers can no longer force you into Binoculars or Dragon form, or apply other bad effects to you
 
