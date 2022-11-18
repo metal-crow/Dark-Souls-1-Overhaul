@@ -131,6 +131,10 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
     // start callback handler
     MainLoop::start();
 
+#ifndef DEBUG
+    set_crash_handlers();
+#endif
+
     return TRUE;
 }
 
@@ -142,11 +146,8 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
 */
 DWORD WINAPI on_process_attach_async(LPVOID lpParam)
 {
-#ifndef DEBUG
-    set_crash_handlers();
-#endif
     Menu::Saves::init_custom_saves();
-    //AntiCheat::start();
+    AntiCheat::start();
     Game::set_gui_hpbar_max();
     Game::stopDurabilityDamage(Mod::stop_durability_damage);
     BloodborneRally::start();
