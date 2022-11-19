@@ -72,7 +72,7 @@ original_code:
 mov     rdi, r8
 mov     [rsp+20h], r8
 mov     rax, rdx
-mov     [rsp+30h], rdx
+mov     [rsp+38h], rdx
 jmp     custom_strings_return
 
 custom_strings_inject ENDP

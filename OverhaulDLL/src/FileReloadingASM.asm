@@ -36,7 +36,7 @@ cmp     ecx, 27h
 jge     abort
 test    edx, edx
 js      abort
-mov     r8, 141D1B360h
+mov     r8, 141c7e000h
 mov     r8, qword ptr [r8]
 ;custom code to change which SoloParamRes we're accessing
 mov     edx, SoloParamRes_curindex

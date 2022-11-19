@@ -12,7 +12,7 @@
 #include "MainLoop.h"
 
 #define DS1_MENU_SAVED_CHARS_CUSTOM_MSG_BUFF_LEN 256
-const uint64_t DS1_MENU_SAVED_CHARS_CUST_STR_INJECTION_OFFSET = 0x5480CE;
+const uint64_t DS1_MENU_SAVED_CHARS_CUST_STR_INJECTION_OFFSET = 0x54a99d;
 
 namespace Menu {
 namespace Saves {
