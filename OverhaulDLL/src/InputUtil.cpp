@@ -85,7 +85,7 @@ inline Status status(XINPUT_GAMEPAD *old, XINPUT_GAMEPAD *current, uint16_t butt
 } // namespace Button
 
 
-static const uint64_t XInput_Get_State_offset = 0x2017ed4;
+static const uint64_t XInput_Get_State_offset = 0x82f790;
 static const uint64_t IDirectInputDevice8GetDeviceState_Keyboard_offset = 0xe2aee0;
 static const uint64_t IDirectInputDevice8GetDeviceState_DIJOYSTATE2_offset = 0xc9e96e;
 
