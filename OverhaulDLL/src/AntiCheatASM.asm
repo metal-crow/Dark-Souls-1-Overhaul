@@ -70,6 +70,7 @@ boss_guard_asm_check PROC
 SUB     RSP,20h
 TEST    byte ptr [RCX+524h],40h
 MOV     RBX,rcx
+jnz     label_jmp_skip_hp_set
 
 sub     rsp, 10h
 movdqu  [rsp], xmm0
@@ -96,7 +97,7 @@ pop     r11
 pop     r10
 pop     r9
 pop     r8
-pop     rcx
+pop     rdx
 pop     rax
 movdqu  xmm3, [rsp]
 add     rsp, 10h
@@ -111,6 +112,7 @@ add     rsp, 10h
 test    rcx, rcx
 MOV     rcx, rbx ;restore rcx
 jz      normal_exit
+label_jmp_skip_hp_set:
 jmp     qword ptr [jmp_skip_hp_set]
 normal_exit:
 jmp     boss_guard_return
