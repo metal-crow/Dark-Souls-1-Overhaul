@@ -1,6 +1,5 @@
 _DATA SEGMENT
 
-FUN_140322a98   dq  140322a98h
 jmp_skip_hp_set dq  14032295bh
 LAB_1405088d9   dq  1405088d9h
 thunk_FUN_142656a04 dq  142656a04h
@@ -57,7 +56,7 @@ add     rsp, 10h
 MOV     EDX,dword ptr [RBX + 3e8h]
 MOV     RCX,RBX
 ADD     EDX,EDI
-jmp     qword ptr [FUN_140322a98]
+jmp     npc_guard_check_exit
 npc_guard_asm_check ENDP
 
 

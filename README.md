@@ -83,7 +83,6 @@ Specify folder location + filenames to use, and the alternate path will be used 
 * Fix the "broken ankles" bug when rolling
 
 * Crash handler and reporter  
-Hope to obsolete this when i make compatable with ModEngine2
 
 * Option to use steam display names instead of character names
 

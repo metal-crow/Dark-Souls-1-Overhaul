@@ -116,7 +116,14 @@ mov     edx, [rbx+3E8h]
 MOV     RCX,RBX
 add     edx, edi
 
-;save temp registers
+sub     rsp, 10h
+movdqu  [rsp], xmm0
+sub     rsp, 10h
+movdqu  [rsp], xmm1
+sub     rsp, 10h
+movdqu  [rsp], xmm2
+sub     rsp, 10h
+movdqu  [rsp], xmm3
 push    rax
 push    rcx
 push    rdx
@@ -124,17 +131,17 @@ push    r8
 push    r9
 push    r10
 push    r11
-sub     rsp, 20h
+sub     rsp, 28h
 
 ;call helper c code
 mov     r9, rdx ;new_hp
-lea     r8, [rsp+20h] ;attack_data
+lea     r8, [rsp+28h] ;attack_data
 add     r8, 8*7 ;account for saved tmp registers
 mov     rdx, rcx ;target
 mov     rcx, r15 ;attacker
 call    main_rally_function
 
-add     rsp, 20h
+add     rsp, 28h
 pop     r11
 pop     r10
 pop     r9
@@ -142,6 +149,14 @@ pop     r8
 pop     rdx
 pop     rcx
 pop     rax
+movdqu  xmm3, [rsp]
+add     rsp, 10h
+movdqu  xmm2, [rsp]
+add     rsp, 10h
+movdqu  xmm1, [rsp]
+add     rsp, 10h
+movdqu  xmm0, [rsp]
+add     rsp, 10h
 jmp     main_rally_injection_return
 
 main_rally_injection ENDP

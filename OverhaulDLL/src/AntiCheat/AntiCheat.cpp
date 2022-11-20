@@ -56,6 +56,7 @@ void start() {
     ConsoleWrite("    Enabling NpcGuard...");
     uint64_t write_address = Game::ds1_base + NpcGuard_offset;
     sp::mem::code::x64::inject_jmp_14b((void*)write_address, &npc_guard_check_exit, 2, &npc_guard_asm_check, true);
+    //npc_guard_check_exit = 0x140322a98; //normally we'd overwrite, but this is chained so need to return into the handler
 
     // Start BossGuard anti-cheat
     ConsoleWrite("    Enabling BossGuard...");
