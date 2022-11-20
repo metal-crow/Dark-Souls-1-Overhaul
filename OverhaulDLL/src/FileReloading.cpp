@@ -126,7 +126,7 @@ void FileReloading::ReloadPlayer(ModMode currentmode, ModMode newmode)
         ReloadPlayer_locks_remaining_mtx.unlock();
 
         // Set bPlayerReload flag to true
-        *((uint8_t*)0x141D151DB) = 1;
+        *((uint8_t*)0x141c77e6b) = 1;
         // Call Force_PlayerReload
         Force_PlayerReload(*(void**)Game::world_chr_man_imp, L"c0000");
     }
