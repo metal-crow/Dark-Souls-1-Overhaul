@@ -16,7 +16,7 @@ PUBLIC send_throw_packet_injection
 send_throw_packet_injection PROC
 ;original code
 mov     rcx, [r14+88h]
-mov     rdx, 141AC8218h
+mov     rdx, 141a2c238h
 call    qword ptr [sendType16NetMessage]
 
 
