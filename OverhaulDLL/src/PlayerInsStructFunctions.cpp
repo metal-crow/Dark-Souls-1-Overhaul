@@ -337,7 +337,7 @@ void copy_PlayerGameData_AttributeInfo(PlayerGameData_AttributeInfo* to, PlayerG
 
 void copy_ChrIns(ChrIns* to, ChrIns* from, bool to_game)
 {
-    copy_ChrIns_field0x18(to->field0x18, from->field0x18);
+    //copy_ChrIns_field0x18(to->field0x18, from->field0x18);
     copy_PlayerCtrl(to->playerCtrl, from->playerCtrl, to_game);
     copy_PadManipulator(to->padManipulator, from->padManipulator);
     to->CharaInitParamID = from->CharaInitParamID;
@@ -378,7 +378,7 @@ ChrIns* init_ChrIns()
 {
     ChrIns* local_ChrIns = (ChrIns*)malloc_(sizeof(ChrIns));
 
-    local_ChrIns->field0x18 = init_ChrIns_field0x18();
+    //local_ChrIns->field0x18 = init_ChrIns_field0x18();
     local_ChrIns->playerCtrl = init_PlayerCtrl();
     local_ChrIns->padManipulator = init_PadManipulator();
     local_ChrIns->specialEffects = init_SpecialEffect();
@@ -393,7 +393,7 @@ ChrIns* init_ChrIns()
 
 void free_ChrIns(ChrIns* to, bool freeself)
 {
-    free_ChrIns_field0x18(to->field0x18);
+    //free_ChrIns_field0x18(to->field0x18);
     free_PlayerCtrl(to->playerCtrl);
     free_PadManipulator(to->padManipulator);
     free_SpecialEffect(to->specialEffects);
@@ -560,7 +560,7 @@ void copy_SpecialEffect_Info(SpecialEffect_Info* to, SpecialEffect_Info* from, b
             //handle if the game's list isn't long enough, and we need to alloc more slots
             if (from->next != NULL && to->next == NULL)
             {
-                to->next = (SpecialEffect_Info*)Game::game_malloc(sizeof(SpecialEffect_Info), 8, (void*)*(uint64_t*)(0x141C04F30)); //internal_heap_3
+                to->next = (SpecialEffect_Info*)Game::game_malloc(sizeof(SpecialEffect_Info), 8, (void*)*(uint64_t*)(0x141b68f20)); //internal_heap_3
                 to->next->next = NULL;
                 to->next->prev = to;
             }

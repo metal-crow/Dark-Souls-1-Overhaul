@@ -794,7 +794,7 @@ static_assert(sizeof(ChrIns_field0x18) == 0x80);
 struct ChrIns
 {
     uint8_t padding_0[8 + 0x18];
-    ChrIns_field0x18* field0x18;
+    uint64_t field0x18;
     uint8_t padding_0a[0x40];
     PlayerCtrl* playerCtrl;
     PadManipulator* padManipulator;
