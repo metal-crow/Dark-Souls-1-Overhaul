@@ -341,13 +341,14 @@ void crash_handler(char* message_str)
     //parent crash directory, if it doesn't exist
     strncat_s(output_dir, "\\crash", sizeof(output_dir));
     _mkdir(output_dir);
+    strncat_s(output_dir, "\\", sizeof(output_dir));
     //crash specific directory
     time_t rawtime;
     struct tm timeinfo;
     char time_str[80];
     time(&rawtime);
     localtime_s(&timeinfo, &rawtime);
-    strftime(time_str, sizeof(time_str), "\\%Y-%m-%d %H-%M-%S", &timeinfo);
+    strftime(time_str, sizeof(time_str), "%Y-%m-%d %H-%M-%S", &timeinfo);
     strncat_s(output_dir, time_str, sizeof(output_dir));
     _mkdir(output_dir);
 
