@@ -241,17 +241,20 @@ void Read_GeneralPlayerData_helper(uint64_t NetworkManipulator)
     PlayerIns* playerins;
 
     uint64_t GeneralPlayerData = *(uint64_t*)(NetworkManipulator + 0x270);
-    uint64_t ConnectedPlayerData = GeneralPlayerData + 0x30;
-    getNetMessage(*(uint64_t*)Game::session_man_imp, ConnectedPlayerData, Rollback::RollbackSinglePacketType, &pkt, sizeof(pkt));
+    uint64_t ConnectedPlayerData = GeneralPlayerData + 0x28;
+    uint32_t res = getNetMessage(*(uint64_t*)Game::session_man_imp, ConnectedPlayerData, Rollback::RollbackSinglePacketType, &pkt, sizeof(pkt));
 
-    playerins = getPlayerInsForConnectedPlayerData(*(void**)Game::world_chr_man_imp, (void*)ConnectedPlayerData);
-    if (playerins == NULL)
+    if (res == sizeof(pkt))
     {
-        FATALERROR("Unable to get PlayerIns for the ConnectedPlayerData %p", ConnectedPlayerData);
-    }
+        playerins = getPlayerInsForConnectedPlayerData(*(void**)Game::world_chr_man_imp, (void*)ConnectedPlayerData);
+        if (playerins == NULL)
+        {
+            FATALERROR("Unable to get PlayerIns for the ConnectedPlayerData %p", ConnectedPlayerData);
+        }
 
-    //temporary, will use this with GGPO later
-    Rollback::LoadRemotePlayerPacket(&pkt, playerins);
+        //temporary, will use this with GGPO later
+        Rollback::LoadRemotePlayerPacket(&pkt, playerins);
+    }
 }
 
 typedef void PlayerIns_SetHp_FUNC(void* playerins, uint64_t curHp);
