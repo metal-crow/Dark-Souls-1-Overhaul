@@ -173,6 +173,14 @@ extern Read_GeneralPlayerData_helper: proc
 
 PUBLIC Read_GeneralPlayerData_injection
 Read_GeneralPlayerData_injection PROC
+;original code
+mov     r11, rsp
+push    rbp
+push    rdi
+push    r15
+lea     rbp, [r11-5Fh]
+sub     rsp, 0D0h
+
 sub     rsp, 10h
 movdqu  [rsp], xmm0
 sub     rsp, 10h
@@ -207,13 +215,7 @@ movdqu  xmm1, [rsp]
 add     rsp, 10h
 movdqu  xmm0, [rsp]
 add     rsp, 10h
-;original code
-mov     r11, rsp
-push    rbp
-push    rdi
-push    r15
-lea     rbp, [r11-5Fh]
-sub     rsp, 0D0h
+
 jmp     Read_GeneralPlayerData_return
 Read_GeneralPlayerData_injection ENDP
 
