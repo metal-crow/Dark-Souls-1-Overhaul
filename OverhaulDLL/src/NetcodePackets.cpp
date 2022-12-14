@@ -108,31 +108,31 @@ bool getNetMessage_helper(uint32_t type)
 }
 
 typedef uint32_t get_AnimationData_FUNC(ActionCtrl* actionctrl, uint32_t i);
-get_AnimationData_FUNC* get_AnimationData = (get_AnimationData_FUNC*)0x140385d00;
+get_AnimationData_FUNC* get_AnimationData = (get_AnimationData_FUNC*)0x1403853c0;
 
 typedef uint32_t PlayerCtrl_Get_WalkAnimTwist_unk_FUNC(PlayerCtrl* playerctrl);
-PlayerCtrl_Get_WalkAnimTwist_unk_FUNC* PlayerCtrl_Get_WalkAnimTwist_unk = (PlayerCtrl_Get_WalkAnimTwist_unk_FUNC*)0x14037c4a0;
+PlayerCtrl_Get_WalkAnimTwist_unk_FUNC* PlayerCtrl_Get_WalkAnimTwist_unk = (PlayerCtrl_Get_WalkAnimTwist_unk_FUNC*)0x14037bb60;
 
 typedef uint32_t FUN_14050ff50_FUNC(float param_1, void* param_2, byte param_3, int param_4, byte param_5);
-FUN_14050ff50_FUNC* FUN_14050ff50 = (FUN_14050ff50_FUNC*)0x14050ff50;
+FUN_14050ff50_FUNC* FUN_14050ff50 = (FUN_14050ff50_FUNC*)0x1405125d0;
 
 typedef uint16_t compress_gamedata_flags_FUNC(uint64_t equipgamedata);
-compress_gamedata_flags_FUNC* compress_gamedata_flags = (compress_gamedata_flags_FUNC*)0x140747900;
+compress_gamedata_flags_FUNC* compress_gamedata_flags = (compress_gamedata_flags_FUNC*)0x14074a5e0;
 
 typedef uint32_t get_currently_selected_magic_id_FUNC(PlayerIns* playerins);
-get_currently_selected_magic_id_FUNC* get_currently_selected_magic_id = (get_currently_selected_magic_id_FUNC*)0x140360650;
+get_currently_selected_magic_id_FUNC* get_currently_selected_magic_id = (get_currently_selected_magic_id_FUNC*)0x14035fd10;
 
 typedef bool sendNetMessageToAllPlayers_FUNC(uint64_t sessionMan, uint32_t type, void* data, int size);
-sendNetMessageToAllPlayers_FUNC* sendNetMessageToAllPlayers = (sendNetMessageToAllPlayers_FUNC*)0x1405098a0;
+sendNetMessageToAllPlayers_FUNC* sendNetMessageToAllPlayers = (sendNetMessageToAllPlayers_FUNC*)0x14050b880;
 
 typedef uint32_t getNetMessage_FUNC(uint64_t session_man, uint64_t ConnectedPlayerData, uint32_t type, void* data_out, int max_size);
-getNetMessage_FUNC* getNetMessage = (getNetMessage_FUNC*)0x140509560;
+getNetMessage_FUNC* getNetMessage = (getNetMessage_FUNC*)0x14050b540;
 
 typedef void GetTimestamp_FUNC(void* timestamp_out);
-GetTimestamp_FUNC* GetTimestamp = (GetTimestamp_FUNC*)0x140d98ef0;
+GetTimestamp_FUNC* GetTimestamp = (GetTimestamp_FUNC*)0x140d9cad0;
 
 typedef uint16_t GetEntityNumForThrow_FUNC(void* WorldChrManImp, void* playerIns);
-GetEntityNumForThrow_FUNC* GetEntityNumForThrow = (GetEntityNumForThrow_FUNC*)0x143576922;
+GetEntityNumForThrow_FUNC* GetEntityNumForThrow = (GetEntityNumForThrow_FUNC*)0x142847c6a;
 
 void send_generalplayerinfo_helper()
 {
@@ -187,18 +187,26 @@ void send_generalplayerinfo_helper()
     pkt.flags = compress_gamedata_flags(equipgamedata);
 
     //Load Type 16
-    uint64_t cur_throw = **(uint64_t**)((*(uint64_t*)Game::throw_man) + 0x68);
-    pkt.attacker_position = *(PosRotFloatVec*)(*(uint64_t*)(cur_throw + 0) + 0x70);
-    pkt.defender_position = *(PosRotFloatVec*)(*(uint64_t*)(cur_throw + 8) + 0x70);
-    pkt.entitynum_defender = GetEntityNumForThrow(*(void**)Game::world_chr_man_imp, (*(PlayerIns**)(*(uint64_t*)(cur_throw + 8) + 0x8)));
-    pkt.entitynum_attacker = GetEntityNumForThrow(*(void**)Game::world_chr_man_imp, (*(PlayerIns**)(*(uint64_t*)(cur_throw + 0) + 0x8)));
-    pkt.throw_id = *(uint16_t*)(cur_throw + 0x10);
+    uint64_t cur_throw_ptr = *(uint64_t*)((*(uint64_t*)Game::throw_man) + 0x68);
+    if (cur_throw_ptr != NULL)
+    {
+        uint64_t cur_throw = *(uint64_t*)cur_throw_ptr;
+        pkt.attacker_position = *(PosRotFloatVec*)(*(uint64_t*)(cur_throw + 0) + 0x70);
+        pkt.defender_position = *(PosRotFloatVec*)(*(uint64_t*)(cur_throw + 8) + 0x70);
+        pkt.entitynum_defender = GetEntityNumForThrow(*(void**)Game::world_chr_man_imp, (*(PlayerIns**)(*(uint64_t*)(cur_throw + 8) + 0x8)));
+        pkt.entitynum_attacker = GetEntityNumForThrow(*(void**)Game::world_chr_man_imp, (*(PlayerIns**)(*(uint64_t*)(cur_throw + 0) + 0x8)));
+        pkt.throw_id = *(uint16_t*)(cur_throw + 0x10);
+    }
+    else
+    {
+        pkt.throw_id = -1;
+    }
 
     //Load Type 17
     pkt.curSelectedMagicId = get_currently_selected_magic_id(playerins);
     pkt.curUsingItemId = (playerins->chrins).curUsedItem.itemId;
 
-    //Load Type 34
+    //Load Type 76
     //need to have this a list of all speffects currently applied to the PC
     //don't need timestamp because we'll refresh every packet
     SpecialEffect_Info* specialEffectInfo = playerins->chrins.specialEffects->specialEffect_Info;
@@ -224,7 +232,7 @@ void send_generalplayerinfo_helper()
 }
 
 typedef PlayerIns* getPlayerInsForConnectedPlayerData_FUNC(void* worldchrman, void* ConnectedPlayerData);
-getPlayerInsForConnectedPlayerData_FUNC* getPlayerInsForConnectedPlayerData = (getPlayerInsForConnectedPlayerData_FUNC*)0x140372710;
+getPlayerInsForConnectedPlayerData_FUNC* getPlayerInsForConnectedPlayerData = (getPlayerInsForConnectedPlayerData_FUNC*)0x140371d90;
 
 void Read_GeneralPlayerData_helper(uint64_t NetworkManipulator)
 {
@@ -247,31 +255,31 @@ void Read_GeneralPlayerData_helper(uint64_t NetworkManipulator)
 }
 
 typedef void PlayerIns_SetHp_FUNC(void* playerins, uint64_t curHp);
-PlayerIns_SetHp_FUNC* PlayerIns_SetHp = (PlayerIns_SetHp_FUNC*)0x1403206c0;
+PlayerIns_SetHp_FUNC* PlayerIns_SetHp = (PlayerIns_SetHp_FUNC*)0x140322910;
 
 typedef void ChrAsm_Set_Equipped_Items_FromNetwork_FUNC(void* EquipGameData, uint32_t index, uint32_t given_item_id, int param_4, bool param_5);
-ChrAsm_Set_Equipped_Items_FromNetwork_FUNC* ChrAsm_Set_Equipped_Items_FromNetwork = (ChrAsm_Set_Equipped_Items_FromNetwork_FUNC*)0x140743b60;
+ChrAsm_Set_Equipped_Items_FromNetwork_FUNC* ChrAsm_Set_Equipped_Items_FromNetwork = (ChrAsm_Set_Equipped_Items_FromNetwork_FUNC*)0x140746840;
 
 typedef void set_playergamedata_flags_FUNC(void* EquipGameData, uint16_t net_data);
-set_playergamedata_flags_FUNC* set_playergamedata_flags = (set_playergamedata_flags_FUNC*)0x140747870;
+set_playergamedata_flags_FUNC* set_playergamedata_flags = (set_playergamedata_flags_FUNC*)0x14074a550;
 
 typedef ChrIns* getEntity_FUNC(uint64_t WorldChrMan, uint32_t entityNum);
-getEntity_FUNC* getEntity = (getEntity_FUNC*)0x1425a71a3;
+getEntity_FUNC* getEntity = (getEntity_FUNC*)0x1428611e2;
 
 typedef void* getThrowParamFromThrowId_FUNC(uint32_t throw_id);
-getThrowParamFromThrowId_FUNC* getThrowParamFromThrowId = (getThrowParamFromThrowId_FUNC*)0x140534b20;
+getThrowParamFromThrowId_FUNC* getThrowParamFromThrowId = (getThrowParamFromThrowId_FUNC*)0x140537210;
 
 typedef void putAttackerIntoThrowAnimation_FUNC(uint64_t param_1);
-putAttackerIntoThrowAnimation_FUNC* putAttackerIntoThrowAnimation = (putAttackerIntoThrowAnimation_FUNC*)0x1403ad660;
+putAttackerIntoThrowAnimation_FUNC* putAttackerIntoThrowAnimation = (putAttackerIntoThrowAnimation_FUNC*)0x1403acc70;
 
 typedef void putDefenderIntoThrowAnimation_FUNC(uint64_t param_1, byte param_2);
-putDefenderIntoThrowAnimation_FUNC* putDefenderIntoThrowAnimation = (putDefenderIntoThrowAnimation_FUNC*)0x1403ad760;
+putDefenderIntoThrowAnimation_FUNC* putDefenderIntoThrowAnimation = (putDefenderIntoThrowAnimation_FUNC*)0x1403acd70;
 
 typedef void Apply_SpeffectSync_FromNetwork_FUNC(void* chrins, uint32_t speffect_id, uint32_t timestamp, float const);
-Apply_SpeffectSync_FromNetwork_FUNC* Apply_SpeffectSync_FromNetwork = (Apply_SpeffectSync_FromNetwork_FUNC*)0x142683b72;
+Apply_SpeffectSync_FromNetwork_FUNC* Apply_SpeffectSync_FromNetwork = (Apply_SpeffectSync_FromNetwork_FUNC*)0x142f69ca9;
 
 typedef void ActionCtrl_ApplyEzState_FUNC(ActionCtrl* actionctrl, uint32_t unk, uint32_t ezState);
-ActionCtrl_ApplyEzState_FUNC* ActionCtrl_ApplyEzState = (ActionCtrl_ApplyEzState_FUNC*)0x140385d80;
+ActionCtrl_ApplyEzState_FUNC* ActionCtrl_ApplyEzState = (ActionCtrl_ApplyEzState_FUNC*)0x140385440;
 
 void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins)
 {
@@ -382,7 +390,7 @@ void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins)
         (playerins->chrins).curUsedItem.amountUsed = 1;
     }
 
-    // Type 34
+    // Type 76
     //remove all old speffects, and apply these as new ones
     uint64_t timestamp_data[2];
     GetTimestamp(&timestamp_data);
@@ -391,7 +399,7 @@ void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins)
     {
         if (pkt->spEffectToApply[i] != -1)
         {
-            Apply_SpeffectSync_FromNetwork(playerins, ((pkt->spEffectToApply[i] << 15) >> 15), timestamp & 0x3fffffff, 1.0f);
+            Apply_SpeffectSync_FromNetwork(playerins, pkt->spEffectToApply[i], timestamp & 0x3fffffff, 1.0f);
         }
     }
 }

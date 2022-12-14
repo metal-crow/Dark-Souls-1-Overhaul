@@ -44,11 +44,11 @@ private:
     static BulletMan* saved_bulletman;
     static class_14152d360* saved_sfxobjs;
 
-    static const uint64_t sendNetMessage_offset = 0x5096d0;
-    static const uint64_t getNetMessage_offset = 0x509560;
-    static const uint64_t send_generalplayerinfo_offset = 0x3980e0;
-    static const uint64_t Read_GeneralPlayerData_offset = 0x395de0;
-    static const uint64_t disableType18PacketEnforcement = 0x35b13b;
+    static const uint64_t sendNetMessage_offset = 0x50b6b0;
+    static const uint64_t getNetMessage_offset = 0x050b540;
+    static const uint64_t send_generalplayerinfo_offset = 0x3976e0;
+    static const uint64_t Read_GeneralPlayerData_offset = 0x3953f0;
+    static const uint64_t disableType18PacketEnforcement = 0x35a7bb;
 
 };
 
