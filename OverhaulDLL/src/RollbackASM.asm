@@ -123,6 +123,13 @@ extern send_generalplayerinfo_helper: proc
 
 PUBLIC send_generalplayerinfo_injection
 send_generalplayerinfo_injection PROC
+;original code
+mov     r11, rsp
+push    rbp
+push    rsi
+lea     rbp, [r11-5Fh]
+sub     rsp, 0B8h
+
 sub     rsp, 10h
 movdqu  [rsp], xmm0
 sub     rsp, 10h
@@ -156,12 +163,7 @@ movdqu  xmm1, [rsp]
 add     rsp, 10h
 movdqu  xmm0, [rsp]
 add     rsp, 10h
-;original code
-mov     r11, rsp
-push    rbp
-push    rsi
-lea     rbp, [r11-5Fh]
-sub     rsp, 0B8h
+
 jmp     send_generalplayerinfo_return
 send_generalplayerinfo_injection ENDP
 

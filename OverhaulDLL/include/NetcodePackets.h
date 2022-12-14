@@ -54,7 +54,7 @@ struct MainPacket
     //Type 17
     uint16_t curSelectedMagicId;
     uint32_t curUsingItemId;
-    //Type 34
+    //Type 76
     uint32_t spEffectToApply[15]; //apply to the playerid that sent this
 };
 #pragma pack(pop)
