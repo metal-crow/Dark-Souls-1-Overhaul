@@ -76,7 +76,14 @@ bool sendNetMessage_helper(uint32_t type)
     }
     else
     {
-        return true;
+        if (type == Rollback::RollbackSinglePacketType)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 }
 
@@ -103,7 +110,14 @@ bool getNetMessage_helper(uint32_t type)
     }
     else
     {
-        return true;
+        if (type == Rollback::RollbackSinglePacketType)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 }
 
@@ -186,7 +200,7 @@ void send_generalplayerinfo_helper(PlayerIns* playerins)
 
     //Load Type 16
     uint64_t cur_throw_ptr = *(uint64_t*)((*(uint64_t*)Game::throw_man) + 0x68);
-    if (cur_throw_ptr != NULL)
+    if (cur_throw_ptr != NULL && *(uint64_t*)cur_throw_ptr != NULL)
     {
         uint64_t cur_throw = *(uint64_t*)cur_throw_ptr;
         pkt.attacker_position = *(PosRotFloatVec*)(*(uint64_t*)(cur_throw + 0) + 0x70);

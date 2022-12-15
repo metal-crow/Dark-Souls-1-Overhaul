@@ -56,6 +56,18 @@ bool input_test(void* unused)
     return true;
 }
 
+bool Rollback::netcodeSwap = false;
+bool netcode_test(void* unused)
+{
+    if (Rollback::netcodeSwap)
+    {
+        Rollback::rollbackEnabled = !Rollback::rollbackEnabled;
+        ConsoleWrite("Rollback netcode %d", Rollback::rollbackEnabled);
+        Rollback::netcodeSwap = false;
+    }
+    return true;
+}
+
 void Rollback::start()
 {
     ConsoleWrite("Rollback...");
@@ -71,6 +83,7 @@ void Rollback::start()
     //TMP save/restore with a hotkey
     MainLoop::setup_mainloop_callback(rollback_test, NULL, "rollback_test");
     MainLoop::setup_mainloop_callback(input_test, NULL, "input_test");
+    MainLoop::setup_mainloop_callback(netcode_test, NULL, "netcode_test");
 }
 
 void Rollback::GameStateSave()

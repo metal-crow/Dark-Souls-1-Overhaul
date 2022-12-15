@@ -33,6 +33,7 @@ public:
     static bool gload;
     static bool isave;
     static bool iload;
+    static bool netcodeSwap;
 
     static bool rollbackEnabled;
 
