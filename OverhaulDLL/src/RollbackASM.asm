@@ -146,7 +146,10 @@ push    r9
 push    r10
 push    r11
 sub     rsp, 28h
+
+mov     rcx, qword ptr [rdx+10h] ;pointer to the PlayerIns parent from PlayerCtrl
 call    send_generalplayerinfo_helper
+
 add     rsp, 28h
 pop     r11
 pop     r10

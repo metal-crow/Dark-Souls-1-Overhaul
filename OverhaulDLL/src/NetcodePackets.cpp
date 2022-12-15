@@ -15,7 +15,7 @@ extern "C" {
 
     uint64_t send_generalplayerinfo_return;
     void send_generalplayerinfo_injection();
-    void send_generalplayerinfo_helper();
+    void send_generalplayerinfo_helper(PlayerIns* p);
 
     uint64_t Read_GeneralPlayerData_return;
     void Read_GeneralPlayerData_injection();
@@ -134,17 +134,15 @@ GetTimestamp_FUNC* GetTimestamp = (GetTimestamp_FUNC*)0x140d9cad0;
 typedef uint16_t GetEntityNumForThrow_FUNC(void* WorldChrManImp, void* playerIns);
 GetEntityNumForThrow_FUNC* GetEntityNumForThrow = (GetEntityNumForThrow_FUNC*)0x142847c6a;
 
-void send_generalplayerinfo_helper()
+void send_generalplayerinfo_helper(PlayerIns* playerins)
 {
     MainPacket pkt;
 
-    auto playerins_o = Game::get_PlayerIns();
-    if (!playerins_o.has_value() || playerins_o.value() == NULL)
+    if (playerins == NULL)
     {
-        ConsoleWrite("ERROR: Tried to get playerins for send_generalplayerinfo_helper, but unable to.");
+        ConsoleWrite("ERROR: playerins value at send_generalplayerinfo_helper is NULL.");
         return;
     }
-    PlayerIns* playerins = (PlayerIns*)playerins_o.value();
 
     //Load Type 1
     pkt.position_x = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x10);
