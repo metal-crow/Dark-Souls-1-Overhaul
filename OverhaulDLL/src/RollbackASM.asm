@@ -192,24 +192,27 @@ sub     rsp, 10h
 movdqu  [rsp], xmm2
 sub     rsp, 10h
 movdqu  [rsp], xmm3
-push    rax
+;push    rax
 push    rcx
 push    rdx
 push    r8
 push    r9
 push    r10
 push    r11
-sub     rsp, 28h
+sub     rsp, 20h
+
 ;NetworkManipulator is passed in implicitly as rcx
 call    Read_GeneralPlayerData_helper
-add     rsp, 28h
+;rax gets set to a const afterwards, so we can clobber it here
+
+add     rsp, 20h
 pop     r11
 pop     r10
 pop     r9
 pop     r8
 pop     rdx
 pop     rcx
-pop     rax
+;pop     rax
 movdqu  xmm3, [rsp]
 add     rsp, 10h
 movdqu  xmm2, [rsp]
@@ -219,6 +222,16 @@ add     rsp, 10h
 movdqu  xmm0, [rsp]
 add     rsp, 10h
 
+;the game for some reason still processes stuff from type1 even if it doesn't get any packet
+;need to exit the function if we're in rollback netcode mode
+cmp     rax, 0
+je      no_rollback
+ADD     RSP, 0D0h
+POP     R15
+POP     RDI
+POP     RBP
+RET
+no_rollback:
 jmp     Read_GeneralPlayerData_return
 Read_GeneralPlayerData_injection ENDP
 

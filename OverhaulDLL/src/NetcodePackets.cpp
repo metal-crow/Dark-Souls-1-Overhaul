@@ -19,7 +19,7 @@ extern "C" {
 
     uint64_t Read_GeneralPlayerData_return;
     void Read_GeneralPlayerData_injection();
-    void Read_GeneralPlayerData_helper(uint64_t NetworkManipulator);
+    uint64_t Read_GeneralPlayerData_helper(uint64_t NetworkManipulator);
 }
 
 void Rollback::NetcodeFix()
@@ -124,12 +124,6 @@ bool getNetMessage_helper(uint32_t type)
 typedef uint32_t get_AnimationData_FUNC(ActionCtrl* actionctrl, uint32_t i);
 get_AnimationData_FUNC* get_AnimationData = (get_AnimationData_FUNC*)0x1403853c0;
 
-typedef uint32_t PlayerCtrl_Get_WalkAnimTwist_unk_FUNC(PlayerCtrl* playerctrl);
-PlayerCtrl_Get_WalkAnimTwist_unk_FUNC* PlayerCtrl_Get_WalkAnimTwist_unk = (PlayerCtrl_Get_WalkAnimTwist_unk_FUNC*)0x14037bb60;
-
-typedef uint32_t FUN_14050ff50_FUNC(float param_1, void* param_2, byte param_3, int param_4, byte param_5);
-FUN_14050ff50_FUNC* FUN_14050ff50 = (FUN_14050ff50_FUNC*)0x1405125d0;
-
 typedef uint16_t compress_gamedata_flags_FUNC(uint64_t equipgamedata);
 compress_gamedata_flags_FUNC* compress_gamedata_flags = (compress_gamedata_flags_FUNC*)0x14074a5e0;
 
@@ -166,15 +160,9 @@ void send_generalplayerinfo_helper(PlayerIns* playerins)
     pkt.ezStatePassiveState = get_AnimationData(playerins->chrins.playerCtrl->chrCtrl.actionctrl, 0);
     pkt.curHp = playerins->chrins.curHp;
     pkt.maxHp = playerins->chrins.curHp;
-    pkt.movementTypeAnimation = PlayerCtrl_Get_WalkAnimTwist_unk(playerins->chrins.playerCtrl);
     pkt.rotation = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4);
-
-    uint32_t type1_unk1 = FUN_14050ff50(*(float*)(((uint64_t)playerins) + 0x954), NULL, 0xd, 5, 1);
-    pkt.type1_unk1 = pkt.type1_unk1 & 0xffffe000;
-    pkt.type1_unk1 = pkt.type1_unk1 | type1_unk1 & 0x1fff;
-    type1_unk1 = FUN_14050ff50(*(float*)(((uint64_t)playerins) + 0x958), NULL, 0xd, 5, 1);
-    pkt.type1_unk1 = pkt.type1_unk1 & 0xfc001fff;
-    pkt.type1_unk1 = pkt.type1_unk1 | (type1_unk1 & 0x1fff) << 0xd;
+    pkt.movement_direction_vals[0] = *(float*)(((uint64_t)(&playerins->chrins.padManipulator->chrManipulator)) + 0x10 + 0);
+    pkt.movement_direction_vals[1] = *(float*)(((uint64_t)(&playerins->chrins.padManipulator->chrManipulator)) + 0x10 + 8);
 
     pkt.type1_unk2 = *(uint8_t*)(((uint64_t)playerins) + 0x94c);
 
@@ -246,7 +234,7 @@ void send_generalplayerinfo_helper(PlayerIns* playerins)
 typedef PlayerIns* getPlayerInsForConnectedPlayerData_FUNC(void* worldchrman, void* ConnectedPlayerData);
 getPlayerInsForConnectedPlayerData_FUNC* getPlayerInsForConnectedPlayerData = (getPlayerInsForConnectedPlayerData_FUNC*)0x140371d90;
 
-void Read_GeneralPlayerData_helper(uint64_t NetworkManipulator)
+uint64_t Read_GeneralPlayerData_helper(uint64_t NetworkManipulator)
 {
     //read in packet for the given connected player
     MainPacket pkt;
@@ -267,6 +255,8 @@ void Read_GeneralPlayerData_helper(uint64_t NetworkManipulator)
         //temporary, will use this with GGPO later
         Rollback::LoadRemotePlayerPacket(&pkt, playerins);
     }
+
+    return Rollback::rollbackEnabled;
 }
 
 typedef void PlayerIns_SetHp_FUNC(void* playerins, uint64_t curHp);
@@ -308,7 +298,12 @@ void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins)
     *(uint32_t*)((uint64_t)(&playerins->playergamedata->attribs) + 4) = pkt->curHp;
     playerins->chrins.maxHp = pkt->maxHp;
     *(uint32_t*)((uint64_t)(&playerins->playergamedata->attribs) + 8) = pkt->maxHp;
-    
+    *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4) = pkt->rotation;
+    *(float*)(((uint64_t)(&playerins->chrins.padManipulator->chrManipulator)) + 0x10 + 0) = pkt->movement_direction_vals[0];
+    *(float*)(((uint64_t)(&playerins->chrins.padManipulator->chrManipulator)) + 0x10 + 4) = 0.0f;
+    *(float*)(((uint64_t)(&playerins->chrins.padManipulator->chrManipulator)) + 0x10 + 8) = pkt->movement_direction_vals[1];
+    *(float*)(((uint64_t)(&playerins->chrins.padManipulator->chrManipulator)) + 0x10 + 0xc) = 0.0f;
+    //type1_unk2
 
     //Type 10
     *(uint32_t*)((uint64_t)(&playerins->playergamedata->attribs) + 0) = pkt->player_num;

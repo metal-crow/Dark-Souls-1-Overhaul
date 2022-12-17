@@ -29,9 +29,8 @@ struct MainPacket
     uint32_t ezStatePassiveState;
     int16_t curHp;
     int16_t maxHp; //just use the normal max hp for this
-    uint32_t movementTypeAnimation;
     float rotation; //just use the normal rotation for this, not the weird version the game uses
-    uint32_t type1_unk1;
+    float movement_direction_vals[2]; //this can theoretically be compressed, we don't need the full float range
     uint8_t type1_unk2;
     //Type 10
     int32_t player_num;
