@@ -1508,8 +1508,6 @@ FinishStep_Havok_FUNC* FinishStep_Havok = (FinishStep_Havok_FUNC*)0x1402a32d0;
 typedef void MoveMapStep_Step_13_FUNC(void* movemapstep, float frame_time);
 MoveMapStep_Step_13_FUNC* MoveMapStep_Step_13 = (MoveMapStep_Step_13_FUNC*)0x14024f6b0;
 
-static const float FRAMETIME = 0.01666666666f;
-
 void Game::Step_GameSimulation(bool renderFrame)
 {
     void* MoveMapStep = Game::get_MoveMapStep();

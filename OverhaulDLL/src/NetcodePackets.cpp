@@ -48,6 +48,7 @@ void Rollback::NetcodeFix()
     // the client does see the other attacking player as a normal npc, and is capable of applying damage the normal way
     // but explicitly doesn't if the other player is a PC
     // disable that throw away check and just return 0 instead
+    //TODO make this a toggle
     write_address = (uint8_t*)(Rollback::disableType18PacketEnforcement + Game::ds1_base);
     uint8_t disableType18PacketEnforcement_patch[] = { 0x48, 0x31, 0xc0, 0x90, 0x90, 0x90 }; //xor    rax,rax | nop | nop | nop
     sp::mem::patch_bytes(write_address, disableType18PacketEnforcement_patch, sizeof(disableType18PacketEnforcement_patch));
@@ -66,7 +67,7 @@ bool sendNetMessage_helper(uint32_t type)
         case 16:
         case 17:
         case 18:
-        case 34:
+        case 76:
         case 35:
         case 70:
             return false;
@@ -100,7 +101,7 @@ bool getNetMessage_helper(uint32_t type)
         case 16:
         case 17:
         case 18:
-        case 34:
+        case 76:
         case 35:
         case 70:
             return false;
@@ -191,10 +192,17 @@ void send_generalplayerinfo_helper(PlayerIns* playerins)
     if (cur_throw_ptr != NULL && *(uint64_t*)cur_throw_ptr != NULL)
     {
         uint64_t cur_throw = *(uint64_t*)cur_throw_ptr;
+        PlayerIns* atk_playerins = (*(PlayerIns**)(*(uint64_t*)(cur_throw + 0) + 0x8));
+        PlayerIns* def_playerins = (*(PlayerIns**)(*(uint64_t*)(cur_throw + 8) + 0x8));
+
         pkt.attacker_position = *(PosRotFloatVec*)(*(uint64_t*)(cur_throw + 0) + 0x70);
+        pkt.attacker_position.Rotation = *(float*)(((uint64_t)atk_playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4);
+
         pkt.defender_position = *(PosRotFloatVec*)(*(uint64_t*)(cur_throw + 8) + 0x70);
-        pkt.entitynum_defender = GetEntityNumForThrow(*(void**)Game::world_chr_man_imp, (*(PlayerIns**)(*(uint64_t*)(cur_throw + 8) + 0x8)));
-        pkt.entitynum_attacker = GetEntityNumForThrow(*(void**)Game::world_chr_man_imp, (*(PlayerIns**)(*(uint64_t*)(cur_throw + 0) + 0x8)));
+        pkt.defender_position.Rotation = *(float*)(((uint64_t)def_playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4);
+
+        pkt.entitynum_defender = GetEntityNumForThrow(*(void**)Game::world_chr_man_imp, def_playerins);
+        pkt.entitynum_attacker = GetEntityNumForThrow(*(void**)Game::world_chr_man_imp, atk_playerins);
         pkt.throw_id = *(uint16_t*)(cur_throw + 0x10);
     }
     else
@@ -286,6 +294,9 @@ Apply_SpeffectSync_FromNetwork_FUNC* Apply_SpeffectSync_FromNetwork = (Apply_Spe
 typedef void ActionCtrl_ApplyEzState_FUNC(ActionCtrl* actionctrl, uint32_t unk, uint32_t ezState);
 ActionCtrl_ApplyEzState_FUNC* ActionCtrl_ApplyEzState = (ActionCtrl_ApplyEzState_FUNC*)0x140385440;
 
+typedef void ChrCtrl_Func_30_FUNC(ChrCtrl* param_1, float FrameTime_const);
+ChrCtrl_Func_30_FUNC* ChrCtrl_Func_30 = (ChrCtrl_Func_30_FUNC*)0x14037c250;
+
 void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins)
 {
     //Type 1
@@ -331,38 +342,26 @@ void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins)
         uint64_t attacker_throw_info = (uint64_t)attacker->throw_animation_info;
         uint64_t defender_throw_info = (uint64_t)defender->throw_animation_info;
 
-        //position
-        *(float*)((uint64_t)(attacker->playerCtrl->chrCtrl.actionctrl) + 0x4e0 + 0) = pkt->attacker_position.X;
-        *(float*)((uint64_t)(attacker->playerCtrl->chrCtrl.actionctrl) + 0x4e0 + 4) = pkt->attacker_position.Y;
-        *(float*)((uint64_t)(attacker->playerCtrl->chrCtrl.actionctrl) + 0x4e0 + 8) = pkt->attacker_position.Z;
-        *(float*)((uint64_t)(attacker->playerCtrl->chrCtrl.actionctrl) + 0x4e0 + 0xc) = 1;
-
-        *(float*)((uint64_t)(defender->playerCtrl->chrCtrl.actionctrl) + 0x4e0 + 0) = pkt->defender_position.X;
-        *(float*)((uint64_t)(defender->playerCtrl->chrCtrl.actionctrl) + 0x4e0 + 4) = pkt->defender_position.Y;
-        *(float*)((uint64_t)(defender->playerCtrl->chrCtrl.actionctrl) + 0x4e0 + 8) = pkt->defender_position.Z;
-        *(float*)((uint64_t)(defender->playerCtrl->chrCtrl.actionctrl) + 0x4e0 + 0xc) = 1;
-
-        *(float*)(attacker_throw_info + 0x70 + 0) = pkt->attacker_position.X;
-        *(float*)(attacker_throw_info + 0x70 + 4) = pkt->attacker_position.Z;
-        *(float*)(attacker_throw_info + 0x70 + 8) = pkt->attacker_position.Y;
-        *(float*)(attacker_throw_info + 0x70 + 0xc) = 1;
-
-        *(float*)(defender_throw_info + 0x70 + 0) = pkt->defender_position.X;
-        *(float*)(defender_throw_info + 0x70 + 4) = pkt->defender_position.Z;
-        *(float*)(defender_throw_info + 0x70 + 8) = pkt->defender_position.Y;
-        *(float*)(defender_throw_info + 0x70 + 0xc) = 1;
-
+        //position    
+        *(float*)(((uint64_t)attacker->playerCtrl->chrCtrl.havokChara) + 0x10) = pkt->attacker_position.X;
+        *(float*)(((uint64_t)attacker->playerCtrl->chrCtrl.havokChara) + 0x14) = pkt->attacker_position.Z;
+        *(float*)(((uint64_t)attacker->playerCtrl->chrCtrl.havokChara) + 0x18) = pkt->attacker_position.Y;
+        
+        *(float*)(((uint64_t)defender->playerCtrl->chrCtrl.havokChara) + 0x10) = pkt->defender_position.X;
+        *(float*)(((uint64_t)defender->playerCtrl->chrCtrl.havokChara) + 0x14) = pkt->defender_position.Z;
+        *(float*)(((uint64_t)defender->playerCtrl->chrCtrl.havokChara) + 0x18) = pkt->defender_position.Y;
+        
         //rotation
         *(float*)((uint64_t)(attacker->playerCtrl->chrCtrl.actionctrl) + 0x500 + 0) = 0;
         *(float*)((uint64_t)(attacker->playerCtrl->chrCtrl.actionctrl) + 0x500 + 4) = pkt->attacker_position.Rotation;
         *(float*)((uint64_t)(attacker->playerCtrl->chrCtrl.actionctrl) + 0x500 + 8) = 0;
         *(float*)((uint64_t)(attacker->playerCtrl->chrCtrl.actionctrl) + 0x500 + 0xc) = 0;
-
+                
         *(float*)((uint64_t)(defender->playerCtrl->chrCtrl.actionctrl) + 0x500 + 0) = 0;
         *(float*)((uint64_t)(defender->playerCtrl->chrCtrl.actionctrl) + 0x500 + 4) = pkt->defender_position.Rotation;
         *(float*)((uint64_t)(defender->playerCtrl->chrCtrl.actionctrl) + 0x500 + 8) = 0;
         *(float*)((uint64_t)(defender->playerCtrl->chrCtrl.actionctrl) + 0x500 + 0xc) = 0;
-
+        
         //override_nonthrow_positionAndRotation
         *(uint8_t*)((uint64_t)(attacker->playerCtrl->chrCtrl.actionctrl) + 0x520) = 1;
         *(uint8_t*)((uint64_t)(defender->playerCtrl->chrCtrl.actionctrl) + 0x520) = 1;
@@ -384,12 +383,15 @@ void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins)
         *(void**)(defender_throw_info + 0x10 + 0) = getThrowParamFromThrowId(pkt->throw_id);
 
         //ThrowPairHandle
-        *(uint32_t*)(attacker_throw_info + 0x24) = *(uint32_t*)(uint64_t)(defender + 8);
-        *(uint32_t*)(defender_throw_info + 0x24) = *(uint32_t*)(uint64_t)(attacker + 8);
+        *(uint32_t*)(attacker_throw_info + 0x24) = *(uint32_t*)((uint64_t)(defender) + 8);
+        *(uint32_t*)(defender_throw_info + 0x24) = *(uint32_t*)((uint64_t)(attacker) + 8);
 
         //putIntoThrowAnimation
         putAttackerIntoThrowAnimation(attacker_throw_info);
         putDefenderIntoThrowAnimation(defender_throw_info, 1);
+
+        //force the game to recheck the animation mediator and set the animation queue. Otherwise it'll miss this data being set and overwrite it start of next frame.
+        ChrCtrl_Func_30(&defender->playerCtrl->chrCtrl, FRAMETIME);
     }
 
     //Type 17

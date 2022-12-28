@@ -112,6 +112,8 @@ enum SessionActionResultEnum
     JoinSessionSuccess = 6
 };
 
+static const float FRAMETIME = 0.01666666666f;
+
 class Game
 {
 public:
