@@ -213,6 +213,12 @@ void Game::injections_init()
     //remove the handles when they get destroyed
     write_address = (uint8_t*)(Game::Destruct_DLThread_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &grab_destruct_thread_handle_return, 1, &grab_destruct_thread_handle_injection);
+
+    //inject code to skip the logos
+    //set the state of the logo class to always be "next menu"
+    uint8_t pat[] = { 0xb9, 0x03, 0x0, 0x0, 0x0, 0x90 };
+    write_address = (uint8_t*)(Game::LogoSkip_offset + Game::ds1_base);
+    sp::mem::patch_bytes(write_address, pat, 6);
 }
 
 static bool character_reload_run = false;

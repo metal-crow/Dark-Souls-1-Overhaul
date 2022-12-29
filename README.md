@@ -108,6 +108,8 @@ You can also edit the file while the game is running, and reloading your save wi
 
 * Compatible with [Painted Worlds](https://www.nexusmods.com/darksoulsremastered/mods/527)
 
+* Skips the intro logos
+
 ### Overhaul
 
 * Gestures can be canceled via rolling
