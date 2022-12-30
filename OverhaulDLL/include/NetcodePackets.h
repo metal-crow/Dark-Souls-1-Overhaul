@@ -31,7 +31,6 @@ struct MainPacket
     int16_t maxHp; //just use the normal max hp for this
     float rotation; //just use the normal rotation for this, not the weird version the game uses
     float movement_direction_vals[2]; //this can theoretically be compressed, we don't need the full float range
-    uint8_t type1_unk2;
     //Type 10
     int32_t player_num;
     uint8_t player_sex;

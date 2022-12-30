@@ -160,12 +160,10 @@ void send_generalplayerinfo_helper(PlayerIns* playerins)
     pkt.ezStateActiveState = get_AnimationData(playerins->chrins.playerCtrl->chrCtrl.actionctrl, 1);
     pkt.ezStatePassiveState = get_AnimationData(playerins->chrins.playerCtrl->chrCtrl.actionctrl, 0);
     pkt.curHp = playerins->chrins.curHp;
-    pkt.maxHp = playerins->chrins.curHp;
+    pkt.maxHp = playerins->chrins.maxHp;
     pkt.rotation = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4);
     pkt.movement_direction_vals[0] = *(float*)(((uint64_t)(&playerins->chrins.padManipulator->chrManipulator)) + 0x10 + 0);
     pkt.movement_direction_vals[1] = *(float*)(((uint64_t)(&playerins->chrins.padManipulator->chrManipulator)) + 0x10 + 8);
-
-    pkt.type1_unk2 = *(uint8_t*)(((uint64_t)playerins) + 0x94c);
 
     //Load Type 10
     uint64_t playergamedata = *(uint64_t*)(*(uint64_t*)(Game::game_data_man) + 0x10);
@@ -314,7 +312,6 @@ void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins)
     *(float*)(((uint64_t)(&playerins->chrins.padManipulator->chrManipulator)) + 0x10 + 4) = 0.0f;
     *(float*)(((uint64_t)(&playerins->chrins.padManipulator->chrManipulator)) + 0x10 + 8) = pkt->movement_direction_vals[1];
     *(float*)(((uint64_t)(&playerins->chrins.padManipulator->chrManipulator)) + 0x10 + 0xc) = 0.0f;
-    //type1_unk2
 
     //Type 10
     *(uint32_t*)((uint64_t)(&playerins->playergamedata->attribs) + 0) = pkt->player_num;
