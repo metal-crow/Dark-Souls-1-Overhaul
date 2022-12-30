@@ -235,6 +235,70 @@ no_rollback:
 jmp     Read_GeneralPlayerData_return
 Read_GeneralPlayerData_injection ENDP
 
+
+EXTERN disableType18PacketEnforcement_return: qword
+extern disableType18PacketEnforcement_helper: proc
+
+PUBLIC disableType18PacketEnforcement_injection
+disableType18PacketEnforcement_injection PROC
+;original code
+push    rbx
+sub     rsp, 20h
+
+sub     rsp, 10h
+movdqu  [rsp], xmm0
+sub     rsp, 10h
+movdqu  [rsp], xmm1
+sub     rsp, 10h
+movdqu  [rsp], xmm2
+sub     rsp, 10h
+movdqu  [rsp], xmm3
+;push    rax
+push    rcx
+push    rdx
+push    r8
+push    r9
+push    r10
+push    r11
+sub     rsp, 20h
+
+;playerins passed in implicitly as rcx
+call    disableType18PacketEnforcement_helper
+;can clobber rax since it's nativly restored afterwards
+
+add     rsp, 20h
+pop     r11
+pop     r10
+pop     r9
+pop     r8
+pop     rdx
+pop     rcx
+;pop     rax
+movdqu  xmm3, [rsp]
+add     rsp, 10h
+movdqu  xmm2, [rsp]
+add     rsp, 10h
+movdqu  xmm1, [rsp]
+add     rsp, 10h
+movdqu  xmm0, [rsp]
+add     rsp, 10h
+
+cmp     rax, 0
+jne     normal_exit
+
+forced_check_exit:
+add     rsp, 20h
+pop     rbx
+ret
+
+normal_exit:
+;original code
+mov     rax, [rcx]
+mov     rbx, rcx
+call    qword ptr [rax+140h]
+jmp     disableType18PacketEnforcement_return
+disableType18PacketEnforcement_injection ENDP
+
 _TEXT    ENDS
 
 END

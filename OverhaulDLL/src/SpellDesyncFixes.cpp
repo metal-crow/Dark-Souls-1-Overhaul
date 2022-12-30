@@ -84,7 +84,7 @@ void homing_spell_trigger_injection_helper_function(uint32_t target, float* bull
     homingPkt.owner = owner_o.value();
 
     //handle if the target is a PC or an NPC
-    if (target > Game::PC_Handle && target < Game::PC_Handle + 10)
+    if (target >= Game::PC_Handle && target < Game::PC_Handle + 10)
     {
         auto target_o = Game::convert_handle_to_playernum(target);
         if (target_o.has_value())

@@ -20,6 +20,10 @@ extern "C" {
     uint64_t Read_GeneralPlayerData_return;
     void Read_GeneralPlayerData_injection();
     uint64_t Read_GeneralPlayerData_helper(uint64_t NetworkManipulator);
+
+    uint64_t disableType18PacketEnforcement_return;
+    void disableType18PacketEnforcement_injection();
+    uint64_t disableType18PacketEnforcement_helper(PlayerIns* pc);
 }
 
 void Rollback::NetcodeFix()
@@ -48,10 +52,9 @@ void Rollback::NetcodeFix()
     // the client does see the other attacking player as a normal npc, and is capable of applying damage the normal way
     // but explicitly doesn't if the other player is a PC
     // disable that throw away check and just return 0 instead
-    //TODO make this a toggle
-    write_address = (uint8_t*)(Rollback::disableType18PacketEnforcement + Game::ds1_base);
-    uint8_t disableType18PacketEnforcement_patch[] = { 0x48, 0x31, 0xc0, 0x90, 0x90, 0x90 }; //xor    rax,rax | nop | nop | nop
-    sp::mem::patch_bytes(write_address, disableType18PacketEnforcement_patch, sizeof(disableType18PacketEnforcement_patch));
+    // Do this by modifying the PlayerIns_Is_PC function to always return false for phantoms. This fixes the check everywhere it's done
+    write_address = (uint8_t*)(Rollback::disableType18PacketEnforcement_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &disableType18PacketEnforcement_return, 4, &disableType18PacketEnforcement_injection);
 }
 
 //return false if we don't want to have sendNetMessage send a packet
@@ -411,4 +414,21 @@ void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins)
             Apply_SpeffectSync_FromNetwork(playerins, pkt->spEffectToApply[i], timestamp & 0x3fffffff, 1.0f);
         }
     }
+}
+
+uint64_t disableType18PacketEnforcement_helper(PlayerIns* pc)
+{
+    if (!Rollback::rollbackEnabled)
+    {
+        return 1;
+    }
+
+    //return 0 if this is a phantom
+    uint32_t handle = *(uint32_t*)((uint64_t)(&pc->chrins) + 8);
+    if (handle >= Game::PC_Handle && handle < Game::PC_Handle + 10)
+    {
+        return 0;
+    }
+
+    return 1;
 }
