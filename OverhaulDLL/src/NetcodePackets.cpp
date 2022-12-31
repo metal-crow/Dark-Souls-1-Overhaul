@@ -2,6 +2,7 @@
 #include "NetcodePackets.h"
 #include "SP/memory.h"
 #include "SP/memory/injection/asm/x64.h"
+#include <unordered_set>
 
 extern "C" {
 
@@ -162,6 +163,7 @@ void send_generalplayerinfo_helper(PlayerIns* playerins)
     pkt.curHp = playerins->chrins.curHp;
     pkt.maxHp = playerins->chrins.maxHp;
     pkt.rotation = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4);
+    pkt.atkAngle = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0);
     pkt.movement_direction_vals[0] = *(float*)(((uint64_t)(&playerins->chrins.padManipulator->chrManipulator)) + 0x10 + 0);
     pkt.movement_direction_vals[1] = *(float*)(((uint64_t)(&playerins->chrins.padManipulator->chrManipulator)) + 0x10 + 8);
 
@@ -312,6 +314,7 @@ void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins)
     *(uint32_t*)((uint64_t)(&playerins->playergamedata->attribs) + 8) = pkt->maxHp;
     *(uint32_t*)((uint64_t)(&playerins->playergamedata->attribs) + 0xC) = pkt->maxHp;
     *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4) = pkt->rotation;
+    *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0) = pkt->atkAngle;
     *(float*)(((uint64_t)(&playerins->chrins.padManipulator->chrManipulator)) + 0x10 + 0) = pkt->movement_direction_vals[0];
     *(float*)(((uint64_t)(&playerins->chrins.padManipulator->chrManipulator)) + 0x10 + 4) = 0.0f;
     *(float*)(((uint64_t)(&playerins->chrins.padManipulator->chrManipulator)) + 0x10 + 8) = pkt->movement_direction_vals[1];
@@ -404,19 +407,30 @@ void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins)
     }
 
     // Type 76
-    //remove all old speffects, and apply these as new ones
-    //by totally resetting the speffects every time, we don't have to worry about life
+    std::unordered_set<uint32_t> packetSpEffectToApply(pkt->spEffectToApply, &pkt->spEffectToApply[15]);
+    packetSpEffectToApply.erase(-1);
+    //extend or remove current speffects
     SpecialEffect_Info* head = playerins->chrins.specialEffects->specialEffect_Info;
     while (head != 0)
     {
-        head = SpecialEffect_Remove_SpecialEffectInfo(playerins->chrins.specialEffects, head, 0x1);
-    }
-    for (size_t i = 0; i < sizeof(pkt->spEffectToApply) / sizeof(uint32_t); i++)
-    {
-        if (pkt->spEffectToApply[i] != -1)
+        uint32_t speffect_id = *(uint32_t*)(((uint64_t)head) + 0x30);
+        //if we still have the speffect, reextend it's life
+        if (packetSpEffectToApply.count(speffect_id))
         {
-            Apply_Speffect(playerins->chrins.specialEffects, pkt->spEffectToApply[i], 1.0f);
+            *(float*)((uint64_t)head) = 1.0f;
+            packetSpEffectToApply.erase(speffect_id);
+            head = head->next;
         }
+        //otherwise remove the effect
+        else
+        {
+            head = SpecialEffect_Remove_SpecialEffectInfo(playerins->chrins.specialEffects, head, 0x1);
+        }
+    }
+    //finally add the effects we don't already have
+    for (uint32_t speffect_id : packetSpEffectToApply)
+    {
+        Apply_Speffect(playerins->chrins.specialEffects, speffect_id, 1.0f);
     }
 }
 
