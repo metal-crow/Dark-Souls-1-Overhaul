@@ -140,9 +140,6 @@ sendNetMessageToAllPlayers_FUNC* sendNetMessageToAllPlayers = (sendNetMessageToA
 typedef uint32_t getNetMessage_FUNC(uint64_t session_man, uint64_t ConnectedPlayerData, uint32_t type, void* data_out, int max_size);
 getNetMessage_FUNC* getNetMessage = (getNetMessage_FUNC*)0x14050b540;
 
-typedef void GetTimestamp_FUNC(void* timestamp_out);
-GetTimestamp_FUNC* GetTimestamp = (GetTimestamp_FUNC*)0x140d9cad0;
-
 typedef uint16_t GetEntityNumForThrow_FUNC(void* WorldChrManImp, void* playerIns);
 GetEntityNumForThrow_FUNC* GetEntityNumForThrow = (GetEntityNumForThrow_FUNC*)0x142847c6a;
 
@@ -289,8 +286,11 @@ putAttackerIntoThrowAnimation_FUNC* putAttackerIntoThrowAnimation = (putAttacker
 typedef void putDefenderIntoThrowAnimation_FUNC(uint64_t param_1, byte param_2);
 putDefenderIntoThrowAnimation_FUNC* putDefenderIntoThrowAnimation = (putDefenderIntoThrowAnimation_FUNC*)0x1403acd70;
 
-typedef void Apply_SpeffectSync_FromNetwork_FUNC(void* chrins, uint32_t speffect_id, uint32_t timestamp, float const);
-Apply_SpeffectSync_FromNetwork_FUNC* Apply_SpeffectSync_FromNetwork = (Apply_SpeffectSync_FromNetwork_FUNC*)0x142f69ca9;
+typedef void Apply_Speffect_FUNC(SpecialEffect*, uint32_t speffect_id, float const);
+Apply_Speffect_FUNC* Apply_Speffect = (Apply_Speffect_FUNC*)0x140402af0;
+
+typedef SpecialEffect_Info* SpecialEffect_Remove_SpecialEffectInfo_FUNC(SpecialEffect*, SpecialEffect_Info*, uint8_t const);
+SpecialEffect_Remove_SpecialEffectInfo_FUNC* SpecialEffect_Remove_SpecialEffectInfo = (SpecialEffect_Remove_SpecialEffectInfo_FUNC*)0x140405ee0;
 
 typedef void ActionCtrl_ApplyEzState_FUNC(ActionCtrl* actionctrl, uint32_t unk, uint32_t ezState);
 ActionCtrl_ApplyEzState_FUNC* ActionCtrl_ApplyEzState = (ActionCtrl_ApplyEzState_FUNC*)0x140385440;
@@ -310,6 +310,7 @@ void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins)
     *(uint32_t*)((uint64_t)(&playerins->playergamedata->attribs) + 4) = pkt->curHp;
     playerins->chrins.maxHp = pkt->maxHp;
     *(uint32_t*)((uint64_t)(&playerins->playergamedata->attribs) + 8) = pkt->maxHp;
+    *(uint32_t*)((uint64_t)(&playerins->playergamedata->attribs) + 0xC) = pkt->maxHp;
     *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4) = pkt->rotation;
     *(float*)(((uint64_t)(&playerins->chrins.padManipulator->chrManipulator)) + 0x10 + 0) = pkt->movement_direction_vals[0];
     *(float*)(((uint64_t)(&playerins->chrins.padManipulator->chrManipulator)) + 0x10 + 4) = 0.0f;
@@ -404,14 +405,17 @@ void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins)
 
     // Type 76
     //remove all old speffects, and apply these as new ones
-    uint64_t timestamp_data[2];
-    GetTimestamp(&timestamp_data);
-    uint32_t timestamp = (uint32_t)(timestamp_data[0] / 10000 >> 4);
+    //by totally resetting the speffects every time, we don't have to worry about life
+    SpecialEffect_Info* head = playerins->chrins.specialEffects->specialEffect_Info;
+    while (head != 0)
+    {
+        head = SpecialEffect_Remove_SpecialEffectInfo(playerins->chrins.specialEffects, head, 0x1);
+    }
     for (size_t i = 0; i < sizeof(pkt->spEffectToApply) / sizeof(uint32_t); i++)
     {
         if (pkt->spEffectToApply[i] != -1)
         {
-            Apply_SpeffectSync_FromNetwork(playerins, pkt->spEffectToApply[i], timestamp & 0x3fffffff, 1.0f);
+            Apply_Speffect(playerins->chrins.specialEffects, pkt->spEffectToApply[i], 1.0f);
         }
     }
 }
