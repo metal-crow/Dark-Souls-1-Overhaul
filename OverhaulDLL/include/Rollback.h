@@ -50,7 +50,7 @@ private:
     static const uint64_t send_generalplayerinfo_offset = 0x3976e0;
     static const uint64_t Read_GeneralPlayerData_offset = 0x3953f0;
     static const uint64_t disableType18PacketEnforcement_offset = 0x3226e0;
-
+    static const uint64_t fixPhantomBulletGenIssue_offset = 0x4229bf;
 };
 
 inline void* malloc_(size_t size)

@@ -299,6 +299,70 @@ call    qword ptr [rax+140h]
 jmp     disableType18PacketEnforcement_return
 disableType18PacketEnforcement_injection ENDP
 
+
+EXTERN fixPhantomBulletGenIssue_return: qword
+extern fixPhantomBulletGenIssue_helper: proc
+
+PUBLIC fixPhantomBulletGenIssue_injection
+fixPhantomBulletGenIssue_injection PROC
+;original code
+mov     rax, [rax]
+mov     rcx, rbx
+
+sub     rsp, 10h
+movdqu  [rsp], xmm0
+sub     rsp, 10h
+movdqu  [rsp], xmm1
+sub     rsp, 10h
+movdqu  [rsp], xmm2
+sub     rsp, 10h
+movdqu  [rsp], xmm3
+;push    rax
+push    rcx
+push    rdx
+push    r8
+push    r9
+push    r10
+push    r11
+sub     rsp, 20h
+
+;playerins passed in implicitly as rcx
+call    fixPhantomBulletGenIssue_helper
+;rax will be either used, or fixed up
+
+add     rsp, 20h
+pop     r11
+pop     r10
+pop     r9
+pop     r8
+pop     rdx
+pop     rcx
+;pop     rax
+movdqu  xmm3, [rsp]
+add     rsp, 10h
+movdqu  xmm2, [rsp]
+add     rsp, 10h
+movdqu  xmm1, [rsp]
+add     rsp, 10h
+movdqu  xmm0, [rsp]
+add     rsp, 10h
+
+cmp     al, 1
+jne     normal_exit
+
+force_true_exit:
+test    al, al
+jmp     fixPhantomBulletGenIssue_return
+
+normal_exit:
+mov     rax, [rcx]
+;original code
+call    qword ptr [rax+148h]
+test    al, al
+jmp     fixPhantomBulletGenIssue_return
+
+fixPhantomBulletGenIssue_injection ENDP
+
 _TEXT    ENDS
 
 END

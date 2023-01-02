@@ -25,6 +25,10 @@ extern "C" {
     uint64_t disableType18PacketEnforcement_return;
     void disableType18PacketEnforcement_injection();
     uint64_t disableType18PacketEnforcement_helper(PlayerIns* pc);
+
+    uint64_t fixPhantomBulletGenIssue_return;
+    void fixPhantomBulletGenIssue_injection();
+    uint64_t fixPhantomBulletGenIssue_helper(PlayerIns* pc);
 }
 
 void Rollback::NetcodeFix()
@@ -56,6 +60,12 @@ void Rollback::NetcodeFix()
     // Do this by modifying the PlayerIns_Is_PC function to always return false for phantoms. This fixes the check everywhere it's done
     write_address = (uint8_t*)(Rollback::disableType18PacketEnforcement_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &disableType18PacketEnforcement_return, 4, &disableType18PacketEnforcement_injection);
+
+    // With the above type 18 packet fix, we have a bug where followup bullets from flamesurge don't get emitted
+    // It checks the PlayerIns_Is_PC func and fails if it returns false
+    // Patch this to be an exception and return true instead of false
+    write_address = (uint8_t*)(Rollback::fixPhantomBulletGenIssue_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &fixPhantomBulletGenIssue_return, 0, &fixPhantomBulletGenIssue_injection);
 }
 
 //return false if we don't want to have sendNetMessage send a packet
@@ -449,4 +459,17 @@ uint64_t disableType18PacketEnforcement_helper(PlayerIns* pc)
     }
 
     return 1;
+}
+
+uint64_t fixPhantomBulletGenIssue_helper(PlayerIns* pc)
+{
+    //return 0 to do nothing, return 1 if we need to fix the bullet bug
+    if (!Rollback::rollbackEnabled)
+    {
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
 }
