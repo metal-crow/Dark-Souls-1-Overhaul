@@ -310,6 +310,12 @@ ActionCtrl_ApplyEzState_FUNC* ActionCtrl_ApplyEzState = (ActionCtrl_ApplyEzState
 typedef void ChrCtrl_Func_30_FUNC(ChrCtrl* param_1, float FrameTime_const);
 ChrCtrl_Func_30_FUNC* ChrCtrl_Func_30 = (ChrCtrl_Func_30_FUNC*)0x14037c250;
 
+typedef void Set_Player_Sex_Specific_Attribs_FUNC(EquipGameData * EquipGameData, int playerSex, int chrType);
+Set_Player_Sex_Specific_Attribs_FUNC* Set_Player_Sex_Specific_Attribs = (Set_Player_Sex_Specific_Attribs_FUNC*)0x14074bf30;
+
+typedef void PlayerIns_Update_curSelectedMagicId_FUNC(PlayerIns* param_1, uint32_t curSelectedMagicId);
+PlayerIns_Update_curSelectedMagicId_FUNC* PlayerIns_Update_curSelectedMagicId = (PlayerIns_Update_curSelectedMagicId_FUNC*)0x14035fd80;
+
 void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins)
 {
     //Type 1
@@ -333,6 +339,8 @@ void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins)
     //Type 10
     *(uint32_t*)((uint64_t)(&playerins->playergamedata->attribs) + 0) = pkt->player_num;
     *(uint8_t*)((uint64_t)(&playerins->playergamedata->attribs) + 0xba) = pkt->player_sex;
+    uint32_t chrType = *(uint32_t*)(((uint64_t)&playerins->playergamedata->attribs) + 0x94);
+    Set_Player_Sex_Specific_Attribs(&playerins->playergamedata->equipGameData, pkt->player_sex, chrType);
     *(uint8_t*)((uint64_t)(&playerins->playergamedata->attribs) + 0x103) = pkt->covenantId;
     for (uint32_t i = 0; i < 20; i++)
     {
@@ -344,9 +352,12 @@ void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins)
     *(float*)(equipgamedata + 0x110) = pkt->type10_unk3;
     *(float*)(equipgamedata + 0x114) = pkt->type10_unk4;
     *(float*)(equipgamedata + 0x118) = pkt->type10_unk5;
+    uint8_t* on_pkt10_recv = (uint8_t*)((*(uint64_t*)(*(uint64_t*)Game::game_data_man) + 0x28) + pkt->player_num);
+    *on_pkt10_recv |= 0x4;
 
     //Type 11
     set_playergamedata_flags((void*)equipgamedata, pkt->flags);
+    *on_pkt10_recv |= 0x8;
 
     //Type 16
     if (pkt->throw_id != -1)
@@ -410,9 +421,12 @@ void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins)
 
     //Type 17
     (playerins->chrins).curSelectedMagicId = pkt->curSelectedMagicId;
+    PlayerIns_Update_curSelectedMagicId(playerins, pkt->curSelectedMagicId);
     if (pkt->curUsingItemId != -1)
     {
         (playerins->chrins).curUsedItem.itemId = pkt->curUsingItemId;
+        (playerins->curUsedItem).itemId = pkt->curUsingItemId;
+        (playerins->curUsedItem).amountUsed = 1;
         (playerins->chrins).curUsedItem.amountUsed = 1;
     }
 
