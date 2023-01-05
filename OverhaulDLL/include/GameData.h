@@ -25,6 +25,7 @@
 #include "SP/memory/pointer.h"
 #include "SP/memory/aob_scan.h"
 #include "Asset/Animation/Tae.h"
+#include "PlayerInsStruct.h"
 
 
 enum InventorySlots
@@ -356,6 +357,8 @@ public:
 
     static void ResumeThreads();
 
+    static int32_t get_SessionPlayerNumber_For_ConnectedPlayerData(uint64_t connectedplayerdata);
+
     /*
      * Help speedup some functions by, whenever we're loaded into an area,
      * preload/preresolve some pointers and values so they can be much more quickly read when we need them
@@ -392,6 +395,102 @@ public:
 };
 typedef Game::Hud Hud;
 
+// Game functions that can be called directly
 
+typedef uint32_t get_AnimationData_FUNC(ActionCtrl* actionctrl, uint32_t i);
+get_AnimationData_FUNC* get_AnimationData = (get_AnimationData_FUNC*)0x1403853c0;
+
+typedef uint16_t compress_gamedata_flags_FUNC(uint64_t equipgamedata);
+compress_gamedata_flags_FUNC* compress_gamedata_flags = (compress_gamedata_flags_FUNC*)0x14074a5e0;
+
+typedef uint32_t get_currently_selected_magic_id_FUNC(PlayerIns* playerins);
+get_currently_selected_magic_id_FUNC* get_currently_selected_magic_id = (get_currently_selected_magic_id_FUNC*)0x14035fd10;
+
+typedef bool sendNetMessageToAllPlayers_FUNC(uint64_t sessionMan, uint32_t type, void* data, int size);
+sendNetMessageToAllPlayers_FUNC* sendNetMessageToAllPlayers = (sendNetMessageToAllPlayers_FUNC*)0x14050b880;
+
+typedef uint32_t getNetMessage_FUNC(uint64_t session_man, uint64_t ConnectedPlayerData, uint32_t type, void* data_out, int max_size);
+getNetMessage_FUNC* getNetMessage = (getNetMessage_FUNC*)0x14050b540;
+
+typedef uint16_t GetEntityNumForThrow_FUNC(void* WorldChrManImp, void* playerIns);
+GetEntityNumForThrow_FUNC* GetEntityNumForThrow = (GetEntityNumForThrow_FUNC*)0x142847c6a;
+
+typedef bool sendNetMessage_FUNC(uint64_t sessionMan, uint64_t ConnectedPlayerData, uint32_t type, void* data, int size);
+sendNetMessage_FUNC* sendNetMessage = (sendNetMessage_FUNC*)0x14050b6b0;
+
+typedef PlayerIns* getPlayerInsForConnectedPlayerData_FUNC(void* worldchrman, void* ConnectedPlayerData);
+getPlayerInsForConnectedPlayerData_FUNC* getPlayerInsForConnectedPlayerData = (getPlayerInsForConnectedPlayerData_FUNC*)0x140371d90;
+
+typedef void PlayerIns_SetHp_FUNC(void* playerins, uint64_t curHp);
+PlayerIns_SetHp_FUNC* PlayerIns_SetHp = (PlayerIns_SetHp_FUNC*)0x140322910;
+
+typedef void ChrAsm_Set_Equipped_Items_FromNetwork_FUNC(void* EquipGameData, uint32_t index, uint32_t given_item_id, int param_4, bool param_5);
+ChrAsm_Set_Equipped_Items_FromNetwork_FUNC* ChrAsm_Set_Equipped_Items_FromNetwork = (ChrAsm_Set_Equipped_Items_FromNetwork_FUNC*)0x140746840;
+
+typedef void set_playergamedata_flags_FUNC(void* EquipGameData, uint16_t net_data);
+set_playergamedata_flags_FUNC* set_playergamedata_flags = (set_playergamedata_flags_FUNC*)0x14074a550;
+
+typedef ChrIns* getEntity_FUNC(uint64_t WorldChrMan, uint32_t entityNum);
+getEntity_FUNC* getEntity = (getEntity_FUNC*)0x1428611e2;
+
+typedef void* getThrowParamFromThrowId_FUNC(uint32_t throw_id);
+getThrowParamFromThrowId_FUNC* getThrowParamFromThrowId = (getThrowParamFromThrowId_FUNC*)0x140537210;
+
+typedef void putAttackerIntoThrowAnimation_FUNC(uint64_t param_1);
+putAttackerIntoThrowAnimation_FUNC* putAttackerIntoThrowAnimation = (putAttackerIntoThrowAnimation_FUNC*)0x1403acc70;
+
+typedef void putDefenderIntoThrowAnimation_FUNC(uint64_t param_1, byte param_2);
+putDefenderIntoThrowAnimation_FUNC* putDefenderIntoThrowAnimation = (putDefenderIntoThrowAnimation_FUNC*)0x1403acd70;
+
+typedef void Apply_Speffect_FUNC(SpecialEffect*, uint32_t speffect_id, float const);
+Apply_Speffect_FUNC* Apply_Speffect = (Apply_Speffect_FUNC*)0x140402af0;
+
+typedef SpecialEffect_Info* SpecialEffect_Remove_SpecialEffectInfo_FUNC(SpecialEffect*, SpecialEffect_Info*, uint8_t const);
+SpecialEffect_Remove_SpecialEffectInfo_FUNC* SpecialEffect_Remove_SpecialEffectInfo = (SpecialEffect_Remove_SpecialEffectInfo_FUNC*)0x140405ee0;
+
+typedef void ActionCtrl_ApplyEzState_FUNC(ActionCtrl* actionctrl, uint32_t unk, uint32_t ezState);
+ActionCtrl_ApplyEzState_FUNC* ActionCtrl_ApplyEzState = (ActionCtrl_ApplyEzState_FUNC*)0x140385440;
+
+typedef void ChrCtrl_Func_30_FUNC(ChrCtrl* param_1, float FrameTime_const);
+ChrCtrl_Func_30_FUNC* ChrCtrl_Func_30 = (ChrCtrl_Func_30_FUNC*)0x14037c250;
+
+typedef void Set_Player_Sex_Specific_Attribs_FUNC(EquipGameData * EquipGameData, int playerSex, int chrType);
+Set_Player_Sex_Specific_Attribs_FUNC* Set_Player_Sex_Specific_Attribs = (Set_Player_Sex_Specific_Attribs_FUNC*)0x14074bf30;
+
+typedef void PlayerIns_Update_curSelectedMagicId_FUNC(PlayerIns* param_1, uint32_t curSelectedMagicId);
+PlayerIns_Update_curSelectedMagicId_FUNC* PlayerIns_Update_curSelectedMagicId = (PlayerIns_Update_curSelectedMagicId_FUNC*)0x14035fd80;
+
+typedef uint64_t FUN_140f5f6c0_FUNC(uint64_t p);
+FUN_140f5f6c0_FUNC* FUN_140f5f6c0 = (FUN_140f5f6c0_FUNC*)0x140f5f6c0;
+
+typedef void* smallObject_internal_malloc_FUNC(uint64_t heap, uint64_t size, uint64_t align);
+smallObject_internal_malloc_FUNC* smallObject_internal_malloc = (smallObject_internal_malloc_FUNC*)0x140cbe4f0;
+
+typedef void* smallObject_internal_dealloc_FUNC(uint64_t heap, void* obj, uint64_t size, uint64_t align);
+smallObject_internal_dealloc_FUNC* smallObject_internal_dealloc = (smallObject_internal_dealloc_FUNC*)0x140cbe790;
+
+typedef bool ok_to_enter_equipment_menu_FUNC(void* playerins);
+ok_to_enter_equipment_menu_FUNC* ok_to_enter_equipment_menu = (ok_to_enter_equipment_menu_FUNC*)0x140361140;
+
+typedef void* Find_ResCap_FUNC(void* ResCapArray, const wchar_t* text);
+Find_ResCap_FUNC* Find_ResCap = (Find_ResCap_FUNC*)0x140518a10;
+
+typedef void Unload_ResCap_FUNC(void* ResCapArray, void* ResCap);
+Unload_ResCap_FUNC* Unload_ResCap = (Unload_ResCap_FUNC*)0x140518c00;
+
+typedef void* ParambndFileCap_Load_FUNC(const wchar_t* filename, void* param_2, void* taskItem, void* fileCap_next_functionPtrLoad);
+ParambndFileCap_Load_FUNC* ParambndFileCap_Load = (ParambndFileCap_Load_FUNC*)0x1405a08a0;
+
+typedef void Force_PlayerReload_FUNC(void* world_chr_man_imp, const wchar_t* c0000);
+Force_PlayerReload_FUNC* Force_PlayerReload = (Force_PlayerReload_FUNC*)0x140370920;
+
+typedef uint32_t Calculate_MaxHP_From_Vit_FUNC(uint32_t vit);
+Calculate_MaxHP_From_Vit_FUNC* Calculate_MaxHP_From_Vit = (Calculate_MaxHP_From_Vit_FUNC*)0x1402df9a0;
+
+typedef uint32_t Calculate_MaxMP_From_Att_FUNC(uint32_t att);
+Calculate_MaxMP_From_Att_FUNC* Calculate_MaxMP_From_Att = (Calculate_MaxMP_From_Att_FUNC*)0x1402dfa60;
+
+typedef uint32_t Calculate_MaxSP_From_End_FUNC(uint32_t end);
+Calculate_MaxSP_From_End_FUNC* Calculate_MaxSP_From_End = (Calculate_MaxSP_From_End_FUNC*)0x1402dfcd0;
 
 #endif // _DS1_OVERHAUL_GAME_DATA_H_

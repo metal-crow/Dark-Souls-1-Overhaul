@@ -1564,3 +1564,31 @@ void Game::ResumeThreads()
         }
     }
 }
+
+uint8_t* ConnectedPlayerData_Get_SteamId(uint64_t connectedplayerdata)
+{
+    uint64_t steam_player_data = *(uint64_t*)(connectedplayerdata + 0);
+    uint64_t online_id = *(uint64_t*)(steam_player_data + 0x18);
+    return (uint8_t*)(online_id + 0x50);
+}
+
+int32_t Game::get_SessionPlayerNumber_For_ConnectedPlayerData(uint64_t connectedplayerdata)
+{
+    uint64_t session_man = *(uint64_t*)Game::session_man_imp;
+    uint64_t connected_players = *(uint64_t*)(session_man + 0x248);
+    uint64_t connected_players_prev = *(uint64_t*)(connected_players + 0);
+    void* looking_steam_id = ConnectedPlayerData_Get_SteamId(connectedplayerdata);
+
+    while (connected_players_prev != connected_players)
+    {
+        void* cur_steam_id = ConnectedPlayerData_Get_SteamId(connected_players_prev + 0x10);
+        int playerEql = memcmp(looking_steam_id, cur_steam_id, 0x20);
+        if (playerEql == 0)
+        {
+            return *(int32_t*)(connected_players_prev + 0x50);
+        }
+        connected_players_prev = *(uint64_t*)(connected_players_prev + 0);
+    }
+
+    return -1;
+}
