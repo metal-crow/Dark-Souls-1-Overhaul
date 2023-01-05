@@ -9,6 +9,19 @@ extern sendNetMessage_helper: proc
 
 PUBLIC sendNetMessage_injection
 sendNetMessage_injection PROC
+;original code
+mov     rax, rsp
+push    rdi
+push    r12
+push    r13
+push    r14
+push    r15
+sub     rsp, 80h
+mov     qword ptr [rax-78h], -2
+mov     [rax+10h], rbx
+mov     [rax+18h], rbp
+mov     [rax+20h], rsi
+
 sub     rsp, 10h
 movdqu  [rsp], xmm0
 sub     rsp, 10h
@@ -25,8 +38,8 @@ push    r10
 push    r11
 sub     rsp, 20h
 
-mov     ecx, r8d ;packet type
 call    sendNetMessage_helper
+;we can clobber rax here
 
 add     rsp, 20h
 pop     r11
@@ -47,18 +60,21 @@ add     rsp, 10h
 ;check if we abort this call or not
 test    eax, eax
 jnz     normal
+lea     r11, [rsp+80h]
+mov     rbx, [r11+38h]
+mov     rbp, [r11+40h]
+mov     rsi, [r11+48h]
+mov     rsp, r11
+pop     r15
+pop     r14
+pop     r13
+pop     r12
+pop     rdi
 xor     al, al ;aborting call, so return false
 ret
 
 ;original code
 normal:
-mov     rax, rsp
-push    rdi
-push    r12
-push    r13
-push    r14
-push    r15
-sub     rsp, 80h
 jmp     sendNetMessage_return
 sendNetMessage_injection ENDP
 
@@ -68,6 +84,14 @@ extern getNetMessage_helper: proc
 
 PUBLIC getNetMessage_injection
 getNetMessage_injection PROC
+;original code
+mov     [rsp+8], rbx
+mov     [rsp+10h], rbp
+mov     [rsp+18h], rsi
+mov     [rsp+20h], rdi
+push    r14
+sub     rsp, 20h
+
 sub     rsp, 10h
 movdqu  [rsp], xmm0
 sub     rsp, 10h
@@ -84,7 +108,6 @@ push    r10
 push    r11
 sub     rsp, 20h
 
-mov     ecx, r8d ;packet type
 call    getNetMessage_helper
 
 add     rsp, 20h
@@ -106,14 +129,16 @@ add     rsp, 10h
 ;check if we abort this call or not
 test    eax, eax
 jnz     normal
+mov     rbx, [rsp+30h]
+mov     rbp, [rsp+38h]
+mov     rsi, [rsp+40h]
+mov     rdi, [rsp+48h]
+add     rsp, 20h
+pop     r14
 xor     eax, eax ;aborting call, so return 0 bytes
 ret
 
-;original code
 normal:
-mov     [rsp+8], rbx
-mov     [rsp+10h], rbp
-mov     [rsp+18h], rsi
 jmp     getNetMessage_return
 getNetMessage_injection ENDP
 
