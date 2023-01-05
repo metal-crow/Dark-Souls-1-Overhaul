@@ -1,16 +1,8 @@
+#include "GameData.h"
 #include "SfxManStructFunctions.h"
 #include "Rollback.h"
 
 static const size_t max_preallocated_class_14152d360 = 256;
-
-typedef uint64_t FUN_140f5f6c0_FUNC(uint64_t p);
-FUN_140f5f6c0_FUNC* FUN_140f5f6c0 = (FUN_140f5f6c0_FUNC*)0x140f5f6c0;
-
-typedef void* smallObject_internal_malloc_FUNC(uint64_t heap, uint64_t size, uint64_t align);
-smallObject_internal_malloc_FUNC* smallObject_internal_malloc = (smallObject_internal_malloc_FUNC*)0x140cbe4f0;
-
-typedef void* smallObject_internal_dealloc_FUNC(uint64_t heap, void* obj, uint64_t size, uint64_t align);
-smallObject_internal_dealloc_FUNC* smallObject_internal_dealloc = (smallObject_internal_dealloc_FUNC*)0x140cbe790;
 
 void copy_class_14152d360(class_14152d360* to, class_14152d360* from, bool to_game)
 {

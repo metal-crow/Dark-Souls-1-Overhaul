@@ -1,5 +1,6 @@
 #include "EquipmentUnlock.h"
 #include "DarkSoulsOverhaulMod.h"
+#include "GameData.h"
 #include "SP/memory/injection/asm/x64.h"
 
 extern "C" {
@@ -25,9 +26,6 @@ void EquipmentUnlock::start() {
     write_address = (uint8_t*)(EquipmentUnlock::equipment_change_unlock_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &equipment_change_unlock_injection_return, 2, &equipment_change_unlock_injection);
 }
-
-typedef bool ok_to_enter_equipment_menu_FUNC(void* playerins);
-ok_to_enter_equipment_menu_FUNC* ok_to_enter_equipment_menu = (ok_to_enter_equipment_menu_FUNC*)0x140361140;
 
 //return true if the change is allowed, false otherwise
 bool equipment_change_unlock_injection_helper(InventorySlots menu_slot)
