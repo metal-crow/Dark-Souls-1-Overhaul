@@ -1456,24 +1456,15 @@ std::optional<int32_t*> Game::get_MP_AreaID_ptr()
     }
 }
 
-typedef void* InGame_Malloc_FUNC(size_t size, size_t alignment, void* heap);
-InGame_Malloc_FUNC* InGame_Malloc = (InGame_Malloc_FUNC*)0x140cc3e10;
-
 void* Game::game_malloc(size_t size, size_t alignment, void* heap)
 {
     return InGame_Malloc(size, alignment, heap);
 }
 
-typedef void InGame_Free_FUNC(void* p, size_t size);
-InGame_Free_FUNC* InGame_Free = (InGame_Free_FUNC*)0x1410e3f6c;
-
 void Game::game_free(void* p, size_t size)
 {
     return InGame_Free(p, size);
 }
-
-typedef uint64_t* FUN_140cbede0_FUNC(void* p);
-FUN_140cbede0_FUNC* FUN_140cbede0 = (FUN_140cbede0_FUNC*)0x140cc29c0;
 
 typedef void heapObjFreeFunc(void* heapObj, void* p);
 
@@ -1492,27 +1483,6 @@ void* Game::get_MoveMapStep()
 
     return (void*)grab_movemapstep_value;
 }
-
-typedef void Step_MapArea_MapAreaObjects_and_NearbyMapAreas_FUNC(void* FieldArea, float frame_time, uint32_t param_3, uint8_t param_4, uint8_t param_5);
-Step_MapArea_MapAreaObjects_and_NearbyMapAreas_FUNC* Step_MapArea_MapAreaObjects_and_NearbyMapAreas = (Step_MapArea_MapAreaObjects_and_NearbyMapAreas_FUNC*)0x1403cbb50;
-
-typedef void Step_Chr_FUNC(void* movemapstep, float frame_time, byte param_3);
-Step_Chr_FUNC* Step_Chr = (Step_Chr_FUNC*)0x1402510d0;
-
-typedef void Step_Bullet_FUNC(void* bulletman, float frame_time);
-Step_Bullet_FUNC* Step_Bullet = (Step_Bullet_FUNC*)0x140429940;
-
-typedef void Step_DamageMan_FUNC(void* damageman, float frame_time);
-Step_DamageMan_FUNC* Step_DamageMan = (Step_DamageMan_FUNC*)0x1403c8dd0;
-
-typedef void Step_Havok_FUNC(void* FrpgHavokManImp, float frame_time);
-Step_Havok_FUNC* Step_Havok = (Step_Havok_FUNC*)0x142f9d251;
-
-typedef void FinishStep_Havok_FUNC(void* FrpgHavokManImp);
-FinishStep_Havok_FUNC* FinishStep_Havok = (FinishStep_Havok_FUNC*)0x1402a32d0;
-
-typedef void MoveMapStep_Step_13_FUNC(void* movemapstep, float frame_time);
-MoveMapStep_Step_13_FUNC* MoveMapStep_Step_13 = (MoveMapStep_Step_13_FUNC*)0x14024f6b0;
 
 void Game::Step_GameSimulation(bool renderFrame)
 {

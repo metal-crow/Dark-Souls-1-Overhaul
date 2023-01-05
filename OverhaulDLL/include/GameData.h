@@ -493,4 +493,34 @@ Calculate_MaxMP_From_Att_FUNC* Calculate_MaxMP_From_Att = (Calculate_MaxMP_From_
 typedef uint32_t Calculate_MaxSP_From_End_FUNC(uint32_t end);
 Calculate_MaxSP_From_End_FUNC* Calculate_MaxSP_From_End = (Calculate_MaxSP_From_End_FUNC*)0x1402dfcd0;
 
+typedef void Step_MapArea_MapAreaObjects_and_NearbyMapAreas_FUNC(void* FieldArea, float frame_time, uint32_t param_3, uint8_t param_4, uint8_t param_5);
+Step_MapArea_MapAreaObjects_and_NearbyMapAreas_FUNC* Step_MapArea_MapAreaObjects_and_NearbyMapAreas = (Step_MapArea_MapAreaObjects_and_NearbyMapAreas_FUNC*)0x1403cbb50;
+
+typedef void Step_Chr_FUNC(void* movemapstep, float frame_time, byte param_3);
+Step_Chr_FUNC* Step_Chr = (Step_Chr_FUNC*)0x1402510d0;
+
+typedef void Step_Bullet_FUNC(void* bulletman, float frame_time);
+Step_Bullet_FUNC* Step_Bullet = (Step_Bullet_FUNC*)0x140429940;
+
+typedef void Step_DamageMan_FUNC(void* damageman, float frame_time);
+Step_DamageMan_FUNC* Step_DamageMan = (Step_DamageMan_FUNC*)0x1403c8dd0;
+
+typedef void Step_Havok_FUNC(void* FrpgHavokManImp, float frame_time);
+Step_Havok_FUNC* Step_Havok = (Step_Havok_FUNC*)0x142f9d251;
+
+typedef void FinishStep_Havok_FUNC(void* FrpgHavokManImp);
+FinishStep_Havok_FUNC* FinishStep_Havok = (FinishStep_Havok_FUNC*)0x1402a32d0;
+
+typedef void MoveMapStep_Step_13_FUNC(void* movemapstep, float frame_time);
+MoveMapStep_Step_13_FUNC* MoveMapStep_Step_13 = (MoveMapStep_Step_13_FUNC*)0x14024f6b0;
+
+typedef uint64_t* FUN_140cbede0_FUNC(void* p);
+FUN_140cbede0_FUNC* FUN_140cbede0 = (FUN_140cbede0_FUNC*)0x140cc29c0;
+
+typedef void InGame_Free_FUNC(void* p, size_t size);
+InGame_Free_FUNC* InGame_Free = (InGame_Free_FUNC*)0x1410e3f6c;
+
+typedef void* InGame_Malloc_FUNC(size_t size, size_t alignment, void* heap);
+InGame_Malloc_FUNC* InGame_Malloc = (InGame_Malloc_FUNC*)0x140cc3e10;
+
 #endif // _DS1_OVERHAUL_GAME_DATA_H_
