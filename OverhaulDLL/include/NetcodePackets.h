@@ -33,9 +33,6 @@ struct MainPacket
     float atkAngle;
     float movement_direction_vals[2]; //this can theoretically be compressed, we don't need the full float range
     //Type 10
-    int32_t player_num;
-    uint8_t player_sex;
-    uint8_t covenantId;
     uint32_t equipment_array[20];
     float type10_unk1;
     float type10_unk2;
@@ -55,6 +52,24 @@ struct MainPacket
     uint32_t curUsingItemId;
     //Type 76
     uint32_t spEffectToApply[15]; //apply to the playerid that sent this
+};
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+struct HandshakePacketExtra
+{
+    //type 10
+    int32_t player_num;
+    uint8_t player_sex;
+    uint8_t covenantId;
+    uint32_t equipment_array[20];
+    float type10_unk1;
+    float type10_unk2;
+    float type10_unk3;
+    float type10_unk4;
+    float type10_unk5;
+    //type 11
+    uint16_t flags;
 };
 #pragma pack(pop)
 

@@ -27,7 +27,7 @@ public:
 
     static void NetcodeFix();
 
-    static void LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* player);
+    static void LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* player, uint64_t ConnectedPlayerData);
 
     static bool gsave;
     static bool gload;
@@ -51,6 +51,7 @@ private:
     static const uint64_t Read_GeneralPlayerData_offset = 0x3953f0;
     static const uint64_t disableType18PacketEnforcement_offset = 0x3226e0;
     static const uint64_t fixPhantomBulletGenIssue_offset = 0x4229bf;
+    static const uint64_t isPacketTypeValid_offset = 0x50f2d0;
 };
 
 inline void* malloc_(size_t size)
