@@ -45,7 +45,7 @@ void inline FATALERROR(const char* error_str, ...) {
 
     global::cmd_out << dest << "\n";
 
-    crash_handler(dest);
+    crash_handler(NULL, dest);
 }
 
 static const char* logfilename = "dsoverhaul_logging.txt";

@@ -16,10 +16,10 @@
 #include <eh.h>
 #include <new.h>
 #include <signal.h>
-#include <Windows.h>
 #include <direct.h>
 #include <ctime>
 #include <string>
+#include <minidumpapiset.h>
 
 uint64_t panic_debug_offset = 0xd53b66;
 extern "C" {
@@ -270,60 +270,13 @@ protected:
 
 };
 
-DWORD WINAPI crash_handler_dump_process(LPVOID output_dir)
-{
-    //command to pass to process dump
-    char cmd[MAX_PATH + 100 + 50];
-    snprintf(cmd, sizeof(cmd), "./pd64.exe -p DarkSoulsRemastered.exe -o \"%s\"", (char*)output_dir);
-
-    // Dump the process using Process Dump (https://github.com/glmcdona/Process-Dump)
-    PROCESS_INFORMATION procdump_pi;
-    STARTUPINFO si;
-    ZeroMemory(&si, sizeof(si));
-    si.cb = sizeof(si);
-    ZeroMemory(&procdump_pi, sizeof(procdump_pi));
-    bool procdump = CreateProcess(NULL, cmd, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &procdump_pi);
-
-    // Wait 15 sec max for the process dump to finish, or kill it if it doesn't
-    WaitForSingleObject(procdump_pi.hProcess, 15 * 1000);
-    TerminateProcess(procdump_pi.hProcess, 0);
-    CloseHandle(procdump_pi.hProcess);
-    CloseHandle(procdump_pi.hThread);
-
-    //remove the extra mostly-useless modules. only need the exe and the d3d11 dumps
-    std::string pattern((char*)output_dir);
-    pattern.append("\\*");
-    WIN32_FIND_DATA data;
-    HANDLE hFind;
-    if ((hFind = FindFirstFile(pattern.c_str(), &data)) != INVALID_HANDLE_VALUE)
-    {
-        do
-        {
-            std::string filename(data.cFileName);
-            if (filename.find("DarkSoulsRemastered.exe") == std::string::npos &&
-                filename.find("d3d11.dll") == std::string::npos &&
-                filename.find("message") == std::string::npos &&
-                filename.find(logfilename) == std::string::npos)
-            {
-                std::string full_filename((char*)output_dir);
-                full_filename.append("\\");
-                full_filename.append(data.cFileName);
-                DeleteFile(full_filename.c_str());
-            }
-        } while (FindNextFile(hFind, &data) != 0);
-        FindClose(hFind);
-    }
-
-    return 0;
-}
-
 /* ------------------ Handlers ------------------ */
 
 std::string const bucket_name = "dark_souls_overhaul_bug_reports";
 std::string const key_path = "./error_reporter_creds.json";
 bool triggered_crash_handler = false;
 
-void crash_handler(char* message_str)
+void crash_handler(EXCEPTION_POINTERS* ExceptionInfo, char* crash_message_str)
 {
     // Prevent an internal failure -> abort from infinitely recursing, and also catch any unexpected double-faults
     signal(SIGABRT, NULL);
@@ -352,8 +305,26 @@ void crash_handler(char* message_str)
     strncat_s(output_dir, time_str, sizeof(output_dir));
     _mkdir(output_dir);
 
-    // Start process dump
-    HANDLE dump_thread = CreateThread(NULL, 0, crash_handler_dump_process, output_dir, 0, NULL);
+    // Generate minidump
+    char dump_file[sizeof(output_dir)];
+    snprintf(dump_file, sizeof(dump_file), "%s\\%s", output_dir, "dump.dmp");
+    HANDLE dump_file_handle = CreateFile(dump_file, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+    MINIDUMP_EXCEPTION_INFORMATION dump_exp_param;
+    dump_exp_param.ThreadId = ::GetCurrentThreadId();
+    dump_exp_param.ExceptionPointers = ExceptionInfo;
+    dump_exp_param.ClientPointers = NULL;
+
+    MINIDUMP_TYPE mDumpValue = (MINIDUMP_TYPE)(
+        MiniDumpNormal |
+        MiniDumpWithIndirectlyReferencedMemory |
+        MiniDumpWithDataSegs |
+        MiniDumpWithCodeSegs
+        );
+
+    MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), dump_file_handle, mDumpValue, &dump_exp_param, NULL, NULL);
+
+    CloseHandle(dump_file_handle);
 
     // Save the stack trace
     MyStackWalker sw;
@@ -366,8 +337,13 @@ void crash_handler(char* message_str)
     snprintf(msg_file, sizeof(msg_file), "%s\\%s", output_dir, "message");
     fopen_s(&fp, msg_file, "w");
     fprintf(fp, "%s\n\n", stack_info.c_str());
-    if (message_str != NULL) {
-        fprintf(fp, "%s", message_str);
+    if (ExceptionInfo != NULL) {
+        char* exception_message_str = (char*)exception_pointer_tostring(ExceptionInfo)->c_str();
+        fprintf(fp, "%s\n", exception_message_str);
+    }
+    if (crash_message_str != NULL)
+    {
+        fprintf(fp, "%s\n", crash_message_str);
     }
     fclose(fp);
 
@@ -394,9 +370,6 @@ void crash_handler(char* message_str)
         fprintf(fp, "--------------------\nUser Email: %s\n", user_email);
     }
     fclose(fp);
-
-    // Wait for the process dump to finish
-    WaitForSingleObject(dump_thread, INFINITE);
 
     //zip the folder
     if (send_report != 0)
@@ -437,33 +410,33 @@ void crash_handler(char* message_str)
 
 void panic_debug_injection_helper_function()
 {
-    crash_handler();
+    crash_handler(NULL, NULL);
 }
 
 void terminator()
 {
-    crash_handler();
+    crash_handler(NULL, NULL);
 }
 
 void signal_handler(int sig)
 {
-    crash_handler();
+    crash_handler(NULL, NULL);
 }
 
 void __cdecl invalid_parameter_handler(const wchar_t *, const wchar_t *, const wchar_t *, unsigned int, uintptr_t)
 {
-    crash_handler();
+    crash_handler(NULL, NULL);
 }
 
 int memory_depleted(size_t)
 {
-    crash_handler();
+    crash_handler(NULL, NULL);
     return 0;
 }
 
 LONG WINAPI top_level_exception_filter(EXCEPTION_POINTERS * ExceptionInfo)
 {
-    crash_handler((char*)exception_pointer_tostring(ExceptionInfo)->c_str());
+    crash_handler(ExceptionInfo, NULL);
     return EXCEPTION_CONTINUE_SEARCH;
 }
 
@@ -488,7 +461,7 @@ LONG WINAPI vectored_exception_handler(EXCEPTION_POINTERS * ExceptionInfo)
         return EXCEPTION_CONTINUE_SEARCH;
     }
 
-    crash_handler((char*)exception_pointer_tostring(ExceptionInfo)->c_str());
+    crash_handler(ExceptionInfo, NULL);
     return EXCEPTION_CONTINUE_SEARCH;
 }
 
