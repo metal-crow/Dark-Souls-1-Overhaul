@@ -11,6 +11,7 @@
 #include "PadManStructFunctions.h"
 #include "BulletManStructFunctions.h"
 #include "SfxManStructFunctions.h"
+#include "DamageManStructFunctions.h"
 
 #include "NetcodePackets.h"
 
@@ -44,6 +45,7 @@ private:
     static PadMan* saved_padman;
     static BulletMan* saved_bulletman;
     static class_14152d360* saved_sfxobjs;
+    static DamageMan* saved_damageman;
 
     static const uint64_t sendNetMessage_offset = 0x50b6b0;
     static const uint64_t getNetMessage_offset = 0x050b540;

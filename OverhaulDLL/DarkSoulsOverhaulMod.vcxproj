@@ -28,6 +28,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\CrashHandler.cpp" />
+    <ClCompile Include="src\DamageManStructFunctions.cpp" />
     <ClCompile Include="src\DarkSoulsOverhaulMod.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </ExcludedFromBuild>
@@ -67,6 +68,8 @@
     <ClInclude Include="include\CustomInvasionTypes.h" />
     <ClInclude Include="include\AntiAntiCheat.h" />
     <ClInclude Include="include\CrashHandler.h" />
+    <ClInclude Include="include\DamageManStruct.h" />
+    <ClInclude Include="include\DamageManStructFunctions.h" />
     <ClInclude Include="include\DarkSoulsOverhaulMod.h" />
     <ClInclude Include="include\DeadAngles.h" />
     <ClInclude Include="include\FileReloading.h" />

@@ -129,6 +129,9 @@
     <ClCompile Include="src\AntiCheat\AntiCheat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\DamageManStructFunctions.cpp">
+      <Filter>Source Files\Rollback</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3d11-wrapper\include\d3d11\exports.h">
@@ -214,6 +217,12 @@
     </ClInclude>
     <ClInclude Include="include\PlayerInsStruct.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DamageManStruct.h">
+      <Filter>Header Files\Rollback</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DamageManStructFunctions.h">
+      <Filter>Header Files\Rollback</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
