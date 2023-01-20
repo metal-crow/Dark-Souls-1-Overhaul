@@ -1028,8 +1028,10 @@ static_assert(sizeof(ProEquipCtrl) == 0x30);
 
 struct ChrAsmModelRes_Elem
 {
-    uint8_t data_0[0x10];
-    uint8_t data_1[0x40];
+    uint64_t data_0;
+    void* PartsbndFileCap1;
+    void* PartsbndFileCap2; //this is only used for intermediate storage
+    uint8_t data_1[0x38];
 };
 
 static_assert(sizeof(ChrAsmModelRes_Elem) == 0x50);

@@ -166,6 +166,8 @@ public:
 
     static uint64_t throw_man;
 
+    static uint64_t delay_delete_man;
+
     static const uint64_t calculate_attack_damage_offset = 0x2f11bf2;
 
     static const uint64_t char_loaded_injection_offset = 0x24f1b0;
@@ -522,5 +524,8 @@ static InGame_Free_FUNC* InGame_Free = (InGame_Free_FUNC*)0x1410e3f6c;
 
 typedef void* InGame_Malloc_FUNC(size_t size, size_t alignment, void* heap);
 static InGame_Malloc_FUNC* InGame_Malloc = (InGame_Malloc_FUNC*)0x140cc3e10;
+
+typedef void ChrAsmModelRes_Load_PartsbndFileCap_Entry_FUNC(void* ChrAsmModelRes, void* ChrAsm, uint8_t param_3, uint8_t param_4, uint8_t param_5, uint8_t param_6, uint8_t param_7, uint8_t param_8);
+static ChrAsmModelRes_Load_PartsbndFileCap_Entry_FUNC* ChrAsmModelRes_Load_PartsbndFileCap_Entry = (ChrAsmModelRes_Load_PartsbndFileCap_Entry_FUNC*)0x14020a280;
 
 #endif // _DS1_OVERHAUL_GAME_DATA_H_

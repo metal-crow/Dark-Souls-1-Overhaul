@@ -19,6 +19,11 @@ void copy_PlayerIns(PlayerIns* to, PlayerIns* from, bool to_game)
     to->override_equipped_magicId = from->override_equipped_magicId;
     copy_ChrAsm(to->chrasm, from->chrasm);
     copy_ChrAsmModelRes(to->chrAsmModelRes, from->chrAsmModelRes, to_game);
+    if (to_game)
+    {
+        //trigger the game to reload the models
+        ChrAsmModelRes_Load_PartsbndFileCap_Entry(to->chrAsmModelRes, to->chrasm, 1, 0, 0, 0, 1, 1);
+    }
     copy_ChrAsmModel(to->chrAsmModel, from->chrAsmModel, to_game);
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
     memcpy(to->data_4, from->data_4, sizeof(to->data_4));
@@ -113,7 +118,8 @@ void free_ChrAsmModelRes(ChrAsmModelRes* to)
 
 void copy_ChrAsmModelRes_Elem(ChrAsmModelRes_Elem* to, ChrAsmModelRes_Elem* from, bool to_game)
 {
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    to->data_0 = from->data_0;
+    to->PartsbndFileCap2 = NULL;
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
 }
 

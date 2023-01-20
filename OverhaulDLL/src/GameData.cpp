@@ -69,6 +69,8 @@ uint64_t Game::sfx_man = NULL;
 
 uint64_t Game::throw_man = NULL;
 
+uint64_t Game::delay_delete_man = NULL;
+
 // Player character status (loading, human, co-op, invader, hollow)
 sp::mem::pointer<int32_t> Game::player_char_status;
 
@@ -181,6 +183,8 @@ void Game::init()
     Game::sfx_man = Game::ds1_base + 0x1c7c758;
 
     Game::throw_man = Game::ds1_base + 0x1c79ad0;
+
+    Game::delay_delete_man = Game::ds1_base + 0x1c6a8e8;
 }
 
 void Game::injections_init()
