@@ -350,6 +350,11 @@ void copy_ChrIns(ChrIns* to, ChrIns* from, bool to_game)
     memcpy(to->data_5, from->data_5, sizeof(to->data_5));
     to->lowerThrowAnim = from->lowerThrowAnim;
     to->upperThrowAnim = from->upperThrowAnim;
+    to->curToughness = from->curToughness;
+    to->maxToughness = from->maxToughness;
+    to->toughnessUnk1 = from->toughnessUnk1;
+    to->toughnessRefillTimer = from->toughnessRefillTimer;
+    to->toughnessUnk2 = from->toughnessUnk2;
     to->curSelectedMagicId = from->curSelectedMagicId;
     to->curUsedItem = from->curUsedItem;
     copy_SpecialEffect(to->specialEffects, from->specialEffects, to_game);
