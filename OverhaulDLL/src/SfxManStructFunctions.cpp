@@ -2,25 +2,45 @@
 #include "SfxManStructFunctions.h"
 #include "Rollback.h"
 
-static const size_t max_preallocated_class_14152d360 = 256;
+void copy_FXManager(FXManager* to, FXManager* from, bool to_game)
+{
+    copy_SFXEntryList(to->SFXEntryList, from->SFXEntryList, to_game);
+}
 
-void copy_class_14152d360(class_14152d360* to, class_14152d360* from, bool to_game)
+FXManager* init_FXManager()
+{
+    FXManager* local_FXManager = (FXManager*)malloc_(sizeof(FXManager));
+
+    local_FXManager->SFXEntryList = init_SFXEntryList();
+
+    return local_FXManager;
+}
+
+void free_FXManager(FXManager* to)
+{
+    free_SFXEntryList(to->SFXEntryList);
+    free(to);
+}
+
+static const size_t max_preallocated_SFXEntries = 256;
+
+void copy_SFXEntryList(SFXEntry* to, SFXEntry* from, bool to_game)
 {
     if (!to_game)
     {
         size_t to_index = 0;
         while (from)
         {
-            if (to_index >= max_preallocated_class_14152d360)
+            if (to_index >= max_preallocated_SFXEntries)
             {
-                ConsoleWrite("Unable to recursivly copy class_14152d360 from the game. Out of space.");
+                ConsoleWrite("Unable to recursivly copy SFXEntry from the game. Out of space.");
                 break;
             }
-            copy_class_14152d360_asObj(to, from, to_game);
+            copy_SFXEntry(to, from, to_game);
 
             if (from->next != NULL)
             {
-                to->next = (class_14152d360*)((uint64_t)(to)+sizeof(class_14152d360));
+                to->next = (SFXEntry*)((uint64_t)(to)+sizeof(SFXEntry));
             }
             else
             {
@@ -28,7 +48,7 @@ void copy_class_14152d360(class_14152d360* to, class_14152d360* from, bool to_ga
             }
 
             from = from->next;
-            to = (class_14152d360*)((uint64_t)(to)+sizeof(class_14152d360));
+            to = (SFXEntry*)((uint64_t)(to)+sizeof(SFXEntry));
             to_index += 1;
         }
     }
@@ -36,26 +56,24 @@ void copy_class_14152d360(class_14152d360* to, class_14152d360* from, bool to_ga
     {
         while (from)
         {
-            copy_class_14152d360_asObj(to, from, to_game);
+            copy_SFXEntry(to, from, to_game);
 
             //handle if the game's list isn't long enough, and we need to alloc more slots
             if (from->next != NULL && to->next == NULL)
             {
-                uint64_t heap = FUN_140f5f6c0(0x141c03470);
-                to->next = (class_14152d360*)smallObject_internal_malloc(heap, sizeof(class_14152d360), 0x10);
+                to->next = (SFXEntry*)smallObject_internal_malloc(0, sizeof(SFXEntry), 0x10); //TODO
                 to->next->next = NULL;
             }
 
             //handle if the game's list is too long, and we need to free it's extra slots
             if (from->next == NULL && to->next != NULL)
             {
-                class_14152d360* entry_to_free = to->next;
+                SFXEntry* entry_to_free = to->next;
                 to->next = NULL;
                 while (entry_to_free)
                 {
-                    class_14152d360* next = entry_to_free->next;
-                    uint64_t heap = FUN_140f5f6c0(0x141c03470);
-                    smallObject_internal_dealloc(heap, entry_to_free, sizeof(class_14152d360), 0x10);
+                    SFXEntry* next = entry_to_free->next;
+                    smallObject_internal_dealloc(0, entry_to_free, sizeof(SFXEntry), 0x10); //TODO
                     entry_to_free = next;
                 }
                 break;
@@ -67,7 +85,7 @@ void copy_class_14152d360(class_14152d360* to, class_14152d360* from, bool to_ga
     }
 }
 
-void copy_class_14152d360_asObj(class_14152d360* to, class_14152d360* from, bool to_game)
+void copy_SFXEntry(SFXEntry* to, SFXEntry* from, bool to_game)
 {
     to->vtable = 0x14152d360;
     to->field0x8 = NULL;
@@ -81,8 +99,7 @@ void copy_class_14152d360_asObj(class_14152d360* to, class_14152d360* from, bool
         {
             if (to_game)
             {
-                uint64_t heap = FUN_140f5f6c0(0x141c03470);
-                to->field0x48_head = (class_14150b808_field0x48*)smallObject_internal_malloc(heap, sizeof(class_14150b808_field0x48), 8);
+                to->field0x48_head = (class_14150b808_field0x48*)smallObject_internal_malloc(0, sizeof(class_14150b808_field0x48), 8); //TODO
             }
             else
             {
@@ -101,8 +118,7 @@ void copy_class_14152d360_asObj(class_14152d360* to, class_14152d360* from, bool
     {
         if (to_game)
         {
-            uint64_t heap = FUN_140f5f6c0(0x141c03470);
-            smallObject_internal_dealloc(heap, to->field0x48_head, sizeof(class_14150b808_field0x48), 8);
+            smallObject_internal_dealloc(0, to->field0x48_head, sizeof(class_14150b808_field0x48), 8); //TODO
         }
         else
         {
@@ -120,23 +136,23 @@ void copy_class_14152d360_asObj(class_14152d360* to, class_14152d360* from, bool
     to->data_3 = from->data_3;
 }
 
-class_14152d360* init_class_14152d360()
+SFXEntry* init_SFXEntryList()
 {
     //this is a linked list, so pre-allocate a max of 256 for the classes
-    class_14152d360* local_class_14152d360 = (class_14152d360*)malloc_(sizeof(class_14152d360)*max_preallocated_class_14152d360);
+    SFXEntry* local_SFXEntry = (SFXEntry*)malloc_(sizeof(SFXEntry)*max_preallocated_SFXEntries);
 
     //field0x48 must be dynamically alloc'd, since it can be null
 
-    return local_class_14152d360;
+    return local_SFXEntry;
 }
 
-void free_class_14152d360(class_14152d360* to)
+void free_SFXEntryList(SFXEntry* to)
 {
-    class_14152d360* head = to;
-    for (size_t i = 0; i < max_preallocated_class_14152d360; i++)
+    SFXEntry* head = to;
+    for (size_t i = 0; i < max_preallocated_SFXEntries; i++)
     {
         free_class_14150b808_field0x48(to->field0x48_head);
-        head = (class_14152d360*)((uint64_t)(head)+sizeof(class_14152d360));
+        head = (SFXEntry*)((uint64_t)(head)+sizeof(SFXEntry));
     }
     free(to);
 }

@@ -10,7 +10,7 @@ bool Rollback::rollbackEnabled = false;
 PlayerIns* Rollback::saved_playerins = NULL;
 PadMan* Rollback::saved_padman = NULL;
 BulletMan* Rollback::saved_bulletman = NULL;
-class_14152d360* Rollback::saved_sfxobjs = NULL;
+FXManager* Rollback::saved_sfxobjs = NULL;
 DamageMan* Rollback::saved_damageman = NULL;
 
 bool Rollback::gsave = false;
@@ -79,7 +79,7 @@ void Rollback::start()
     Rollback::saved_playerins = init_PlayerIns(false);
     Rollback::saved_padman = init_PadMan();
     Rollback::saved_bulletman = init_BulletMan();
-    Rollback::saved_sfxobjs = init_class_14152d360();
+    Rollback::saved_sfxobjs = init_FXManager();
     Rollback::saved_damageman = init_DamageMan();
 
     //TMP save/restore with a hotkey
@@ -104,7 +104,7 @@ void Rollback::GameStateSave()
     //we pre-allocate a static playerins on boot, so we can assume all pointers are set up
     copy_PlayerIns(Rollback::saved_playerins, player, false, false);
     copy_BulletMan(Rollback::saved_bulletman, *(BulletMan**)Game::bullet_man, false);
-    //copy_class_14152d360(Rollback::saved_sfxobjs, (*(SfxMan**)Game::sfx_man)->FrpgFxManagerBase->base.Class_1415002c8->Class_14152d360, false);
+    copy_FXManager(Rollback::saved_sfxobjs, (*(SfxMan**)Game::sfx_man)->FrpgFxManagerBase->base.fXManager, false);
     copy_DamageMan(Rollback::saved_damageman, *(DamageMan**)Game::damage_man, false);
 }
 
@@ -123,7 +123,7 @@ void Rollback::GameStateLoad()
 
     copy_PlayerIns(player, Rollback::saved_playerins, true, false);
     copy_BulletMan(*(BulletMan**)Game::bullet_man, Rollback::saved_bulletman, true);
-    //copy_class_14152d360((*(SfxMan**)Game::sfx_man)->FrpgFxManagerBase->base.Class_1415002c8->Class_14152d360, Rollback::saved_sfxobjs, true);
+    copy_FXManager((*(SfxMan**)Game::sfx_man)->FrpgFxManagerBase->base.fXManager, Rollback::saved_sfxobjs, true);
     copy_DamageMan(*(DamageMan**)Game::damage_man, Rollback::saved_damageman, true);
 }
 

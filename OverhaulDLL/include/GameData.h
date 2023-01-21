@@ -462,9 +462,6 @@ static Set_Player_Sex_Specific_Attribs_FUNC* Set_Player_Sex_Specific_Attribs = (
 typedef void PlayerIns_Update_curSelectedMagicId_FUNC(PlayerIns* param_1, uint32_t curSelectedMagicId);
 static PlayerIns_Update_curSelectedMagicId_FUNC* PlayerIns_Update_curSelectedMagicId = (PlayerIns_Update_curSelectedMagicId_FUNC*)0x14035fd80;
 
-typedef uint64_t FUN_140f5f6c0_FUNC(uint64_t p);
-static FUN_140f5f6c0_FUNC* FUN_140f5f6c0 = (FUN_140f5f6c0_FUNC*)0x140f5f6c0;
-
 typedef void* smallObject_internal_malloc_FUNC(uint64_t heap, uint64_t size, uint64_t align);
 static smallObject_internal_malloc_FUNC* smallObject_internal_malloc = (smallObject_internal_malloc_FUNC*)0x140cbe4f0;
 
