@@ -662,8 +662,14 @@ static_assert(sizeof(ChrManipulator) == 0x230);
 
 struct NetworkManipulator
 {
-    //TODO this is used in place of PadManipulator in PlayerIns for remote PCs. Need to determine how to differentiate
+    ChrManipulator chrManipulator;
+    uint8_t padding_0[0x50];
+    uint8_t data_0[0x80];
 };
+
+static_assert(offsetof(NetworkManipulator, chrManipulator) == 0x0);
+static_assert(offsetof(NetworkManipulator, data_0) == 0x280);
+static_assert(sizeof(NetworkManipulator) == 0x300);
 
 struct PadManipulator
 {
@@ -797,7 +803,11 @@ struct ChrIns
     uint64_t field0x18;
     uint8_t padding_0a[0x40];
     PlayerCtrl* playerCtrl;
-    PadManipulator* padManipulator;
+    union
+    {
+        PadManipulator* padManipulator;
+        NetworkManipulator* netManipulator;
+    };
     uint8_t padding_1[0x54];
     int32_t CharaInitParamID;
     uint8_t padding_3[0x9c];

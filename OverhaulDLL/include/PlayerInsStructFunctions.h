@@ -5,9 +5,9 @@
 #include <stdint.h>
 #include "PlayerInsStruct.h"
 
-void copy_PlayerIns(PlayerIns* to, PlayerIns* from, bool to_game);
-PlayerIns* init_PlayerIns();
-void free_PlayerIns(PlayerIns* to);
+void copy_PlayerIns(PlayerIns* to, PlayerIns* from, bool to_game, bool is_networked);
+PlayerIns* init_PlayerIns(bool is_networked);
+void free_PlayerIns(PlayerIns* to, bool is_networked);
 
 void copy_ChrAsm(ChrAsm* to, ChrAsm* from);
 ChrAsm* init_ChrAsm();
@@ -55,9 +55,9 @@ void free_EquipMagicData(EquipMagicData* to);
 
 void copy_PlayerGameData_AttributeInfo(PlayerGameData_AttributeInfo* to, PlayerGameData_AttributeInfo* from);
 
-void copy_ChrIns(ChrIns* to, ChrIns* from, bool to_game);
-ChrIns* init_ChrIns();
-void free_ChrIns(ChrIns* to, bool freeself);
+void copy_ChrIns(ChrIns* to, ChrIns* from, bool to_game, bool is_networked);
+ChrIns* init_ChrIns(bool is_networked);
+void free_ChrIns(ChrIns* to, bool freeself, bool is_networked);
 
 void copy_ChrIns_field0x18(ChrIns_field0x18* to, ChrIns_field0x18* from);
 ChrIns_field0x18* init_ChrIns_field0x18();
@@ -88,6 +88,8 @@ PadManipulator* init_PadManipulator();
 void free_PadManipulator(PadManipulator* to);
 
 void copy_NetworkManipulator(NetworkManipulator* to, NetworkManipulator* from);
+NetworkManipulator* init_NetworkManipulator();
+void free_NetworkManipulator(NetworkManipulator* to);
 
 void copy_ChrManipulator(ChrManipulator* to, ChrManipulator* from);
 
