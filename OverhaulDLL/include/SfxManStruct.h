@@ -31,7 +31,7 @@ struct class_14150b808_field0x48
     uint8_t padding_0[0x28]; //wstring, set to null
     SFXEntry* parent;
     uint64_t unk6; //can be nulled without error
-    uint64_t vtable; //0x1415262e0
+    uint64_t vtable;
     void* unk7;
     void* unk8; //can be nulled without error
     void* unk9; //can be nulled without error
@@ -58,7 +58,7 @@ struct SFXEntry
         uint64_t vtable;
         void* field0x8; //can be nulled without error
         uint8_t data_0[24];
-        void* parent;
+        FXManager* parent;
         uint64_t unk1; //always null
         uint64_t unk2; //can be nulled without error
         SFXEntry* next;

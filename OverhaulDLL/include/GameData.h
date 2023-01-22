@@ -463,10 +463,10 @@ typedef void PlayerIns_Update_curSelectedMagicId_FUNC(PlayerIns* param_1, uint32
 static PlayerIns_Update_curSelectedMagicId_FUNC* PlayerIns_Update_curSelectedMagicId = (PlayerIns_Update_curSelectedMagicId_FUNC*)0x14035fd80;
 
 typedef void* smallObject_internal_malloc_FUNC(uint64_t heap, uint64_t size, uint64_t align);
-static smallObject_internal_malloc_FUNC* smallObject_internal_malloc = (smallObject_internal_malloc_FUNC*)0x140cbe4f0;
+static smallObject_internal_malloc_FUNC* smallObject_internal_malloc = (smallObject_internal_malloc_FUNC*)0x140cc20d0;
 
 typedef void* smallObject_internal_dealloc_FUNC(uint64_t heap, void* obj, uint64_t size, uint64_t align);
-static smallObject_internal_dealloc_FUNC* smallObject_internal_dealloc = (smallObject_internal_dealloc_FUNC*)0x140cbe790;
+static smallObject_internal_dealloc_FUNC* smallObject_internal_dealloc = (smallObject_internal_dealloc_FUNC*)0x140cc2370;
 
 typedef bool ok_to_enter_equipment_menu_FUNC(void* playerins);
 static ok_to_enter_equipment_menu_FUNC* ok_to_enter_equipment_menu = (ok_to_enter_equipment_menu_FUNC*)0x140361140;

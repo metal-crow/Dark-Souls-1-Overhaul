@@ -4,7 +4,7 @@
 
 void copy_FXManager(FXManager* to, FXManager* from, bool to_game)
 {
-    copy_SFXEntryList(to->SFXEntryList, from->SFXEntryList, to_game);
+    copy_SFXEntryList(to->SFXEntryList, from->SFXEntryList, to_game, to);
 }
 
 FXManager* init_FXManager()
@@ -24,7 +24,9 @@ void free_FXManager(FXManager* to)
 
 static const size_t max_preallocated_SFXEntries = 256;
 
-void copy_SFXEntryList(SFXEntry* to, SFXEntry* from, bool to_game)
+uint64_t* HeapPtr = (uint64_t*)(0x0141B67450 + 8);
+
+void copy_SFXEntryList(SFXEntry* to, SFXEntry* from, bool to_game, FXManager* parent)
 {
     if (!to_game)
     {
@@ -57,11 +59,12 @@ void copy_SFXEntryList(SFXEntry* to, SFXEntry* from, bool to_game)
         while (from)
         {
             copy_SFXEntry(to, from, to_game);
+            to->parent = parent;
 
             //handle if the game's list isn't long enough, and we need to alloc more slots
             if (from->next != NULL && to->next == NULL)
             {
-                to->next = (SFXEntry*)smallObject_internal_malloc(0, sizeof(SFXEntry), 0x10); //TODO
+                to->next = (SFXEntry*)smallObject_internal_malloc(*HeapPtr, sizeof(SFXEntry), 0x10);
                 to->next->next = NULL;
             }
 
@@ -73,7 +76,7 @@ void copy_SFXEntryList(SFXEntry* to, SFXEntry* from, bool to_game)
                 while (entry_to_free)
                 {
                     SFXEntry* next = entry_to_free->next;
-                    smallObject_internal_dealloc(0, entry_to_free, sizeof(SFXEntry), 0x10); //TODO
+                    smallObject_internal_dealloc(*HeapPtr, entry_to_free, sizeof(SFXEntry), 0x10);
                     entry_to_free = next;
                 }
                 break;
@@ -87,19 +90,20 @@ void copy_SFXEntryList(SFXEntry* to, SFXEntry* from, bool to_game)
 
 void copy_SFXEntry(SFXEntry* to, SFXEntry* from, bool to_game)
 {
-    to->vtable = 0x14152d360;
+    to->vtable = 0x14151c278;
     to->field0x8 = NULL;
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     to->parent = NULL;
     to->unk1 = NULL;
-    to->unk2 = NULL;
+    to->unk2 = NULL; //TODO
+    //TODO
     if (from->field0x48_head != NULL)
     {
         if (to->field0x48_head == NULL)
         {
             if (to_game)
             {
-                to->field0x48_head = (class_14150b808_field0x48*)smallObject_internal_malloc(0, sizeof(class_14150b808_field0x48), 8); //TODO
+                to->field0x48_head = (class_14150b808_field0x48*)smallObject_internal_malloc(*HeapPtr, sizeof(class_14150b808_field0x48), 8);
             }
             else
             {
@@ -118,7 +122,7 @@ void copy_SFXEntry(SFXEntry* to, SFXEntry* from, bool to_game)
     {
         if (to_game)
         {
-            smallObject_internal_dealloc(0, to->field0x48_head, sizeof(class_14150b808_field0x48), 8); //TODO
+            smallObject_internal_dealloc(*HeapPtr, to->field0x48_head, sizeof(class_14150b808_field0x48), 8);
         }
         else
         {
@@ -171,7 +175,7 @@ void copy_class_14150b808_field0x48(class_14150b808_field0x48* to, class_14150b8
     memset(to->padding_0, 0, sizeof(to->padding_0));
     //leave parent ptr alone
     to->unk6 = NULL;
-    to->vtable = 0x1415262e0;
+    to->vtable = 0x141519DA0;
     to->unk7 = from->unk7;
     to->unk8 = NULL;
     to->unk9 = NULL;

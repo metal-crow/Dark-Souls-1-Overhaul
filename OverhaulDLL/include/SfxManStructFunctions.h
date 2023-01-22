@@ -9,7 +9,7 @@ void copy_FXManager(FXManager* to, FXManager* from, bool to_game);
 FXManager* init_FXManager();
 void free_FXManager(FXManager* to);
 
-void copy_SFXEntryList(SFXEntry* to, SFXEntry* from, bool to_game);
+void copy_SFXEntryList(SFXEntry* to, SFXEntry* from, bool to_game, FXManager* parent);
 void copy_SFXEntry(SFXEntry* to, SFXEntry* from, bool to_game);
 SFXEntry* init_SFXEntryList();
 void free_SFXEntryList(SFXEntry* to);
