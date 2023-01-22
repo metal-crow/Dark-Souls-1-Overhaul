@@ -136,23 +136,22 @@ void copy_SFXEntry(SFXEntry* to, SFXEntry* from, bool to_game)
     to->parent = NULL;
     to->unk1 = NULL;
     to->unk2 = NULL; //TODO
-    //TODO
     if (from->field0x48_head != NULL)
     {
         if (to->field0x48_head == NULL)
         {
             if (to_game)
             {
-                to->field0x48_head = (class_14150b808_field0x48*)smallObject_internal_malloc(*HeapPtr, sizeof(class_14150b808_field0x48), 8);
+                to->field0x48_head = (FXEntry_Substruct*)smallObject_internal_malloc(*HeapPtr, sizeof(FXEntry_Substruct), 8);
                 to->field0x48_head->parent = to;
             }
             else
             {
-                to->field0x48_head = init_class_14150b808_field0x48();
+                to->field0x48_head = init_FXEntry_Substruct();
             }
         }
-        copy_class_14150b808_field0x48(to->field0x48_head, from->field0x48_head, to_game);
-        class_14150b808_field0x48* tail = to->field0x48_head;
+        copy_FXEntry_Substruct(to->field0x48_head, from->field0x48_head, to_game);
+        FXEntry_Substruct* tail = to->field0x48_head;
         while (tail->next != NULL)
         {
             tail = tail->next;
@@ -163,11 +162,11 @@ void copy_SFXEntry(SFXEntry* to, SFXEntry* from, bool to_game)
     {
         if (to_game)
         {
-            smallObject_internal_dealloc(*HeapPtr, to->field0x48_head, sizeof(class_14150b808_field0x48), 8);
+            smallObject_internal_dealloc(*HeapPtr, to->field0x48_head, sizeof(FXEntry_Substruct), 8);
         }
         else
         {
-            free_class_14150b808_field0x48(to->field0x48_head);
+            free_FXEntry_Substruct(to->field0x48_head);
         }
         to->field0x48_head = NULL;
         to->field0x48_tail = NULL;
@@ -196,43 +195,42 @@ void free_SFXEntryList(SFXEntry* to)
     SFXEntry* head = to;
     for (size_t i = 0; i < max_preallocated_SFXEntries; i++)
     {
-        free_class_14150b808_field0x48(to->field0x48_head);
+        free_FXEntry_Substruct(to->field0x48_head);
         head = (SFXEntry*)((uint64_t)(head)+sizeof(SFXEntry));
     }
     free(to);
 }
 
-void copy_class_14150b808_field0x48(class_14150b808_field0x48* to, class_14150b808_field0x48* from, bool to_game)
+void copy_FXEntry_Substruct(FXEntry_Substruct* to, FXEntry_Substruct* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-    to->self_class_1415262e0 = (uint64_t)to + 0xe0;
+    to->self_substruct2 = (uint64_t)to + 0xe0;
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
-    to->unk1 = from->unk1;
+    to->unk1 = 0; //TODO
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
     to->unk2 = NULL;
     to->next = NULL;
-    to->unk4 = from->unk4;
-    to->unk5 = from->unk5;
+    to->unk4 = 0; //TODO
+    to->unk5 = 0; //TODO
     memset(to->padding_0, 0, sizeof(to->padding_0));
     //leave parent ptr alone
     to->unk6 = NULL;
     to->vtable = 0x141519DA0;
-    to->unk7 = from->unk7;
+    to->unk7 = 0; //TODO
     to->unk8 = NULL;
     to->unk9 = NULL;
     to->unk10 = NULL;
-    to->unk11 = NULL;
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
 }
 
-class_14150b808_field0x48* init_class_14150b808_field0x48()
+FXEntry_Substruct* init_FXEntry_Substruct()
 {
-    class_14150b808_field0x48* local_class_14150b808_field0x48 = (class_14150b808_field0x48*)malloc_(sizeof(class_14150b808_field0x48));
+    FXEntry_Substruct* local_class_14150b808_field0x48 = (FXEntry_Substruct*)malloc_(sizeof(FXEntry_Substruct));
 
     return local_class_14150b808_field0x48;
 }
 
-void free_class_14150b808_field0x48(class_14150b808_field0x48* to)
+void free_FXEntry_Substruct(FXEntry_Substruct* to)
 {
     free(to);
 }
