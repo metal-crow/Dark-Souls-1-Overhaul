@@ -90,7 +90,7 @@ struct FXManager
 {
     uint64_t padding_0[3];
     SFXEntry* SFXEntryList;
-    SFXEntry* SFXEntryList_tail; //can ignore since it's unchanging after alloc
+    SFXEntry* SFXEntryList_tail; //can ignore since it's unchanging after alloc. Need to check to ensure we don't go past it, since it represents the last "valid" entry.
 };
 static_assert(offsetof(FXManager, SFXEntryList) == 0x18);
 

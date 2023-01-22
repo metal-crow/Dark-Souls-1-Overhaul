@@ -4,7 +4,7 @@
 
 void copy_FXManager(FXManager* to, FXManager* from, bool to_game)
 {
-    copy_SFXEntryList(to->SFXEntryList, from->SFXEntryList, to_game, to);
+    copy_SFXEntryList(to->SFXEntryList, from->SFXEntryList, to_game, to, from);
 }
 
 FXManager* init_FXManager()
@@ -26,7 +26,7 @@ static const size_t max_preallocated_SFXEntries = 256;
 
 uint64_t* HeapPtr = (uint64_t*)(0x0141B67450 + 8);
 
-void copy_SFXEntryList(SFXEntry* to, SFXEntry* from, bool to_game, FXManager* parent)
+void copy_SFXEntryList(SFXEntry* to, SFXEntry* from, bool to_game, FXManager* to_parent, FXManager* from_parent)
 {
     if (!to_game)
     {
@@ -39,6 +39,13 @@ void copy_SFXEntryList(SFXEntry* to, SFXEntry* from, bool to_game, FXManager* pa
                 break;
             }
             copy_SFXEntry(to, from, to_game);
+
+            //if we reach the tail here, we're at the last valid entry. The next ptr should be null anyway, but just to be safe
+            if (from == from_parent->SFXEntryList_tail)
+            {
+                to->next = NULL;
+                break;
+            }
 
             if (from->next != NULL)
             {
@@ -56,29 +63,62 @@ void copy_SFXEntryList(SFXEntry* to, SFXEntry* from, bool to_game, FXManager* pa
     }
     else
     {
+        //pre-process the list. If the target has too few or too many entries, need to correct that
+        SFXEntry* from_pre = from;
+        size_t from_len = 0;
+        while (from_pre)
+        {
+            from_len++;
+            from_pre = from_pre->next;
+        }
+
+        SFXEntry* to_pre = to;
+        size_t to_len = 0;
+        while (to_pre)
+        {
+            to_len++;
+            to_pre = to_pre->next;
+        }
+
+        //handle if the game's list is too long, and we need to free it's extra slots
+        if (from_len < to_len)
+        {
+            ConsoleWrite("Game SFXEntryList too long. Free");
+            for (from_len; from_len < to_len; from_len++)
+            {
+                SFXEntry* entry_to_free = to_parent->SFXEntryList;
+                to_parent->SFXEntryList = to_parent->SFXEntryList->next;
+                smallObject_internal_dealloc(*HeapPtr, entry_to_free, sizeof(SFXEntry), 0x10);
+            }
+        }
+        //handle if the game's list isn't long enough, and we need to alloc more slots
+        else if (from_len > to_len)
+        {
+            ConsoleWrite("Game SFXEntryList too short. Alloc");
+            for (to_len; to_len < from_len; to_len++)
+            {
+                SFXEntry* newEntry = (SFXEntry*)smallObject_internal_malloc(*HeapPtr, sizeof(SFXEntry), 0x10);
+                newEntry->field0x48_head = NULL;
+                newEntry->field0x48_tail = NULL;
+                newEntry->field0xe0 = NULL;
+                newEntry->field0xf0 = NULL;
+                newEntry->next = to_parent->SFXEntryList;
+
+                to_parent->SFXEntryList = newEntry;
+            }
+        }
+
+        to = to_parent->SFXEntryList;
         while (from)
         {
             copy_SFXEntry(to, from, to_game);
-            to->parent = parent;
+            to->parent = to_parent;
 
-            //handle if the game's list isn't long enough, and we need to alloc more slots
-            if (from->next != NULL && to->next == NULL)
+            // last valid entry failsafe
+            if (to == to_parent->SFXEntryList_tail && !(to->next == NULL && from->next == NULL))
             {
-                to->next = (SFXEntry*)smallObject_internal_malloc(*HeapPtr, sizeof(SFXEntry), 0x10);
-                to->next->next = NULL;
-            }
-
-            //handle if the game's list is too long, and we need to free it's extra slots
-            if (from->next == NULL && to->next != NULL)
-            {
-                SFXEntry* entry_to_free = to->next;
+                ConsoleWrite("Warning: early abort at last valid entry. Some SFX lost");
                 to->next = NULL;
-                while (entry_to_free)
-                {
-                    SFXEntry* next = entry_to_free->next;
-                    smallObject_internal_dealloc(*HeapPtr, entry_to_free, sizeof(SFXEntry), 0x10);
-                    entry_to_free = next;
-                }
                 break;
             }
 
@@ -104,6 +144,7 @@ void copy_SFXEntry(SFXEntry* to, SFXEntry* from, bool to_game)
             if (to_game)
             {
                 to->field0x48_head = (class_14150b808_field0x48*)smallObject_internal_malloc(*HeapPtr, sizeof(class_14150b808_field0x48), 8);
+                to->field0x48_head->parent = to;
             }
             else
             {
