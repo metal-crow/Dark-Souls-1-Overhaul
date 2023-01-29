@@ -16,6 +16,17 @@ typedef struct SFXEntry SFXEntry;
 typedef struct FXEntry_Substruct FXEntry_Substruct;
 typedef struct class_14152d360_field0xe0 class_14152d360_field0xe0;
 typedef struct class_14150b808_field0xf0 class_14150b808_field0xf0;
+typedef struct wstring wstring;
+
+struct wstring
+{
+    wchar_t* ptr;
+    wchar_t buf[8];
+    size_t chrLen;
+    size_t len;
+};
+
+static_assert(sizeof(wstring) == 0x28);
 
 struct FXEntry_Substruct
 {
@@ -26,13 +37,13 @@ struct FXEntry_Substruct
     uint8_t data_2[16];
     void* unk2; //can be nulled without error
     FXEntry_Substruct* next; //this is p much always null, probably safe to ignore
-    void* unk4; //needed, otherwise the sfx freezes in place
+    FXEntry_Substruct* linked; //needed, otherwise the sfx freezes in place
     void* unk5; //needed, otherwise game crashes
-    uint8_t padding_0[0x28]; //wstring, set to null
+    wstring str;
     SFXEntry* parent;
     uint64_t unk6; //can be nulled without error
     uint64_t vtable;
-    void* unk7; //needed, otherwise game crashes
+    FXEntry_Substruct* self; //needed, otherwise game crashes.
     void* unk8; //can be nulled without error
     void* unk9; //can be nulled without error
     void* unk10; //can be nulled without error
@@ -45,11 +56,12 @@ static_assert(offsetof(FXEntry_Substruct, unk1) == 0x70);
 static_assert(offsetof(FXEntry_Substruct, data_2) == 0x78);
 static_assert(offsetof(FXEntry_Substruct, unk2) == 0x88);
 static_assert(offsetof(FXEntry_Substruct, next) == 0x90);
-static_assert(offsetof(FXEntry_Substruct, unk4) == 0x98);
+static_assert(offsetof(FXEntry_Substruct, linked) == 0x98);
 static_assert(offsetof(FXEntry_Substruct, unk5) == 0xa0);
+static_assert(offsetof(FXEntry_Substruct, str) == 0xa8);
 static_assert(offsetof(FXEntry_Substruct, parent) == 0xd0);
 static_assert(offsetof(FXEntry_Substruct, unk6) == 0xd8);
-static_assert(offsetof(FXEntry_Substruct, unk7) == 0xe0+8);
+static_assert(offsetof(FXEntry_Substruct, self) == 0xe0+8);
 static_assert(offsetof(FXEntry_Substruct, data_3) == 0xe0+0x28);
 static_assert(sizeof(FXEntry_Substruct) == 0x130);
 

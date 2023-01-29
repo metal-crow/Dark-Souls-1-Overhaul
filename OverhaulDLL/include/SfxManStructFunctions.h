@@ -14,8 +14,9 @@ void copy_SFXEntry(SFXEntry* to, SFXEntry* from, bool to_game);
 SFXEntry* init_SFXEntryList();
 void free_SFXEntryList(SFXEntry* to);
 
-void copy_FXEntry_Substruct(FXEntry_Substruct* to, FXEntry_Substruct* from, bool to_game);
-FXEntry_Substruct* init_FXEntry_Substruct();
-void free_FXEntry_Substruct(FXEntry_Substruct* to);
+void copy_FXEntry_Substruct_List(FXEntry_Substruct* to, FXEntry_Substruct* from, bool to_game, SFXEntry* parent);
+void copy_FXEntry_Substruct(FXEntry_Substruct* to, FXEntry_Substruct* from, bool to_game, SFXEntry* parent);
+FXEntry_Substruct* init_FXEntry_Substruct_List();
+void free_FXEntry_Substruct_List(FXEntry_Substruct* to);
 
 #endif

@@ -5,6 +5,7 @@
 void copy_FXManager(FXManager* to, FXManager* from, bool to_game)
 {
     copy_SFXEntryList(to->SFXEntryList, from->SFXEntryList, to_game, to, from);
+    ConsoleWrite("--------------------------------------------");
 }
 
 FXManager* init_FXManager()
@@ -136,6 +137,7 @@ void copy_SFXEntry(SFXEntry* to, SFXEntry* from, bool to_game)
     to->parent = NULL;
     to->unk1 = NULL;
     to->unk2 = NULL; //TODO
+    //leave next ptr alone
     if (from->field0x48_head != NULL)
     {
         if (to->field0x48_head == NULL)
@@ -143,14 +145,13 @@ void copy_SFXEntry(SFXEntry* to, SFXEntry* from, bool to_game)
             if (to_game)
             {
                 to->field0x48_head = (FXEntry_Substruct*)smallObject_internal_malloc(*HeapPtr, sizeof(FXEntry_Substruct), 8);
-                to->field0x48_head->parent = to;
             }
             else
             {
-                to->field0x48_head = init_FXEntry_Substruct();
+                to->field0x48_head = init_FXEntry_Substruct_List();
             }
         }
-        copy_FXEntry_Substruct(to->field0x48_head, from->field0x48_head, to_game);
+        copy_FXEntry_Substruct_List(to->field0x48_head, from->field0x48_head, to_game, to);
         FXEntry_Substruct* tail = to->field0x48_head;
         while (tail->next != NULL)
         {
@@ -166,7 +167,7 @@ void copy_SFXEntry(SFXEntry* to, SFXEntry* from, bool to_game)
         }
         else
         {
-            free_FXEntry_Substruct(to->field0x48_head);
+            free_FXEntry_Substruct_List(to->field0x48_head);
         }
         to->field0x48_head = NULL;
         to->field0x48_tail = NULL;
@@ -195,42 +196,177 @@ void free_SFXEntryList(SFXEntry* to)
     SFXEntry* head = to;
     for (size_t i = 0; i < max_preallocated_SFXEntries; i++)
     {
-        free_FXEntry_Substruct(to->field0x48_head);
+        free_FXEntry_Substruct_List(to->field0x48_head);
         head = (SFXEntry*)((uint64_t)(head)+sizeof(SFXEntry));
     }
     free(to);
 }
 
-void copy_FXEntry_Substruct(FXEntry_Substruct* to, FXEntry_Substruct* from, bool to_game)
+static const size_t max_preallocated_FXEntry_Substruct_Entries = 16;
+
+void copy_FXEntry_Substruct_List(FXEntry_Substruct* to, FXEntry_Substruct* from, bool to_game, SFXEntry* parent)
+{
+    if (!to_game)
+    {
+        size_t to_index = 0;
+        while (from)
+        {
+            if (to_index >= max_preallocated_FXEntry_Substruct_Entries)
+            {
+                ConsoleWrite("Unable to recursivly copy FXEntry_Substruct from the game. Out of space.");
+                break;
+            }
+            copy_FXEntry_Substruct(to, from, to_game, parent);
+
+            if (from->linked != NULL)
+            {
+                to->linked = (FXEntry_Substruct*)((uint64_t)(to)+sizeof(FXEntry_Substruct));
+            }
+            else
+            {
+                to->linked = NULL;
+            }
+
+            from = from->linked;
+            to = (FXEntry_Substruct*)((uint64_t)(to)+sizeof(FXEntry_Substruct));
+            to_index += 1;
+        }
+    }
+    else
+    {
+        //pre-process the list. If the target has too few or too many entries, need to correct that
+        FXEntry_Substruct* from_pre = from;
+        size_t from_len = 0;
+        while (from_pre)
+        {
+            from_len++;
+            from_pre = from_pre->linked;
+        }
+
+        FXEntry_Substruct* to_pre = to;
+        size_t to_len = 0;
+        while (to_pre)
+        {
+            to_len++;
+            to_pre = to_pre->linked;
+        }
+
+        //handle if the game's list is too long, and we need to free it's extra slots
+        if (from_len < to_len)
+        {
+            ConsoleWrite("Game FXEntry_Substruct List too long. Free");
+            FXEntry_Substruct* entry_to_free = to;
+            for (size_t i = 1; i < from_len; i++)
+            {
+                entry_to_free = entry_to_free->linked;
+            }
+            FXEntry_Substruct* next_entry_to_free;
+            for (from_len; from_len < to_len; from_len++)
+            {
+                next_entry_to_free = entry_to_free->linked;
+                entry_to_free->linked = NULL;
+                smallObject_internal_dealloc(*HeapPtr, entry_to_free, sizeof(FXEntry_Substruct), 8);
+                entry_to_free = next_entry_to_free;
+            }
+        }
+        //handle if the game's list isn't long enough, and we need to alloc more slots
+        else if (from_len > to_len)
+        {
+            ConsoleWrite("Game FXEntry_Substruct List too short. Alloc");
+            FXEntry_Substruct* last_entry = to;
+            for (size_t i = 1; i < to_len; i++)
+            {
+                last_entry = last_entry->linked;
+            }
+            for (to_len; to_len < from_len; to_len++)
+            {
+                FXEntry_Substruct* newEntry = (FXEntry_Substruct*)smallObject_internal_malloc(*HeapPtr, sizeof(FXEntry_Substruct), 8);
+                newEntry->linked = NULL;
+                newEntry->self = newEntry;
+                last_entry->linked = newEntry;
+                last_entry = newEntry;
+            }
+        }
+
+        while (from)
+        {
+            copy_FXEntry_Substruct(to, from, to_game, parent);
+            from = from->linked;
+            to = to->linked;
+        }
+    }
+}
+
+void copy_FXEntry_Substruct(FXEntry_Substruct* to, FXEntry_Substruct* from, bool to_game, SFXEntry* parent)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     to->self_substruct2 = (uint64_t)to + 0xe0;
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
-    to->unk1 = 0; //TODO
+    to->unk1 = from->unk1;
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
     to->unk2 = NULL;
-    to->next = NULL;
-    to->unk4 = 0; //TODO
-    to->unk5 = 0; //TODO
-    memset(to->padding_0, 0, sizeof(to->padding_0));
-    //leave parent ptr alone
+    to->next = NULL; //TODO
+    //leaved linked ptr alone
+    to->unk5 = from->unk5;
+    memcpy(&to->str, &from->str, sizeof(to->str));
+    to->parent = parent;
     to->unk6 = NULL;
     to->vtable = 0x141519DA0;
-    to->unk7 = 0; //TODO
+    to->self = to;
     to->unk8 = NULL;
     to->unk9 = NULL;
     to->unk10 = NULL;
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
+
+    FXEntry_Substruct* printer;
+    const size_t len = 4092;
+    size_t ofst = 0;
+    char buf[len];
+    if (!to_game)
+    {
+        printer = from;
+    }
+    else
+    {
+        printer = to;
+    }
+
+    ofst += snprintf(buf+ofst, len,"parent sfxid=%d addr=%p ", *(uint32_t*)(((uint64_t)parent) + 0x14), printer);
+    for (size_t i = 0; i < sizeof(printer->data_0); i+=4)
+    {
+        ofst += snprintf(buf + ofst, len, "%x ", *(uint32_t*)(&printer->data_0[i]));
+    }
+    ofst += snprintf(buf + ofst, len, "%llx ", printer->self_substruct2);
+    for (size_t i = 0; i < sizeof(printer->data_1); i += 2)
+    {
+        ofst += snprintf(buf + ofst, len, "%x ", *(uint16_t*)(&printer->data_1[i]));
+    }
+    ofst += snprintf(buf + ofst, len, "%llx ", (uint64_t)printer->unk1);
+    for (size_t i = 0; i < sizeof(printer->data_2); i += 2)
+    {
+        ofst += snprintf(buf + ofst, len, "%x ", *(uint16_t*)(&printer->data_2[i]));
+    }
+    ofst += snprintf(buf + ofst, len, "next=%llx ", (uint64_t)printer->next);
+    ofst += snprintf(buf + ofst, len, "linked=%llx ", (uint64_t)printer->linked);
+    ofst += snprintf(buf + ofst, len, "%llx ", (uint64_t)printer->unk5);
+    ofst += snprintf(buf + ofst, len, "strptr=%llx ", (uint64_t)printer->str.ptr);
+    ofst += snprintf(buf + ofst, len, "parent=%llx ", (uint64_t)printer->parent);
+    for (size_t i = 0; i < sizeof(printer->data_3); i += 4)
+    {
+        ofst += snprintf(buf + ofst, len, "%x ", *(uint32_t*)(&printer->data_3[i]));
+    }
+    ConsoleWrite(buf);
 }
 
-FXEntry_Substruct* init_FXEntry_Substruct()
+FXEntry_Substruct* init_FXEntry_Substruct_List()
 {
-    FXEntry_Substruct* local_class_14150b808_field0x48 = (FXEntry_Substruct*)malloc_(sizeof(FXEntry_Substruct));
+    //this is a linked list, so pre-allocate a max of 8 for the classes
+    FXEntry_Substruct* local_class_14150b808_field0x48 = (FXEntry_Substruct*)malloc_(sizeof(FXEntry_Substruct)*max_preallocated_FXEntry_Substruct_Entries);
 
     return local_class_14150b808_field0x48;
 }
 
-void free_FXEntry_Substruct(FXEntry_Substruct* to)
+void free_FXEntry_Substruct_List(FXEntry_Substruct* to)
 {
     free(to);
 }
