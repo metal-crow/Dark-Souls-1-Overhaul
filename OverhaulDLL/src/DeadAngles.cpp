@@ -24,6 +24,12 @@ static const float dead_angle_radians = (float)(80.0 * (M_PI/180.0));
 
 uint64_t main_dead_angle_helper(uint64_t attacker, uint64_t target)
 {
+    //only use dead angles if both players have the mod
+    if (Mod::get_mode() == ModMode::Compatability)
+    {
+        return 1;
+    }
+
     auto target_rotation = Game::get_entity_rotation((void*)target);
     auto attacker_rotation = Game::get_entity_rotation((void*)attacker);
     if (!target_rotation.has_value() ||! attacker_rotation.has_value())
