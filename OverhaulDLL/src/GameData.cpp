@@ -1084,10 +1084,6 @@ std::optional<uint32_t> Game::convert_playernum_to_handle(uint32_t playernum) {
     }
 }
 
-uint32_t Game::get_last_attack_weapon_id() {
-    return last_attack_weaponid;
-}
-
 std::optional<void*> Game::get_pc_ActiveState_EzStateMachineImpl() {
     if (pc_EzStateMachineImpl_cache) {
         return *pc_EzStateMachineImpl_cache;

@@ -301,8 +301,6 @@ public:
 
     static std::optional<uint32_t> convert_playernum_to_handle(uint32_t playernum);
 
-    static uint32_t get_last_attack_weapon_id();
-
 	static std::optional<void*> get_pc_ActiveState_EzStateMachineImpl();
 
 	static std::optional<uint64_t> get_EzStateMachineImpl_curstate_id(void * EzStateMachineImpl);
