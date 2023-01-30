@@ -75,10 +75,6 @@ uint64_t Game::delay_delete_man = NULL;
 sp::mem::pointer<int32_t> Game::player_char_status;
 
 extern "C" {
-    uint32_t last_attack_weaponid;
-    uint64_t calculate_attack_damage_injection_return;
-    void calculate_attack_damage_injection();
-
     bool char_loaded;
     uint64_t char_loaded_injection_return;
     void char_loaded_injection();
@@ -190,11 +186,6 @@ void Game::init()
 void Game::injections_init()
 {
     uint8_t* write_address;
-
-    //hook the code that calculates attack damage and save off the weapon id used for the attack
-    last_attack_weaponid = -1;
-    write_address = (uint8_t*)(Game::calculate_attack_damage_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &calculate_attack_damage_injection_return, 1, &calculate_attack_damage_injection);
 
     //inject the code that detects if the character is loaded in or not
     char_loaded = false;
