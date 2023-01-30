@@ -58,7 +58,7 @@ __Overhaul__ mode can be switched on to get the full suite of improvements this 
 * Bug fix for invisible attacks after backstabs
 
 * Dead Angles and Ghost Hits are back, and made slighly more consistent  
-This only affects you, the client. If you are playing with a non-mod user, they can dead angle you but you can't them.
+These are only enabled if both users have the mod installed.
 
 * Equipment (except weapons) can again be changed while in any animation
 
