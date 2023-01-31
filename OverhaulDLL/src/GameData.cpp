@@ -955,7 +955,8 @@ std::optional<int32_t*> Game::get_saved_chars_menu_flag() {
     }
 
     sp::mem::pointer saved_chars_menu_flag = sp::mem::pointer<int32_t>((void*)(Game::menu_man), { 0xA4 });
-    if (saved_chars_menu_flag.resolve() == NULL || !character_reload_run) {
+    //don't check for character_reload_run here, since this is called before chr load
+    if (saved_chars_menu_flag.resolve() == NULL) {
         return std::nullopt;
     }
     else {
