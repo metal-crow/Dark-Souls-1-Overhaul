@@ -45,8 +45,6 @@ __Overhaul__ mode can be switched on to get the full suite of improvements this 
 	
 ### Legacy
 
-* Skip logos on game start
-
 * NPCs and bosses can no longer be killed by hackers
 
 * Hackers can no longer force you into Binoculars or Dragon form, or apply other bad effects to you
@@ -95,12 +93,12 @@ Specify folder location + filenames to use, and the alternate path will be used 
 * Fix for the halberd instant running attack glitch in mud and pvp
 
 * New items added:
-  * "__Searching Red Eye Orb__" (id 104, available from the Undead Merchant), that searches all multiplayer areas while trying to invade. This allows you to invade any area across the entire game via 1 single use. It will continually search all areas rapidly, until cancelled or invasion found.
-  * "__Unbound Red Eye Orb__" (id 105, available from the Undead Merchant), that does PTDE-style red eye invasions: searching infinitely upwards in Soul Level. This means, as a SL 100 character, you can invade anyone from SL 90 to SL 713. This doesn't also enable infinite upwards weapon level searching, however.
-  * "__Twin Red Eye Orb__" (id 107, available from the Undead Merchant), that does both of the above orbs' functions, combined.
-  * "__Searching Blue Eye Orb__" (id 150, available from the Undead Merchant), a variant of the "Searching Red Eye Orb" used to look for for blue (Darkmoon Covenant) invasions across all areas.
-  * "__Unbound Blue Eye Orb__" (id 151, available from the Undead Merchant), a variant of the "Unbound Red Eye Orb" used to look for blue (Darkmoon Covenant) invasions while searching infinitely upwards in Soul Level.
-  * "__Twin Blue Eye Orb__" (id 152, available from the Undead Merchant), a variant of the "Unbound Red Eye Orb" that does both of the above orbs' functions, combined.
+  * "__Searching Red Eye Orb__" (id 104, available from Rickert of Vinheim), that searches all multiplayer areas while trying to invade. This allows you to invade any area across the entire game via 1 single use. It will continually search all areas rapidly, until cancelled or invasion found.
+  * "__Unbound Red Eye Orb__" (id 105, available from Rickert of Vinheim), that does PTDE-style red eye invasions: searching infinitely upwards in Soul Level. This means, as a SL 100 character, you can invade anyone from SL 90 to SL 713. This doesn't also enable infinite upwards weapon level searching, however.
+  * "__Twin Red Eye Orb__" (id 107, available from Rickert of Vinheim), that does both of the above orbs' functions, combined.
+  * "__Searching Blue Eye Orb__" (id 150, available from Rickert of Vinheim), a variant of the "Searching Red Eye Orb" used to look for for blue (Darkmoon Covenant) invasions across all areas.
+  * "__Unbound Blue Eye Orb__" (id 151, available from Rickert of Vinheim), a variant of the "Unbound Red Eye Orb" used to look for blue (Darkmoon Covenant) invasions while searching infinitely upwards in Soul Level.
+  * "__Twin Blue Eye Orb__" (id 152, available from Rickert of Vinheim), a variant of the "Unbound Red Eye Orb" that does both of the above orbs' functions, combined.
 
 * System for selecting what areas you want to try invading with the above eye orbs.  
 Edit the included searchlist.txt with what areas to search for, and the orbs will only look in those areas.  
