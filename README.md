@@ -134,3 +134,5 @@ These include everything EXCEPT: Combustions, Firestorms, and all miracles but L
 
 * Large scale health increase across the board.  
 Average SL 125 build should be \~3k HP.
+
+* Dusk Crown now only increases magic damage.
