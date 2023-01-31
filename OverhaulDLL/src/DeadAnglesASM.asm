@@ -1,7 +1,7 @@
 _DATA SEGMENT
 
 jnz_one dq 14032930eh
-jmp_two dq 1428d1209h
+jmp_two dq 140334513h
 
 _DATA ENDS
 
