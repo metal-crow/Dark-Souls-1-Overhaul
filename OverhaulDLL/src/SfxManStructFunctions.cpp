@@ -290,6 +290,7 @@ void copy_FXEntry_Substruct_Obj(FXEntry_Substruct* to, FXEntry_Substruct* from, 
     to->unk10 = NULL;
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
 
+#if 0
     FXEntry_Substruct* printer;
     const size_t len = 4092;
     size_t ofst = 0;
@@ -308,7 +309,7 @@ void copy_FXEntry_Substruct_Obj(FXEntry_Substruct* to, FXEntry_Substruct* from, 
     {
         ofst += snprintf(buf + ofst, len, "%x ", *(uint32_t*)(&printer->data_0[i]));
     }
-    ofst += snprintf(buf + ofst, len, "self_substruct2=%llx ", printer->self_substruct2);
+    ofst += snprintf(buf + ofst, len, "self_substruct2 offset=%llx ", (uint64_t)printer->self_substruct2-(uint64_t)printer);
     for (size_t i = 0; i < sizeof(printer->data_1); i += 2)
     {
         ofst += snprintf(buf + ofst, len, "%x ", *(uint16_t*)(&printer->data_1[i]));
@@ -328,6 +329,7 @@ void copy_FXEntry_Substruct_Obj(FXEntry_Substruct* to, FXEntry_Substruct* from, 
         ofst += snprintf(buf + ofst, len, "%x ", *(uint32_t*)(&printer->data_3[i]));
     }
     ConsoleWrite(buf);
+#endif
 }
 
 FXEntry_Substruct* init_FXEntry_Substruct()
