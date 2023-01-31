@@ -214,6 +214,11 @@ void Game::injections_init()
     uint8_t pat[] = { 0xb9, 0x03, 0x0, 0x0, 0x0, 0x90 };
     write_address = (uint8_t*)(Game::LogoSkip_offset + Game::ds1_base);
     sp::mem::patch_bytes(write_address, pat, 6);
+
+    //inject code to skip validating the player face/hair/body data
+    uint8_t Validate_Type6FaceData_patch[] = { 0xB0, 0x1, 0x90, 0x90, 0x90 }; //mov al, 1
+    write_address = (uint8_t*)(Game::Validate_Type6FaceData_offset + Game::ds1_base);
+    sp::mem::patch_bytes(write_address, Validate_Type6FaceData_patch, 5);
 }
 
 static bool character_reload_run = false;

@@ -183,6 +183,8 @@ public:
 
     static const uint64_t LogoSkip_offset = 0x70f130;
 
+    static const uint64_t Validate_Type6FaceData_offset = 0x506e04;
+
     // Player character status (loading, human, co-op, invader, hollow)
     static sp::mem::pointer<int32_t> player_char_status;
 
