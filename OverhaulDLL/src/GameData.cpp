@@ -973,7 +973,8 @@ std::optional<int32_t*> Game::get_main_menu_flag()
     }
 
     sp::mem::pointer main_menu_flag = sp::mem::pointer<int32_t>((void*)(Game::menu_man), { 0x80 });
-    if (main_menu_flag.resolve() == NULL || !character_reload_run)
+    //don't check for character_reload_run here, since this is called before chr load
+    if (main_menu_flag.resolve() == NULL)
     {
         return std::nullopt;
     }
@@ -990,7 +991,8 @@ std::optional<uint8_t*> Game::get_saved_chars_preview_data() {
     }
 
     sp::mem::pointer saved_chars_preview_data = sp::mem::pointer<uint8_t>((void*)(Game::game_data_man), { 0x60, 0x10 });
-    if (saved_chars_preview_data.resolve() == NULL || !character_reload_run) {
+    //don't check for character_reload_run here, since this is called before chr load
+    if (saved_chars_preview_data.resolve() == NULL) {
         return std::nullopt;
     }
     else {
