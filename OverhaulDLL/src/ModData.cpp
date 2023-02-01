@@ -255,6 +255,40 @@ bool Mod::mode_setting_process(void* unused)
                     Mod::change_mode(Mod::next_mode);
                 }
             }
+            // Handle setting the speffect to show the current mode
+            //add the speffect for the current mode, if applicable and not present
+            uint32_t currentModeSpeffectId = ModModes_To_Speffect.at(Mod::current_mode);
+            if (currentModeSpeffectId != -1)
+            {
+                auto playerCurrentModeSpeffect_o = Game::player_get_speffect(playerIns, currentModeSpeffectId);
+                if (!playerCurrentModeSpeffect_o.has_value())
+                {
+                    Game::player_add_speffect(currentModeSpeffectId);
+                    playerCurrentModeSpeffect_o = Game::player_get_speffect(playerIns, currentModeSpeffectId);
+                    if (!playerCurrentModeSpeffect_o.has_value())
+                    {
+                        ConsoleWrite("WARNING: unable to add speffect to indicate current mode.");
+                    }
+                    else
+                    {
+                        //update life to last forever
+                        *(float*)(playerCurrentModeSpeffect_o.value() + 0) = -1.0f;
+                    }
+                }
+            }
+            //delete the speffects for the other modes
+            for (auto const& modespeffect : ModModes_To_Speffect)
+            {
+                if (modespeffect.first != Mod::current_mode && modespeffect.second != -1)
+                {
+                    auto otherModeSpeffect = Game::player_get_speffect(playerIns, modespeffect.second);
+                    if (otherModeSpeffect.has_value())
+                    {
+                        //update life to 0
+                        *(float*)(otherModeSpeffect.value() + 0) = 0.0f;
+                    }
+                }
+            }
         }
     }
 

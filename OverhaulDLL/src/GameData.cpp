@@ -1237,6 +1237,39 @@ bool Game::player_has_speffect(uint64_t playerins, std::unordered_set<uint32_t> 
     return false;
 }
 
+std::optional<SpecialEffect_Info*> Game::player_get_speffect(uint64_t playerins, uint32_t speffectId)
+{
+    if (speffectId == -1)
+    {
+        return std::nullopt;
+    }
+    uint64_t chrIns = (uint64_t)(playerins + 0x8);
+    uint64_t specialEffects = *(uint64_t*)(chrIns + 0x270);
+    uint64_t specialEffectInfo = *(uint64_t*)(specialEffects + 0x8 + 0x0);
+    while (true)
+    {
+        if (specialEffectInfo == 0x0)
+        {
+            return std::nullopt;
+        }
+        uint32_t specialEffectInfo_id = *(uint32_t*)(specialEffectInfo + 0x30);
+        if (specialEffectInfo_id == speffectId)
+        {
+            return (SpecialEffect_Info*)specialEffectInfo;
+        }
+        //get next in linked list
+        specialEffectInfo = *(uint64_t*)(specialEffectInfo + 0x40);
+    }
+    return std::nullopt;
+}
+
+
+void Game::player_add_speffect(uint32_t speffectId)
+{
+    //0x2710 is hardcoded to the PC
+    return lua_SetEventSpecialEffect_2_function(NULL, 0x2710, speffectId);
+}
+
 std::optional<void*> Game::get_host_player_gamedata()
 {
     if (host_player_gamedata_cache)

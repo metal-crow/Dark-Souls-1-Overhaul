@@ -321,6 +321,10 @@ public:
 
 	static bool player_has_speffect(uint64_t playerins, std::unordered_set<uint32_t> speffects);
 
+    static std::optional<SpecialEffect_Info*> player_get_speffect(uint64_t playerins, uint32_t speffectId);
+
+    static void player_add_speffect(uint32_t speffectId);
+
 	static std::optional<void*> get_host_player_gamedata();
 
 	static bool set_display_name(bool useSteam);
@@ -524,5 +528,8 @@ static InGame_Malloc_FUNC* InGame_Malloc = (InGame_Malloc_FUNC*)0x140cc3e10;
 
 typedef void ChrAsmModelRes_Load_PartsbndFileCap_Entry_FUNC(void* ChrAsmModelRes, void* ChrAsm, uint8_t param_3, uint8_t param_4, uint8_t param_5, uint8_t param_6, uint8_t param_7, uint8_t param_8);
 static ChrAsmModelRes_Load_PartsbndFileCap_Entry_FUNC* ChrAsmModelRes_Load_PartsbndFileCap_Entry = (ChrAsmModelRes_Load_PartsbndFileCap_Entry_FUNC*)0x14020a280;
+
+typedef void lua_SetEventSpecialEffect_2_FUNC(void* unused, uint32_t target, uint32_t speffectId);
+static lua_SetEventSpecialEffect_2_FUNC* lua_SetEventSpecialEffect_2_function = (lua_SetEventSpecialEffect_2_FUNC*)0x140487d00;
 
 #endif // _DS1_OVERHAUL_GAME_DATA_H_
