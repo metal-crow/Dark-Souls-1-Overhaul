@@ -2,9 +2,7 @@ _DATA SEGMENT
 
 get_EzMenuEzMenuDlgObj_for_namedObj   dq  140ed6020h
 MenuDlgObjStr   dw  "i","c","o","n","_","l","e","v","e","l","s","y","n","c",0 ;unicode
-FloatingMultiplayHpBar_ShowIcon   dq  140edbdb0h
-FUN_14031ff30   dq  140322180h
-loc_1406F352A   dq  1406f5e3ah
+loc_1406F6154   dq  1406F6154h
 
 _DATA ENDS
 
@@ -43,27 +41,57 @@ Insert_IconObj_FrpgMenuDlgFloatingPCGauge_injection ENDP
 
 
 EXTERN Render_IconObj_FrpgMenuDlgFloatingPCGauge_return: qword
+extern Render_IconObj_FrpgMenuDlgFloatingPCGauge_helper: PROC
 
 PUBLIC Render_IconObj_FrpgMenuDlgFloatingPCGauge_injection
 Render_IconObj_FrpgMenuDlgFloatingPCGauge_injection PROC
-;custom code
-mov     rcx, [r14+250h] ;the custom icon obj
-test    rcx, rcx
-jz      noNewIconRender
-mov     edx, 1 ;if we should render the icon
-call    qword ptr [FloatingMultiplayHpBar_ShowIcon] ;function to render icon
+
+sub     rsp, 10h
+movdqu  [rsp], xmm0
+sub     rsp, 10h
+movdqu  [rsp], xmm1
+sub     rsp, 10h
+movdqu  [rsp], xmm2
+sub     rsp, 10h
+movdqu  [rsp], xmm3
+push    rax
+push    rcx
+push    rdx
+push    r8
+push    r9
+push    r10
+push    r11
+sub     rsp, 28h
+
+mov     rcx, r14 ;the FrpgMenuDlgFloatingPCGauge obj
+call    Render_IconObj_FrpgMenuDlgFloatingPCGauge_helper
+
+add     rsp, 28h
+pop     r11
+pop     r10
+pop     r9
+pop     r8
+pop     rdx
+pop     rcx
+pop     rax
+movdqu  xmm3, [rsp]
+add     rsp, 10h
+movdqu  xmm2, [rsp]
+add     rsp, 10h
+movdqu  xmm1, [rsp]
+add     rsp, 10h
+movdqu  xmm0, [rsp]
+add     rsp, 10h
 
 ;original code
-noNewIconRender:
-mov     rcx, rdi
-call    qword ptr [FUN_14031ff30]
-cmp     eax, 2
-jnz     continue
-jmp     qword ptr [loc_1406F352A]
+cmp     qword ptr [rbp-9], 8
+jnb     continue 
+jmp     qword ptr [loc_1406F6154]
 continue:
-mov     rcx, rdi
-
+mov     rcx, [rbp-29h]
+mov     rax, [rcx]
 jmp     Render_IconObj_FrpgMenuDlgFloatingPCGauge_return
+
 Render_IconObj_FrpgMenuDlgFloatingPCGauge_injection ENDP
 
 _TEXT    ENDS
