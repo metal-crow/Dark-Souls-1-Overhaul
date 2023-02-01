@@ -36,6 +36,8 @@ std::set<std::wstring> Files::files_to_always_intercept_loading = {
     L"fdlc_main.fev",
     L"fdlc_main.fsb",
     L"item.msgbnd.dcx",
+    L"menu.drb.dcx",
+    L"menu_3.tpf.dcx",
 };
 
 bool Files::UseOverhaulFiles = false;

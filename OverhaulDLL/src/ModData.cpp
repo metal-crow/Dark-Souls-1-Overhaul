@@ -264,16 +264,6 @@ bool Mod::mode_setting_process(void* unused)
                 if (!playerCurrentModeSpeffect_o.has_value())
                 {
                     Game::player_add_speffect(currentModeSpeffectId);
-                    playerCurrentModeSpeffect_o = Game::player_get_speffect(playerIns, currentModeSpeffectId);
-                    if (!playerCurrentModeSpeffect_o.has_value())
-                    {
-                        ConsoleWrite("WARNING: unable to add speffect to indicate current mode.");
-                    }
-                    else
-                    {
-                        //update life to last forever
-                        *(float*)(playerCurrentModeSpeffect_o.value() + 0) = -1.0f;
-                    }
                 }
             }
             //delete the speffects for the other modes
