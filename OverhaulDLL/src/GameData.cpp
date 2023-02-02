@@ -95,6 +95,10 @@ extern "C" {
     uint64_t grab_destruct_thread_handle_return;
     void grab_destruct_thread_handle_injection();
     void grab_destruct_thread_handle_helper(HANDLE);
+
+    uint64_t Step_PadMan_ReadInputs_return;
+    bool Step_PadMan_ReadInputs_allowed = true;
+    void Step_PadMan_ReadInputs_injection();
 }
 
 // Flag to determine if a character have been loaded since the game was launched (useful if player had a character loaded but returned to main menu)
@@ -219,6 +223,10 @@ void Game::injections_init()
     uint8_t Validate_Type6FaceData_patch[] = { 0xB0, 0x1, 0x90, 0x90, 0x90 }; //mov al, 1
     write_address = (uint8_t*)(Game::Validate_Type6FaceData_offset + Game::ds1_base);
     sp::mem::patch_bytes(write_address, Validate_Type6FaceData_patch, 5);
+
+    //inject code to control if Step_PadMan can read inputs or not
+    write_address = (uint8_t*)(Game::Step_PadMan_ReadInputs_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &Step_PadMan_ReadInputs_return, 2, &Step_PadMan_ReadInputs_injection);
 }
 
 static bool character_reload_run = false;
@@ -1531,6 +1539,10 @@ void Game::Step_GameSimulation(bool renderFrame)
     {
         MoveMapStep_Step_13(MoveMapStep, FRAMETIME);
     }
+    //need to prevent the game from reading inputs directly here
+    Step_PadMan_ReadInputs_allowed = false;
+    Step_PadMan(FRAMETIME);
+    Step_PadMan_ReadInputs_allowed = true;
     Step_Havok(*(void**)Game::frpg_havok_man_imp, FRAMETIME);
     FinishStep_Havok(*(void**)Game::frpg_havok_man_imp);
 }

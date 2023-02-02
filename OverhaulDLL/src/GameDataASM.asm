@@ -1,6 +1,7 @@
 _DATA SEGMENT
 
 aUnnamed_1      dq  1414a5f80h
+LAB_1401ad106   dq  1401ad106h
 
 _DATA ENDS
 
@@ -201,6 +202,30 @@ add     rsp, 10h
 
 jmp     grab_destruct_thread_handle_return
 grab_destruct_thread_handle_injection ENDP
+
+
+EXTERN Step_PadMan_ReadInputs_return: qword
+extern Step_PadMan_ReadInputs_allowed: byte
+
+PUBLIC Step_PadMan_ReadInputs_injection
+Step_PadMan_ReadInputs_injection PROC
+;original code
+mov     rcx, [rbx+8]
+mov     [rbx+2Ch], rbp
+test    rcx, rcx
+jnz     continue
+jmp     qword ptr [LAB_1401ad106]
+
+;custom code to check bool
+continue:
+cmp     Step_PadMan_ReadInputs_allowed, 0
+jnz     continueAllowed
+jmp     qword ptr [LAB_1401ad106]
+
+continueAllowed:
+mov     rax, [rcx] ;original code
+jmp     Step_PadMan_ReadInputs_return
+Step_PadMan_ReadInputs_injection ENDP
 
 _TEXT    ENDS
 

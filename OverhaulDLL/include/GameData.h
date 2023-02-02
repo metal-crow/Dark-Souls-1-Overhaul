@@ -185,6 +185,8 @@ public:
 
     static const uint64_t Validate_Type6FaceData_offset = 0x506e04;
 
+    static const uint64_t Step_PadMan_ReadInputs_offset = 0x1ad0f0;
+
     // Player character status (loading, human, co-op, invader, hollow)
     static sp::mem::pointer<int32_t> player_char_status;
 
@@ -531,5 +533,8 @@ static ChrAsmModelRes_Load_PartsbndFileCap_Entry_FUNC* ChrAsmModelRes_Load_Parts
 
 typedef void lua_SetEventSpecialEffect_2_FUNC(void* unused, uint32_t target, uint32_t speffectId);
 static lua_SetEventSpecialEffect_2_FUNC* lua_SetEventSpecialEffect_2_function = (lua_SetEventSpecialEffect_2_FUNC*)0x140487d00;
+
+typedef void Step_PadMan_FUNC(float frame_time);
+static Step_PadMan_FUNC* Step_PadMan = (Step_PadMan_FUNC*)0x1401af3b0;
 
 #endif // _DS1_OVERHAUL_GAME_DATA_H_
