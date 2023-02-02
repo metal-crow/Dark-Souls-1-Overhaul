@@ -8,7 +8,7 @@
 bool Rollback::rollbackEnabled = false;
 
 PlayerIns* Rollback::saved_playerins = NULL;
-PadMan* Rollback::saved_padman = NULL;
+PadMan** Rollback::saved_padman = NULL;
 BulletMan* Rollback::saved_bulletman = NULL;
 FXManager* Rollback::saved_sfxobjs = NULL;
 DamageMan* Rollback::saved_damageman = NULL;
@@ -39,19 +39,32 @@ bool rollback_test(void* unused)
 
 bool Rollback::isave = false;
 bool Rollback::iload = false;
+static uint32_t inputSaveFrameI = 0;
 bool input_test(void* unused)
 {
     if (Rollback::isave)
     {
-        Rollback::GameInputSave();
-        Rollback::isave = false;
+        Rollback::GameInputSave(inputSaveFrameI);
+        inputSaveFrameI++;
+        if (inputSaveFrameI >= 60 * 1)
+        {
+            ConsoleWrite("Input save finish");
+            Rollback::isave = false;
+            inputSaveFrameI = 0;
+        }
     }
 
     if (Rollback::iload)
     {
-        Rollback::GameInputLoad();
+        Rollback::GameInputLoad(inputSaveFrameI);
+        inputSaveFrameI++;
         Game::Step_GameSimulation();
-        Rollback::iload = false;
+        if (inputSaveFrameI >= 60 * 1)
+        {
+            ConsoleWrite("Input restore finish");
+            Rollback::iload = false;
+            inputSaveFrameI = 0;
+        }
     }
 
     return true;
@@ -77,7 +90,12 @@ void Rollback::start()
 
     //TMP init out copy of the playerins struct, for saving/restoring with rollback
     Rollback::saved_playerins = init_PlayerIns(false);
-    Rollback::saved_padman = init_PadMan();
+    //1 seconds worth of inputs
+    Rollback::saved_padman = (PadMan**)malloc(sizeof(PadMan*) * 60 * 1);
+    for (size_t i = 0; i < 60 * 1; i++)
+    {
+        Rollback::saved_padman[i] = init_PadMan();
+    }
     Rollback::saved_bulletman = init_BulletMan();
     Rollback::saved_sfxobjs = init_FXManager();
     Rollback::saved_damageman = init_DamageMan();
@@ -104,7 +122,7 @@ void Rollback::GameStateSave()
     //we pre-allocate a static playerins on boot, so we can assume all pointers are set up
     copy_PlayerIns(Rollback::saved_playerins, player, false, false);
     copy_BulletMan(Rollback::saved_bulletman, *(BulletMan**)Game::bullet_man, false);
-    copy_FXManager(Rollback::saved_sfxobjs, (*(SfxMan**)Game::sfx_man)->FrpgFxManagerBase->base.fXManager, false);
+    //copy_FXManager(Rollback::saved_sfxobjs, (*(SfxMan**)Game::sfx_man)->FrpgFxManagerBase->base.fXManager, false);
     copy_DamageMan(Rollback::saved_damageman, *(DamageMan**)Game::damage_man, false);
 }
 
@@ -123,17 +141,17 @@ void Rollback::GameStateLoad()
 
     copy_PlayerIns(player, Rollback::saved_playerins, true, false);
     copy_BulletMan(*(BulletMan**)Game::bullet_man, Rollback::saved_bulletman, true);
-    copy_FXManager((*(SfxMan**)Game::sfx_man)->FrpgFxManagerBase->base.fXManager, Rollback::saved_sfxobjs, true);
+    //copy_FXManager((*(SfxMan**)Game::sfx_man)->FrpgFxManagerBase->base.fXManager, Rollback::saved_sfxobjs, true);
     copy_DamageMan(*(DamageMan**)Game::damage_man, Rollback::saved_damageman, true);
 }
 
-void Rollback::GameInputSave()
+void Rollback::GameInputSave(uint32_t frame)
 {
     //we pre-allocate a static padman on boot, so we can assume all pointers are set up
-    copy_PadMan(Rollback::saved_padman, *(PadMan**)Game::pad_man);
+    copy_PadMan(Rollback::saved_padman[frame], *(PadMan**)Game::pad_man);
 }
 
-void Rollback::GameInputLoad()
+void Rollback::GameInputLoad(uint32_t frame)
 {
-    copy_PadMan(*(PadMan**)Game::pad_man, Rollback::saved_padman);
+    copy_PadMan(*(PadMan**)Game::pad_man, Rollback::saved_padman[frame]);
 }

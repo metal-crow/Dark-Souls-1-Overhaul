@@ -23,8 +23,8 @@ public:
     static void GameStateSave();
     static void GameStateLoad();
 
-    static void GameInputSave();
-    static void GameInputLoad();
+    static void GameInputSave(uint32_t frame);
+    static void GameInputLoad(uint32_t frame);
 
     static void NetcodeFix();
 
@@ -42,7 +42,7 @@ public:
 private:
 
     static PlayerIns* saved_playerins;
-    static PadMan* saved_padman;
+    static PadMan** saved_padman;
     static BulletMan* saved_bulletman;
     static FXManager* saved_sfxobjs;
     static DamageMan* saved_damageman;
