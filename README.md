@@ -33,7 +33,7 @@ The mod is completely backwards compatible with vanilla dark souls 1 by default.
   - As a guest, you can configure who you want to be able to connect to. By default you accept all connections and change your mode to match the host.
   	- You can toggle this behavior with F1 (to disallow connecting to non-mod hosts), F2 (to disallow connecting to legacy mode hosts), and F3 (to disallow connecting to overhaul mode hosts).
 
-Modes can be switched between by pressing F5. The icons below the HP bar, show which mode you're in.
+Modes can be switched between by pressing F5. The icons below the HP bar show which mode you're in.
 
 __Legacy__ mode is the default starting mode the mod is in (this can be changed in the ini). It includes a number of significant but fully backwards compatible bugfixes, quality-of-life improvements, visual glitch fixes, and functional anti-cheat measures.  
 It also unlocks a number of in-engine limitations and fixes other engine problems (including disabling the terrible built-in anti-cheat).  

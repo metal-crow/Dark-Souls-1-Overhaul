@@ -666,7 +666,7 @@ void ModNetworking::LobbyDataUpdateCallback(LobbyDataUpdate_t* pCallback)
                 {
                     approved_in_session = true;
                     const char* mod_guest_value_str = ModNetworking::SteamMatchmaking->GetLobbyMemberData(pCallback->m_ulSteamIDLobby, member, MOD_LOBBY_DATA_KEY);
-                    if (String_To_ModModes.count(mod_guest_value_str) != 0)
+                    if (mod_guest_value_str != NULL && String_To_ModModes.count(mod_guest_value_str) != 0)
                     {
                         user_mode = String_To_ModModes.at(mod_guest_value_str);
                     }
@@ -693,7 +693,7 @@ void ModNetworking::LobbyDataUpdateCallback(LobbyDataUpdate_t* pCallback)
 
         const char* mod_guest_value_str = ModNetworking::SteamMatchmaking->GetLobbyMemberData(pCallback->m_ulSteamIDLobby, pCallback->m_ulSteamIDMember, MOD_LOBBY_DATA_KEY);
         ModMode mod_guest_value = ModMode::InvalidMode;
-        if (String_To_ModModes.count(mod_guest_value_str) != 0)
+        if (mod_guest_value_str != NULL && String_To_ModModes.count(mod_guest_value_str) != 0)
         {
             mod_guest_value = String_To_ModModes.at(mod_guest_value_str);
         }
@@ -809,7 +809,7 @@ bool GuestAwaitIncomingLobbyData(void* data_a)
         CSteamID member = ModNetworking::SteamMatchmaking->GetLobbyMemberByIndex(ModNetworking::currentLobby, i);
         const char* user_mod_value_str = ModNetworking::SteamMatchmaking->GetLobbyMemberData(ModNetworking::currentLobby, member, MOD_LOBBY_DATA_KEY);
         ModMode user_mod_value = ModMode::InvalidMode;
-        if (String_To_ModModes.count(user_mod_value_str) != 0)
+        if (user_mod_value_str != NULL && String_To_ModModes.count(user_mod_value_str) != 0)
         {
             user_mod_value = String_To_ModModes.at(user_mod_value_str);
         }
@@ -1032,7 +1032,7 @@ bool GuestAwaitIncomingGuestMemberData(void* data_a)
 
     const char* mod_guest_value_str = ModNetworking::SteamMatchmaking->GetLobbyMemberData(ModNetworking::currentLobby, data->steamid, MOD_LOBBY_DATA_KEY);
     ModMode mod_guest_value = ModMode::InvalidMode;
-    if (String_To_ModModes.count(mod_guest_value_str) != 0)
+    if (mod_guest_value_str != NULL && String_To_ModModes.count(mod_guest_value_str) != 0)
     {
         mod_guest_value = String_To_ModModes.at(mod_guest_value_str);
     }
