@@ -255,6 +255,21 @@ bool Mod::mode_setting_process(void* unused)
                     Mod::change_mode(Mod::next_mode);
                 }
             }
+        }
+    }
+
+    return true;
+}
+
+DWORD WINAPI mod_mode_visuals_setting_thread(LPVOID unused)
+{
+    while (true)
+    {
+        auto playerIns_o = Game::get_PlayerIns();
+        if (playerIns_o.has_value() && playerIns_o.value() != NULL)
+        {
+            uint64_t playerIns = (uint64_t)playerIns_o.value();
+
             // Handle setting the speffect to show the current mode
             //add the speffect for the current mode, if applicable and not present
             uint32_t currentModeSpeffectId = ModModes_To_Speffect.at(Mod::current_mode);
@@ -280,9 +295,9 @@ bool Mod::mode_setting_process(void* unused)
                 }
             }
         }
-    }
 
-    return true;
+        Sleep(100);
+    }
 }
 
 ModMode Mod::get_mode()

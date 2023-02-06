@@ -172,6 +172,7 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
 
     //start callback for setting the preferred mode
     MainLoop::setup_mainloop_callback(Mod::mode_setting_process, NULL, "mode_setting_process");
+    CreateThread(NULL, 0, mod_mode_visuals_setting_thread, NULL,  0, NULL);
 
     Update_Check();
 

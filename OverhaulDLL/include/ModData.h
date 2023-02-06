@@ -72,6 +72,8 @@ const std::map<ModMode, uint32_t> ModModes_To_Speffect =
     {InvalidMode, -1},
 };
 
+DWORD WINAPI mod_mode_visuals_setting_thread(LPVOID unused);
+
 class Mod
 {
 public:
@@ -136,7 +138,8 @@ private:
     // The mode we will next enter as soon as the mode_setting_process is capable
     static ModMode next_mode;
 
-    static ModMode current_mode;
+public:
+    static ModMode current_mode; //only public and readonly for use with mod_mode_visuals_setting_thread
 };
 
 
