@@ -41,6 +41,8 @@
 #include <vector>
 #include <map>
 #include <string>
+#define WIN32_LEAN_AND_MEAN   // Exclude rarely-used stuff from Windows headers
+#include <Windows.h>
 
 enum ModMode
 {
