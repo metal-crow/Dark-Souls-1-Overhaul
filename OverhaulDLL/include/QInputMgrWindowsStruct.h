@@ -68,7 +68,7 @@ struct QXInputPad
     uint64_t data_1;
     QInputStates_substruct_BD data_2[24];
     QInputStates_substruct_BDQ data_3[24];
-    uint64_t padding_1[6];
+    uint64_t data_3a[6];
     uint32_t data_4[24];
     uint64_t padding_2[2];
 };
@@ -132,7 +132,8 @@ struct QInputMgr
     uint64_t padding_0;
     QInputDevice** device_array_start; //this is a list of mixed QMouse, QKeyboard, QXInputPad, and QDirectInputPad struct ptrs. Identify via vtable
     QInputDevice** device_array_end;
-    uint8_t padding_1[0x10];
+    uint8_t padding_1[8];
+    uint64_t data_0;
     uint64_t curDevice; //this is a pointer to a QInputDevice in the device list, but we can just treat it like a const since those pointers don't change
 };
 

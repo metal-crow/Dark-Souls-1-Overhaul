@@ -79,6 +79,7 @@ void copy_QInputMgr(QInputMgr* to, QInputMgr* from)
         }
     }
 
+    to->data_0 = from->data_0;
     to->curDevice = from->curDevice;
 }
 
@@ -218,6 +219,7 @@ void copy_QXInputPad(QXInputPad* to, QXInputPad* from)
     {
         copy_QInputStates_substruct_BDQ(&to->data_3[i], &from->data_3[i]);
     }
+    memcpy(to->data_3a, from->data_3a, sizeof(to->data_3a));
     memcpy(to->data_4, from->data_4, sizeof(to->data_4));
 }
 
