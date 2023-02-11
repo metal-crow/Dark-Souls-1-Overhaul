@@ -18,6 +18,8 @@ DamageMan* Rollback::saved_damageman = NULL;
 bool Rollback::gsave = false;
 bool Rollback::gload = false;
 
+static const size_t INPUT_ROLLBACK_LENGTH = 5 * 60; //5 seconds
+
 bool rollback_test(void* unused)
 {
     if (Rollback::gsave)
@@ -48,7 +50,7 @@ bool input_test(void* unused)
     {
         Rollback::GameInputSave(inputSaveFrameI);
         inputSaveFrameI++;
-        if (inputSaveFrameI >= 60 * 1)
+        if (inputSaveFrameI >= INPUT_ROLLBACK_LENGTH)
         {
             ConsoleWrite("Input save finish");
             Rollback::isave = false;
@@ -61,7 +63,7 @@ bool input_test(void* unused)
         Game::set_ReadInputs_allowed(false);
         Rollback::GameInputLoad(inputSaveFrameI);
         inputSaveFrameI++;
-        if (inputSaveFrameI >= 60 * 1)
+        if (inputSaveFrameI >= INPUT_ROLLBACK_LENGTH)
         {
             Game::set_ReadInputs_allowed(true);
             ConsoleWrite("Input restore finish");
@@ -95,18 +97,18 @@ void Rollback::start()
     Rollback::saved_playerins = init_PlayerIns(false);
 
     //1 seconds worth of inputs
-    Rollback::saved_padman = (PadMan**)malloc(sizeof(PadMan*) * 60 * 1);
-    for (size_t i = 0; i < 60 * 1; i++)
+    Rollback::saved_padman = (PadMan**)malloc(sizeof(PadMan*) * INPUT_ROLLBACK_LENGTH);
+    for (size_t i = 0; i < INPUT_ROLLBACK_LENGTH; i++)
     {
         Rollback::saved_padman[i] = init_PadMan();
     }
-    Rollback::saved_qinputman = (QInputMgrWindows**)malloc(sizeof(QInputMgrWindows*) * 60 * 1);
-    for (size_t i = 0; i < 60 * 1; i++)
+    Rollback::saved_qinputman = (QInputMgrWindows**)malloc(sizeof(QInputMgrWindows*) * INPUT_ROLLBACK_LENGTH);
+    for (size_t i = 0; i < INPUT_ROLLBACK_LENGTH; i++)
     {
         Rollback::saved_qinputman[i] = init_QInputMgrWindows();
     }
-    Rollback::saved_InputDirectionMovementMan = (InputDirectionMovementMan**)malloc(sizeof(InputDirectionMovementMan*) * 60 * 1);
-    for (size_t i = 0; i < 60 * 1; i++)
+    Rollback::saved_InputDirectionMovementMan = (InputDirectionMovementMan**)malloc(sizeof(InputDirectionMovementMan*) * INPUT_ROLLBACK_LENGTH);
+    for (size_t i = 0; i < INPUT_ROLLBACK_LENGTH; i++)
     {
         Rollback::saved_InputDirectionMovementMan[i] = init_InputDirectionMovementMan();
     }
