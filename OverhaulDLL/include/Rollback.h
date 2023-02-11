@@ -12,6 +12,8 @@
 #include "BulletManStructFunctions.h"
 #include "SfxManStructFunctions.h"
 #include "DamageManStructFunctions.h"
+#include "QInputMgrWindowsStructFunctions.h"
+#include "InputDirectionMovementManStructFunctions.h"
 
 #include "NetcodePackets.h"
 
@@ -43,6 +45,8 @@ private:
 
     static PlayerIns* saved_playerins;
     static PadMan** saved_padman;
+    static QInputMgrWindows** saved_qinputman;
+    static InputDirectionMovementMan** saved_InputDirectionMovementMan;
     static BulletMan* saved_bulletman;
     static FXManager* saved_sfxobjs;
     static DamageMan* saved_damageman;

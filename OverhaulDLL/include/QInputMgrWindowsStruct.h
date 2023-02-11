@@ -21,7 +21,7 @@ typedef struct QInputStates_substruct_BDQ QInputStates_substruct_BDQ;
 struct QInputStates_substruct_BDQ
 {
     uint8_t data_0[0x10];
-    uint64_t padding_0;
+    uint8_t* data_1;
 };
 
 static_assert(sizeof(QInputStates_substruct_BDQ) == 0x18);
@@ -88,7 +88,7 @@ struct QKeyboard
     uint64_t data_1;
     QInputStates_substruct_BD data_2[256];
     QInputStates_substruct_BDQ data_3[256];
-    uint8_t padding_1[0x200];
+    uint8_t data_3a[0x200];
     uint32_t data_4[256];
     uint8_t padding_2[24];
 };
@@ -132,10 +132,13 @@ struct QInputMgr
     uint64_t padding_0;
     QInputDevice** device_array_start; //this is a list of mixed QMouse, QKeyboard, QXInputPad, and QDirectInputPad struct ptrs. Identify via vtable
     QInputDevice** device_array_end;
+    uint8_t padding_1[0x10];
+    uint64_t curDevice; //this is a pointer to a QInputDevice in the device list, but we can just treat it like a const since those pointers don't change
 };
 
 static_assert(offsetof(QInputMgr, device_array_start) == 0x8);
-static_assert(sizeof(QInputMgr) == 0x18);
+static_assert(offsetof(QInputMgr, curDevice) == 0x28);
+static_assert(sizeof(QInputMgr) == 0x30);
 
 struct QInputMgrWindows
 {
@@ -143,6 +146,6 @@ struct QInputMgrWindows
 };
 
 static_assert(offsetof(QInputMgrWindows, base) == 0);
-static_assert(sizeof(QInputMgrWindows) == 0x18);
+static_assert(sizeof(QInputMgrWindows) == 0x30);
 
 #endif

@@ -29,4 +29,8 @@ void copy_QDirectInputPad(QDirectInputPad* to, QDirectInputPad* from);
 QDirectInputPad* init_QDirectInputPad();
 void free_QDirectInputPad(QDirectInputPad* to);
 
+void copy_QInputStates_substruct_BDQ(QInputStates_substruct_BDQ* to, QInputStates_substruct_BDQ* from);
+QInputStates_substruct_BDQ* init_QInputStates_substruct_BDQ();
+void free_QInputStates_substruct_BDQ(QInputStates_substruct_BDQ* to, bool free_self);
+
 #endif

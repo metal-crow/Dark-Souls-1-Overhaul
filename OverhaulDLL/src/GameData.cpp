@@ -71,6 +71,10 @@ uint64_t Game::throw_man = NULL;
 
 uint64_t Game::delay_delete_man = NULL;
 
+uint64_t Game::QInputMgrWindowsFantasy = NULL;
+
+uint64_t Game::InputDirectionMovementMan = NULL;
+
 // Player character status (loading, human, co-op, invader, hollow)
 sp::mem::pointer<int32_t> Game::player_char_status;
 
@@ -96,9 +100,11 @@ extern "C" {
     void grab_destruct_thread_handle_injection();
     void grab_destruct_thread_handle_helper(HANDLE);
 
+    bool ReadInputs_allowed = true;
     uint64_t Step_PadMan_ReadInputs_return;
-    bool Step_PadMan_ReadInputs_allowed = true;
     void Step_PadMan_ReadInputs_injection();
+    uint64_t Step_QInputMgrWindowsFantasy_ReadInputs_return;
+    void Step_QInputMgrWindowsFantasy_ReadInputs_injection();
 }
 
 // Flag to determine if a character have been loaded since the game was launched (useful if player had a character loaded but returned to main menu)
@@ -185,6 +191,10 @@ void Game::init()
     Game::throw_man = Game::ds1_base + 0x1c79ad0;
 
     Game::delay_delete_man = Game::ds1_base + 0x1c6a8e8;
+
+    Game::QInputMgrWindowsFantasy = Game::ds1_base + 0x1cb5490;
+
+    Game::InputDirectionMovementMan = Game::ds1_base + 0x1c6a680;
 }
 
 void Game::injections_init()
@@ -227,6 +237,8 @@ void Game::injections_init()
     //inject code to control if Step_PadMan can read inputs or not
     write_address = (uint8_t*)(Game::Step_PadMan_ReadInputs_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &Step_PadMan_ReadInputs_return, 2, &Step_PadMan_ReadInputs_injection);
+    write_address = (uint8_t*)(Game::Step_QInputMgrWindowsFantasy_ReadInputs_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &Step_QInputMgrWindowsFantasy_ReadInputs_return, 0, &Step_QInputMgrWindowsFantasy_ReadInputs_injection);
 }
 
 static bool character_reload_run = false;
@@ -1539,10 +1551,6 @@ void Game::Step_GameSimulation(bool renderFrame)
     {
         MoveMapStep_Step_13(MoveMapStep, FRAMETIME);
     }
-    //need to prevent the game from reading inputs directly here
-    Step_PadMan_ReadInputs_allowed = false;
-    Step_PadMan(FRAMETIME);
-    Step_PadMan_ReadInputs_allowed = true;
     Step_Havok(*(void**)Game::frpg_havok_man_imp, FRAMETIME);
     FinishStep_Havok(*(void**)Game::frpg_havok_man_imp);
 }
@@ -1605,4 +1613,9 @@ int32_t Game::get_SessionPlayerNumber_For_ConnectedPlayerData(uint64_t connected
     }
 
     return -1;
+}
+
+void Game::set_ReadInputs_allowed(bool allow)
+{
+    ReadInputs_allowed = allow;
 }

@@ -205,7 +205,7 @@ grab_destruct_thread_handle_injection ENDP
 
 
 EXTERN Step_PadMan_ReadInputs_return: qword
-extern Step_PadMan_ReadInputs_allowed: byte
+extern ReadInputs_allowed: byte
 
 PUBLIC Step_PadMan_ReadInputs_injection
 Step_PadMan_ReadInputs_injection PROC
@@ -218,7 +218,7 @@ jmp     qword ptr [LAB_1401ad106]
 
 ;custom code to check bool
 continue:
-cmp     Step_PadMan_ReadInputs_allowed, 0
+cmp     ReadInputs_allowed, 0
 jnz     continueAllowed
 jmp     qword ptr [LAB_1401ad106]
 
@@ -226,6 +226,23 @@ continueAllowed:
 mov     rax, [rcx] ;original code
 jmp     Step_PadMan_ReadInputs_return
 Step_PadMan_ReadInputs_injection ENDP
+
+
+EXTERN Step_QInputMgrWindowsFantasy_ReadInputs_return: qword
+
+PUBLIC Step_QInputMgrWindowsFantasy_ReadInputs_injection
+Step_QInputMgrWindowsFantasy_ReadInputs_injection PROC
+;original code
+mov     rax, [rcx]
+lea     rdx, [rsp+80h]
+
+;custom code to check bool
+cmp     ReadInputs_allowed, 0
+jz      skip_read
+call    qword ptr [rax+18h] ;original code
+skip_read:
+jmp     Step_QInputMgrWindowsFantasy_ReadInputs_return
+Step_QInputMgrWindowsFantasy_ReadInputs_injection ENDP
 
 _TEXT    ENDS
 

@@ -78,6 +78,8 @@ void copy_QInputMgr(QInputMgr* to, QInputMgr* from)
             break;
         }
     }
+
+    to->curDevice = from->curDevice;
 }
 
 QInputMgr* init_QInputMgr()
@@ -139,7 +141,10 @@ void copy_QMouse(QMouse* to, QMouse* from)
 {
     to->data_1 = from->data_1;
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
-    memcpy(to->data_3, from->data_3, sizeof(to->data_3));
+    for (size_t i = 0; i < sizeof(to->data_3) / sizeof(to->data_3[0]); i++)
+    {
+        copy_QInputStates_substruct_BDQ(&to->data_3[i], &from->data_3[i]);
+    }
     memcpy(to->data_4, from->data_4, sizeof(to->data_4));
     memcpy(to->data_5, from->data_5, sizeof(to->data_5));
     memcpy(to->data_6, from->data_6, sizeof(to->data_6));
@@ -150,12 +155,22 @@ QMouse* init_QMouse()
     QMouse* local = (QMouse*)malloc_(sizeof(QMouse));
 
     local->base.vtable = QMouseVtable;
+    for (size_t i = 0; i < sizeof(local->data_3) / sizeof(local->data_3[0]); i++)
+    {
+        QInputStates_substruct_BDQ* elem = init_QInputStates_substruct_BDQ();
+        local->data_3[i] = *elem;
+        free(elem);
+    }
 
     return local;
 }
 
 void free_QMouse(QMouse* to)
 {
+    for (size_t i = 0; i < sizeof(to->data_3) / sizeof(to->data_3[0]); i++)
+    {
+        free_QInputStates_substruct_BDQ(&to->data_3[i], false);
+    }
     free(to);
 }
 
@@ -163,7 +178,11 @@ void copy_QKeyboard(QKeyboard* to, QKeyboard* from)
 {
     to->data_1 = from->data_1;
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
-    memcpy(to->data_3, from->data_3, sizeof(to->data_3));
+    for (size_t i = 0; i < sizeof(to->data_3) / sizeof(to->data_3[0]); i++)
+    {
+        copy_QInputStates_substruct_BDQ(&to->data_3[i], &from->data_3[i]);
+    }
+    memcpy(to->data_3a, from->data_3a, sizeof(to->data_3a));
     memcpy(to->data_4, from->data_4, sizeof(to->data_4));
 }
 
@@ -172,12 +191,22 @@ QKeyboard* init_QKeyboard()
     QKeyboard* local = (QKeyboard*)malloc_(sizeof(QKeyboard));
 
     local->base.vtable = QKeyboardVtable;
+    for (size_t i = 0; i < sizeof(local->data_3) / sizeof(local->data_3[0]); i++)
+    {
+        QInputStates_substruct_BDQ* elem = init_QInputStates_substruct_BDQ();
+        local->data_3[i] = *elem;
+        free(elem);
+    }
 
     return local;
 }
 
 void free_QKeyboard(QKeyboard* to)
 {
+    for (size_t i = 0; i < sizeof(to->data_3) / sizeof(to->data_3[0]); i++)
+    {
+        free_QInputStates_substruct_BDQ(&to->data_3[i], false);
+    }
     free(to);
 }
 
@@ -185,7 +214,10 @@ void copy_QXInputPad(QXInputPad* to, QXInputPad* from)
 {
     to->data_1 = from->data_1;
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
-    memcpy(to->data_3, from->data_3, sizeof(to->data_3));
+    for (size_t i = 0; i < sizeof(to->data_3) / sizeof(to->data_3[0]); i++)
+    {
+        copy_QInputStates_substruct_BDQ(&to->data_3[i], &from->data_3[i]);
+    }
     memcpy(to->data_4, from->data_4, sizeof(to->data_4));
 }
 
@@ -194,12 +226,22 @@ QXInputPad* init_QXInputPad()
     QXInputPad* local = (QXInputPad*)malloc_(sizeof(QXInputPad));
 
     local->base.vtable = QXInputPadVtable;
+    for (size_t i = 0; i < sizeof(local->data_3) / sizeof(local->data_3[0]); i++)
+    {
+        QInputStates_substruct_BDQ* elem = init_QInputStates_substruct_BDQ();
+        local->data_3[i] = *elem;
+        free(elem);
+    }
 
     return local;
 }
 
 void free_QXInputPad(QXInputPad* to)
 {
+    for (size_t i = 0; i < sizeof(to->data_3) / sizeof(to->data_3[0]); i++)
+    {
+        free_QInputStates_substruct_BDQ(&to->data_3[i], false);
+    }
     free(to);
 }
 
@@ -207,7 +249,10 @@ void copy_QDirectInputPad(QDirectInputPad* to, QDirectInputPad* from)
 {
     to->data_1 = from->data_1;
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
-    memcpy(to->data_3, from->data_3, sizeof(to->data_3));
+    for (size_t i = 0; i < sizeof(to->data_3) / sizeof(to->data_3[0]); i++)
+    {
+        copy_QInputStates_substruct_BDQ(&to->data_3[i], &from->data_3[i]);
+    }
     memcpy(to->data_4, from->data_4, sizeof(to->data_4));
 }
 
@@ -216,11 +261,53 @@ QDirectInputPad* init_QDirectInputPad()
     QDirectInputPad* local = (QDirectInputPad*)malloc_(sizeof(QDirectInputPad));
 
     local->base.vtable = QDirectInputPadVtable;
+    for (size_t i = 0; i < sizeof(local->data_3) / sizeof(local->data_3[0]); i++)
+    {
+        QInputStates_substruct_BDQ* elem = init_QInputStates_substruct_BDQ();
+        local->data_3[i] = *elem;
+        free(elem);
+    }
 
     return local;
 }
 
 void free_QDirectInputPad(QDirectInputPad* to)
 {
+    for (size_t i = 0; i < sizeof(to->data_3) / sizeof(to->data_3[0]); i++)
+    {
+        free_QInputStates_substruct_BDQ(&to->data_3[i], false);
+    }
     free(to);
+}
+
+void copy_QInputStates_substruct_BDQ(QInputStates_substruct_BDQ* to, QInputStates_substruct_BDQ* from)
+{
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    if (to->data_1 == NULL && from->data_1 == NULL)
+    {
+        ConsoleWrite("ERROR: got data1 ptr as null for QInputStates_substruct_BDQ. %p %p", to, from);
+    }
+    else
+    {
+        *to->data_1 = *from->data_1;
+    }
+}
+
+QInputStates_substruct_BDQ* init_QInputStates_substruct_BDQ()
+{
+    QInputStates_substruct_BDQ* local = (QInputStates_substruct_BDQ*)malloc_(sizeof(QInputStates_substruct_BDQ));
+
+    local->data_1 = (uint8_t*)malloc_(sizeof(uint8_t));
+
+    return local;
+}
+
+void free_QInputStates_substruct_BDQ(QInputStates_substruct_BDQ* to, bool free_self)
+{
+    free(to->data_1);
+
+    if (free_self)
+    {
+        free(to);
+    }
 }

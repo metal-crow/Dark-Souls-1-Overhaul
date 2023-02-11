@@ -168,6 +168,10 @@ public:
 
     static uint64_t delay_delete_man;
 
+    static uint64_t QInputMgrWindowsFantasy;
+
+    static uint64_t InputDirectionMovementMan;
+
     static const uint64_t calculate_attack_damage_offset = 0x2f11bf2;
 
     static const uint64_t char_loaded_injection_offset = 0x24f1b0;
@@ -186,6 +190,8 @@ public:
     static const uint64_t Validate_Type6FaceData_offset = 0x506e04;
 
     static const uint64_t Step_PadMan_ReadInputs_offset = 0x1ad0f0;
+
+    static const uint64_t Step_QInputMgrWindowsFantasy_ReadInputs_offset = 0x1af09b;
 
     // Player character status (loading, human, co-op, invader, hollow)
     static sp::mem::pointer<int32_t> player_char_status;
@@ -366,6 +372,8 @@ public:
     static void ResumeThreads();
 
     static int32_t get_SessionPlayerNumber_For_ConnectedPlayerData(uint64_t connectedplayerdata);
+
+    static void set_ReadInputs_allowed(bool allow);
 
     /*
      * Help speedup some functions by, whenever we're loaded into an area,
