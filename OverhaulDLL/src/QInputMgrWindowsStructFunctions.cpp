@@ -62,7 +62,7 @@ void copy_QInputMgr(QInputMgr* to, QInputMgr* from)
         switch (from_vtable)
         {
         case QMouseVtable:
-            copy_QMouse((QMouse*)(to_device), (QMouse*)(from_device));
+            //don't actually need mouse movement as an input. camera works fine without it
             break;
         case QKeyboardVtable:
             copy_QKeyboard((QKeyboard*)(to_device), (QKeyboard*)(from_device));
