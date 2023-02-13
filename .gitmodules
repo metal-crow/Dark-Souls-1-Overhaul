@@ -9,3 +9,7 @@
 	path = OverhaulDLL/lib/Dark-Souls-Game-Files-Lib
 	url = https://github.com/SeanPesce/Dark-Souls-Game-Files-Lib.git
 	branch = Remaster
+[submodule "OverhaulDLL/lib/ggpo_steamapi"]
+	path = OverhaulDLL/lib/ggpo_steamapi
+	url = https://github.com/metal-crow/ggpo_steamapi.git
+	branch = SteamNet
