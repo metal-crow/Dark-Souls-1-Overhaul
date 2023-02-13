@@ -9,6 +9,14 @@ void copy_BulletMan(BulletMan* to, BulletMan* from, bool to_game);
 BulletMan* init_BulletMan();
 void free_BulletMan(BulletMan* to);
 
+void copy_ChrCam(ChrCam* to, ChrCam* from, bool to_game);
+ChrCam* init_ChrCam();
+void free_ChrCam(ChrCam* to);
+
+void copy_ChrExFollowCam(ChrExFollowCam* to, ChrExFollowCam* from, bool to_game);
+ChrExFollowCam* init_ChrExFollowCam();
+void free_ChrExFollowCam(ChrExFollowCam* to);
+
 void copy_BulletIns(BulletIns* to, BulletIns* from, bool to_game);
 BulletIns* init_BulletIns();
 void free_BulletIns(BulletIns* to, bool freeself);

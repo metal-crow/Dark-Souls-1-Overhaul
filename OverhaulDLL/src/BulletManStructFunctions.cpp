@@ -25,6 +25,9 @@ void copy_BulletMan(BulletMan* to, BulletMan* from, bool to_game)
     }
 
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+
+    copy_ChrCam(to->chrCam, from->chrCam, to_game);
+
     to->data_3 = from->data_3;
 
     if (from->field0x78 != NULL && from->field0x78_end != NULL)
@@ -80,6 +83,8 @@ BulletMan* init_BulletMan()
         free(local_BulletMan_Field0x40);
     }
 
+    local_BulletMan->chrCam = init_ChrCam();
+
     local_BulletMan->field0x78 = (BulletMan_field0x78Elem**)malloc(sizeof(BulletMan_field0x78Elem*) * 3);
     for (size_t i = 0; i < 3; i++)
     {
@@ -110,8 +115,43 @@ void free_BulletMan(BulletMan* to)
     {
         free_BulletMan_field0x78Elem(to->field0x78[i]);
     }
+    free_ChrCam(to->chrCam);
     free(to->field0x78);
 
+    free(to);
+}
+
+void copy_ChrCam(ChrCam* to, ChrCam* from, bool to_game)
+{
+    copy_ChrExFollowCam(to->chrExFollowCam, from->chrExFollowCam, to_game);
+}
+
+ChrCam* init_ChrCam()
+{
+    ChrCam* local_ChrCam = (ChrCam*)malloc_(sizeof(ChrCam));
+    local_ChrCam->chrExFollowCam = init_ChrExFollowCam();
+    return local_ChrCam;
+}
+
+void free_ChrCam(ChrCam* to)
+{
+    free_ChrExFollowCam(to->chrExFollowCam);
+    free(to);
+}
+
+void copy_ChrExFollowCam(ChrExFollowCam* to, ChrExFollowCam* from, bool to_game)
+{
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+}
+
+ChrExFollowCam* init_ChrExFollowCam()
+{
+    ChrExFollowCam* local_ChrExFollowCam = (ChrExFollowCam*)malloc_(sizeof(ChrExFollowCam));
+    return local_ChrExFollowCam;
+}
+
+void free_ChrExFollowCam(ChrExFollowCam* to)
+{
     free(to);
 }
 

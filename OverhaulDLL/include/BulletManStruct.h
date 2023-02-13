@@ -22,6 +22,8 @@ typedef struct BulletFlyState BulletFlyState;
 typedef struct TargetingSystemBase TargetingSystemBase;
 typedef struct BulletTargetingSystemOwner BulletTargetingSystemOwner;
 typedef struct BulletIns_FollowupBullet BulletIns_FollowupBullet;
+typedef struct ChrCam ChrCam;
+typedef struct ChrExFollowCam ChrExFollowCam;
 
 struct BulletIns_FollowupBullet
 {
@@ -168,6 +170,22 @@ struct BulletMan_field0x78Elem
 };
 static_assert(sizeof(BulletMan_field0x78Elem) == 0x30);
 
+struct ChrExFollowCam
+{
+    uint8_t padding_0[8];
+    uint8_t data_0[0x338];
+};
+static_assert(sizeof(ChrExFollowCam) == 0x340);
+
+struct ChrCam
+{
+    uint8_t padding_0[0x60];
+    ChrExFollowCam* chrExFollowCam;
+    uint8_t padding[0x68];
+};
+static_assert(offsetof(ChrCam, chrExFollowCam) == 0x60);
+static_assert(sizeof(ChrCam) == 0xd0);
+
 struct BulletMan
 {
     BulletIns* bulletins_arry; //length == 128
@@ -176,7 +194,7 @@ struct BulletMan
     uint64_t data_1[3]; //includes pointers to offsets in above
     BulletMan_Field0x40* field0x40; //length == 4
     uint64_t data_2[3]; //includes pointers to offsets in above
-    uint64_t padding_0;
+    ChrCam* chrCam;
     uint64_t data_3;
     uint64_t padding_1;
     BulletMan_field0x78Elem** field0x78; //variable length
@@ -191,7 +209,7 @@ static_assert(offsetof(BulletMan, field0x20) == 0x20);
 static_assert(offsetof(BulletMan, data_1) == 0x28);
 static_assert(offsetof(BulletMan, field0x40) == 0x40);
 static_assert(offsetof(BulletMan, data_2) == 0x48);
-static_assert(offsetof(BulletMan, padding_0) == 0x60);
+static_assert(offsetof(BulletMan, chrCam) == 0x60);
 static_assert(offsetof(BulletMan, data_3) == 0x68);
 static_assert(offsetof(BulletMan, padding_1) == 0x70);
 static_assert(offsetof(BulletMan, field0x78) == 0x78);
