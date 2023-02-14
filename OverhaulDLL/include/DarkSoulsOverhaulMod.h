@@ -36,7 +36,7 @@ extern HMODULE d3d11_module;
 
 DWORD WINAPI on_process_attach_async(LPVOID lpParam);
 
-void inline FATALERROR(const char* error_str, ...) {
+[[noreturn]] void inline FATALERROR(const char* error_str, ...) {
     char dest[1024];
     va_list argptr;
     va_start(argptr, error_str);
@@ -70,7 +70,10 @@ void inline ConsoleWrite(const char* str, ...)
 
     global::cmd_out << "[" << std::to_string(time) << "] " << dest << "\n";
 
-    fprintf(logfile, "[%lld] %s\n", time, dest);
+    if (logfile != NULL)
+    {
+        fprintf(logfile, "[%lld] %s\n", time, dest);
+    }
 }
 
 #endif

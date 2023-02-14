@@ -44,7 +44,7 @@
 #define WIN32_LEAN_AND_MEAN   // Exclude rarely-used stuff from Windows headers
 #include <Windows.h>
 
-enum ModMode
+enum class ModMode
 {
     Overhaul = 3,
     Legacy = 2,
@@ -55,23 +55,23 @@ enum ModMode
 //these must be keep constant, we now rely on them to set the steam lobby mode
 const std::map<ModMode, const char*> ModModes_To_String =
 {
-    {Overhaul, "Overhaul"},
-    {Legacy, "Legacy"},
-    {Compatability, "Compatability"},
-    {InvalidMode, "InvalidMode"},
+    {ModMode::Overhaul, "Overhaul"},
+    {ModMode::Legacy, "Legacy"},
+    {ModMode::Compatability, "Compatability"},
+    {ModMode::InvalidMode, "InvalidMode"},
 };
 const std::map<std::string, ModMode> String_To_ModModes =
 {
-    {"Overhaul", Overhaul},
-    {"Legacy", Legacy},
-    {"Compatability", Compatability},
+    {"Overhaul", ModMode::Overhaul},
+    {"Legacy", ModMode::Legacy},
+    {"Compatability", ModMode::Compatability},
 };
 const std::map<ModMode, uint32_t> ModModes_To_Speffect =
 {
-    {Overhaul, 9701},
-    {Legacy, 9700},
-    {Compatability, -1},
-    {InvalidMode, -1},
+    {ModMode::Overhaul, 9701},
+    {ModMode::Legacy, 9700},
+    {ModMode::Compatability, -1},
+    {ModMode::InvalidMode, -1},
 };
 
 DWORD WINAPI mod_mode_visuals_setting_thread(LPVOID unused);

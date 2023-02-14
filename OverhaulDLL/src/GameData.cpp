@@ -1232,6 +1232,10 @@ InventorySlots Game::get_equipped_right_weapon_inhand(uint64_t playerins)
     {
         return RightHand2;
     }
+    else
+    {
+        FATALERROR("right_weapon_slot_index=%d", right_weapon_slot_index);
+    }
 }
 
 //given a list of speffects, check if the given player has any of them active

@@ -8,6 +8,8 @@
 #include <unordered_map>
 #include <string>
 #include <queue>
+#include "Rollback.h"
+#include "ggponet.h"
 
 //This is needed for the steam callbacks to work
 static ModNetworking modnet = ModNetworking();
@@ -1016,6 +1018,7 @@ bool HostAwaitIncomingGuestMemberData(void* data_a)
     SteamAPIStatusKnown_Users.insert_or_assign(data->steamid, ModNetworking::incoming_guest_mod_installed);
     SendQueuedPackets();
 
+
     //reset for next guest
     exit:
     ModNetworking::incoming_guest_got_info = false;
@@ -1044,7 +1047,7 @@ bool GuestAwaitIncomingGuestMemberData(void* data_a)
     }
 
     //either we timed out and they're non-mod, or we got their status
-    SteamAPIStatusKnown_Users.insert_or_assign(data->steamid, mod_guest_value);
+    SteamAPIStatusKnown_Users.insert_or_assign(data->steamid, mod_guest_value != ModMode::InvalidMode);
     SendQueuedPackets();
 
     return false;
