@@ -160,7 +160,7 @@ bool getNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint3
     }
 }
 
-void BuildRemotePlayerPacket(PlayerIns* playerins, MainPacket* pkt)
+void Rollback::BuildRemotePlayerPacket(PlayerIns* playerins, MainPacket* pkt)
 {
     if (playerins == NULL)
     {
