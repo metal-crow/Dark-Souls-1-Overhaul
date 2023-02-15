@@ -39,6 +39,7 @@ void Rollback::NetcodeFix()
 
     /* Type 1 Packet */
     //use it's calling function as the base for our new main packet
+    //used for TESTING only
     //(send)
     write_address = (uint8_t*)(Rollback::send_generalplayerinfo_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &send_generalplayerinfo_return, 2, &send_generalplayerinfo_injection);
@@ -86,6 +87,7 @@ bool sendNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint
             // Our rollback packet, via hooking type 1, doesn't start arriving until a bit later then the game would like
             // which means we don't set up certain flags, that are set by type 10 and 11, in time and the session fails
             // Add an additional packet type that is sent as part of the join handshake set, that does their jobs
+            //*TODO* need to limit this to once per session
             send_HandshakePacketExtra(ConnectedPlayerData);
         }
 
@@ -102,6 +104,7 @@ bool sendNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint
         case 70:
             return false;
         case Rollback::RollbackSinglePacketType:
+            return Rollback::netcodeTestingEnabled;
         default:
             return true;
         }
@@ -143,6 +146,7 @@ bool getNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint3
         case 70:
             return false;
         case Rollback::RollbackSinglePacketType:
+            return Rollback::netcodeTestingEnabled;
         default:
             return true;
         }
@@ -249,6 +253,11 @@ void Rollback::BuildRemotePlayerPacket(PlayerIns* playerins, MainPacket* pkt)
 
 void send_generalplayerinfo_helper(PlayerIns* playerins)
 {
+    if (!Rollback::netcodeTestingEnabled)
+    {
+        return;
+    }
+
     MainPacket pkt;
 
     Rollback::BuildRemotePlayerPacket(playerins, &pkt);
@@ -291,6 +300,11 @@ void send_HandshakePacketExtra(uint64_t ConnectedPlayerData)
 
 uint64_t Read_GeneralPlayerData_helper(uint64_t NetworkManipulator)
 {
+    if (!Rollback::netcodeTestingEnabled)
+    {
+        return false;
+    }
+
     //read in packet for the given connected player
     MainPacket pkt;
     PlayerIns* playerins;
@@ -312,7 +326,7 @@ uint64_t Read_GeneralPlayerData_helper(uint64_t NetworkManipulator)
         Rollback::LoadRemotePlayerPacket(&pkt, playerins, session_player_num);
     }
 
-    return Rollback::rollbackEnabled;
+    return true;
 }
 
 void recv_HandshakePacketExtra(uint64_t ConnectedPlayerData)
