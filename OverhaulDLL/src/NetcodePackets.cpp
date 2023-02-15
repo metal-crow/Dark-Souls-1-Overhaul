@@ -160,45 +160,43 @@ bool getNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint3
     }
 }
 
-void send_generalplayerinfo_helper(PlayerIns* playerins)
+void BuildRemotePlayerPacket(PlayerIns* playerins, MainPacket* pkt)
 {
-    MainPacket pkt;
-
     if (playerins == NULL)
     {
-        ConsoleWrite("ERROR: playerins value at send_generalplayerinfo_helper is NULL.");
+        ConsoleWrite("ERROR: playerins value at BuildRemotePlayerPacket is NULL.");
         return;
     }
 
     //Load Type 1
-    pkt.position_x = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x10);
-    pkt.position_z = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x14);
-    pkt.position_y = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x18);
-    pkt.ezStateActiveState = get_AnimationData(playerins->chrins.playerCtrl->chrCtrl.actionctrl, 1);
-    pkt.ezStatePassiveState = get_AnimationData(playerins->chrins.playerCtrl->chrCtrl.actionctrl, 0);
-    pkt.curHp = playerins->chrins.curHp;
-    pkt.maxHp = playerins->chrins.maxHp;
-    pkt.rotation = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4);
-    pkt.atkAngle = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0);
-    pkt.movement_direction_vals[0] = *(float*)(((uint64_t)(&playerins->chrins.padManipulator->chrManipulator)) + 0x10 + 0);
-    pkt.movement_direction_vals[1] = *(float*)(((uint64_t)(&playerins->chrins.padManipulator->chrManipulator)) + 0x10 + 8);
+    pkt->position_x = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x10);
+    pkt->position_z = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x14);
+    pkt->position_y = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x18);
+    pkt->ezStateActiveState = get_AnimationData(playerins->chrins.playerCtrl->chrCtrl.actionctrl, 1);
+    pkt->ezStatePassiveState = get_AnimationData(playerins->chrins.playerCtrl->chrCtrl.actionctrl, 0);
+    pkt->curHp = playerins->chrins.curHp;
+    pkt->maxHp = playerins->chrins.maxHp;
+    pkt->rotation = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4);
+    pkt->atkAngle = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0);
+    pkt->movement_direction_vals[0] = *(float*)(((uint64_t)(&playerins->chrins.padManipulator->chrManipulator)) + 0x10 + 0);
+    pkt->movement_direction_vals[1] = *(float*)(((uint64_t)(&playerins->chrins.padManipulator->chrManipulator)) + 0x10 + 8);
 
     //Load Type 10
-    uint64_t playergamedata = *(uint64_t*)(*(uint64_t*)(Game::game_data_man) + 0x10);
+    uint64_t playergamedata = *(uint64_t*)(*(uint64_t*)(Game::game_data_man)+0x10);
     uint64_t attribs = playergamedata + 0x10;
     uint64_t equipgamedata = playergamedata + 0x280;
     for (int i = 0; i < 0x14; i++)
     {
-        pkt.equipment_array[i] = Game::get_equipped_inventory((uint64_t)playerins, (InventorySlots)i);
+        pkt->equipment_array[i] = Game::get_equipped_inventory((uint64_t)playerins, (InventorySlots)i);
     }
-    pkt.type10_unk1 = *(float*)(equipgamedata + 0x108);
-    pkt.type10_unk2 = *(float*)(equipgamedata + 0x10C);
-    pkt.type10_unk3 = *(float*)(equipgamedata + 0x110);
-    pkt.type10_unk4 = *(float*)(equipgamedata + 0x114);
-    pkt.type10_unk5 = *(float*)(equipgamedata + 0x118);
+    pkt->type10_unk1 = *(float*)(equipgamedata + 0x108);
+    pkt->type10_unk2 = *(float*)(equipgamedata + 0x10C);
+    pkt->type10_unk3 = *(float*)(equipgamedata + 0x110);
+    pkt->type10_unk4 = *(float*)(equipgamedata + 0x114);
+    pkt->type10_unk5 = *(float*)(equipgamedata + 0x118);
 
     //Load Type 11
-    pkt.flags = compress_gamedata_flags(equipgamedata);
+    pkt->flags = compress_gamedata_flags(equipgamedata);
 
     //Load Type 16
     uint64_t cur_throw_ptr = *(uint64_t*)((*(uint64_t*)Game::throw_man) + 0x68);
@@ -208,24 +206,24 @@ void send_generalplayerinfo_helper(PlayerIns* playerins)
         PlayerIns* atk_playerins = (*(PlayerIns**)(*(uint64_t*)(cur_throw + 0) + 0x8));
         PlayerIns* def_playerins = (*(PlayerIns**)(*(uint64_t*)(cur_throw + 8) + 0x8));
 
-        pkt.attacker_position = *(PosRotFloatVec*)(*(uint64_t*)(cur_throw + 0) + 0x70);
-        pkt.attacker_position.Rotation = *(float*)(((uint64_t)atk_playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4);
+        pkt->attacker_position = *(PosRotFloatVec*)(*(uint64_t*)(cur_throw + 0) + 0x70);
+        pkt->attacker_position.Rotation = *(float*)(((uint64_t)atk_playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4);
 
-        pkt.defender_position = *(PosRotFloatVec*)(*(uint64_t*)(cur_throw + 8) + 0x70);
-        pkt.defender_position.Rotation = *(float*)(((uint64_t)def_playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4);
+        pkt->defender_position = *(PosRotFloatVec*)(*(uint64_t*)(cur_throw + 8) + 0x70);
+        pkt->defender_position.Rotation = *(float*)(((uint64_t)def_playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4);
 
-        pkt.entitynum_defender = GetEntityNumForThrow(*(void**)Game::world_chr_man_imp, def_playerins);
-        pkt.entitynum_attacker = GetEntityNumForThrow(*(void**)Game::world_chr_man_imp, atk_playerins);
-        pkt.throw_id = *(uint16_t*)(cur_throw + 0x10);
+        pkt->entitynum_defender = GetEntityNumForThrow(*(void**)Game::world_chr_man_imp, def_playerins);
+        pkt->entitynum_attacker = GetEntityNumForThrow(*(void**)Game::world_chr_man_imp, atk_playerins);
+        pkt->throw_id = *(uint16_t*)(cur_throw + 0x10);
     }
     else
     {
-        pkt.throw_id = -1;
+        pkt->throw_id = -1;
     }
 
     //Load Type 17
-    pkt.curSelectedMagicId = get_currently_selected_magic_id(playerins);
-    pkt.curUsingItemId = (playerins->chrins).curUsedItem.itemId;
+    pkt->curSelectedMagicId = get_currently_selected_magic_id(playerins);
+    pkt->curUsingItemId = (playerins->chrins).curUsedItem.itemId;
 
     //Load Type 76
     //need to have this a list of all speffects currently applied to the PC
@@ -235,18 +233,25 @@ void send_generalplayerinfo_helper(PlayerIns* playerins)
     while (specialEffectInfo != NULL)
     {
         uint32_t specialEffectInfo_id = *(uint32_t*)((uint64_t)specialEffectInfo + 0x30);
-        if (i >= sizeof(pkt.spEffectToApply) / sizeof(uint32_t))
+        if (i >= sizeof(pkt->spEffectToApply) / sizeof(uint32_t))
         {
             FATALERROR("pkt.spEffectToApply size of 15 is insufficent.");
         }
-        pkt.spEffectToApply[i] = specialEffectInfo_id;
+        pkt->spEffectToApply[i] = specialEffectInfo_id;
         i++;
         specialEffectInfo = specialEffectInfo->next;
     }
-    for (; i < sizeof(pkt.spEffectToApply) / sizeof(uint32_t); i++)
+    for (; i < sizeof(pkt->spEffectToApply) / sizeof(uint32_t); i++)
     {
-        pkt.spEffectToApply[i] = -1;
+        pkt->spEffectToApply[i] = -1;
     }
+}
+
+void send_generalplayerinfo_helper(PlayerIns* playerins)
+{
+    MainPacket pkt;
+
+    Rollback::BuildRemotePlayerPacket(playerins, &pkt);
 
     //send out packet
     sendNetMessageToAllPlayers(*(uint64_t*)Game::session_man_imp, Rollback::RollbackSinglePacketType, &pkt, sizeof(pkt));
@@ -302,8 +307,9 @@ uint64_t Read_GeneralPlayerData_helper(uint64_t NetworkManipulator)
             FATALERROR("Unable to get PlayerIns for the ConnectedPlayerData %p", ConnectedPlayerData);
         }
 
-        //temporary, will use this with GGPO later
-        Rollback::LoadRemotePlayerPacket(&pkt, playerins, ConnectedPlayerData);
+        uint32_t session_player_num = Game::get_SessionPlayerNumber_For_ConnectedPlayerData(ConnectedPlayerData);
+
+        Rollback::LoadRemotePlayerPacket(&pkt, playerins, session_player_num);
     }
 
     return Rollback::rollbackEnabled;
@@ -352,7 +358,7 @@ void recv_HandshakePacketExtra(uint64_t ConnectedPlayerData)
     }
 }
 
-void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins, uint64_t ConnectedPlayerData)
+void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins, int32_t session_player_num)
 {
     //Type 1
     *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x10) = pkt->position_x;
@@ -390,7 +396,6 @@ void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins, uin
     //Type 11
     set_playergamedata_flags((void*)equipgamedata, pkt->flags);
 
-    int32_t session_player_num = Game::get_SessionPlayerNumber_For_ConnectedPlayerData(ConnectedPlayerData);
     if (session_player_num != -1)
     {
         uint8_t* on_pkt10_recv = (uint8_t*)((*(uint64_t*)((*(uint64_t*)Game::game_data_man) + 0x28)) + session_player_num);
