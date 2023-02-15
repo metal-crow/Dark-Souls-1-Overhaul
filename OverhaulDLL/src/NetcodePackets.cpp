@@ -518,7 +518,7 @@ void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins, int
 
 uint64_t disableType18PacketEnforcement_helper(PlayerIns* pc)
 {
-    if (!Rollback::rollbackEnabled)
+    if (!Rollback::rollbackEnabled && !Rollback::netcodeTestingEnabled)
     {
         return 1;
     }
@@ -536,7 +536,7 @@ uint64_t disableType18PacketEnforcement_helper(PlayerIns* pc)
 uint64_t fixPhantomBulletGenIssue_helper(PlayerIns* pc)
 {
     //return 0 to do nothing, return 1 if we need to fix the bullet bug
-    if (!Rollback::rollbackEnabled)
+    if (!Rollback::rollbackEnabled && !Rollback::netcodeTestingEnabled)
     {
         return 0;
     }

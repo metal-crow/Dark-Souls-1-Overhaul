@@ -17,32 +17,33 @@
 
 #include "NetcodePackets.h"
 
+#include "ggponet.h"
+
 class Rollback
 {
 public:
     static void start();
 
-    static void GameStateSave();
-    static void GameStateLoad();
-
-    static void GameInputSave(uint32_t frame);
-    static void GameInputLoad(uint32_t frame);
-
     static void NetcodeFix();
 
-    static void LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* player, uint64_t ConnectedPlayerData);
+    static void BuildRemotePlayerPacket(PlayerIns* playerins, MainPacket* out);
+    static void LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* player, int32_t session_player_num);
 
+    static bool rollbackToggle;
+    static bool rollbackEnabled;
+    static GGPOSession* ggpo;
+    static GGPOSessionCallbacks ggpoCallbacks;
+
+    static void rollback_start_session(ISteamNetworkingMessages* steamMsgs, CSteamID steamid);
+
+    //used for testing only
     static bool gsave;
     static bool gload;
     static bool isave;
     static bool iload;
     static bool netcodeSwap;
-
-    static bool rollbackEnabled;
-
+    static bool netcodeTestingEnabled;
     static const uint32_t RollbackSinglePacketType = 2; //this is unused, and passes the checks the game does on the type
-private:
-
     static PlayerIns* saved_playerins;
     static PadMan** saved_padman;
     static QInputMgrWindows** saved_qinputman;
@@ -51,6 +52,7 @@ private:
     static FXManager* saved_sfxobjs;
     static DamageMan* saved_damageman;
 
+private:
     static const uint64_t sendNetMessage_offset = 0x50b6b0;
     static const uint64_t getNetMessage_offset = 0x050b540;
     static const uint64_t send_generalplayerinfo_offset = 0x3976e0;
@@ -58,6 +60,45 @@ private:
     static const uint64_t disableType18PacketEnforcement_offset = 0x3226e0;
     static const uint64_t fixPhantomBulletGenIssue_offset = 0x4229bf;
     static const uint64_t isPacketTypeValid_offset = 0x50f2d0;
+};
+
+
+typedef struct RollbackInput RollbackInput;
+typedef struct RollbackLocalInput RollbackLocalInput;
+typedef struct RollbackRemoteInput RollbackRemoteInput;
+typedef struct RollbackState RollbackState;
+
+struct RollbackLocalInput
+{
+    PadMan* padman;
+    QInputMgrWindows* qInputMgrWindows;
+    InputDirectionMovementMan* inputDirectionMovementMan;
+};
+
+struct RollbackRemoteInput
+{
+    MainPacket pkt;
+    PlayerIns* playerins;
+    uint32_t session_player_num;
+};
+
+struct RollbackInput
+{
+    bool isLocal;
+    union
+    {
+        RollbackLocalInput local;
+        RollbackRemoteInput remote;
+    };
+};
+
+struct RollbackState
+{
+    PlayerIns* playerins_PC;
+    PlayerIns* playerins_Guest1;
+    BulletMan* bulletman;
+    SfxMan* sfman;
+    DamageMan* damageman;
 };
 
 inline void* malloc_(size_t size)
@@ -70,5 +111,13 @@ inline void* malloc_(size_t size)
     memset(out, 0, size);
     return out;
 }
+
+bool rollback_begin_game_callback(const char*);
+bool rollback_advance_frame_callback(int);
+bool rollback_load_game_state_callback(unsigned char* buffer, int);
+bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int);
+void rollback_free_buffer(void* buffer);
+bool rollback_on_event_callback(GGPOEvent* info);
+bool rollback_log_game_state(char* filename, unsigned char* buffer, int);
 
 #endif
