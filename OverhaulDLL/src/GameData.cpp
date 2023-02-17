@@ -1041,11 +1041,11 @@ std::optional<uint32_t> Game::get_pc_playernum() {
     }
 }
 
-// returns PlayerIns
+// returns PlayerIns. index 0 is always the PC/self
 std::optional<uint64_t> Game::get_connected_player(uint32_t i) {
     //go to the given index in the connectedPlayers_ChrSlotArray, grab the first value (pointer to PlayerIns) and return it
     if (connected_players_array_cache) {
-        return *(uint64_t*)(connected_players_array_cache + (0x38 * (i + 1)));
+        return *(uint64_t*)(connected_players_array_cache + (0x38 * i));
     }
 
     //gets a pointer to the connectedPlayers_ChrSlotArray stored in the player's PlayerIns
@@ -1055,7 +1055,7 @@ std::optional<uint64_t> Game::get_connected_player(uint32_t i) {
     }
     else {
         connected_players_array_cache = *(uint64_t*)connected_players_array.resolve();
-        return *(uint64_t*)(connected_players_array_cache + (0x38 * (i + 1)));
+        return *(uint64_t*)(connected_players_array_cache + (0x38 * i));
     }
 }
 
@@ -1066,7 +1066,7 @@ std::optional<int32_t> Game::convert_handle_to_playernum(uint32_t handle) {
     }
     else {
         //loop through the conncted players and look for matching handle
-        for (int i = 0; i < 5; i++) {
+        for (int i = 1; i < 6; i++) {
             std::optional<uint64_t> guest_o = Game::get_connected_player(i);
             if (guest_o.has_value()) {
                 uint64_t guest = guest_o.value();
@@ -1094,7 +1094,7 @@ std::optional<uint32_t> Game::convert_playernum_to_handle(uint32_t playernum) {
     }
     else {
         //loop through the conncted players and look for matching playernum
-        for (int i = 0; i < 5; i++) {
+        for (int i = 1; i < 6; i++) {
             std::optional<uint64_t> guest_o = Game::get_connected_player(i);
             if (guest_o.has_value()) {
                 uint64_t guest = guest_o.value();
