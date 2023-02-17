@@ -268,7 +268,7 @@ void send_generalplayerinfo_helper(PlayerIns* playerins)
 
 void send_HandshakePacketExtra(uint64_t ConnectedPlayerData)
 {
-    HandshakePacketExtra pkt;
+    HandshakePacketExtra pkt = {};
     auto gamedata_o = Game::get_host_player_gamedata();
     if (!gamedata_o.has_value())
     {
@@ -282,7 +282,7 @@ void send_HandshakePacketExtra(uint64_t ConnectedPlayerData)
     pkt.player_num = *(int32_t*)(attribs + 0);
     pkt.player_sex = *(uint8_t*)(attribs + 0xba);
     pkt.covenantId = *(uint8_t*)(attribs + 0x103);
-    for (int i = 0; i < 0x14; i++)
+    for (size_t i = 0; i < 0x14; i++)
     {
         pkt.equipment_array[i] = *(uint32_t*)((equipgamedata + 0x80 + 0x24) + (i * 4));
     }
@@ -342,7 +342,7 @@ void recv_HandshakePacketExtra(uint64_t ConnectedPlayerData)
             ConsoleWrite("Warning: Got -1 for session_player_num in recv_HandshakePacketExtra. Connection will fail.");
             return;
         }
-        PlayerGameData* playergamedata = (PlayerGameData*)(*(uint64_t*)((*(uint64_t*)Game::game_data_man) + 0x18) + (0x660 * session_player_num));
+        PlayerGameData* playergamedata = (PlayerGameData*)(*(uint64_t*)((*(uint64_t*)Game::game_data_man) + 0x18) + (0x660 * (uint64_t)session_player_num));
 
         //Type 10
         *(uint32_t*)((uint64_t)(&playergamedata->attribs) + 0) = pkt.player_num;
