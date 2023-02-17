@@ -80,7 +80,7 @@ void Rollback::NetcodeFix()
 //return false if we don't want to have sendNetMessage send a packet
 bool sendNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint32_t type)
 {
-    if (Rollback::rollbackEnabled)
+    if (Rollback::rollbackEnabled || Rollback::netcodeTestingEnabled)
     {
         if (type == 10)
         {
@@ -104,7 +104,7 @@ bool sendNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint
         case 70:
             return false;
         case Rollback::RollbackSinglePacketType:
-            return Rollback::netcodeTestingEnabled;
+            return true;
         default:
             return true;
         }
@@ -125,7 +125,7 @@ bool sendNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint
 //return false if we don't want to have getNetMessage get a packet
 bool getNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint32_t type)
 {
-    if (Rollback::rollbackEnabled)
+    if (Rollback::rollbackEnabled || Rollback::netcodeTestingEnabled)
     {
         if (type == 10)
         {
@@ -146,7 +146,7 @@ bool getNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint3
         case 70:
             return false;
         case Rollback::RollbackSinglePacketType:
-            return Rollback::netcodeTestingEnabled;
+            return true;
         default:
             return true;
         }
