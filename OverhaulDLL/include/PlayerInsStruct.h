@@ -72,6 +72,8 @@ typedef struct ChrAsmModelRes ChrAsmModelRes;
 typedef struct ProEquipCtrl ProEquipCtrl;
 typedef struct ChrAsm ChrAsm;
 typedef struct PlayerIns PlayerIns;
+typedef struct PlayerGameData PlayerGameData;
+typedef struct SteamOnlineIDData SteamOnlineIDData;
 
 struct AnimationQueue_Entry_sub1_field0x10
 {
@@ -1101,12 +1103,32 @@ static_assert(offsetof(ChrAsmModel, padding_4) == 0x1c0);
 static_assert(offsetof(ChrAsmModel, data_6) == 0x1c8);
 static_assert(sizeof(ChrAsmModel) == 0x1d0);
 
+struct SteamOnlineIDData
+{
+    uint8_t padding_0[0x48];
+    uint64_t steam_id;
+    uint8_t padding_1[0x20];
+};
+static_assert(offsetof(SteamOnlineIDData, steam_id) == 0x48);
+static_assert(sizeof(SteamOnlineIDData) == 0x70);
+
+struct SteamPlayerData
+{
+    uint8_t padding_0[0x18];
+    SteamOnlineIDData* steamOnlineIDData;
+    uint8_t padding_1[0x78];
+};
+static_assert(offsetof(SteamPlayerData, steamOnlineIDData) == 0x18);
+static_assert(sizeof(SteamPlayerData) == 0x98);
+
 struct PlayerIns
 {
     ChrIns chrins;
     uint8_t padding_0[8];
     PlayerGameData* playergamedata;
-    uint8_t padding_1a[0x50];
+    uint8_t padding_1a[0x10];
+    SteamPlayerData* steamPlayerData;
+    uint8_t padding_1ab[0x38];
     uint8_t data_0[0x1d0];
     uint64_t padding_1b;
     uint8_t data_1[16];
@@ -1138,6 +1160,7 @@ struct PlayerIns
 static_assert(offsetof(PlayerIns, chrins) == 0x0);
 static_assert(offsetof(PlayerIns, playergamedata) == 0x578);
 static_assert(offsetof(PlayerIns, padding_1a) == 0x580);
+static_assert(offsetof(PlayerIns, steamPlayerData) == 0x590);
 static_assert(offsetof(PlayerIns, data_0) == 0x5d0);
 static_assert(offsetof(PlayerIns, padding_1b) == 0x7a0);
 static_assert(offsetof(PlayerIns, data_1) == 0x7a8);
