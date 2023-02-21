@@ -19,6 +19,13 @@
 
 #include "ggponet.h"
 
+enum class GGPOREADY
+{
+    NotReady,
+    ReadyAwaitingFrameHead,
+    Ready
+};
+
 class Rollback
 {
 public:
@@ -31,10 +38,15 @@ public:
 
     static bool rollbackToggle;
     static bool rollbackEnabled;
+
+    static bool ggpoStarted;
+    static GGPOREADY ggpoReady;
     static GGPOSession* ggpo;
     static GGPOSessionCallbacks ggpoCallbacks;
+    static GGPOPlayerHandle ggpoHandles[GGPO_MAX_PLAYERS];
+    static const size_t ggpoCurrentPlayerCount = 2;
 
-    static void rollback_start_session(ISteamNetworkingMessages* steamMsgs, CSteamID steamid);
+    static void rollback_start_session(ISteamNetworkingMessages* steamMsgs);
 
     //used for testing only
     static bool gsave;
@@ -60,12 +72,13 @@ private:
     static const uint64_t disableType18PacketEnforcement_offset = 0x3226e0;
     static const uint64_t fixPhantomBulletGenIssue_offset = 0x4229bf;
     static const uint64_t isPacketTypeValid_offset = 0x50f2d0;
+    static const uint64_t rollback_game_frame_sync_inputs_offset = 0x15d4d5;
+    static const uint64_t MainUpdate_end_offset = 0x15d701;
 };
 
 
 typedef struct RollbackInput RollbackInput;
 typedef struct RollbackLocalInput RollbackLocalInput;
-typedef struct RollbackRemoteInput RollbackRemoteInput;
 typedef struct RollbackState RollbackState;
 
 struct RollbackLocalInput
@@ -75,27 +88,16 @@ struct RollbackLocalInput
     InputDirectionMovementMan* inputDirectionMovementMan;
 };
 
-struct RollbackRemoteInput
-{
-    MainPacket pkt;
-    PlayerIns* playerins;
-    uint32_t session_player_num;
-};
-
+//this full packet is used both locally, and sent to the remote player
 struct RollbackInput
 {
-    bool isLocal;
-    union
-    {
-        RollbackLocalInput local;
-        RollbackRemoteInput remote;
-    };
+    RollbackLocalInput local;
+    MainPacket remote;
 };
 
 struct RollbackState
 {
-    PlayerIns* playerins_PC;
-    PlayerIns* playerins_Guest1;
+    PlayerIns* playerins[GGPO_MAX_PLAYERS];
     BulletMan* bulletman;
     SfxMan* sfman;
     DamageMan* damageman;
@@ -119,5 +121,7 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
 void rollback_free_buffer(void* buffer);
 bool rollback_on_event_callback(GGPOEvent* info);
 bool rollback_log_game_state(char* filename, unsigned char* buffer, int);
+
+bool rollback_await_player_added_before_init(void* steamMsgs);
 
 #endif

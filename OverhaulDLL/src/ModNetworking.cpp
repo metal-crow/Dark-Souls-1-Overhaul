@@ -820,6 +820,9 @@ bool GuestAwaitIncomingLobbyData(void* data_a)
     //this also means it's safe to send out the queued packets for everyone
     SendQueuedPackets();
 
+    //Kick off ggpo once the game sets up the other players in connectedPlayers_ChrSlotArray
+    MainLoop::setup_mainloop_callback(rollback_await_player_added_before_init, ModNetworking::SteamNetMessages, "rollback_await_player_added_before_init");
+
     //this flag is finished, we don't need it anymore. Reset for next time we connect to a host.
     ModNetworking::host_got_info = false;
     guest_get_host_info_mtx.unlock();
@@ -1018,6 +1021,8 @@ bool HostAwaitIncomingGuestMemberData(void* data_a)
     SteamAPIStatusKnown_Users.insert_or_assign(data->steamid, ModNetworking::incoming_guest_mod_installed);
     SendQueuedPackets();
 
+    //Kick off ggpo once the game sets up the other players in connectedPlayers_ChrSlotArray
+    MainLoop::setup_mainloop_callback(rollback_await_player_added_before_init, ModNetworking::SteamNetMessages, "rollback_await_player_added_before_init");
 
     //reset for next guest
     exit:

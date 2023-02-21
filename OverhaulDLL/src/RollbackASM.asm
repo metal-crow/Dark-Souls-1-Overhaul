@@ -1,5 +1,8 @@
 _DATA SEGMENT
 
+sub_1401862A0   dq  1401862A0h
+nullsub_78     dq  140185470h
+
 _DATA ENDS
 
 _TEXT    SEGMENT
@@ -387,6 +390,109 @@ test    al, al
 jmp     fixPhantomBulletGenIssue_return
 
 fixPhantomBulletGenIssue_injection ENDP
+
+
+EXTERN rollback_game_frame_sync_inputs_return: qword
+extern rollback_game_frame_sync_inputs_helper: proc
+
+PUBLIC rollback_game_frame_sync_inputs_injection
+rollback_game_frame_sync_inputs_injection PROC
+;original code
+call    qword ptr [sub_1401862A0]
+mov     rcx, rax
+mov     edx, 2
+call    qword ptr [nullsub_78]
+
+sub     rsp, 10h
+movdqu  [rsp], xmm0
+sub     rsp, 10h
+movdqu  [rsp], xmm1
+sub     rsp, 10h
+movdqu  [rsp], xmm2
+sub     rsp, 10h
+movdqu  [rsp], xmm3
+push    rax
+push    rcx
+push    rdx
+push    r8
+push    r9
+push    r10
+push    r11
+sub     rsp, 28h
+
+call    rollback_game_frame_sync_inputs_helper
+
+add     rsp, 28h
+pop     r11
+pop     r10
+pop     r9
+pop     r8
+pop     rdx
+pop     rcx
+pop     rax
+movdqu  xmm3, [rsp]
+add     rsp, 10h
+movdqu  xmm2, [rsp]
+add     rsp, 10h
+movdqu  xmm1, [rsp]
+add     rsp, 10h
+movdqu  xmm0, [rsp]
+add     rsp, 10h
+
+jmp     rollback_game_frame_sync_inputs_return
+rollback_game_frame_sync_inputs_injection ENDP
+
+
+EXTERN dsr_frame_finished_return: qword
+extern dsr_frame_finished_helper: proc
+
+PUBLIC dsr_frame_finished_injection
+dsr_frame_finished_injection PROC
+;original code
+movzx   ecx, dil
+xor     edx, edx
+test    al, al
+cmovnz  ecx, edx
+movzx   eax, cl
+
+sub     rsp, 10h
+movdqu  [rsp], xmm0
+sub     rsp, 10h
+movdqu  [rsp], xmm1
+sub     rsp, 10h
+movdqu  [rsp], xmm2
+sub     rsp, 10h
+movdqu  [rsp], xmm3
+push    rax
+push    rcx
+push    rdx
+push    r8
+push    r9
+push    r10
+push    r11
+sub     rsp, 28h
+
+call    dsr_frame_finished_helper
+
+add     rsp, 28h
+pop     r11
+pop     r10
+pop     r9
+pop     r8
+pop     rdx
+pop     rcx
+pop     rax
+movdqu  xmm3, [rsp]
+add     rsp, 10h
+movdqu  xmm2, [rsp]
+add     rsp, 10h
+movdqu  xmm1, [rsp]
+add     rsp, 10h
+movdqu  xmm0, [rsp]
+add     rsp, 10h
+
+jmp     dsr_frame_finished_return
+dsr_frame_finished_injection ENDP
 
 _TEXT    ENDS
 

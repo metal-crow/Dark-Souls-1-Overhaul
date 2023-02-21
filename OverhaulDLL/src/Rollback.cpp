@@ -13,7 +13,10 @@ BulletMan* Rollback::saved_bulletman = NULL;
 FXManager* Rollback::saved_sfxobjs = NULL;
 DamageMan* Rollback::saved_damageman = NULL;
 
-static const size_t INPUT_ROLLBACK_LENGTH = 5 * 60; //5 seconds
+GGPOSession* Rollback::ggpo = NULL;
+GGPOPlayerHandle Rollback::ggpoHandles[GGPO_MAX_PLAYERS] = {};
+bool Rollback::ggpoStarted = false;
+GGPOREADY Rollback::ggpoReady = GGPOREADY::NotReady;
 
 GGPOSessionCallbacks Rollback::ggpoCallbacks = {
     .begin_game = rollback_begin_game_callback,
@@ -63,6 +66,7 @@ bool state_test(void* unused)
 bool Rollback::isave = false;
 bool Rollback::iload = false;
 static uint32_t inputSaveFrameI = 0;
+static const size_t INPUT_ROLLBACK_LENGTH = 5 * 60; //5 seconds
 bool input_test(void* unused)
 {
     if (Rollback::isave)
@@ -127,28 +131,161 @@ bool ggpo_toggle(void* unused)
     return true;
 }
 
+void rollback_sync_inputs()
+{
+    RollbackInput inputs[GGPO_MAX_PLAYERS];
+    int disconnect_flags; //TODO
+
+    //get the inputs for this frame
+    GGPOErrorCode res = ggpo_synchronize_input(Rollback::ggpo, inputs, sizeof(RollbackInput) * GGPO_MAX_PLAYERS, &disconnect_flags);
+    if (!GGPO_SUCCEEDED(res))
+    {
+        FATALERROR("ggpo_synchronize_input call returned %d", res);
+    }
+
+    for (size_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
+    {
+        ConsoleWrite("%p %p %p %d", inputs[i].local.padman, inputs[i].local.qInputMgrWindows, inputs[i].local.inputDirectionMovementMan, inputs[i].remote.maxHp);
+    }
+
+    //load the input states into the game to be used this frame
+    //Make sure to use the values returned rather than the values you've read from the local controllers
+    for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
+    {
+        auto player_o = Game::get_connected_player(i);
+        if (!player_o.has_value() || player_o.value() == NULL)
+        {
+            FATALERROR("Unable to get playerins in rollback_load_game_state_callback");
+        }
+        PlayerIns* player = (PlayerIns*)player_o.value();
+
+        //first player is always the local player, since we add them first in setup
+        if (i == 0)
+        {
+            if (inputs[i].local.padman == NULL ||
+                inputs[i].local.qInputMgrWindows == NULL ||
+                inputs[i].local.inputDirectionMovementMan == NULL)
+            {
+                FATALERROR("PC local input returned null for ggpo_synchronize_input");
+            }
+            copy_PadMan(*(PadMan**)Game::pad_man, inputs[i].local.padman);
+            copy_QInputMgrWindows(*(QInputMgrWindows**)Game::QInputMgrWindowsFantasy, inputs[i].local.qInputMgrWindows);
+            copy_InputDirectionMovementMan(*(InputDirectionMovementMan**)Game::InputDirectionMovementMan, inputs[i].local.inputDirectionMovementMan);
+        }
+        else
+        {
+            if (inputs[i].remote.maxHp == 0)
+            {
+                ConsoleWrite("WARNING: Player remote input returned empty for ggpo_synchronize_input. Leave unchanged for this frame");
+            }
+            else
+            {
+                Rollback::LoadRemotePlayerPacket(&inputs[i].remote, player, Game::get_SessionPlayerNumber_For_ConnectedPlayerData((uint64_t)(&player->steamPlayerData)));
+            }
+        }
+    }
+}
+
+extern "C" {
+    uint64_t rollback_game_frame_sync_inputs_return;
+    void rollback_game_frame_sync_inputs_injection();
+    void rollback_game_frame_sync_inputs_helper();
+}
+
+void rollback_game_frame_sync_inputs_helper()
+{
+    if (Rollback::rollbackEnabled && Rollback::ggpoStarted)
+    {
+        ggpo_idle(Rollback::ggpo, 0); //timeout isn't actually used by this function
+
+        if (Rollback::ggpoReady == GGPOREADY::ReadyAwaitingFrameHead)
+        {
+            Rollback::ggpoReady = GGPOREADY::Ready;
+        }
+
+        if (Rollback::ggpoReady == GGPOREADY::Ready)
+        {
+            RollbackInput localInput;
+
+            auto player_o = Game::get_PlayerIns();
+            if (!player_o.has_value() || player_o.value() == NULL)
+            {
+                FATALERROR("Unable to get playerins for PC in rollback_game_frame_sync_inputs_helper");
+            }
+            PlayerIns* player = (PlayerIns*)player_o.value();
+
+            //read local controller inputs
+            localInput.local.padman = init_PadMan();
+            copy_PadMan(localInput.local.padman, *(PadMan**)Game::pad_man);
+            localInput.local.qInputMgrWindows = init_QInputMgrWindows();
+            copy_QInputMgrWindows(localInput.local.qInputMgrWindows, *(QInputMgrWindows**)Game::QInputMgrWindowsFantasy);
+            localInput.local.inputDirectionMovementMan = init_InputDirectionMovementMan();
+            copy_InputDirectionMovementMan(localInput.local.inputDirectionMovementMan, *(InputDirectionMovementMan**)Game::InputDirectionMovementMan);
+
+            //setup the remote section for the local player
+            Rollback::BuildRemotePlayerPacket(player, &localInput.remote);
+
+            /* notify ggpo of the local player's inputs */
+            GGPOErrorCode result = ggpo_add_local_input(Rollback::ggpo, Rollback::ggpoHandles[0], &localInput, sizeof(RollbackInput));
+
+            if (!GGPO_SUCCEEDED(result))
+            {
+                FATALERROR("Unable to ggpo_add_local_input. %d", result);
+            }
+
+            rollback_sync_inputs();
+        }
+    }
+}
+
+extern "C" {
+    uint64_t dsr_frame_finished_return;
+    void dsr_frame_finished_injection();
+    void dsr_frame_finished_helper();
+}
+
+void dsr_frame_finished_helper()
+{
+    if (Rollback::rollbackEnabled && Rollback::ggpoStarted)
+    {
+        //only start telling ggpo we're running once the players are synced
+        if (Rollback::ggpoReady == GGPOREADY::Ready)
+        {
+            ggpo_advance_frame(Rollback::ggpo);
+        }
+    }
+}
+
 void Rollback::start()
 {
     ConsoleWrite("Rollback...");
 
+    SetEnvironmentVariable("ggpo.log", "1");
+
     Rollback::NetcodeFix();
 
     //Synchronize input at the start of each frame
+    //do this anytime after the game reads the inputs, but before MoveMapStep_Step_13
+    uint8_t* write_address = (uint8_t*)(Rollback::rollback_game_frame_sync_inputs_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &rollback_game_frame_sync_inputs_return, 4, &rollback_game_frame_sync_inputs_injection);
 
+    //Inform ggpo after a frame has been rendered
+    write_address = (uint8_t*)(Rollback::MainUpdate_end_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &dsr_frame_finished_return, 0, &dsr_frame_finished_injection);
 
     //Testing rollback related stuff
     Rollback::saved_playerins = init_PlayerIns(false);
-    Rollback::saved_padman = (PadMan**)malloc(sizeof(PadMan*) * INPUT_ROLLBACK_LENGTH);
+    Rollback::saved_padman = (PadMan**)malloc_(sizeof(PadMan*) * INPUT_ROLLBACK_LENGTH);
     for (size_t i = 0; i < INPUT_ROLLBACK_LENGTH; i++)
     {
         Rollback::saved_padman[i] = init_PadMan();
     }
-    Rollback::saved_qinputman = (QInputMgrWindows**)malloc(sizeof(QInputMgrWindows*) * INPUT_ROLLBACK_LENGTH);
+    Rollback::saved_qinputman = (QInputMgrWindows**)malloc_(sizeof(QInputMgrWindows*) * INPUT_ROLLBACK_LENGTH);
     for (size_t i = 0; i < INPUT_ROLLBACK_LENGTH; i++)
     {
         Rollback::saved_qinputman[i] = init_QInputMgrWindows();
     }
-    Rollback::saved_InputDirectionMovementMan = (InputDirectionMovementMan**)malloc(sizeof(InputDirectionMovementMan*) * INPUT_ROLLBACK_LENGTH);
+    Rollback::saved_InputDirectionMovementMan = (InputDirectionMovementMan**)malloc_(sizeof(InputDirectionMovementMan*) * INPUT_ROLLBACK_LENGTH);
     for (size_t i = 0; i < INPUT_ROLLBACK_LENGTH; i++)
     {
         Rollback::saved_InputDirectionMovementMan[i] = init_InputDirectionMovementMan();
@@ -174,38 +311,15 @@ bool rollback_begin_game_callback(const char*)
 */
 bool rollback_advance_frame_callback(int)
 {
-    const size_t numplayers = 2;
-    RollbackInput inputs[numplayers];
-    int disconnect_flags;
+    rollback_sync_inputs();
 
-    //get the inputs for this frame
-    GGPOErrorCode res = ggpo_synchronize_input(Rollback::ggpo, (void*)inputs, sizeof(RollbackInput) * numplayers, &disconnect_flags);
-    if (res != GGPOErrorCode::GGPO_ERRORCODE_SUCCESS)
-    {
-        FATALERROR("ggpo_synchronize_input call in rollback_advance_frame_callback returned %d", res);
-    }
-
-    //load the inputs
-    for (size_t i = 0; i < numplayers; i++)
-    {
-        if (inputs[i].isLocal)
-        {
-            copy_PadMan(*(PadMan**)Game::pad_man, inputs[i].local.padman);
-            copy_QInputMgrWindows(*(QInputMgrWindows**)Game::QInputMgrWindowsFantasy, inputs[i].local.qInputMgrWindows);
-            copy_InputDirectionMovementMan(*(InputDirectionMovementMan**)Game::InputDirectionMovementMan, inputs[i].local.inputDirectionMovementMan);
-        }
-        else
-        {
-            Rollback::LoadRemotePlayerPacket(&inputs[i].remote.pkt, inputs[i].remote.playerins, inputs[i].remote.session_player_num);
-        }
-    }
-
-    //step next frame, ignoring inputs
+    //step next frame
     Game::SuspendThreads();
-    Game::set_ReadInputs_allowed(false);
     Game::Step_GameSimulation();
-    Game::set_ReadInputs_allowed(true);
     Game::ResumeThreads();
+    ggpo_advance_frame(Rollback::ggpo);
+
+    ConsoleWrite("rollback_advance_frame_callback finished");
     return true;
 }
 
@@ -214,26 +328,25 @@ bool rollback_advance_frame_callback(int)
  */
 bool rollback_load_game_state_callback(unsigned char* buffer, int)
 {
-    auto player_o = Game::get_PlayerIns();
-    if (!player_o.has_value())
-    {
-        FATALERROR("Unable to get playerins for PC in rollback_load_game_state_callback");
-    }
-    PlayerIns* player = (PlayerIns*)player_o.value();
-    if (player == NULL)
-    {
-        FATALERROR("Unable to get playerins for PC in rollback_load_game_state_callback. Got null");
-    }
-
-    PlayerIns* player_guest1 = 0;
-
     RollbackState* state = (RollbackState*)buffer;
 
-    copy_PlayerIns(player, state->playerins_PC, true, false);
-    copy_PlayerIns(player_guest1, state->playerins_Guest1, true, true);
+    for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
+    {
+        auto player_o = Game::get_connected_player(i);
+        if (!player_o.has_value() || player_o.value() == NULL)
+        {
+            FATALERROR("Unable to get playerins in rollback_load_game_state_callback");
+        }
+        PlayerIns* player = (PlayerIns*)player_o.value();
+
+        copy_PlayerIns(player, state->playerins[i], true, (i > 0));
+    }
+
     copy_BulletMan(*(BulletMan**)Game::bullet_man, state->bulletman, true);
-    //copy_FXManager
+    //TODO copy_FXManager
     copy_DamageMan(*(DamageMan**)Game::damage_man, state->damageman, true);
+
+    ConsoleWrite("rollback_load_game_state_callback finish");
 
     return true;
 }
@@ -244,38 +357,36 @@ bool rollback_load_game_state_callback(unsigned char* buffer, int)
  */
 bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int)
 {
-    auto player_o = Game::get_PlayerIns();
-    if (!player_o.has_value())
-    {
-        FATALERROR("Unable to get playerins for PC in rollback_save_game_state_callback");
-    }
-    PlayerIns* player = (PlayerIns*)player_o.value();
-    if (player == NULL)
-    {
-        FATALERROR("Unable to get playerins for PC in rollback_save_game_state_callback. Got null");
-    }
-
-    PlayerIns* player_guest1 = 0;//Game::get_connected_player
-
     RollbackState* state = (RollbackState*)malloc(sizeof(RollbackState));
     if (state == NULL)
     {
         FATALERROR("Unable to get allocate state for rollback_save_game_state_callback");
     }
 
-    state->playerins_PC = init_PlayerIns(false);
-    copy_PlayerIns(state->playerins_PC, player, false, false);
-    state->playerins_Guest1 = init_PlayerIns(true);
-    copy_PlayerIns(state->playerins_Guest1, player_guest1, false, true);
+    for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
+    {
+        auto player_o = Game::get_connected_player(i);
+        if (!player_o.has_value() || player_o.value() == NULL)
+        {
+            FATALERROR("Unable to get playerins in rollback_load_game_state_callback");
+        }
+        PlayerIns* player = (PlayerIns*)player_o.value();
+
+        state->playerins[i] = init_PlayerIns(i>0);
+        copy_PlayerIns(state->playerins[i], player, false, (i>0));
+    }
+
     state->bulletman = init_BulletMan();
     copy_BulletMan(state->bulletman, *(BulletMan**)Game::bullet_man, false);
-    //copy_FXManager;
+    //TODO copy_FXManager;
     state->damageman = init_DamageMan();
     copy_DamageMan(state->damageman, *(DamageMan**)Game::damage_man, false);
 
     *buffer = (unsigned char*)state;
     *len = sizeof(RollbackState*);
     *checksum = 0;
+
+    ConsoleWrite("rollback_save_game_state_callback finish");
 
     return true;
 }
@@ -284,9 +395,11 @@ void rollback_free_buffer(void* buffer)
 {
     RollbackState* state = (RollbackState*)buffer;
 
-    free_PlayerIns(state->playerins_PC, false);
-    free_PlayerIns(state->playerins_Guest1, true);
-    //free_FXManager
+    for (size_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
+    {
+        free_PlayerIns(state->playerins[i], (i>0));
+    }
+    //TODO free_FXManager
     free_BulletMan(state->bulletman);
     free_DamageMan(state->damageman);
 
@@ -308,6 +421,7 @@ bool rollback_on_event_callback(GGPOEvent* info)
         break;
     case GGPO_EVENTCODE_RUNNING:
         ConsoleWrite("GGPO_EVENTCODE_RUNNING");
+        Rollback::ggpoReady = GGPOREADY::ReadyAwaitingFrameHead;
         break;
     case GGPO_EVENTCODE_CONNECTION_INTERRUPTED:
         ConsoleWrite("GGPO_EVENTCODE_CONNECTION_INTERRUPTED");
@@ -331,39 +445,95 @@ bool rollback_log_game_state(char* filename, unsigned char* buffer, int)
     return true;
 }
 
-void Rollback::rollback_start_session(ISteamNetworkingMessages* steamMsgs, CSteamID steamid)
+static size_t timer = 0;
+
+bool rollback_await_player_added_before_init(void* steamMsgs)
 {
+    if (!Game::playerchar_is_loaded())
+    {
+        return true;
+    }
+
+    //TODO wait for the players to be fully loaded
+    for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
+    {
+        auto player_o = Game::get_connected_player(i);
+        if (!player_o.has_value() || player_o.value() == NULL)
+        {
+            return true;
+        }
+    }
+
+    if (timer * 16.6f < 15 * 1000)
+    {
+        timer++;
+        return true;
+    }
+    timer = 0;
+
+    Rollback::rollback_start_session((ISteamNetworkingMessages*)steamMsgs);
+    return false;
+}
+
+void Rollback::rollback_start_session(ISteamNetworkingMessages* steamMsgs)
+{
+    GGPOErrorCode result;
+
     if (Rollback::rollbackEnabled)
     {
-        GGPOErrorCode result = ggpo_start_session(&Rollback::ggpo, &Rollback::ggpoCallbacks, steamMsgs, "DSR_GGPO", 2, sizeof(RollbackInput));
-        if (result != GGPO_ERRORCODE_SUCCESS)
+        //TODO move this to when session ends
+        if (Rollback::ggpo != NULL)
+        {
+            Rollback::ggpoStarted = false;
+            Rollback::ggpoReady = GGPOREADY::NotReady;
+            result = ggpo_close_session(Rollback::ggpo);
+            Rollback::ggpo = NULL;
+            if (!GGPO_SUCCEEDED(result))
+            {
+                FATALERROR("unable to close ggpo. %d", result);
+            }
+        }
+
+        result = ggpo_start_session(&Rollback::ggpo, &Rollback::ggpoCallbacks, steamMsgs, "DSR_GGPO", Rollback::ggpoCurrentPlayerCount, sizeof(RollbackInput));
+        if (!GGPO_SUCCEEDED(result))
         {
             FATALERROR("unable to start ggpo. %d", result);
         }
 
-        ConsoleWrite("GGPO connecting to %llx", steamid.ConvertToUint64());
-
-        GGPOPlayer pc;
-        GGPOPlayerHandle pc_handle;
-        pc.size = sizeof(GGPOPlayer);
-        pc.type = GGPO_PLAYERTYPE_LOCAL;
-        pc.player_num = 1;
-        result = ggpo_add_player(ggpo, &pc, &pc_handle);
-        if (result != GGPO_ERRORCODE_SUCCESS)
+        for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
         {
-            FATALERROR("unable to ggpo_add_player for self. %d", result);
+            GGPOPlayer ggpoplayer = {};
+            ggpoplayer.size = sizeof(GGPOPlayer);
+            if (i > 0)
+            {
+                auto player_o = Game::get_connected_player(i);
+                if (!player_o.has_value() || player_o.value() == NULL)
+                {
+                    FATALERROR("Unable to get playerins for guest in rollback_start_session");
+                }
+                PlayerIns* player = (PlayerIns*)player_o.value();
+                uint64_t steamid = player->steamPlayerData->steamOnlineIDData->steam_id;
+
+                ConsoleWrite("GGPO connecting to guest %llx", steamid);
+
+                ggpoplayer.type = GGPO_PLAYERTYPE_REMOTE;
+                ggpoplayer.u.remote.steamid.SetSteamID(steamid);
+            }
+            else
+            {
+                ggpoplayer.type = GGPO_PLAYERTYPE_LOCAL;
+            }
+            ggpoplayer.player_num = i+1;
+            result = ggpo_add_player(ggpo, &ggpoplayer, &Rollback::ggpoHandles[i]);
+            if (!GGPO_SUCCEEDED(result))
+            {
+                FATALERROR("unable to ggpo_add_player. %d", result);
+            }
         }
 
-        GGPOPlayer guest1;
-        GGPOPlayerHandle guest1_handle;
-        guest1.size = sizeof(GGPOPlayer);
-        guest1.type = GGPO_PLAYERTYPE_REMOTE;
-        guest1.player_num = 2;
-        guest1.u.remote.steamid.SetSteamID(steamid);
-        result = ggpo_add_player(ggpo, &guest1, &guest1_handle);
-        if (result != GGPO_ERRORCODE_SUCCESS)
-        {
-            FATALERROR("unable to ggpo_add_player for guest. %d", result);
-        }
+        //ggpo_set_frame_delay(ggpo, Rollback::ggpoHandles[0], 1); //bug here where ggpo returns a padded frame 0 on frame 0, which doesn't exist
+
+        ConsoleWrite("GGPO started");
+        Rollback::ggpoStarted = true;
     }
 }
