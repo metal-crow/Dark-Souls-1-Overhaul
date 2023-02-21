@@ -17,6 +17,10 @@ typedef struct QXInputPad QXInputPad;
 typedef struct QDirectInputPad QDirectInputPad;
 typedef struct QInputStates_substruct_BD QInputStates_substruct_BD;
 typedef struct QInputStates_substruct_BDQ QInputStates_substruct_BDQ;
+typedef struct FlattenedQInputMgrWindowsObj FlattenedQInputMgrWindowsObj;
+typedef struct FlattenedQXInputPad FlattenedQXInputPad;
+typedef struct FlattenedQDirectInputPad FlattenedQDirectInputPad;
+typedef struct FlattenedQInputStates_substruct_BDQ FlattenedQInputStates_substruct_BDQ;
 
 struct QInputStates_substruct_BDQ
 {
@@ -32,6 +36,58 @@ struct QInputStates_substruct_BD
 };
 
 static_assert(sizeof(QInputStates_substruct_BD) == 0x10);
+
+#pragma pack(push, 1)
+
+struct FlattenedQInputStates_substruct_BDQ
+{
+    uint8_t data_0[0x10];
+    uint8_t data_1;
+};
+
+struct FlattenedQDirectInputPad
+{
+    uint64_t data_1;
+    QInputStates_substruct_BD data_2[32];
+    FlattenedQInputStates_substruct_BDQ data_3[32];
+    uint32_t data_4[32];
+};
+
+struct FlattenedQXInputPad
+{
+    uint64_t data_1;
+    QInputStates_substruct_BD data_2[24];
+    FlattenedQInputStates_substruct_BDQ data_3[24];
+    uint64_t data_3a[6];
+    uint32_t data_4[24];
+};
+
+struct FlattenedQInputMgrWindowsObj
+{
+    struct
+    {
+        uint64_t data_1;
+        QInputStates_substruct_BD data_2[14];
+        FlattenedQInputStates_substruct_BDQ data_3[14];
+        uint8_t data_4[6];
+        uint8_t data_5[6];
+        uint32_t data_6[15];
+    } mouse;
+    struct
+    {
+        uint64_t data_1;
+        QInputStates_substruct_BD data_2[256];
+        FlattenedQInputStates_substruct_BDQ data_3[256];
+        uint8_t data_3a[0x200];
+        uint32_t data_4[256];
+    } keyboard;
+    FlattenedQXInputPad xpads[4];
+    FlattenedQDirectInputPad dpads[4];
+    uint64_t data_0;
+    uint64_t curDevice;
+};
+
+#pragma pack(pop)
 
 struct QInputDevice
 {

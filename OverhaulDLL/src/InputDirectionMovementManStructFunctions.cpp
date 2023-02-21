@@ -1,6 +1,24 @@
 #include "InputDirectionMovementManStructFunctions.h"
 #include "Rollback.h"
 
+void FlattenedInputDirectionMovementManObj_to_InputDirectionMovementMan(InputDirectionMovementMan* to, FlattenedInputDirectionMovementManObj* from)
+{
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    for (size_t i = 0; i < 44; i++)
+    {
+        *to->data_1[i] = from->data_1[i];
+    }
+}
+
+void InputDirectionMovementMan_to_FlattenedInputDirectionMovementManObj(FlattenedInputDirectionMovementManObj* to, InputDirectionMovementMan* from)
+{
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    for (size_t i = 0; i < 44; i++)
+    {
+        to->data_1[i] = *from->data_1[i];
+    }
+}
+
 void copy_InputDirectionMovementMan(InputDirectionMovementMan* to, InputDirectionMovementMan* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));

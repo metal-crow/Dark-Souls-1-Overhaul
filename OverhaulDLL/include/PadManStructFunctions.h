@@ -5,6 +5,9 @@
 #include <stdint.h>
 #include "PadManStruct.h"
 
+void PadMan_to_FlattenedPadManObj(FlattenedPadManObj* to, PadMan* from);
+void FlattenedPadManObj_to_PadMan(PadMan* to, FlattenedPadManObj* from);
+
 void copy_PadMan(PadMan* to, PadMan* from);
 PadMan* init_PadMan();
 void free_PadMan(PadMan* to);

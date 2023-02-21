@@ -5,6 +5,9 @@
 #include <stdint.h>
 #include "QInputMgrWindowsStruct.h"
 
+void FlattenedQInputMgrWindowsObj_to_QInputMgrWindows(QInputMgrWindows* to, FlattenedQInputMgrWindowsObj* from);
+void QInputMgrWindows_to_FlattenedQInputMgrWindowsObj(FlattenedQInputMgrWindowsObj* to, QInputMgrWindows* from);
+
 void copy_QInputMgrWindows(QInputMgrWindows* to, QInputMgrWindows* from);
 QInputMgrWindows* init_QInputMgrWindows();
 void free_QInputMgrWindows(QInputMgrWindows* to);

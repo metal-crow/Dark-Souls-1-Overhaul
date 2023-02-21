@@ -19,6 +19,48 @@ typedef struct DLUserInputDevice DLUserInputDevice;
 typedef struct VirtualInputData VirtualInputData;
 typedef struct VirtualAnalogKeyInfo_float VirtualAnalogKeyInfo_float;
 typedef struct DynamicBitset DynamicBitset;
+typedef struct FlattenedPadManObj FlattenedPadManObj;
+typedef struct FlattenedDLUserInputDeviceImplObj FlattenedDLUserInputDeviceImplObj;
+
+#pragma pack(push, 1)
+
+struct FlattenedDLUserInputDeviceImplObj
+{
+    float a[0x80];
+    uint32_t b[32];
+    float c[0x80];
+    float d[0x80];
+    float e[0x80];
+    uint32_t f[32];
+};
+
+struct FlattenedPadManObj
+{
+    struct
+    {
+        FlattenedDLUserInputDeviceImplObj base;
+    } VirtMultiDevice;
+    struct
+    {
+        FlattenedDLUserInputDeviceImplObj base;
+        uint8_t data_0[24];
+        uint8_t data_1[0x1f8];
+        uint64_t data_2;
+    } padDevice_UserInput;
+    struct
+    {
+        FlattenedDLUserInputDeviceImplObj base;
+        uint8_t data_0[20];
+        uint8_t data_1[12];
+    } mouseDevice;
+    struct
+    {
+        FlattenedDLUserInputDeviceImplObj base;
+        uint8_t data_0[256];
+    } keyboardDevice;
+};
+
+#pragma pack(pop)
 
 struct DynamicBitset
 {

@@ -9,6 +9,17 @@
 #include <stdint.h>
 
 typedef struct InputDirectionMovementMan InputDirectionMovementMan;
+typedef struct FlattenedInputDirectionMovementManObj FlattenedInputDirectionMovementManObj;
+
+#pragma pack(push, 1)
+
+struct FlattenedInputDirectionMovementManObj
+{
+    uint64_t data_0[44];
+    float data_1[44];
+};
+
+#pragma pack(pop)
 
 struct InputDirectionMovementMan
 {

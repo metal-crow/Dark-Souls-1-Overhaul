@@ -1,6 +1,158 @@
 #include "QInputMgrWindowsStructFunctions.h"
 #include "Rollback.h"
 
+void FlattenedQInputMgrWindowsObj_to_QInputMgrWindows(QInputMgrWindows* to, FlattenedQInputMgrWindowsObj* from)
+{
+    {
+        QMouse* to_mouse = (QMouse*)to->base.device_array_start[0];
+        to_mouse->data_1 = from->mouse.data_1;
+        for (size_t i = 0; i < 14; i++)
+        {
+            memcpy(to_mouse->data_2[i].data_0, from->mouse.data_2[i].data_0, 0x10);
+        }
+        for (size_t i = 0; i < 14; i++)
+        {
+            memcpy(to_mouse->data_3[i].data_0, from->mouse.data_3[i].data_0, 0x10);
+            *to_mouse->data_3[i].data_1 = from->mouse.data_3[i].data_1;
+        }
+        memcpy(to_mouse->data_4, from->mouse.data_4, sizeof(to_mouse->data_4));
+        memcpy(to_mouse->data_5, from->mouse.data_5, sizeof(to_mouse->data_5));
+        memcpy(to_mouse->data_6, from->mouse.data_6, sizeof(to_mouse->data_6));
+    }
+
+    {
+        QKeyboard* to_kybd = (QKeyboard*)to->base.device_array_start[1];
+        to_kybd->data_1 = from->keyboard.data_1;
+        for (size_t i = 0; i < 256; i++)
+        {
+            memcpy(to_kybd->data_2[i].data_0, from->keyboard.data_2[i].data_0, 0x10);
+        }
+        for (size_t i = 0; i < 256; i++)
+        {
+            memcpy(to_kybd->data_3[i].data_0, from->keyboard.data_3[i].data_0, 0x10);
+            *to_kybd->data_3[i].data_1 = from->keyboard.data_3[i].data_1;
+        }
+        memcpy(to_kybd->data_3a, from->keyboard.data_3a, sizeof(to_kybd->data_3a));
+        memcpy(to_kybd->data_4, from->keyboard.data_4, sizeof(to_kybd->data_4));
+    }
+
+    for (size_t j = 0; j < 4; j++)
+    {
+        QXInputPad* to_pad = (QXInputPad*)to->base.device_array_start[2 + j];
+        FlattenedQXInputPad* from_pad = &from->xpads[j];
+
+        to_pad->data_1 = from_pad->data_1;
+        for (size_t i = 0; i < 24; i++)
+        {
+            memcpy(to_pad->data_2[i].data_0, from_pad->data_2[i].data_0, 0x10);
+        }
+        for (size_t i = 0; i < 24; i++)
+        {
+            memcpy(to_pad->data_3[i].data_0, from_pad->data_3[i].data_0, 0x10);
+            *to_pad->data_3[i].data_1 = from_pad->data_3[i].data_1;
+        }
+        memcpy(to_pad->data_3a, from_pad->data_3a, sizeof(to_pad->data_3a));
+        memcpy(to_pad->data_4, from_pad->data_4, sizeof(to_pad->data_4));
+    }
+
+    for (size_t j = 0; j < 4; j++)
+    {
+        QDirectInputPad* to_pad = (QDirectInputPad*)to->base.device_array_start[6 + j];
+        FlattenedQDirectInputPad* from_pad = &from->dpads[j];
+
+        to_pad->data_1 = from_pad->data_1;
+        for (size_t i = 0; i < 32; i++)
+        {
+            memcpy(to_pad->data_2[i].data_0, from_pad->data_2[i].data_0, 0x10);
+        }
+        for (size_t i = 0; i < 32; i++)
+        {
+            memcpy(to_pad->data_3[i].data_0, from_pad->data_3[i].data_0, 0x10);
+            *to_pad->data_3[i].data_1 = from_pad->data_3[i].data_1;
+        }
+        memcpy(to_pad->data_4, from_pad->data_4, sizeof(to_pad->data_4));
+    }
+
+    to->base.data_0 = from->data_0;
+    to->base.curDevice = from->curDevice;
+}
+
+void QInputMgrWindows_to_FlattenedQInputMgrWindowsObj(FlattenedQInputMgrWindowsObj* to, QInputMgrWindows* from)
+{
+    {
+        QMouse* from_mouse = (QMouse*)from->base.device_array_start[0];
+        to->mouse.data_1 = from_mouse->data_1;
+        for (size_t i = 0; i < 14; i++)
+        {
+            memcpy(to->mouse.data_2[i].data_0, from_mouse->data_2[i].data_0, 0x10);
+        }
+        for (size_t i = 0; i < 14; i++)
+        {
+            memcpy(to->mouse.data_3[i].data_0, from_mouse->data_3[i].data_0, 0x10);
+            to->mouse.data_3[i].data_1 = *from_mouse->data_3[i].data_1;
+        }
+        memcpy(to->mouse.data_4, from_mouse->data_4, sizeof(to->mouse.data_4));
+        memcpy(to->mouse.data_5, from_mouse->data_5, sizeof(to->mouse.data_5));
+        memcpy(to->mouse.data_6, from_mouse->data_6, sizeof(to->mouse.data_6));
+    }
+
+    {
+        QKeyboard* from_kybd = (QKeyboard*)from->base.device_array_start[1];
+        to->keyboard.data_1 = from_kybd->data_1;
+        for (size_t i = 0; i < 256; i++)
+        {
+            memcpy(to->keyboard.data_2[i].data_0, from_kybd->data_2[i].data_0, 0x10);
+        }
+        for (size_t i = 0; i < 256; i++)
+        {
+            memcpy(to->keyboard.data_3[i].data_0, from_kybd->data_3[i].data_0, 0x10);
+            to->keyboard.data_3[i].data_1 = *from_kybd->data_3[i].data_1;
+        }
+        memcpy(to->keyboard.data_3a, from_kybd->data_3a, sizeof(to->keyboard.data_3a));
+        memcpy(to->keyboard.data_4, from_kybd->data_4, sizeof(to->keyboard.data_4));
+    }
+
+    for (size_t j = 0; j < 4; j++)
+    {
+        QXInputPad* from_pad = (QXInputPad*)from->base.device_array_start[2+j];
+        FlattenedQXInputPad* to_pad = &to->xpads[j];
+
+        to_pad->data_1 = from_pad->data_1;
+        for (size_t i = 0; i < 24; i++)
+        {
+            memcpy(to_pad->data_2[i].data_0, from_pad->data_2[i].data_0, 0x10);
+        }
+        for (size_t i = 0; i < 24; i++)
+        {
+            memcpy(to_pad->data_3[i].data_0, from_pad->data_3[i].data_0, 0x10);
+            to_pad->data_3[i].data_1 = *from_pad->data_3[i].data_1;
+        }
+        memcpy(to_pad->data_3a, from_pad->data_3a, sizeof(to_pad->data_3a));
+        memcpy(to_pad->data_4, from_pad->data_4, sizeof(to_pad->data_4));
+    }
+
+    for (size_t j = 0; j < 4; j++)
+    {
+        QDirectInputPad* from_pad = (QDirectInputPad*)from->base.device_array_start[6 + j];
+        FlattenedQDirectInputPad* to_pad = &to->dpads[j];
+
+        to_pad->data_1 = from_pad->data_1;
+        for (size_t i = 0; i < 32; i++)
+        {
+            memcpy(to_pad->data_2[i].data_0, from_pad->data_2[i].data_0, 0x10);
+        }
+        for (size_t i = 0; i < 32; i++)
+        {
+            memcpy(to_pad->data_3[i].data_0, from_pad->data_3[i].data_0, 0x10);
+            to_pad->data_3[i].data_1 = *from_pad->data_3[i].data_1;
+        }
+        memcpy(to_pad->data_4, from_pad->data_4, sizeof(to_pad->data_4));
+    }
+
+    to->data_0 = from->base.data_0;
+    to->curDevice = from->base.curDevice;
+}
+
 void copy_QInputMgrWindows(QInputMgrWindows* to, QInputMgrWindows* from)
 {
     copy_QInputMgr(&to->base, &from->base);

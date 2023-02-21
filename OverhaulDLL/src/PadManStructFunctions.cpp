@@ -1,6 +1,60 @@
 #include "PadManStructFunctions.h"
 #include "Rollback.h"
 
+void DLUserInputDeviceImpl_to_FlattenedPadManObj(FlattenedDLUserInputDeviceImplObj* to, DLUserInputDeviceImpl* from)
+{
+    memcpy(to->a, from->base.VirtInputData.VirAnalogKeyInfo.analogSticksAndPad, sizeof(float) * 0x80);
+    memcpy(to->b, from->base.VirtInputData.keys.inputKeys, sizeof(uint32_t) * 32);
+    memcpy(to->c, from->VirtAnalogKeyInfo_1.analogSticksAndPad, sizeof(float) * 0x80);
+    memcpy(to->d, from->VirtAnalogKeyInfo_2.analogSticksAndPad, sizeof(float) * 0x80);
+    memcpy(to->e, from->VirtInputData.VirAnalogKeyInfo.analogSticksAndPad, sizeof(float) * 0x80);
+    memcpy(to->f, from->VirtInputData.keys.inputKeys, sizeof(uint32_t) * 32);
+}
+
+void PadMan_to_FlattenedPadManObj(FlattenedPadManObj* to, PadMan* from)
+{
+    DLUserInputDeviceImpl_to_FlattenedPadManObj(&to->VirtMultiDevice.base, &from->PadDevice_0->VirtMultiDevice->base);
+
+    DLUserInputDeviceImpl_to_FlattenedPadManObj(&to->padDevice_UserInput.base, &from->PadDevice_0->padDevice_UserInput->base);
+    memcpy(to->padDevice_UserInput.data_0, from->PadDevice_0->padDevice_UserInput->data_0, sizeof(to->padDevice_UserInput.data_0));
+    memcpy(to->padDevice_UserInput.data_1, from->PadDevice_0->padDevice_UserInput->data_1, sizeof(to->padDevice_UserInput.data_1));
+    to->padDevice_UserInput.data_2 = from->PadDevice_0->padDevice_UserInput->data_2;
+
+    DLUserInputDeviceImpl_to_FlattenedPadManObj(&to->mouseDevice.base, &from->PadDevice_0->mouseDevice->base);
+    memcpy(to->mouseDevice.data_0, from->PadDevice_0->mouseDevice->data_0, sizeof(to->mouseDevice.data_0));
+    memcpy(to->mouseDevice.data_1, from->PadDevice_0->mouseDevice->data_1, sizeof(to->mouseDevice.data_1));
+
+    DLUserInputDeviceImpl_to_FlattenedPadManObj(&to->keyboardDevice.base, &from->PadDevice_0->keyboardDevice->base);
+    memcpy(to->keyboardDevice.data_0, from->PadDevice_0->keyboardDevice->data_0, sizeof(to->keyboardDevice.data_0));
+}
+
+void FlattenedPadManObj_to_DLUserInputDeviceImpl(DLUserInputDeviceImpl* to, FlattenedDLUserInputDeviceImplObj* from)
+{
+    memcpy(to->base.VirtInputData.VirAnalogKeyInfo.analogSticksAndPad, from->a, sizeof(float) * 0x80);
+    memcpy(to->base.VirtInputData.keys.inputKeys, from->b, sizeof(uint32_t) * 32);
+    memcpy(to->VirtAnalogKeyInfo_1.analogSticksAndPad, from->c, sizeof(float) * 0x80);
+    memcpy(to->VirtAnalogKeyInfo_2.analogSticksAndPad, from->d, sizeof(float) * 0x80);
+    memcpy(to->VirtInputData.VirAnalogKeyInfo.analogSticksAndPad, from->e, sizeof(float) * 0x80);
+    memcpy(to->VirtInputData.keys.inputKeys, from->f, sizeof(uint32_t) * 32);
+}
+
+void FlattenedPadManObj_to_PadMan(PadMan* to, FlattenedPadManObj* from)
+{
+    FlattenedPadManObj_to_DLUserInputDeviceImpl(&to->PadDevice_0->VirtMultiDevice->base, &from->VirtMultiDevice.base);
+
+    FlattenedPadManObj_to_DLUserInputDeviceImpl(&to->PadDevice_0->padDevice_UserInput->base, &from->padDevice_UserInput.base);
+    memcpy(to->PadDevice_0->padDevice_UserInput->data_0, from->padDevice_UserInput.data_0, sizeof(to->PadDevice_0->padDevice_UserInput->data_0));
+    memcpy(to->PadDevice_0->padDevice_UserInput->data_1, from->padDevice_UserInput.data_1, sizeof(to->PadDevice_0->padDevice_UserInput->data_1));
+    to->PadDevice_0->padDevice_UserInput->data_2 = from->padDevice_UserInput.data_2;
+
+    FlattenedPadManObj_to_DLUserInputDeviceImpl(&to->PadDevice_0->mouseDevice->base, &from->mouseDevice.base);
+    memcpy(to->PadDevice_0->mouseDevice->data_0, from->mouseDevice.data_0, sizeof(to->PadDevice_0->mouseDevice->data_0));
+    memcpy(to->PadDevice_0->mouseDevice->data_1, from->mouseDevice.data_1, sizeof(to->PadDevice_0->mouseDevice->data_1));
+
+    FlattenedPadManObj_to_DLUserInputDeviceImpl(&to->PadDevice_0->keyboardDevice->base, &from->keyboardDevice.base);
+    memcpy(to->PadDevice_0->keyboardDevice->data_0, from->keyboardDevice.data_0, sizeof(to->PadDevice_0->keyboardDevice->data_0));
+}
+
 void copy_PadMan(PadMan* to, PadMan* from)
 {
     copy_PadDevice(to->PadDevice_0, from->PadDevice_0);
