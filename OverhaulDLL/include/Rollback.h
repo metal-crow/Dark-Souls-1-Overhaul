@@ -121,6 +121,8 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
 void rollback_free_buffer(void* buffer);
 bool rollback_on_event_callback(GGPOEvent* info);
 bool rollback_log_game_state(char* filename, unsigned char* buffer, int);
+void rollback_on_free_input(void* input, int len);
+bool rollback_on_compare_inputs(void* input1, int len1, void* input2, int len2);
 
 bool rollback_await_player_added_before_init(void* steamMsgs);
 

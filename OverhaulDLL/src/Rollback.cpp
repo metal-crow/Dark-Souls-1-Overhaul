@@ -26,6 +26,8 @@ GGPOSessionCallbacks Rollback::ggpoCallbacks = {
     .free_buffer = rollback_free_buffer,
     .advance_frame = rollback_advance_frame_callback,
     .on_event = rollback_on_event_callback,
+    .free_input = rollback_on_free_input,
+    .compare_inputs = rollback_on_compare_inputs,
 };
 
 bool Rollback::gsave = false;
@@ -141,11 +143,6 @@ void rollback_sync_inputs()
     if (!GGPO_SUCCEEDED(res))
     {
         FATALERROR("ggpo_synchronize_input call returned %d", res);
-    }
-
-    for (size_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
-    {
-        ConsoleWrite("%p %p %p %d", inputs[i].local.padman, inputs[i].local.qInputMgrWindows, inputs[i].local.inputDirectionMovementMan, inputs[i].remote.maxHp);
     }
 
     //load the input states into the game to be used this frame
@@ -386,8 +383,6 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
     *len = sizeof(RollbackState*);
     *checksum = 0;
 
-    ConsoleWrite("rollback_save_game_state_callback finish");
-
     return true;
 }
 
@@ -442,6 +437,51 @@ bool rollback_on_event_callback(GGPOEvent* info)
 
 bool rollback_log_game_state(char* filename, unsigned char* buffer, int)
 {
+    return true;
+}
+
+void rollback_on_free_input(void* input, int len)
+{
+    RollbackInput* inputs = (RollbackInput*)input;
+
+    //we only need to free the pointers in the first input, since the others are garbage. Pointers from the other players
+    if (len >= sizeof(RollbackInput))
+    {
+        if (inputs[0].local.padman != NULL)
+        {
+            free_PadMan(inputs[0].local.padman);
+        }
+        if (inputs[0].local.qInputMgrWindows != NULL)
+        {
+            free_QInputMgrWindows(inputs[0].local.qInputMgrWindows);
+        }
+        if (inputs[0].local.inputDirectionMovementMan != NULL)
+        {
+            free_InputDirectionMovementMan(inputs[0].local.inputDirectionMovementMan);
+        }
+    }
+}
+
+bool rollback_on_compare_inputs(void* input1, int len1, void* input2, int len2)
+{
+    RollbackInput* inputs1 = (RollbackInput*)input1;
+    RollbackInput* inputs2 = (RollbackInput*)input2;
+
+    if (len1 != len2)
+    {
+        return false;
+    }
+
+    for (size_t i = 0; i < len1 / sizeof(RollbackInput); i++)
+    {
+        //ignore the local part, just compare the remote
+        int isEqual = memcmp(&inputs1[i].remote, &inputs2[i].remote, sizeof(MainPacket));
+        if (isEqual != 0)
+        {
+            return false;
+        }
+    }
+
     return true;
 }
 
