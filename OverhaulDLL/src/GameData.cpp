@@ -1269,7 +1269,15 @@ std::optional<SpecialEffect_Info*> Game::player_get_speffect(uint64_t playerins,
     }
     uint64_t chrIns = (uint64_t)(playerins + 0x8);
     uint64_t specialEffects = *(uint64_t*)(chrIns + 0x270);
+    if (specialEffects == 0)
+    {
+        return std::nullopt;
+    }
     uint64_t specialEffectInfo = *(uint64_t*)(specialEffects + 0x8 + 0x0);
+    if (specialEffectInfo == 0)
+    {
+        return std::nullopt;
+    }
     while (true)
     {
         if (specialEffectInfo == 0x0)
