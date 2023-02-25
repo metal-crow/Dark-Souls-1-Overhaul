@@ -265,38 +265,41 @@ DWORD WINAPI mod_mode_visuals_setting_thread(LPVOID unused)
 {
     while (true)
     {
-        auto playerIns_o = Game::get_PlayerIns();
-        if (playerIns_o.has_value() && playerIns_o.value() != NULL)
+        if (Game::playerchar_is_loaded())
         {
-            uint64_t playerIns = (uint64_t)playerIns_o.value();
+            auto playerIns_o = Game::get_PlayerIns();
+            if (playerIns_o.has_value() && playerIns_o.value() != NULL)
+            {
+                uint64_t playerIns = (uint64_t)playerIns_o.value();
 
-            // Handle setting the speffect to show the current mode
-            //add the speffect for the current mode, if applicable and not present
-            uint32_t currentModeSpeffectId = ModModes_To_Speffect.at(Mod::current_mode);
-            if (currentModeSpeffectId != -1)
-            {
-                auto playerCurrentModeSpeffect_o = Game::player_get_speffect(playerIns, currentModeSpeffectId);
-                if (!playerCurrentModeSpeffect_o.has_value())
+                // Handle setting the speffect to show the current mode
+                //add the speffect for the current mode, if applicable and not present
+                uint32_t currentModeSpeffectId = ModModes_To_Speffect.at(Mod::current_mode);
+                if (currentModeSpeffectId != -1)
                 {
-                    Game::player_add_speffect(currentModeSpeffectId);
-                }
-            }
-            //delete the speffects for the other modes
-            for (auto const& modespeffect : ModModes_To_Speffect)
-            {
-                if (modespeffect.first != Mod::current_mode && modespeffect.second != -1)
-                {
-                    auto otherModeSpeffect = Game::player_get_speffect(playerIns, modespeffect.second);
-                    if (otherModeSpeffect.has_value())
+                    auto playerCurrentModeSpeffect_o = Game::player_get_speffect(playerIns, currentModeSpeffectId);
+                    if (!playerCurrentModeSpeffect_o.has_value())
                     {
-                        //update life to 0
-                        *(float*)(otherModeSpeffect.value() + 0) = 0.0f;
+                        Game::player_add_speffect(currentModeSpeffectId);
+                    }
+                }
+                //delete the speffects for the other modes
+                for (auto const& modespeffect : ModModes_To_Speffect)
+                {
+                    if (modespeffect.first != Mod::current_mode && modespeffect.second != -1)
+                    {
+                        auto otherModeSpeffect = Game::player_get_speffect(playerIns, modespeffect.second);
+                        if (otherModeSpeffect.has_value())
+                        {
+                            //update life to 0
+                            *(float*)(otherModeSpeffect.value() + 0) = 0.0f;
+                        }
                     }
                 }
             }
         }
 
-        Sleep(100);
+        Sleep(400);
     }
 }
 

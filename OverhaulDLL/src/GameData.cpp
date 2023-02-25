@@ -294,6 +294,8 @@ bool Game::on_character_load(void* unused)
     //set the flags to determine what to run
     if (character_reload_run == true && !Game::playerchar_is_loaded())
     {
+        //invalidate the cache
+        Game::invalidate_function_caches();
         character_reload_run = false;
     }
     if (character_initial_load_run == true && Game::get_main_menu_flag().has_value() && *Game::get_main_menu_flag().value() == 1)
@@ -360,65 +362,71 @@ static void** host_player_gamedata_cache = NULL;
 static bool* display_name_cache = NULL;
 static int32_t** MP_AreaID_cache = NULL;
 
+void Game::invalidate_function_caches()
+{
+    pc_entity_ptr = NULL;
+    pc_position_ptr = NULL;
+    time_address = NULL;
+    left_hand_weapon_ptr_cache = NULL;
+    right_hand_weapon_ptr_cache = NULL;
+    player_char_max_hp_cache = NULL;
+    player_body_anim_id_cache = NULL;
+    player_upper_body_anim_id_cache = NULL;
+    player_lower_body_anim_id_cache = NULL;
+    set_current_player_animation_speed_cache = NULL;
+    area_num_cache = NULL;
+    world_num_cache = NULL;
+    mp_id_cache = NULL;
+    area_id_cache = NULL;
+    saved_chars_menu_flag_cache = NULL;
+    main_menu_flag_cache = NULL;
+    saved_chars_preview_data_cache = NULL;
+    pc_playernum_cache = NULL;
+    connected_players_array_cache = NULL;
+    pc_EzStateMachineImpl_cache = NULL;
+    SessionManagerImp_session_action_result_cache = NULL;
+    SteamSessionLight_cache = NULL;
+    NextPlayerNum_cache = NULL;
+    PlayerIns_cache = NULL;
+    player_animationMediator_cache = NULL;
+    host_player_gamedata_cache = NULL;
+    MP_AreaID_cache = NULL;
+}
+
 void Game::preload_function_caches() {
     ConsoleWrite("Cache loading");
 
-    pc_entity_ptr = NULL;
+    Game::invalidate_function_caches();
+
     Game::get_pc_entity_pointer();
-    time_address = NULL;
     Game::get_game_time_ms();
-    pc_position_ptr = NULL;
     Game::get_pc_position();
-    left_hand_weapon_ptr_cache = NULL;
     Game::left_hand_weapon();
-    right_hand_weapon_ptr_cache = NULL;
     Game::right_hand_weapon();
-    player_char_max_hp_cache = NULL;
     Game::get_player_char_max_hp();
-    player_body_anim_id_cache = NULL;
     Game::get_player_body_anim_id();
-    player_upper_body_anim_id_cache = NULL;
     Game::get_player_upper_body_anim_id();
-    player_lower_body_anim_id_cache = NULL;
     Game::get_player_lower_body_anim_id();
-    area_num_cache = NULL;
     Game::get_area_number();
-    world_num_cache = NULL;
     Game::get_world_number();
-    mp_id_cache = NULL;
     Game::get_online_area_id_ptr();
-    area_id_cache = NULL;
     Game::get_area_id_ptr();
-    saved_chars_menu_flag_cache = NULL;
     Game::get_saved_chars_menu_flag();
-    main_menu_flag_cache = NULL;
     Game::get_main_menu_flag();
-    saved_chars_preview_data_cache = NULL;
     Game::get_saved_chars_preview_data();
-    pc_playernum_cache = NULL;
     Game::get_pc_playernum();
-    connected_players_array_cache = NULL;
     Game::get_connected_player(0);
-    pc_EzStateMachineImpl_cache = NULL;
     Game::get_pc_ActiveState_EzStateMachineImpl();
-    SessionManagerImp_session_action_result_cache = NULL;
     Game::get_SessionManagerImp_session_action_result();
-    SteamSessionLight_cache = NULL;
     Game::get_SessionManagerImp_SteamSessionLight();
-    NextPlayerNum_cache = NULL;
     Game::get_SessionManagerImp_Next_Player_Num();
-    PlayerIns_cache = NULL;
     Game::get_PlayerIns();
-    player_animationMediator_cache = NULL;
     Game::get_player_animationMediator();
-    host_player_gamedata_cache = NULL;
     Game::get_host_player_gamedata();
-    MP_AreaID_cache = NULL;
     Game::get_MP_AreaID_ptr();
 
     Sleep(10);
     //this pointer is a bit late to resolve on load
-    set_current_player_animation_speed_cache = NULL;
     uint_fast8_t i;
     for(i=0;i<16;i++) {
         if (resolve_current_player_animation_speed()) break;
@@ -613,7 +621,7 @@ std::optional<int32_t> Game::get_player_body_anim_id()
     }
 
     sp::mem::pointer anim_id = sp::mem::pointer<int32_t>((void*)Game::world_chr_man_imp, { 0x68, 0x68, 0x48, 0x80 });
-    if (anim_id.resolve() == NULL || !character_reload_run) {
+    if (anim_id.resolve() == NULL) {
         return std::nullopt;
     } else {
         player_body_anim_id_cache = (int32_t*)anim_id.resolve();
@@ -629,7 +637,7 @@ std::optional<int32_t> Game::get_player_upper_body_anim_id()
     }
 
     sp::mem::pointer anim_id = sp::mem::pointer<int32_t>((void*)Game::world_chr_man_imp, { 0x68, 0x30, 0x5D0, 0x690 });
-    if (anim_id.resolve() == NULL || !character_reload_run) {
+    if (anim_id.resolve() == NULL) {
         return std::nullopt;
     }
     else {
@@ -646,7 +654,7 @@ std::optional<int32_t> Game::get_player_lower_body_anim_id()
     }
 
     sp::mem::pointer anim_id = sp::mem::pointer<int32_t>((void*)Game::world_chr_man_imp, { 0x68, 0x30, 0x5D0, 0x13B0 });
-    if (anim_id.resolve() == NULL || !character_reload_run) {
+    if (anim_id.resolve() == NULL) {
         return std::nullopt;
     }
     else {
@@ -663,7 +671,7 @@ std::optional<void*> Game::get_player_animationMediator()
     }
 
     sp::mem::pointer animationMediator = sp::mem::pointer<void*>((void*)Game::world_chr_man_imp, { 0x68, 0x68, 0x20 });
-    if (animationMediator.resolve() == NULL || !character_reload_run)
+    if (animationMediator.resolve() == NULL)
     {
         return std::nullopt;
     }
@@ -754,7 +762,7 @@ std::optional<uint32_t*> Game::get_game_time_ms()
     }
     //first time resolve
     sp::mem::pointer timer = sp::mem::pointer<uint32_t>((void*)((uint64_t)Game::fmod_event64_base + 0x00077278), { 0x470, 0x40, 0x8C });
-    if (timer.resolve() == NULL || !character_reload_run) {
+    if (timer.resolve() == NULL) {
         return std::nullopt;
     }
     else {
@@ -776,7 +784,7 @@ std::optional<uint64_t> Game::get_pc_entity_pointer() {
     }
 
     sp::mem::pointer entity_ptr = sp::mem::pointer<uint64_t>((void*)(Game::world_chr_man_imp), { 0x68 });
-    if (entity_ptr.resolve() == NULL || !character_reload_run) {
+    if (entity_ptr.resolve() == NULL) {
         return std::nullopt;
     }
     else {
@@ -791,7 +799,7 @@ std::optional<float*> Game::get_pc_position() {
     }
 
     sp::mem::pointer position_ptr = sp::mem::pointer<float>((void*)(Game::world_chr_man_imp), { 0x68, 0x68, 0x28, 0x10 });
-    if (position_ptr.resolve() == NULL || !character_reload_run) {
+    if (position_ptr.resolve() == NULL) {
         return std::nullopt;
     }
     else {
@@ -848,7 +856,7 @@ std::optional<uint32_t> Game::left_hand_weapon() {
     }
 
     sp::mem::pointer weapon = sp::mem::pointer<uint32_t>((void*)(Game::ds1_base + 0x1a31768), { 0x28, 0x250, 0x2F8, 0x18, 0x0 });
-    if (weapon.resolve() == NULL || !character_reload_run) {
+    if (weapon.resolve() == NULL) {
         return std::nullopt;
     }
     else {
@@ -864,7 +872,7 @@ std::optional<uint32_t> Game::right_hand_weapon() {
     }
 
     sp::mem::pointer weapon = sp::mem::pointer<uint32_t>((void*)(Game::ds1_base + 0x1a31768), { 0x28, 0x250, 0x2F8, 0x18, 0x4 });
-    if (weapon.resolve() == NULL || !character_reload_run) {
+    if (weapon.resolve() == NULL) {
         return std::nullopt;
     }
     else {
@@ -886,7 +894,7 @@ std::optional<uint32_t> Game::get_player_char_max_hp() {
     }
 
     sp::mem::pointer maxhp = sp::mem::pointer<uint32_t>((void*)(Game::world_chr_man_imp), { 0x68, 0x3EC });
-    if (maxhp.resolve() == NULL || !character_reload_run) {
+    if (maxhp.resolve() == NULL) {
         return std::nullopt;
     }
     else {
@@ -912,7 +920,7 @@ std::optional<uint8_t> Game::get_area_number() {
     }
 
     sp::mem::pointer area_num = sp::mem::pointer<uint8_t>((void*)(Game::frpg_net_base), { 0xA22 });
-    if (area_num.resolve() == NULL || !character_reload_run) {
+    if (area_num.resolve() == NULL) {
         return std::nullopt;
     }
     else {
@@ -929,7 +937,7 @@ std::optional<uint8_t> Game::get_world_number()
     }
 
     sp::mem::pointer world_num = sp::mem::pointer<uint8_t>((void*)(Game::frpg_net_base), { 0xA23 });
-    if (world_num.resolve() == NULL || !character_reload_run)
+    if (world_num.resolve() == NULL)
     {
         return std::nullopt;
     }
@@ -946,7 +954,7 @@ std::optional<int32_t*> Game::get_online_area_id_ptr() {
     }
 
     sp::mem::pointer mp_id = sp::mem::pointer<int32_t>((void*)(Game::world_chr_man_imp), { 0x68, 0x354 });
-    if (mp_id.resolve() == NULL || !character_reload_run) {
+    if (mp_id.resolve() == NULL) {
         return std::nullopt;
     }
     else {
@@ -963,7 +971,7 @@ std::optional<int32_t*> Game::get_area_id_ptr()
     }
 
     sp::mem::pointer area_id = sp::mem::pointer<int32_t>((void*)(Game::world_chr_man_imp), { 0x68, 0x358 });
-    if (area_id.resolve() == NULL || !character_reload_run)
+    if (area_id.resolve() == NULL)
     {
         return std::nullopt;
     }
@@ -980,7 +988,6 @@ std::optional<int32_t*> Game::get_saved_chars_menu_flag() {
     }
 
     sp::mem::pointer saved_chars_menu_flag = sp::mem::pointer<int32_t>((void*)(Game::menu_man), { 0xA4 });
-    //don't check for character_reload_run here, since this is called before chr load
     if (saved_chars_menu_flag.resolve() == NULL) {
         return std::nullopt;
     }
@@ -998,7 +1005,6 @@ std::optional<int32_t*> Game::get_main_menu_flag()
     }
 
     sp::mem::pointer main_menu_flag = sp::mem::pointer<int32_t>((void*)(Game::menu_man), { 0x80 });
-    //don't check for character_reload_run here, since this is called before chr load
     if (main_menu_flag.resolve() == NULL)
     {
         return std::nullopt;
@@ -1016,7 +1022,6 @@ std::optional<uint8_t*> Game::get_saved_chars_preview_data() {
     }
 
     sp::mem::pointer saved_chars_preview_data = sp::mem::pointer<uint8_t>((void*)(Game::game_data_man), { 0x60, 0x10 });
-    //don't check for character_reload_run here, since this is called before chr load
     if (saved_chars_preview_data.resolve() == NULL) {
         return std::nullopt;
     }
@@ -1032,7 +1037,7 @@ std::optional<uint32_t> Game::get_pc_playernum() {
     }
 
     sp::mem::pointer pc_playernum = sp::mem::pointer<uint32_t>((void*)(Game::game_data_man), { 0x10, 0x10 });
-    if (pc_playernum.resolve() == NULL || !character_reload_run) {
+    if (pc_playernum.resolve() == NULL) {
         return std::nullopt;
     }
     else {
@@ -1050,7 +1055,7 @@ std::optional<uint64_t> Game::get_connected_player(uint32_t i) {
 
     //gets a pointer to the connectedPlayers_ChrSlotArray stored in the player's PlayerIns
     sp::mem::pointer connected_players_array = sp::mem::pointer<uint64_t>((void*)(Game::world_chr_man_imp), { 0x68, 0x18 });
-    if (connected_players_array.resolve() == NULL || !character_reload_run) {
+    if (connected_players_array.resolve() == NULL) {
         return std::nullopt;
     }
     else {
@@ -1119,7 +1124,7 @@ std::optional<void*> Game::get_pc_ActiveState_EzStateMachineImpl() {
 
     //WorldChrManImp -> PlayerIns -> ChrIns -> PlayerCtrl -> ChrCtrl -> ActionCtrl -> ActiveState -> EzStateMachineImpl
     sp::mem::pointer pc_EzStateMachineImpl = sp::mem::pointer<void*>((void*)(Game::world_chr_man_imp), { 0x68, 8+0x60, 0x48, 0x30+(0x20*1) });
-    if (pc_EzStateMachineImpl.resolve() == NULL || !character_reload_run) {
+    if (pc_EzStateMachineImpl.resolve() == NULL) {
         return std::nullopt;
     }
     else {
@@ -1141,7 +1146,7 @@ std::optional<SessionActionResultEnum> Game::get_SessionManagerImp_session_actio
     }
 
     sp::mem::pointer session_action_result = sp::mem::pointer<uint32_t>((void*)(Game::session_man_imp), { 0xf8 });
-    if (session_action_result.resolve() == NULL || !character_reload_run)
+    if (session_action_result.resolve() == NULL)
     {
         return std::nullopt;
     }
@@ -1160,7 +1165,7 @@ std::optional<void*> Game::get_SessionManagerImp_SteamSessionLight()
     }
 
     sp::mem::pointer SteamSessionLight = sp::mem::pointer<void*>((void*)(Game::session_man_imp), { 0x08 });
-    if (SteamSessionLight.resolve() == NULL || !character_reload_run)
+    if (SteamSessionLight.resolve() == NULL)
     {
         return std::nullopt;
     }
@@ -1179,7 +1184,7 @@ std::optional<uint32_t> Game::get_SessionManagerImp_Next_Player_Num()
     }
 
     sp::mem::pointer NextPlayerNum = sp::mem::pointer<uint32_t>((void*)(Game::session_man_imp), { 0x108 });
-    if (NextPlayerNum.resolve() == NULL || !character_reload_run)
+    if (NextPlayerNum.resolve() == NULL)
     {
         return std::nullopt;
     }
@@ -1198,7 +1203,7 @@ std::optional<void*> Game::get_PlayerIns()
     }
 
     sp::mem::pointer playerIns = sp::mem::pointer<void*>((void*)(Game::world_chr_man_imp), { 0x68 });
-    if (playerIns.resolve() == NULL || !character_reload_run)
+    if (playerIns.resolve() == NULL)
     {
         return std::nullopt;
     }
@@ -1310,7 +1315,7 @@ std::optional<void*> Game::get_host_player_gamedata()
     }
 
     sp::mem::pointer host_player_gamedata = sp::mem::pointer<void*>((void*)(Game::game_data_man), { 0x10 });
-    if (host_player_gamedata.resolve() == NULL || !character_reload_run)
+    if (host_player_gamedata.resolve() == NULL)
     {
         return std::nullopt;
     }
@@ -1509,7 +1514,7 @@ std::optional<int32_t*> Game::get_MP_AreaID_ptr()
     }
 
     sp::mem::pointer MP_AreaID = sp::mem::pointer<int32_t*>((void*)(Game::frpg_net_man), { 0xA8C });
-    if (MP_AreaID.resolve() == NULL || !character_reload_run)
+    if (MP_AreaID.resolve() == NULL)
     {
         return std::nullopt;
     }
