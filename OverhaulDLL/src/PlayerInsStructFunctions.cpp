@@ -561,7 +561,7 @@ void copy_SpecialEffect_Info(SpecialEffect_Info* to, SpecialEffect_Info* from, b
         {
             if (to_index >= max_preallocated_SpecialEffect_Info)
             {
-                ConsoleWrite("Unable to recursivly copy SpecialEffect_Info from the game. Out of space.");
+                FATALERROR("Unable to recursivly copy SpecialEffect_Info from the game. Out of space.");
                 break;
             }
             memcpy(to->data_0, from->data_0, sizeof(to->data_0));
@@ -881,7 +881,6 @@ void copy_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* to, WalkA
     if (to->field0x10_cap > 0 && to->field0x10 == NULL)
     {
         //need to manually alloc the array for the game
-        ConsoleWrite("WalkAnim_Twist_Field0x228Elem(%p)->field0x10 alloc", to);
         to->field0x10 = (WalkAnim_Twist_Field0x228Elem_field0x10elem**)(*(falloc*)*(uint64_t*)(*((uint64_t*)to->padding_1[0]) + 0x50))(to->padding_1[0], (to->field0x10_cap) * 8, 8);
         memset(to->field0x10, 0, to->field0x10_cap * 8);
     }
@@ -896,7 +895,6 @@ void copy_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* to, WalkA
         if (to->field0x10[i] == NULL && from->field0x10[i] != NULL)
         {
             //need to manually alloc the entry for the game
-            ConsoleWrite("WalkAnim_Twist_Field0x228Elem->field0x10 entry alloc");
             to->field0x10[i] = (WalkAnim_Twist_Field0x228Elem_field0x10elem*)(*(falloc*)*(uint64_t*)(*((uint64_t*)to->padding_1[0]) + 0x50))(to->padding_1[0], 4 * 4, 4);
         }
         if (to->field0x10[i] != NULL && from->field0x10[i] != NULL)
@@ -1595,7 +1593,6 @@ void copy_AnimationQueue_Entry_sub1(AnimationQueue_Entry_sub1* to, AnimationQueu
     if (to->field0x10_cap > 0 && to->field0x10 == NULL)
     {
         //need to manually alloc the array for the game
-        ConsoleWrite("AnimationQueue_Entry(%p)->field0x10 alloc", to);
         to->field0x10 = (AnimationQueue_Entry_sub1_field0x10**)(*(falloc*)*(uint64_t*)(*((uint64_t*)to->padding_1[0]) + 0x50))(to->padding_1[0], (to->field0x10_cap) * 8, 8);
         memset(to->field0x10, 0, to->field0x10_cap * 8);
     }
@@ -1610,7 +1607,6 @@ void copy_AnimationQueue_Entry_sub1(AnimationQueue_Entry_sub1* to, AnimationQueu
         if (to->field0x10[i] == NULL)
         {
             //need to manually alloc the entry for the game
-            ConsoleWrite("AnimationQueue_Entry->field0x10 entry alloc");
             to->field0x10[i] = (AnimationQueue_Entry_sub1_field0x10*)(*(falloc*)*(uint64_t*)(*((uint64_t*)to->padding_1[0]) + 0x50))(to->padding_1[0], 2 * 8, 8);
         }
         copy_AnimationQueue_Entry_sub1_field0x10(to->field0x10[i], from->field0x10[i]);
