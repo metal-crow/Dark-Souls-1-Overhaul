@@ -92,14 +92,6 @@ extern "C" {
     void grab_movemapstep_injection();
     uint64_t grab_movemapstep_value;
 
-    uint64_t grab_thread_handle_return;
-    void grab_thread_handle_injection();
-    void grab_thread_handle_helper(HANDLE);
-
-    uint64_t grab_destruct_thread_handle_return;
-    void grab_destruct_thread_handle_injection();
-    void grab_destruct_thread_handle_helper(HANDLE);
-
     bool ReadInputs_allowed = true;
     uint64_t Step_PadMan_ReadInputs_return;
     void Step_PadMan_ReadInputs_injection();
@@ -216,13 +208,6 @@ void Game::injections_init()
     write_address = (uint8_t*)(Game::MoveMapStep_New_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &grab_movemapstep_return, 1, &grab_movemapstep_injection);
 
-    //inject code to save the handles of DLThreads dark souls starts, so they can be paused/resumed
-    write_address = (uint8_t*)(Game::InitAndStart_DLThread_injection_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &grab_thread_handle_return, 3, &grab_thread_handle_injection);
-    //remove the handles when they get destroyed
-    write_address = (uint8_t*)(Game::Destruct_DLThread_injection_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &grab_destruct_thread_handle_return, 1, &grab_destruct_thread_handle_injection);
-
     //inject code to skip the logos
     //set the state of the logo class to always be "next menu"
     uint8_t pat[] = { 0xb9, 0x03, 0x0, 0x0, 0x0, 0x90 };
@@ -304,24 +289,6 @@ bool Game::on_character_load(void* unused)
     }
 
     return true;
-}
-
-std::unordered_set<HANDLE> thread_handles;
-
-void grab_thread_handle_helper(HANDLE h)
-{
-    if (h != NULL)
-    {
-        thread_handles.emplace(h);
-    }
-}
-
-void grab_destruct_thread_handle_helper(HANDLE h)
-{
-    if (h != NULL)
-    {
-        thread_handles.erase(h);
-    }
 }
 
 static bool resolve_current_player_animation_speed();
@@ -1570,38 +1537,6 @@ void Game::Step_GameSimulation(bool renderFrame)
     }
     Step_Havok(*(void**)Game::frpg_havok_man_imp, FRAMETIME);
     FinishStep_Havok(*(void**)Game::frpg_havok_man_imp);
-}
-
-void Game::SuspendThreads()
-{
-    for (const auto& handle : thread_handles)
-    {
-        DWORD out;
-        do
-        {
-            out = SuspendThread(handle);
-        } while (out != (DWORD)-1 && out > 0);
-        if (out == (DWORD)-1)
-        {
-            FATALERROR("Unable to suspend thread correctly. Error=%x", GetLastError());
-        }
-    }
-}
-
-void Game::ResumeThreads()
-{
-    for (const auto& handle : thread_handles)
-    {
-        DWORD out;
-        do
-        {
-            out = ResumeThread(handle);
-        } while (out != (DWORD)-1 && out > 0);
-        if (out == (DWORD)-1)
-        {
-            FATALERROR("Unable to resume thread correctly. Error=%x", GetLastError());
-        }
-    }
 }
 
 uint8_t* ConnectedPlayerData_Get_SteamId(uint64_t connectedplayerdata)

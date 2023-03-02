@@ -367,10 +367,6 @@ public:
 
 	static void Step_GameSimulation(bool renderFrame = false);
 
-    static void SuspendThreads();
-
-    static void ResumeThreads();
-
     static int32_t get_SessionPlayerNumber_For_ConnectedPlayerData(uint64_t connectedplayerdata);
 
     static void set_ReadInputs_allowed(bool allow);
