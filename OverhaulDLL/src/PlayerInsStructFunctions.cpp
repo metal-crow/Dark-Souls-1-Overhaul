@@ -799,7 +799,7 @@ void copy_ChrCtrl(ChrCtrl* to, ChrCtrl* from, bool to_game)
     copy_ActionCtrl(to->actionctrl, from->actionctrl, to_game);
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
-    copy_WalkAnim_Twist(to->walkAnim_Twist, from->walkAnim_Twist);
+    copy_WalkAnim_Twist(to->walkAnim_Twist, from->walkAnim_Twist, to_game);
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
     memcpy(to->data_4, from->data_4, sizeof(to->data_4));
 }
@@ -831,7 +831,7 @@ void free_ChrCtrl(ChrCtrl* to, bool freeself)
     }
 }
 
-void copy_WalkAnim_Twist(WalkAnim_Twist* to, WalkAnim_Twist* from)
+void copy_WalkAnim_Twist(WalkAnim_Twist* to, WalkAnim_Twist* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
@@ -840,7 +840,7 @@ void copy_WalkAnim_Twist(WalkAnim_Twist* to, WalkAnim_Twist* from)
     copy_SpinJoint(to->master_joint, from->master_joint);
     copy_SpinJoint(to->neck_joint, from->neck_joint);
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
-    copy_WalkAnim_Twist_Field0x228Elem(&to->walkAnim_Twist_Field0x228Elem, &from->walkAnim_Twist_Field0x228Elem);
+    copy_WalkAnim_Twist_Field0x228Elem(&to->walkAnim_Twist_Field0x228Elem, &from->walkAnim_Twist_Field0x228Elem, to_game);
     memcpy(to->data_4, from->data_4, sizeof(to->data_4));
 }
 
@@ -868,7 +868,7 @@ void free_WalkAnim_Twist(WalkAnim_Twist* to)
     free(to);
 }
 
-void copy_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* to, WalkAnim_Twist_Field0x228Elem* from)
+void copy_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* to, WalkAnim_Twist_Field0x228Elem* from, bool to_game)
 {
     to->field0x10_cap = from->field0x10_cap;
     to->unk = from->unk;
@@ -881,8 +881,15 @@ void copy_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* to, WalkA
     if (to->field0x10_cap > 0 && to->field0x10 == NULL)
     {
         //need to manually alloc the array for the game
-        to->field0x10 = (WalkAnim_Twist_Field0x228Elem_field0x10elem**)(*(falloc*)*(uint64_t*)(*((uint64_t*)to->padding_1[0]) + 0x50))(to->padding_1[0], (to->field0x10_cap) * 8, 8);
-        memset(to->field0x10, 0, to->field0x10_cap * 8);
+        if (to_game)
+        {
+            to->field0x10 = (WalkAnim_Twist_Field0x228Elem_field0x10elem**)(*(falloc*)*(uint64_t*)(*((uint64_t*)to->padding_1[0]) + 0x50))(to->padding_1[0], (to->field0x10_cap) * 8, 8);
+            memset(to->field0x10, 0, to->field0x10_cap * 8);
+        }
+        else
+        {
+            FATALERROR("Why is the local WalkAnim_Twist_Field0x228Elem->field0x10 null");
+        }
     }
 
     //this array is allocated and also pre-populated with pointers in it's entries
@@ -890,12 +897,23 @@ void copy_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* to, WalkA
     {
         if (from->field0x10[i] == NULL && to->field0x10[i] != NULL)
         {
+            if (!to_game)
+            {
+                free(to->field0x10[i]);
+            }
             to->field0x10[i] = NULL;
         }
         if (to->field0x10[i] == NULL && from->field0x10[i] != NULL)
         {
             //need to manually alloc the entry for the game
-            to->field0x10[i] = (WalkAnim_Twist_Field0x228Elem_field0x10elem*)(*(falloc*)*(uint64_t*)(*((uint64_t*)to->padding_1[0]) + 0x50))(to->padding_1[0], 4 * 4, 4);
+            if (to_game)
+            {
+                to->field0x10[i] = (WalkAnim_Twist_Field0x228Elem_field0x10elem*)(*(falloc*)*(uint64_t*)(*((uint64_t*)to->padding_1[0]) + 0x50))(to->padding_1[0], 4 * 4, 4);
+            }
+            else
+            {
+                to->field0x10[i] = (WalkAnim_Twist_Field0x228Elem_field0x10elem*)malloc_(sizeof(WalkAnim_Twist_Field0x228Elem_field0x10elem));
+            }
         }
         if (to->field0x10[i] != NULL && from->field0x10[i] != NULL)
         {

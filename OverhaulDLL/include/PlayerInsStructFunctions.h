@@ -113,11 +113,11 @@ void copy_ChrCtrl(ChrCtrl* to, ChrCtrl* from, bool to_game);
 ChrCtrl* init_ChrCtrl();
 void free_ChrCtrl(ChrCtrl* to, bool freeself);
 
-void copy_WalkAnim_Twist(WalkAnim_Twist* to, WalkAnim_Twist* from);
+void copy_WalkAnim_Twist(WalkAnim_Twist* to, WalkAnim_Twist* from, bool to_game);
 WalkAnim_Twist* init_WalkAnim_Twist();
 void free_WalkAnim_Twist(WalkAnim_Twist* to);
 
-void copy_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* to, WalkAnim_Twist_Field0x228Elem* from);
+void copy_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* to, WalkAnim_Twist_Field0x228Elem* from, bool to_game);
 WalkAnim_Twist_Field0x228Elem* init_WalkAnim_Twist_Field0x228Elem();
 void free_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* to, bool freeself);
 
