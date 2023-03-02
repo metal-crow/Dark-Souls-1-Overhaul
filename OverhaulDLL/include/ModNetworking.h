@@ -17,8 +17,6 @@ public:
     ModNetworking() { }; //This is needed for the steam callbacks to work
     static void start();
 
-    static bool UseNewSteamAPI;
-
     static ISteamUser* SteamUser;
     static ISteamFriends* SteamFriends;
     static ISteamMatchmaking* SteamMatchmaking;

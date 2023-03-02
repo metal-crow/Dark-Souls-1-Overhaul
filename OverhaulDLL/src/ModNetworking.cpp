@@ -14,8 +14,6 @@
 //This is needed for the steam callbacks to work
 static ModNetworking modnet = ModNetworking();
 
-bool ModNetworking::UseNewSteamAPI = false;
-
 extern "C" {
     uint64_t AcceptP2PSessionWithUser_injection_return;
     void AcceptP2PSessionWithUser_injection();
@@ -176,11 +174,6 @@ static std::unordered_map<uint64_t, bool> SteamAPIStatusKnown_Users;
 //At the point this is called, we should know the exact nature of the other user. So we should be all set up, mode-wise.
 bool SteamNetworkingMessages_Supported(CSteamID steamIDRemote)
 {
-    if (!ModNetworking::UseNewSteamAPI)
-    {
-        return false;
-    }
-
     //this should never happen, but just in case
     if (SteamAPIStatusKnown_Users.count(steamIDRemote.ConvertToUint64()) == 0)
     {
@@ -276,11 +269,6 @@ void SendQueuedPackets()
 //Add a new callback for the NetMessages equivalent of AcceptP2PSessionWithUser
 void ModNetworking::SteamNetworkingMessagesSessionRequestCallback(SteamNetworkingMessagesSessionRequest_t* pCallback)
 {
-    if (!ModNetworking::UseNewSteamAPI)
-    {
-        return;
-    }
-
     CSteamID user = pCallback->m_identityRemote.GetSteamID();
 
     //Check if we want to d/c them
@@ -318,11 +306,6 @@ bool IsP2PPacketAvailable_Replacement_injection_helper(uint32 *pcubMsgSize, int 
         nChannel = 0;
     }
 
-    if (!ModNetworking::UseNewSteamAPI)
-    {
-        return ModNetworking::SteamNetworking->IsP2PPacketAvailable(pcubMsgSize, nChannel);;
-    }
-
     /*
     * There is no equivilent in the NetworkingMessages API, so just grab a message if one is present and save it
     * Grab this saved message and return it in the upcoming ReadP2PPacket call
@@ -354,7 +337,7 @@ bool ReadP2PPacket_Replacement_injection_helper(void *pubDest, uint32 cubDest, u
     }
 
     //If we have a packet from the NetworkingMessages interface to return, return it
-    if (ModNetworking::UseNewSteamAPI && messages.size() > 0 && nChannel == 0)
+    if (messages.size() > 0 && nChannel == 0)
     {
         //fill out the given args from the saved network message struct
         SteamNetworkingMessage_t* cur_message = messages.front();
@@ -391,7 +374,7 @@ bool SendP2PPacket_Replacement_injection_helper(CSteamID steamIDRemote, const vo
     // Handle disconnecting a user
     if (ModNetworking::incoming_guest_to_not_accept != 0 && ModNetworking::incoming_guest_to_not_accept == steamIDRemote.ConvertToUint64())
     {
-        ConsoleWrite("Forcing d/c on user %lld", steamIDRemote.ConvertToUint64());
+        //ConsoleWrite("Forcing d/c on user %lld", steamIDRemote.ConvertToUint64());
         return false;
     }
 
@@ -760,72 +743,65 @@ bool GuestAwaitIncomingLobbyData(void* data_a)
         ModNetworking::host_mod_installed = false;
     }
 
-    if (ModNetworking::UseNewSteamAPI)
+    // 3. As the guest, we must change our settings to match the host (based on how we've configured our options), or else disconnect.
+    if (ModNetworking::host_mod_installed == false && ModNetworking::allow_connect_with_non_mod_host == true)
     {
-        // 3. As the guest, we must change our settings to match the host (based on how we've configured our options), or else disconnect.
-        if (ModNetworking::host_mod_installed == false && ModNetworking::allow_connect_with_non_mod_host == true)
-        {
-            //connecting to non-mod
-            Mod::set_mode(ModMode::Compatability);
-        }
-        else if (ModNetworking::host_mod_installed == true && ModNetworking::host_mod_mode == ModMode::Compatability && ModNetworking::allow_connect_with_non_mod_host == true)
-        {
-            //connecting to (basically) non-mod
-            Mod::set_mode(ModMode::Compatability);
-        }
-        else if (ModNetworking::host_mod_installed == true && ModNetworking::host_mod_mode == ModMode::Overhaul && ModNetworking::allow_connect_with_overhaul_mod_host == true)
-        {
-            //connecting to overhaul
-            Mod::set_mode(ModMode::Overhaul);
-        }
-        else if (ModNetworking::host_mod_installed == true && ModNetworking::host_mod_mode == ModMode::Legacy && ModNetworking::allow_connect_with_legacy_mod_host == true)
-        {
-            //connecting to legacy
-            Mod::set_mode(ModMode::Legacy);
-        }
-        else
-        {
-            //Tell the player why we're dcing
-            wchar_t dc_msg[300];
-            wcscpy_s(dc_msg, L"Unable to connect to host player.\n");
-            if (ModNetworking::host_mod_installed == false && ModNetworking::allow_connect_with_non_mod_host == false)
-            {
-                wcscat_s(dc_msg, L"Host does not have mod and you do not allow connections with non-mod users.");
-            }
-            else if (ModNetworking::host_mod_installed && ModNetworking::host_mod_mode == ModMode::Compatability && ModNetworking::allow_connect_with_non_mod_host == false)
-            {
-                wcscat_s(dc_msg, L"Host has a non-mod user connected and you do not allow connections with non-mod users.");
-            }
-            else if (ModNetworking::host_mod_installed && ModNetworking::host_mod_mode == ModMode::Overhaul && ModNetworking::allow_connect_with_overhaul_mod_host == false)
-            {
-                wcscat_s(dc_msg, L"Host is in overhaul mode and you do not allow connections with overhaul mode users.");
-            }
-            else if (ModNetworking::host_mod_installed && ModNetworking::host_mod_mode == ModMode::Legacy && ModNetworking::allow_connect_with_legacy_mod_host == false)
-            {
-                wcscat_s(dc_msg, L"Host is in legacy mode and you do not allow connections with legacy mode users.");
-            }
-            Game::show_popup_message(dc_msg);
-            ConsoleWrite("G3. Guest disconnecting due to settings");
-
-            //disconnect
-            ModNetworking::SteamMatchmaking->LeaveLobby(ModNetworking::currentLobby);
-            ModNetworking::currentLobby = 0;
-            SteamAPIStatusKnown_Users.clear();
-            ModNetworking::host_got_info = false;
-            guest_get_host_info_mtx.unlock();
-            ClearQueuedPackets();
-            free(data);
-            return false;
-        }
-
-        //set our lobby member data confirming we also respect these settings and have the mod
-        ModNetworking::SteamMatchmaking->SetLobbyMemberData(ModNetworking::currentLobby, MOD_LOBBY_DATA_KEY, ModModes_To_String.at(Mod::get_mode()));
-        ConsoleWrite("G3. Guest set member data = %hhx", Mod::get_mode());
+        //connecting to non-mod
+        Mod::set_mode(ModMode::Compatability);
+    }
+    else if (ModNetworking::host_mod_installed == true && ModNetworking::host_mod_mode == ModMode::Compatability && ModNetworking::allow_connect_with_non_mod_host == true)
+    {
+        //connecting to (basically) non-mod
+        Mod::set_mode(ModMode::Compatability);
+    }
+    else if (ModNetworking::host_mod_installed == true && ModNetworking::host_mod_mode == ModMode::Overhaul && ModNetworking::allow_connect_with_overhaul_mod_host == true)
+    {
+        //connecting to overhaul
+        Mod::set_mode(ModMode::Overhaul);
+    }
+    else if (ModNetworking::host_mod_installed == true && ModNetworking::host_mod_mode == ModMode::Legacy && ModNetworking::allow_connect_with_legacy_mod_host == true)
+    {
+        //connecting to legacy
+        Mod::set_mode(ModMode::Legacy);
     }
     else
     {
-        Mod::set_mode(ModMode::Compatability);
+        //Tell the player why we're dcing
+        wchar_t dc_msg[300];
+        wcscpy_s(dc_msg, L"Unable to connect to host player.\n");
+        if (ModNetworking::host_mod_installed == false && ModNetworking::allow_connect_with_non_mod_host == false)
+        {
+            wcscat_s(dc_msg, L"Host does not have mod and you do not allow connections with non-mod users.");
+        }
+        else if (ModNetworking::host_mod_installed && ModNetworking::host_mod_mode == ModMode::Compatability && ModNetworking::allow_connect_with_non_mod_host == false)
+        {
+            wcscat_s(dc_msg, L"Host has a non-mod user connected and you do not allow connections with non-mod users.");
+        }
+        else if (ModNetworking::host_mod_installed && ModNetworking::host_mod_mode == ModMode::Overhaul && ModNetworking::allow_connect_with_overhaul_mod_host == false)
+        {
+            wcscat_s(dc_msg, L"Host is in overhaul mode and you do not allow connections with overhaul mode users.");
+        }
+        else if (ModNetworking::host_mod_installed && ModNetworking::host_mod_mode == ModMode::Legacy && ModNetworking::allow_connect_with_legacy_mod_host == false)
+        {
+            wcscat_s(dc_msg, L"Host is in legacy mode and you do not allow connections with legacy mode users.");
+        }
+        Game::show_popup_message(dc_msg);
+        ConsoleWrite("G3. Guest disconnecting due to settings");
+
+        //disconnect
+        ModNetworking::SteamMatchmaking->LeaveLobby(ModNetworking::currentLobby);
+        ModNetworking::currentLobby = 0;
+        SteamAPIStatusKnown_Users.clear();
+        ModNetworking::host_got_info = false;
+        guest_get_host_info_mtx.unlock();
+        ClearQueuedPackets();
+        free(data);
+        return false;
     }
+
+    //set our lobby member data confirming we also respect these settings and have the mod
+    ModNetworking::SteamMatchmaking->SetLobbyMemberData(ModNetworking::currentLobby, MOD_LOBBY_DATA_KEY, ModModes_To_String.at(Mod::get_mode()));
+    ConsoleWrite("G3. Guest set member data = %hhx", Mod::get_mode());
 
     //we now lookup the status of the guest and any connected hosts
     //we can safely assume their lobby member data is set before we get there
@@ -845,7 +821,7 @@ bool GuestAwaitIncomingLobbyData(void* data_a)
     SendQueuedPackets();
 
     //Kick off ggpo once the game sets up the other players in connectedPlayers_ChrSlotArray
-    //MainLoop::setup_mainloop_callback(rollback_await_player_added_before_init, ModNetworking::SteamNetMessages, "rollback_await_player_added_before_init");
+    MainLoop::setup_mainloop_callback(rollback_await_player_added_before_init, ModNetworking::SteamNetMessages, "rollback_await_player_added_before_init");
 
     //this flag is finished, we don't need it anymore. Reset for next time we connect to a host.
     ModNetworking::host_got_info = false;
@@ -1046,7 +1022,7 @@ bool HostAwaitIncomingGuestMemberData(void* data_a)
     SendQueuedPackets();
 
     //Kick off ggpo once the game sets up the other players in connectedPlayers_ChrSlotArray
-    //MainLoop::setup_mainloop_callback(rollback_await_player_added_before_init, ModNetworking::SteamNetMessages, "rollback_await_player_added_before_init");
+    MainLoop::setup_mainloop_callback(rollback_await_player_added_before_init, ModNetworking::SteamNetMessages, "rollback_await_player_added_before_init");
 
     //reset for next guest
     exit:
