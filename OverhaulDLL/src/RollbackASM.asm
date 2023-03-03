@@ -61,7 +61,7 @@ movdqu  xmm0, [rsp]
 add     rsp, 10h
 
 ;check if we abort this call or not
-test    eax, eax
+test    al, al
 jnz     normal
 lea     r11, [rsp+80h]
 mov     rbx, [r11+38h]
@@ -130,7 +130,7 @@ movdqu  xmm0, [rsp]
 add     rsp, 10h
 
 ;check if we abort this call or not
-test    eax, eax
+test    al, al
 jnz     normal
 mov     rbx, [rsp+30h]
 mov     rbp, [rsp+38h]
