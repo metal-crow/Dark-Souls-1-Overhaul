@@ -5,14 +5,26 @@ typedef void* falloc(uint64_t, uint64_t, uint32_t);
 
 void copy_PlayerIns(PlayerIns* to, PlayerIns* from, bool to_game, bool is_networked)
 {
+    bool visualChanges = false;
+
     copy_ChrIns(&to->chrins, &from->chrins, to_game, is_networked);
     copy_PlayerGameData(to->playergamedata, from->playergamedata);
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     to->data_2 = from->data_2;
     copy_RingEquipCtrl(to->ringequipctrl, from->ringequipctrl, to_game);
+
+    //check data before we copy in the new data
+    visualChanges |= (to->weaponequipctrl->equipped_weapons_ids[0] != from->weaponequipctrl->equipped_weapons_ids[0]);
+    visualChanges |= (to->weaponequipctrl->equipped_weapons_ids[1] != from->weaponequipctrl->equipped_weapons_ids[1]);
     copy_WeaponEquipCtrl(to->weaponequipctrl, from->weaponequipctrl, to_game);
+
+    for (size_t i = 0; i < 5; i++)
+    {
+        visualChanges |= (to->proequipctrl->equipped_armors_ids[i] != from->proequipctrl->equipped_armors_ids[i]);
+    }
     copy_ProEquipCtrl(to->proequipctrl, from->proequipctrl, to_game);
+
     to->curSelectedMagicId = from->curSelectedMagicId;
     to->curUsedItem = from->curUsedItem;
     to->itemId = from->itemId;
@@ -21,8 +33,12 @@ void copy_PlayerIns(PlayerIns* to, PlayerIns* from, bool to_game, bool is_networ
     copy_ChrAsmModelRes(to->chrAsmModelRes, from->chrAsmModelRes, to_game);
     if (to_game)
     {
-        //trigger the game to reload the models
-        ChrAsmModelRes_Load_PartsbndFileCap_Entry(to->chrAsmModelRes, to->chrasm, 1, 0, 0, 0, 1, 1);
+        //trigger the game to reload the models only if any visual changes happened
+        if (visualChanges)
+        {
+            ConsoleWrite("Reload player model");
+            ChrAsmModelRes_Load_PartsbndFileCap_Entry(to->chrAsmModelRes, to->chrasm, 1, 0, 0, 0, 1, 1);
+        }
     }
     copy_ChrAsmModel(to->chrAsmModel, from->chrAsmModel, to_game);
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
@@ -119,7 +135,7 @@ void free_ChrAsmModelRes(ChrAsmModelRes* to)
 void copy_ChrAsmModelRes_Elem(ChrAsmModelRes_Elem* to, ChrAsmModelRes_Elem* from, bool to_game)
 {
     to->data_0 = from->data_0;
-    to->PartsbndFileCap2 = NULL;
+    to->PartsbndFileCap2 = NULL; //this should always be null since it's just tmp storage for 1 frame
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
 }
 
