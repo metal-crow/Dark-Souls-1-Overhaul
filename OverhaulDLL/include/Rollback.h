@@ -49,6 +49,7 @@ public:
     static void rollback_start_session(ISteamNetworkingMessages* steamMsgs);
 
     //used for testing only
+    static const bool rollbackVisual = true; //a visual indicator of rollback for testing
     static bool gsave;
     static bool gload;
     static bool isave;

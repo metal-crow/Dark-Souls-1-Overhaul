@@ -55,9 +55,7 @@ bool state_test(void* unused)
         //copy_FXManager((*(SfxMan**)Game::sfx_man)->FrpgFxManagerBase->base.fXManager, Rollback::saved_sfxobjs, true);
         copy_DamageMan(*(DamageMan**)Game::damage_man, Rollback::saved_damageman, true);
 
-        Game::SuspendThreads();
         Game::Step_GameSimulation();
-        Game::ResumeThreads();
 
         Rollback::gload = false;
     }
@@ -249,6 +247,15 @@ void dsr_frame_finished_helper()
         if (Rollback::ggpoReady == GGPOREADY::Ready)
         {
             ggpo_advance_frame(Rollback::ggpo);
+
+            if (Rollback::rollbackVisual)
+            {
+                float* visability = (float*)((uint64_t)Game::get_PlayerIns().value() + 0x328);
+                if (*visability < 1.0f)
+                {
+                    *visability += 0.2f;
+                }
+            }
         }
     }
 }
@@ -311,12 +318,10 @@ bool rollback_advance_frame_callback(int)
     rollback_sync_inputs();
 
     //step next frame
-    Game::SuspendThreads();
     Game::Step_GameSimulation();
-    Game::ResumeThreads();
     ggpo_advance_frame(Rollback::ggpo);
 
-    ConsoleWrite("rollback_advance_frame_callback finished");
+    //ConsoleWrite("rollback_advance_frame_callback finished");
     return true;
 }
 
@@ -332,7 +337,7 @@ bool rollback_load_game_state_callback(unsigned char* buffer, int)
         auto player_o = Game::get_connected_player(i);
         if (!player_o.has_value() || player_o.value() == NULL)
         {
-            FATALERROR("Unable to get playerins in rollback_load_game_state_callback");
+            FATALERROR("Unable to get playerins %d in rollback_load_game_state_callback", i);
         }
         PlayerIns* player = (PlayerIns*)player_o.value();
 
@@ -343,7 +348,11 @@ bool rollback_load_game_state_callback(unsigned char* buffer, int)
     //TODO copy_FXManager
     copy_DamageMan(*(DamageMan**)Game::damage_man, state->damageman, true);
 
-    ConsoleWrite("rollback_load_game_state_callback finish");
+    if (Rollback::rollbackVisual)
+    {
+        *(float*)((uint64_t)Game::get_PlayerIns().value() + 0x328) = 0.0f;
+    }
+    //ConsoleWrite("rollback_load_game_state_callback finish");
 
     return true;
 }
@@ -365,7 +374,7 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
         auto player_o = Game::get_connected_player(i);
         if (!player_o.has_value() || player_o.value() == NULL)
         {
-            FATALERROR("Unable to get playerins in rollback_load_game_state_callback");
+            FATALERROR("Unable to get playerins %d in rollback_save_game_state_callback", i);
         }
         PlayerIns* player = (PlayerIns*)player_o.value();
 
