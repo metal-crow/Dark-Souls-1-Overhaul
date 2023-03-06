@@ -12,6 +12,7 @@ bool Files::save_file_index_pending_set_next = false;
 bool Files::save_file_index_pending_set_prev = false;
 bool Files::save_file_index_make_new = false;
 bool first_save_load = true;
+const char* OVERHAUL_SAVE_FILE_EXTENSION = ".overhaul";
 std::string Files::save_file;
 
 //Make sure file names are lowercase
@@ -103,10 +104,22 @@ HANDLE WINAPI intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesiredAccess,
             {
                 // Parse the save file on first read
                 if (first_save_load) {
-                    // If not set by user, store default save file
+                    // If not set by user, use default overhaul save file
                     if (Files::save_file.length() == 0) {
-                        if (Files::string_wide_to_mb((wchar_t*)lpFileName, Files::save_file)) {
+                        //point to the default overhaul save
+                        if (Files::string_wide_to_mb((wchar_t*)lpFileName, Files::save_file))
+                        {
                             FATALERROR("Unable to convert in game save file to char");
+                        }
+                        Files::save_file.append(OVERHAUL_SAVE_FILE_EXTENSION);
+
+                        //create the overhaul save from the default save if it doesn't exist
+                        DWORD fileAtribs = GetFileAttributesA(Files::save_file.c_str());
+                        if (fileAtribs == INVALID_FILE_ATTRIBUTES)
+                        {
+                            std::string orig_save_file;
+                            Files::string_wide_to_mb((wchar_t*)lpFileName, orig_save_file);
+                            CopyFile(orig_save_file.c_str(), Files::save_file.c_str(), true);
                         }
                     }
 

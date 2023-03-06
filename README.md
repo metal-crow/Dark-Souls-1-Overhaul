@@ -22,7 +22,7 @@ Unzip the contents of the zip into your DARK SOULS REMASTERED folder to install 
   
 ### Uninstall
 
-To uninstall or disable the mod, remove d3d11.dll. I also recommend deleting or restoring your old save on uninstall, to prevent a possible ban now that the mod is disabled.  
+To uninstall or disable the mod, remove d3d11.dll. This will also restore your save to before the mod was installed. 
 
 ## Description
 The mod is completely backwards compatible with vanilla dark souls 1 by default. It will __not__ separate you from vanilla players.  
@@ -109,6 +109,8 @@ You can also edit the file while the game is running, and reloading your save wi
 * Compatible with [Painted Worlds](https://www.nexusmods.com/darksoulsremastered/mods/527)
 
 * Skips the intro logos
+
+* Does not touch your original save file. Uses it's own copy to prevent bans on uninstall.  
 
 ### Overhaul
 
