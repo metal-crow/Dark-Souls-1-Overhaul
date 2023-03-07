@@ -1,6 +1,7 @@
 #include "SpellDesyncFixes.h"
 #include "DarkSoulsOverhaulMod.h"
 #include "SP/memory/injection/asm/x64.h"
+#include "Rollback.h"
 #include <vector>
 #include <mutex>
 
@@ -68,7 +69,7 @@ sendType1NetMessage_Typedef* sendType1NetMessage = (sendType1NetMessage_Typedef*
 // By entering this function we know the owner of the bullet is the PC and the target is another entity
 void homing_spell_trigger_injection_helper_function(uint32_t target, float* bulletPos)
 {
-    if (Mod::get_mode() == ModMode::Compatability)
+    if (Mod::get_mode() == ModMode::Compatability || Rollback::rollbackEnabled)
     {
         return;
     }
@@ -117,7 +118,7 @@ void homing_spell_trigger_injection_helper_function(uint32_t target, float* bull
 // Take in the custom spell type 1 packet, and extract it's data
 void type1_p2pPacket_parse_injection_helper_function(CustomSpellPacketData* bullet_packet)
 {
-    if (Mod::get_mode() == ModMode::Compatability)
+    if (Mod::get_mode() == ModMode::Compatability || Rollback::rollbackEnabled)
     {
         return;
     }
@@ -176,7 +177,7 @@ void type1_p2pPacket_parse_injection_helper_function(CustomSpellPacketData* bull
 // Check if the current bullet being checked to fire has been received as a network packet
 void homing_spell_checkIfTriggered_injection_helper_function(uint8_t* firing_bullet, uint32_t* bulletParamEntry)
 {
-    if (Mod::get_mode() == ModMode::Compatability)
+    if (Mod::get_mode() == ModMode::Compatability || Rollback::rollbackEnabled)
     {
         return;
     }
