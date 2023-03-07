@@ -252,8 +252,8 @@ add     rsp, 10h
 
 ;the game for some reason still processes stuff from type1 even if it doesn't get any packet
 ;need to exit the function if we're in rollback netcode mode
-cmp     rax, 0
-je      no_rollback
+cmp     al, 0
+jne     no_rollback
 ADD     RSP, 0D0h
 POP     R15
 POP     RDI

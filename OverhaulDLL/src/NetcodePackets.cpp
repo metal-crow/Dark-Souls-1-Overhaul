@@ -20,7 +20,7 @@ extern "C" {
 
     uint64_t Read_GeneralPlayerData_return;
     void Read_GeneralPlayerData_injection();
-    uint64_t Read_GeneralPlayerData_helper(uint64_t NetworkManipulator);
+    bool Read_GeneralPlayerData_helper(uint64_t NetworkManipulator);
 
     uint64_t disableType18PacketEnforcement_return;
     void disableType18PacketEnforcement_injection();
@@ -343,7 +343,7 @@ void send_HandshakePacketExtra(uint64_t ConnectedPlayerData)
     sendNetMessage(*(uint64_t*)Game::session_man_imp, ConnectedPlayerData, Rollback::RollbackSinglePacketType, &pkt, sizeof(pkt));
 }
 
-uint64_t Read_GeneralPlayerData_helper(uint64_t NetworkManipulator)
+bool Read_GeneralPlayerData_helper(uint64_t NetworkManipulator)
 {
     if (!Rollback::netcodeTestingEnabled)
     {
@@ -441,10 +441,10 @@ void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins, int
     *(uint32_t*)((uint64_t)(&playerins->playergamedata->attribs) + 0xC) = pkt->maxHp;
     *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4) = pkt->rotation;
     *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0) = pkt->atkAngle;
-    *(float*)(((uint64_t)(&playerins->chrins.padManipulator->chrManipulator)) + 0x10 + 0) = pkt->movement_direction_vals[0];
-    *(float*)(((uint64_t)(&playerins->chrins.padManipulator->chrManipulator)) + 0x10 + 4) = 0.0f;
-    *(float*)(((uint64_t)(&playerins->chrins.padManipulator->chrManipulator)) + 0x10 + 8) = pkt->movement_direction_vals[1];
-    *(float*)(((uint64_t)(&playerins->chrins.padManipulator->chrManipulator)) + 0x10 + 0xc) = 0.0f;
+    *(float*)(((uint64_t)(&playerins->chrins.netManipulator->chrManipulator)) + 0x10 + 0) = pkt->movement_direction_vals[0];
+    *(float*)(((uint64_t)(&playerins->chrins.netManipulator->chrManipulator)) + 0x10 + 4) = 0.0f;
+    *(float*)(((uint64_t)(&playerins->chrins.netManipulator->chrManipulator)) + 0x10 + 8) = pkt->movement_direction_vals[1];
+    *(float*)(((uint64_t)(&playerins->chrins.netManipulator->chrManipulator)) + 0x10 + 0xc) = 0.0f;
 
     //Type 10
     uint32_t chrType = *(uint32_t*)(((uint64_t)&playerins->playergamedata->attribs) + 0x94);
