@@ -200,7 +200,7 @@ void rollback_game_frame_sync_inputs_helper()
 
         if (Rollback::ggpoReady == GGPOREADY::Ready)
         {
-            RollbackInput localInput;
+            RollbackInput localInput{};
 
             auto player_o = Game::get_PlayerIns();
             if (!player_o.has_value() || player_o.value() == NULL)
@@ -484,8 +484,8 @@ bool rollback_on_compare_inputs(void* input1, int len1, void* input2, int len2)
     for (size_t i = 0; i < len1 / sizeof(RollbackInput); i++)
     {
         //ignore the local part, just compare the remote
-        int isEqual = memcmp(&inputs1[i].remote, &inputs2[i].remote, sizeof(MainPacket));
-        if (isEqual != 0)
+        bool isEqual = Rollback::RemotePlayerPackets_areEqual(&inputs1[i].remote, &inputs2[i].remote);
+        if (!isEqual)
         {
             return false;
         }

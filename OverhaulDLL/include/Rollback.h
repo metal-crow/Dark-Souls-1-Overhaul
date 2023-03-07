@@ -35,6 +35,7 @@ public:
 
     static void BuildRemotePlayerPacket(PlayerIns* playerins, MainPacket* out);
     static void LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* player, int32_t session_player_num);
+    static bool RemotePlayerPackets_areEqual(MainPacket* pkt1, MainPacket* pkt2);
 
     static bool rollbackToggle;
     static bool rollbackEnabled;

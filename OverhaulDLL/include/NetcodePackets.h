@@ -22,9 +22,22 @@ struct PosRotFloatVec
 struct MainPacket
 {
     //Type 1
-    float position_x;
-    float position_y;
-    float position_z;
+    bool absolutePosition;
+    union
+    {
+        struct
+        {
+            float position_x;
+            float position_y;
+            float position_z;
+        };
+        struct
+        {
+            float delta_x;
+            float delta_y;
+            float delta_z;
+        };
+    };
     uint32_t ezStateActiveState;
     uint32_t ezStatePassiveState;
     int16_t curHp;

@@ -164,6 +164,11 @@ bool getNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint3
     }
 }
 
+//every X seconds, resync the position to handle floating point errors due to dead reckoning
+static const size_t SEND_ABSOLUTE_POSITION_TICKRATE = 60 * 10;
+static size_t send_absolute_position_tick = 0; //TODO reset on session start
+static float last_sent_position[3];
+
 void Rollback::BuildRemotePlayerPacket(PlayerIns* playerins, MainPacket* pkt)
 {
     if (playerins == NULL)
@@ -173,9 +178,39 @@ void Rollback::BuildRemotePlayerPacket(PlayerIns* playerins, MainPacket* pkt)
     }
 
     //Load Type 1
-    pkt->position_x = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x10);
-    pkt->position_z = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x14);
-    pkt->position_y = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x18);
+    pkt->absolutePosition = (send_absolute_position_tick == 0);
+    if (pkt->absolutePosition)
+    {
+        pkt->position_x = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x10);
+        pkt->position_z = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x14);
+        pkt->position_y = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x18);
+
+        last_sent_position[0] = pkt->position_x;
+        last_sent_position[1] = pkt->position_z;
+        last_sent_position[2] = pkt->position_y;
+    }
+    else
+    {
+        pkt->delta_x = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x10) - last_sent_position[0];
+        pkt->delta_z = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x14) - last_sent_position[1];
+        pkt->delta_y = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x18) - last_sent_position[2];
+
+        //using deltas means we don't rollback for straight line movement. Round them so that floating point weirdness doesn't break this
+        pkt->delta_x = roundf(pkt->delta_x * 100.0f) / 100.0f;
+        pkt->delta_z = roundf(pkt->delta_z * 100.0f) / 100.0f;
+        pkt->delta_y = roundf(pkt->delta_y * 100.0f) / 100.0f;
+
+        //set the last send position so the next delta calculation takes into account the rounding
+        last_sent_position[0] += pkt->delta_x;
+        last_sent_position[1] += pkt->delta_z;
+        last_sent_position[2] += pkt->delta_y;
+    }
+    send_absolute_position_tick++;
+    if (send_absolute_position_tick >= SEND_ABSOLUTE_POSITION_TICKRATE)
+    {
+        send_absolute_position_tick = 0;
+    }
+
     pkt->ezStateActiveState = get_AnimationData(playerins->chrins.playerCtrl->chrCtrl.actionctrl, 1);
     pkt->ezStatePassiveState = get_AnimationData(playerins->chrins.playerCtrl->chrCtrl.actionctrl, 0);
     pkt->curHp = playerins->chrins.curHp;
@@ -241,7 +276,17 @@ void Rollback::BuildRemotePlayerPacket(PlayerIns* playerins, MainPacket* pkt)
         {
             FATALERROR("pkt.spEffectToApply size of 15 is insufficent.");
         }
-        pkt->spEffectToApply[i] = specialEffectInfo_id;
+
+        //ignore this weird speffect that gets applied every few frames
+        if (specialEffectInfo_id == 40)
+        {
+            pkt->spEffectToApply[i] = -1;
+        }
+        else
+        {
+            pkt->spEffectToApply[i] = specialEffectInfo_id;
+        }
+
         i++;
         specialEffectInfo = specialEffectInfo->next;
     }
@@ -375,9 +420,18 @@ void recv_HandshakePacketExtra(uint64_t ConnectedPlayerData)
 void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins, int32_t session_player_num)
 {
     //Type 1
-    *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x10) = pkt->position_x;
-    *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x14) = pkt->position_z;
-    *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x18) = pkt->position_y;
+    if (pkt->absolutePosition)
+    {
+        *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x10) = pkt->position_x;
+        *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x14) = pkt->position_z;
+        *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x18) = pkt->position_y;
+    }
+    else
+    {
+        *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x10) += pkt->delta_x;
+        *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x14) += pkt->delta_z;
+        *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x18) += pkt->delta_y;
+    }
     ActionCtrl_ApplyEzState(playerins->chrins.playerCtrl->chrCtrl.actionctrl, 0x0, pkt->ezStatePassiveState);
     ActionCtrl_ApplyEzState(playerins->chrins.playerCtrl->chrCtrl.actionctrl, 0x1, pkt->ezStateActiveState);
     PlayerIns_SetHp(playerins, pkt->curHp);
@@ -544,4 +598,189 @@ uint64_t fixPhantomBulletGenIssue_helper(PlayerIns* pc)
     {
         return 1;
     }
+}
+
+static const bool RemotePlayerPackets_areEqual_LOGGING = false;
+bool Rollback::RemotePlayerPackets_areEqual(MainPacket* pkt1, MainPacket* pkt2)
+{
+    if (!RemotePlayerPackets_areEqual_LOGGING)
+    {
+        return memcmp(pkt1, pkt2, sizeof(MainPacket)) == 0;
+    }
+
+    if (pkt1->absolutePosition != pkt2->absolutePosition)
+    {
+        if (RemotePlayerPackets_areEqual_LOGGING)
+        {
+            ConsoleWrite("Mismatch in absolutePosition");
+        }
+        return false;
+    }
+
+    if (pkt1->absolutePosition)
+    {
+        if (pkt1->position_x != pkt2->position_x ||
+            pkt1->position_y != pkt2->position_y ||
+            pkt1->position_z != pkt2->position_z)
+        {
+            if (RemotePlayerPackets_areEqual_LOGGING)
+            {
+                ConsoleWrite("Mismatch in position pkt1=%f %f %f pkt2=%f %f %f", pkt1->position_x, pkt1->position_y, pkt1->position_z, pkt2->position_x, pkt2->position_y, pkt2->position_z);
+            }
+            return false;
+        }
+    }
+    else
+    {
+        if (pkt1->delta_x != pkt2->delta_x ||
+            pkt1->delta_y != pkt2->delta_y ||
+            pkt1->delta_z != pkt2->delta_z)
+        {
+            if (RemotePlayerPackets_areEqual_LOGGING)
+            {
+                ConsoleWrite("Mismatch in delta pkt1=%f %f %f pkt2=%f %f %f", pkt1->delta_x, pkt1->delta_y, pkt1->delta_z, pkt2->delta_x, pkt2->delta_y, pkt2->delta_z);
+            }
+            return false;
+        }
+    }
+
+    if (pkt1->ezStateActiveState != pkt2->ezStateActiveState ||
+        pkt1->ezStatePassiveState != pkt2->ezStatePassiveState)
+    {
+        if (RemotePlayerPackets_areEqual_LOGGING)
+        {
+            ConsoleWrite("Mismatch in ezState");
+        }
+        return false;
+    }
+
+    if (pkt1->curHp != pkt2->curHp ||
+        pkt1->maxHp != pkt2->maxHp)
+    {
+        if (RemotePlayerPackets_areEqual_LOGGING)
+        {
+            ConsoleWrite("Mismatch in hp");
+        }
+        return false;
+    }
+
+    if (pkt1->rotation != pkt2->rotation)
+    {
+        if (RemotePlayerPackets_areEqual_LOGGING)
+        {
+            ConsoleWrite("Mismatch in rotation");
+        }
+        return false;
+    }
+
+    if (pkt1->atkAngle != pkt2->atkAngle)
+    {
+        if (RemotePlayerPackets_areEqual_LOGGING)
+        {
+            ConsoleWrite("Mismatch in atkAngle");
+        }
+        return false;
+    }
+
+    if (pkt1->movement_direction_vals[0] != pkt2->movement_direction_vals[0] ||
+        pkt1->movement_direction_vals[1] != pkt2->movement_direction_vals[1])
+    {
+        if (RemotePlayerPackets_areEqual_LOGGING)
+        {
+            ConsoleWrite("Mismatch in movement_direction_vals");
+        }
+        return false;
+    }
+
+    if (memcmp(pkt1->equipment_array, pkt2->equipment_array, sizeof(pkt1->equipment_array)) != 0)
+    {
+        if (RemotePlayerPackets_areEqual_LOGGING)
+        {
+            ConsoleWrite("Mismatch in equipment_array");
+        }
+        return false;
+    }
+
+    if (pkt1->type10_unk1 != pkt2->type10_unk1 ||
+        pkt1->type10_unk2 != pkt2->type10_unk2 ||
+        pkt1->type10_unk3 != pkt2->type10_unk3 ||
+        pkt1->type10_unk4 != pkt2->type10_unk4 ||
+        pkt1->type10_unk5 != pkt2->type10_unk5)
+    {
+        if (RemotePlayerPackets_areEqual_LOGGING)
+        {
+            ConsoleWrite("Mismatch in type10_unk");
+        }
+        return false;
+    }
+
+    if (pkt1->flags != pkt2->flags)
+    {
+        if (RemotePlayerPackets_areEqual_LOGGING)
+        {
+            ConsoleWrite("Mismatch in flags");
+        }
+        return false;
+    }
+
+    if (pkt1->throw_id != pkt2->throw_id)
+    {
+        if (RemotePlayerPackets_areEqual_LOGGING)
+        {
+            ConsoleWrite("Mismatch in throw_id");
+        }
+        return false;
+    }
+
+    if (pkt1->throw_id != -1)
+    {
+        if (memcmp(&pkt1->attacker_position, &pkt2->attacker_position, sizeof(pkt1->attacker_position)) != 0 ||
+            memcmp(&pkt1->defender_position, &pkt2->defender_position, sizeof(pkt1->defender_position)) != 0)
+        {
+            if (RemotePlayerPackets_areEqual_LOGGING)
+            {
+                ConsoleWrite("Mismatch in attacker/defender_position");
+            }
+            return false;
+        }
+
+        if (pkt1->entitynum_defender != pkt2->entitynum_defender ||
+            pkt1->entitynum_attacker != pkt2->entitynum_attacker)
+        {
+            if (RemotePlayerPackets_areEqual_LOGGING)
+            {
+                ConsoleWrite("Mismatch in entitynum attacker/defender");
+            }
+            return false;
+        }
+    }
+
+    if (pkt1->curSelectedMagicId != pkt2->curSelectedMagicId)
+    {
+        if (RemotePlayerPackets_areEqual_LOGGING)
+        {
+            ConsoleWrite("Mismatch in curSelectedMagicId");
+        }
+        return false;
+    }
+
+    if (pkt1->curUsingItemId != pkt2->curUsingItemId)
+    {
+        if (RemotePlayerPackets_areEqual_LOGGING)
+        {
+            ConsoleWrite("Mismatch in curUsingItemId");
+        }
+        return false;
+    }
+
+    if (memcmp(pkt1->spEffectToApply, pkt2->spEffectToApply, sizeof(pkt1->spEffectToApply)) != 0)
+    {
+        if (RemotePlayerPackets_areEqual_LOGGING)
+        {
+            ConsoleWrite("Mismatch in spEffectToApply");
+        }
+        return false;
+    }
+
+    return true;
 }
