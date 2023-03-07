@@ -111,15 +111,25 @@ HANDLE WINAPI intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesiredAccess,
                         {
                             FATALERROR("Unable to convert in game save file to char");
                         }
+                        std::string orig_save_file = Files::save_file;
                         Files::save_file.append(OVERHAUL_SAVE_FILE_EXTENSION);
 
                         //create the overhaul save from the default save if it doesn't exist
                         DWORD fileAtribs = GetFileAttributesA(Files::save_file.c_str());
                         if (fileAtribs == INVALID_FILE_ATTRIBUTES)
                         {
-                            std::string orig_save_file;
-                            Files::string_wide_to_mb((wchar_t*)lpFileName, orig_save_file);
                             CopyFile(orig_save_file.c_str(), Files::save_file.c_str(), true);
+                        }
+                        //also rename the other pages of the save if they exist from an older mod version
+                        for (size_t i = 1; i < 10; i++)
+                        {
+                            std::string new_save_file_page = Files::save_file + "_0" + std::to_string(i);
+                            std::string old_save_file_page = orig_save_file + "_0" + std::to_string(i);
+                            DWORD fileAtribs = GetFileAttributesA(old_save_file_page.c_str());
+                            if (fileAtribs == INVALID_FILE_ATTRIBUTES)
+                            {
+                                MoveFile(old_save_file_page.c_str(), new_save_file_page.c_str());
+                            }
                         }
                     }
 
