@@ -21,8 +21,11 @@ struct PosRotFloatVec
 #pragma pack(push, 1)
 struct MainPacket
 {
+    //use bitfields to better pack data
+    //bitfields must also be consecutive to pack correctly
+    bool absolutePosition : 1;
+
     //Type 1
-    bool absolutePosition;
     union
     {
         struct
