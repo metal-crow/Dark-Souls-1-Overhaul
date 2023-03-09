@@ -121,10 +121,20 @@ HANDLE WINAPI intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesiredAccess,
                             CopyFile(orig_save_file.c_str(), Files::save_file.c_str(), true);
                         }
                         //also rename the other pages of the save if they exist from an older mod version
-                        for (size_t i = 1; i < 10; i++)
+                        for (size_t i = 1; i < 100; i++)
                         {
-                            std::string new_save_file_page = Files::save_file + "_0" + std::to_string(i);
-                            std::string old_save_file_page = orig_save_file + "_0" + std::to_string(i);
+                            std::string new_save_file_page;
+                            std::string old_save_file_page;
+                            if (i < 10)
+                            {
+                                new_save_file_page = Files::save_file + "_0" + std::to_string(i);
+                                old_save_file_page = orig_save_file + "_0" + std::to_string(i);
+                            }
+                            else
+                            {
+                                new_save_file_page = Files::save_file + "_" + std::to_string(i);
+                                old_save_file_page = orig_save_file + "_" + std::to_string(i);
+                            }
                             DWORD fileAtribs = GetFileAttributesA(old_save_file_page.c_str());
                             if (fileAtribs != INVALID_FILE_ATTRIBUTES)
                             {
