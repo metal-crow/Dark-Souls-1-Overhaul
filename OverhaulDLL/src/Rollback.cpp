@@ -318,7 +318,7 @@ bool rollback_advance_frame_callback(int)
     rollback_sync_inputs();
 
     //step next frame
-    Game::Step_GameSimulation();
+    Game::Step_GameSimulation(true);
     ggpo_advance_frame(Rollback::ggpo);
 
     //ConsoleWrite("rollback_advance_frame_callback finished");
