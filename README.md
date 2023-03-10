@@ -112,6 +112,8 @@ You can also edit the file while the game is running, and reloading your save wi
 
 * Does not touch your original save file. Uses it's own copy to prevent bans on uninstall.  
 
+* Fix bug where invalid eye and hair colors would cause multiplayer to not work.  
+
 ### Overhaul
 
 * Gestures can be canceled via rolling
