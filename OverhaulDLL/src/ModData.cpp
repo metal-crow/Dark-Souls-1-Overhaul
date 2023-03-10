@@ -274,7 +274,7 @@ DWORD WINAPI mod_mode_visuals_setting_thread(LPVOID unused)
 
                 // Handle setting the speffect to show the current mode
                 //add the speffect for the current mode, if applicable and not present
-                uint32_t currentModeSpeffectId = ModModes_To_Speffect.at(Mod::current_mode);
+                uint32_t currentModeSpeffectId = ModModes_To_Speffect.at(Mod::get_mode());
                 if (currentModeSpeffectId != -1)
                 {
                     auto playerCurrentModeSpeffect_o = Game::player_get_speffect(playerIns, currentModeSpeffectId);
@@ -286,7 +286,7 @@ DWORD WINAPI mod_mode_visuals_setting_thread(LPVOID unused)
                 //delete the speffects for the other modes
                 for (auto const& modespeffect : ModModes_To_Speffect)
                 {
-                    if (modespeffect.first != Mod::current_mode && modespeffect.second != -1)
+                    if (modespeffect.first != Mod::get_mode() && modespeffect.second != -1)
                     {
                         auto otherModeSpeffect = Game::player_get_speffect(playerIns, modespeffect.second);
                         if (otherModeSpeffect.has_value())

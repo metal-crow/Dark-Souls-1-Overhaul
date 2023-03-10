@@ -140,8 +140,7 @@ private:
     // The mode we will next enter as soon as the mode_setting_process is capable
     static ModMode next_mode;
 
-public:
-    static ModMode current_mode; //only public and readonly for use with mod_mode_visuals_setting_thread
+    static ModMode current_mode;
 };
 
 
