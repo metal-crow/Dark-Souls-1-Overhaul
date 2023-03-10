@@ -29,6 +29,7 @@
 #include "CustomInvasionTypes.h"
 #include "UIFeatures.h"
 #include "Rollback.h"
+#include "PlayerVisualsValidationFix.h"
 
 HMODULE d3d11_module;
 FILE* logfile = NULL;
@@ -164,6 +165,7 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     //UIFeatures::start();
     //Rollback::start();
     Game::disable_low_fps_disconnect(Mod::disable_low_fps_disconnect);
+    PlayerVisualsValidationFix::start();
 
     ConsoleWrite("All initial loading finished!");
 

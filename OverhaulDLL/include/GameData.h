@@ -187,8 +187,6 @@ public:
 
     static const uint64_t LogoSkip_offset = 0x70f130;
 
-    static const uint64_t Validate_Type6FaceData_offset = 0x506e04;
-
     static const uint64_t Step_PadMan_ReadInputs_offset = 0x1ad0f0;
 
     static const uint64_t Step_QInputMgrWindowsFantasy_ReadInputs_offset = 0x1af09b;

@@ -214,11 +214,6 @@ void Game::injections_init()
     write_address = (uint8_t*)(Game::LogoSkip_offset + Game::ds1_base);
     sp::mem::patch_bytes(write_address, pat, 6);
 
-    //inject code to skip validating the player face/hair/body data
-    uint8_t Validate_Type6FaceData_patch[] = { 0xB0, 0x1, 0x90, 0x90, 0x90 }; //mov al, 1
-    write_address = (uint8_t*)(Game::Validate_Type6FaceData_offset + Game::ds1_base);
-    sp::mem::patch_bytes(write_address, Validate_Type6FaceData_patch, 5);
-
     //inject code to control if Step_PadMan can read inputs or not
     write_address = (uint8_t*)(Game::Step_PadMan_ReadInputs_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &Step_PadMan_ReadInputs_return, 2, &Step_PadMan_ReadInputs_injection);

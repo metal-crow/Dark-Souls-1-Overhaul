@@ -138,6 +138,9 @@
     <ClCompile Include="src\InputDirectionMovementManStructFunctions.cpp">
       <Filter>Source Files\Rollback</Filter>
     </ClCompile>
+    <ClCompile Include="src\PlayerVisualsValidationFix.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3d11-wrapper\include\d3d11\exports.h">
@@ -241,6 +244,9 @@
     </ClInclude>
     <ClInclude Include="include\InputDirectionMovementManStructFunctions.h">
       <Filter>Header Files\Rollback</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PlayerVisualsValidationFix.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

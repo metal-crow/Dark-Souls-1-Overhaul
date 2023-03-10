@@ -10,6 +10,7 @@
 #include <queue>
 #include "Rollback.h"
 #include "ggponet.h"
+#include "PlayerVisualsValidationFix.h"
 
 //This is needed for the steam callbacks to work
 static ModNetworking modnet = ModNetworking();
@@ -33,7 +34,7 @@ extern "C" {
     void SendP2PPacket_voice_Replacement_injection();
     uint64_t SendP2PPacket_Replacement_injection_return;
     void SendP2PPacket_Replacement_injection();
-    bool SendP2PPacket_Replacement_injection_helper(CSteamID steamIDRemote, const void *pubData, uint32 cubData, EP2PSend eP2PSendType, int nChannel);
+    bool SendP2PPacket_Replacement_injection_helper(CSteamID steamIDRemote, void *pubData, uint32 cubData, EP2PSend eP2PSendType, int nChannel);
 
     uint64_t CloseP2PSessionWithUser_Replacement_injection_return;
     void CloseP2PSessionWithUser_Replacement_injection();
@@ -364,7 +365,7 @@ bool ReadP2PPacket_Replacement_injection_helper(void *pubDest, uint32 cubDest, u
 }
 
 //SendP2PPacket/SendMessageToUser
-bool SendP2PPacket_Replacement_injection_helper(CSteamID steamIDRemote, const void *pubData, uint32 cubData, EP2PSend eP2PSendType, int nChannel)
+bool SendP2PPacket_Replacement_injection_helper(CSteamID steamIDRemote, void *pubData, uint32 cubData, EP2PSend eP2PSendType, int nChannel)
 {
     if (nChannel != 0)
     {
@@ -422,6 +423,7 @@ bool SendP2PPacket_Replacement_injection_helper(CSteamID steamIDRemote, const vo
     }
     else
     {
+        PlayerVisualsValidationFix::sanitizePacketData((uint8_t*)pubData, cubData); //since the other player doesn't have the mod, need to prevent them from seeing invalid player visuals
         return ModNetworking::SteamNetworking->SendP2PPacket(steamIDRemote, pubData, cubData, eP2PSendType, nChannel);
     }
 }
