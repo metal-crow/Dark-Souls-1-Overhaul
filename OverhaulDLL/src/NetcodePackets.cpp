@@ -196,9 +196,9 @@ void Rollback::BuildRemotePlayerPacket(PlayerIns* playerins, MainPacket* pkt)
         pkt->delta_y = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x18) - last_sent_position[2];
 
         //using deltas means we don't rollback for straight line movement. Round them so that floating point weirdness doesn't break this
-        pkt->delta_x = roundf(pkt->delta_x * 100.0f) / 100.0f;
-        pkt->delta_z = roundf(pkt->delta_z * 100.0f) / 100.0f;
-        pkt->delta_y = roundf(pkt->delta_y * 100.0f) / 100.0f;
+        pkt->delta_x = roundf(pkt->delta_x * 1000.0f) / 1000.0f;
+        pkt->delta_z = roundf(pkt->delta_z * 1000.0f) / 1000.0f;
+        pkt->delta_y = roundf(pkt->delta_y * 1000.0f) / 1000.0f;
 
         //set the last send position so the next delta calculation takes into account the rounding
         last_sent_position[0] += pkt->delta_x;
