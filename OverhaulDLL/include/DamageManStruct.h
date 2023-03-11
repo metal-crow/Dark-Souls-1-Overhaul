@@ -30,8 +30,8 @@ struct DamageEntry
     hkpCapsuleShape* hkpCapsuleShape2;
     uint64_t data_3;
     uint64_t padding_1;
-    uint8_t data_4[176];
-    uint64_t padding_2;
+    uint8_t data_4[168];
+    uint64_t padding_2[2];
     FrpgPhysWorld* physWorld;
     hkpSimpleShapePhantom* simpleShapePhantom;
     uint64_t padding_3;
