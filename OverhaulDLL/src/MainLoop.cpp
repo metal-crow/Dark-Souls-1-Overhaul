@@ -34,6 +34,8 @@ void MainLoop::setup_mainloop_callback(MainLoopCallback func, void* data, std::s
     callbacks_queue_mtx.unlock();
 }
 
+static const uint64_t CALLBACK_FUNC_TIME_WARNING = (0.1 * 10000000); //100 ms
+
 void main_game_loop_injection_helper()
 {
     //move any items from the queue to our real list
@@ -52,7 +54,16 @@ void main_game_loop_injection_helper()
         auto callback = *iter;
         MainLoopCallback func = std::get<0>(callback);
         void* data = std::get<1>(callback);
+
+        //monitor the time for these callbacks to isolate issues
+        uint64_t start_time = Game::get_accurate_time();
         bool result = func(data);
+        uint64_t end_time = Game::get_accurate_time();
+        uint64_t length_time = end_time - start_time;
+        if (length_time > CALLBACK_FUNC_TIME_WARNING)
+        {
+            ConsoleWrite("WARNING: Callback function %s took %f ms", std::get<2>(callback).c_str(), length_time/1000.0f);
+        }
 
         //when the function returns false, remove from our callbacks
         if (result == false)
