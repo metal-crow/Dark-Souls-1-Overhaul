@@ -371,7 +371,7 @@ bool Read_GeneralPlayerData_helper(uint64_t NetworkManipulator)
         Rollback::LoadRemotePlayerPacket(&pkt, playerins, session_player_num);
     }
 
-    return true;
+    return false;
 }
 
 void recv_HandshakePacketExtra(uint64_t ConnectedPlayerData)
