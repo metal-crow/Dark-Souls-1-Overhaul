@@ -29,7 +29,6 @@ The mod is completely backwards compatible with vanilla dark souls 1 by default.
   - As a host, anyone connecting with you will conform to your mod's mode. 
   	- I.e, if you are in overhaul mode and they are in legacy, they will either change to overhaul or disconnect.
   	- If it's a non-mod user who is connecting, you can configure if you want to deny their connection attempt, or have your own mode change to match them (the default) via F4.
-    - Of note: if you have an existing mod-user connected and a non-mod user connects, you will have a few seconds of packet loss while you and the other mod user fall back to the older steam packet API.
   - As a guest, you can configure who you want to be able to connect to. By default you accept all connections and change your mode to match the host.
   	- You can toggle this behavior with F1 (to disallow connecting to non-mod hosts), F2 (to disallow connecting to legacy mode hosts), and F3 (to disallow connecting to overhaul mode hosts).
 
