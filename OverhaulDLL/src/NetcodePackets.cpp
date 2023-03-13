@@ -527,8 +527,11 @@ void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins, int
         putAttackerIntoThrowAnimation(attacker_throw_info);
         putDefenderIntoThrowAnimation(defender_throw_info, 1);
 
-        //force the game to recheck the animation mediator and set the animation queue. Otherwise it'll miss this data being set and overwrite it start of next frame.
-        ChrCtrl_Func_30(&defender->playerCtrl->chrCtrl, FRAMETIME);
+        if (Rollback::netcodeTestingEnabled)
+        {
+            //force the game to recheck the animation mediator and set the animation queue. Otherwise it'll miss this data being set and overwrite it start of next frame.
+            ChrCtrl_Func_30(&defender->playerCtrl->chrCtrl, FRAMETIME);
+        }
     }
 
     //Type 17
