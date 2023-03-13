@@ -34,7 +34,7 @@ void MainLoop::setup_mainloop_callback(MainLoopCallback func, void* data, std::s
     callbacks_queue_mtx.unlock();
 }
 
-static const uint64_t CALLBACK_FUNC_TIME_WARNING = (0.1 * 10000000); //100 ms
+static const uint64_t CALLBACK_FUNC_TIME_WARNING = (uint64_t)(0.1 * 10000000); //100 ms
 
 void main_game_loop_injection_helper()
 {

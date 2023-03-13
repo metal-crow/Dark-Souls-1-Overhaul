@@ -402,10 +402,13 @@ void rollback_free_buffer(void* buffer)
     for (size_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
     {
         free_PlayerIns(state->playerins[i], (i>0));
+        state->playerins[i] = NULL;
     }
     //TODO free_FXManager
     free_BulletMan(state->bulletman);
+    state->bulletman = NULL;
     free_DamageMan(state->damageman);
+    state->damageman = NULL;
 
     free(state);
 }
@@ -437,8 +440,8 @@ bool rollback_on_event_callback(GGPOEvent* info)
         ConsoleWrite("GGPO_EVENTCODE_DISCONNECTED_FROM_PEER");
         break;
     case GGPO_EVENTCODE_TIMESYNC:
-        //TODO
-        ConsoleWrite("WARNING: TODO ===== GGPO_EVENTCODE_TIMESYNC =====");
+        ConsoleWrite("GGPO_EVENTCODE_TIMESYNC");
+        Sleep(1000 * info->u.timesync.frames_ahead / 60);
         break;
     }
     return true;
@@ -459,14 +462,17 @@ void rollback_on_free_input(void* input, int len)
         if (inputs[0].local.padman != NULL)
         {
             free_PadMan(inputs[0].local.padman);
+            inputs[0].local.padman = NULL;
         }
         if (inputs[0].local.qInputMgrWindows != NULL)
         {
             free_QInputMgrWindows(inputs[0].local.qInputMgrWindows);
+            inputs[0].local.qInputMgrWindows = NULL;
         }
         if (inputs[0].local.inputDirectionMovementMan != NULL)
         {
             free_InputDirectionMovementMan(inputs[0].local.inputDirectionMovementMan);
+            inputs[0].local.inputDirectionMovementMan = NULL;
         }
     }
 }
