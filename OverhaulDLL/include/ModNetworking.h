@@ -59,6 +59,7 @@ private:
     static const uint64_t SendP2PPacket_voice_injection_offset = 0x10bb1d4;
     static const uint64_t SendP2PPacket_injection_offset = 0x10bd8e7;
     static const uint64_t CloseP2PSessionWithUser_Replacement_injection_offset = 0x10bdf55;
+    static const uint64_t sendType34SteamMessage_data_offset = 0x108bb78;
 };
 
 #endif

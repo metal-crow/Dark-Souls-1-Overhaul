@@ -161,6 +161,14 @@ void ModNetworking::start()
     write_address = (uint8_t*)(ModNetworking::CloseP2PSessionWithUser_Replacement_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &CloseP2PSessionWithUser_Replacement_injection_return, 9, &CloseP2PSessionWithUser_Replacement_injection);
 
+    /*
+     * Prevent the type 34 steam network packet from ever informing the host that we don't see any guests
+     * Normally this is a desync prevention measure but the timing is too strict plus it just d/cs the guest anyway
+     * So lie and say always just say we aren't missing any guests by returning 0 in the packet
+     */
+    write_address = (uint8_t*)(ModNetworking::sendType34SteamMessage_data_offset + Game::ds1_base);
+    uint8_t type34_data_patch[3] = { 0x45, 0x31, 0xc0 }; //xor r8d, r8d
+    sp::mem::patch_bytes(write_address, type34_data_patch, sizeof(type34_data_patch));
 }
 
 /*
