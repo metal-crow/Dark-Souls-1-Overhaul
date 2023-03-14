@@ -545,4 +545,7 @@ static lua_SetEventSpecialEffect_2_FUNC* lua_SetEventSpecialEffect_2_function = 
 typedef void Step_PadMan_FUNC(float frame_time);
 static Step_PadMan_FUNC* Step_PadMan = (Step_PadMan_FUNC*)0x1401af3b0;
 
+typedef bool Create_BannerMessage_Func_Typedef(uint64_t menuman_banner, uint32_t banner_type, const wchar_t* str);
+Create_BannerMessage_Func_Typedef* Create_BannerMessage_Func = (Create_BannerMessage_Func_Typedef*)0x14071fc60;
+
 #endif // _DS1_OVERHAUL_GAME_DATA_H_
