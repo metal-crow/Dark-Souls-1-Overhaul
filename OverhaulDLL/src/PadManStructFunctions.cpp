@@ -57,7 +57,11 @@ void FlattenedPadManObj_to_PadMan(PadMan* to, FlattenedPadManObj* from)
 
 void copy_PadMan(PadMan* to, PadMan* from)
 {
+    Game::SuspendThreads();
+
     copy_PadDevice(to->PadDevice_0, from->PadDevice_0);
+
+    Game::ResumeThreads();
 }
 
 PadMan* init_PadMan()

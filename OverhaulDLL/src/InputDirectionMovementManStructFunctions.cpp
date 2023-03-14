@@ -21,11 +21,15 @@ void InputDirectionMovementMan_to_FlattenedInputDirectionMovementManObj(Flattene
 
 void copy_InputDirectionMovementMan(InputDirectionMovementMan* to, InputDirectionMovementMan* from)
 {
+    Game::SuspendThreads();
+
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     for (size_t i = 0; i < sizeof(to->data_1) / sizeof(to->data_1[1]); i++)
     {
         *to->data_1[i] = *from->data_1[i];
     }
+
+    Game::ResumeThreads();
 }
 
 InputDirectionMovementMan* init_InputDirectionMovementMan()

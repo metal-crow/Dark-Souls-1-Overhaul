@@ -5,6 +5,8 @@ typedef void* falloc(uint64_t, uint64_t, uint32_t);
 
 void copy_PlayerIns(PlayerIns* to, PlayerIns* from, bool to_game, bool is_networked)
 {
+    Game::SuspendThreads();
+
     bool visualChanges = false;
 
     copy_ChrIns(&to->chrins, &from->chrins, to_game, is_networked);
@@ -45,6 +47,8 @@ void copy_PlayerIns(PlayerIns* to, PlayerIns* from, bool to_game, bool is_networ
     memcpy(to->data_4, from->data_4, sizeof(to->data_4));
     memcpy(to->data_5, from->data_5, sizeof(to->data_5));
     memcpy(to->data_6, from->data_6, sizeof(to->data_6));
+
+    Game::ResumeThreads();
 }
 
 PlayerIns* init_PlayerIns(bool is_networked)

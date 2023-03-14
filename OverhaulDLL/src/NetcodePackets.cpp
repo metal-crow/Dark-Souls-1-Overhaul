@@ -173,9 +173,11 @@ void Rollback::BuildRemotePlayerPacket(PlayerIns* playerins, MainPacket* pkt)
 {
     if (playerins == NULL)
     {
-        ConsoleWrite("ERROR: playerins value at BuildRemotePlayerPacket is NULL.");
+        FATALERROR("ERROR: playerins value at BuildRemotePlayerPacket is NULL.");
         return;
     }
+
+    Game::SuspendThreads();
 
     //Load Type 1
     pkt->absolutePosition = (send_absolute_position_tick == 0);
@@ -294,6 +296,8 @@ void Rollback::BuildRemotePlayerPacket(PlayerIns* playerins, MainPacket* pkt)
     {
         pkt->spEffectToApply[i] = -1;
     }
+
+    Game::ResumeThreads();
 }
 
 void send_generalplayerinfo_helper(PlayerIns* playerins)
@@ -419,6 +423,8 @@ void recv_HandshakePacketExtra(uint64_t ConnectedPlayerData)
 
 void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins, int32_t session_player_num)
 {
+    Game::SuspendThreads();
+
     //Type 1
     if (pkt->absolutePosition)
     {
@@ -571,6 +577,8 @@ void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins, int
     {
         Apply_Speffect(playerins->chrins.specialEffects, speffect_id, 1.0f);
     }
+
+    Game::ResumeThreads();
 }
 
 uint64_t disableType18PacketEnforcement_helper(PlayerIns* pc)

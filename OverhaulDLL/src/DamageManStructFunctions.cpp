@@ -6,6 +6,8 @@ static const size_t max_preallocated_DamageEntry = 128;
 
 void copy_DamageMan(DamageMan* to, DamageMan* from, bool to_game)
 {
+    Game::SuspendThreads();
+
     uint64_t active_damage_entries_list_offset = (uint64_t)from->active_damage_entries_list - (uint64_t)from->all_damage_entries_list_start;
     to->active_damage_entries_list = (DamageEntry*)((uint64_t)to->all_damage_entries_list_start + active_damage_entries_list_offset);
 
@@ -32,6 +34,8 @@ void copy_DamageMan(DamageMan* to, DamageMan* from, bool to_game)
 
     to->data_0 = from->data_0;
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+
+    Game::ResumeThreads();
 }
 
 DamageMan* init_DamageMan()

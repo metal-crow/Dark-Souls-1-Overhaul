@@ -155,7 +155,11 @@ void QInputMgrWindows_to_FlattenedQInputMgrWindowsObj(FlattenedQInputMgrWindowsO
 
 void copy_QInputMgrWindows(QInputMgrWindows* to, QInputMgrWindows* from)
 {
+    Game::SuspendThreads();
+
     copy_QInputMgr(&to->base, &from->base);
+
+    Game::ResumeThreads();
 }
 
 QInputMgrWindows* init_QInputMgrWindows()

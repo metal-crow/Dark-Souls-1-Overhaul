@@ -5,6 +5,8 @@ typedef void* falloc(uint64_t, uint64_t, uint32_t);
 
 void copy_BulletMan(BulletMan* to, BulletMan* from, bool to_game)
 {
+    Game::SuspendThreads();
+
     for (size_t i = 0; i < 128; i++)
     {
         copy_BulletIns(&to->bulletins_arry[i], &from->bulletins_arry[i], to_game);
@@ -53,6 +55,8 @@ void copy_BulletMan(BulletMan* to, BulletMan* from, bool to_game)
     to->field0x78_end = (uint64_t)(to->field0x78) + (from->field0x78_end - (uint64_t)from->field0x78);
 
     memcpy(to->data_5, from->data_5, sizeof(to->data_5));
+
+    Game::ResumeThreads();
 }
 
 BulletMan* init_BulletMan()

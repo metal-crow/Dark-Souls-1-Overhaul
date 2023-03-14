@@ -4,8 +4,12 @@
 
 void copy_FXManager(FXManager* to, FXManager* from, bool to_game)
 {
+    Game::SuspendThreads();
+
     copy_SFXEntryList(to->SFXEntryList, from->SFXEntryList, to_game, to, from);
     ConsoleWrite("--------------------------------------------");
+
+    Game::ResumeThreads();
 }
 
 FXManager* init_FXManager()
