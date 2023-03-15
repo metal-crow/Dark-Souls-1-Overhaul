@@ -8,7 +8,7 @@
 extern "C" {
     uint64_t sendNetMessage_return;
     void sendNetMessage_injection();
-    bool sendNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint32_t type);
+    bool sendNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint32_t type, uint8_t* data);
 
     uint64_t getNetMessage_return;
     void getNetMessage_injection();
@@ -32,6 +32,22 @@ extern "C" {
 }
 void send_HandshakePacketExtra(uint64_t ConnectedPlayerData);
 void recv_HandshakePacketExtra(uint64_t ConnectedPlayerData);
+
+typedef struct Type16NetworkDataStruct Type16NetworkDataStruct;
+struct Type16NetworkDataStruct
+{
+    PosRotFloatVec attacker_pos;
+    PosRotFloatVec defender_pos;
+    uint16_t entitynum_defender;
+    uint16_t entitynum_attacker;
+    uint32_t throwId;
+};
+static_assert(offsetof(Type16NetworkDataStruct, attacker_pos) == 0);
+static_assert(offsetof(Type16NetworkDataStruct, defender_pos) == 0x10);
+static_assert(offsetof(Type16NetworkDataStruct, entitynum_defender) == 0x20);
+static_assert(offsetof(Type16NetworkDataStruct, entitynum_attacker) == 0x22);
+static_assert(offsetof(Type16NetworkDataStruct, throwId) == 0x24);
+static Type16NetworkDataStruct saved_throw_info = {};
 
 void Rollback::NetcodeFix()
 {
@@ -78,7 +94,7 @@ void Rollback::NetcodeFix()
 }
 
 //return false if we don't want to have sendNetMessage send a packet
-bool sendNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint32_t type)
+bool sendNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint32_t type, uint8_t* data)
 {
     if (Rollback::rollbackEnabled || Rollback::netcodeTestingEnabled)
     {
@@ -89,6 +105,12 @@ bool sendNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint
             // Add an additional packet type that is sent as part of the join handshake set, that does their jobs
             //*TODO* need to limit this to once per session
             send_HandshakePacketExtra(ConnectedPlayerData);
+        }
+
+        if (type == 16)
+        {
+            // Need to save the throw info, because at the start of the frame throw man is empty, and by next frame the throw is processed and cleared
+            memcpy(&saved_throw_info, data, sizeof(Type16NetworkDataStruct));
         }
 
         switch (type)
@@ -240,22 +262,17 @@ void Rollback::BuildRemotePlayerPacket(PlayerIns* playerins, MainPacket* pkt)
     pkt->flags = compress_gamedata_flags(equipgamedata);
 
     //Load Type 16
-    uint64_t cur_throw_ptr = *(uint64_t*)((*(uint64_t*)Game::throw_man) + 0x68);
-    if (cur_throw_ptr != NULL && *(uint64_t*)cur_throw_ptr != NULL)
+    if (saved_throw_info.throwId != 0)
     {
-        uint64_t cur_throw = *(uint64_t*)cur_throw_ptr;
-        PlayerIns* atk_playerins = (*(PlayerIns**)(*(uint64_t*)(cur_throw + 0) + 0x8));
-        PlayerIns* def_playerins = (*(PlayerIns**)(*(uint64_t*)(cur_throw + 8) + 0x8));
+        pkt->attacker_position = saved_throw_info.attacker_pos;
+        pkt->defender_position = saved_throw_info.defender_pos;
 
-        pkt->attacker_position = *(PosRotFloatVec*)(*(uint64_t*)(cur_throw + 0) + 0x70);
-        pkt->attacker_position.Rotation = *(float*)(((uint64_t)atk_playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4);
+        pkt->entitynum_defender = saved_throw_info.entitynum_defender;
+        pkt->entitynum_attacker = saved_throw_info.entitynum_attacker;
 
-        pkt->defender_position = *(PosRotFloatVec*)(*(uint64_t*)(cur_throw + 8) + 0x70);
-        pkt->defender_position.Rotation = *(float*)(((uint64_t)def_playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4);
+        pkt->throw_id = saved_throw_info.throwId;
 
-        pkt->entitynum_defender = GetEntityNumForThrow(*(void**)Game::world_chr_man_imp, def_playerins);
-        pkt->entitynum_attacker = GetEntityNumForThrow(*(void**)Game::world_chr_man_imp, atk_playerins);
-        pkt->throw_id = *(uint16_t*)(cur_throw + 0x10);
+        memset(&saved_throw_info, 0, sizeof(Type16NetworkDataStruct));
     }
     else
     {
