@@ -62,7 +62,7 @@ void main_game_loop_injection_helper()
         uint64_t length_time = end_time - start_time;
         if (length_time > CALLBACK_FUNC_TIME_WARNING)
         {
-            ConsoleWrite("WARNING: Callback function %s took %f ms", std::get<2>(callback).c_str(), length_time/1000.0f);
+            ConsoleWrite("WARNING: Callback function %s took %f ms", std::get<2>(callback).c_str(), length_time/10000.0f);
         }
 
         //when the function returns false, remove from our callbacks
