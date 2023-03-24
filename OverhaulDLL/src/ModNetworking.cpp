@@ -256,6 +256,7 @@ void RemoveQueuedPackets(uint64_t steamid)
 void SendQueuedPackets()
 {
     //send out all the packets that were queued during this time, and remove them as we send them
+    ConsoleWrite("Sending queued packets: total %d", queued_packets.size());
     std::vector<PacketStorageData*>::iterator pkt_it = queued_packets.begin();
     while (pkt_it != queued_packets.end())
     {
@@ -263,7 +264,10 @@ void SendQueuedPackets()
         if (SteamAPIStatusKnown_Users.count(elem->steamIDRemote.ConvertToUint64()) != 0)
         {
             bool sent = SendP2PPacket_Replacement_injection_helper(elem->steamIDRemote, elem->pubData, elem->cubData, elem->eP2PSendType, elem->nChannel);
-            ConsoleWrite("Sending queued packets: total %d was_sent=%d", queued_packets.size(), sent);
+            if (!sent)
+            {
+                ConsoleWrite("WARNING: failed sending queued packet type %d", ((uint8_t*)elem->pubData)[1]);
+            }
             pkt_it = queued_packets.erase(pkt_it);
             delete elem;
         }
@@ -398,7 +402,7 @@ bool SendP2PPacket_Replacement_injection_helper(CSteamID steamIDRemote, void *pu
             if (member == steamIDRemote)
             {
                 queued_packets.push_back(new PacketStorageData(steamIDRemote, pubData, cubData, eP2PSendType, nChannel));
-                ConsoleWrite("Saving queued packets for %llx: total %d", steamIDRemote.ConvertToUint64(), queued_packets.size());
+                ConsoleWrite("Saving queued packet type %d for %llx: total %d", ((uint8_t*)pubData)[1], steamIDRemote.ConvertToUint64(), queued_packets.size());
                 return true;
             }
         }
