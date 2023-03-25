@@ -389,7 +389,7 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
     copy_DamageMan(state->damageman, *(DamageMan**)Game::damage_man, false);
 
     *buffer = (unsigned char*)state;
-    *len = sizeof(RollbackState*);
+    *len = sizeof(RollbackState);
     *checksum = 0;
 
     return true;
