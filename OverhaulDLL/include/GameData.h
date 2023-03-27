@@ -187,9 +187,7 @@ public:
 
     static const uint64_t LogoSkip_offset = 0x70f130;
 
-    static const uint64_t Step_PadMan_ReadInputs_offset = 0x1ad0f0;
-
-    static const uint64_t Step_QInputMgrWindowsFantasy_ReadInputs_offset = 0x1af09b;
+    static const uint64_t Step_PadManipulator_GetInputs_offset = 0x396860;
 
     // Player character status (loading, human, co-op, invader, hollow)
     static sp::mem::pointer<int32_t> player_char_status;

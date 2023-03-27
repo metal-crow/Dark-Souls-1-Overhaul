@@ -3,13 +3,13 @@
 
 typedef void* falloc(uint64_t, uint64_t, uint32_t);
 
-void copy_PlayerIns(PlayerIns* to, PlayerIns* from, bool to_game, bool is_networked)
+void copy_PlayerIns(PlayerIns* to, PlayerIns* from, bool to_game)
 {
     Game::SuspendThreads();
 
     bool visualChanges = false;
 
-    copy_ChrIns(&to->chrins, &from->chrins, to_game, is_networked);
+    copy_ChrIns(&to->chrins, &from->chrins, to_game);
     copy_PlayerGameData(to->playergamedata, from->playergamedata);
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
@@ -51,11 +51,11 @@ void copy_PlayerIns(PlayerIns* to, PlayerIns* from, bool to_game, bool is_networ
     Game::ResumeThreads();
 }
 
-PlayerIns* init_PlayerIns(bool is_networked)
+PlayerIns* init_PlayerIns()
 {
     PlayerIns* local_PlayerIns = (PlayerIns*)malloc_(sizeof(PlayerIns));
 
-    ChrIns* pChrIns = init_ChrIns(is_networked);
+    ChrIns* pChrIns = init_ChrIns();
     local_PlayerIns->chrins = *pChrIns;
     free(pChrIns);
     local_PlayerIns->playergamedata = init_PlayerGameData();
@@ -69,9 +69,9 @@ PlayerIns* init_PlayerIns(bool is_networked)
     return local_PlayerIns;
 }
 
-void free_PlayerIns(PlayerIns* to, bool is_networked)
+void free_PlayerIns(PlayerIns* to)
 {
-    free_ChrIns(&to->chrins, false, is_networked);
+    free_ChrIns(&to->chrins, false);
     free_PlayerGameData(to->playergamedata);
     free_RingEquipCtrl(to->ringequipctrl);
     free_WeaponEquipCtrl(to->weaponequipctrl);
@@ -361,18 +361,10 @@ void copy_PlayerGameData_AttributeInfo(PlayerGameData_AttributeInfo* to, PlayerG
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 }
 
-void copy_ChrIns(ChrIns* to, ChrIns* from, bool to_game, bool is_networked)
+void copy_ChrIns(ChrIns* to, ChrIns* from, bool to_game)
 {
     //copy_ChrIns_field0x18(to->field0x18, from->field0x18);
     copy_PlayerCtrl(to->playerCtrl, from->playerCtrl, to_game);
-    if (!is_networked)
-    {
-        copy_PadManipulator(to->padManipulator, from->padManipulator);
-    }
-    else
-    {
-        copy_NetworkManipulator(to->netManipulator, from->netManipulator);
-    }
     to->CharaInitParamID = from->CharaInitParamID;
     memcpy(to->data_5, from->data_5, sizeof(to->data_5));
     to->lowerThrowAnim = from->lowerThrowAnim;
@@ -412,20 +404,12 @@ void copy_ChrIns(ChrIns* to, ChrIns* from, bool to_game, bool is_networked)
     memcpy(to->data_4, from->data_4, sizeof(to->data_4));
 }
 
-ChrIns* init_ChrIns(bool is_networked)
+ChrIns* init_ChrIns()
 {
     ChrIns* local_ChrIns = (ChrIns*)malloc_(sizeof(ChrIns));
 
     //local_ChrIns->field0x18 = init_ChrIns_field0x18();
     local_ChrIns->playerCtrl = init_PlayerCtrl();
-    if (!is_networked)
-    {
-        local_ChrIns->padManipulator = init_PadManipulator();
-    }
-    else
-    {
-        local_ChrIns->netManipulator = init_NetworkManipulator();
-    }
     local_ChrIns->specialEffects = init_SpecialEffect();
     local_ChrIns->qwcSpEffectEquipCtrl = init_QwcSpEffectEquipCtrl();
     local_ChrIns->field0x2c8 = init_ChrIns_field0x2c8();
@@ -436,18 +420,10 @@ ChrIns* init_ChrIns(bool is_networked)
     return local_ChrIns;
 }
 
-void free_ChrIns(ChrIns* to, bool freeself, bool is_networked)
+void free_ChrIns(ChrIns* to, bool freeself)
 {
     //free_ChrIns_field0x18(to->field0x18);
     free_PlayerCtrl(to->playerCtrl);
-    if (!is_networked)
-    {
-        free_PadManipulator(to->padManipulator);
-    }
-    else
-    {
-        free_NetworkManipulator(to->netManipulator);
-    }
     free_SpecialEffect(to->specialEffects);
     free_QwcSpEffectEquipCtrl(to->qwcSpEffectEquipCtrl);
     free_ChrIns_field0x2c8(to->field0x2c8);
@@ -648,46 +624,6 @@ SpecialEffect_Info* init_SpecialEffect_Info()
 void free_SpecialEffect_Info(SpecialEffect_Info* to)
 {
     free(to);
-}
-
-void copy_PadManipulator(PadManipulator* to, PadManipulator* from)
-{
-    copy_ChrManipulator(&to->chrManipulator, &from->chrManipulator);
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
-}
-
-PadManipulator* init_PadManipulator()
-{
-    PadManipulator* local_PadManipulator = (PadManipulator*)malloc_(sizeof(PadManipulator));
-    return local_PadManipulator;
-}
-
-void free_PadManipulator(PadManipulator* to)
-{
-    free(to);
-}
-
-void copy_NetworkManipulator(NetworkManipulator* to, NetworkManipulator* from)
-{
-    copy_ChrManipulator(&to->chrManipulator, &from->chrManipulator);
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-}
-
-NetworkManipulator* init_NetworkManipulator()
-{
-    NetworkManipulator* local_NetworkManipulator = (NetworkManipulator*)malloc_(sizeof(NetworkManipulator));
-    return local_NetworkManipulator;
-}
-
-void free_NetworkManipulator(NetworkManipulator* to)
-{
-    free(to);
-}
-
-void copy_ChrManipulator(ChrManipulator* to, ChrManipulator* from)
-{
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 }
 
 void copy_PlayerCtrl(PlayerCtrl* to, PlayerCtrl* from, bool to_game)

@@ -7,6 +7,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include "PadManipulatorStruct.h"
 
 typedef struct AnimationQueue_Entry_sub1_field0x10 AnimationQueue_Entry_sub1_field0x10;
 typedef struct AnimationQueue_Entry_sub1 AnimationQueue_Entry_sub1;
@@ -43,9 +44,6 @@ typedef struct TurnAnim TurnAnim;
 typedef struct SpinJoint SpinJoint;
 typedef struct ArrowTurnAnim ArrowTurnAnim;
 typedef struct PlayerCtrl PlayerCtrl;
-typedef struct ChrManipulator ChrManipulator;
-typedef struct NetworkManipulator NetworkManipulator;
-typedef struct PadManipulator PadManipulator;
 typedef struct ChrIns_AnimationMediatorStateInfo ChrIns_AnimationMediatorStateInfo;
 typedef struct ItemUsed ItemUsed;
 typedef struct SpecialEffect_Info SpecialEffect_Info;
@@ -654,38 +652,6 @@ static_assert(offsetof(PlayerCtrl, padding_1) == 0x338);
 static_assert(offsetof(PlayerCtrl, data_2) == 0x358);
 static_assert(sizeof(PlayerCtrl) == 0x370);
 
-struct ChrManipulator
-{
-    uint8_t padding_0[0x8];
-    uint8_t data_0[0x228];
-};
-
-static_assert(sizeof(ChrManipulator) == 0x230);
-
-struct NetworkManipulator
-{
-    ChrManipulator chrManipulator;
-    uint8_t padding_0[0x50];
-    uint8_t data_0[0x80];
-};
-
-static_assert(offsetof(NetworkManipulator, chrManipulator) == 0x0);
-static_assert(offsetof(NetworkManipulator, data_0) == 0x280);
-static_assert(sizeof(NetworkManipulator) == 0x300);
-
-struct PadManipulator
-{
-    ChrManipulator chrManipulator;
-    uint8_t padding_0[0xc];
-    uint8_t data_0[4];
-    uint8_t padding_1[0x20];
-    uint8_t data_1[0x100];
-};
-
-static_assert(offsetof(PadManipulator, chrManipulator) == 0x0);
-static_assert(offsetof(PadManipulator, data_0) == 0x23c);
-static_assert(offsetof(PadManipulator, data_1) == 0x260);
-static_assert(sizeof(PadManipulator) == 0x360);
 
 struct ChrIns_AnimationMediatorStateInfo
 {
@@ -808,7 +774,7 @@ struct ChrIns
     union
     {
         PadManipulator* padManipulator;
-        NetworkManipulator* netManipulator;
+        void* netManipulator;
     };
     uint8_t padding_1[0x54];
     int32_t CharaInitParamID;

@@ -464,10 +464,10 @@ void Rollback::LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* playerins, int
     *(uint32_t*)((uint64_t)(&playerins->playergamedata->attribs) + 0xC) = pkt->maxHp;
     *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4) = pkt->rotation;
     *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0) = pkt->atkAngle;
-    *(float*)(((uint64_t)(&playerins->chrins.netManipulator->chrManipulator)) + 0x10 + 0) = pkt->movement_direction_vals[0];
-    *(float*)(((uint64_t)(&playerins->chrins.netManipulator->chrManipulator)) + 0x10 + 4) = 0.0f;
-    *(float*)(((uint64_t)(&playerins->chrins.netManipulator->chrManipulator)) + 0x10 + 8) = pkt->movement_direction_vals[1];
-    *(float*)(((uint64_t)(&playerins->chrins.netManipulator->chrManipulator)) + 0x10 + 0xc) = 0.0f;
+    *(float*)(((uint64_t)(&playerins->chrins.netManipulator)) + 0x10 + 0) = pkt->movement_direction_vals[0];
+    *(float*)(((uint64_t)(&playerins->chrins.netManipulator)) + 0x10 + 4) = 0.0f;
+    *(float*)(((uint64_t)(&playerins->chrins.netManipulator)) + 0x10 + 8) = pkt->movement_direction_vals[1];
+    *(float*)(((uint64_t)(&playerins->chrins.netManipulator)) + 0x10 + 0xc) = 0.0f;
 
     //Type 10
     uint32_t chrType = *(uint32_t*)(((uint64_t)&playerins->playergamedata->attribs) + 0x94);

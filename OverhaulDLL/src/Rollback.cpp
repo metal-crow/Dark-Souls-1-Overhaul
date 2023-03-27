@@ -6,12 +6,10 @@
 #include "InputUtil.h"
 
 PlayerIns* Rollback::saved_playerins = NULL;
-PadMan** Rollback::saved_padman = NULL;
-QInputMgrWindows** Rollback::saved_qinputman = NULL;
-InputDirectionMovementMan** Rollback::saved_InputDirectionMovementMan = NULL;
 BulletMan* Rollback::saved_bulletman = NULL;
 FXManager* Rollback::saved_sfxobjs = NULL;
 DamageMan* Rollback::saved_damageman = NULL;
+PadManipulator** Rollback::saved_PadManipulator = NULL;
 
 GGPOSession* Rollback::ggpo = NULL;
 GGPOPlayerHandle Rollback::ggpoHandles[GGPO_MAX_PLAYERS] = {};
@@ -38,7 +36,7 @@ bool state_test(void* unused)
     {
         auto player_o = Game::get_PlayerIns();
         PlayerIns* player = (PlayerIns*)player_o.value();
-        copy_PlayerIns(Rollback::saved_playerins, player, false, false);
+        copy_PlayerIns(Rollback::saved_playerins, player, false);
         copy_BulletMan(Rollback::saved_bulletman, *(BulletMan**)Game::bullet_man, false);
         //copy_FXManager(Rollback::saved_sfxobjs, (*(SfxMan**)Game::sfx_man)->FrpgFxManagerBase->base.fXManager, false);
         copy_DamageMan(Rollback::saved_damageman, *(DamageMan**)Game::damage_man, false);
@@ -50,7 +48,7 @@ bool state_test(void* unused)
     {
         auto player_o = Game::get_PlayerIns();
         PlayerIns* player = (PlayerIns*)player_o.value();
-        copy_PlayerIns(player, Rollback::saved_playerins, true, false);
+        copy_PlayerIns(player, Rollback::saved_playerins, true);
         copy_BulletMan(*(BulletMan**)Game::bullet_man, Rollback::saved_bulletman, true);
         //copy_FXManager((*(SfxMan**)Game::sfx_man)->FrpgFxManagerBase->base.fXManager, Rollback::saved_sfxobjs, true);
         copy_DamageMan(*(DamageMan**)Game::damage_man, Rollback::saved_damageman, true);
@@ -71,9 +69,9 @@ bool input_test(void* unused)
 {
     if (Rollback::isave)
     {
-        copy_PadMan(Rollback::saved_padman[inputSaveFrameI], *(PadMan**)Game::pad_man);
-        copy_QInputMgrWindows(Rollback::saved_qinputman[inputSaveFrameI], *(QInputMgrWindows**)Game::QInputMgrWindowsFantasy);
-        copy_InputDirectionMovementMan(Rollback::saved_InputDirectionMovementMan[inputSaveFrameI], *(InputDirectionMovementMan**)Game::InputDirectionMovementMan);
+        auto player_o = Game::get_PlayerIns();
+        PlayerIns* player = (PlayerIns*)player_o.value();
+        copy_PadManipulator(Rollback::saved_PadManipulator[inputSaveFrameI], player->chrins.padManipulator);
 
         inputSaveFrameI++;
         if (inputSaveFrameI >= INPUT_ROLLBACK_LENGTH)
@@ -88,9 +86,9 @@ bool input_test(void* unused)
     {
         Game::set_ReadInputs_allowed(false);
 
-        copy_PadMan(*(PadMan**)Game::pad_man, Rollback::saved_padman[inputSaveFrameI]);
-        copy_QInputMgrWindows(*(QInputMgrWindows**)Game::QInputMgrWindowsFantasy, Rollback::saved_qinputman[inputSaveFrameI]);
-        copy_InputDirectionMovementMan(*(InputDirectionMovementMan**)Game::InputDirectionMovementMan, Rollback::saved_InputDirectionMovementMan[inputSaveFrameI]);
+        auto player_o = Game::get_PlayerIns();
+        PlayerIns* player = (PlayerIns*)player_o.value();
+        copy_PadManipulator(player->chrins.padManipulator, Rollback::saved_PadManipulator[inputSaveFrameI]);
 
         inputSaveFrameI++;
         if (inputSaveFrameI >= INPUT_ROLLBACK_LENGTH)
@@ -266,19 +264,23 @@ void Rollback::start()
 
     SetEnvironmentVariable("ggpo.log", "1");
 
-    Rollback::NetcodeFix();
+    uint8_t* write_address = (uint8_t*)(Game::ds1_base + 0x27ba147);
+    uint8_t patch1[] = { 0xC7, 0x44, 0x24, 0x28, 0x01, 0x00, 0x00, 0x00 };
+    sp::mem::patch_bytes(write_address, patch1, sizeof(patch1));
+
+    //Rollback::NetcodeFix();
 
     //Synchronize input at the start of each frame
     //do this anytime after the game reads the inputs, but before MoveMapStep_Step_13
-    uint8_t* write_address = (uint8_t*)(Rollback::rollback_game_frame_sync_inputs_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &rollback_game_frame_sync_inputs_return, 4, &rollback_game_frame_sync_inputs_injection);
+    //write_address = (uint8_t*)(Rollback::rollback_game_frame_sync_inputs_offset + Game::ds1_base);
+    //sp::mem::code::x64::inject_jmp_14b(write_address, &rollback_game_frame_sync_inputs_return, 4, &rollback_game_frame_sync_inputs_injection);
 
     //Inform ggpo after a frame has been rendered
-    write_address = (uint8_t*)(Rollback::MainUpdate_end_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &dsr_frame_finished_return, 0, &dsr_frame_finished_injection);
+    //write_address = (uint8_t*)(Rollback::MainUpdate_end_offset + Game::ds1_base);
+    //sp::mem::code::x64::inject_jmp_14b(write_address, &dsr_frame_finished_return, 0, &dsr_frame_finished_injection);
 
     //Testing rollback related stuff
-    Rollback::saved_playerins = init_PlayerIns(false);
+    Rollback::saved_playerins = init_PlayerIns();
     Rollback::saved_padman = (PadMan**)malloc_(sizeof(PadMan*) * INPUT_ROLLBACK_LENGTH);
     for (size_t i = 0; i < INPUT_ROLLBACK_LENGTH; i++)
     {
@@ -293,6 +295,11 @@ void Rollback::start()
     for (size_t i = 0; i < INPUT_ROLLBACK_LENGTH; i++)
     {
         Rollback::saved_InputDirectionMovementMan[i] = init_InputDirectionMovementMan();
+    }
+    Rollback::saved_PadManipulator = (PadManipulator**)malloc_(sizeof(PadManipulator*) * INPUT_ROLLBACK_LENGTH);
+    for (size_t i = 0; i < INPUT_ROLLBACK_LENGTH; i++)
+    {
+        Rollback::saved_PadManipulator[i] = init_PadManipulator();
     }
     Rollback::saved_bulletman = init_BulletMan();
     Rollback::saved_sfxobjs = init_FXManager();
@@ -341,7 +348,7 @@ bool rollback_load_game_state_callback(unsigned char* buffer, int)
         }
         PlayerIns* player = (PlayerIns*)player_o.value();
 
-        copy_PlayerIns(player, state->playerins[i], true, (i > 0));
+        copy_PlayerIns(player, state->playerins[i], true);
     }
 
     copy_BulletMan(*(BulletMan**)Game::bullet_man, state->bulletman, true);
@@ -378,8 +385,8 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
         }
         PlayerIns* player = (PlayerIns*)player_o.value();
 
-        state->playerins[i] = init_PlayerIns(i>0);
-        copy_PlayerIns(state->playerins[i], player, false, (i>0));
+        state->playerins[i] = init_PlayerIns();
+        copy_PlayerIns(state->playerins[i], player, false);
     }
 
     state->bulletman = init_BulletMan();
@@ -401,7 +408,7 @@ void rollback_free_buffer(void* buffer)
 
     for (size_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
     {
-        free_PlayerIns(state->playerins[i], (i>0));
+        free_PlayerIns(state->playerins[i]);
         state->playerins[i] = NULL;
     }
     //TODO free_FXManager
@@ -497,7 +504,7 @@ bool rollback_on_compare_inputs(void* input1, int len1, void* input2, int len2)
         }
     }
 
-    return true;
+    return false;
 }
 
 static size_t timer = 0;

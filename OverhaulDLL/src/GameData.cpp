@@ -101,10 +101,8 @@ extern "C" {
     void grab_destruct_thread_handle_helper(HANDLE);
 
     bool ReadInputs_allowed = true;
-    uint64_t Step_PadMan_ReadInputs_return;
-    void Step_PadMan_ReadInputs_injection();
-    uint64_t Step_QInputMgrWindowsFantasy_ReadInputs_return;
-    void Step_QInputMgrWindowsFantasy_ReadInputs_injection();
+    uint64_t Step_PadManipulator_GetInputs_return;
+    void Step_PadManipulator_GetInputs_injection();
 }
 
 // Flag to determine if a character have been loaded since the game was launched (useful if player had a character loaded but returned to main menu)
@@ -229,11 +227,9 @@ void Game::injections_init()
     write_address = (uint8_t*)(Game::LogoSkip_offset + Game::ds1_base);
     sp::mem::patch_bytes(write_address, pat, 6);
 
-    //inject code to control if Step_PadMan can read inputs or not
-    write_address = (uint8_t*)(Game::Step_PadMan_ReadInputs_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &Step_PadMan_ReadInputs_return, 2, &Step_PadMan_ReadInputs_injection);
-    write_address = (uint8_t*)(Game::Step_QInputMgrWindowsFantasy_ReadInputs_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &Step_QInputMgrWindowsFantasy_ReadInputs_return, 0, &Step_QInputMgrWindowsFantasy_ReadInputs_injection);
+    //inject code to control if Step_PadManipulator can read inputs or not
+    write_address = (uint8_t*)(Game::Step_PadManipulator_GetInputs_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &Step_PadManipulator_GetInputs_return, 0, &Step_PadManipulator_GetInputs_injection);
 }
 
 static bool character_reload_run = false;

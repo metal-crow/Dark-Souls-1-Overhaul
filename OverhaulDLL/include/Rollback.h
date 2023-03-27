@@ -8,12 +8,10 @@
 #include "DarkSoulsOverhaulMod.h"
 
 #include "PlayerInsStructFunctions.h"
-#include "PadManStructFunctions.h"
 #include "BulletManStructFunctions.h"
 #include "SfxManStructFunctions.h"
 #include "DamageManStructFunctions.h"
-#include "QInputMgrWindowsStructFunctions.h"
-#include "InputDirectionMovementManStructFunctions.h"
+#include "PadManipulatorStructFunctions.h"
 
 #include "NetcodePackets.h"
 
@@ -59,12 +57,10 @@ public:
     static bool netcodeTestingEnabled;
     static const uint32_t RollbackSinglePacketType = 2; //this is unused, and passes the checks the game does on the type
     static PlayerIns* saved_playerins;
-    static PadMan** saved_padman;
-    static QInputMgrWindows** saved_qinputman;
-    static InputDirectionMovementMan** saved_InputDirectionMovementMan;
     static BulletMan* saved_bulletman;
     static FXManager* saved_sfxobjs;
     static DamageMan* saved_damageman;
+    static PadManipulator** saved_PadManipulator;
 
 private:
     static const uint64_t sendNetMessage_offset = 0x50b6b0;
@@ -85,9 +81,6 @@ typedef struct RollbackState RollbackState;
 
 struct RollbackLocalInput
 {
-    PadMan* padman;
-    QInputMgrWindows* qInputMgrWindows;
-    InputDirectionMovementMan* inputDirectionMovementMan;
 };
 
 //this full packet is used both locally, and sent to the remote player

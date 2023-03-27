@@ -44,8 +44,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="src\InputDirectionMovementManStructFunctions.cpp" />
-    <ClCompile Include="src\PadManStructFunctions.cpp" />
+    <ClCompile Include="src\PadManipulatorStructFunctions.cpp" />
     <ClCompile Include="src\InvisibleBackstabAttackFix.cpp" />
     <ClCompile Include="src\MainLoop.cpp" />
     <ClCompile Include="src\Menu\SavedCharacters.cpp" />
@@ -56,7 +55,6 @@
     <ClCompile Include="src\InputUtil.cpp" />
     <ClCompile Include="src\PlayerInsStructFunctions.cpp" />
     <ClCompile Include="src\PlayerVisualsValidationFix.cpp" />
-    <ClCompile Include="src\QInputMgrWindowsStructFunctions.cpp" />
     <ClCompile Include="src\Rollback.cpp" />
     <ClCompile Include="src\SfxManStructFunctions.cpp" />
     <ClCompile Include="src\SpellDesyncFixes.cpp" />
@@ -78,18 +76,14 @@
     <ClInclude Include="include\FileReloading.h" />
     <ClInclude Include="include\EquipmentUnlock.h" />
     <ClInclude Include="include\FixAnkles.h" />
-    <ClInclude Include="include\InputDirectionMovementManStruct.h" />
-    <ClInclude Include="include\InputDirectionMovementManStructFunctions.h" />
     <ClInclude Include="include\InvisibleBackstabAttackFix.h" />
     <ClInclude Include="include\MainLoop.h" />
     <ClInclude Include="include\ModNetworking.h" />
     <ClInclude Include="include\NetcodePackets.h" />
-    <ClInclude Include="include\PadManStruct.h" />
-    <ClInclude Include="include\PadManStructFunctions.h" />
+    <ClInclude Include="include\PadManipulatorStruct.h" />
+    <ClInclude Include="include\PadManipulatorStructFunctions.h" />
     <ClInclude Include="include\PlayerInsStructFunctions.h" />
     <ClInclude Include="include\PlayerVisualsValidationFix.h" />
-    <ClInclude Include="include\QInputMgrWindowsStruct.h" />
-    <ClInclude Include="include\QInputMgrWindowsStructFunctions.h" />
     <ClInclude Include="include\Rollback.h" />
     <ClInclude Include="include\PlayerInsStruct.h" />
     <ClInclude Include="include\SfxManStruct.h" />
