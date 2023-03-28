@@ -24,8 +24,6 @@ GGPOSessionCallbacks Rollback::ggpoCallbacks = {
     .free_buffer = rollback_free_buffer,
     .advance_frame = rollback_advance_frame_callback,
     .on_event = rollback_on_event_callback,
-    .free_input = rollback_on_free_input,
-    .compare_inputs = rollback_on_compare_inputs,
 };
 
 bool Rollback::gsave = false;
@@ -103,19 +101,6 @@ bool input_test(void* unused)
     return true;
 }
 
-bool Rollback::netcodeSwap = false;
-bool Rollback::netcodeTestingEnabled = false;
-bool netcode_test(void* unused)
-{
-    if (Rollback::netcodeSwap)
-    {
-        Rollback::netcodeTestingEnabled = !Rollback::netcodeTestingEnabled;
-        ConsoleWrite("netcodeTestingEnabled netcode %d", Rollback::netcodeTestingEnabled);
-        Rollback::netcodeSwap = false;
-    }
-    return true;
-}
-
 bool Rollback::rollbackToggle = false;
 bool Rollback::rollbackEnabled = false;
 bool ggpo_toggle(void* unused)
@@ -142,7 +127,6 @@ void rollback_sync_inputs()
     }
 
     //load the input states into the game to be used this frame
-    //Make sure to use the values returned rather than the values you've read from the local controllers
     for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
     {
         auto player_o = Game::get_connected_player(i);
@@ -151,31 +135,7 @@ void rollback_sync_inputs()
             FATALERROR("Unable to get playerins in rollback_load_game_state_callback");
         }
         PlayerIns* player = (PlayerIns*)player_o.value();
-
-        //first player is always the local player, since we add them first in setup
-        if (i == 0)
-        {
-            if (inputs[i].local.padman == NULL ||
-                inputs[i].local.qInputMgrWindows == NULL ||
-                inputs[i].local.inputDirectionMovementMan == NULL)
-            {
-                FATALERROR("PC local input returned null for ggpo_synchronize_input");
-            }
-            copy_PadMan(*(PadMan**)Game::pad_man, inputs[i].local.padman);
-            copy_QInputMgrWindows(*(QInputMgrWindows**)Game::QInputMgrWindowsFantasy, inputs[i].local.qInputMgrWindows);
-            copy_InputDirectionMovementMan(*(InputDirectionMovementMan**)Game::InputDirectionMovementMan, inputs[i].local.inputDirectionMovementMan);
-        }
-        else
-        {
-            if (inputs[i].remote.maxHp == 0)
-            {
-                ConsoleWrite("WARNING: Player remote input returned empty for ggpo_synchronize_input. Leave unchanged for this frame");
-            }
-            else
-            {
-                Rollback::LoadRemotePlayerPacket(&inputs[i].remote, player, Game::get_SessionPlayerNumber_For_ConnectedPlayerData((uint64_t)(&player->steamPlayerData)));
-            }
-        }
+        PadManipulatorPacked_to_PadManipulator(player->chrins.padManipulator, &inputs[i].padmanipulator);
     }
 }
 
@@ -198,8 +158,6 @@ void rollback_game_frame_sync_inputs_helper()
 
         if (Rollback::ggpoReady == GGPOREADY::Ready)
         {
-            RollbackInput localInput{};
-
             auto player_o = Game::get_PlayerIns();
             if (!player_o.has_value() || player_o.value() == NULL)
             {
@@ -207,20 +165,18 @@ void rollback_game_frame_sync_inputs_helper()
             }
             PlayerIns* player = (PlayerIns*)player_o.value();
 
-            //read local controller inputs
-            localInput.local.padman = init_PadMan();
-            copy_PadMan(localInput.local.padman, *(PadMan**)Game::pad_man);
-            localInput.local.qInputMgrWindows = init_QInputMgrWindows();
-            copy_QInputMgrWindows(localInput.local.qInputMgrWindows, *(QInputMgrWindows**)Game::QInputMgrWindowsFantasy);
-            localInput.local.inputDirectionMovementMan = init_InputDirectionMovementMan();
-            copy_InputDirectionMovementMan(localInput.local.inputDirectionMovementMan, *(InputDirectionMovementMan**)Game::InputDirectionMovementMan);
+            //Manually call the PadManipulator function to read the inputs
+            //ONLY allow it to be called here, so we don't have it called normally by the game and overwrite our custom inputs
+            Game::set_ReadInputs_allowed(true);
+            Step_PadManipulator(player->chrins.padManipulator, FRAMETIME, player->chrins.playerCtrl);
+            Game::set_ReadInputs_allowed(false);
 
-            //setup the remote section for the local player
-            Rollback::BuildRemotePlayerPacket(player, &localInput.remote);
+            //read local inputs
+            RollbackInput localInput{};
+            PadManipulator_to_PadManipulatorPacked(&localInput.padmanipulator, player->chrins.padManipulator);
 
-            /* notify ggpo of the local player's inputs */
+            //notify ggpo of the local player's inputs
             GGPOErrorCode result = ggpo_add_local_input(Rollback::ggpo, Rollback::ggpoHandles[0], &localInput, sizeof(RollbackInput));
-
             if (!GGPO_SUCCEEDED(result))
             {
                 FATALERROR("Unable to ggpo_add_local_input. %d", result);
@@ -261,53 +217,34 @@ void dsr_frame_finished_helper()
 void Rollback::start()
 {
     ConsoleWrite("Rollback...");
+    uint8_t* write_address;
 
     SetEnvironmentVariable("ggpo.log", "1");
 
-    uint8_t* write_address = (uint8_t*)(Game::ds1_base + 0x27ba147);
-    uint8_t patch1[] = { 0xC7, 0x44, 0x24, 0x28, 0x01, 0x00, 0x00, 0x00 };
-    sp::mem::patch_bytes(write_address, patch1, sizeof(patch1));
-
-    //Rollback::NetcodeFix();
+    Rollback::NetcodeFix();
 
     //Synchronize input at the start of each frame
     //do this anytime after the game reads the inputs, but before MoveMapStep_Step_13
-    //write_address = (uint8_t*)(Rollback::rollback_game_frame_sync_inputs_offset + Game::ds1_base);
-    //sp::mem::code::x64::inject_jmp_14b(write_address, &rollback_game_frame_sync_inputs_return, 4, &rollback_game_frame_sync_inputs_injection);
+    write_address = (uint8_t*)(Rollback::rollback_game_frame_sync_inputs_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &rollback_game_frame_sync_inputs_return, 4, &rollback_game_frame_sync_inputs_injection);
 
     //Inform ggpo after a frame has been rendered
-    //write_address = (uint8_t*)(Rollback::MainUpdate_end_offset + Game::ds1_base);
-    //sp::mem::code::x64::inject_jmp_14b(write_address, &dsr_frame_finished_return, 0, &dsr_frame_finished_injection);
+    write_address = (uint8_t*)(Rollback::MainUpdate_end_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &dsr_frame_finished_return, 0, &dsr_frame_finished_injection);
 
     //Testing rollback related stuff
     Rollback::saved_playerins = init_PlayerIns();
-    Rollback::saved_padman = (PadMan**)malloc_(sizeof(PadMan*) * INPUT_ROLLBACK_LENGTH);
-    for (size_t i = 0; i < INPUT_ROLLBACK_LENGTH; i++)
-    {
-        Rollback::saved_padman[i] = init_PadMan();
-    }
-    Rollback::saved_qinputman = (QInputMgrWindows**)malloc_(sizeof(QInputMgrWindows*) * INPUT_ROLLBACK_LENGTH);
-    for (size_t i = 0; i < INPUT_ROLLBACK_LENGTH; i++)
-    {
-        Rollback::saved_qinputman[i] = init_QInputMgrWindows();
-    }
-    Rollback::saved_InputDirectionMovementMan = (InputDirectionMovementMan**)malloc_(sizeof(InputDirectionMovementMan*) * INPUT_ROLLBACK_LENGTH);
-    for (size_t i = 0; i < INPUT_ROLLBACK_LENGTH; i++)
-    {
-        Rollback::saved_InputDirectionMovementMan[i] = init_InputDirectionMovementMan();
-    }
-    Rollback::saved_PadManipulator = (PadManipulator**)malloc_(sizeof(PadManipulator*) * INPUT_ROLLBACK_LENGTH);
-    for (size_t i = 0; i < INPUT_ROLLBACK_LENGTH; i++)
-    {
-        Rollback::saved_PadManipulator[i] = init_PadManipulator();
-    }
     Rollback::saved_bulletman = init_BulletMan();
     Rollback::saved_sfxobjs = init_FXManager();
     Rollback::saved_damageman = init_DamageMan();
+    Rollback::saved_PadManipulator = (PadManipulator**)malloc_(sizeof(PadManipulator*) * INPUT_ROLLBACK_LENGTH);
+    for (size_t i = 0; i < INPUT_ROLLBACK_LENGTH; i++)
+    {
+        Rollback::saved_PadManipulator[i] = (PadManipulator*)malloc(sizeof(PadManipulator));
+    }
     //Testing save/restore with a hotkey
     MainLoop::setup_mainloop_callback(state_test, NULL, "state_test");
     MainLoop::setup_mainloop_callback(input_test, NULL, "input_test");
-    MainLoop::setup_mainloop_callback(netcode_test, NULL, "netcode_test");
     MainLoop::setup_mainloop_callback(ggpo_toggle, NULL, "ggpo_toggle");
 }
 
@@ -459,54 +396,6 @@ bool rollback_log_game_state(char* filename, unsigned char* buffer, int)
     return true;
 }
 
-void rollback_on_free_input(void* input, int len)
-{
-    RollbackInput* inputs = (RollbackInput*)input;
-
-    //we only need to free the pointers in the first input, since the others are garbage. Pointers from the other players
-    if (len >= sizeof(RollbackInput))
-    {
-        if (inputs[0].local.padman != NULL)
-        {
-            free_PadMan(inputs[0].local.padman);
-            inputs[0].local.padman = NULL;
-        }
-        if (inputs[0].local.qInputMgrWindows != NULL)
-        {
-            free_QInputMgrWindows(inputs[0].local.qInputMgrWindows);
-            inputs[0].local.qInputMgrWindows = NULL;
-        }
-        if (inputs[0].local.inputDirectionMovementMan != NULL)
-        {
-            free_InputDirectionMovementMan(inputs[0].local.inputDirectionMovementMan);
-            inputs[0].local.inputDirectionMovementMan = NULL;
-        }
-    }
-}
-
-bool rollback_on_compare_inputs(void* input1, int len1, void* input2, int len2)
-{
-    RollbackInput* inputs1 = (RollbackInput*)input1;
-    RollbackInput* inputs2 = (RollbackInput*)input2;
-
-    if (len1 != len2)
-    {
-        return false;
-    }
-
-    for (size_t i = 0; i < len1 / sizeof(RollbackInput); i++)
-    {
-        //ignore the local part, just compare the remote
-        bool isEqual = Rollback::RemotePlayerPackets_areEqual(&inputs1[i].remote, &inputs2[i].remote);
-        if (!isEqual)
-        {
-            return false;
-        }
-    }
-
-    return false;
-}
-
 static size_t timer = 0;
 
 bool rollback_await_player_added_before_init(void* steamMsgs)
@@ -593,7 +482,7 @@ void Rollback::rollback_start_session(ISteamNetworkingMessages* steamMsgs)
             }
         }
 
-        //ggpo_set_frame_delay(ggpo, Rollback::ggpoHandles[0], 1); //bug here where ggpo returns a padded frame 0 on frame 0, which doesn't exist
+        ggpo_set_frame_delay(ggpo, Rollback::ggpoHandles[0], 1);
 
         ConsoleWrite("GGPO started");
         Rollback::ggpoStarted = true;

@@ -12,6 +12,15 @@
 
 typedef struct PadManipulator PadManipulator;
 typedef struct ChrManipulator ChrManipulator;
+typedef struct PadManipulatorPacked PadManipulatorPacked;
+
+struct PadManipulatorPacked
+{
+    //this is the sum of the data components in PadManipulator
+    uint8_t data_0[0x228];
+    uint32_t data_0a;
+    uint8_t data_1[0x100];
+};
 
 struct ChrManipulator
 {
@@ -27,7 +36,7 @@ struct PadManipulator
     uint8_t padding_0[12];
     uint32_t data_0;
     uint64_t padding_1[4];
-    uint8_t data_1[0x100];
+    uint8_t data_1[0x100]; //fill this out once we have it understood in ghidra
 };
 
 static_assert(offsetof(PadManipulator, padding_0) == 0x230);

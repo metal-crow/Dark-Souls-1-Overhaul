@@ -79,7 +79,6 @@
     <ClInclude Include="include\InvisibleBackstabAttackFix.h" />
     <ClInclude Include="include\MainLoop.h" />
     <ClInclude Include="include\ModNetworking.h" />
-    <ClInclude Include="include\NetcodePackets.h" />
     <ClInclude Include="include\PadManipulatorStruct.h" />
     <ClInclude Include="include\PadManipulatorStructFunctions.h" />
     <ClInclude Include="include\PlayerInsStructFunctions.h" />

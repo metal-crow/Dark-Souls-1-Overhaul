@@ -546,4 +546,7 @@ static Step_PadMan_FUNC* Step_PadMan = (Step_PadMan_FUNC*)0x1401af3b0;
 typedef bool Create_BannerMessage_Func_Typedef(uint64_t menuman_banner, uint32_t banner_type, const wchar_t* str);
 static Create_BannerMessage_Func_Typedef* Create_BannerMessage_Func = (Create_BannerMessage_Func_Typedef*)0x14071fc60;
 
+typedef void Step_PadManipulator_FUNC(PadManipulator* PadManipulator, float frameTime, PlayerCtrl* PlayerCtrl);
+static Step_PadManipulator_FUNC* Step_PadManipulator = (Step_PadManipulator_FUNC*)0x140396860;
+
 #endif // _DS1_OVERHAUL_GAME_DATA_H_

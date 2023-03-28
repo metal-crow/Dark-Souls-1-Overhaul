@@ -13,8 +13,6 @@
 #include "DamageManStructFunctions.h"
 #include "PadManipulatorStructFunctions.h"
 
-#include "NetcodePackets.h"
-
 #include "ggponet.h"
 
 enum class GGPOREADY
@@ -30,10 +28,6 @@ public:
     static void start();
 
     static void NetcodeFix();
-
-    static void BuildRemotePlayerPacket(PlayerIns* playerins, MainPacket* out);
-    static void LoadRemotePlayerPacket(MainPacket* pkt, PlayerIns* player, int32_t session_player_num);
-    static bool RemotePlayerPackets_areEqual(MainPacket* pkt1, MainPacket* pkt2);
 
     static bool rollbackToggle;
     static bool rollbackEnabled;
@@ -53,9 +47,6 @@ public:
     static bool gload;
     static bool isave;
     static bool iload;
-    static bool netcodeSwap;
-    static bool netcodeTestingEnabled;
-    static const uint32_t RollbackSinglePacketType = 2; //this is unused, and passes the checks the game does on the type
     static PlayerIns* saved_playerins;
     static BulletMan* saved_bulletman;
     static FXManager* saved_sfxobjs;
@@ -65,8 +56,6 @@ public:
 private:
     static const uint64_t sendNetMessage_offset = 0x50b6b0;
     static const uint64_t getNetMessage_offset = 0x050b540;
-    static const uint64_t send_generalplayerinfo_offset = 0x3976e0;
-    static const uint64_t Read_GeneralPlayerData_offset = 0x3953f0;
     static const uint64_t disableType18PacketEnforcement_offset = 0x3226e0;
     static const uint64_t fixPhantomBulletGenIssue_offset = 0x4229bf;
     static const uint64_t isPacketTypeValid_offset = 0x50f2d0;
@@ -76,18 +65,11 @@ private:
 
 
 typedef struct RollbackInput RollbackInput;
-typedef struct RollbackLocalInput RollbackLocalInput;
 typedef struct RollbackState RollbackState;
 
-struct RollbackLocalInput
-{
-};
-
-//this full packet is used both locally, and sent to the remote player
 struct RollbackInput
 {
-    RollbackLocalInput local;
-    MainPacket remote;
+    PadManipulatorPacked padmanipulator;
 };
 
 struct RollbackState
@@ -116,8 +98,6 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
 void rollback_free_buffer(void* buffer);
 bool rollback_on_event_callback(GGPOEvent* info);
 bool rollback_log_game_state(char* filename, unsigned char* buffer, int);
-void rollback_on_free_input(void* input, int len);
-bool rollback_on_compare_inputs(void* input1, int len1, void* input2, int len2);
 
 bool rollback_await_player_added_before_init(void* steamMsgs);
 

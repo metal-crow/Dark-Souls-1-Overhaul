@@ -273,10 +273,6 @@ void handle_input(XINPUT_GAMEPAD* xold, XINPUT_GAMEPAD* xcurrent, DIJOYSTATE2* d
         {
             Rollback::iload = true;
         }
-        if (Button::pressed(kbold, kbcurrent, DIK_F7))
-        {
-            Rollback::netcodeSwap = true;
-        }
         if (Button::pressed(kbold, kbcurrent, DIK_F6))
         {
             Rollback::rollbackToggle = true;
