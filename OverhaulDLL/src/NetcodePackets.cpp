@@ -40,20 +40,20 @@ void Rollback::NetcodeFix()
     // but explicitly doesn't if the other player is a PC
     // disable that throw away check and just return 0 instead
     // Do this by modifying the PlayerIns_Is_PC function to always return false for phantoms. This fixes the check everywhere it's done
-    write_address = (uint8_t*)(Rollback::disableType18PacketEnforcement_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &disableType18PacketEnforcement_return, 4, &disableType18PacketEnforcement_injection);
+    //write_address = (uint8_t*)(Rollback::disableType18PacketEnforcement_offset + Game::ds1_base);
+    //sp::mem::code::x64::inject_jmp_14b(write_address, &disableType18PacketEnforcement_return, 4, &disableType18PacketEnforcement_injection);
 
     // With the above type 18 packet fix, we have a bug where followup bullets from flamesurge don't get emitted
     // It checks the PlayerIns_Is_PC func and fails if it returns false
     // Patch this to be an exception and return true instead of false
-    write_address = (uint8_t*)(Rollback::fixPhantomBulletGenIssue_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &fixPhantomBulletGenIssue_return, 0, &fixPhantomBulletGenIssue_injection);
+    //write_address = (uint8_t*)(Rollback::fixPhantomBulletGenIssue_offset + Game::ds1_base);
+    //sp::mem::code::x64::inject_jmp_14b(write_address, &fixPhantomBulletGenIssue_return, 0, &fixPhantomBulletGenIssue_injection);
 
     //allow our packet to be received even if the other playerins isn't available
     //just have the function always return true
-    write_address = (uint8_t*)(Rollback::isPacketTypeValid_offset + Game::ds1_base);
-    uint8_t mov_r8b_1[] = { 0x41, 0xb0, 0x01 };
-    sp::mem::patch_bytes(write_address, mov_r8b_1, 3);
+    //write_address = (uint8_t*)(Rollback::isPacketTypeValid_offset + Game::ds1_base);
+    //uint8_t mov_r8b_1[] = { 0x41, 0xb0, 0x01 };
+    //sp::mem::patch_bytes(write_address, mov_r8b_1, 3);
 
     //cause the new playerins to be created with a PadManipulator, instead of a NetworkManipulator
     //TODO make not temporary
@@ -74,26 +74,26 @@ struct StartupLocationPkt
 //return false if we don't want to have sendNetMessage send a packet
 bool sendNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint32_t type, uint8_t* data)
 {
+    if (type == 10)
+    {
+        //TODO temp solution to set position on join
+        StartupLocationPkt pkt;
+        auto player_o = Game::get_PlayerIns();
+        if (player_o.has_value() && player_o.value() != NULL)
+        {
+            PlayerIns* playerins = (PlayerIns*)player_o.value();
+
+            pkt.position_x = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x10);
+            pkt.position_z = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x14);
+            pkt.position_y = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x18);
+            pkt.rotation = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4);
+
+            sendNetMessage(*(uint64_t*)Game::session_man_imp, ConnectedPlayerData, 2, &pkt, sizeof(pkt));
+        }
+    }
+
     if (Rollback::rollbackEnabled)
     {
-        if (type == 10)
-        {
-            //TODO temp solution to set position on join
-            StartupLocationPkt pkt;
-            auto player_o = Game::get_PlayerIns();
-            if (player_o.has_value() && player_o.value() != NULL)
-            {
-                PlayerIns* playerins = (PlayerIns*)player_o.value();
-
-                pkt.position_x = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x10);
-                pkt.position_z = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x14);
-                pkt.position_y = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x18);
-                pkt.rotation = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4);
-
-                sendNetMessage(*(uint64_t*)Game::session_man_imp, ConnectedPlayerData, 2, &pkt, sizeof(pkt));
-            }
-        }
-
         switch (type)
         {
         case 1:
@@ -120,25 +120,25 @@ bool sendNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint
 //return false if we don't want to have getNetMessage get a packet
 bool getNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint32_t type)
 {
-    if (Rollback::rollbackEnabled)
+    if (type == 10)
     {
-        if (type == 10)
+        StartupLocationPkt pkt;
+        uint32_t res = getNetMessage(*(uint64_t*)Game::session_man_imp, ConnectedPlayerData, 2, &pkt, sizeof(pkt));
+        if (res == sizeof(pkt))
         {
-            StartupLocationPkt pkt;
-            uint32_t res = getNetMessage(*(uint64_t*)Game::session_man_imp, ConnectedPlayerData, 2, &pkt, sizeof(pkt));
-            if (res == sizeof(pkt))
+            PlayerIns* playerins = getPlayerInsForConnectedPlayerData(*(void**)Game::world_chr_man_imp, (void*)ConnectedPlayerData);
+            if (playerins != NULL)
             {
-                PlayerIns* playerins = getPlayerInsForConnectedPlayerData(*(void**)Game::world_chr_man_imp, (void*)ConnectedPlayerData);
-                if (playerins != NULL)
-                {
-                    *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x10) = pkt.position_x;
-                    *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x14) = pkt.position_z;
-                    *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x18) = pkt.position_y;
-                    *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4) = pkt.rotation;
-                }
+                *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x10) = pkt.position_x;
+                *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x14) = pkt.position_z;
+                *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x18) = pkt.position_y;
+                *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4) = pkt.rotation;
             }
         }
+    }
 
+    if (Rollback::rollbackEnabled)
+    {
         switch (type)
         {
         case 1:

@@ -4,6 +4,7 @@
 #include "DarkSoulsOverhaulMod.h"
 #include "MainLoop.h"
 #include "InputUtil.h"
+#include "ModNetworking.h"
 
 PlayerIns* Rollback::saved_playerins = NULL;
 BulletMan* Rollback::saved_bulletman = NULL;
@@ -101,6 +102,19 @@ bool input_test(void* unused)
     return true;
 }
 
+bool Rollback::networkToggle = false;
+bool Rollback::networkTest = false;
+bool network_toggle(void* unused)
+{
+    if (Rollback::networkToggle)
+    {
+        Rollback::networkTest = !Rollback::networkTest;
+        ConsoleWrite("Netcode %d", Rollback::networkTest);
+        Rollback::networkToggle = false;
+    }
+    return true;
+}
+
 bool Rollback::rollbackToggle = false;
 bool Rollback::rollbackEnabled = false;
 bool ggpo_toggle(void* unused)
@@ -135,7 +149,14 @@ void rollback_sync_inputs()
             FATALERROR("Unable to get playerins in rollback_load_game_state_callback");
         }
         PlayerIns* player = (PlayerIns*)player_o.value();
-        PadManipulatorPacked_to_PadManipulator(player->chrins.padManipulator, &inputs[i].padmanipulator);
+        if (inputs[i].padmanipulator.const1 == 1)
+        {
+            PadManipulatorPacked_to_PadManipulator(player->chrins.padManipulator, &inputs[i].padmanipulator);
+        }
+        else
+        {
+            ConsoleWrite("sync_input returned an empty input list, ignoring");
+        }
     }
 }
 
@@ -174,6 +195,7 @@ void rollback_game_frame_sync_inputs_helper()
             //read local inputs
             RollbackInput localInput{};
             PadManipulator_to_PadManipulatorPacked(&localInput.padmanipulator, player->chrins.padManipulator);
+            localInput.padmanipulator.const1 = 1;
 
             //notify ggpo of the local player's inputs
             GGPOErrorCode result = ggpo_add_local_input(Rollback::ggpo, Rollback::ggpoHandles[0], &localInput, sizeof(RollbackInput));
@@ -183,6 +205,43 @@ void rollback_game_frame_sync_inputs_helper()
             }
 
             rollback_sync_inputs();
+        }
+    }
+
+    if (Rollback::networkTest)
+    {
+        auto player_o = Game::get_PlayerIns();
+        if (!player_o.has_value() || player_o.value() == NULL)
+        {
+            FATALERROR("Unable to get playerins for PC in rollback_game_frame_sync_inputs_helper");
+        }
+        PlayerIns* player = (PlayerIns*)player_o.value();
+        auto guest_o = Game::get_connected_player(1);
+        if (!guest_o.has_value() || guest_o.value() == NULL)
+        {
+            FATALERROR("Unable to get guest in rollback_load_game_state_callback");
+        }
+        PlayerIns* guest = (PlayerIns*)guest_o.value();
+
+        Game::set_ReadInputs_allowed(true);
+        Step_PadManipulator(player->chrins.padManipulator, FRAMETIME, player->chrins.playerCtrl);
+        Game::set_ReadInputs_allowed(false);
+
+        //send out our input
+        RollbackInput localInput{};
+        PadManipulator_to_PadManipulatorPacked(&localInput.padmanipulator, player->chrins.padManipulator);
+        SteamNetworkingIdentity target;
+        target.SetSteamID(guest->steamPlayerData->steamOnlineIDData->steam_id);
+        ModNetworking::SteamNetMessages->SendMessageToUser(target, &localInput, sizeof(localInput), k_nSteamNetworkingSend_UnreliableNoDelay, 1);
+
+        //read in and set the other player input
+        SteamNetworkingMessage_t* new_message;
+        int num_messages = ModNetworking::SteamNetMessages->ReceiveMessagesOnChannel(1, &new_message, 1);
+        if (num_messages == 1)
+        {
+            RollbackInput* remoteInput = (RollbackInput*)new_message->GetData();
+            PadManipulatorPacked_to_PadManipulator(guest->chrins.padManipulator, &remoteInput->padmanipulator);
+            new_message->Release();
         }
     }
 }
@@ -246,6 +305,7 @@ void Rollback::start()
     MainLoop::setup_mainloop_callback(state_test, NULL, "state_test");
     MainLoop::setup_mainloop_callback(input_test, NULL, "input_test");
     MainLoop::setup_mainloop_callback(ggpo_toggle, NULL, "ggpo_toggle");
+    MainLoop::setup_mainloop_callback(network_toggle, NULL, "network_toggle");
 }
 
 bool rollback_begin_game_callback(const char*)

@@ -47,6 +47,8 @@ public:
     static bool gload;
     static bool isave;
     static bool iload;
+    static bool networkToggle;
+    static bool networkTest;
     static PlayerIns* saved_playerins;
     static BulletMan* saved_bulletman;
     static FXManager* saved_sfxobjs;
