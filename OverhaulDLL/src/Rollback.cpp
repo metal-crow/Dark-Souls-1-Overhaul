@@ -211,37 +211,35 @@ void rollback_game_frame_sync_inputs_helper()
     if (Rollback::networkTest)
     {
         auto player_o = Game::get_PlayerIns();
-        if (!player_o.has_value() || player_o.value() == NULL)
+        if (player_o.has_value() && player_o.value() != NULL)
         {
-            FATALERROR("Unable to get playerins for PC in rollback_game_frame_sync_inputs_helper");
-        }
-        PlayerIns* player = (PlayerIns*)player_o.value();
-        auto guest_o = Game::get_connected_player(1);
-        if (!guest_o.has_value() || guest_o.value() == NULL)
-        {
-            FATALERROR("Unable to get guest in rollback_load_game_state_callback");
-        }
-        PlayerIns* guest = (PlayerIns*)guest_o.value();
+            PlayerIns* player = (PlayerIns*)player_o.value();
 
-        Game::set_ReadInputs_allowed(true);
-        Step_PadManipulator(player->chrins.padManipulator, FRAMETIME, player->chrins.playerCtrl);
-        Game::set_ReadInputs_allowed(false);
+            Game::set_ReadInputs_allowed(true);
+            Step_PadManipulator(player->chrins.padManipulator, FRAMETIME, player->chrins.playerCtrl);
+            Game::set_ReadInputs_allowed(false);
 
-        //send out our input
-        RollbackInput localInput{};
-        PadManipulator_to_PadManipulatorPacked(&localInput.padmanipulator, player->chrins.padManipulator);
-        SteamNetworkingIdentity target;
-        target.SetSteamID(guest->steamPlayerData->steamOnlineIDData->steam_id);
-        ModNetworking::SteamNetMessages->SendMessageToUser(target, &localInput, sizeof(localInput), k_nSteamNetworkingSend_UnreliableNoDelay, 1);
+            auto guest_o = Game::get_connected_player(1);
+            if (guest_o.has_value() && guest_o.value() != NULL)
+            {
+                PlayerIns* guest = (PlayerIns*)guest_o.value();
+                //send out our input
+                RollbackInput localInput{};
+                PadManipulator_to_PadManipulatorPacked(&localInput.padmanipulator, player->chrins.padManipulator);
+                SteamNetworkingIdentity target;
+                target.SetSteamID(guest->steamPlayerData->steamOnlineIDData->steam_id);
+                ModNetworking::SteamNetMessages->SendMessageToUser(target, &localInput, sizeof(localInput), k_nSteamNetworkingSend_UnreliableNoNagle, 1);
 
-        //read in and set the other player input
-        SteamNetworkingMessage_t* new_message;
-        int num_messages = ModNetworking::SteamNetMessages->ReceiveMessagesOnChannel(1, &new_message, 1);
-        if (num_messages == 1)
-        {
-            RollbackInput* remoteInput = (RollbackInput*)new_message->GetData();
-            PadManipulatorPacked_to_PadManipulator(guest->chrins.padManipulator, &remoteInput->padmanipulator);
-            new_message->Release();
+                //read in and set the other player input
+                SteamNetworkingMessage_t* new_message;
+                int num_messages = ModNetworking::SteamNetMessages->ReceiveMessagesOnChannel(1, &new_message, 1);
+                if (num_messages == 1)
+                {
+                    RollbackInput* remoteInput = (RollbackInput*)new_message->GetData();
+                    PadManipulatorPacked_to_PadManipulator(guest->chrins.padManipulator, &remoteInput->padmanipulator);
+                    new_message->Release();
+                }
+            }
         }
     }
 }
