@@ -1,4 +1,5 @@
 #include "Rollback.h"
+#include "NetcodePackets.h"
 #include "GameData.h"
 #include "SP/memory.h"
 #include "SP/memory/injection/asm/x64.h"
@@ -39,7 +40,7 @@ void Rollback::NetcodeFix()
     // the client does see the other attacking player as a normal npc, and is capable of applying damage the normal way
     // but explicitly doesn't if the other player is a PC
     // disable that throw away check and just return 0 instead
-    // Do this by modifying the PlayerIns_Is_PC function to always return false for phantoms. This fixes the check everywhere it's done
+    // Do this by modifying the PlayerIns_Is_NetworkedPlayer function to always return false for phantoms. This fixes the check everywhere it's done
     write_address = (uint8_t*)(Rollback::disableType18PacketEnforcement_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &disableType18PacketEnforcement_return, 4, &disableType18PacketEnforcement_injection);
 
@@ -62,15 +63,6 @@ void Rollback::NetcodeFix()
     sp::mem::patch_bytes(write_address, patch1, sizeof(patch1));
 }
 
-typedef struct StartupLocationPkt StartupLocationPkt;
-struct StartupLocationPkt
-{
-    float position_x;
-    float position_z;
-    float position_y;
-    float rotation;
-};
-
 //return false if we don't want to have sendNetMessage send a packet
 bool sendNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint32_t type, uint8_t* data)
 {
@@ -78,20 +70,7 @@ bool sendNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint
     {
         if (type == 10)
         {
-            //TODO temp solution to set position on join
-            StartupLocationPkt pkt;
-            auto player_o = Game::get_PlayerIns();
-            if (player_o.has_value() && player_o.value() != NULL)
-            {
-                PlayerIns* playerins = (PlayerIns*)player_o.value();
-
-                pkt.position_x = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x10);
-                pkt.position_z = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x14);
-                pkt.position_y = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x18);
-                pkt.rotation = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4);
-
-                sendNetMessage(*(uint64_t*)Game::session_man_imp, ConnectedPlayerData, 2, &pkt, sizeof(pkt));
-            }
+            SendPlayerInitPacket(ConnectedPlayerData);
         }
 
         switch (type)
@@ -114,6 +93,28 @@ bool sendNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint
     else
     {
         return true;
+    }
+}
+
+void SendPlayerInitPacket(uint64_t ConnectedPlayerData)
+{
+    //TODO temp solution. will need to send this on player join
+    PlayerInitPacket pkt;
+    auto player_o = Game::get_PlayerIns();
+    if (player_o.has_value() && player_o.value() != NULL)
+    {
+        PlayerIns* playerins = (PlayerIns*)player_o.value();
+
+        pkt.position_x = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x10);
+        pkt.position_z = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x14);
+        pkt.position_y = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x18);
+        pkt.rotation = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4);
+        pkt.curHp = playerins->chrins.curHp;
+        pkt.baseMaxHp = *(uint32_t*)(((uint64_t)&playerins->playergamedata->attribs) + 0xC);
+        pkt.curSp = playerins->chrins.curSp;
+        pkt.baseMaxSp = *(uint32_t*)(((uint64_t)&playerins->playergamedata->attribs) + 0x28);
+
+        sendNetMessage(*(uint64_t*)Game::session_man_imp, ConnectedPlayerData, RollbackPlayerInitPacketType, &pkt, sizeof(pkt));
     }
 }
 
@@ -124,19 +125,7 @@ bool getNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint3
     {
         if (type == 10)
         {
-            StartupLocationPkt pkt;
-            uint32_t res = getNetMessage(*(uint64_t*)Game::session_man_imp, ConnectedPlayerData, 2, &pkt, sizeof(pkt));
-            if (res == sizeof(pkt))
-            {
-                PlayerIns* playerins = getPlayerInsForConnectedPlayerData(*(void**)Game::world_chr_man_imp, (void*)ConnectedPlayerData);
-                if (playerins != NULL)
-                {
-                    *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x10) = pkt.position_x;
-                    *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x14) = pkt.position_z;
-                    *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x18) = pkt.position_y;
-                    *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4) = pkt.rotation;
-                }
-            }
+            RecvPlayerInitPacket(ConnectedPlayerData);
         }
 
         switch (type)
@@ -162,9 +151,30 @@ bool getNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint3
     }
 }
 
+void RecvPlayerInitPacket(uint64_t ConnectedPlayerData)
+{
+    PlayerInitPacket pkt;
+    uint32_t res = getNetMessage(*(uint64_t*)Game::session_man_imp, ConnectedPlayerData, RollbackPlayerInitPacketType, &pkt, sizeof(pkt));
+    if (res == sizeof(pkt))
+    {
+        PlayerIns* playerins = getPlayerInsForConnectedPlayerData(*(void**)Game::world_chr_man_imp, (void*)ConnectedPlayerData);
+        if (playerins != NULL)
+        {
+            *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x10) = pkt.position_x;
+            *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x14) = pkt.position_z;
+            *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x18) = pkt.position_y;
+            *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4) = pkt.rotation;
+            playerins->chrins.curHp = pkt.curHp;
+            *(uint32_t*)(((uint64_t)&playerins->playergamedata->attribs) + 0xC) = pkt.baseMaxHp;
+            playerins->chrins.curSp = pkt.curSp;
+            *(uint32_t*)(((uint64_t)&playerins->playergamedata->attribs) + 0x28) = pkt.baseMaxSp;
+        }
+    }
+}
+
 uint64_t disableType18PacketEnforcement_helper(PlayerIns* pc)
 {
-    if (!Rollback::rollbackEnabled)
+    if (!Rollback::rollbackEnabled && !Rollback::networkTest)
     {
         return 1;
     }
@@ -182,7 +192,7 @@ uint64_t disableType18PacketEnforcement_helper(PlayerIns* pc)
 uint64_t fixPhantomBulletGenIssue_helper(PlayerIns* pc)
 {
     //return 0 to do nothing, return 1 if we need to fix the bullet bug
-    if (!Rollback::rollbackEnabled)
+    if (!Rollback::rollbackEnabled && !Rollback::networkTest)
     {
         return 0;
     }

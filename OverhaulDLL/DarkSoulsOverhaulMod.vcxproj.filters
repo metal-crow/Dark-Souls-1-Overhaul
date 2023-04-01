@@ -117,9 +117,6 @@
     <ClCompile Include="src\PlayerInsStructFunctions.cpp">
       <Filter>Source Files\Rollback</Filter>
     </ClCompile>
-    <ClCompile Include="src\PadManStructFunctions.cpp">
-      <Filter>Source Files\Rollback</Filter>
-    </ClCompile>
     <ClCompile Include="src\BulletManStructFunctions.cpp">
       <Filter>Source Files\Rollback</Filter>
     </ClCompile>
@@ -132,13 +129,10 @@
     <ClCompile Include="src\DamageManStructFunctions.cpp">
       <Filter>Source Files\Rollback</Filter>
     </ClCompile>
-    <ClCompile Include="src\QInputMgrWindowsStructFunctions.cpp">
-      <Filter>Source Files\Rollback</Filter>
-    </ClCompile>
-    <ClCompile Include="src\InputDirectionMovementManStructFunctions.cpp">
-      <Filter>Source Files\Rollback</Filter>
-    </ClCompile>
     <ClCompile Include="src\PlayerVisualsValidationFix.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PadManipulatorStructFunctions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -200,19 +194,10 @@
     <ClInclude Include="include\Rollback.h">
       <Filter>Header Files\Rollback</Filter>
     </ClInclude>
-    <ClInclude Include="include\PadManStruct.h">
-      <Filter>Header Files\Rollback</Filter>
-    </ClInclude>
-    <ClInclude Include="include\NetcodePackets.h">
-      <Filter>Header Files\Rollback</Filter>
-    </ClInclude>
     <ClInclude Include="include\BulletManStruct.h">
       <Filter>Header Files\Rollback</Filter>
     </ClInclude>
     <ClInclude Include="include\PlayerInsStructFunctions.h">
-      <Filter>Header Files\Rollback</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PadManStructFunctions.h">
       <Filter>Header Files\Rollback</Filter>
     </ClInclude>
     <ClInclude Include="include\BulletManStructFunctions.h">
@@ -233,20 +218,17 @@
     <ClInclude Include="include\DamageManStructFunctions.h">
       <Filter>Header Files\Rollback</Filter>
     </ClInclude>
-    <ClInclude Include="include\QInputMgrWindowsStruct.h">
-      <Filter>Header Files\Rollback</Filter>
-    </ClInclude>
-    <ClInclude Include="include\QInputMgrWindowsStructFunctions.h">
-      <Filter>Header Files\Rollback</Filter>
-    </ClInclude>
-    <ClInclude Include="include\InputDirectionMovementManStruct.h">
-      <Filter>Header Files\Rollback</Filter>
-    </ClInclude>
-    <ClInclude Include="include\InputDirectionMovementManStructFunctions.h">
-      <Filter>Header Files\Rollback</Filter>
-    </ClInclude>
     <ClInclude Include="include\PlayerVisualsValidationFix.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PadManipulatorStruct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PadManipulatorStructFunctions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\NetcodePackets.h">
+      <Filter>Header Files\Rollback</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
