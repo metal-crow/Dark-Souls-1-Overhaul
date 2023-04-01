@@ -71,8 +71,15 @@ typedef struct RollbackState RollbackState;
 
 struct RollbackInput
 {
+    uint8_t const1;
     PadManipulatorPacked padmanipulator;
+    uint16_t curSelectedMagicId;
+    uint32_t curUsingItemId;
+    uint32_t equipment_array[20];
 };
+
+void PackRollbackInput(RollbackInput* out, PlayerIns* player);
+void UnpackRollbackInput(RollbackInput* in, PlayerIns* player);
 
 struct RollbackState
 {

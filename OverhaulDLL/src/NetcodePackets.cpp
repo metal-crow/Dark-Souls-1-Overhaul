@@ -45,7 +45,7 @@ void Rollback::NetcodeFix()
     sp::mem::code::x64::inject_jmp_14b(write_address, &disableType18PacketEnforcement_return, 4, &disableType18PacketEnforcement_injection);
 
     // With the above type 18 packet fix, we have a bug where followup bullets from flamesurge don't get emitted
-    // It checks the PlayerIns_Is_PC func and fails if it returns false
+    // It checks the PlayerIns_Is_NetworkedPlayer func and fails if it returns false
     // Patch this to be an exception and return true instead of false
     write_address = (uint8_t*)(Rollback::fixPhantomBulletGenIssue_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &fixPhantomBulletGenIssue_return, 0, &fixPhantomBulletGenIssue_injection);

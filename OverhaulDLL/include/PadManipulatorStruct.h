@@ -16,7 +16,6 @@ typedef struct PadManipulatorPacked PadManipulatorPacked;
 
 struct PadManipulatorPacked
 {
-    uint8_t const1;
     //this is the sum of the data components in PadManipulator
     uint8_t data_0[0x228];
     uint32_t data_0a;

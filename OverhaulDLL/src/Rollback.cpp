@@ -128,6 +128,36 @@ bool ggpo_toggle(void* unused)
     return true;
 }
 
+void PackRollbackInput(RollbackInput* out, PlayerIns* player)
+{
+    PadManipulator_to_PadManipulatorPacked(&out->padmanipulator, player->chrins.padManipulator);
+    out->const1 = 1;
+    out->curSelectedMagicId = get_currently_selected_magic_id(player);
+    out->curUsingItemId = (player->chrins).curUsedItem.itemId;
+    for (size_t i = 0; i < 20; i++)
+    {
+        out->equipment_array[i] = Game::get_equipped_inventory((uint64_t)player, (InventorySlots)i);
+    }
+}
+
+void UnpackRollbackInput(RollbackInput* in, PlayerIns* player)
+{
+    PadManipulatorPacked_to_PadManipulator(player->chrins.padManipulator, &in->padmanipulator);
+    (player->chrins).curSelectedMagicId = in->curSelectedMagicId;
+    PlayerIns_Update_curSelectedMagicId(player, in->curSelectedMagicId);
+    if (in->curUsingItemId != -1)
+    {
+        (player->chrins).curUsedItem.itemId = in->curUsingItemId;
+        (player->curUsedItem).itemId = in->curUsingItemId;
+        (player->curUsedItem).amountUsed = 1;
+        (player->chrins).curUsedItem.amountUsed = 1;
+    }
+    for (size_t i = 0; i < 20; i++)
+    {
+        ChrAsm_Set_Equipped_Items_FromNetwork(&player->playergamedata->equipGameData, i, in->equipment_array[i], -1, false);
+    }
+}
+
 void rollback_sync_inputs()
 {
     RollbackInput inputs[GGPO_MAX_PLAYERS];
@@ -149,13 +179,13 @@ void rollback_sync_inputs()
             FATALERROR("Unable to get playerins in rollback_load_game_state_callback");
         }
         PlayerIns* player = (PlayerIns*)player_o.value();
-        if (inputs[i].padmanipulator.const1 == 1)
+        if (inputs[i].const1 == 1)
         {
-            PadManipulatorPacked_to_PadManipulator(player->chrins.padManipulator, &inputs[i].padmanipulator);
+            UnpackRollbackInput(&inputs[i], player);
         }
         else
         {
-            ConsoleWrite("sync_input returned an empty input list, ignoring");
+            ConsoleWrite("sync_input returned an empty input, ignoring");
         }
     }
 }
@@ -194,8 +224,7 @@ void rollback_game_frame_sync_inputs_helper()
 
             //read local inputs
             RollbackInput localInput{};
-            PadManipulator_to_PadManipulatorPacked(&localInput.padmanipulator, player->chrins.padManipulator);
-            localInput.padmanipulator.const1 = 1;
+            PackRollbackInput(&localInput, player);
 
             //notify ggpo of the local player's inputs
             GGPOErrorCode result = ggpo_add_local_input(Rollback::ggpo, Rollback::ggpoHandles[0], &localInput, sizeof(RollbackInput));
@@ -225,7 +254,7 @@ void rollback_game_frame_sync_inputs_helper()
                 PlayerIns* guest = (PlayerIns*)guest_o.value();
                 //send out our input
                 RollbackInput localInput{};
-                PadManipulator_to_PadManipulatorPacked(&localInput.padmanipulator, player->chrins.padManipulator);
+                PackRollbackInput(&localInput, player);
                 SteamNetworkingIdentity target;
                 target.SetSteamID(guest->steamPlayerData->steamOnlineIDData->steam_id);
                 ModNetworking::SteamNetMessages->SendMessageToUser(target, &localInput, sizeof(localInput), k_nSteamNetworkingSend_UnreliableNoNagle, 1);
@@ -236,7 +265,7 @@ void rollback_game_frame_sync_inputs_helper()
                 if (num_messages == 1)
                 {
                     RollbackInput* remoteInput = (RollbackInput*)new_message->GetData();
-                    PadManipulatorPacked_to_PadManipulator(guest->chrins.padManipulator, &remoteInput->padmanipulator);
+                    UnpackRollbackInput(remoteInput, guest);
                     new_message->Release();
                 }
             }
