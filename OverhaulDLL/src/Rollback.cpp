@@ -143,18 +143,27 @@ void PackRollbackInput(RollbackInput* out, PlayerIns* player)
 void UnpackRollbackInput(RollbackInput* in, PlayerIns* player)
 {
     PadManipulatorPacked_to_PadManipulator(player->chrins.padManipulator, &in->padmanipulator);
-    (player->chrins).curSelectedMagicId = in->curSelectedMagicId;
-    PlayerIns_Update_curSelectedMagicId(player, in->curSelectedMagicId);
-    if (in->curUsingItemId != -1)
+    //only have to do the rest if this is a remote player, if this is the pc the game takes care of it
+    uint32_t playerHandle = *(uint32_t*)(((uint64_t)player) + 8);
+    if (playerHandle > Game::PC_Handle && playerHandle < Game::PC_Handle + 10)
     {
-        (player->chrins).curUsedItem.itemId = in->curUsingItemId;
-        (player->curUsedItem).itemId = in->curUsingItemId;
-        (player->curUsedItem).amountUsed = 1;
-        (player->chrins).curUsedItem.amountUsed = 1;
-    }
-    for (size_t i = 0; i < 20; i++)
-    {
-        ChrAsm_Set_Equipped_Items_FromNetwork(&player->playergamedata->equipGameData, i, in->equipment_array[i], -1, false);
+        (player->chrins).curSelectedMagicId = in->curSelectedMagicId;
+        PlayerIns_Update_curSelectedMagicId(player, in->curSelectedMagicId);
+        //don't bother to emulate the spell changing, just force it manually
+        player->playergamedata->equipGameData.equipMagicData->equippedMagicList[0].count = 999;
+        player->playergamedata->equipGameData.equipMagicData->equippedMagicList[0].magic_id = in->curSelectedMagicId;
+
+        if (in->curUsingItemId != -1)
+        {
+            (player->chrins).curUsedItem.itemId = in->curUsingItemId;
+            (player->curUsedItem).itemId = in->curUsingItemId;
+            (player->curUsedItem).amountUsed = 1;
+            (player->chrins).curUsedItem.amountUsed = 1;
+        }
+        for (size_t i = 0; i < 20; i++)
+        {
+            ChrAsm_Set_Equipped_Items_FromNetwork(&player->playergamedata->equipGameData, (uint32_t)i, in->equipment_array[i], -1, false);
+        }
     }
 }
 
