@@ -21,6 +21,10 @@ extern "C" {
     uint64_t fixPhantomBulletGenIssue_return;
     void fixPhantomBulletGenIssue_injection();
     uint64_t fixPhantomBulletGenIssue_helper(PlayerIns* pc);
+
+    uint64_t fixRollTypeComputing_return;
+    void fixRollTypeComputing_injection();
+    bool fixRollTypeComputing_helper(PlayerIns* pc);
 }
 
 void Rollback::NetcodeFix()
@@ -49,6 +53,10 @@ void Rollback::NetcodeFix()
     // Patch this to be an exception and return true instead of false
     write_address = (uint8_t*)(Rollback::fixPhantomBulletGenIssue_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &fixPhantomBulletGenIssue_return, 0, &fixPhantomBulletGenIssue_injection);
+
+    // Fix the code in PlayerIns_ComputeChanges to compute the roll type for other players even if they're networked
+    write_address = (uint8_t*)(Rollback::fixRollTypeComputing_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &fixRollTypeComputing_return, 0, &fixRollTypeComputing_injection);
 
     //allow our packet to be received even if the other playerins isn't available
     //just have the function always return true
@@ -199,5 +207,17 @@ uint64_t fixPhantomBulletGenIssue_helper(PlayerIns* pc)
     else
     {
         return 1;
+    }
+}
+
+bool fixRollTypeComputing_helper(PlayerIns* pc)
+{
+    if (!Rollback::rollbackEnabled && !Rollback::networkTest)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
     }
 }

@@ -376,6 +376,63 @@ add     rsp, 10h
 jmp     dsr_frame_finished_return
 dsr_frame_finished_injection ENDP
 
+
+EXTERN fixRollTypeComputing_return: qword
+extern fixRollTypeComputing_helper: proc
+
+PUBLIC fixRollTypeComputing_injection
+fixRollTypeComputing_injection PROC
+;original code
+movaps  xmmword ptr [rsp+0D0h], xmm7
+
+sub     rsp, 10h
+movdqu  [rsp], xmm0
+sub     rsp, 10h
+movdqu  [rsp], xmm1
+sub     rsp, 10h
+movdqu  [rsp], xmm2
+sub     rsp, 10h
+movdqu  [rsp], xmm3
+;push    rax
+push    rcx
+push    rdx
+push    r8
+push    r9
+push    r10
+push    r11
+sub     rsp, 20h
+
+call    fixRollTypeComputing_helper
+;clobber rax here
+
+add     rsp, 20h
+pop     r11
+pop     r10
+pop     r9
+pop     r8
+pop     rdx
+pop     rcx
+;pop     rax
+movdqu  xmm3, [rsp]
+add     rsp, 10h
+movdqu  xmm2, [rsp]
+add     rsp, 10h
+movdqu  xmm1, [rsp]
+add     rsp, 10h
+movdqu  xmm0, [rsp]
+add     rsp, 10h
+
+test    al, al
+jnz     exit
+
+;original code
+mov     rax, [rsi] ;restore rax
+call    qword ptr [rax+150h]
+
+exit:
+jmp     fixRollTypeComputing_return
+fixRollTypeComputing_injection ENDP
+
 _TEXT    ENDS
 
 END

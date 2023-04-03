@@ -134,7 +134,7 @@ void PackRollbackInput(RollbackInput* out, PlayerIns* player)
     out->const1 = 1;
     out->curSelectedMagicId = get_currently_selected_magic_id(player);
     out->curUsingItemId = (player->chrins).curUsedItem.itemId;
-    for (size_t i = 0; i < 20; i++)
+    for (size_t i = 0; i < InventorySlots::END; i++)
     {
         out->equipment_array[i] = Game::get_equipped_inventory((uint64_t)player, (InventorySlots)i);
     }
@@ -160,9 +160,25 @@ void UnpackRollbackInput(RollbackInput* in, PlayerIns* player)
             (player->curUsedItem).amountUsed = 1;
             (player->chrins).curUsedItem.amountUsed = 1;
         }
-        for (size_t i = 0; i < 20; i++)
+
+        uint64_t itemList = *(uint64_t*)(((uint64_t)(&player->playergamedata->equipGameData.equippedInventory)) + 0x30);
+        for (uint32_t i = 0; i < InventorySlots::END; i++)
         {
-            ChrAsm_Set_Equipped_Items_FromNetwork(&player->playergamedata->equipGameData, (uint32_t)i, in->equipment_array[i], -1, false);
+            //insert into EquipGameData
+            ChrAsm_Set_Equipped_Items_FromNetwork(&player->playergamedata->equipGameData, i, in->equipment_array[i], -1, false);
+            //inset into EquipInventoryData, and set the equippedItemIndexes
+            player->playergamedata->equipGameData.equippedItemIndexes[i] = i;
+            //category
+            if (i >= InventorySlots::LeftHand1 && i <= InventorySlots::RightHand2)
+            {
+                *(uint32_t*)(itemList + 0x1C * i + 0) = 0;
+            }
+            else if (i >= InventorySlots::ArmorHead && i <= InventorySlots::ArmorLegs)
+            {
+                *(uint32_t*)(itemList + 0x1C * i + 0) = 0x10000000;
+            }
+            *(uint32_t*)(itemList + 0x1C * i + 4) = in->equipment_array[i];
+            *(uint32_t*)(itemList + 0x1C * i + 8) = 1;
         }
     }
 }

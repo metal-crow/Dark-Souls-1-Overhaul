@@ -48,7 +48,8 @@ enum InventorySlots
     Quickbar2 = 0x10,
     Quickbar3 = 0x11,
     Quickbar4 = 0x12,
-    Quickbar5 = 0x13
+    Quickbar5 = 0x13,
+    END
 };
 
 enum TAE_type0_param_values {
