@@ -931,15 +931,18 @@ static_assert(sizeof(ChrAsm) == 0x80);
 
 struct EquipGameData
 {
-    uint8_t padding_0[0x80];
+    uint8_t padding_0[0x24];
+    uint32_t equippedItemIndexes[20];
+    uint8_t padding_1[12];
     ChrAsm chrasm;
-    uint8_t padding_0a[0x20];
+    uint8_t padding_2[0x20];
     EquipInventoryData equippedInventory;
     EquipMagicData* equipMagicData;
     EquipItemData equippedItemsInQuickbar;
-    uint8_t padding_1[0x48];
+    uint8_t padding_3[0x48];
 };
 
+static_assert(offsetof(EquipGameData, equippedItemIndexes) == 0x24);
 static_assert(offsetof(EquipGameData, chrasm) == 0x80);
 static_assert(offsetof(EquipGameData, equippedInventory) == 0x120);
 static_assert(offsetof(EquipGameData, equipMagicData) == 0x198);
