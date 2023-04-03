@@ -60,7 +60,7 @@ private:
     static const uint64_t getNetMessage_offset = 0x050b540;
     static const uint64_t disableType18PacketEnforcement_offset = 0x3226e0;
     static const uint64_t fixPhantomBulletGenIssue_offset = 0x4229bf;
-    static const uint64_t fixRollTypeComputing_offset = 0x356ebf;
+    static const uint64_t WorldChrManImp_IsHostPlayerIns_offset = 0x322730;
     //static const uint64_t isPacketTypeValid_offset = 0x50f2d0;
     static const uint64_t rollback_game_frame_sync_inputs_offset = 0x15d4d5;
     static const uint64_t MainUpdate_end_offset = 0x15d701;

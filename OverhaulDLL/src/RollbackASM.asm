@@ -377,14 +377,11 @@ jmp     dsr_frame_finished_return
 dsr_frame_finished_injection ENDP
 
 
-EXTERN fixRollTypeComputing_return: qword
-extern fixRollTypeComputing_helper: proc
+EXTERN WorldChrManImp_IsHostPlayerIns_return: qword
+extern WorldChrManImp_IsHostPlayerIns_helper: proc
 
-PUBLIC fixRollTypeComputing_injection
-fixRollTypeComputing_injection PROC
-;original code
-movaps  xmmword ptr [rsp+0D0h], xmm7
-
+PUBLIC WorldChrManImp_IsHostPlayerIns_injection
+WorldChrManImp_IsHostPlayerIns_injection PROC
 sub     rsp, 10h
 movdqu  [rsp], xmm0
 sub     rsp, 10h
@@ -402,7 +399,7 @@ push    r10
 push    r11
 sub     rsp, 20h
 
-call    fixRollTypeComputing_helper
+call    WorldChrManImp_IsHostPlayerIns_helper
 ;clobber rax here
 
 add     rsp, 20h
@@ -422,16 +419,8 @@ add     rsp, 10h
 movdqu  xmm0, [rsp]
 add     rsp, 10h
 
-test    al, al
-jnz     exit
-
-;original code
-mov     rax, [rsi] ;restore rax
-call    qword ptr [rax+150h]
-
-exit:
-jmp     fixRollTypeComputing_return
-fixRollTypeComputing_injection ENDP
+ret
+WorldChrManImp_IsHostPlayerIns_injection ENDP
 
 _TEXT    ENDS
 

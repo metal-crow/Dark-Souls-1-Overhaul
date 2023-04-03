@@ -22,9 +22,9 @@ extern "C" {
     void fixPhantomBulletGenIssue_injection();
     uint64_t fixPhantomBulletGenIssue_helper(PlayerIns* pc);
 
-    uint64_t fixRollTypeComputing_return;
-    void fixRollTypeComputing_injection();
-    bool fixRollTypeComputing_helper(PlayerIns* pc);
+    uint64_t WorldChrManImp_IsHostPlayerIns_return;
+    void WorldChrManImp_IsHostPlayerIns_injection();
+    bool WorldChrManImp_IsHostPlayerIns_helper(PlayerIns* pc);
 }
 
 void Rollback::NetcodeFix()
@@ -54,9 +54,10 @@ void Rollback::NetcodeFix()
     write_address = (uint8_t*)(Rollback::fixPhantomBulletGenIssue_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &fixPhantomBulletGenIssue_return, 0, &fixPhantomBulletGenIssue_injection);
 
-    // Fix the code in PlayerIns_ComputeChanges to compute the roll type for other players even if they're networked
-    write_address = (uint8_t*)(Rollback::fixRollTypeComputing_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &fixRollTypeComputing_return, 0, &fixRollTypeComputing_injection);
+    // Fix the code in WorldChrManImp_IsHostPlayerIns to return true for networked players as well
+    // This means the game will copmute the correct roll, correctly apply speffects, etc
+    write_address = (uint8_t*)(Rollback::WorldChrManImp_IsHostPlayerIns_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &WorldChrManImp_IsHostPlayerIns_return, 0, &WorldChrManImp_IsHostPlayerIns_injection);
 
     //allow our packet to be received even if the other playerins isn't available
     //just have the function always return true
@@ -210,14 +211,17 @@ uint64_t fixPhantomBulletGenIssue_helper(PlayerIns* pc)
     }
 }
 
-bool fixRollTypeComputing_helper(PlayerIns* pc)
+bool WorldChrManImp_IsHostPlayerIns_helper(PlayerIns* pc)
 {
+    PlayerIns* hostPc = *(PlayerIns**)((*((uint64_t*)Game::world_chr_man_imp)) + 0x68);
+
     if (!Rollback::rollbackEnabled && !Rollback::networkTest)
     {
-        return false;
+        return hostPc == pc;
     }
     else
     {
-        return true;
+        uint32_t playerHandle = *(uint32_t*)(((uint64_t)pc) + 8);
+        return hostPc == pc || (playerHandle >= Game::PC_Handle && playerHandle < Game::PC_Handle + 10);
     }
 }
