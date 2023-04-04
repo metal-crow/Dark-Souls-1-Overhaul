@@ -550,4 +550,7 @@ static Create_BannerMessage_Func_Typedef* Create_BannerMessage_Func = (Create_Ba
 typedef void Step_PadManipulator_FUNC(PadManipulator* PadManipulator, float frameTime, PlayerCtrl* PlayerCtrl);
 static Step_PadManipulator_FUNC* Step_PadManipulator = (Step_PadManipulator_FUNC*)0x140396860;
 
+typedef bool PlayerIns_Is_NetworkedPlayer_FUNC(PlayerIns* pc);
+static PlayerIns_Is_NetworkedPlayer_FUNC* PlayerIns_Is_NetworkedPlayer = (PlayerIns_Is_NetworkedPlayer_FUNC*)0x1403226e0;
+
 #endif // _DS1_OVERHAUL_GAME_DATA_H_

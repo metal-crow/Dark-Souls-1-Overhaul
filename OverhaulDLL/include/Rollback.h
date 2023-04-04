@@ -58,12 +58,17 @@ public:
 private:
     static const uint64_t sendNetMessage_offset = 0x50b6b0;
     static const uint64_t getNetMessage_offset = 0x050b540;
-    static const uint64_t disableType18PacketEnforcement_offset = 0x3226e0;
-    static const uint64_t fixPhantomBulletGenIssue_offset = 0x4229bf;
-    static const uint64_t WorldChrManImp_IsHostPlayerIns_offset = 0x322730;
-    //static const uint64_t isPacketTypeValid_offset = 0x50f2d0;
+
     static const uint64_t rollback_game_frame_sync_inputs_offset = 0x15d4d5;
     static const uint64_t MainUpdate_end_offset = 0x15d701;
+
+    static const uint64_t PlayerIns_Is_NetworkedPlayer_offsets[];
+    static const uint64_t PlayerIns_IsHostPlayerIns_offsets[];
+
+    //these are free spaces after the vtable that we can use to store another pointer so modifying the vtable call is trivial
+    static const uint64_t EnemyIns_PlayerIns_Is_NetworkedPlayer_trampoline_offset = 0x1322e68 + 0x968; //this one is if enemyins class uses it. Must be same offset
+    static const uint64_t PlayerIns_PlayerIns_Is_NetworkedPlayer_trampoline_offset = 0x13251f0 + 0x968; //this one is if playerins class uses it.  Must be same offset
+    static const uint64_t WorldChrManImp_IsHostPlayerIns_trampoline_offset = 0x13251f0 + 0xC43;
 };
 
 
