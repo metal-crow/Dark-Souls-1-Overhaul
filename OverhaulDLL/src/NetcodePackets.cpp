@@ -271,14 +271,20 @@ void Rollback::NetcodeFix()
     sp::mem::patch_bytes(write_address, (uint8_t*)&PlayerIns_Is_NetworkedPlayer_helper_addr, sizeof(uint64_t));
     write_address = (uint8_t*)(Rollback::EnemyIns_PlayerIns_Is_NetworkedPlayer_trampoline_offset + Game::ds1_base);
     sp::mem::patch_bytes(write_address, (uint8_t*)&PlayerIns_Is_NetworkedPlayer_helper_addr, sizeof(uint64_t));
+    write_address = (uint8_t*)(Rollback::ReplayGhostIns_PlayerIns_Is_NetworkedPlayer_trampoline_offset + Game::ds1_base);
+    sp::mem::patch_bytes(write_address, (uint8_t*)&PlayerIns_Is_NetworkedPlayer_helper_addr, sizeof(uint64_t));
 
     uint64_t WorldChrManImp_IsHostPlayerIns_helper_addr = (uint64_t)&WorldChrManImp_IsHostPlayerIns_helper;
-    write_address = (uint8_t*)(Rollback::WorldChrManImp_IsHostPlayerIns_trampoline_offset + Game::ds1_base);
+    write_address = (uint8_t*)(Rollback::PlayerIns_WorldChrManImp_IsHostPlayerIns_trampoline_offset + Game::ds1_base);
+    sp::mem::patch_bytes(write_address, (uint8_t*)&WorldChrManImp_IsHostPlayerIns_helper_addr, sizeof(uint64_t));
+    write_address = (uint8_t*)(Rollback::EnemyIns_WorldChrManImp_IsHostPlayerIns_trampoline_offset + Game::ds1_base);
+    sp::mem::patch_bytes(write_address, (uint8_t*)&WorldChrManImp_IsHostPlayerIns_helper_addr, sizeof(uint64_t));
+    write_address = (uint8_t*)(Rollback::ReplayGhostIns_WorldChrManImp_IsHostPlayerIns_trampoline_offset + Game::ds1_base);
     sp::mem::patch_bytes(write_address, (uint8_t*)&WorldChrManImp_IsHostPlayerIns_helper_addr, sizeof(uint64_t));
 
     //call our helpers as a very far away vtable entry. this allows us to patch, instead of inject
-    uint8_t call_IsNetworkedPlayer_trampoline_addr[6] = { 0xff, 0x90, 0x68, 0x09, 0x00, 0x00 }; //call QWORD PTR [rax+0x968]. RAX is the playerins vtable, +0x968 is our trampoline offset
-    uint8_t call_IsHostPlayerIns_trampoline_addr[6] = { 0xff, 0x90, 0x43, 0x0C, 0x00, 0x00 }; //call QWORD PTR [rax+0xC43].
+    uint8_t call_IsNetworkedPlayer_trampoline_addr[6] = { 0xff, 0x90, 0x02, 0x17, 0x00, 0x00 }; //call QWORD PTR [rax+0x1702]. RAX is the playerins vtable, +0x1702 is our trampoline offset
+    uint8_t call_IsHostPlayerIns_trampoline_addr[6] = { 0xff, 0x90, 0x0A, 0x17, 0x00, 0x00 }; //call QWORD PTR [rax+0x170A].
     for (uint64_t patch_loc : PlayerIns_Is_NetworkedPlayer_offsets)
     {
         write_address = (uint8_t*)(patch_loc);

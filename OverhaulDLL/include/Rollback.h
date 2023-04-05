@@ -65,10 +65,14 @@ private:
     static const uint64_t PlayerIns_Is_NetworkedPlayer_offsets[];
     static const uint64_t PlayerIns_IsHostPlayerIns_offsets[];
 
-    //these are free spaces after the vtable that we can use to store another pointer so modifying the vtable call is trivial
-    static const uint64_t EnemyIns_PlayerIns_Is_NetworkedPlayer_trampoline_offset = 0x1322e68 + 0x968; //this one is if enemyins class uses it. Must be same offset
-    static const uint64_t PlayerIns_PlayerIns_Is_NetworkedPlayer_trampoline_offset = 0x13251f0 + 0x968; //this one is if playerins class uses it.  Must be same offset
-    static const uint64_t WorldChrManImp_IsHostPlayerIns_trampoline_offset = 0x13251f0 + 0xC43;
+    //this overwrites unneeded dbg strings after the vtable that we can use to store another pointer so modifying the vtable call is trivial
+    static const uint64_t EnemyIns_PlayerIns_Is_NetworkedPlayer_trampoline_offset = 0x1322e68 + 0x1702; //this one is if enemyins class uses it. Must be same offset
+    static const uint64_t PlayerIns_PlayerIns_Is_NetworkedPlayer_trampoline_offset = 0x13251f0 + 0x1702; //this one is if playerins class uses it.  Must be same offset
+    static const uint64_t ReplayGhostIns_PlayerIns_Is_NetworkedPlayer_trampoline_offset = 0x1326d20 + 0x1702; //this one is if ReplayGhostIns class uses it.  Must be same offset
+
+    static const uint64_t EnemyIns_WorldChrManImp_IsHostPlayerIns_trampoline_offset = 0x1322e68 + 0x170A;
+    static const uint64_t PlayerIns_WorldChrManImp_IsHostPlayerIns_trampoline_offset = 0x13251f0 + 0x170A;
+    static const uint64_t ReplayGhostIns_WorldChrManImp_IsHostPlayerIns_trampoline_offset = 0x1326d20 + 0x170A;
 };
 
 
