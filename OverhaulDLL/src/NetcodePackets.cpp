@@ -16,7 +16,7 @@ const uint64_t Rollback::PlayerIns_Is_NetworkedPlayer_offsets[] = {
     0x140322eda, //needed for stamina calculation
     //0x140324271,
     //0x1403242c5,
-    //0x140324322,
+    0x140324322, //needed to apply speffect on hit
     //0x140324529,
     //0x140324975,
     //0x140325ac2,
@@ -33,7 +33,7 @@ const uint64_t Rollback::PlayerIns_Is_NetworkedPlayer_offsets[] = {
     //0x1403561e2,
     //0x14035689a,
     //0x14035a79b,
-    //0x14035a7bb,
+    0x14035a7bb, //needed to take damage
     //0x14035a7db,
     //0x14035a7f0,
     //0x140360476,
@@ -79,10 +79,10 @@ const uint64_t Rollback::PlayerIns_IsHostPlayerIns_offsets[] = {
     //0x140321429,
     //0x140321669,
     //0x1403218c5,
-    //0x1403226fc,
+    0x1403226fc, //to apply armor speffects
     //0x14032425d,
     //0x1403242df,
-    //0x140324308,
+    0x140324308, //to apply armor speffects
     //0x140324502,
     //0x1403248fb,
     //0x140324a68,
