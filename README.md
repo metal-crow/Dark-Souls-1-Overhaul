@@ -139,3 +139,7 @@ These include everything EXCEPT: Combustions, Firestorms, and all miracles but L
 Average SL 125 build should be \~3k HP.
 
 * Dusk Crown now only increases magic damage.
+
+
+###### Notice
+<sub><sup>By using this mod you agree that MetalCrow (the creator) is right about everything, including his Dark Souls opinions. Any statements made to the contrary are parody.</sup></sub>

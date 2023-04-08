@@ -133,7 +133,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\PadManipulatorStructFunctions.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Rollback</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -221,13 +221,13 @@
     <ClInclude Include="include\PlayerVisualsValidationFix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\NetcodePackets.h">
+      <Filter>Header Files\Rollback</Filter>
+    </ClInclude>
     <ClInclude Include="include\PadManipulatorStruct.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Rollback</Filter>
     </ClInclude>
     <ClInclude Include="include\PadManipulatorStructFunctions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\NetcodePackets.h">
       <Filter>Header Files\Rollback</Filter>
     </ClInclude>
   </ItemGroup>
