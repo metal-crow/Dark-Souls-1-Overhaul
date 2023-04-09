@@ -143,6 +143,7 @@ void PackRollbackInput(RollbackInput* out, PlayerIns* player)
 void UnpackRollbackInput(RollbackInput* in, PlayerIns* player)
 {
     PadManipulatorPacked_to_PadManipulator(player->chrins.padManipulator, &in->padmanipulator);
+
     //only have to do the rest if this is a remote player, if this is the pc the game takes care of it
     uint32_t playerHandle = *(uint32_t*)(((uint64_t)player) + 8);
     if (playerHandle > Game::PC_Handle && playerHandle < Game::PC_Handle + 10)
@@ -179,6 +180,18 @@ void UnpackRollbackInput(RollbackInput* in, PlayerIns* player)
             }
             *(uint32_t*)(itemList + 0x1C * i + 4) = in->equipment_array[i];
             *(uint32_t*)(itemList + 0x1C * i + 8) = 1;
+        }
+
+        //forcably set the PlayerCtrl->chrctrl_parent.NotLockedOn flag if the player is locked on. Dark souls will never set this itself
+        uint32_t LockonTargetHandle = *(uint32_t*)(((uint64_t)(&player->chrins.padManipulator->chrManipulator)) + 0x220);
+        uint8_t* NotLockedOn = (uint8_t*)(((uint64_t)(&player->chrins.playerCtrl->chrCtrl)) + 0x21D);
+        if (LockonTargetHandle != -1)
+        {
+            *NotLockedOn = 0;
+        }
+        else
+        {
+            *NotLockedOn = 1;
         }
     }
 }
