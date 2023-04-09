@@ -58,6 +58,7 @@ public:
 private:
     static const uint64_t sendNetMessage_offset = 0x50b6b0;
     static const uint64_t getNetMessage_offset = 0x050b540;
+    static const uint64_t init_playerins_with_padmanip_offset = 0x27ba143;
 
     static const uint64_t rollback_game_frame_sync_inputs_offset = 0x15d4d5;
     static const uint64_t MainUpdate_end_offset = 0x15d701;

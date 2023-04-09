@@ -247,6 +247,10 @@ extern "C" {
 
     bool PlayerIns_Is_NetworkedPlayer_helper(PlayerIns* pc);
     bool WorldChrManImp_IsHostPlayerIns_helper(PlayerIns* pc);
+
+    uint64_t init_playerins_with_padmanip_return;
+    void init_playerins_with_padmanip_injection();
+    void init_playerins_with_padmanip_helper(uint32_t*);
 }
 
 void Rollback::NetcodeFix()
@@ -297,10 +301,8 @@ void Rollback::NetcodeFix()
     }
 
     //cause the new playerins to be created with a PadManipulator, instead of a NetworkManipulator
-    //TODO make not temporary
-    write_address = (uint8_t*)(Game::ds1_base + 0x27ba147);
-    uint8_t patch1[] = { 0xC7, 0x44, 0x24, 0x28, 0x01, 0x00, 0x00, 0x00 };
-    sp::mem::patch_bytes(write_address, patch1, sizeof(patch1));
+    write_address = (uint8_t*)(Rollback::init_playerins_with_padmanip_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &init_playerins_with_padmanip_return, 2, &init_playerins_with_padmanip_injection);
 }
 
 //return false if we don't want to have sendNetMessage send a packet
@@ -441,5 +443,19 @@ bool WorldChrManImp_IsHostPlayerIns_helper(PlayerIns* pc)
     {
         uint32_t playerHandle = *(uint32_t*)(((uint64_t)pc) + 8);
         return hostPc == pc || (playerHandle >= Game::PC_Handle && playerHandle < Game::PC_Handle + 10);
+    }
+}
+
+void init_playerins_with_padmanip_helper(uint32_t* manipulator_type)
+{
+    if (Rollback::rollbackEnabled || Rollback::networkTest)
+    {
+        *manipulator_type = 1;
+        return;
+    }
+    else
+    {
+        *manipulator_type = 2;
+        return;
     }
 }

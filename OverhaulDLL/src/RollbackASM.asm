@@ -249,6 +249,56 @@ jmp     dsr_frame_finished_return
 dsr_frame_finished_injection ENDP
 
 
+EXTERN init_playerins_with_padmanip_return: qword
+extern init_playerins_with_padmanip_helper: proc
+
+PUBLIC init_playerins_with_padmanip_injection
+init_playerins_with_padmanip_injection PROC
+;original code
+mov     [rsp+30h], ebp
+mov     [rsp+20h], edx
+
+sub     rsp, 10h
+movdqu  [rsp], xmm0
+sub     rsp, 10h
+movdqu  [rsp], xmm1
+sub     rsp, 10h
+movdqu  [rsp], xmm2
+sub     rsp, 10h
+movdqu  [rsp], xmm3
+push    rax
+push    rcx
+push    rdx
+push    r8
+push    r9
+push    r10
+push    r11
+sub     rsp, 28h
+
+lea     rcx, dword ptr [rsp+28h + 40h+8*7+28h] ;pass in ptr to the arg for what Manipulator type to use
+call    init_playerins_with_padmanip_helper
+
+add     rsp, 28h
+pop     r11
+pop     r10
+pop     r9
+pop     r8
+pop     rdx
+pop     rcx
+pop     rax
+movdqu  xmm3, [rsp]
+add     rsp, 10h
+movdqu  xmm2, [rsp]
+add     rsp, 10h
+movdqu  xmm1, [rsp]
+add     rsp, 10h
+movdqu  xmm0, [rsp]
+add     rsp, 10h
+
+jmp     init_playerins_with_padmanip_return
+init_playerins_with_padmanip_injection ENDP
+
+
 _TEXT    ENDS
 
 END
