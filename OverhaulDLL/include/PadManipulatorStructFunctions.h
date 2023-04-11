@@ -10,6 +10,4 @@ void PadManipulatorPacked_to_PadManipulator(PadManipulator* to, PadManipulatorPa
 
 void copy_PadManipulator(PadManipulator* to, PadManipulator* from);
 
-void copy_ChrManipulator(ChrManipulator* to, ChrManipulator* from);
-
 #endif
