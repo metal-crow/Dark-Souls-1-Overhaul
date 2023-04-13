@@ -22,7 +22,6 @@ void PadManipulator_to_PadManipulatorPacked(PadManipulatorPacked* to, PadManipul
     to->not_getting_movement_input = from->not_getting_movement_input;
 
     to->camera_x_direction_movement_input_amount = from->chrManipulator.camera_x_direction_movement_input_amount;
-    to->camera_z_direction_movement_input_amount = from->chrManipulator.camera_z_direction_movement_input_amount;
     to->camera_y_direction_movement_input_amount = from->chrManipulator.camera_y_direction_movement_input_amount;
     to->continuous_weapon_controlled_angle = from->chrManipulator.continuous_weapon_controlled_angle;
     to->delta_pc_rotation_perframe = from->chrManipulator.delta_pc_rotation_perframe;
@@ -47,8 +46,6 @@ void PadManipulatorPacked_to_PadManipulator(PadManipulator* to, PadManipulatorPa
 {
     to->chrManipulator.camera_x_direction_movement_input_amount = from->camera_x_direction_movement_input_amount;
     to->chrManipulator.camera_x_direction_movement_input_amount_alt = from->camera_x_direction_movement_input_amount;
-    to->chrManipulator.camera_z_direction_movement_input_amount = from->camera_z_direction_movement_input_amount;
-    to->chrManipulator.camera_z_direction_movement_input_amount_alt = from->camera_z_direction_movement_input_amount;
     to->chrManipulator.camera_y_direction_movement_input_amount = from->camera_y_direction_movement_input_amount;
     to->chrManipulator.camera_y_direction_movement_input_amount_alt = from->camera_y_direction_movement_input_amount;
     to->chrManipulator.continuous_weapon_controlled_angle = from->continuous_weapon_controlled_angle;

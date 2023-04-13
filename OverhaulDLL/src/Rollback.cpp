@@ -607,7 +607,7 @@ void Rollback::rollback_start_session(ISteamNetworkingMessages* steamMsgs)
             }
         }
 
-        ggpo_set_frame_delay(ggpo, Rollback::ggpoHandles[0], 1);
+        //ggpo_set_frame_delay(ggpo, Rollback::ggpoHandles[0], 1);
 
         ConsoleWrite("GGPO started");
         Rollback::ggpoStarted = true;

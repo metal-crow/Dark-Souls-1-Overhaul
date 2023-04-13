@@ -38,7 +38,6 @@ struct PadManipulatorPacked
     unsigned int not_getting_movement_input : 1;
 
     float camera_x_direction_movement_input_amount;
-    float camera_z_direction_movement_input_amount;
     float camera_y_direction_movement_input_amount;
     float continuous_weapon_controlled_angle;
     float delta_pc_rotation_perframe;
