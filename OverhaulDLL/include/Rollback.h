@@ -40,6 +40,7 @@ public:
     static const size_t ggpoCurrentPlayerCount = 2;
 
     static void rollback_start_session(ISteamNetworkingMessages* steamMsgs);
+    static void rollback_end_session();
 
     //used for testing only
     static const bool rollbackVisual = true; //a visual indicator of rollback for testing
@@ -59,6 +60,7 @@ private:
     static const uint64_t sendNetMessage_offset = 0x50b6b0;
     static const uint64_t getNetMessage_offset = 0x050b540;
     static const uint64_t init_playerins_with_padmanip_offset = 0x27ba143;
+    static const uint64_t isPacketTypeValid_offset = 0x50f2d0;
 
     static const uint64_t rollback_game_frame_sync_inputs_offset = 0x15d4d5;
     static const uint64_t MainUpdate_end_offset = 0x15d701;
@@ -118,7 +120,5 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
 void rollback_free_buffer(void* buffer);
 bool rollback_on_event_callback(GGPOEvent* info);
 bool rollback_log_game_state(char* filename, unsigned char* buffer, int);
-
-bool rollback_await_player_added_before_init(void* steamMsgs);
 
 #endif

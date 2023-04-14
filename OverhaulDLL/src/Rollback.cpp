@@ -521,16 +521,29 @@ bool rollback_log_game_state(char* filename, unsigned char* buffer, int)
     return true;
 }
 
-static size_t timer = 0;
-
-bool rollback_await_player_added_before_init(void* steamMsgs)
+void Rollback::rollback_end_session()
 {
+    if (Rollback::ggpoStarted)
+    {
+        Rollback::ggpoStarted = false;
+        Rollback::ggpoReady = GGPOREADY::NotReady;
+        GGPOErrorCode result = ggpo_close_session(Rollback::ggpo);
+        Rollback::ggpo = NULL;
+        if (!GGPO_SUCCEEDED(result))
+        {
+            FATALERROR("unable to close ggpo. %d", result);
+        }
+    }
+}
+
+bool rollback_await_init(void* steamMsgs)
+{
+    //Wait for all the players to be loaded in before we start ggpo
     if (!Game::playerchar_is_loaded())
     {
         return true;
     }
 
-    //TODO wait for the players to be fully loaded
     for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
     {
         auto player_o = Game::get_connected_player(i);
@@ -538,78 +551,63 @@ bool rollback_await_player_added_before_init(void* steamMsgs)
         {
             return true;
         }
+        PlayerIns* player = (PlayerIns*)player_o.value();
+        if (player->chrins.maxHp <= 1)
+        {
+            return true;
+        }
     }
 
-    if (timer * 16.6f < 15 * 1000)
+    //Start ggpo
+    GGPOErrorCode result = ggpo_start_session(&Rollback::ggpo, &Rollback::ggpoCallbacks, (ISteamNetworkingMessages*)steamMsgs, "DSR_GGPO", Rollback::ggpoCurrentPlayerCount, sizeof(RollbackInput));
+    if (!GGPO_SUCCEEDED(result))
     {
-        timer++;
-        return true;
+        FATALERROR("unable to start ggpo. %d", result);
     }
-    timer = 0;
 
-    Rollback::rollback_start_session((ISteamNetworkingMessages*)steamMsgs);
+    for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
+    {
+        GGPOPlayer ggpoplayer = {};
+        ggpoplayer.size = sizeof(GGPOPlayer);
+        if (i > 0)
+        {
+            auto player_o = Game::get_connected_player(i);
+            if (!player_o.has_value() || player_o.value() == NULL)
+            {
+                FATALERROR("Unable to get playerins for guest in rollback_start_session");
+            }
+            PlayerIns* player = (PlayerIns*)player_o.value();
+            uint64_t steamid = player->steamPlayerData->steamOnlineIDData->steam_id;
+
+            ConsoleWrite("GGPO connecting to guest %llx", steamid);
+
+            ggpoplayer.type = GGPO_PLAYERTYPE_REMOTE;
+            ggpoplayer.u.remote.steamid.SetSteamID(steamid);
+        }
+        else
+        {
+            ggpoplayer.type = GGPO_PLAYERTYPE_LOCAL;
+        }
+        ggpoplayer.player_num = i + 1;
+        result = ggpo_add_player(Rollback::ggpo, &ggpoplayer, &Rollback::ggpoHandles[i]);
+        if (!GGPO_SUCCEEDED(result))
+        {
+            FATALERROR("unable to ggpo_add_player. %d", result);
+        }
+    }
+
+    //ggpo_set_frame_delay(ggpo, Rollback::ggpoHandles[0], 1);
+
+    ConsoleWrite("GGPO started");
+    Rollback::ggpoStarted = true;
+
     return false;
 }
 
 void Rollback::rollback_start_session(ISteamNetworkingMessages* steamMsgs)
 {
-    GGPOErrorCode result;
-
     if (Rollback::rollbackEnabled)
     {
-        //TODO move this to when session ends
-        if (Rollback::ggpo != NULL)
-        {
-            Rollback::ggpoStarted = false;
-            Rollback::ggpoReady = GGPOREADY::NotReady;
-            result = ggpo_close_session(Rollback::ggpo);
-            Rollback::ggpo = NULL;
-            if (!GGPO_SUCCEEDED(result))
-            {
-                FATALERROR("unable to close ggpo. %d", result);
-            }
-        }
-
-        result = ggpo_start_session(&Rollback::ggpo, &Rollback::ggpoCallbacks, steamMsgs, "DSR_GGPO", Rollback::ggpoCurrentPlayerCount, sizeof(RollbackInput));
-        if (!GGPO_SUCCEEDED(result))
-        {
-            FATALERROR("unable to start ggpo. %d", result);
-        }
-
-        for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
-        {
-            GGPOPlayer ggpoplayer = {};
-            ggpoplayer.size = sizeof(GGPOPlayer);
-            if (i > 0)
-            {
-                auto player_o = Game::get_connected_player(i);
-                if (!player_o.has_value() || player_o.value() == NULL)
-                {
-                    FATALERROR("Unable to get playerins for guest in rollback_start_session");
-                }
-                PlayerIns* player = (PlayerIns*)player_o.value();
-                uint64_t steamid = player->steamPlayerData->steamOnlineIDData->steam_id;
-
-                ConsoleWrite("GGPO connecting to guest %llx", steamid);
-
-                ggpoplayer.type = GGPO_PLAYERTYPE_REMOTE;
-                ggpoplayer.u.remote.steamid.SetSteamID(steamid);
-            }
-            else
-            {
-                ggpoplayer.type = GGPO_PLAYERTYPE_LOCAL;
-            }
-            ggpoplayer.player_num = i+1;
-            result = ggpo_add_player(ggpo, &ggpoplayer, &Rollback::ggpoHandles[i]);
-            if (!GGPO_SUCCEEDED(result))
-            {
-                FATALERROR("unable to ggpo_add_player. %d", result);
-            }
-        }
-
-        //ggpo_set_frame_delay(ggpo, Rollback::ggpoHandles[0], 1);
-
-        ConsoleWrite("GGPO started");
-        Rollback::ggpoStarted = true;
+        MainLoop::setup_mainloop_callback(rollback_await_init, steamMsgs, "rollback_await_init");
     }
 }

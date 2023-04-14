@@ -17,12 +17,22 @@ struct PlayerInitPacket
     uint32_t baseMaxHp;
     uint32_t curSp;
     uint32_t baseMaxSp;
+    int32_t player_num;
+    uint8_t player_sex;
+    uint8_t covenantId;
+    float type10_unk1;
+    float type10_unk2;
+    float type10_unk3;
+    float type10_unk4;
+    float type10_unk5;
+    uint16_t type11_flags;
+    uint32_t equipment_array[20];
 };
 #pragma pack(pop)
 
 static const uint32_t RollbackPlayerInitPacketType = 2;
 
-void SendPlayerInitPacket(uint64_t ConnectedPlayerData);
+void SendPlayerInitPacket();
 void RecvPlayerInitPacket(uint64_t ConnectedPlayerData);
 
 #endif

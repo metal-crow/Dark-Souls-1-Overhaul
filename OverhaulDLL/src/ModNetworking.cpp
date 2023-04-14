@@ -834,8 +834,8 @@ bool GuestAwaitIncomingLobbyData(void* data_a)
     //this also means it's safe to send out the queued packets for everyone
     SendQueuedPackets();
 
-    //Kick off ggpo once the game sets up the other players in connectedPlayers_ChrSlotArray
-    MainLoop::setup_mainloop_callback(rollback_await_player_added_before_init, ModNetworking::SteamNetMessages, "rollback_await_player_added_before_init");
+    //Kick off ggpo
+    Rollback::rollback_start_session(ModNetworking::SteamNetMessages);
 
     //this flag is finished, we don't need it anymore. Reset for next time we connect to a host.
     ModNetworking::host_got_info = false;
@@ -909,6 +909,9 @@ void ModNetworking::LobbyChatUpdateCallback(LobbyChatUpdate_t* pCallback)
         SteamAPIStatusKnown_Users.erase(pCallback->m_ulSteamIDUserChanged); //remove the user from the known list
         RemoveQueuedPackets(pCallback->m_ulSteamIDUserChanged); //get rid of the queued packets for this user since we don't need them anymore
 
+        //end the GGPO session
+        Rollback::rollback_end_session();
+
         // We can switch modes back to non-compatability if this list is empty now
         bool all_mod_users = true;
         for (const auto &[user, is_mod] : SteamAPIStatusKnown_Users)
@@ -961,6 +964,9 @@ void ModNetworking::LobbyChatUpdateCallback(LobbyChatUpdate_t* pCallback)
 
         SteamAPIStatusKnown_Users.erase(pCallback->m_ulSteamIDUserChanged); //remove the user from the known list
         RemoveQueuedPackets(pCallback->m_ulSteamIDUserChanged);
+
+        //end the GGPO session
+        Rollback::rollback_end_session();
     }
 }
 
@@ -1035,8 +1041,8 @@ bool HostAwaitIncomingGuestMemberData(void* data_a)
     SteamAPIStatusKnown_Users.insert_or_assign(data->steamid, ModNetworking::incoming_guest_mod_installed);
     SendQueuedPackets();
 
-    //Kick off ggpo once the game sets up the other players in connectedPlayers_ChrSlotArray
-    MainLoop::setup_mainloop_callback(rollback_await_player_added_before_init, ModNetworking::SteamNetMessages, "rollback_await_player_added_before_init");
+    //Kick off ggpo
+    Rollback::rollback_start_session(ModNetworking::SteamNetMessages);
 
     //reset for next guest
     exit:

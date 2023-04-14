@@ -4,6 +4,7 @@
 #include "SP/memory.h"
 #include "SP/memory/injection/asm/x64.h"
 #include <unordered_set>
+#include "MainLoop.h"
 
 const uint64_t Rollback::PlayerIns_Is_NetworkedPlayer_offsets[] = {
     //0x1400d81c5,
@@ -300,6 +301,12 @@ void Rollback::NetcodeFix()
         sp::mem::patch_bytes(write_address, call_IsHostPlayerIns_trampoline_addr, sizeof(call_IsHostPlayerIns_trampoline_addr));
     }
 
+    //allow our custom type'd packet to be received
+    //just have the function always return true
+    write_address = (uint8_t*)(Rollback::isPacketTypeValid_offset + Game::ds1_base);
+    uint8_t mov_r8b_1[] = { 0x41, 0xb0, 0x01 };
+    sp::mem::patch_bytes(write_address, mov_r8b_1, 3);
+
     //cause the new playerins to be created with a PadManipulator, instead of a NetworkManipulator
     write_address = (uint8_t*)(Rollback::init_playerins_with_padmanip_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &init_playerins_with_padmanip_return, 2, &init_playerins_with_padmanip_injection);
@@ -310,17 +317,17 @@ bool sendNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint
 {
     if (Rollback::rollbackEnabled || Rollback::networkTest)
     {
-        if (type == 10)
+        //ensures this is only sent on session start
+        if (type == 10 && !Rollback::ggpoStarted)
         {
-            SendPlayerInitPacket(ConnectedPlayerData);
+            SendPlayerInitPacket();
         }
 
         switch (type)
         {
         case 1:
-        //TODO
-        //case 10:
-        //case 11:
+        case 10:
+        case 11:
         case 16:
         case 17:
         case 18:
@@ -338,14 +345,15 @@ bool sendNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint
     }
 }
 
-void SendPlayerInitPacket(uint64_t ConnectedPlayerData)
+void SendPlayerInitPacket()
 {
-    //TODO temp solution. will need to send this on player join
     PlayerInitPacket pkt;
     auto player_o = Game::get_PlayerIns();
     if (player_o.has_value() && player_o.value() != NULL)
     {
         PlayerIns* playerins = (PlayerIns*)player_o.value();
+        uint64_t attribs = (uint64_t)&playerins->playergamedata->attribs;
+        uint64_t equipgamedata = (uint64_t)&playerins->playergamedata->equipGameData;
 
         pkt.position_x = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x10);
         pkt.position_z = *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x14);
@@ -355,8 +363,21 @@ void SendPlayerInitPacket(uint64_t ConnectedPlayerData)
         pkt.baseMaxHp = *(uint32_t*)(((uint64_t)&playerins->playergamedata->attribs) + 0xC);
         pkt.curSp = playerins->chrins.curSp;
         pkt.baseMaxSp = *(uint32_t*)(((uint64_t)&playerins->playergamedata->attribs) + 0x28);
+        pkt.player_num = *(int32_t*)(attribs + 0);
+        pkt.player_sex = *(uint8_t*)(attribs + 0xba);
+        pkt.covenantId = *(uint8_t*)(attribs + 0x103);
+        pkt.type10_unk1 = *(float*)(equipgamedata + 0x108);
+        pkt.type10_unk2 = *(float*)(equipgamedata + 0x10C);
+        pkt.type10_unk3 = *(float*)(equipgamedata + 0x110);
+        pkt.type10_unk4 = *(float*)(equipgamedata + 0x114);
+        pkt.type10_unk5 = *(float*)(equipgamedata + 0x118);
+        pkt.type11_flags = compress_gamedata_flags(equipgamedata);
+        for (int i = 0; i < 20; i++)
+        {
+            pkt.equipment_array[i] = *(uint32_t*)((equipgamedata + 0x80 + 0x24) + (i * 4));
+        }
 
-        sendNetMessage(*(uint64_t*)Game::session_man_imp, ConnectedPlayerData, RollbackPlayerInitPacketType, &pkt, sizeof(pkt));
+        sendNetMessageToAllPlayers(*(uint64_t*)Game::session_man_imp, RollbackPlayerInitPacketType, &pkt, sizeof(pkt));
     }
 }
 
@@ -365,7 +386,8 @@ bool getNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint3
 {
     if (Rollback::rollbackEnabled || Rollback::networkTest)
     {
-        if (type == 10)
+        //prevent infinite recursion
+        if (type != RollbackPlayerInitPacketType)
         {
             RecvPlayerInitPacket(ConnectedPlayerData);
         }
@@ -373,9 +395,8 @@ bool getNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint3
         switch (type)
         {
         case 1:
-        //TODO
-        //case 10:
-        //case 11:
+        case 10:
+        case 11:
         case 16:
         case 17:
         case 18:
@@ -393,23 +414,79 @@ bool getNetMessage_helper(void* session_man, uint64_t ConnectedPlayerData, uint3
     }
 }
 
+typedef struct PlayerInitPacketDelayedStruct PlayerInitPacketDelayedStruct;
+struct PlayerInitPacketDelayedStruct
+{
+    PlayerInitPacket* pkt;
+    uint64_t ConnectedPlayerData;
+};
+
+bool RecvPlayerInitPacket_AwaitForPlayerIns(void* data_)
+{
+    PlayerInitPacketDelayedStruct* data = (PlayerInitPacketDelayedStruct*)data_;
+    PlayerInitPacket* pkt = data->pkt;
+    PlayerIns* playerins = getPlayerInsForConnectedPlayerData(*(void**)Game::world_chr_man_imp, (void*)data->ConnectedPlayerData);
+    if (playerins == NULL)
+    {
+        return true;
+    }
+
+    *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x10) = pkt->position_x;
+    *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x14) = pkt->position_z;
+    *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x18) = pkt->position_y;
+    *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4) = pkt->rotation;
+    playerins->chrins.curHp = pkt->curHp;
+    playerins->chrins.curSp = pkt->curSp;
+
+    free(pkt);
+    free(data_);
+
+    return false;
+}
+
 void RecvPlayerInitPacket(uint64_t ConnectedPlayerData)
 {
-    PlayerInitPacket pkt;
-    uint32_t res = getNetMessage(*(uint64_t*)Game::session_man_imp, ConnectedPlayerData, RollbackPlayerInitPacketType, &pkt, sizeof(pkt));
-    if (res == sizeof(pkt))
+    int32_t session_player_num = Game::get_SessionPlayerNumber_For_ConnectedPlayerData(ConnectedPlayerData);
+    if (session_player_num != -1)
     {
-        PlayerIns* playerins = getPlayerInsForConnectedPlayerData(*(void**)Game::world_chr_man_imp, (void*)ConnectedPlayerData);
-        if (playerins != NULL)
+        PlayerInitPacket* pkt = (PlayerInitPacket*)malloc(sizeof(PlayerInitPacket));
+        uint32_t res = getNetMessage(*(uint64_t*)Game::session_man_imp, ConnectedPlayerData, RollbackPlayerInitPacketType, pkt, sizeof(PlayerInitPacket));
+        if (res == sizeof(PlayerInitPacket))
         {
-            *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x10) = pkt.position_x;
-            *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x14) = pkt.position_z;
-            *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x18) = pkt.position_y;
-            *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4) = pkt.rotation;
-            playerins->chrins.curHp = pkt.curHp;
-            *(uint32_t*)(((uint64_t)&playerins->playergamedata->attribs) + 0xC) = pkt.baseMaxHp;
-            playerins->chrins.curSp = pkt.curSp;
-            *(uint32_t*)(((uint64_t)&playerins->playergamedata->attribs) + 0x28) = pkt.baseMaxSp;
+            PlayerGameData* playergamedata = (PlayerGameData*)(*(uint64_t*)((*(uint64_t*)Game::game_data_man) + 0x18) + (0x660 * session_player_num));
+            uint64_t attribs = (uint64_t)&playergamedata->attribs;
+            uint64_t equipgamedata = (uint64_t)&playergamedata->equipGameData;
+
+            //need to set these once the playerins has been created
+            PlayerInitPacketDelayedStruct* data = (PlayerInitPacketDelayedStruct*)malloc(sizeof(PlayerInitPacketDelayedStruct));
+            data->pkt = pkt;
+            data->ConnectedPlayerData = ConnectedPlayerData;
+            MainLoop::setup_mainloop_callback(RecvPlayerInitPacket_AwaitForPlayerIns, data, "RecvPlayerInitPacket_AwaitForPlayerIns");
+
+            *(uint32_t*)(attribs + 0xC) = pkt->baseMaxHp;
+            *(uint32_t*)(attribs + 0x28) = pkt->baseMaxSp;
+            *(uint32_t*)(attribs + 0) = pkt->player_num;
+            uint32_t chrType = *(uint32_t*)(attribs + 0x94);
+            *(uint8_t*)(attribs + 0xba) = pkt->player_sex;
+            Set_Player_Sex_Specific_Attribs((EquipGameData*)equipgamedata, pkt->player_sex, chrType);
+            *(uint8_t*)(attribs + 0x103) = pkt->covenantId;
+            *(float*)(equipgamedata + 0x108) = pkt->type10_unk1;
+            *(float*)(equipgamedata + 0x10C) = pkt->type10_unk2;
+            *(float*)(equipgamedata + 0x110) = pkt->type10_unk3;
+            *(float*)(equipgamedata + 0x114) = pkt->type10_unk4;
+            *(float*)(equipgamedata + 0x118) = pkt->type10_unk5;
+            set_playergamedata_flags((void*)equipgamedata, pkt->type11_flags);
+            for (uint32_t i = 0; i < 20; i++)
+            {
+                ChrAsm_Set_Equipped_Items_FromNetwork((void*)equipgamedata, i, pkt->equipment_array[i], -1, false);
+            }
+
+            uint8_t* playerAttribsSet = (uint8_t*)((uint64_t)(playergamedata) + 0x612);
+            *playerAttribsSet = 1;
+
+            uint8_t* on_pkt_recv = (uint8_t*)((*(uint64_t*)((*(uint64_t*)Game::game_data_man) + 0x28)) + session_player_num);
+            *on_pkt_recv |= 0x4;
+            *on_pkt_recv |= 0x8;
         }
     }
 }
