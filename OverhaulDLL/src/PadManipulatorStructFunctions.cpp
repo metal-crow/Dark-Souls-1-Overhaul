@@ -42,7 +42,7 @@ void PadManipulator_to_PadManipulatorPacked(PadManipulatorPacked* to, PadManipul
     to->cur_movement_input_index_to_use = from->cur_movement_input_index_to_use;
 }
 
-void PadManipulatorPacked_to_PadManipulator(PadManipulator* to, PadManipulatorPacked* from)
+void PadManipulatorPacked_to_PadManipulator(PadManipulator* to, PadManipulatorPacked* from, bool networkedPc)
 {
     to->chrManipulator.camera_x_direction_movement_input_amount = from->camera_x_direction_movement_input_amount;
     to->chrManipulator.camera_x_direction_movement_input_amount_alt = from->camera_x_direction_movement_input_amount;
@@ -62,7 +62,10 @@ void PadManipulatorPacked_to_PadManipulator(PadManipulator* to, PadManipulatorPa
     to->chrManipulator.movement_velocity[3] = from->movement_velocity[3];
 
     //move the CurrentFrame_ActionInputs to the PrevFrame_ActionInputs
-    memcpy(&to->chrManipulator.PrevFrame_ActionInputs, &to->chrManipulator.CurrentFrame_ActionInputs, sizeof(ChrManipulator_ActionInputted));
+    if (networkedPc)
+    {
+        memcpy(&to->chrManipulator.PrevFrame_ActionInputs, &to->chrManipulator.CurrentFrame_ActionInputs, sizeof(ChrManipulator_ActionInputted));
+    }
 
     to->chrManipulator.CurrentFrame_ActionInputs.r1_weapon_attack_input_1 = from->r1_weapon_attack_input;
     to->chrManipulator.CurrentFrame_ActionInputs.l1_input = from->l1_input;
@@ -79,20 +82,23 @@ void PadManipulatorPacked_to_PadManipulator(PadManipulator* to, PadManipulatorPa
     to->chrManipulator.CurrentFrame_ActionInputs.l2_weapon_attack = from->l2_weapon_attack;
 
     //update the ActionInputtedTimeHeld and AnyActionInputted
-    to->chrManipulator.AnyActionInputted = false;
-    for (size_t i = 0; i < sizeof(ChrManipulator_ActionInputted); i++)
+    if (networkedPc)
     {
-        bool* buttonPressed = (bool*)((uint64_t)(&to->chrManipulator.CurrentFrame_ActionInputs) + i);
-        float* timeHeld = (float*)((uint64_t)(&to->chrManipulator.ActionInputtedTimeHeld) + i * 4);
+        to->chrManipulator.AnyActionInputted = false;
+        for (size_t i = 0; i < sizeof(ChrManipulator_ActionInputted); i++)
+        {
+            bool* buttonPressed = (bool*)((uint64_t)(&to->chrManipulator.CurrentFrame_ActionInputs) + i);
+            float* timeHeld = (float*)((uint64_t)(&to->chrManipulator.ActionInputtedTimeHeld) + i * 4);
 
-        if (*buttonPressed)
-        {
-            *timeHeld += FRAMETIME;
-            to->chrManipulator.AnyActionInputted |= true;
-        }
-        else
-        {
-            *timeHeld = 0.0f;
+            if (*buttonPressed)
+            {
+                *timeHeld += FRAMETIME;
+                to->chrManipulator.AnyActionInputted |= true;
+            }
+            else
+            {
+                *timeHeld = 0.0f;
+            }
         }
     }
 

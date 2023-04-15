@@ -142,12 +142,12 @@ void PackRollbackInput(RollbackInput* out, PlayerIns* player)
 
 void UnpackRollbackInput(RollbackInput* in, PlayerIns* player)
 {
-    PadManipulatorPacked_to_PadManipulator(player->chrins.padManipulator, &in->padmanipulator);
-
-    //only have to do the rest if this is a remote player, if this is the pc the game takes care of it
     uint32_t playerHandle = *(uint32_t*)(((uint64_t)player) + 8);
     if (playerHandle > Game::PC_Handle && playerHandle < Game::PC_Handle + 10)
     {
+        PadManipulatorPacked_to_PadManipulator(player->chrins.padManipulator, &in->padmanipulator, true);
+
+        //only have to do the rest if this is a remote player, if this is the pc the game takes care of it
         (player->chrins).curSelectedMagicId = in->curSelectedMagicId;
         PlayerIns_Update_curSelectedMagicId(player, in->curSelectedMagicId);
         //don't bother to emulate the spell changing, just force it manually
@@ -193,6 +193,10 @@ void UnpackRollbackInput(RollbackInput* in, PlayerIns* player)
         {
             *NotLockedOn = 1;
         }
+    }
+    else
+    {
+        PadManipulatorPacked_to_PadManipulator(player->chrins.padManipulator, &in->padmanipulator, false);
     }
 }
 

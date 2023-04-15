@@ -366,6 +366,7 @@ void copy_ChrIns(ChrIns* to, ChrIns* from, bool to_game)
 {
     //copy_ChrIns_field0x18(to->field0x18, from->field0x18);
     copy_PlayerCtrl(to->playerCtrl, from->playerCtrl, to_game);
+    //copy_PadManipulator(to->padManipulator, from->padManipulator);
     to->CharaInitParamID = from->CharaInitParamID;
     memcpy(to->data_5, from->data_5, sizeof(to->data_5));
     to->lowerThrowAnim = from->lowerThrowAnim;
@@ -411,6 +412,7 @@ ChrIns* init_ChrIns()
 
     //local_ChrIns->field0x18 = init_ChrIns_field0x18();
     local_ChrIns->playerCtrl = init_PlayerCtrl();
+    //local_ChrIns->padManipulator = init_PadManipulator();
     local_ChrIns->specialEffects = init_SpecialEffect();
     local_ChrIns->qwcSpEffectEquipCtrl = init_QwcSpEffectEquipCtrl();
     local_ChrIns->field0x2c8 = init_ChrIns_field0x2c8();
@@ -425,6 +427,7 @@ void free_ChrIns(ChrIns* to, bool freeself)
 {
     //free_ChrIns_field0x18(to->field0x18);
     free_PlayerCtrl(to->playerCtrl);
+    //free_PadManipulator(to->padManipulator);
     free_SpecialEffect(to->specialEffects);
     free_QwcSpEffectEquipCtrl(to->qwcSpEffectEquipCtrl);
     free_ChrIns_field0x2c8(to->field0x2c8);
