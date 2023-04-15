@@ -443,14 +443,14 @@ bool SendP2PPacket_Replacement_injection_helper(CSteamID steamIDRemote, void *pu
 //CloseP2PSessionWithUser/CloseSessionWithUser
 bool CloseP2PSessionWithUser_Replacement_injection_helper(CSteamID steamIDRemote)
 {
-    //end the GGPO session
-    Rollback::rollback_end_session();
-
     //In theory we should never still have the user saved when the game hits this, so just return that we already closed them
     if (SteamAPIStatusKnown_Users.count(steamIDRemote.ConvertToUint64()) == 0)
     {
         return true;
     }
+
+    //end the GGPO session
+    Rollback::rollback_end_session();
 
     //Have this just in case
     ConsoleWrite("Dark Souls manually closing session with %llx", steamIDRemote.ConvertToUint64());
