@@ -299,6 +299,21 @@ jmp     init_playerins_with_padmanip_return
 init_playerins_with_padmanip_injection ENDP
 
 
+EXTERN MoveMapStep_SetPlayerLockOn_FromController_offset_return: qword
+EXTERN ggpoStarted_ptr: qword
+
+PUBLIC MoveMapStep_SetPlayerLockOn_FromController_offset_injection
+MoveMapStep_SetPlayerLockOn_FromController_offset_injection PROC
+cmp     byte ptr [ggpoStarted_ptr], 0
+jne     exit
+;original code
+cmp     byte ptr [rcx+1430h], 0
+setz    al
+mov     [rcx+1431h], al
+exit:
+jmp     MoveMapStep_SetPlayerLockOn_FromController_offset_return
+MoveMapStep_SetPlayerLockOn_FromController_offset_injection ENDP
+
 _TEXT    ENDS
 
 END

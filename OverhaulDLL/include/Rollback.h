@@ -64,6 +64,7 @@ private:
 
     static const uint64_t rollback_game_frame_sync_inputs_offset = 0x15d4d5;
     static const uint64_t MainUpdate_end_offset = 0x15d701;
+    static const uint64_t MoveMapStep_SetPlayerLockOn_FromController_offset = 0x24fd0b;
 
     static const uint64_t PlayerIns_Is_NetworkedPlayer_offsets[];
     static const uint64_t PlayerIns_IsHostPlayerIns_offsets[];
@@ -82,14 +83,19 @@ private:
 typedef struct RollbackInput RollbackInput;
 typedef struct RollbackState RollbackState;
 
+#pragma pack(push, 1)
+
 struct RollbackInput
 {
     uint8_t const1;
+    unsigned int lockonButton : 1; //this is only used for the local player, the remote player only needs LockonTargetHandle
     PadManipulatorPacked padmanipulator;
     uint16_t curSelectedMagicId;
     uint32_t curUsingItemId;
     uint32_t equipment_array[20];
 };
+
+#pragma pack(pop)
 
 void PackRollbackInput(RollbackInput* out, PlayerIns* player);
 void UnpackRollbackInput(RollbackInput* in, PlayerIns* player);

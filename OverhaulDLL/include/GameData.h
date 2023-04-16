@@ -173,6 +173,8 @@ public:
 
     static uint64_t InputDirectionMovementMan;
 
+    static uint64_t LockTgtManImp;
+
     static const uint64_t calculate_attack_damage_offset = 0x2f11bf2;
 
     static const uint64_t char_loaded_injection_offset = 0x24f1b0;
@@ -552,5 +554,18 @@ static Step_PadManipulator_FUNC* Step_PadManipulator = (Step_PadManipulator_FUNC
 
 typedef bool PlayerIns_Is_NetworkedPlayer_FUNC(PlayerIns* pc);
 static PlayerIns_Is_NetworkedPlayer_FUNC* PlayerIns_Is_NetworkedPlayer = (PlayerIns_Is_NetworkedPlayer_FUNC*)0x1403226e0;
+
+typedef struct
+{
+    uint64_t vtable;
+    void* PadDevice;
+    uint64_t dbgnode;
+} BasePad;
+
+typedef bool DbgMapWalkPad_CheckLockOnButton_FUNC(BasePad* BasePad);
+static DbgMapWalkPad_CheckLockOnButton_FUNC* DbgMapWalkPad_CheckLockOnButton = (DbgMapWalkPad_CheckLockOnButton_FUNC*)0x1401a3b60;
+
+typedef void* PadMan_GetPadDevice_FUNC(uint32_t DeviceNum);
+static PadMan_GetPadDevice_FUNC* PadMan_GetPadDevice = (PadMan_GetPadDevice_FUNC*)0x1401af490;
 
 #endif // _DS1_OVERHAUL_GAME_DATA_H_

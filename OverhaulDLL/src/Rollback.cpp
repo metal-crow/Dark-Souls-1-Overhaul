@@ -132,6 +132,9 @@ void PackRollbackInput(RollbackInput* out, PlayerIns* player)
 {
     PadManipulator_to_PadManipulatorPacked(&out->padmanipulator, player->chrins.padManipulator);
     out->const1 = 1;
+    BasePad pad;
+    pad.PadDevice = PadMan_GetPadDevice(0x0);
+    out->lockonButton = DbgMapWalkPad_CheckLockOnButton(&pad);
     out->curSelectedMagicId = get_currently_selected_magic_id(player);
     out->curUsingItemId = (player->chrins).curUsedItem.itemId;
     for (size_t i = 0; i < InventorySlots::END; i++)
@@ -197,6 +200,14 @@ void UnpackRollbackInput(RollbackInput* in, PlayerIns* player)
     else
     {
         PadManipulatorPacked_to_PadManipulator(player->chrins.padManipulator, &in->padmanipulator, false);
+
+        //manually set the LockTgtManImp->bTargetLocked_Alt flags for the host, since the game needs this flag set and directly sets it from the controller input
+        if (in->lockonButton)
+        {
+            uint8_t* bTargetLocked = (uint8_t*)((*(uint64_t*)Game::LockTgtManImp) + 0x1430);
+            uint8_t* bTargetLocked_Alt = (uint8_t*)((*(uint64_t*)Game::LockTgtManImp) + 0x1431);
+            *bTargetLocked_Alt = ((*bTargetLocked) == 0);
+        }
     }
 }
 
@@ -342,6 +353,12 @@ void dsr_frame_finished_helper()
     }
 }
 
+extern "C" {
+    uint64_t MoveMapStep_SetPlayerLockOn_FromController_offset_return;
+    void MoveMapStep_SetPlayerLockOn_FromController_offset_injection();
+    bool ggpoStarted_ptr;
+}
+
 void Rollback::start()
 {
     ConsoleWrite("Rollback...");
@@ -359,6 +376,11 @@ void Rollback::start()
     //Inform ggpo after a frame has been rendered
     write_address = (uint8_t*)(Rollback::MainUpdate_end_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &dsr_frame_finished_return, 0, &dsr_frame_finished_injection);
+
+    //prevent the game from directly reading the controller and setting our lockon. We need to only use the RollbackInput
+    write_address = (uint8_t*)(Rollback::MoveMapStep_SetPlayerLockOn_FromController_offset + Game::ds1_base);
+    ggpoStarted_ptr = Rollback::ggpoStarted; //this is a ptr, trust me
+    sp::mem::code::x64::inject_jmp_14b(write_address, &MoveMapStep_SetPlayerLockOn_FromController_offset_return, 2, &MoveMapStep_SetPlayerLockOn_FromController_offset_injection);
 
     //Testing rollback related stuff
     Rollback::saved_playerins = init_PlayerIns();

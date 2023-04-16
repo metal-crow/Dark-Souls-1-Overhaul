@@ -75,6 +75,8 @@ uint64_t Game::QInputMgrWindowsFantasy = NULL;
 
 uint64_t Game::InputDirectionMovementMan = NULL;
 
+uint64_t Game::LockTgtManImp = NULL;
+
 // Player character status (loading, human, co-op, invader, hollow)
 sp::mem::pointer<int32_t> Game::player_char_status;
 
@@ -193,6 +195,8 @@ void Game::init()
     Game::QInputMgrWindowsFantasy = Game::ds1_base + 0x1cb5490;
 
     Game::InputDirectionMovementMan = Game::ds1_base + 0x1c6a680;
+
+    Game::LockTgtManImp = Game::ds1_base + 0x1c7a138;
 }
 
 void Game::injections_init()
