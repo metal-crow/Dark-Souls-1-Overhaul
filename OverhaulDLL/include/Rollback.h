@@ -88,7 +88,8 @@ typedef struct RollbackState RollbackState;
 struct RollbackInput
 {
     uint8_t const1;
-    unsigned int lockonButton : 1; //this is only used for the local player, the remote player only needs LockonTargetHandle
+    unsigned int bTargetLocked : 1; //this is only used for the local player, the remote player only needs LockonTargetHandle
+    unsigned int bTargetLocked_Alt : 1;
     PadManipulatorPacked padmanipulator;
     uint16_t curSelectedMagicId;
     uint32_t curUsingItemId;

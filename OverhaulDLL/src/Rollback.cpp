@@ -132,9 +132,20 @@ void PackRollbackInput(RollbackInput* out, PlayerIns* player)
 {
     PadManipulator_to_PadManipulatorPacked(&out->padmanipulator, player->chrins.padManipulator);
     out->const1 = 1;
+
+    //need to manually replicate the lockon code the game normally does
     BasePad pad;
     pad.PadDevice = PadMan_GetPadDevice(0x0);
-    out->lockonButton = DbgMapWalkPad_CheckLockOnButton(&pad);
+    bool lockonButton = DbgMapWalkPad_CheckLockOnButton(&pad);
+    uint8_t* bTargetLocked = (uint8_t*)((*(uint64_t*)Game::LockTgtManImp) + 0x1430);
+    uint8_t* bTargetLocked_Alt = (uint8_t*)((*(uint64_t*)Game::LockTgtManImp) + 0x1431);
+    if (lockonButton)
+    {
+        *bTargetLocked_Alt = (*bTargetLocked == 0);
+    }
+    out->bTargetLocked = *bTargetLocked;
+    out->bTargetLocked_Alt = *bTargetLocked_Alt;
+
     out->curSelectedMagicId = get_currently_selected_magic_id(player);
     out->curUsingItemId = (player->chrins).curUsedItem.itemId;
     for (size_t i = 0; i < InventorySlots::END; i++)
@@ -202,12 +213,10 @@ void UnpackRollbackInput(RollbackInput* in, PlayerIns* player)
         PadManipulatorPacked_to_PadManipulator(player->chrins.padManipulator, &in->padmanipulator, false);
 
         //manually set the LockTgtManImp->bTargetLocked_Alt flags for the host, since the game needs this flag set and directly sets it from the controller input
-        if (in->lockonButton)
-        {
-            uint8_t* bTargetLocked = (uint8_t*)((*(uint64_t*)Game::LockTgtManImp) + 0x1430);
-            uint8_t* bTargetLocked_Alt = (uint8_t*)((*(uint64_t*)Game::LockTgtManImp) + 0x1431);
-            *bTargetLocked_Alt = ((*bTargetLocked) == 0);
-        }
+        uint8_t* bTargetLocked = (uint8_t*)((*(uint64_t*)Game::LockTgtManImp) + 0x1430);
+        *bTargetLocked = in->bTargetLocked;
+        uint8_t* bTargetLocked_Alt = (uint8_t*)((*(uint64_t*)Game::LockTgtManImp) + 0x1431);
+        *bTargetLocked_Alt = in->bTargetLocked_Alt;
     }
 }
 
