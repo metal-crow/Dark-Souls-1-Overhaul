@@ -356,7 +356,7 @@ void dsr_frame_finished_helper()
 extern "C" {
     uint64_t MoveMapStep_SetPlayerLockOn_FromController_offset_return;
     void MoveMapStep_SetPlayerLockOn_FromController_offset_injection();
-    bool ggpoStarted_ptr;
+    bool* ggpoStarted_ptr;
 }
 
 void Rollback::start()
@@ -379,7 +379,7 @@ void Rollback::start()
 
     //prevent the game from directly reading the controller and setting our lockon. We need to only use the RollbackInput
     write_address = (uint8_t*)(Rollback::MoveMapStep_SetPlayerLockOn_FromController_offset + Game::ds1_base);
-    ggpoStarted_ptr = Rollback::ggpoStarted; //this is a ptr, trust me
+    ggpoStarted_ptr = &Rollback::ggpoStarted;
     sp::mem::code::x64::inject_jmp_14b(write_address, &MoveMapStep_SetPlayerLockOn_FromController_offset_return, 2, &MoveMapStep_SetPlayerLockOn_FromController_offset_injection);
 
     //Testing rollback related stuff

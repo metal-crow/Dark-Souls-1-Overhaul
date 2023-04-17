@@ -304,7 +304,8 @@ EXTERN ggpoStarted_ptr: qword
 
 PUBLIC MoveMapStep_SetPlayerLockOn_FromController_offset_injection
 MoveMapStep_SetPlayerLockOn_FromController_offset_injection PROC
-cmp     byte ptr [ggpoStarted_ptr], 0
+mov     rax, qword ptr [ggpoStarted_ptr]
+cmp     byte ptr [rax], 0
 jne     exit
 ;original code
 cmp     byte ptr [rcx+1430h], 0
