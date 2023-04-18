@@ -131,6 +131,7 @@ bool ggpo_toggle(void* unused)
 void PackRollbackInput(RollbackInput* out, PlayerIns* player)
 {
     PadManipulator_to_PadManipulatorPacked(&out->padmanipulator, player->chrins.padManipulator);
+    //need to tell if GGPO has actually returned us a real input, or padding
     out->const1 = 1;
 
     //need to manually replicate the lockon code the game normally does

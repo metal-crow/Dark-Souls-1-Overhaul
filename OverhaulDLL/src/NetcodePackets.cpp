@@ -165,7 +165,7 @@ const uint64_t Rollback::PlayerIns_IsHostPlayerIns_offsets[] = {
     //0x14035a319,
     //0x14035a78b,
     //0x14035a7cb,
-    //0x14035c93c,
+    0x14035c93c, //needed to update the Player after ChrAsm->equipitems is set
     //0x14035cd6e,
     //0x14035df19,
     //0x14035e0be,
@@ -237,6 +237,9 @@ const uint64_t Rollback::PlayerIns_IsHostPlayerIns_offsets[] = {
     //0x14110cab4,
 };
 
+//This uses RDX instead of RAX
+const uint64_t PlayerIns_IsHostPlayerIns_offsets_alt = 0x1403419d5; //needed to set the ChrAsm->equipitems
+
 extern "C" {
     uint64_t sendNetMessage_return;
     void sendNetMessage_injection();
@@ -290,6 +293,7 @@ void Rollback::NetcodeFix()
     //call our helpers as a very far away vtable entry. this allows us to patch, instead of inject
     uint8_t call_IsNetworkedPlayer_trampoline_addr[6] = { 0xff, 0x90, 0x02, 0x17, 0x00, 0x00 }; //call QWORD PTR [rax+0x1702]. RAX is the playerins vtable, +0x1702 is our trampoline offset
     uint8_t call_IsHostPlayerIns_trampoline_addr[6] = { 0xff, 0x90, 0x0A, 0x17, 0x00, 0x00 }; //call QWORD PTR [rax+0x170A].
+    uint8_t call_IsHostPlayerIns_trampoline_addr_alt[6] = { 0xff, 0x92, 0x0A, 0x17, 0x00, 0x00 }; //call QWORD PTR [rdx+0x170A].
     for (uint64_t patch_loc : PlayerIns_Is_NetworkedPlayer_offsets)
     {
         write_address = (uint8_t*)(patch_loc);
@@ -300,6 +304,8 @@ void Rollback::NetcodeFix()
         write_address = (uint8_t*)(patch_loc);
         sp::mem::patch_bytes(write_address, call_IsHostPlayerIns_trampoline_addr, sizeof(call_IsHostPlayerIns_trampoline_addr));
     }
+    write_address = (uint8_t*)(PlayerIns_IsHostPlayerIns_offsets_alt);
+    sp::mem::patch_bytes(write_address, call_IsHostPlayerIns_trampoline_addr_alt, sizeof(call_IsHostPlayerIns_trampoline_addr_alt));
 
     //allow our custom type'd packet to be received
     //just have the function always return true
