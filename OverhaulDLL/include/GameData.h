@@ -372,8 +372,6 @@ public:
 
     static int32_t get_SessionPlayerNumber_For_ConnectedPlayerData(uint64_t connectedplayerdata);
 
-    static void set_ReadInputs_allowed(bool allow);
-
     static void invalidate_function_caches();
 
     /*
@@ -555,15 +553,11 @@ static Step_PadManipulator_FUNC* Step_PadManipulator = (Step_PadManipulator_FUNC
 typedef bool PlayerIns_Is_NetworkedPlayer_FUNC(PlayerIns* pc);
 static PlayerIns_Is_NetworkedPlayer_FUNC* PlayerIns_Is_NetworkedPlayer = (PlayerIns_Is_NetworkedPlayer_FUNC*)0x1403226e0;
 
-typedef struct
-{
-    uint64_t vtable;
-    void* PadDevice;
-    uint64_t dbgnode;
-} BasePad;
+typedef bool PadDevice_GetInputI_FUNC(void* PadDevice, uint32_t inputI);
+static PadDevice_GetInputI_FUNC* PadDevice_GetInputI = (PadDevice_GetInputI_FUNC*)0x1401a5ca0;
 
-typedef bool DbgMapWalkPad_CheckLockOnButton_FUNC(BasePad* BasePad);
-static DbgMapWalkPad_CheckLockOnButton_FUNC* DbgMapWalkPad_CheckLockOnButton = (DbgMapWalkPad_CheckLockOnButton_FUNC*)0x1401a3b60;
+typedef float* PadDevice_Get2StickInputI_FUNC(void* PadDevice, float* out, uint32_t inputI1, uint32_t inputI2);
+static PadDevice_Get2StickInputI_FUNC* PadDevice_Get2StickInputI = (PadDevice_Get2StickInputI_FUNC*)0x1401ad530;
 
 typedef void* PadMan_GetPadDevice_FUNC(uint32_t DeviceNum);
 static PadMan_GetPadDevice_FUNC* PadMan_GetPadDevice = (PadMan_GetPadDevice_FUNC*)0x1401af490;

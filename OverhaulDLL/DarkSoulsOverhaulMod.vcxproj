@@ -82,6 +82,7 @@
     <ClInclude Include="include\NetcodePackets.h" />
     <ClInclude Include="include\PadManipulatorStruct.h" />
     <ClInclude Include="include\PadManipulatorStructFunctions.h" />
+    <ClInclude Include="include\PadManStruct.h" />
     <ClInclude Include="include\PlayerInsStructFunctions.h" />
     <ClInclude Include="include\PlayerVisualsValidationFix.h" />
     <ClInclude Include="include\Rollback.h" />

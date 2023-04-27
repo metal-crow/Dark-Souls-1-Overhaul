@@ -11,7 +11,7 @@
 #include "BulletManStructFunctions.h"
 #include "SfxManStructFunctions.h"
 #include "DamageManStructFunctions.h"
-#include "PadManipulatorStructFunctions.h"
+#include "PadManStruct.h"
 
 #include "ggponet.h"
 
@@ -65,6 +65,8 @@ private:
     static const uint64_t rollback_game_frame_sync_inputs_offset = 0x15d4d5;
     static const uint64_t MainUpdate_end_offset = 0x15d701;
     static const uint64_t MoveMapStep_SetPlayerLockOn_FromController_offset = 0x24fd0b;
+    static const uint64_t VirtualMultiDevice_GetInputI_offset = 0x1803c0;
+    static const uint64_t VirtualMultiDevice_GetStickInputI_offset = 0x1801f0;
 
     static const uint64_t PlayerIns_Is_NetworkedPlayer_offsets[];
     static const uint64_t PlayerIns_IsHostPlayerIns_offsets[];
@@ -79,6 +81,30 @@ private:
     static const uint64_t ReplayGhostIns_WorldChrManImp_IsHostPlayerIns_trampoline_offset = 0x1326d20 + 0x170A;
 };
 
+enum PadButtons
+{
+    Y = 0x50,
+    B = 0x5B,
+    B_click = 0x5C,
+    A = 0x4D,
+    X = 0x5A,
+    R1 = 0x41,
+    R1_alt = 0x55,
+    R1_weapon = 0x3b,
+    R2 = 0x42,
+    R2_weapon = 0x3c,
+    R3 = 0x36,
+    L1 = 0x43,
+    L2 = 0x44,
+    DpadUp = 0x54,
+    DpadDown = 0x53,
+    DpadLeft = 0x52,
+    DpadRight = 0x51,
+    LStickY = 0x10,
+    LStickX = 0x11,
+    RStickY = 0x13,
+    RStickX = 0x12,
+};
 
 typedef struct RollbackInput RollbackInput;
 typedef struct RollbackState RollbackState;
@@ -87,19 +113,34 @@ typedef struct RollbackState RollbackState;
 
 struct RollbackInput
 {
-    uint8_t const1;
-    unsigned int bTargetLocked : 1; //this is only used for the local player, the remote player only needs LockonTargetHandle
-    unsigned int bTargetLocked_Alt : 1;
-    PadManipulatorPacked padmanipulator;
-    uint16_t curSelectedMagicId;
-    uint32_t curUsingItemId;
-    uint32_t equipment_array[20];
+    unsigned int Y : 1;
+    unsigned int B : 1;
+    unsigned int A : 1;
+    unsigned int X : 1;
+    unsigned int R1 : 1;
+    unsigned int R2 : 1;
+    unsigned int R3 : 1;
+    unsigned int IsLockedOn : 1; //we can't simulate lockon attempts for non-host
+    unsigned int L1 : 1;
+    unsigned int L2 : 1;
+    unsigned int DpadUp : 1;
+    unsigned int DpadDown : 1;
+    unsigned int DpadLeft : 1;
+    unsigned int DpadRight : 1;
+    float LStickX;
+    float LStickY;
+    float RStickX;
+    float RStickY;
+    uint32_t curGesture; //we can't simulate the gesture menus for non-host
+    uint16_t curSelectedMagicId; //this could be simulated, but let's not
+    uint32_t curUsingItemId; //we can't simulate the inventory menus for non-host
+    uint32_t equipment_array[20]; //we can't simulate the inventory menus for non-host
 };
 
 #pragma pack(pop)
 
 void PackRollbackInput(RollbackInput* out, PlayerIns* player);
-void UnpackRollbackInput(RollbackInput* in, PlayerIns* player);
+void UnpackRollbackInput(RollbackInput* in, PlayerIns* player, uint32_t player_i);
 
 struct RollbackState
 {

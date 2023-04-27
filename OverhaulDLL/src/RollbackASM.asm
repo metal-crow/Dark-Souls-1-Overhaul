@@ -2,6 +2,8 @@ _DATA SEGMENT
 
 sub_1401862A0   dq  1401862A0h
 nullsub_78     dq  140185470h
+FUN_140391370   dq  140391370h
+PadMan_GetPadDevice dq  1401af490h
 
 _DATA ENDS
 
@@ -314,6 +316,183 @@ mov     [rcx+1431h], al
 exit:
 jmp     MoveMapStep_SetPlayerLockOn_FromController_offset_return
 MoveMapStep_SetPlayerLockOn_FromController_offset_injection ENDP
+
+
+EXTERN VirtualMultiDevice_GetInputI_return: qword
+extern VirtualMultiDevice_GetInputI_helper: proc
+
+PUBLIC VirtualMultiDevice_GetInputI_injection
+VirtualMultiDevice_GetInputI_injection PROC
+;original code
+push    rbx
+sub     rsp, 40h
+
+sub     rsp, 10h
+movdqu  [rsp], xmm0
+sub     rsp, 10h
+movdqu  [rsp], xmm1
+sub     rsp, 10h
+movdqu  [rsp], xmm2
+sub     rsp, 10h
+movdqu  [rsp], xmm3
+;push    rax
+push    rcx
+push    rdx
+push    r8
+push    r9
+push    r10
+push    r11
+sub     rsp, 20h
+
+call    VirtualMultiDevice_GetInputI_helper
+
+add     rsp, 20h
+pop     r11
+pop     r10
+pop     r9
+pop     r8
+pop     rdx
+pop     rcx
+;pop     rax
+movdqu  xmm3, [rsp]
+add     rsp, 10h
+movdqu  xmm2, [rsp]
+add     rsp, 10h
+movdqu  xmm1, [rsp]
+add     rsp, 10h
+movdqu  xmm0, [rsp]
+add     rsp, 10h
+
+cmp     al, 0
+jne     continue
+exit:
+mov     byte ptr [rdx], 0
+add     rsp, 40h
+pop     rbx
+ret
+
+;original code
+continue:
+mov     rbx, rdx
+xor     r8d, r8d
+mov     edx, ecx
+jmp     VirtualMultiDevice_GetInputI_return
+VirtualMultiDevice_GetInputI_injection ENDP
+
+
+EXTERN VirtualMultiDevice_GetStickInputI_return: qword
+extern VirtualMultiDevice_GetStickInputI_helper: proc
+
+PUBLIC VirtualMultiDevice_GetStickInputI_injection
+VirtualMultiDevice_GetStickInputI_injection PROC
+;original code
+push    rbx
+sub     rsp, 60h
+
+sub     rsp, 10h
+movdqu  [rsp], xmm0
+sub     rsp, 10h
+movdqu  [rsp], xmm1
+sub     rsp, 10h
+movdqu  [rsp], xmm2
+sub     rsp, 10h
+movdqu  [rsp], xmm3
+;push    rax
+push    rcx
+push    rdx
+push    r8
+push    r9
+push    r10
+push    r11
+sub     rsp, 20h
+
+call    VirtualMultiDevice_GetStickInputI_helper
+
+add     rsp, 20h
+pop     r11
+pop     r10
+pop     r9
+pop     r8
+pop     rdx
+pop     rcx
+;pop     rax
+movdqu  xmm3, [rsp]
+add     rsp, 10h
+movdqu  xmm2, [rsp]
+add     rsp, 10h
+movdqu  xmm1, [rsp]
+add     rsp, 10h
+movdqu  xmm0, [rsp]
+add     rsp, 10h
+
+cmp     al, 0
+jne     continue
+exit:
+mov     byte ptr [rdx], 0
+xorps   xmm0, xmm0
+add     rsp, 60h
+pop     rbx
+ret
+
+;original code
+continue:
+mov     rbx, rdx
+movaps  xmmword ptr [rsp+50h], xmm6
+jmp     VirtualMultiDevice_GetStickInputI_return
+VirtualMultiDevice_GetStickInputI_injection ENDP
+
+
+EXTERN PadMan_GetPadDevice_return: qword
+extern PadMan_GetPadDevice_helper: proc
+
+PUBLIC PadMan_GetPadDevice_injection
+PadMan_GetPadDevice_injection PROC
+;original code
+mov     rcx, rbx
+call    qword ptr [FUN_140391370]
+
+sub     rsp, 10h
+movdqu  [rsp], xmm0
+sub     rsp, 10h
+movdqu  [rsp], xmm1
+sub     rsp, 10h
+movdqu  [rsp], xmm2
+sub     rsp, 10h
+movdqu  [rsp], xmm3
+push    rax
+;push    rcx
+push    rdx
+push    r8
+push    r9
+push    r10
+push    r11
+sub     rsp, 20h
+
+mov     rcx, rdi
+call    PadMan_GetPadDevice_helper
+mov     rcx, rax
+
+add     rsp, 20h
+pop     r11
+pop     r10
+pop     r9
+pop     r8
+pop     rdx
+;pop     rcx
+pop     rax
+movdqu  xmm3, [rsp]
+add     rsp, 10h
+movdqu  xmm2, [rsp]
+add     rsp, 10h
+movdqu  xmm1, [rsp]
+add     rsp, 10h
+movdqu  xmm0, [rsp]
+add     rsp, 10h
+
+;original code
+call    qword ptr [PadMan_GetPadDevice]
+jmp     PadMan_GetPadDevice_return
+PadMan_GetPadDevice_injection ENDP
 
 _TEXT    ENDS
 

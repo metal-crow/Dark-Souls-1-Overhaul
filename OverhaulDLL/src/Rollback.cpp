@@ -66,39 +66,6 @@ static uint32_t inputSaveFrameI = 0;
 static const size_t INPUT_ROLLBACK_LENGTH = 5 * 60; //5 seconds
 bool input_test(void* unused)
 {
-    if (Rollback::isave)
-    {
-        auto player_o = Game::get_PlayerIns();
-        PlayerIns* player = (PlayerIns*)player_o.value();
-        copy_PadManipulator(Rollback::saved_PadManipulator[inputSaveFrameI], player->chrins.padManipulator);
-
-        inputSaveFrameI++;
-        if (inputSaveFrameI >= INPUT_ROLLBACK_LENGTH)
-        {
-            ConsoleWrite("Input save finish");
-            Rollback::isave = false;
-            inputSaveFrameI = 0;
-        }
-    }
-
-    if (Rollback::iload)
-    {
-        Game::set_ReadInputs_allowed(false);
-
-        auto player_o = Game::get_PlayerIns();
-        PlayerIns* player = (PlayerIns*)player_o.value();
-        copy_PadManipulator(player->chrins.padManipulator, Rollback::saved_PadManipulator[inputSaveFrameI]);
-
-        inputSaveFrameI++;
-        if (inputSaveFrameI >= INPUT_ROLLBACK_LENGTH)
-        {
-            Game::set_ReadInputs_allowed(true);
-            ConsoleWrite("Input restore finish");
-            Rollback::iload = false;
-            inputSaveFrameI = 0;
-        }
-    }
-
     return true;
 }
 
@@ -128,25 +95,39 @@ bool ggpo_toggle(void* unused)
     return true;
 }
 
+//need to use this so PackRollbackInput can get the correct values post keybind processing, but will return failed when the game calls it
+static bool OverrideVirtualMultiDeviceInjection = false;
+
 void PackRollbackInput(RollbackInput* out, PlayerIns* player)
 {
-    PadManipulator_to_PadManipulatorPacked(&out->padmanipulator, player->chrins.padManipulator);
-    //need to tell if GGPO has actually returned us a real input, or padding
-    out->const1 = 1;
+    void* padDevice = PadMan_GetPadDevice(0);
 
-    //need to manually replicate the lockon code the game normally does
-    BasePad pad;
-    pad.PadDevice = PadMan_GetPadDevice(0x0);
-    bool lockonButton = DbgMapWalkPad_CheckLockOnButton(&pad);
-    uint8_t* bTargetLocked = (uint8_t*)((*(uint64_t*)Game::LockTgtManImp) + 0x1430);
-    uint8_t* bTargetLocked_Alt = (uint8_t*)((*(uint64_t*)Game::LockTgtManImp) + 0x1431);
-    if (lockonButton)
-    {
-        *bTargetLocked_Alt = (*bTargetLocked == 0);
-    }
-    out->bTargetLocked = *bTargetLocked;
-    out->bTargetLocked_Alt = *bTargetLocked_Alt;
+    OverrideVirtualMultiDeviceInjection = true;
+    out->Y = PadDevice_GetInputI(padDevice, PadButtons::Y);
+    out->B = PadDevice_GetInputI(padDevice, PadButtons::B);
+    out->A = PadDevice_GetInputI(padDevice, PadButtons::A);
+    out->X = PadDevice_GetInputI(padDevice, PadButtons::X);
+    out->R1 = PadDevice_GetInputI(padDevice, PadButtons::R1);
+    out->R2 = PadDevice_GetInputI(padDevice, PadButtons::R2);
+    out->R3 = PadDevice_GetInputI(padDevice, PadButtons::R3);
+    out->IsLockedOn = !(*(bool*)(((uint64_t)(&player->chrins.playerCtrl->chrCtrl)) + 0x21D));
+    out->L1 = PadDevice_GetInputI(padDevice, PadButtons::L1);
+    out->L2 = PadDevice_GetInputI(padDevice, PadButtons::L2);
+    out->DpadUp = PadDevice_GetInputI(padDevice, PadButtons::DpadUp);
+    out->DpadDown = PadDevice_GetInputI(padDevice, PadButtons::DpadDown);
+    out->DpadLeft = PadDevice_GetInputI(padDevice, PadButtons::DpadLeft);
+    out->DpadRight = PadDevice_GetInputI(padDevice, PadButtons::DpadRight);
 
+    float sticks[2];
+    PadDevice_Get2StickInputI(padDevice, sticks, PadButtons::LStickX, PadButtons::LStickY);
+    out->LStickX = sticks[0];
+    out->LStickY = sticks[1];
+    PadDevice_Get2StickInputI(padDevice, sticks, PadButtons::RStickX, PadButtons::RStickY);
+    out->RStickX = sticks[0];
+    out->RStickY = sticks[1];
+    OverrideVirtualMultiDeviceInjection = false;
+
+    //out->curGesture
     out->curSelectedMagicId = get_currently_selected_magic_id(player);
     out->curUsingItemId = (player->chrins).curUsedItem.itemId;
     for (size_t i = 0; i < InventorySlots::END; i++)
@@ -155,14 +136,52 @@ void PackRollbackInput(RollbackInput* out, PlayerIns* player)
     }
 }
 
-void UnpackRollbackInput(RollbackInput* in, PlayerIns* player)
+void PadDeviceSetKey(uint32_t* inputkeys, uint32_t keyI, bool state)
 {
-    uint32_t playerHandle = *(uint32_t*)(((uint64_t)player) + 8);
-    if (playerHandle > Game::PC_Handle && playerHandle < Game::PC_Handle + 10)
+    if (state)
     {
-        PadManipulatorPacked_to_PadManipulator(player->chrins.padManipulator, &in->padmanipulator, true);
+        inputkeys[keyI >> 0x5] |= (1 << (keyI & 0x1f));
+    }
+    else
+    {
+        inputkeys[keyI >> 0x5] &= ~(1 << (keyI & 0x1f));
+    }
+}
 
-        //only have to do the rest if this is a remote player, if this is the pc the game takes care of it
+void UnpackRollbackInput(RollbackInput* in, PlayerIns* player, uint32_t player_i)
+{
+    PadDevice* padDevice = (PadDevice*)PadMan_GetPadDevice(player_i);
+    uint32_t* keys = padDevice->VirtMultiDevice->base.base.VirtInputData.keys.inputKeys;
+
+    PadDeviceSetKey(keys, PadButtons::Y, in->Y);
+    PadDeviceSetKey(keys, PadButtons::A, in->A);
+    PadDeviceSetKey(keys, PadButtons::B, in->B);
+    PadDeviceSetKey(keys, PadButtons::B_click, in->B);
+    PadDeviceSetKey(keys, PadButtons::X, in->X);
+    PadDeviceSetKey(keys, PadButtons::R1, in->R1);
+    PadDeviceSetKey(keys, PadButtons::R1_alt, in->R1);
+    PadDeviceSetKey(keys, PadButtons::R1_weapon, in->R1);
+    PadDeviceSetKey(keys, PadButtons::R2, in->R2);
+    PadDeviceSetKey(keys, PadButtons::R2_weapon, in->R2);
+    PadDeviceSetKey(keys, PadButtons::R3, in->R3);
+    PadDeviceSetKey(keys, PadButtons::L1, in->L1);
+    PadDeviceSetKey(keys, PadButtons::L2, in->L2);
+    PadDeviceSetKey(keys, PadButtons::DpadUp, in->DpadUp);
+    PadDeviceSetKey(keys, PadButtons::DpadDown, in->DpadDown);
+    PadDeviceSetKey(keys, PadButtons::DpadLeft, in->DpadLeft);
+    PadDeviceSetKey(keys, PadButtons::DpadRight, in->DpadRight);
+
+    float* sticks = padDevice->VirtMultiDevice->base.base.VirtInputData.VirAnalogKeyInfo.analogSticksAndPad;
+    sticks[PadButtons::LStickY] = in->LStickY;
+    sticks[PadButtons::LStickX] = in->LStickX;
+    sticks[PadButtons::RStickY] = in->RStickY;
+    sticks[PadButtons::RStickX] = in->RStickX;
+
+    //only have to do the rest if this is a remote player, if this is the pc the game takes care of it
+    if (player_i > 0)
+    {
+        //in->curGesture
+
         (player->chrins).curSelectedMagicId = in->curSelectedMagicId;
         PlayerIns_Update_curSelectedMagicId(player, in->curSelectedMagicId);
         //don't bother to emulate the spell changing, just force it manually
@@ -197,10 +216,9 @@ void UnpackRollbackInput(RollbackInput* in, PlayerIns* player)
             *(uint32_t*)(itemList + 0x1C * i + 8) = 1;
         }
 
-        //forcably set the PlayerCtrl->chrctrl_parent.NotLockedOn flag if the player is locked on. Dark souls will never set this itself
-        uint32_t LockonTargetHandle = *(uint32_t*)(((uint64_t)(&player->chrins.padManipulator->chrManipulator)) + 0x220);
+        //forcably set the PlayerCtrl->chrctrl_parent.NotLockedOn flag if the player is locked on. Dark souls can't handle this for anyone but the host
         uint8_t* NotLockedOn = (uint8_t*)(((uint64_t)(&player->chrins.playerCtrl->chrCtrl)) + 0x21D);
-        if (LockonTargetHandle != -1)
+        if (in->IsLockedOn)
         {
             *NotLockedOn = 0;
         }
@@ -208,16 +226,6 @@ void UnpackRollbackInput(RollbackInput* in, PlayerIns* player)
         {
             *NotLockedOn = 1;
         }
-    }
-    else
-    {
-        PadManipulatorPacked_to_PadManipulator(player->chrins.padManipulator, &in->padmanipulator, false);
-
-        //manually set the LockTgtManImp->bTargetLocked_Alt flags for the host, since the game needs this flag set and directly sets it from the controller input
-        uint8_t* bTargetLocked = (uint8_t*)((*(uint64_t*)Game::LockTgtManImp) + 0x1430);
-        *bTargetLocked = in->bTargetLocked;
-        uint8_t* bTargetLocked_Alt = (uint8_t*)((*(uint64_t*)Game::LockTgtManImp) + 0x1431);
-        *bTargetLocked_Alt = in->bTargetLocked_Alt;
     }
 }
 
@@ -242,14 +250,7 @@ void rollback_sync_inputs()
             FATALERROR("Unable to get playerins in rollback_load_game_state_callback");
         }
         PlayerIns* player = (PlayerIns*)player_o.value();
-        if (inputs[i].const1 == 1)
-        {
-            UnpackRollbackInput(&inputs[i], player);
-        }
-        else
-        {
-            ConsoleWrite("sync_input returned an empty input, ignoring");
-        }
+        UnpackRollbackInput(&inputs[i], player, i);
     }
 }
 
@@ -279,13 +280,7 @@ void rollback_game_frame_sync_inputs_helper()
             }
             PlayerIns* player = (PlayerIns*)player_o.value();
 
-            //Manually call the PadManipulator function to read the inputs
-            //ONLY allow it to be called here, so we don't have it called normally by the game and overwrite our custom inputs
-            Game::set_ReadInputs_allowed(true);
-            Step_PadManipulator(player->chrins.padManipulator, FRAMETIME, player->chrins.playerCtrl);
-            Game::set_ReadInputs_allowed(false);
-
-            //read local inputs
+            //By this point, the game will have read the controller inputs and saved them. Read it now
             RollbackInput localInput{};
             PackRollbackInput(&localInput, player);
 
@@ -307,9 +302,7 @@ void rollback_game_frame_sync_inputs_helper()
         {
             PlayerIns* player = (PlayerIns*)player_o.value();
 
-            Game::set_ReadInputs_allowed(true);
             Step_PadManipulator(player->chrins.padManipulator, FRAMETIME, player->chrins.playerCtrl);
-            Game::set_ReadInputs_allowed(false);
 
             auto guest_o = Game::get_connected_player(1);
             if (guest_o.has_value() && guest_o.value() != NULL)
@@ -328,7 +321,7 @@ void rollback_game_frame_sync_inputs_helper()
                 if (num_messages == 1)
                 {
                     RollbackInput* remoteInput = (RollbackInput*)new_message->GetData();
-                    UnpackRollbackInput(remoteInput, guest);
+                    UnpackRollbackInput(remoteInput, guest, 1);
                     new_message->Release();
                 }
             }
@@ -367,6 +360,78 @@ extern "C" {
     uint64_t MoveMapStep_SetPlayerLockOn_FromController_offset_return;
     void MoveMapStep_SetPlayerLockOn_FromController_offset_injection();
     bool* ggpoStarted_ptr;
+
+    uint64_t VirtualMultiDevice_GetInputI_return;
+    void VirtualMultiDevice_GetInputI_injection();
+    bool VirtualMultiDevice_GetInputI_helper(uint32_t inputI);
+}
+
+//return false to abort the function, true to continue
+bool VirtualMultiDevice_GetInputI_helper(uint32_t inputI)
+{
+    if (Rollback::rollbackEnabled && Rollback::ggpoStarted && !OverrideVirtualMultiDeviceInjection)
+    {
+        switch (inputI)
+        {
+        case PadButtons::Y:
+        case PadButtons::B:
+        case PadButtons::A:
+        case PadButtons::X:
+        case PadButtons::R1:
+        case PadButtons::R2:
+        case PadButtons::R3:
+        case PadButtons::L1:
+        case PadButtons::L2:
+        case PadButtons::DpadUp:
+        case PadButtons::DpadDown:
+        case PadButtons::DpadLeft:
+        case PadButtons::DpadRight:
+            return false;
+        default:
+            return false;
+        }
+    }
+    else
+    {
+        return true;
+    }
+}
+
+extern "C" {
+    uint64_t VirtualMultiDevice_GetStickInputI_return;
+    void VirtualMultiDevice_GetStickInputI_injection();
+    bool VirtualMultiDevice_GetStickInputI_helper();
+}
+
+//return false to abort the function, true to continue
+bool VirtualMultiDevice_GetStickInputI_helper()
+{
+    if (Rollback::rollbackEnabled && Rollback::ggpoStarted)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
+
+extern "C" {
+    uint64_t PadMan_GetPadDevice_return;
+    void PadMan_GetPadDevice_injection();
+    uint32_t PadMan_GetPadDevice_helper(PlayerCtrl*);
+}
+
+uint32_t PadMan_GetPadDevice_helper(PlayerCtrl* playerctrl)
+{
+    uint64_t playerins = (uint64_t)playerctrl->chrCtrl.playerins_parent;
+    uint32_t playerhandle = *(uint32_t*)(playerins + 8);
+
+    if (playerhandle >= Game::PC_Handle && playerhandle < Game::PC_Handle + 4)
+    {
+        return playerhandle - Game::PC_Handle;
+    }
+    return 0;
 }
 
 void Rollback::start()
@@ -391,6 +456,18 @@ void Rollback::start()
     write_address = (uint8_t*)(Rollback::MoveMapStep_SetPlayerLockOn_FromController_offset + Game::ds1_base);
     ggpoStarted_ptr = &Rollback::ggpoStarted;
     sp::mem::code::x64::inject_jmp_14b(write_address, &MoveMapStep_SetPlayerLockOn_FromController_offset_return, 2, &MoveMapStep_SetPlayerLockOn_FromController_offset_injection);
+
+    //disable the VirtualMultiDevice_GetInputI method in most cases. It doesn't work for PadDevices > 0, so just force the fallback on inputs we care about
+    write_address = (uint8_t*)(Game::ds1_base + Rollback::VirtualMultiDevice_GetInputI_offset);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &VirtualMultiDevice_GetInputI_return, 0, &VirtualMultiDevice_GetInputI_injection);
+
+    //disable the VirtualMultiDevice_GetStickInputI method. Same as above, but it has no inputs we care about
+    write_address = (uint8_t*)(Game::ds1_base + Rollback::VirtualMultiDevice_GetStickInputI_offset);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &VirtualMultiDevice_GetStickInputI_return, 0, &VirtualMultiDevice_GetStickInputI_injection);
+
+    //patch the PadMan_GetPadDevice calls so we get the correct PadDevice for the player being checked
+    write_address = (uint8_t*)0x14039690b;
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PadMan_GetPadDevice_return, 1, &PadMan_GetPadDevice_injection);
 
     //Testing rollback related stuff
     Rollback::saved_playerins = init_PlayerIns();
@@ -588,7 +665,8 @@ bool rollback_await_init(void* steamMsgs)
             return true;
         }
         PlayerIns* player = (PlayerIns*)player_o.value();
-        if (player->chrins.maxHp <= 1)
+        //kinda hacky checks to make sure the chrs are fully loaded
+        if (player->chrins.maxHp <= 1 || player->chrins.specialEffects == NULL || player->chrins.specialEffects->specialEffect_Info == NULL)
         {
             return true;
         }

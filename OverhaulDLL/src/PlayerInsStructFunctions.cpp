@@ -1,5 +1,6 @@
 #include "PlayerInsStructFunctions.h"
 #include "Rollback.h"
+#include "PadManipulatorStructFunctions.h"
 
 typedef void* falloc(uint64_t, uint64_t, uint32_t);
 
@@ -8,6 +9,7 @@ void copy_PlayerIns(PlayerIns* to, PlayerIns* from, bool to_game)
     Game::SuspendThreads();
 
     bool visualChanges = false;
+    uint32_t newModelIds[6] = { 0, 0, 0, 0, 0, 0 }; //used to set the chrAsmModelRes if any equipment changes
 
     copy_ChrIns(&to->chrins, &from->chrins, to_game);
     copy_PlayerGameData(to->playergamedata, from->playergamedata);
@@ -16,14 +18,25 @@ void copy_PlayerIns(PlayerIns* to, PlayerIns* from, bool to_game)
     to->data_2 = from->data_2;
     copy_RingEquipCtrl(to->ringequipctrl, from->ringequipctrl, to_game);
 
-    //check data before we copy in the new data
-    visualChanges |= (to->weaponequipctrl->equipped_weapons_ids[0] != from->weaponequipctrl->equipped_weapons_ids[0]);
-    visualChanges |= (to->weaponequipctrl->equipped_weapons_ids[1] != from->weaponequipctrl->equipped_weapons_ids[1]);
+    if (to->weaponequipctrl->equipped_weapons_ids[0] != from->weaponequipctrl->equipped_weapons_ids[0])
+    {
+        newModelIds[0] = from->weaponequipctrl->equipped_weapons_ids[0];
+        visualChanges = true;
+    }
+    if (to->weaponequipctrl->equipped_weapons_ids[1] != from->weaponequipctrl->equipped_weapons_ids[1])
+    {
+        newModelIds[1] = from->weaponequipctrl->equipped_weapons_ids[1];
+        visualChanges = true;
+    }
     copy_WeaponEquipCtrl(to->weaponequipctrl, from->weaponequipctrl, to_game);
 
-    for (size_t i = 0; i < 5; i++)
+    for (size_t i = 0; i < 4; i++)
     {
-        visualChanges |= (to->proequipctrl->equipped_armors_ids[i] != from->proequipctrl->equipped_armors_ids[i]);
+        if (to->proequipctrl->equipped_armors_ids[i] != from->proequipctrl->equipped_armors_ids[i])
+        {
+            newModelIds[i+2] = from->proequipctrl->equipped_armors_ids[i];
+            visualChanges = true;
+        }
     }
     copy_ProEquipCtrl(to->proequipctrl, from->proequipctrl, to_game);
 
@@ -33,20 +46,47 @@ void copy_PlayerIns(PlayerIns* to, PlayerIns* from, bool to_game)
     to->override_equipped_magicId = from->override_equipped_magicId;
     copy_ChrAsm(to->chrasm, from->chrasm);
     copy_ChrAsmModelRes(to->chrAsmModelRes, from->chrAsmModelRes, to_game);
-    if (to_game)
-    {
-        //trigger the game to reload the models only if any visual changes happened
-        if (visualChanges)
-        {
-            ConsoleWrite("Reload player model");
-            ChrAsmModelRes_Load_PartsbndFileCap_Entry(to->chrAsmModelRes, to->chrasm, 1, 0, 0, 0, 1, 1);
-        }
-    }
     copy_ChrAsmModel(to->chrAsmModel, from->chrAsmModel, to_game);
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
     memcpy(to->data_4, from->data_4, sizeof(to->data_4));
     memcpy(to->data_5, from->data_5, sizeof(to->data_5));
     memcpy(to->data_6, from->data_6, sizeof(to->data_6));
+
+    if (to_game)
+    {
+        //trigger the game to reload the models only if any visual changes happened
+        if (visualChanges && false)
+        {
+            //set the newModelId in each ChrAsmModelRes_Elem. The ChrAsmModelRes_Load_PartsbndFileCap_Entry function will then set up the PartsbndFileCap and reload the visuals somehow
+            for (size_t i = 0; i < 6; i++)
+            {
+                switch (i)
+                {
+                case 0://l hand
+                    *(uint32_t*)((uint64_t)(&to->chrAsmModelRes->arry[6]) + 4) = newModelIds[i];
+                    break;
+                case 1://r hand
+                    *(uint32_t*)((uint64_t)(&to->chrAsmModelRes->arry[7]) + 4) = newModelIds[i];
+                    break;
+                case 2://head
+                    *(uint32_t*)((uint64_t)(&to->chrAsmModelRes->arry[1]) + 4) = newModelIds[i];
+                    break;
+                case 3://body
+                    *(uint32_t*)((uint64_t)(&to->chrAsmModelRes->arry[2]) + 4) = newModelIds[i];
+                    break;
+                case 4://arms
+                    *(uint32_t*)((uint64_t)(&to->chrAsmModelRes->arry[3]) + 4) = newModelIds[i];
+                    break;
+                case 5://legs
+                    *(uint32_t*)((uint64_t)(&to->chrAsmModelRes->arry[4]) + 4) = newModelIds[i];
+                    break;
+                }
+            }
+
+            ConsoleWrite("Reload player model");
+            //ChrAsmModelRes_Load_PartsbndFileCap_Entry(to->chrAsmModelRes, to->chrasm, 1, 0, 0, 0, 0, 0);
+        }
+    }
 
     Game::ResumeThreads();
 }
@@ -366,7 +406,7 @@ void copy_ChrIns(ChrIns* to, ChrIns* from, bool to_game)
 {
     //copy_ChrIns_field0x18(to->field0x18, from->field0x18);
     copy_PlayerCtrl(to->playerCtrl, from->playerCtrl, to_game);
-    //copy_PadManipulator(to->padManipulator, from->padManipulator);
+    copy_PadManipulator(to->padManipulator, from->padManipulator);
     to->CharaInitParamID = from->CharaInitParamID;
     memcpy(to->data_5, from->data_5, sizeof(to->data_5));
     to->lowerThrowAnim = from->lowerThrowAnim;
@@ -412,7 +452,7 @@ ChrIns* init_ChrIns()
 
     //local_ChrIns->field0x18 = init_ChrIns_field0x18();
     local_ChrIns->playerCtrl = init_PlayerCtrl();
-    //local_ChrIns->padManipulator = init_PadManipulator();
+    local_ChrIns->padManipulator = init_PadManipulator();
     local_ChrIns->specialEffects = init_SpecialEffect();
     local_ChrIns->qwcSpEffectEquipCtrl = init_QwcSpEffectEquipCtrl();
     local_ChrIns->field0x2c8 = init_ChrIns_field0x2c8();
@@ -427,7 +467,7 @@ void free_ChrIns(ChrIns* to, bool freeself)
 {
     //free_ChrIns_field0x18(to->field0x18);
     free_PlayerCtrl(to->playerCtrl);
-    //free_PadManipulator(to->padManipulator);
+    free_PadManipulator(to->padManipulator);
     free_SpecialEffect(to->specialEffects);
     free_QwcSpEffectEquipCtrl(to->qwcSpEffectEquipCtrl);
     free_ChrIns_field0x2c8(to->field0x2c8);
@@ -528,7 +568,10 @@ void free_QwcSpEffectEquipCtrl(QwcSpEffectEquipCtrl* to)
 
 void copy_SpecialEffect(SpecialEffect* to, SpecialEffect* from, bool to_game)
 {
-    copy_SpecialEffect_Info(to->specialEffect_Info, from->specialEffect_Info, to_game);
+    if (from->specialEffect_Info != NULL && to->specialEffect_Info != NULL)
+    {
+        copy_SpecialEffect_Info(to->specialEffect_Info, from->specialEffect_Info, to_game);
+    }
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));

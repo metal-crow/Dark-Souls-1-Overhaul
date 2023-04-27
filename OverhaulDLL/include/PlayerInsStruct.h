@@ -547,7 +547,7 @@ struct ChrCtrl
 {
     uint8_t padding_0[8];
     uint8_t data_0[8];
-    uint8_t padding_1[8];
+    void* playerins_parent;
     ChrCtrl_AnimationQueue* animationQueue;
     AnimationMediator* animationMediator;
     HavokChara* havokChara;

@@ -204,28 +204,6 @@ jmp     grab_destruct_thread_handle_return
 grab_destruct_thread_handle_injection ENDP
 
 
-extern ReadInputs_allowed: byte
-EXTERN Step_PadManipulator_GetInputs_return: qword
-
-PUBLIC Step_PadManipulator_GetInputs_injection
-Step_PadManipulator_GetInputs_injection PROC
-;custom code to check bool
-cmp     ReadInputs_allowed, 0
-jnz     do_read
-ret
-do_read:
-;original code
-mov     rax, rsp
-push    rbp
-push    rsi
-push    rdi
-push    r12
-push    r13
-push    r14
-push    r15
-jmp     Step_PadManipulator_GetInputs_return
-Step_PadManipulator_GetInputs_injection ENDP
-
 _TEXT    ENDS
 
 END
