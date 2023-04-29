@@ -556,8 +556,8 @@ static PlayerIns_Is_NetworkedPlayer_FUNC* PlayerIns_Is_NetworkedPlayer = (Player
 typedef bool PadDevice_GetInputI_FUNC(void* PadDevice, uint32_t inputI);
 static PadDevice_GetInputI_FUNC* PadDevice_GetInputI = (PadDevice_GetInputI_FUNC*)0x1401a5ca0;
 
-typedef float* PadDevice_Get2StickInputI_FUNC(void* PadDevice, float* out, uint32_t inputI1, uint32_t inputI2);
-static PadDevice_Get2StickInputI_FUNC* PadDevice_Get2StickInputI = (PadDevice_Get2StickInputI_FUNC*)0x1401ad530;
+typedef float PadDevice_GetStickInputI_FUNC(void* PadDevice, uint32_t inputI);
+static PadDevice_GetStickInputI_FUNC* PadDevice_GetStickInputI = (PadDevice_GetStickInputI_FUNC*)0x1401ad390;
 
 typedef void* PadMan_GetPadDevice_FUNC(uint32_t DeviceNum);
 static PadMan_GetPadDevice_FUNC* PadMan_GetPadDevice = (PadMan_GetPadDevice_FUNC*)0x1401af490;

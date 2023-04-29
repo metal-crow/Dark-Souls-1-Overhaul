@@ -113,24 +113,12 @@ typedef struct RollbackState RollbackState;
 
 struct RollbackInput
 {
-    unsigned int Y : 1;
-    unsigned int B : 1;
-    unsigned int A : 1;
-    unsigned int X : 1;
-    unsigned int R1 : 1;
-    unsigned int R2 : 1;
-    unsigned int R3 : 1;
     unsigned int IsLockedOn : 1; //we can't simulate lockon attempts for non-host
-    unsigned int L1 : 1;
-    unsigned int L2 : 1;
-    unsigned int DpadUp : 1;
-    unsigned int DpadDown : 1;
-    unsigned int DpadLeft : 1;
-    unsigned int DpadRight : 1;
-    float LStickX;
-    float LStickY;
-    float RStickX;
-    float RStickY;
+
+    //TODO slim these down
+    uint32_t keys[8];
+    float sticks[40];
+
     uint32_t curGesture; //we can't simulate the gesture menus for non-host
     uint16_t curSelectedMagicId; //this could be simulated, but let's not
     uint32_t curUsingItemId; //we can't simulate the inventory menus for non-host

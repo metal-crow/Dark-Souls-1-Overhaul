@@ -95,47 +95,6 @@ bool ggpo_toggle(void* unused)
     return true;
 }
 
-//need to use this so PackRollbackInput can get the correct values post keybind processing, but will return failed when the game calls it
-static bool OverrideVirtualMultiDeviceInjection = false;
-
-void PackRollbackInput(RollbackInput* out, PlayerIns* player)
-{
-    void* padDevice = PadMan_GetPadDevice(0);
-
-    OverrideVirtualMultiDeviceInjection = true;
-    out->Y = PadDevice_GetInputI(padDevice, PadButtons::Y);
-    out->B = PadDevice_GetInputI(padDevice, PadButtons::B);
-    out->A = PadDevice_GetInputI(padDevice, PadButtons::A);
-    out->X = PadDevice_GetInputI(padDevice, PadButtons::X);
-    out->R1 = PadDevice_GetInputI(padDevice, PadButtons::R1);
-    out->R2 = PadDevice_GetInputI(padDevice, PadButtons::R2);
-    out->R3 = PadDevice_GetInputI(padDevice, PadButtons::R3);
-    out->IsLockedOn = !(*(bool*)(((uint64_t)(&player->chrins.playerCtrl->chrCtrl)) + 0x21D));
-    out->L1 = PadDevice_GetInputI(padDevice, PadButtons::L1);
-    out->L2 = PadDevice_GetInputI(padDevice, PadButtons::L2);
-    out->DpadUp = PadDevice_GetInputI(padDevice, PadButtons::DpadUp);
-    out->DpadDown = PadDevice_GetInputI(padDevice, PadButtons::DpadDown);
-    out->DpadLeft = PadDevice_GetInputI(padDevice, PadButtons::DpadLeft);
-    out->DpadRight = PadDevice_GetInputI(padDevice, PadButtons::DpadRight);
-
-    float sticks[2];
-    PadDevice_Get2StickInputI(padDevice, sticks, PadButtons::LStickX, PadButtons::LStickY);
-    out->LStickX = sticks[0];
-    out->LStickY = sticks[1];
-    PadDevice_Get2StickInputI(padDevice, sticks, PadButtons::RStickX, PadButtons::RStickY);
-    out->RStickX = sticks[0];
-    out->RStickY = sticks[1];
-    OverrideVirtualMultiDeviceInjection = false;
-
-    //out->curGesture
-    out->curSelectedMagicId = get_currently_selected_magic_id(player);
-    out->curUsingItemId = (player->chrins).curUsedItem.itemId;
-    for (size_t i = 0; i < InventorySlots::END; i++)
-    {
-        out->equipment_array[i] = Game::get_equipped_inventory((uint64_t)player, (InventorySlots)i);
-    }
-}
-
 void PadDeviceSetKey(uint32_t* inputkeys, uint32_t keyI, bool state)
 {
     if (state)
@@ -148,34 +107,50 @@ void PadDeviceSetKey(uint32_t* inputkeys, uint32_t keyI, bool state)
     }
 }
 
+//need to use this so PackRollbackInput can get the correct values post keybind processing, but will return failed when the game calls it
+static bool OverrideVirtualMultiDeviceInjection = false;
+
+void PackRollbackInput(RollbackInput* out, PlayerIns* player)
+{
+    void* padDevice = PadMan_GetPadDevice(0);
+
+    OverrideVirtualMultiDeviceInjection = true;
+    for (uint32_t i = 0; i < 256; i++)
+    {
+        PadDeviceSetKey(out->keys, i, PadDevice_GetInputI(padDevice, i));
+    }
+    for (uint32_t i = 0; i < 40; i++)
+    {
+        out->sticks[i] = PadDevice_GetStickInputI(padDevice, i);
+    }
+    OverrideVirtualMultiDeviceInjection = false;
+
+    out->IsLockedOn = !(*(bool*)(((uint64_t)(&player->chrins.playerCtrl->chrCtrl)) + 0x21D));
+    //out->curGesture
+    out->curSelectedMagicId = get_currently_selected_magic_id(player);
+    out->curUsingItemId = (player->chrins).curUsedItem.itemId;
+    for (size_t i = 0; i < InventorySlots::END; i++)
+    {
+        out->equipment_array[i] = Game::get_equipped_inventory((uint64_t)player, (InventorySlots)i);
+    }
+}
+
 void UnpackRollbackInput(RollbackInput* in, PlayerIns* player, uint32_t player_i)
 {
     PadDevice* padDevice = (PadDevice*)PadMan_GetPadDevice(player_i);
-    uint32_t* keys = padDevice->VirtMultiDevice->base.base.VirtInputData.keys.inputKeys;
 
-    PadDeviceSetKey(keys, PadButtons::Y, in->Y);
-    PadDeviceSetKey(keys, PadButtons::A, in->A);
-    PadDeviceSetKey(keys, PadButtons::B, in->B);
-    PadDeviceSetKey(keys, PadButtons::B_click, in->B);
-    PadDeviceSetKey(keys, PadButtons::X, in->X);
-    PadDeviceSetKey(keys, PadButtons::R1, in->R1);
-    PadDeviceSetKey(keys, PadButtons::R1_alt, in->R1);
-    PadDeviceSetKey(keys, PadButtons::R1_weapon, in->R1);
-    PadDeviceSetKey(keys, PadButtons::R2, in->R2);
-    PadDeviceSetKey(keys, PadButtons::R2_weapon, in->R2);
-    PadDeviceSetKey(keys, PadButtons::R3, in->R3);
-    PadDeviceSetKey(keys, PadButtons::L1, in->L1);
-    PadDeviceSetKey(keys, PadButtons::L2, in->L2);
-    PadDeviceSetKey(keys, PadButtons::DpadUp, in->DpadUp);
-    PadDeviceSetKey(keys, PadButtons::DpadDown, in->DpadDown);
-    PadDeviceSetKey(keys, PadButtons::DpadLeft, in->DpadLeft);
-    PadDeviceSetKey(keys, PadButtons::DpadRight, in->DpadRight);
+    uint32_t* keys = padDevice->VirtMultiDevice->base.base.VirtInputData.keys.inputKeys;
+    for (uint32_t i = 0; i < 256; i++)
+    {
+        bool val = (in->keys[i >> 0x5] >> (i & 0x1f)) & 1;
+        PadDeviceSetKey(keys, i, val);
+    }
 
     float* sticks = padDevice->VirtMultiDevice->base.base.VirtInputData.VirAnalogKeyInfo.analogSticksAndPad;
-    sticks[PadButtons::LStickY] = in->LStickY;
-    sticks[PadButtons::LStickX] = in->LStickX;
-    sticks[PadButtons::RStickY] = in->RStickY;
-    sticks[PadButtons::RStickX] = in->RStickX;
+    for (uint32_t i = 0; i < 40; i++)
+    {
+        sticks[i] = in->sticks[i];
+    }
 
     //only have to do the rest if this is a remote player, if this is the pc the game takes care of it
     if (player_i > 0)
@@ -406,7 +381,7 @@ extern "C" {
 //return false to abort the function, true to continue
 bool VirtualMultiDevice_GetStickInputI_helper()
 {
-    if (Rollback::rollbackEnabled && Rollback::ggpoStarted)
+    if (Rollback::rollbackEnabled && Rollback::ggpoStarted && !OverrideVirtualMultiDeviceInjection)
     {
         return false;
     }

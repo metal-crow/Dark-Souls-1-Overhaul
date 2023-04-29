@@ -431,6 +431,10 @@ bool RecvPlayerInitPacket_AwaitForPlayerIns(void* data_)
 {
     PlayerInitPacketDelayedStruct* data = (PlayerInitPacketDelayedStruct*)data_;
     PlayerInitPacket* pkt = data->pkt;
+    if (*(void**)Game::world_chr_man_imp == NULL)
+    {
+        return true;
+    }
     PlayerIns* playerins = getPlayerInsForConnectedPlayerData(*(void**)Game::world_chr_man_imp, (void*)data->ConnectedPlayerData);
     if (playerins == NULL)
     {
