@@ -32,9 +32,9 @@ std::vector<std::string> Mod::authors = {
     "jellybaby34",
     "SiriusTextra",
     "Hillo",
-    "Verideth",
+    "Graham",
     "ChurchGuard",
-    "Relinquished001"
+    "Relinquished001",
     // Apologies in advance to anyone I forgot, just let me know so I can add you to the list
     //     -Sean
 };
@@ -44,7 +44,8 @@ std::vector<std::string> Mod::authors = {
 std::vector<std::string> Mod::contributors = {
     "eur0pa",
     "Youri \"NullBy7e\" de Mooij",
-    "Zullie The Witch"
+    "Zullie The Witch",
+    "LukeYui",
 };
 
 // Others who made the project possible
