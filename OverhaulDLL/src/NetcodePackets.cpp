@@ -378,6 +378,8 @@ void SendPlayerInitPacket()
         pkt.type10_unk4 = *(float*)(equipgamedata + 0x114);
         pkt.type10_unk5 = *(float*)(equipgamedata + 0x118);
         pkt.type11_flags = compress_gamedata_flags(equipgamedata);
+        pkt.left_hand_slot_selected = playerins->chrins.padManipulator->chrManipulator.left_hand_slot_selected;
+        pkt.right_hand_slot_selected = playerins->chrins.padManipulator->chrManipulator.right_hand_slot_selected;
         for (int i = 0; i < 20; i++)
         {
             pkt.equipment_array[i] = *(uint32_t*)((equipgamedata + 0x80 + 0x24) + (i * 4));
@@ -431,6 +433,10 @@ bool RecvPlayerInitPacket_AwaitForPlayerIns(void* data_)
 {
     PlayerInitPacketDelayedStruct* data = (PlayerInitPacketDelayedStruct*)data_;
     PlayerInitPacket* pkt = data->pkt;
+    if (*(void**)Game::world_chr_man_imp == NULL)
+    {
+        return true;
+    }
     PlayerIns* playerins = getPlayerInsForConnectedPlayerData(*(void**)Game::world_chr_man_imp, (void*)data->ConnectedPlayerData);
     if (playerins == NULL)
     {
@@ -443,6 +449,8 @@ bool RecvPlayerInitPacket_AwaitForPlayerIns(void* data_)
     *(float*)(((uint64_t)playerins->chrins.playerCtrl->chrCtrl.havokChara) + 0x4) = pkt->rotation;
     playerins->chrins.curHp = pkt->curHp;
     playerins->chrins.curSp = pkt->curSp;
+    playerins->chrins.padManipulator->chrManipulator.left_hand_slot_selected = pkt->left_hand_slot_selected;
+    playerins->chrins.padManipulator->chrManipulator.right_hand_slot_selected = pkt->right_hand_slot_selected;
 
     free(pkt);
     free(data_);

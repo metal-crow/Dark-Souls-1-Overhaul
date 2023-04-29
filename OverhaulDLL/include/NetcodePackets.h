@@ -26,6 +26,8 @@ struct PlayerInitPacket
     float type10_unk4;
     float type10_unk5;
     uint16_t type11_flags;
+    unsigned int left_hand_slot_selected : 1;
+    unsigned int right_hand_slot_selected : 1;
     uint32_t equipment_array[20];
 };
 #pragma pack(pop)
