@@ -32,8 +32,6 @@ struct PadManipulatorPacked
     unsigned int jump_input : 1;
     unsigned int l1_weapon_attack : 1;
     unsigned int l2_weapon_attack : 1;
-    unsigned int left_hand_slot_selected : 1;
-    unsigned int right_hand_slot_selected : 1;
     unsigned int isSprintingAnim : 1;
     unsigned int not_getting_movement_input : 1;
 

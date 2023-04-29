@@ -555,15 +555,8 @@ static Step_PadManipulator_FUNC* Step_PadManipulator = (Step_PadManipulator_FUNC
 typedef bool PlayerIns_Is_NetworkedPlayer_FUNC(PlayerIns* pc);
 static PlayerIns_Is_NetworkedPlayer_FUNC* PlayerIns_Is_NetworkedPlayer = (PlayerIns_Is_NetworkedPlayer_FUNC*)0x1403226e0;
 
-typedef struct
-{
-    uint64_t vtable;
-    void* PadDevice;
-    uint64_t dbgnode;
-} BasePad;
-
-typedef bool DbgMapWalkPad_CheckLockOnButton_FUNC(BasePad* BasePad);
-static DbgMapWalkPad_CheckLockOnButton_FUNC* DbgMapWalkPad_CheckLockOnButton = (DbgMapWalkPad_CheckLockOnButton_FUNC*)0x1401a3b60;
+typedef bool PadDevice_GetInputI_FUNC(void* PadDevice, uint32_t inputI);
+static PadDevice_GetInputI_FUNC* PadDevice_GetInputI = (PadDevice_GetInputI_FUNC*)0x1401a5ca0;
 
 typedef void* PadMan_GetPadDevice_FUNC(uint32_t DeviceNum);
 static PadMan_GetPadDevice_FUNC* PadMan_GetPadDevice = (PadMan_GetPadDevice_FUNC*)0x1401af490;

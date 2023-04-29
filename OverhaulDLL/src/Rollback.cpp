@@ -134,10 +134,9 @@ void PackRollbackInput(RollbackInput* out, PlayerIns* player)
     //need to tell if GGPO has actually returned us a real input, or padding
     out->const1 = 1;
 
+    void* PadDevice = PadMan_GetPadDevice(0);
     //need to manually replicate the lockon code the game normally does
-    BasePad pad;
-    pad.PadDevice = PadMan_GetPadDevice(0x0);
-    bool lockonButton = DbgMapWalkPad_CheckLockOnButton(&pad);
+    bool lockonButton = PadDevice_GetInputI(PadDevice, 0x36); //R3(on click)
     uint8_t* bTargetLocked = (uint8_t*)((*(uint64_t*)Game::LockTgtManImp) + 0x1430);
     uint8_t* bTargetLocked_Alt = (uint8_t*)((*(uint64_t*)Game::LockTgtManImp) + 0x1431);
     if (lockonButton)
@@ -146,6 +145,10 @@ void PackRollbackInput(RollbackInput* out, PlayerIns* player)
     }
     out->bTargetLocked = *bTargetLocked;
     out->bTargetLocked_Alt = *bTargetLocked_Alt;
+
+    //need to know when the toggle buttons are pressed, instead of the current selected slot
+    out->toggle_right_hand_slot_selected = PadDevice_GetInputI(PadDevice, 0x51); //DpadRight
+    out->toggle_left_hand_slot_selected = PadDevice_GetInputI(PadDevice, 0x52); //DpadLeft
 
     out->curSelectedMagicId = get_currently_selected_magic_id(player);
     out->curUsingItemId = (player->chrins).curUsedItem.itemId;
@@ -157,6 +160,17 @@ void PackRollbackInput(RollbackInput* out, PlayerIns* player)
 
 void UnpackRollbackInput(RollbackInput* in, PlayerIns* player)
 {
+    uint32_t* right_hand_slot_selected = &(player->chrins.padManipulator->chrManipulator.right_hand_slot_selected);
+    if (in->toggle_right_hand_slot_selected)
+    {
+        *right_hand_slot_selected ^= 1;
+    }
+    uint32_t* left_hand_slot_selected = &(player->chrins.padManipulator->chrManipulator.left_hand_slot_selected);
+    if (in->toggle_left_hand_slot_selected)
+    {
+        *left_hand_slot_selected ^= 1;
+    }
+
     uint32_t playerHandle = *(uint32_t*)(((uint64_t)player) + 8);
     if (playerHandle > Game::PC_Handle && playerHandle < Game::PC_Handle + 10)
     {

@@ -88,12 +88,17 @@ typedef struct RollbackState RollbackState;
 struct RollbackInput
 {
     uint8_t const1;
-    unsigned int bTargetLocked : 1; //this is only used for the local player, the remote player only needs LockonTargetHandle
+
+    //this is only used for the local player, the remote player only needs LockonTargetHandle
+    unsigned int bTargetLocked : 1;
     unsigned int bTargetLocked_Alt : 1;
+
+    unsigned int toggle_left_hand_slot_selected : 1;
+    unsigned int toggle_right_hand_slot_selected : 1;
     PadManipulatorPacked padmanipulator;
-    uint16_t curSelectedMagicId;
-    uint32_t curUsingItemId;
-    uint32_t equipment_array[20];
+    uint16_t curSelectedMagicId; //this could be simulated, but let's not
+    uint32_t curUsingItemId; //we can't simulate the inventory menus for non-host
+    uint32_t equipment_array[20];//we can't simulate the inventory menus for non-host
 };
 
 #pragma pack(pop)
