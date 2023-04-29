@@ -356,6 +356,8 @@ extern "C" {
     void dsr_frame_finished_helper();
 }
 
+static int ggpo_eventcode_timesync_frames_ahead = 0;
+
 void dsr_frame_finished_helper()
 {
     if (Rollback::rollbackEnabled && Rollback::ggpoStarted)
@@ -372,6 +374,13 @@ void dsr_frame_finished_helper()
                 {
                     *visability += 0.2f;
                 }
+            }
+
+            if (ggpo_eventcode_timesync_frames_ahead > 0)
+            {
+                //slow us down a bit
+                Sleep((1000 * 1) / 60);
+                ggpo_eventcode_timesync_frames_ahead--;
             }
         }
     }
@@ -560,7 +569,7 @@ bool rollback_on_event_callback(GGPOEvent* info)
         break;
     case GGPO_EVENTCODE_TIMESYNC:
         ConsoleWrite("GGPO_EVENTCODE_TIMESYNC");
-        Sleep(1000 * info->u.timesync.frames_ahead / 60);
+        ggpo_eventcode_timesync_frames_ahead = info->u.timesync.frames_ahead;
         break;
     }
     return true;
