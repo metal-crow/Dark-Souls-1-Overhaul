@@ -782,7 +782,9 @@ struct ChrIns
     uint8_t data_5[0x10];
     ChrIns_AnimationMediatorStateInfo lowerThrowAnim;
     ChrIns_AnimationMediatorStateInfo upperThrowAnim;
-    uint8_t padding_4a[0xc4];
+    uint8_t padding_4a[12];
+    uint32_t* player_handing_state;
+    uint8_t padding_4b[176];
     float curToughness;
     float maxToughness;
     float toughnessUnk1;
@@ -834,6 +836,7 @@ static_assert(offsetof(ChrIns, CharaInitParamID) == 0xc4+8);
 static_assert(offsetof(ChrIns, data_5) == 0x164 + 8);
 static_assert(offsetof(ChrIns, lowerThrowAnim) == 0x174+8);
 static_assert(offsetof(ChrIns, upperThrowAnim) == 0x17c+8);
+static_assert(offsetof(ChrIns, player_handing_state) == 0x190+8);
 static_assert(offsetof(ChrIns, curToughness) == 0x248 + 8);
 static_assert(offsetof(ChrIns, maxToughness) == 0x24C + 8);
 static_assert(offsetof(ChrIns, curSelectedMagicId) == 0x25c+8);
@@ -935,7 +938,8 @@ struct EquipGameData
     uint32_t equippedItemIndexes[20];
     uint8_t padding_1[12];
     ChrAsm chrasm;
-    uint8_t padding_2[0x20];
+    ChrAsm* chrasm_alt;
+    uint8_t padding_2[24];
     EquipInventoryData equippedInventory;
     EquipMagicData* equipMagicData;
     EquipItemData equippedItemsInQuickbar;

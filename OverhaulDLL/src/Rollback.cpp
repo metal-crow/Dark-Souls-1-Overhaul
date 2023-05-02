@@ -194,8 +194,23 @@ void UnpackRollbackInput(RollbackInput* in, PlayerIns* player)
         uint64_t itemList = *(uint64_t*)(((uint64_t)(&player->playergamedata->equipGameData.equippedInventory)) + 0x30);
         for (uint32_t i = 0; i < InventorySlots::END; i++)
         {
+            //handle changing equipment while 2 handing
+            if ((i == player->playergamedata->equipGameData.chrasm.l_hand_equipped_index * 0x2) ||
+                (i == player->playergamedata->equipGameData.chrasm.r_hand_equipped_index * 0x2 + 0x1))
+            {
+                if (player->playergamedata->equipGameData.chrasm.equip_items[i] != in->equipment_array[i])
+                {
+                    player->playergamedata->equipGameData.chrasm.equipped_weapon_style = 0x1;
+                }
+            }
+
             //insert into EquipGameData
-            ChrAsm_Set_Equipped_Items_FromNetwork(&player->playergamedata->equipGameData, i, in->equipment_array[i], -1, false);
+            player->playergamedata->equipGameData.chrasm.equip_items[i] = in->equipment_array[i];
+            if (player->playergamedata->equipGameData.chrasm_alt != NULL)
+            {
+                player->playergamedata->equipGameData.chrasm_alt->equip_items[i] = in->equipment_array[i];
+            }
+
             //inset into EquipInventoryData, and set the equippedItemIndexes
             player->playergamedata->equipGameData.equippedItemIndexes[i] = i;
             //category

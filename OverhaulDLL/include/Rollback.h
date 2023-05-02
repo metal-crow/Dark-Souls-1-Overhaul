@@ -98,7 +98,10 @@ struct RollbackInput
     PadManipulatorPacked padmanipulator;
     uint16_t curSelectedMagicId; //this could be simulated, but let's not
     uint32_t curUsingItemId; //we can't simulate the inventory menus for non-host
-    uint32_t equipment_array[20];//we can't simulate the inventory menus for non-host
+
+    //uint8_t equipment_change_index;
+    //uint32_t equipment_change_id;
+    uint32_t equipment_array[20];//we can't simulate the inventory menus for non-host. can optimize this since only 1 item will change per-frame (except for dragon body)
 };
 
 #pragma pack(pop)

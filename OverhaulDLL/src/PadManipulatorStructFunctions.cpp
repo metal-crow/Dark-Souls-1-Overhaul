@@ -18,6 +18,7 @@ void PadManipulator_to_PadManipulatorPacked(PadManipulatorPacked* to, PadManipul
     to->l2_weapon_attack = from->chrManipulator.CurrentFrame_ActionInputs.l2_weapon_attack;
     to->isSprintingAnim = from->chrManipulator.isSprintingAnim;
     to->not_getting_movement_input = from->not_getting_movement_input;
+    to->change_2handing_state = from->chrManipulator.change_2handing_state;
 
     to->camera_x_direction_movement_input_amount = from->chrManipulator.camera_x_direction_movement_input_amount;
     to->camera_y_direction_movement_input_amount = from->chrManipulator.camera_y_direction_movement_input_amount;
@@ -102,6 +103,7 @@ void PadManipulatorPacked_to_PadManipulator(PadManipulator* to, PadManipulatorPa
 
     to->chrManipulator.isSprintingAnim = from->isSprintingAnim;
     to->chrManipulator.LockonTargetHandle = from->LockonTargetHandle;
+    to->chrManipulator.change_2handing_state = from->change_2handing_state;
     to->movement_related_flags = from->movement_related_flags;
     to->not_getting_movement_input = from->not_getting_movement_input;
     to->y_movement_input[0] = from->y_movement_input;

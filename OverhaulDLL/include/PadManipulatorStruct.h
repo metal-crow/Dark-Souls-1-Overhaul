@@ -34,6 +34,7 @@ struct PadManipulatorPacked
     unsigned int l2_weapon_attack : 1;
     unsigned int isSprintingAnim : 1;
     unsigned int not_getting_movement_input : 1;
+    unsigned int change_2handing_state : 2;
 
     float camera_x_direction_movement_input_amount;
     float camera_y_direction_movement_input_amount;
@@ -220,7 +221,7 @@ struct ChrManipulator
     uint8_t field45_0x1c5;
     uint8_t field46_0x1c6;
     uint8_t field47_0x1c7;
-    uint32_t field48_0x1c8;
+    uint32_t change_2handing_state;
     uint32_t left_hand_slot_selected;
     uint32_t right_hand_slot_selected;
     uint32_t field51_0x1d4;
