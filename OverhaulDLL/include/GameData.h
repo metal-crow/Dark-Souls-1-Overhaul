@@ -383,6 +383,7 @@ public:
     */
 	static void preload_function_caches();
 
+    static void update_ChrAsmModelRes_model(uint64_t ChrAsmModelRes, uint64_t ChrAsmModelResElem, uint32_t newModelId, bool useProtector, bool useWeapon);
 
 
 
@@ -560,5 +561,23 @@ static PadDevice_GetInputI_FUNC* PadDevice_GetInputI = (PadDevice_GetInputI_FUNC
 
 typedef void* PadMan_GetPadDevice_FUNC(uint32_t DeviceNum);
 static PadMan_GetPadDevice_FUNC* PadMan_GetPadDevice = (PadMan_GetPadDevice_FUNC*)0x1401af490;
+
+typedef void* EquipParamWeaponInfo_From_ModelId_FUNC(void* EquipParamWeaponInfo, int newModelId);
+static EquipParamWeaponInfo_From_ModelId_FUNC* EquipParamWeaponInfo_From_ModelId = (EquipParamWeaponInfo_From_ModelId_FUNC*)0x14020af60;
+
+typedef bool EquipParamWeaponInfo_To_PartsIdString_FUNC(void* EquipParamWeaponInfo, void* strout, uint8_t param_3, uint64_t param_4);
+static EquipParamWeaponInfo_To_PartsIdString_FUNC* EquipParamWeaponInfo_To_PartsIdString = (EquipParamWeaponInfo_To_PartsIdString_FUNC*)0x140532f40;
+
+typedef void* Construct_PartsbndFileCap_FUNC(wchar_t* param_1, uint64_t param_2);
+static Construct_PartsbndFileCap_FUNC* Construct_PartsbndFileCap = (Construct_PartsbndFileCap_FUNC*)0x1405a10f0;
+
+typedef bool PartsbndFileCap_Free_FUNC(void* DelayDeleteManImp, uint32_t param_2, void* PartsbndFileCapOut, uint64_t param_4);
+static PartsbndFileCap_Free_FUNC* PartsbndFileCap_Free = (PartsbndFileCap_Free_FUNC*)0x1401957a0;
+
+typedef bool EquipParamProtectorInfo_To_PartsIdString_FUNC(void* EquipParamProtectorInfo, void* strout, uint8_t param_3, uint64_t param_4);
+static EquipParamProtectorInfo_To_PartsIdString_FUNC* EquipParamProtectorInfo_To_PartsIdString = (EquipParamProtectorInfo_To_PartsIdString_FUNC*)0x14052eda0;
+
+typedef void* Build_EquipParamProtectorInfo_FUNC(void* EquipParamProtectorInfo, int newModelId);
+static Build_EquipParamProtectorInfo_FUNC* Build_EquipParamProtectorInfo = (Build_EquipParamProtectorInfo_FUNC*)0x14052eb90;
 
 #endif // _DS1_OVERHAUL_GAME_DATA_H_

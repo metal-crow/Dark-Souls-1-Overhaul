@@ -1628,3 +1628,59 @@ void Game::set_ReadInputs_allowed(bool allow)
 {
     ReadInputs_allowed = allow;
 }
+
+typedef struct
+{
+    void* ptr;
+    union{
+        wchar_t buf[8];
+        wchar_t* bufPtr;
+    };
+    uint64_t chrLen;
+    uint64_t len;
+} DSRwstring;
+
+typedef void* init_wstring_FUNC(void* str);
+static init_wstring_FUNC* init_wstring = (init_wstring_FUNC*)0x14013b5d0;
+
+void Game::update_ChrAsmModelRes_model(uint64_t ChrAsmModelRes, uint64_t ChrAsmModelResElem, uint32_t newModelId, bool useProtector, bool useWeapon)
+{
+    uint8_t paramInfo[0x28]; //this can be hidden to us, only passed around
+
+    DSRwstring part_id_wstr;
+    init_wstring(&part_id_wstr);
+
+    wchar_t part_filename[50];
+
+    //get the param info for this model
+    if (useWeapon)
+    {
+        EquipParamWeaponInfo_From_ModelId(&paramInfo, newModelId);
+    }
+    else if (useProtector)
+    {
+        Build_EquipParamProtectorInfo(&paramInfo, newModelId);
+    }
+
+    //convert param info to a part id string
+    bool res = false;
+    if (useWeapon)
+    {
+        res = EquipParamWeaponInfo_To_PartsIdString(&paramInfo, &part_id_wstr, 1, 0);
+    }
+    else if (useProtector)
+    {
+        res = EquipParamProtectorInfo_To_PartsIdString(&paramInfo, &part_id_wstr, 1, 0);
+    }
+
+    if (res)
+    {
+        //build the filecap from the part id string
+        swprintf(part_filename, 50, L"parts:/%s.partsbnd", part_id_wstr.bufPtr);
+        void* newPartsFileCap = Construct_PartsbndFileCap(part_filename, ChrAsmModelRes+0x10);
+        //free the old PartsbndFileCap1
+        PartsbndFileCap_Free(*(void**)Game::delay_delete_man, 0x1, *(void**)(ChrAsmModelResElem+8), 0x140195870);
+        //set PartsbndFileCap1 to the new filecap
+        *(void**)(ChrAsmModelResElem + 8) = newPartsFileCap;
+    }
+}
