@@ -626,7 +626,14 @@ bool rollback_await_init(void* steamMsgs)
             return true;
         }
         PlayerIns* player = (PlayerIns*)player_o.value();
-        if (player->chrins.maxHp <= 1)
+
+        //some sanity checks
+        if (player->chrins.maxHp <= 1 || player->chrins.curHp < 10)
+        {
+            return true;
+        }
+        float x_pos = *(float*)(((uint64_t)player->chrins.playerCtrl->chrCtrl.havokChara) + 0x10);
+        if (x_pos == 0.0f)
         {
             return true;
         }
