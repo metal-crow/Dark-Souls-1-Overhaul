@@ -9,5 +9,7 @@ void PadManipulator_to_PadManipulatorPacked(PadManipulatorPacked* to, PadManipul
 void PadManipulatorPacked_to_PadManipulator(PadManipulator* to, PadManipulatorPacked* from, bool networkedPc);
 
 void copy_PadManipulator(PadManipulator* to, PadManipulator* from);
+PadManipulator* init_PadManipulator();
+void free_PadManipulator(PadManipulator* to);
 
 #endif
