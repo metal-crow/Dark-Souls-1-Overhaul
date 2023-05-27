@@ -1519,6 +1519,10 @@ std::optional<int32_t*> Game::get_MP_AreaID_ptr()
 
 void* Game::game_malloc(size_t size, size_t alignment, void* heap)
 {
+    if (heap == NULL)
+    {
+        heap = (void*)*(uint64_t*)(0x141b68f20); //internal_heap_3
+    }
     return InGame_Malloc(size, alignment, heap);
 }
 
