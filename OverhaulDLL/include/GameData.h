@@ -580,4 +580,7 @@ static EquipParamProtectorInfo_To_PartsIdString_FUNC* EquipParamProtectorInfo_To
 typedef void* Build_EquipParamProtectorInfo_FUNC(void* EquipParamProtectorInfo, int newModelId);
 static Build_EquipParamProtectorInfo_FUNC* Build_EquipParamProtectorInfo = (Build_EquipParamProtectorInfo_FUNC*)0x14052eb90;
 
+typedef void Vector_IncreaseSize_FUNC(void* vector, uint64_t spaceToAdd);
+static Vector_IncreaseSize_FUNC* Vector_IncreaseSize = (Vector_IncreaseSize_FUNC*)0x1403ab910;
+
 #endif // _DS1_OVERHAUL_GAME_DATA_H_
