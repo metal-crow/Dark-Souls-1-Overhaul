@@ -71,6 +71,10 @@ void copy_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to, EntityThrow
 EntityThrowAnimationStatus* init_EntityThrowAnimationStatus();
 void free_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to);
 
+void copy_ThrowSelfEsc(ThrowSelfEsc* to, ThrowSelfEsc* from);
+ThrowSelfEsc* init_ThrowSelfEsc();
+void free_ThrowSelfEsc(ThrowSelfEsc* to);
+
 void copy_QwcSpEffectEquipCtrl(QwcSpEffectEquipCtrl* to, QwcSpEffectEquipCtrl* from);
 QwcSpEffectEquipCtrl* init_QwcSpEffectEquipCtrl();
 void free_QwcSpEffectEquipCtrl(QwcSpEffectEquipCtrl* to);

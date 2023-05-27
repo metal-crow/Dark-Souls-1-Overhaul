@@ -50,6 +50,7 @@ typedef struct SpecialEffect_Info SpecialEffect_Info;
 typedef struct SpecialEffect SpecialEffect;
 typedef struct QwcSpEffectEquipCtrl QwcSpEffectEquipCtrl;
 typedef struct ChrAttachSys ChrAttachSys;
+typedef struct ThrowSelfEsc ThrowSelfEsc;
 typedef struct EntityThrowAnimationStatus EntityThrowAnimationStatus;
 typedef struct ChrIns_field0x2c8 ChrIns_field0x2c8;
 typedef struct ChrIns_field0x18 ChrIns_field0x18;
@@ -725,18 +726,29 @@ struct ChrAttachSys
 
 static_assert(sizeof(ChrAttachSys) == 0x18);
 
+struct ThrowSelfEsc
+{
+    EntityThrowAnimationStatus* parent;
+    uint8_t data_0[0x18];
+    void* padding_0;
+};
+
+static_assert(offsetof(ThrowSelfEsc, data_0) == 0x8);
+static_assert(sizeof(ThrowSelfEsc) == 0x28);
+
 struct EntityThrowAnimationStatus
 {
-    uint8_t padding_0[0x10];
+    uint8_t padding_0[8];
+    uint64_t playerins_parent;
     uint64_t throw_paramdef; //this is a pointer to a const struct, so just read/write the pointer itself
     uint8_t data_0[0x40];
-    uint8_t padding_1[0x8];
+    ThrowSelfEsc* throwSelfEsc;
     uint8_t data_1[0x50];
 };
 
 static_assert(offsetof(EntityThrowAnimationStatus, throw_paramdef) == 0x10);
 static_assert(offsetof(EntityThrowAnimationStatus, data_0) == 0x18);
-static_assert(offsetof(EntityThrowAnimationStatus, padding_1) == 0x58);
+static_assert(offsetof(EntityThrowAnimationStatus, throwSelfEsc) == 0x58);
 static_assert(offsetof(EntityThrowAnimationStatus, data_1) == 0x60);
 static_assert(sizeof(EntityThrowAnimationStatus) == 0xb0);
 

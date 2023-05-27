@@ -512,18 +512,38 @@ void free_ChrIns_field0x2c8(ChrIns_field0x2c8* to)
 
 void copy_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to, EntityThrowAnimationStatus* from)
 {
+    to->playerins_parent = from->playerins_parent;
     to->throw_paramdef = from->throw_paramdef;
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    copy_ThrowSelfEsc(to->throwSelfEsc, from->throwSelfEsc);
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
 }
 
 EntityThrowAnimationStatus* init_EntityThrowAnimationStatus()
 {
     EntityThrowAnimationStatus* local_EntityThrowAnimationStatus = (EntityThrowAnimationStatus*)malloc_(sizeof(EntityThrowAnimationStatus));
+    local_EntityThrowAnimationStatus->throwSelfEsc = init_ThrowSelfEsc();
     return local_EntityThrowAnimationStatus;
 }
 
 void free_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to)
+{
+    free(to->throwSelfEsc);
+    free(to);
+}
+
+void copy_ThrowSelfEsc(ThrowSelfEsc* to, ThrowSelfEsc* from)
+{
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+}
+
+ThrowSelfEsc* init_ThrowSelfEsc()
+{
+    ThrowSelfEsc* local_ThrowSelfEsc = (ThrowSelfEsc*)malloc_(sizeof(ThrowSelfEsc));
+    return local_ThrowSelfEsc;
+}
+
+void free_ThrowSelfEsc(ThrowSelfEsc* to)
 {
     free(to);
 }
@@ -626,7 +646,7 @@ void copy_SpecialEffect_Info(SpecialEffect_Info* to, SpecialEffect_Info* from, b
             //handle if the game's list isn't long enough, and we need to alloc more slots
             if (from->next != NULL && to->next == NULL)
             {
-                to->next = (SpecialEffect_Info*)Game::game_malloc(sizeof(SpecialEffect_Info), 8, (void*)*(uint64_t*)(0x141b68f20)); //internal_heap_3
+                to->next = (SpecialEffect_Info*)Game::game_malloc(sizeof(SpecialEffect_Info), 8, NULL);
                 to->next->next = NULL;
                 to->next->prev = to;
             }
