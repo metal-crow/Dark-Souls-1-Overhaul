@@ -67,7 +67,7 @@ void copy_ChrIns_field0x2c8(ChrIns_field0x2c8* to, ChrIns_field0x2c8* from);
 ChrIns_field0x2c8* init_ChrIns_field0x2c8();
 void free_ChrIns_field0x2c8(ChrIns_field0x2c8* to);
 
-void copy_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to, EntityThrowAnimationStatus* from);
+void copy_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to, EntityThrowAnimationStatus* from, bool to_game);
 EntityThrowAnimationStatus* init_EntityThrowAnimationStatus();
 void free_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to);
 

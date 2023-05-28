@@ -209,6 +209,10 @@ public:
     //Const handle for the PC
     static const uint32_t PC_Handle = 0x10044000;
 
+    // Pointers for the game malloc heap entries
+    static const uint64_t internal_heap_2 = 0x141b68f10;
+    static const uint64_t internal_heap_3 = 0x141b68f20;
+
     /////////////////////////////////////////
     /////////////// FUNCTIONS ///////////////
     /////////////////////////////////////////
@@ -356,7 +360,7 @@ public:
 
     static std::optional<int32_t*> get_MP_AreaID_ptr();
 
-    static void* game_malloc(size_t size, size_t alignment, void* heap);
+    static void* game_malloc(size_t size, size_t alignment, uint64_t heap);
 
     static void game_free(void* p, size_t size);
 

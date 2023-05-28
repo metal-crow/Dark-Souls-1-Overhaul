@@ -431,7 +431,7 @@ void copy_ChrIns(ChrIns* to, ChrIns* from, bool to_game)
     to->resistPlagueTotal = from->resistPlagueTotal;
     to->resistBleedingTotal = from->resistBleedingTotal;
     to->resistCurseTotal = from->resistCurseTotal;
-    copy_EntityThrowAnimationStatus(to->throw_animation_info, from->throw_animation_info);
+    copy_EntityThrowAnimationStatus(to->throw_animation_info, from->throw_animation_info, to_game);
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
@@ -510,25 +510,56 @@ void free_ChrIns_field0x2c8(ChrIns_field0x2c8* to)
     free(to);
 }
 
-void copy_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to, EntityThrowAnimationStatus* from)
+void copy_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to, EntityThrowAnimationStatus* from, bool to_game)
 {
     to->playerins_parent = from->playerins_parent;
     to->throw_paramdef = from->throw_paramdef;
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-    copy_ThrowSelfEsc(to->throwSelfEsc, from->throwSelfEsc);
+
+    if (to->throwSelfEsc == NULL && from->throwSelfEsc != NULL)
+    {
+        if (to_game)
+        {
+            to->throwSelfEsc = (ThrowSelfEsc*)Game::game_malloc(sizeof(ThrowSelfEsc), 8, *(uint64_t*)Game::internal_heap_2);
+        }
+        else
+        {
+            to->throwSelfEsc = init_ThrowSelfEsc();
+        }
+    }
+    if (to->throwSelfEsc != NULL && from->throwSelfEsc == NULL)
+    {
+        if (to_game)
+        {
+            Game::game_free(to->throwSelfEsc, sizeof(ThrowSelfEsc));
+        }
+        else
+        {
+            free_ThrowSelfEsc(to->throwSelfEsc);
+            to->throwSelfEsc = NULL;
+        }
+    }
+    if (to->throwSelfEsc != NULL && from->throwSelfEsc != NULL)
+    {
+        copy_ThrowSelfEsc(to->throwSelfEsc, from->throwSelfEsc);
+    }
+
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
 }
 
 EntityThrowAnimationStatus* init_EntityThrowAnimationStatus()
 {
     EntityThrowAnimationStatus* local_EntityThrowAnimationStatus = (EntityThrowAnimationStatus*)malloc_(sizeof(EntityThrowAnimationStatus));
-    local_EntityThrowAnimationStatus->throwSelfEsc = init_ThrowSelfEsc();
+    local_EntityThrowAnimationStatus->throwSelfEsc = NULL;
     return local_EntityThrowAnimationStatus;
 }
 
 void free_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to)
 {
-    free(to->throwSelfEsc);
+    if (to->throwSelfEsc != NULL)
+    {
+        free(to->throwSelfEsc);
+    }
     free(to);
 }
 
@@ -646,7 +677,7 @@ void copy_SpecialEffect_Info(SpecialEffect_Info* to, SpecialEffect_Info* from, b
             //handle if the game's list isn't long enough, and we need to alloc more slots
             if (from->next != NULL && to->next == NULL)
             {
-                to->next = (SpecialEffect_Info*)Game::game_malloc(sizeof(SpecialEffect_Info), 8, NULL);
+                to->next = (SpecialEffect_Info*)Game::game_malloc(sizeof(SpecialEffect_Info), 8, *(uint64_t*)Game::internal_heap_3);
                 to->next->next = NULL;
                 to->next->prev = to;
             }
