@@ -26,7 +26,6 @@ void copy_ThrowMan(ThrowMan* to, ThrowMan* from, bool to_game)
         {
             //this function already checks the end ptr for us
             Vector_IncreaseSize((void*)(((uint64_t)to) + 0x20), from_len - to_len);
-            ConsoleWrite("len %d %d", to_len, from_len);
             for (size_t i = to_len; i < from_len; i++)
             {
                 to->throw_request_queue_start[i] = (ThrowRequestedEntry*)Game::game_malloc(sizeof(ThrowRequestedEntry), 0x8, *(uint64_t*)Game::internal_heap_3);
