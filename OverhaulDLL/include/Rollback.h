@@ -12,6 +12,7 @@
 #include "SfxManStructFunctions.h"
 #include "DamageManStructFunctions.h"
 #include "PadManipulatorStructFunctions.h"
+#include "ThrowManStructFunctions.h"
 
 #include "ggponet.h"
 
@@ -115,6 +116,7 @@ struct RollbackState
     BulletMan* bulletman;
     SfxMan* sfman;
     DamageMan* damageman;
+    ThrowMan* throwman;
 };
 
 inline void* malloc_(size_t size)

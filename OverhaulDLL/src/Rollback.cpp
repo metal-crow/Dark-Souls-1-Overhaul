@@ -490,6 +490,7 @@ bool rollback_load_game_state_callback(unsigned char* buffer, int)
     copy_BulletMan(*(BulletMan**)Game::bullet_man, state->bulletman, true);
     //TODO copy_FXManager
     copy_DamageMan(*(DamageMan**)Game::damage_man, state->damageman, true);
+    copy_ThrowMan(*(ThrowMan**)Game::throw_man, state->throwman, true);
 
     if (Rollback::rollbackVisual)
     {
@@ -530,6 +531,8 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
     //TODO copy_FXManager;
     state->damageman = init_DamageMan();
     copy_DamageMan(state->damageman, *(DamageMan**)Game::damage_man, false);
+    state->throwman = init_ThrowMan();
+    copy_ThrowMan(state->throwman, *(ThrowMan**)Game::throw_man, false);
 
     *buffer = (unsigned char*)state;
     *len = sizeof(RollbackState);
@@ -552,6 +555,8 @@ void rollback_free_buffer(void* buffer)
     state->bulletman = NULL;
     free_DamageMan(state->damageman);
     state->damageman = NULL;
+    free_ThrowMan(state->throwman);
+    state->throwman = NULL;
 
     free(state);
 }
@@ -634,6 +639,10 @@ bool rollback_await_init(void* steamMsgs)
         }
         float x_pos = *(float*)(((uint64_t)player->chrins.playerCtrl->chrCtrl.havokChara) + 0x10);
         if (x_pos == 0.0f)
+        {
+            return true;
+        }
+        if (player->chrins.playerCtrl->chrCtrl.animationMediator == NULL)
         {
             return true;
         }

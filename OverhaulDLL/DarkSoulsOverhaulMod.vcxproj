@@ -58,6 +58,7 @@
     <ClCompile Include="src\Rollback.cpp" />
     <ClCompile Include="src\SfxManStructFunctions.cpp" />
     <ClCompile Include="src\SpellDesyncFixes.cpp" />
+    <ClCompile Include="src\ThrowManStructFunctions.cpp" />
     <ClCompile Include="src\UIFeatures.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -89,6 +90,8 @@
     <ClInclude Include="include\SfxManStruct.h" />
     <ClInclude Include="include\SfxManStructFunctions.h" />
     <ClInclude Include="include\SpellDesyncFixes.h" />
+    <ClInclude Include="include\ThrowManStruct.h" />
+    <ClInclude Include="include\ThrowManStructFunctions.h" />
     <ClInclude Include="include\UIFeatures.h" />
     <ClInclude Include="include\Xinput_1_3.h" />
     <ClInclude Include="ui\crash_hander_ui_resource.h" />
