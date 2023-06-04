@@ -8,50 +8,118 @@ _DATA ENDS
 
 _TEXT    SEGMENT
 
+FUNC_PROLOGUE macro
+	push	r15
+	mov		r15, rsp
+	and		rsp, -10h
+	sub		rsp, 0C0h
+	movaps	[rsp + 0B0h], xmm0
+	movaps	[rsp + 0A0h], xmm1
+	movaps	[rsp + 90h], xmm2
+	movaps	[rsp + 80h], xmm3
+	movaps	[rsp + 70h], xmm4
+	movaps	[rsp + 60h], xmm5
+	mov		[rsp + 58h], rax
+	mov		[rsp + 50h], rcx
+	mov		[rsp + 48h], rdx
+	mov		[rsp + 40h], r8
+	mov		[rsp + 38h], r9
+	mov		[rsp + 30h], r10
+	mov		[rsp + 28h], r11
+	mov		[rsp + 20h], r15
+endm
+
+FUNC_PROLOGUE_USER14 macro
+	push	r14
+	mov		r14, rsp
+	and		rsp, -10h
+	sub		rsp, 0C0h
+	movaps	[rsp + 0B0h], xmm0
+	movaps	[rsp + 0A0h], xmm1
+	movaps	[rsp + 90h], xmm2
+	movaps	[rsp + 80h], xmm3
+	movaps	[rsp + 70h], xmm4
+	movaps	[rsp + 60h], xmm5
+	mov		[rsp + 58h], rax
+	mov		[rsp + 50h], rcx
+	mov		[rsp + 48h], rdx
+	mov		[rsp + 40h], r8
+	mov		[rsp + 38h], r9
+	mov		[rsp + 30h], r10
+	mov		[rsp + 28h], r11
+	mov		[rsp + 20h], r14
+endm
+ 
+FUNC_EPILOGUE macro
+	mov		r15, [rsp + 20h]
+	mov		r11, [rsp + 28h]
+	mov		r10, [rsp + 30h]
+	mov		r9, [rsp + 38h]
+	mov		r8, [rsp + 40h]
+	mov		rdx, [rsp + 48h]
+	mov		rcx, [rsp + 50h]
+	mov		rax, [rsp + 58h]
+	movaps	xmm5, [rsp + 60h]
+	movaps	xmm4, [rsp + 70h]
+	movaps	xmm3, [rsp + 80h]
+	movaps	xmm2, [rsp + 90h]
+	movaps	xmm1, [rsp + 0A0h]
+	movaps	xmm0, [rsp + 0B0h]
+	mov		rsp, r15
+	pop		r15
+endm
+
+FUNC_EPILOGUE_USER14 macro
+	mov		r14, [rsp + 20h]
+	mov		r11, [rsp + 28h]
+	mov		r10, [rsp + 30h]
+	mov		r9, [rsp + 38h]
+	mov		r8, [rsp + 40h]
+	mov		rdx, [rsp + 48h]
+	mov		rcx, [rsp + 50h]
+	mov		rax, [rsp + 58h]
+	movaps	xmm5, [rsp + 60h]
+	movaps	xmm4, [rsp + 70h]
+	movaps	xmm3, [rsp + 80h]
+	movaps	xmm2, [rsp + 90h]
+	movaps	xmm1, [rsp + 0A0h]
+	movaps	xmm0, [rsp + 0B0h]
+	mov		rsp, r14
+	pop		r14
+endm
+
+FUNC_EPILOGUE_NORCX macro
+	mov		r15, [rsp + 20h]
+	mov		r11, [rsp + 28h]
+	mov		r10, [rsp + 30h]
+	mov		r9, [rsp + 38h]
+	mov		r8, [rsp + 40h]
+	mov		rdx, [rsp + 48h]
+	mov		rax, [rsp + 58h]
+	movaps	xmm5, [rsp + 60h]
+	movaps	xmm4, [rsp + 70h]
+	movaps	xmm3, [rsp + 80h]
+	movaps	xmm2, [rsp + 90h]
+	movaps	xmm1, [rsp + 0A0h]
+	movaps	xmm0, [rsp + 0B0h]
+	mov		rsp, r15
+	pop		r15
+endm
+
 extern npc_guard_check_exit: qword
 extern npc_guard_asm_check_helper: proc
 
 PUBLIC npc_guard_asm_check
 npc_guard_asm_check PROC
-sub     rsp, 10h
-movdqu  [rsp], xmm0
-sub     rsp, 10h
-movdqu  [rsp], xmm1
-sub     rsp, 10h
-movdqu  [rsp], xmm2
-sub     rsp, 10h
-movdqu  [rsp], xmm3
-push    rax
-push    rcx
-push    rdx
-push    r8
-push    r9
-push    r10
-push    r11
-sub     rsp, 28h
 
+FUNC_PROLOGUE_USER14
 mov     rcx, r15 ; r15 is entityPointer of the attacker
 mov     rdx, rbx ; rbx is entityPointer of target; check if they are a non-hostile NPC
 mov     r8d, edi ; current damage amount
 call    npc_guard_asm_check_helper
 mov     edi, eax ;use the return value as the new damage amount
+FUNC_EPILOGUE_USER14
 
-add     rsp, 28h
-pop     r11
-pop     r10
-pop     r9
-pop     r8
-pop     rdx
-pop     rcx
-pop     rax
-movdqu  xmm3, [rsp]
-add     rsp, 10h
-movdqu  xmm2, [rsp]
-add     rsp, 10h
-movdqu  xmm1, [rsp]
-add     rsp, 10h
-movdqu  xmm0, [rsp]
-add     rsp, 10h
 ;original code
 MOV     EDX,dword ptr [RBX + 3e8h]
 MOV     RCX,RBX
@@ -68,44 +136,14 @@ boss_guard_asm_check PROC
 ;original code
 SUB     RSP,20h
 TEST    byte ptr [RCX+524h],40h
-MOV     RBX,rcx
+MOV     RBX,RCX
 jnz     label_jmp_skip_hp_set
 
-sub     rsp, 10h
-movdqu  [rsp], xmm0
-sub     rsp, 10h
-movdqu  [rsp], xmm1
-sub     rsp, 10h
-movdqu  [rsp], xmm2
-sub     rsp, 10h
-movdqu  [rsp], xmm3
-push    rax
-push    rdx
-push    r8
-push    r9
-push    r10
-push    r11
-sub     rsp, 20h
-
+FUNC_PROLOGUE
 ;boss entity ptr passed implicitly as rcx
 call    boss_guard_asm_check_helper
 mov     rcx, rax ;grab the result
-
-add     rsp, 20h
-pop     r11
-pop     r10
-pop     r9
-pop     r8
-pop     rdx
-pop     rax
-movdqu  xmm3, [rsp]
-add     rsp, 10h
-movdqu  xmm2, [rsp]
-add     rsp, 10h
-movdqu  xmm1, [rsp]
-add     rsp, 10h
-movdqu  xmm0, [rsp]
-add     rsp, 10h
+FUNC_EPILOGUE_NORCX
 
 ;check the result
 test    rcx, rcx
@@ -134,43 +172,12 @@ unpcklps xmm3, xmm0
 unpcklps xmm2, xmm1
 unpcklps xmm3, xmm2
 
-sub     rsp, 10h
-movdqu  [rsp], xmm0
-sub     rsp, 10h
-movdqu  [rsp], xmm1
-sub     rsp, 10h
-movdqu  [rsp], xmm2
-sub     rsp, 10h
-movdqu  [rsp], xmm3
-push    rax
-push    rcx
-push    rdx
-push    r8
-push    r9
-push    r10
-push    r11
-sub     rsp, 28h
-
+FUNC_PROLOGUE
 movaps  xmmword ptr [new_player_position], xmm3 ;save the new player position to compare with
 lea     rcx, [rbx+10h] ;ptr to _old_ position (b4 being changed)
 call    TeleBackstabProtect_helper_check ;this will set the new PC position if needed
+FUNC_EPILOGUE
 
-add     rsp, 28h
-pop     r11
-pop     r10
-pop     r9
-pop     r8
-pop     rdx
-pop     rcx
-pop     rax
-movdqu  xmm3, [rsp]
-add     rsp, 10h
-movdqu  xmm2, [rsp]
-add     rsp, 10h
-movdqu  xmm1, [rsp]
-add     rsp, 10h
-movdqu  xmm0, [rsp]
-add     rsp, 10h
 jmp     TeleBackstabProtect_setPosition_return
 
 TeleBackstabProtect_setPosition_check ENDP
@@ -198,42 +205,11 @@ extern NameCrash_prevent_helper: proc
 
 PUBLIC NameCrash_prevent
 NameCrash_prevent PROC
-sub     rsp, 10h
-movdqu  [rsp], xmm0
-sub     rsp, 10h
-movdqu  [rsp], xmm1
-sub     rsp, 10h
-movdqu  [rsp], xmm2
-sub     rsp, 10h
-movdqu  [rsp], xmm3
-push    rax
-push    rcx
-push    rdx
-push    r8
-push    r9
-push    r10
-push    r11
-sub     rsp, 28h
 
+FUNC_PROLOGUE
 lea     rcx, [rsi+98h] ;ptr to loaded name string
 call    NameCrash_prevent_helper
-
-add     rsp, 28h
-pop     r11
-pop     r10
-pop     r9
-pop     r8
-pop     rdx
-pop     rcx
-pop     rax
-movdqu  xmm3, [rsp]
-add     rsp, 10h
-movdqu  xmm2, [rsp]
-add     rsp, 10h
-movdqu  xmm1, [rsp]
-add     rsp, 10h
-movdqu  xmm0, [rsp]
-add     rsp, 10h
+FUNC_EPILOGUE
 
 ;original code
 mov     rbx, [rsp+30h]
@@ -248,42 +224,11 @@ extern ReadParseType18_packet_injection_helper: proc
 
 PUBLIC ReadParseType18_packet_injection
 ReadParseType18_packet_injection PROC
-sub     rsp, 10h
-movdqu  [rsp], xmm0
-sub     rsp, 10h
-movdqu  [rsp], xmm1
-sub     rsp, 10h
-movdqu  [rsp], xmm2
-sub     rsp, 10h
-movdqu  [rsp], xmm3
-push    rax
-push    rcx
-push    rdx
-push    r8
-push    r9
-push    r10
-push    r11
-sub     rsp, 28h
 
+FUNC_PROLOGUE
 mov     rcx, rdi ;pointer to the packet data
 call    ReadParseType18_packet_injection_helper
-
-add     rsp, 28h
-pop     r11
-pop     r10
-pop     r9
-pop     r8
-pop     rdx
-pop     rcx
-pop     rax
-movdqu  xmm3, [rsp]
-add     rsp, 10h
-movdqu  xmm2, [rsp]
-add     rsp, 10h
-movdqu  xmm1, [rsp]
-add     rsp, 10h
-movdqu  xmm0, [rsp]
-add     rsp, 10h
+FUNC_EPILOGUE
 
 ;original code
 CMP     EAX, 80h
@@ -299,42 +244,10 @@ extern ReadParseType35_packet_injection_helper: proc
 PUBLIC ReadParseType35_packet_injection
 ReadParseType35_packet_injection PROC
 
-sub     rsp, 10h
-movdqu  [rsp], xmm0
-sub     rsp, 10h
-movdqu  [rsp], xmm1
-sub     rsp, 10h
-movdqu  [rsp], xmm2
-sub     rsp, 10h
-movdqu  [rsp], xmm3
-push    rax
-push    rcx
-push    rdx
-push    r8
-push    r9
-push    r10
-push    r11
-sub     rsp, 28h
-
-lea     rcx, [RSP + 30h] ;pointer to the packet data
+FUNC_PROLOGUE
+lea     rcx, [R15+30h + 8] ;pointer to the packet data
 call    ReadParseType35_packet_injection_helper
-
-add     rsp, 28h
-pop     r11
-pop     r10
-pop     r9
-pop     r8
-pop     rdx
-pop     rcx
-pop     rax
-movdqu  xmm3, [rsp]
-add     rsp, 10h
-movdqu  xmm2, [rsp]
-add     rsp, 10h
-movdqu  xmm1, [rsp]
-add     rsp, 10h
-movdqu  xmm0, [rsp]
-add     rsp, 10h
+FUNC_EPILOGUE
 
 ;original code
 MOV     RDX,RBX
