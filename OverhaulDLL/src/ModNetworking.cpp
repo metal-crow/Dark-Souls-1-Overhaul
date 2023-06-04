@@ -39,6 +39,10 @@ extern "C" {
     uint64_t CloseP2PSessionWithUser_Replacement_injection_return;
     void CloseP2PSessionWithUser_Replacement_injection();
     bool CloseP2PSessionWithUser_Replacement_injection_helper(CSteamID steamIDRemote);
+
+    uint64_t Start_SessionDisconnect_Task_injection_return;
+    void Start_SessionDisconnect_Task_injection();
+    void Start_SessionDisconnect_Task_injection_helper(uint32_t);
 }
 
 typedef void* gfGetSteamInterface(int iSteamUser, int iUnkInt, const char* pcVersion, const char* pcInterface);
@@ -169,6 +173,18 @@ void ModNetworking::start()
     write_address = (uint8_t*)(ModNetworking::sendType34SteamMessage_data_offset + Game::ds1_base);
     uint8_t type34_data_patch[3] = { 0x45, 0x31, 0xc0 }; //xor r8d, r8d
     sp::mem::patch_bytes(write_address, type34_data_patch, sizeof(type34_data_patch));
+
+    /*
+     * Hook the Start_SessionDisconnect_Task function and log the reason a session is ended.
+     * Useful for debugging
+     */
+    write_address = (uint8_t*)(ModNetworking::Start_SessionDisconnect_Task_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &Start_SessionDisconnect_Task_injection_return, 0, &Start_SessionDisconnect_Task_injection);
+}
+
+void Start_SessionDisconnect_Task_injection_helper(uint32_t reason)
+{
+    ConsoleWrite("Session disconnection. Reason: %llx", reason);
 }
 
 /*

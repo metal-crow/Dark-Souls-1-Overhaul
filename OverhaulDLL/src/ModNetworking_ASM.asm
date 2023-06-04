@@ -46,6 +46,25 @@ FUNC_PROLOGUE_PLUS10_USER13 macro
 	mov		[rsp + 30h], r13
 endm
 
+FUNC_EPILOGUE macro
+	mov		r15, [rsp + 20h]
+	mov		r11, [rsp + 28h]
+	mov		r10, [rsp + 30h]
+	mov		r9, [rsp + 38h]
+	mov		r8, [rsp + 40h]
+	mov		rdx, [rsp + 48h]
+	mov		rcx, [rsp + 50h]
+	mov		rax, [rsp + 58h]
+	movaps	xmm5, [rsp + 60h]
+	movaps	xmm4, [rsp + 70h]
+	movaps	xmm3, [rsp + 80h]
+	movaps	xmm2, [rsp + 90h]
+	movaps	xmm1, [rsp + 0A0h]
+	movaps	xmm0, [rsp + 0B0h]
+	mov		rsp, r15
+	pop		r15
+endm
+
 FUNC_EPILOGUE_NORAX macro
 	mov		r15, [rsp + 20h]
 	mov		r11, [rsp + 28h]
@@ -213,6 +232,25 @@ FUNC_EPILOGUE_NORAX
 jmp     CloseP2PSessionWithUser_Replacement_injection_return
 
 CloseP2PSessionWithUser_Replacement_injection ENDP
+
+
+EXTERN Start_SessionDisconnect_Task_injection_helper: PROC
+EXTERN Start_SessionDisconnect_Task_injection_return: qword
+
+PUBLIC Start_SessionDisconnect_Task_injection
+Start_SessionDisconnect_Task_injection PROC
+;original code
+mov     qword ptr [rsp+20h], -2
+mov     [rsp+58h], rbx
+
+FUNC_PROLOGUE
+mov     rcx, rdx
+call    Start_SessionDisconnect_Task_injection_helper
+FUNC_EPILOGUE
+
+jmp     Start_SessionDisconnect_Task_injection_return
+
+Start_SessionDisconnect_Task_injection ENDP
 
 _TEXT    ENDS
 
