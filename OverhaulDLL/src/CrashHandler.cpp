@@ -527,3 +527,13 @@ void set_crash_handlers()
     uint8_t *write_address = (uint8_t*)(panic_debug_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &panic_debug_return, 1, &panic_debug_injection);
 }
+
+// CaptureStackBackTrace doesn't work with our custom asm epilogues. Have to manually dump the stack
+void backtrace_debug()
+{
+    uint64_t head = 0xdeadbeef;
+    for (size_t i = 0; i < 80; i++)
+    {
+        ConsoleWrite("%llx", *(uint64_t*)(((uint64_t)(&head)) + (i * 8)));
+    }
+}

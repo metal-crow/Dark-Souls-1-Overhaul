@@ -14,5 +14,6 @@
 
 void crash_handler(EXCEPTION_POINTERS* ExceptionInfo, char* crash_message_str);
 void set_crash_handlers();
+void backtrace_debug();
 
 #endif
