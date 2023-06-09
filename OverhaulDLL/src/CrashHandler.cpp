@@ -215,8 +215,6 @@ std::string context_record_tostring(PCONTEXT ContextRecord)
     out.append(scratch);
     snprintf(scratch, sizeof(scratch), "Xmm15=%llx %llx\n", (ContextRecord->Xmm15.High), (ContextRecord->Xmm15.Low));
     out.append(scratch);
-    snprintf(scratch, sizeof(scratch), "VectorRegister[26]=%llx %llx\n", (ContextRecord->VectorRegister[26].High), (ContextRecord->VectorRegister[26].Low));
-    out.append(scratch);
     snprintf(scratch, sizeof(scratch), "VectorControl=%llx\n", ContextRecord->VectorControl);
     out.append(scratch);
     snprintf(scratch, sizeof(scratch), "DebugControl=%llx\n", ContextRecord->DebugControl);
