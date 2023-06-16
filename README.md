@@ -118,7 +118,6 @@ You can also edit the file while the game is running, and reloading your save wi
 * Gestures can be canceled via rolling
 
 * Animations:
-  * Firestorm startup and main animation have been sped up (x10 and x1.6)
   * Gravelord Sword Dance startup and main animation have been sped up (x10 and x1.6)
   * All kneeling heals have had their startup sped up (x6)
   * Lightning Spear startup and main animation have been sped up (x10 and x1.2)
