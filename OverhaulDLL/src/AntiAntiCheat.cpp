@@ -593,6 +593,11 @@ void AntiAntiCheat::start() {
     //Prevent any member flags from being set ANYWHERE that are not required
     write_address = (uint8_t*)(AntiAntiCheat::set_MemberFlags_bitflag_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &set_MemberFlags_bitflag_injection_return, 1, &set_MemberFlags_bitflag_injection);
+
+    //Another RequestUpdatePlayerStatus that doesn't seem to be used, or is used rarely. Just disable for now, can enable later if it breaks stuff
+    uint8_t nop5[] = { 0xB0, 0x01, 0x90, 0x90, 0x90 }; //mov al, 1. Then nop
+    write_address = (uint8_t*)(AntiAntiCheat::SendBuild_RequestUpdatePlayerStatus_GeneralRequestTask_alt2_injection_offset + Game::ds1_base);
+    sp::mem::patch_bytes(write_address, nop5, sizeof(nop5));
 }
 
 
