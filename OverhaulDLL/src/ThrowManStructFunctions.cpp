@@ -43,6 +43,8 @@ void copy_ThrowMan(ThrowMan* to, ThrowMan* from, bool to_game)
     to->throw_request_queue_cur = &to->throw_request_queue_start[to_len];
 
     to->data_0 = from->data_0;
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
 }
 
 ThrowMan* init_ThrowMan()

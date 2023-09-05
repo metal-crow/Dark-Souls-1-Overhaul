@@ -25,11 +25,17 @@ struct ThrowMan
     ThrowRequestedEntry** throw_request_queue_start;
     ThrowRequestedEntry** throw_request_queue_cur;
     ThrowRequestedEntry** throw_request_queue_end;
-    uint8_t padding_1[0x8d];
-    uint8_t data_0;
+    uint8_t padding_1[8*8];
+    uint64_t data_0;
+    uint8_t padding_2[16];
+    float data_1[6];
+    uint64_t padding_3;
+    uint8_t data_2[0x78];
 };
 static_assert(offsetof(ThrowMan, throw_request_queue_start) == 0x28);
-static_assert(offsetof(ThrowMan, data_0) == 0xcd);
-//static_assert(sizeof(ThrowMan) == 0x40);
+static_assert(offsetof(ThrowMan, data_0) == 0x80);
+static_assert(offsetof(ThrowMan, data_1) == 0x98);
+static_assert(offsetof(ThrowMan, data_2) == 0xb8);
+static_assert(sizeof(ThrowMan) == 0x130);
 
 #endif
