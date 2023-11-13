@@ -8,6 +8,51 @@ _DATA ENDS
 _TEXT    SEGMENT
 
 FUNC_PROLOGUE macro
+    pushfq 
+    push    rax
+    mov     rax,rsp
+    and     rsp,-10h
+    sub     rsp,000002A0h
+    fxsave  [rsp+20h]
+    mov     [rsp+00000220h],rbx
+    mov     [rsp+00000228h],rcx
+    mov     [rsp+00000230h],rdx
+    mov     [rsp+00000238h],rsi
+    mov     [rsp+00000240h],rdi
+    mov     [rsp+00000248h],rax
+    mov     [rsp+00000250h],rbp
+    mov     [rsp+00000258h],r8
+    mov     [rsp+00000260h],r9
+    mov     [rsp+00000268h],r10
+    mov     [rsp+00000270h],r11
+    mov     [rsp+00000278h],r12
+    mov     [rsp+00000280h],r13
+    mov     [rsp+00000288h],r14
+    mov     [rsp+00000290h],r15
+endm
+
+FUNC_EPILOGUE macro
+    mov     r15,[rsp+00000290h]
+    mov     r14,[rsp+00000288h]
+    mov     r13,[rsp+00000280h]
+    mov     r12,[rsp+00000278h]
+    mov     r11,[rsp+00000270h]
+    mov     r10,[rsp+00000268h]
+    mov     r9, [rsp+00000260h]
+    mov     r8, [rsp+00000258h]
+    mov     rbp,[rsp+00000250h]
+    mov     rdi,[rsp+00000240h]
+    mov     rsi,[rsp+00000238h]
+    mov     rdx,[rsp+00000230h]
+    mov     rcx,[rsp+00000228h]
+    mov     rbx,[rsp+00000220h]
+    fxrstor [rsp+20h]
+    mov     rsp,[rsp+00000248h]
+    pop     rax
+    popfq 
+endm
+
+FUNC_PROLOGUE_LITE macro
 	push	r15
 	mov		r15, rsp
 	and		rsp, -10h
@@ -28,7 +73,7 @@ FUNC_PROLOGUE macro
 	mov		[rsp + 20h], r15
 endm
 
-FUNC_EPILOGUE macro
+FUNC_EPILOGUE_LITE macro
 	mov		r15, [rsp + 20h]
 	mov		r11, [rsp + 28h]
 	mov		r10, [rsp + 30h]
@@ -47,7 +92,7 @@ FUNC_EPILOGUE macro
 	pop		r15
 endm
 
-FUNC_EPILOGUE_NORAX macro
+FUNC_EPILOGUE_LITE_NORAX macro
 	mov		r15, [rsp + 20h]
 	mov		r11, [rsp + 28h]
 	mov		r10, [rsp + 30h]
@@ -70,6 +115,17 @@ extern sendNetMessage_helper: proc
 
 PUBLIC sendNetMessage_injection
 sendNetMessage_injection PROC
+
+FUNC_PROLOGUE_LITE
+call    sendNetMessage_helper
+FUNC_EPILOGUE_LITE_NORAX
+;check if we abort this call or not
+test    al, al
+jnz     normal
+xor     al, al ;aborting call, so return false
+ret
+
+normal:
 ;original code
 mov     rax, rsp
 push    rdi
@@ -82,29 +138,6 @@ mov     qword ptr [rax-78h], -2
 mov     [rax+10h], rbx
 mov     [rax+18h], rbp
 mov     [rax+20h], rsi
-
-FUNC_PROLOGUE
-call    sendNetMessage_helper
-FUNC_EPILOGUE_NORAX
-
-;check if we abort this call or not
-test    al, al
-jnz     normal
-lea     r11, [rsp+80h]
-mov     rbx, [r11+38h]
-mov     rbp, [r11+40h]
-mov     rsi, [r11+48h]
-mov     rsp, r11
-pop     r15
-pop     r14
-pop     r13
-pop     r12
-pop     rdi
-xor     al, al ;aborting call, so return false
-ret
-
-;original code
-normal:
 jmp     sendNetMessage_return
 sendNetMessage_injection ENDP
 
@@ -114,6 +147,17 @@ extern getNetMessage_helper: proc
 
 PUBLIC getNetMessage_injection
 getNetMessage_injection PROC
+
+FUNC_PROLOGUE_LITE
+call    getNetMessage_helper
+FUNC_EPILOGUE_LITE_NORAX
+;check if we abort this call or not
+test    al, al
+jnz     normal
+xor     eax, eax ;aborting call, so return 0 bytes
+ret
+
+normal:
 ;original code
 mov     [rsp+8], rbx
 mov     [rsp+10h], rbp
@@ -121,24 +165,6 @@ mov     [rsp+18h], rsi
 mov     [rsp+20h], rdi
 push    r14
 sub     rsp, 20h
-
-FUNC_PROLOGUE
-call    getNetMessage_helper
-FUNC_EPILOGUE_NORAX
-
-;check if we abort this call or not
-test    al, al
-jnz     normal
-mov     rbx, [rsp+30h]
-mov     rbp, [rsp+38h]
-mov     rsi, [rsp+40h]
-mov     rdi, [rsp+48h]
-add     rsp, 20h
-pop     r14
-xor     eax, eax ;aborting call, so return 0 bytes
-ret
-
-normal:
 jmp     getNetMessage_return
 getNetMessage_injection ENDP
 
@@ -192,7 +218,7 @@ mov     [rsp+30h], ebp
 mov     [rsp+20h], edx
 
 FUNC_PROLOGUE
-lea     rcx, dword ptr [R15+28h + 8] ;pass in ptr to the arg for what Manipulator type to use
+lea     rcx, dword ptr [RAX+28h + 10h] ;pass in ptr to the arg for what Manipulator type to use
 call    init_playerins_with_padmanip_helper
 FUNC_EPILOGUE
 

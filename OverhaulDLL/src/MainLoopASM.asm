@@ -44,23 +44,6 @@ FUNC_EPILOGUE macro
 	pop		r15
 endm
 
-FUNC_EPILOGUE_NORAX macro
-	mov		r15, [rsp + 20h]
-	mov		r11, [rsp + 28h]
-	mov		r10, [rsp + 30h]
-	mov		r9, [rsp + 38h]
-	mov		r8, [rsp + 40h]
-	mov		rdx, [rsp + 48h]
-	mov		rcx, [rsp + 50h]
-	movaps	xmm5, [rsp + 60h]
-	movaps	xmm4, [rsp + 70h]
-	movaps	xmm3, [rsp + 80h]
-	movaps	xmm2, [rsp + 90h]
-	movaps	xmm1, [rsp + 0A0h]
-	movaps	xmm0, [rsp + 0B0h]
-	mov		rsp, r15
-	pop		r15
-endm
 
 EXTERN main_game_loop_injection_helper: PROC
 EXTERN main_game_loop_injection_return: qword
@@ -68,18 +51,16 @@ EXTERN main_game_loop_injection_return: qword
 PUBLIC main_game_loop_injection
 main_game_loop_injection PROC
 
+FUNC_PROLOGUE
+call    main_game_loop_injection_helper
+FUNC_EPILOGUE
+
 ;original code
 mov     rax, rsp
 push    rdi
 sub     rsp, 70h
 mov     qword ptr [rax-58h], -2
-
-FUNC_PROLOGUE
-call    main_game_loop_injection_helper
-FUNC_EPILOGUE
-
 jmp main_game_loop_injection_return
-
 main_game_loop_injection ENDP
 
 _TEXT    ENDS

@@ -17,7 +17,7 @@ void CustomInvasionTypes::start()
     ConsoleWrite("Enabling Custom Invasions...");
 
     uint8_t *write_address = (uint8_t*)(CustomInvasionTypes::Send_Type17_GeneralRequestTask_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &Send_Type17_GeneralRequestTask_injection_return, 1, &Send_Type17_GeneralRequestTask_injection);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &Send_Type17_GeneralRequestTask_injection_return, 2, &Send_Type17_GeneralRequestTask_injection);
 }
 
 //These only need to include 1 area id from each set that match all but the last digit

@@ -45,7 +45,8 @@ private:
     static void disable_whiff_animations();
 
 private:
-    static const uint64_t animation_entry_set_offset = 0x43ed81; //Triggered when an animation entry in the table has it's speed set
+    static const uint64_t animation_entry_set_offset = 0x43ece0; //Triggered when an animation entry in the table has it's speed set
+    static const uint64_t animation_entry_set_speed_offset = 0x43ed81;
     static const uint64_t animation_whiff_set_offset = 0x386384;
 };
 

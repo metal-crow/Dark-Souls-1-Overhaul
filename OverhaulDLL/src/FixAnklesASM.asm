@@ -56,7 +56,6 @@ call    main_fix_ankles_helper
 FUNC_EPILOGUE
 
 jmp     main_fix_ankles_injection_return
-
 main_fix_ankles_injection ENDP
 
 _TEXT    ENDS

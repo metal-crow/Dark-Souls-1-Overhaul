@@ -328,7 +328,7 @@ public:
 
 	static uint32_t get_equipped_inventory(uint64_t playerins, InventorySlots index);
 
-    static InventorySlots get_equipped_right_weapon_inhand(uint64_t playerins);
+    static InventorySlots return_weaponslot_in_hand(uint64_t playerins, bool right_hand);
 
 	static bool player_has_speffect(uint64_t playerins, std::unordered_set<uint32_t> speffects);
 

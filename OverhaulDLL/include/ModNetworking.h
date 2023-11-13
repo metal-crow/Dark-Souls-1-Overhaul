@@ -52,7 +52,7 @@ public:
     static bool new_guest_incoming;
 
 private:
-    static const uint64_t AcceptP2PSessionWithUser_injection_offset = 0x10b6ce6;
+    static const uint64_t AcceptP2PSessionWithUser_injection_offset = 0x10b6ce0;
     static const uint64_t IsP2PPacketAvailable_1_injection_offset = 0x10ba160;
     static const uint64_t IsP2PPacketAvailable_2_injection_offset = 0x10ba1ee;
     static const uint64_t ReadP2PPacket_injection_offset = 0x10b879d;
@@ -60,7 +60,7 @@ private:
     static const uint64_t SendP2PPacket_injection_offset = 0x10bd8e7;
     static const uint64_t CloseP2PSessionWithUser_Replacement_injection_offset = 0x10bdf55;
     static const uint64_t sendType34SteamMessage_data_offset = 0x108bb78;
-    static const uint64_t Start_SessionDisconnect_Task_offset = 0x1089196;
+    static const uint64_t Start_SessionDisconnect_Task_offset = 0x1089190;
 };
 
 #endif

@@ -44,6 +44,7 @@ FUNC_EPILOGUE macro
 	pop		r15
 endm
 
+
 EXTERN Send_Type17_GeneralRequestTask_injection_helper: PROC
 EXTERN Send_Type17_GeneralRequestTask_injection_return: qword
 
@@ -56,10 +57,12 @@ call    Send_Type17_GeneralRequestTask_injection_helper
 FUNC_EPILOGUE
 
 ;original code
+push    rbp
+push    rsi
+push    rdi
+lea     rbp, [rsp-47h]
 sub     rsp, 0D0h
-mov     qword ptr [rbp-49h], -2
 jmp     Send_Type17_GeneralRequestTask_injection_return
-
 Send_Type17_GeneralRequestTask_injection ENDP
 
 

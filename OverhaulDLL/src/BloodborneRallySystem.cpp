@@ -11,22 +11,18 @@
 #include "SP/memory/injection/asm/x64.h"
 #include "MainLoop.h"
 
-#define DS1_BB_RALLY_SYS_OCCULT_MAT_ID 700
 const uint64_t MAX_RALLY_RECOVERY_TIME_MS = 5000;
 
 // HP of the player before last hit
-uint32_t  beforehit_hp = UINT16_MAX;
+uint32_t beforehit_hp = UINT16_MAX;
 
 // Tracker for the number of hits the user has received
-uint64_t  gothit = 0;
+uint64_t gothit = 0;
+
+// Time (in milliseonds) player was last hit
+uint64_t beforehit_time = 0;
 
 extern "C" {
-    // Time (in milliseonds) player was last hit
-    uint64_t  beforehit_time = 0;
-
-    uint64_t weapon_toggle_injection_return;
-    void weapon_toggle_injection();
-
     uint64_t control_timer_injection_return;
     void control_timer_injection();
     uint64_t control_timer_function(uint64_t, uint64_t);
@@ -46,16 +42,16 @@ extern "C" {
 }
 
 bool Apply_rally_capable_sfx_and_starting_hp(void*);
+bool Check_weapon_swap_for_rally(void*);
 
 void BloodborneRally::start() {
     ConsoleWrite("Setting up Bloodborne Rally System...");
 
-    // Inject function to clear rally on weapon toggle
-    uint8_t *write_address = (uint8_t*)(BloodborneRally::weapon_toggle_injection_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &weapon_toggle_injection_return, 5, &weapon_toggle_injection);
+    // Create callback to clear rally on weapon toggle
+    MainLoop::setup_mainloop_callback(Check_weapon_swap_for_rally, NULL, "Check_weapon_swap_for_rally");
 
     // Inject function to control the timer for the current ui bar
-    write_address = (uint8_t*)(BloodborneRally::control_timer_injection_offset + Game::ds1_base);
+    uint8_t* write_address = (uint8_t*)(BloodborneRally::control_timer_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &control_timer_injection_return, 1, &control_timer_injection);
 
     // Inject function to perform the main rally code
@@ -65,6 +61,31 @@ void BloodborneRally::start() {
 
     // Start new callback dedicated to applying rally-capable weapon sfx and setting the starting HP
     MainLoop::setup_mainloop_callback(Apply_rally_capable_sfx_and_starting_hp, NULL, "Apply_rally_capable_sfx_and_starting_hp");
+}
+
+static uint32_t equipped_wep_r = 0;
+static uint32_t equipped_wep_l = 0;
+bool Check_weapon_swap_for_rally(void* unused)
+{
+    auto pc_o = Game::get_PlayerIns();
+    if (!pc_o.has_value() || pc_o.value() == NULL)
+    {
+        return true;
+    }
+    uint64_t pc = (uint64_t)(pc_o.value());
+
+    uint32_t new_equipped_wep_r = Game::get_equipped_inventory(pc, Game::return_weaponslot_in_hand(pc, true));
+    uint32_t new_equipped_wep_l = Game::get_equipped_inventory(pc, Game::return_weaponslot_in_hand(pc, false));
+
+    //weapon changed
+    if (equipped_wep_r != new_equipped_wep_r || equipped_wep_l != new_equipped_wep_l)
+    {
+        equipped_wep_r = new_equipped_wep_r;
+        equipped_wep_l = new_equipped_wep_l;
+        beforehit_time = 0; //Fake we got hit infinite time ago, to drop rally
+    }
+
+    return true;
 }
 
 uint64_t control_timer_function(uint64_t bar_id, uint64_t orange_bar) {
@@ -224,5 +245,3 @@ bool Apply_rally_capable_sfx_and_starting_hp(void* unused) {
 
     return true;
 }
-
-#undef DS1_BB_RALLY_SYS_OCCULT_MAT_ID

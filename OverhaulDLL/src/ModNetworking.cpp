@@ -131,7 +131,7 @@ void ModNetworking::start()
      * Inject into the AcceptP2PSessionWithUser callback to be sure we d/c users
      */
     write_address = (uint8_t*)(ModNetworking::AcceptP2PSessionWithUser_injection_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &AcceptP2PSessionWithUser_injection_return, 0, &AcceptP2PSessionWithUser_injection);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &AcceptP2PSessionWithUser_injection_return, 1, &AcceptP2PSessionWithUser_injection);
 
     /*
      * Code to replace the IsP2PPacketAvailable call with a compatible ISteamNetworkingMessages API call
@@ -179,7 +179,7 @@ void ModNetworking::start()
      * Useful for debugging
      */
     write_address = (uint8_t*)(ModNetworking::Start_SessionDisconnect_Task_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &Start_SessionDisconnect_Task_injection_return, 0, &Start_SessionDisconnect_Task_injection);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &Start_SessionDisconnect_Task_injection_return, 1, &Start_SessionDisconnect_Task_injection);
 }
 
 void Start_SessionDisconnect_Task_injection_helper(uint32_t reason)

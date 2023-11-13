@@ -26,11 +26,13 @@ void main_fix_ankles_helper(uint64_t parentfootIk) {
         case 33:
         case 34:
         case 35:
+        case 38:
         //2h rolls
         case 94:
         case 95:
         case 96:
         case 97:
+        case 100:
             *footik_enabled = 0;
             return;
         default:

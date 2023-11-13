@@ -40,7 +40,7 @@ static const std::unordered_map<int32_t, std::tuple<float, float>> ANIMATIONS_TO
 extern "C" {
     uint64_t animation_entry_set_return;
     void animation_entry_set_injection();
-    void read_body_aid_injection_helper_function(int32_t*, float*);
+    void read_body_aid_injection_helper_function(float*, int32_t);
 }
 
 void AnimationEdits::alter_animation_parameters()
@@ -48,7 +48,12 @@ void AnimationEdits::alter_animation_parameters()
     ConsoleWrite("Enabling animation parameter alteration injection...");
 
     uint8_t *write_address = (uint8_t*)(AnimationEdits::animation_entry_set_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &animation_entry_set_return, 1, &animation_entry_set_injection);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &animation_entry_set_return, 0, &animation_entry_set_injection);
+
+    //we need to have our injection at function start, so prevent the function from overwriting speed later
+    write_address = (uint8_t*)(AnimationEdits::animation_entry_set_speed_offset + Game::ds1_base);
+    uint8_t nop_7[7] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
+    sp::mem::patch_bytes(write_address, nop_7, 7);
 }
 
 typedef struct SpeedAlterStruct_ {
@@ -85,14 +90,17 @@ bool DelayAnimationSpeedAjustment(void* thread_data_arg) {
     return true;
 }
 
-void read_body_aid_injection_helper_function(int32_t* animation_id, float* speed) {
+void read_body_aid_injection_helper_function(float* speed, int32_t animation_id) {
+    //we disable the speed getting set to prevent this from being overwritten, so set the default speed of 1.0 here like the code would do
+    *speed = 1.0f;
+
     //If feature disabled, don't do anything
     if (Mod::get_mode() != ModMode::Overhaul) {
         return;
     }
 
     //Since we set animation speed at the table entry level, when it gets unset the speed is automatically reset. No cleanup needed
-    auto ajust_aid = ANIMATIONS_TO_AJUST_SPEED_RATIO.find(*animation_id);
+    auto ajust_aid = ANIMATIONS_TO_AJUST_SPEED_RATIO.find(animation_id);
     if (ajust_aid != ANIMATIONS_TO_AJUST_SPEED_RATIO.end()) {
         //if this is a instant speed ajustment
         if (std::get<1>(ajust_aid->second) == 0) {

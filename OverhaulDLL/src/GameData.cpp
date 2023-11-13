@@ -1218,23 +1218,41 @@ uint32_t Game::get_equipped_inventory(uint64_t playerins, InventorySlots index)
     return equip_items[index];
 }
 
-InventorySlots Game::get_equipped_right_weapon_inhand(uint64_t playerins)
+InventorySlots Game::return_weaponslot_in_hand(uint64_t playerins, bool right_hand)
 {
     uint64_t playerGameData = *(uint64_t*)(playerins + 0x578);
     uint64_t equipGameData = (uint64_t)(playerGameData + 0x280);
     uint64_t charAsm = (uint64_t)(equipGameData + 0x80);
-    uint32_t right_weapon_slot_index = *(uint32_t*)(charAsm + 0x10);
-    if (right_weapon_slot_index == 0)
+    uint32_t weapon_slot_index = *(uint32_t*)(charAsm + 0x10);
+    if (!right_hand)
     {
-        return RightHand1;
+        weapon_slot_index = *(uint32_t*)(charAsm + 0xC);
     }
-    else if (right_weapon_slot_index == 1)
+    if (weapon_slot_index == 0)
     {
-        return RightHand2;
+        if (right_hand)
+        {
+            return RightHand1;
+        }
+        else
+        {
+            return LeftHand1;
+        }
+    }
+    else if (weapon_slot_index == 1)
+    {
+        if (right_hand)
+        {
+            return RightHand2;
+        }
+        else
+        {
+            return LeftHand2;
+        }
     }
     else
     {
-        FATALERROR("right_weapon_slot_index=%d", right_weapon_slot_index);
+        FATALERROR("right_weapon_slot_index=%d", weapon_slot_index);
     }
 }
 

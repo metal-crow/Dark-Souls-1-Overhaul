@@ -8,6 +8,51 @@ _DATA ENDS
 _TEXT SEGMENT
 
 FUNC_PROLOGUE macro
+    pushfq 
+    push    rax
+    mov     rax,rsp
+    and     rsp,-10h
+    sub     rsp,000002A0h
+    fxsave  [rsp+20h]
+    mov     [rsp+00000220h],rbx
+    mov     [rsp+00000228h],rcx
+    mov     [rsp+00000230h],rdx
+    mov     [rsp+00000238h],rsi
+    mov     [rsp+00000240h],rdi
+    mov     [rsp+00000248h],rax
+    mov     [rsp+00000250h],rbp
+    mov     [rsp+00000258h],r8
+    mov     [rsp+00000260h],r9
+    mov     [rsp+00000268h],r10
+    mov     [rsp+00000270h],r11
+    mov     [rsp+00000278h],r12
+    mov     [rsp+00000280h],r13
+    mov     [rsp+00000288h],r14
+    mov     [rsp+00000290h],r15
+endm
+
+FUNC_EPILOGUE macro
+    mov     r15,[rsp+00000290h]
+    mov     r14,[rsp+00000288h]
+    mov     r13,[rsp+00000280h]
+    mov     r12,[rsp+00000278h]
+    mov     r11,[rsp+00000270h]
+    mov     r10,[rsp+00000268h]
+    mov     r9, [rsp+00000260h]
+    mov     r8, [rsp+00000258h]
+    mov     rbp,[rsp+00000250h]
+    mov     rdi,[rsp+00000240h]
+    mov     rsi,[rsp+00000238h]
+    mov     rdx,[rsp+00000230h]
+    mov     rcx,[rsp+00000228h]
+    mov     rbx,[rsp+00000220h]
+    fxrstor [rsp+20h]
+    mov     rsp,[rsp+00000248h]
+    pop     rax
+    popfq 
+endm
+
+FUNC_PROLOGUE_LITE macro
 	push	r15
 	mov		r15, rsp
 	and		rsp, -10h
@@ -28,7 +73,7 @@ FUNC_PROLOGUE macro
 	mov		[rsp + 20h], r15
 endm
 
-FUNC_EPILOGUE macro
+FUNC_EPILOGUE_LITE macro
 	mov		r15, [rsp + 20h]
 	mov		r11, [rsp + 28h]
 	mov		r10, [rsp + 30h]
@@ -37,24 +82,6 @@ FUNC_EPILOGUE macro
 	mov		rdx, [rsp + 48h]
 	mov		rcx, [rsp + 50h]
 	mov		rax, [rsp + 58h]
-	movaps	xmm5, [rsp + 60h]
-	movaps	xmm4, [rsp + 70h]
-	movaps	xmm3, [rsp + 80h]
-	movaps	xmm2, [rsp + 90h]
-	movaps	xmm1, [rsp + 0A0h]
-	movaps	xmm0, [rsp + 0B0h]
-	mov		rsp, r15
-	pop		r15
-endm
-
-FUNC_EPILOGUE_NORAX macro
-	mov		r15, [rsp + 20h]
-	mov		r11, [rsp + 28h]
-	mov		r10, [rsp + 30h]
-	mov		r9, [rsp + 38h]
-	mov		r8, [rsp + 40h]
-	mov		rdx, [rsp + 48h]
-	mov		rcx, [rsp + 50h]
 	movaps	xmm5, [rsp + 60h]
 	movaps	xmm4, [rsp + 70h]
 	movaps	xmm3, [rsp + 80h]
@@ -194,18 +221,16 @@ extern grab_destruct_thread_handle_helper: proc
 PUBLIC grab_destruct_thread_handle_injection
 grab_destruct_thread_handle_injection PROC
 
+FUNC_PROLOGUE_LITE
+mov     rcx, qword ptr [rcx + 8h] ;handle
+call    grab_destruct_thread_handle_helper
+FUNC_EPILOGUE_LITE
+
 ;original code
 push    rdi
 sub     rsp, 30h
 mov     qword ptr [rsp+20h], -2
-
-FUNC_PROLOGUE
-mov     rcx, qword ptr [rcx + 8h] ;handle
-call    grab_destruct_thread_handle_helper
-FUNC_EPILOGUE
-
 jmp     grab_destruct_thread_handle_return
-
 grab_destruct_thread_handle_injection ENDP
 
 
