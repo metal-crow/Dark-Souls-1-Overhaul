@@ -536,8 +536,8 @@ void copy_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to, EntityThrow
         else
         {
             free_ThrowSelfEsc(to->throwSelfEsc);
-            to->throwSelfEsc = NULL;
         }
+        to->throwSelfEsc = NULL;
     }
     if (to->throwSelfEsc != NULL && from->throwSelfEsc != NULL)
     {

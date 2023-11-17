@@ -70,20 +70,47 @@ void free_DamageMan(DamageMan* to)
 void copy_DamageEntry(DamageEntry* to, DamageEntry* from, bool to_game)
 {
     to->data_0 = from->data_0;
-    to->PhysShapePhantomIns = from->PhysShapePhantomIns;
-    to->FrpgPhysShapePhantomIns_Sphere = from->FrpgPhysShapePhantomIns_Sphere;
-    to->FrpgPhysShapePhantomIns_Capsule = from->FrpgPhysShapePhantomIns_Capsule;
-    to->hkpSphereShape1 = from->hkpSphereShape1;
-    to->hkpCapsuleShape1 = from->hkpCapsuleShape1;
+    //to->PhysShapePhantomIns = from->PhysShapePhantomIns;
+    //to->FrpgPhysShapePhantomIns_Sphere = from->FrpgPhysShapePhantomIns_Sphere;
+    //to->FrpgPhysShapePhantomIns_Capsule = from->FrpgPhysShapePhantomIns_Capsule;
+    //to->hkpSphereShape1 = from->hkpSphereShape1;
+    //to->hkpCapsuleShape1 = from->hkpCapsuleShape1;
     to->data_1 = from->data_1;
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
-    to->hkpCapsuleShape2 = from->hkpCapsuleShape2;
+    if (to->field0x118 == NULL && from->field0x118 != NULL)
+    {
+        if (to_game)
+        {
+            to->field0x118 = (DamageEntryField0x118*)Game::game_malloc(sizeof(DamageEntryField0x118), 16, *(uint64_t*)Game::internal_heap_3);
+        }
+        else
+        {
+            to->field0x118 = init_DamageEntryField0x118();
+        }
+    }
+    if (to->field0x118 != NULL && from->field0x118 == NULL)
+    {
+        if (to_game)
+        {
+            //TODO why can't i free this without a _misaligned_access error
+            //Game::game_free(to->field0x118, sizeof(DamageEntryField0x118));
+        }
+        else
+        {
+            free_DamageEntryField0x118(to->field0x118);
+            to->field0x118 = NULL;
+        }
+    }
+    if (to->field0x118 != NULL && from->field0x118 != NULL)
+    {
+        copy_DamageEntryField0x118(to->field0x118, from->field0x118, to_game);
+    }
     to->data_3 = from->data_3;
     memcpy(to->data_4, from->data_4, sizeof(to->data_4));
-    to->physWorld = from->physWorld;
-    to->simpleShapePhantom = from->simpleShapePhantom;
+    //to->physWorld = from->physWorld;
+    //to->simpleShapePhantom = from->simpleShapePhantom;
     to->data_5 = from->data_5;
-    to->hkpSphereShape2 = from->hkpSphereShape2;
+    //to->hkpSphereShape2 = from->hkpSphereShape2;
     to->data_6 = from->data_6;
     to->data_7 = from->data_7;
 }
@@ -92,15 +119,32 @@ DamageEntry* init_DamageEntry()
 {
     DamageEntry* local_DamageEntry = (DamageEntry*)malloc_(sizeof(DamageEntry));
 
+    local_DamageEntry->field0x118 = init_DamageEntryField0x118();
+
     return local_DamageEntry;
 }
 
 void free_DamageEntry(DamageEntry* to, bool freeself)
 {
-
-
+    free_DamageEntryField0x118(to->field0x118);
     if (freeself)
     {
         free(to);
     }
+}
+
+void copy_DamageEntryField0x118(DamageEntryField0x118* to, DamageEntryField0x118* from, bool to_game)
+{
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+}
+
+DamageEntryField0x118* init_DamageEntryField0x118()
+{
+    DamageEntryField0x118* local = (DamageEntryField0x118*)malloc_(sizeof(DamageEntryField0x118));
+    return local;
+}
+
+void free_DamageEntryField0x118(DamageEntryField0x118* to)
+{
+    free(to);
 }

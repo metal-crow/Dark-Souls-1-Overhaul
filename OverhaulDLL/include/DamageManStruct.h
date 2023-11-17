@@ -14,7 +14,14 @@ typedef struct DamageEntry DamageEntry;
 typedef struct FrpgPhysShapePhantomIns FrpgPhysShapePhantomIns;
 typedef struct hkpSphereShape hkpSphereShape;
 typedef struct hkpCapsuleShape hkpCapsuleShape;
+typedef struct DamageEntryField0x118 DamageEntryField0x118;
 typedef struct FrpgPhysWorld FrpgPhysWorld;
+
+struct DamageEntryField0x118
+{
+    uint8_t data_0[0x20];
+};
+static_assert(sizeof(DamageEntryField0x118) == 0x20);
 
 struct DamageEntry
 {
@@ -27,7 +34,7 @@ struct DamageEntry
     uint64_t data_1;
     uint64_t padding_0;
     uint8_t data_2[216];
-    hkpCapsuleShape* hkpCapsuleShape2;
+    DamageEntryField0x118* field0x118;
     uint64_t data_3;
     uint64_t padding_1;
     uint8_t data_4[168];
@@ -51,7 +58,7 @@ static_assert(offsetof(DamageEntry, hkpSphereShape1) == 0x20);
 static_assert(offsetof(DamageEntry, hkpCapsuleShape1) == 0x28);
 static_assert(offsetof(DamageEntry, data_1) == 0x30);
 static_assert(offsetof(DamageEntry, data_2) == 0x40);
-static_assert(offsetof(DamageEntry, hkpCapsuleShape2) == 0x118);
+static_assert(offsetof(DamageEntry, field0x118) == 0x118);
 static_assert(offsetof(DamageEntry, data_3) == 0x120);
 static_assert(offsetof(DamageEntry, data_4) == 0x130);
 static_assert(offsetof(DamageEntry, physWorld) == 0x1e8);
