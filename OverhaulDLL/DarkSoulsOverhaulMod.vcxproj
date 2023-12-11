@@ -14,6 +14,7 @@
     <ClCompile Include="d3d11-wrapper\src\d3d11\d3d11.cpp" />
     <ClCompile Include="d3d11-wrapper\src\d3d11\exports_.cpp" />
     <ClCompile Include="d3d11-wrapper\src\dllmain.cpp" />
+    <ClCompile Include="src\AttachSysSlotStructsFunctions.cpp" />
     <ClCompile Include="src\BulletManStructFunctions.cpp" />
     <ClCompile Include="src\CustomInvasionTypes.cpp" />
     <ClCompile Include="src\AnimationEdits.cpp" />
@@ -65,6 +66,8 @@
     <ClInclude Include="d3d11-wrapper\include\d3d11\exports.h" />
     <ClInclude Include="d3d11-wrapper\include\d3d11\main.h" />
     <ClInclude Include="d3d11-wrapper\include\dllmain.h" />
+    <ClInclude Include="include\AttachSysSlotStructs.h" />
+    <ClInclude Include="include\AttachSysSlotStructsFunctions.h" />
     <ClInclude Include="include\BulletManStruct.h" />
     <ClInclude Include="include\BulletManStructFunctions.h" />
     <ClInclude Include="include\CustomInvasionTypes.h" />

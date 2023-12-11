@@ -138,6 +138,9 @@
     <ClCompile Include="src\ThrowManStructFunctions.cpp">
       <Filter>Source Files\Rollback</Filter>
     </ClCompile>
+    <ClCompile Include="src\AttachSysSlotStructsFunctions.cpp">
+      <Filter>Source Files\Rollback</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3d11-wrapper\include\d3d11\exports.h">
@@ -237,6 +240,12 @@
       <Filter>Header Files\Rollback</Filter>
     </ClInclude>
     <ClInclude Include="include\ThrowManStructFunctions.h">
+      <Filter>Header Files\Rollback</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AttachSysSlotStructs.h">
+      <Filter>Header Files\Rollback</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AttachSysSlotStructsFunctions.h">
       <Filter>Header Files\Rollback</Filter>
     </ClInclude>
   </ItemGroup>
