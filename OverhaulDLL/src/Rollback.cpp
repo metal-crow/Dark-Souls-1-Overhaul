@@ -460,9 +460,22 @@ bool rollback_advance_frame_callback(int)
 {
     rollback_sync_inputs();
 
+    //There is a problem with the slots list getting corrupted when it's processed via Step twice in a frame
+    //Work around it for now by just nulling it
+    auto player_o = Game::get_PlayerIns();
+    if (!player_o.has_value() || player_o.value() == NULL)
+    {
+        FATALERROR("Unable to get playerins in rollback_advance_frame_callback");
+    }
+    PlayerIns* player = (PlayerIns*)player_o.value();
+    AttachSysSlotBaseImpl* saved_list = player->chrins.chrattachsys.SysSlots;
+    player->chrins.chrattachsys.SysSlots = NULL;
+
     //step next frame
     Game::Step_GameSimulation(true);
     ggpo_advance_frame(Rollback::ggpo);
+
+    player->chrins.chrattachsys.SysSlots = saved_list;
 
     //ConsoleWrite("rollback_advance_frame_callback finished");
     return true;
