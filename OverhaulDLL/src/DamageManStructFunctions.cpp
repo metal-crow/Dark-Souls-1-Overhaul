@@ -77,6 +77,7 @@ void copy_DamageEntry(DamageEntry* to, DamageEntry* from, bool to_game)
     //to->hkpCapsuleShape1 = from->hkpCapsuleShape1;
     to->data_1 = from->data_1;
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+#if 0
     if (to->field0x118 == NULL && from->field0x118 != NULL)
     {
         if (to_game)
@@ -105,6 +106,7 @@ void copy_DamageEntry(DamageEntry* to, DamageEntry* from, bool to_game)
     {
         copy_DamageEntryField0x118(to->field0x118, from->field0x118, to_game);
     }
+#endif
     to->data_3 = from->data_3;
     memcpy(to->data_4, from->data_4, sizeof(to->data_4));
     //to->physWorld = from->physWorld;

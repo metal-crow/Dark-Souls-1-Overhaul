@@ -59,6 +59,10 @@ void copy_ChrIns(ChrIns* to, ChrIns* from, bool to_game);
 ChrIns* init_ChrIns();
 void free_ChrIns(ChrIns* to, bool freeself);
 
+void copy_ChrAttachSys(ChrAttachSys* to, ChrAttachSys* from, bool to_game);
+ChrAttachSys* init_ChrAttachSys();
+void free_ChrAttachSys(ChrAttachSys* to, bool freeself);
+
 void copy_ChrIns_field0x18(ChrIns_field0x18* to, ChrIns_field0x18* from);
 ChrIns_field0x18* init_ChrIns_field0x18();
 void free_ChrIns_field0x18(ChrIns_field0x18* to);

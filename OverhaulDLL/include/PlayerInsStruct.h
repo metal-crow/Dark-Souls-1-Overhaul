@@ -8,6 +8,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "PadManipulatorStruct.h"
+#include "AttachSysSlotStructs.h"
 
 typedef struct AnimationQueue_Entry_sub1_field0x10 AnimationQueue_Entry_sub1_field0x10;
 typedef struct AnimationQueue_Entry_sub1 AnimationQueue_Entry_sub1;
@@ -720,8 +721,9 @@ static_assert(sizeof(QwcSpEffectEquipCtrl) == 0x30);
 
 struct ChrAttachSys
 {
-    //this is sfx stuff, unneeded for rollback
-    uint8_t padding_0[0x18];
+    uint8_t padding_0[8];
+    AttachSysSlotBaseImpl* SysSlots;
+    uint8_t padding_1[8];
 };
 
 static_assert(sizeof(ChrAttachSys) == 0x18);
@@ -781,7 +783,8 @@ struct ChrIns
 {
     uint8_t padding_0[8 + 0x18];
     uint64_t field0x18;
-    uint8_t padding_0a[0x40];
+    uint8_t padding_0a[0x38];
+    void* chrModel;
     PlayerCtrl* playerCtrl;
     union
     {
