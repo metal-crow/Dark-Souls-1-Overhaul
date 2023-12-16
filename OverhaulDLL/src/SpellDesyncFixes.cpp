@@ -153,9 +153,9 @@ void type1_p2pPacket_parse_injection_helper_function(CustomSpellPacketData* bull
 
     //verify we can find this bullet in our bullet list
     std::unordered_set<uint8_t> formidden_nums;
-    for (auto bullet : BulletNetworkInfo_Array)
+    for (auto net_bullet : BulletNetworkInfo_Array)
     {
-        formidden_nums.insert(bullet->number);
+        formidden_nums.insert(net_bullet->number);
     }
     auto found_bullet =  Game::find_unfired_bullet(bullet->owner_id, bullet_packet->pos_x, bullet_packet->pos_y, bullet_packet->pos_z, formidden_nums);
     if (!found_bullet.has_value())

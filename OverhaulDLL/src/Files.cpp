@@ -135,8 +135,8 @@ HANDLE WINAPI intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesiredAccess,
                                 new_save_file_page = Files::save_file + "_" + std::to_string(i);
                                 old_save_file_page = orig_save_file + "_" + std::to_string(i);
                             }
-                            DWORD fileAtribs = GetFileAttributesA(old_save_file_page.c_str());
-                            if (fileAtribs != INVALID_FILE_ATTRIBUTES)
+                            DWORD fileAtribs_old = GetFileAttributesA(old_save_file_page.c_str());
+                            if (fileAtribs_old != INVALID_FILE_ATTRIBUTES)
                             {
                                 MoveFile(old_save_file_page.c_str(), new_save_file_page.c_str());
                             }
