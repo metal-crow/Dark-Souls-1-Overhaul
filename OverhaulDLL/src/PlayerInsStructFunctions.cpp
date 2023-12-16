@@ -4,6 +4,74 @@
 
 typedef void* falloc(uint64_t, uint64_t, uint32_t);
 
+std::string print_PlayerIns(PlayerIns* to)
+{
+    std::string out = "PlayerIns\n";
+    out += print_ChrIns(&to->chrins);
+    out += print_PlayerGameData(to->playergamedata);
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data 1:";
+    for (size_t i = 0; i < sizeof(to->data_1); i++)
+    {
+        out += std::to_string(to->data_1[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data 2:" + std::to_string(to->data_2) + "\n";
+    out += print_RingEquipCtrl(to->ringequipctrl);
+    out += print_WeaponEquipCtrl(to->weaponequipctrl);
+    out += print_ProEquipCtrl(to->proequipctrl);
+    out += "curSelectedMagicId:" + std::to_string(to->curSelectedMagicId) + "\n";
+    out += "curUsedItem:" + std::to_string(to->curUsedItem.amountUsed) + "," + std::to_string(to->curUsedItem.itemId) + "\n";
+    out += "override_equipped_magicId:" + std::to_string(to->override_equipped_magicId) + "\n";
+    out += print_ChrAsm(to->chrasm);
+    out += print_ChrAsmModelRes(to->chrAsmModelRes);
+    out += print_ChrAsmModel(to->chrAsmModel);
+
+    out += "Unknown data 3:";
+    for (size_t i = 0; i < sizeof(to->data_3)/4; i++)
+    {
+        out += std::to_string((float)to->data_3[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data 4:";
+    for (size_t i = 0; i < sizeof(to->data_4); i++)
+    {
+        out += std::to_string(to->data_4[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data 5:";
+    for (size_t i = 0; i < sizeof(to->data_5); i++)
+    {
+        out += std::to_string(to->data_5[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data 6:";
+    for (size_t i = 0; i < sizeof(to->data_6); i++)
+    {
+        out += std::to_string(to->data_6[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
+}
+
 void copy_PlayerIns(PlayerIns* to, PlayerIns* from, bool to_game)
 {
     Game::SuspendThreads();
@@ -115,6 +183,40 @@ void free_PlayerIns(PlayerIns* to)
     free(to);
 }
 
+std::string print_ChrAsm(ChrAsm* to)
+{
+    std::string out = "ChrAsm\n";
+    out += "equipped_weapon_style:" + std::to_string(to->equipped_weapon_style) + "\n";
+    out += "l_hand_equipped_index:" + std::to_string(to->l_hand_equipped_index) + "\n";
+    out += "r_hand_equipped_index:" + std::to_string(to->r_hand_equipped_index) + "\n";
+
+    out += "Unknown data_0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown equip_items:";
+    for (size_t i = 0; i < sizeof(to->equip_items)/4; i++)
+    {
+        out += std::to_string(to->equip_items[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_1:";
+    for (size_t i = 0; i < sizeof(to->data_1); i++)
+    {
+        out += std::to_string(to->data_1[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
+}
+
 void copy_ChrAsm(ChrAsm* to, ChrAsm* from)
 {
     to->equipped_weapon_style = from->equipped_weapon_style;
@@ -134,6 +236,25 @@ ChrAsm* init_ChrAsm()
 void free_ChrAsm(ChrAsm* to)
 {
     free(to);
+}
+
+std::string print_ChrAsmModelRes(ChrAsmModelRes* to)
+{
+    std::string out = "ChrAsmModelRes\n";
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    for (size_t i = 0; i < 14; i++)
+    {
+        out += print_ChrAsmModelRes_Elem(&to->arry[i]);
+    }
+
+    return out;
 }
 
 void copy_ChrAsmModelRes(ChrAsmModelRes* to, ChrAsmModelRes* from, bool to_game)
@@ -168,6 +289,22 @@ void free_ChrAsmModelRes(ChrAsmModelRes* to)
     free(to);
 }
 
+std::string print_ChrAsmModelRes_Elem(ChrAsmModelRes_Elem* to)
+{
+    std::string out = "ChrAsmModelRes_Elem\n";
+    out += "Unknown data_0:" + std::to_string(to->data_0) + "\n";
+
+    out += "Unknown data 1:";
+    for (size_t i = 0; i < sizeof(to->data_1); i++)
+    {
+        out += std::to_string(to->data_1[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
+}
+
 void copy_ChrAsmModelRes_Elem(ChrAsmModelRes_Elem* to, ChrAsmModelRes_Elem* from, bool to_game)
 {
     to->data_0 = from->data_0;
@@ -187,6 +324,62 @@ void free_ChrAsmModelRes_Elem(ChrAsmModelRes_Elem* to, bool freeself)
     {
         free(to);
     }
+}
+
+std::string print_ChrAsmModel(ChrAsmModel* to)
+{
+    std::string out = "ChrAsmModel\n";
+    out += "Unknown data_0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_1:";
+    for (size_t i = 0; i < sizeof(to->data_1); i++)
+    {
+        out += std::to_string(to->data_1[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_2:";
+    for (size_t i = 0; i < sizeof(to->data_2); i++)
+    {
+        out += std::to_string(to->data_2[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_3:";
+    for (size_t i = 0; i < sizeof(to->data_3); i++)
+    {
+        out += std::to_string(to->data_3[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_4:";
+    for (size_t i = 0; i < sizeof(to->data_4); i++)
+    {
+        out += std::to_string(to->data_4[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_5:";
+    for (size_t i = 0; i < sizeof(to->data_5)/8; i++)
+    {
+        out += std::to_string(to->data_5[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_6:" + std::to_string(to->data_6) + "\n";
+
+    return out;
 }
 
 void copy_ChrAsmModel(ChrAsmModel* to, ChrAsmModel* from, bool to_game)
@@ -209,6 +402,20 @@ ChrAsmModel* init_ChrAsmModel()
 void free_ChrAsmModel(ChrAsmModel* to)
 {
     free(to);
+}
+
+std::string print_ProEquipCtrl(ProEquipCtrl* to)
+{
+    std::string out = "ProEquipCtrl\n";
+    out += print_SpecialEffect(to->spEffectList);
+    out += "equipped_armors_ids:" +
+        std::to_string(to->equipped_armors_ids[0]) + "," +
+        std::to_string(to->equipped_armors_ids[1]) + "," +
+        std::to_string(to->equipped_armors_ids[2]) + "," +
+        std::to_string(to->equipped_armors_ids[3]) + "," +
+        std::to_string(to->equipped_armors_ids[4]) + "\n";
+
+    return out;
 }
 
 void copy_ProEquipCtrl(ProEquipCtrl* to, ProEquipCtrl* from, bool to_game)
@@ -246,6 +453,17 @@ void free_ProEquipCtrl(ProEquipCtrl* to)
     free(to);
 }
 
+std::string print_WeaponEquipCtrl(WeaponEquipCtrl* to)
+{
+    std::string out = "WeaponEquipCtrl\n";
+    out += print_SpecialEffect(to->spEffectList);
+    out += "equipped_weapons_ids:" +
+        std::to_string(to->equipped_weapons_ids[0]) + "," +
+        std::to_string(to->equipped_weapons_ids[1]) + "\n";
+
+    return out;
+}
+
 void copy_WeaponEquipCtrl(WeaponEquipCtrl* to, WeaponEquipCtrl* from, bool to_game)
 {
     copy_SpecialEffect(to->spEffectList, from->spEffectList, to_game);
@@ -276,6 +494,17 @@ void free_WeaponEquipCtrl(WeaponEquipCtrl* to)
     free(to->equipped_weapons_ids);
 
     free(to);
+}
+
+std::string print_RingEquipCtrl(RingEquipCtrl* to)
+{
+    std::string out = "RingEquipCtrl\n";
+    out += print_SpecialEffect(to->spEffectList);
+    out += "equipped_rings_ids:" +
+        std::to_string(to->equipped_rings_ids[0]) + "," +
+        std::to_string(to->equipped_rings_ids[1]) + "\n";
+
+    return out;
 }
 
 void copy_RingEquipCtrl(RingEquipCtrl* to, RingEquipCtrl* from, bool to_game)
@@ -310,6 +539,17 @@ void free_RingEquipCtrl(RingEquipCtrl* to)
     free(to);
 }
 
+std::string print_PlayerGameData(PlayerGameData* to)
+{
+    std::string out = "PlayerGameData\n";
+
+    out += print_PlayerGameData_AttributeInfo(&to->attribs);
+    out += print_EquipGameData(&to->equipGameData);
+    out += print_PlayerGameData_ChrProperties(&to->ChrProperties);
+
+    return out;
+}
+
 void copy_PlayerGameData(PlayerGameData* to, PlayerGameData* from)
 {
     copy_PlayerGameData_AttributeInfo(&to->attribs, &from->attribs);
@@ -335,9 +575,43 @@ void free_PlayerGameData(PlayerGameData* to)
     free(to);
 }
 
+std::string print_PlayerGameData_ChrProperties(PlayerGameData_ChrProperties* to)
+{
+    std::string out = "PlayerGameData_ChrProperties\n";
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
+}
+
 void copy_PlayerGameData_ChrProperties(PlayerGameData_ChrProperties* to, PlayerGameData_ChrProperties* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+}
+
+std::string print_EquipGameData(EquipGameData* to)
+{
+    std::string out = "EquipGameData\n";
+
+    out += "equippedItemIndexes:";
+    for (size_t i = 0; i < sizeof(to->equippedItemIndexes)/4; i++)
+    {
+        out += std::to_string(to->equippedItemIndexes[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += print_ChrAsm(&to->chrasm);
+    out += print_EquipMagicData(to->equipMagicData);
+    out += print_EquipItemData(&to->equippedItemsInQuickbar);
+
+    return out;
 }
 
 void copy_EquipGameData(EquipGameData* to, EquipGameData* from)
@@ -367,9 +641,41 @@ void free_EquipGameData(EquipGameData* to, bool freeself)
     }
 }
 
+std::string print_EquipItemData(EquipItemData* to)
+{
+    std::string out = "EquipItemData\n";
+
+    out += "quickbar:";
+    for (size_t i = 0; i < sizeof(to->quickbar) / 4; i++)
+    {
+        out += std::to_string(to->quickbar[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
+}
+
 void copy_EquipItemData(EquipItemData* to, EquipItemData* from)
 {
     memcpy(to->quickbar, from->quickbar, sizeof(to->quickbar));
+}
+
+std::string print_EquipMagicData(EquipMagicData* to)
+{
+    std::string out = "EquipMagicData\n";
+
+    out += "equippedMagicList:";
+    for (size_t i = 0; i < sizeof(to->equippedMagicList) / 8; i++)
+    {
+        out += std::to_string(to->equippedMagicList[i].magic_id);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "curSelectedMagicSlot:" + std::to_string(to->curSelectedMagicSlot) + "\n";
+
+    return out;
 }
 
 void copy_EquipMagicData(EquipMagicData* to, EquipMagicData* from)
@@ -389,9 +695,130 @@ void free_EquipMagicData(EquipMagicData* to)
     free(to);
 }
 
+std::string print_PlayerGameData_AttributeInfo(PlayerGameData_AttributeInfo* to)
+{
+    std::string out = "PlayerGameData_AttributeInfo\n";
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
+}
+
 void copy_PlayerGameData_AttributeInfo(PlayerGameData_AttributeInfo* to, PlayerGameData_AttributeInfo* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+}
+
+std::string print_ChrIns(ChrIns* to)
+{
+    std::string out = "ChrIns\n";
+    out += print_PlayerCtrl(to->playerCtrl);
+    out += "CharaInitParamID:" + std::to_string(to->CharaInitParamID) + "\n";
+
+    out += "Unknown data 5:";
+    for (size_t i = 0; i < sizeof(to->data_5); i++)
+    {
+        out += std::to_string(to->data_5[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "lowerThrowAnim:" + std::to_string(to->lowerThrowAnim.animationId) + "," + std::to_string(to->lowerThrowAnim.stateIndex) + "\n";
+    out += "upperThrowAnim:" + std::to_string(to->upperThrowAnim.animationId) + "," + std::to_string(to->upperThrowAnim.stateIndex) + "\n";
+
+    out += "player_handing_state:";
+    for (size_t i = 0; i < 3; i++)
+    {
+        out += std::to_string(to->player_handing_state[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "curToughness:" + std::to_string(to->curToughness) + "\n";
+    out += "maxToughness:" + std::to_string(to->maxToughness) + "\n";
+    out += "toughnessUnk1:" + std::to_string(to->toughnessUnk1) + "\n";
+    out += "toughnessRefillTimer:" + std::to_string(to->toughnessRefillTimer) + "\n";
+    out += "toughnessUnk2:" + std::to_string(to->toughnessUnk2) + "\n";
+    out += "curSelectedMagicId:" + std::to_string(to->curSelectedMagicId) + "\n";
+    out += "curUsedItem:" + std::to_string(to->curUsedItem.amountUsed) + "," + std::to_string(to->curUsedItem.itemId) + "\n";
+    out += print_SpecialEffect(to->specialEffects);
+    out += print_QwcSpEffectEquipCtrl(to->qwcSpEffectEquipCtrl);
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += print_ChrIns_field0x2c8(to->field0x2c8);
+
+    out += "Unknown data 0a:";
+    for (size_t i = 0; i < sizeof(to->data_0a); i++)
+    {
+        out += std::to_string(to->data_0a[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += print_HitIns(to->hitins_1);
+    out += print_HitIns(to->hitins_2);
+    out += "data_0b:" + std::to_string(to->data_0b) + "\n";
+    out += "curHp:" + std::to_string(to->curHp) + "\n";
+    out += "maxHp:" + std::to_string(to->maxHp) + "\n";
+    out += "curSp:" + std::to_string(to->curSp) + "\n";
+    out += "maxSp:" + std::to_string(to->maxSp) + "\n";
+    out += "damage_taken_scalar:" + std::to_string(to->damage_taken_scalar) + "\n";
+    out += "PoisonResist:" + std::to_string(to->PoisonResist) + "\n";
+    out += "ToxicResist:" + std::to_string(to->ToxicResist) + "\n";
+    out += "BleedResist:" + std::to_string(to->BleedResist) + "\n";
+    out += "CurseResist:" + std::to_string(to->CurseResist) + "\n";
+    out += "resistPoisonTotal:" + std::to_string(to->resistPoisonTotal) + "\n";
+    out += "resistPlagueTotal:" + std::to_string(to->resistPlagueTotal) + "\n";
+    out += "resistBleedingTotal:" + std::to_string(to->resistBleedingTotal) + "\n";
+    out += "resistCurseTotal:" + std::to_string(to->resistCurseTotal) + "\n";
+    out += print_EntityThrowAnimationStatus(to->throw_animation_info);
+
+    out += "Unknown data 1:";
+    for (size_t i = 0; i < sizeof(to->data_1); i++)
+    {
+        out += std::to_string(to->data_1[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data 2:";
+    for (size_t i = 0; i < sizeof(to->data_2); i++)
+    {
+        out += std::to_string(to->data_2[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data 3:";
+    for (size_t i = 0; i < sizeof(to->data_3)/8; i++)
+    {
+        out += std::to_string(to->data_3[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data 4:";
+    for (size_t i = 0; i < sizeof(to->data_4); i++)
+    {
+        out += std::to_string(to->data_4[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
 }
 
 void copy_ChrIns(ChrIns* to, ChrIns* from, bool to_game)
@@ -481,6 +908,20 @@ void free_ChrIns(ChrIns* to, bool freeself)
     }
 }
 
+std::string print_ChrAttachSys(ChrAttachSys* to)
+{
+    std::string out = "ChrAttachSys\n";
+    if (to->SysSlots != NULL)
+    {
+        out += print_AttachSysSlot(to->SysSlots);
+    }
+    else
+    {
+        out += "SysSlots: NULL\n";
+    }
+    return out;
+}
+
 void copy_ChrAttachSys(ChrAttachSys* to, ChrAttachSys* from, bool to_game)
 {
     if (to->SysSlots == NULL && from->SysSlots != NULL)
@@ -512,6 +953,20 @@ void free_ChrAttachSys(ChrAttachSys* to, bool freeself)
     }
 }
 
+std::string print_ChrIns_field0x18(ChrIns_field0x18* to)
+{
+    std::string out = "ChrIns_field0x18\n";
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
+}
+
 void copy_ChrIns_field0x18(ChrIns_field0x18* to, ChrIns_field0x18* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
@@ -526,6 +981,33 @@ ChrIns_field0x18* init_ChrIns_field0x18()
 void free_ChrIns_field0x18(ChrIns_field0x18* to)
 {
     free(to);
+}
+
+std::string print_ChrIns_field0x2c8(ChrIns_field0x2c8* to)
+{
+    std::string out = "ChrIns_field0x2c8\n";
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "data_1:" + std::to_string(to->data_1) + "\n";
+
+    out += "Unknown data 2:";
+    for (size_t i = 0; i < sizeof(to->data_2); i++)
+    {
+        out += std::to_string(to->data_2[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "data_3:" + std::to_string(to->data_3) + "\n";
+
+    return out;
 }
 
 void copy_ChrIns_field0x2c8(ChrIns_field0x2c8* to, ChrIns_field0x2c8* from)
@@ -545,6 +1027,38 @@ ChrIns_field0x2c8* init_ChrIns_field0x2c8()
 void free_ChrIns_field0x2c8(ChrIns_field0x2c8* to)
 {
     free(to);
+}
+
+std::string print_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to)
+{
+    std::string out = "EntityThrowAnimationStatus\n";
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    if (to->throwSelfEsc != NULL)
+    {
+        out += print_ThrowSelfEsc(to->throwSelfEsc);
+    }
+    else
+    {
+        out += "throwSelfEsc: NULL\n";
+    }
+
+    out += "Unknown data 1:";
+    for (size_t i = 0; i < sizeof(to->data_1); i++)
+    {
+        out += std::to_string(to->data_1[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
 }
 
 void copy_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to, EntityThrowAnimationStatus* from, bool to_game)
@@ -600,6 +1114,21 @@ void free_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to)
     free(to);
 }
 
+std::string print_ThrowSelfEsc(ThrowSelfEsc* to)
+{
+    std::string out = "ThrowSelfEsc\n";
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
+}
+
 void copy_ThrowSelfEsc(ThrowSelfEsc* to, ThrowSelfEsc* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
@@ -614,6 +1143,28 @@ ThrowSelfEsc* init_ThrowSelfEsc()
 void free_ThrowSelfEsc(ThrowSelfEsc* to)
 {
     free(to);
+}
+
+std::string print_QwcSpEffectEquipCtrl(QwcSpEffectEquipCtrl* to)
+{
+    std::string out = "QwcSpEffectEquipCtrl\n";
+
+    out += "Array: ";
+    for (size_t i = 0; i < to->arry_len; i++)
+    {
+        out += std::to_string(to->arry[i]) + " ";
+    }
+    out += "\n";
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0)/4; i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
 }
 
 void copy_QwcSpEffectEquipCtrl(QwcSpEffectEquipCtrl* to, QwcSpEffectEquipCtrl* from)
@@ -648,6 +1199,39 @@ void free_QwcSpEffectEquipCtrl(QwcSpEffectEquipCtrl* to)
     free(to);
 }
 
+std::string print_SpecialEffect(SpecialEffect* to)
+{
+    std::string out = "SpecialEffect\n";
+
+    out += print_SpecialEffect_Info(to->specialEffect_Info);
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data 1:";
+    for (size_t i = 0; i < sizeof(to->data_1); i++)
+    {
+        out += std::to_string(to->data_1[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data 2:";
+    for (size_t i = 0; i < sizeof(to->data_2); i++)
+    {
+        out += std::to_string(to->data_2[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
+}
+
 void copy_SpecialEffect(SpecialEffect* to, SpecialEffect* from, bool to_game)
 {
     copy_SpecialEffect_Info(to->specialEffect_Info, from->specialEffect_Info, to_game);
@@ -673,6 +1257,26 @@ void free_SpecialEffect(SpecialEffect* to)
 }
 
 static const size_t max_preallocated_SpecialEffect_Info = 64;
+
+std::string print_SpecialEffect_Info(SpecialEffect_Info* to)
+{
+    std::string out = "SpecialEffect_Info\n";
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    if (to->next != NULL)
+    {
+        out += print_SpecialEffect_Info(to->next);
+    }
+
+    return out;
+}
 
 void copy_SpecialEffect_Info(SpecialEffect_Info* to, SpecialEffect_Info* from, bool to_game)
 {
@@ -752,6 +1356,42 @@ void free_SpecialEffect_Info(SpecialEffect_Info* to)
     free(to);
 }
 
+std::string print_PlayerCtrl(PlayerCtrl* to)
+{
+    std::string out = "PlayerCtrl\n";
+
+    out += print_ChrCtrl(&to->chrCtrl);
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += print_TurnAnim(to->turnAnim);
+    out += print_ArrowTurnAnim(to->arrowTurnAnim);
+
+    out += "Unknown data 1:";
+    for (size_t i = 0; i < sizeof(to->data_1); i++)
+    {
+        out += std::to_string(to->data_1[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data 2:";
+    for (size_t i = 0; i < sizeof(to->data_2); i++)
+    {
+        out += std::to_string(to->data_2[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
+}
+
 void copy_PlayerCtrl(PlayerCtrl* to, PlayerCtrl* from, bool to_game)
 {
     copy_ChrCtrl(&to->chrCtrl, &from->chrCtrl, to_game);
@@ -784,6 +1424,25 @@ void free_PlayerCtrl(PlayerCtrl* to)
     free(to);
 }
 
+std::string print_ArrowTurnAnim(ArrowTurnAnim* to)
+{
+    std::string out = "ArrowTurnAnim\n";
+
+    out += print_TurnAnim(&to->turnAnim);
+    out += print_SpinJoint(to->joint_spine_2);
+    out += print_SpinJoint(to->joint_spine1_2);
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
+}
+
 void copy_ArrowTurnAnim(ArrowTurnAnim* to, ArrowTurnAnim* from)
 {
     copy_TurnAnim(&to->turnAnim, &from->turnAnim);
@@ -814,6 +1473,37 @@ void free_ArrowTurnAnim(ArrowTurnAnim* to)
     free(to);
 }
 
+std::string print_SpinJoint(SpinJoint* to)
+{
+    std::string out = "SpinJoint\n";
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_1:";
+    for (size_t i = 0; i < sizeof(to->data_1); i++)
+    {
+        out += std::to_string(to->data_1[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_2:";
+    for (size_t i = 0; i < sizeof(to->data_2); i++)
+    {
+        out += std::to_string(to->data_2[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
+}
+
 void copy_SpinJoint(SpinJoint* to, SpinJoint* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
@@ -830,6 +1520,51 @@ SpinJoint* init_SpinJoint()
 void free_SpinJoint(SpinJoint* to)
 {
     free(to);
+}
+
+std::string print_TurnAnim(TurnAnim* to)
+{
+    std::string out = "TurnAnim\n";
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_1:";
+    for (size_t i = 0; i < sizeof(to->data_1); i++)
+    {
+        out += std::to_string(to->data_1[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += print_SpinJoint(to->joint_UpperRoot);
+    out += print_SpinJoint(to->joint_LowerRoot);
+    out += print_SpinJoint(to->joint_spine1_1);
+    out += print_SpinJoint(to->joint_spine_1);
+    out += print_SpinJoint(to->joint_master);
+
+    out += "Unknown data_2:";
+    for (size_t i = 0; i < sizeof(to->data_2); i++)
+    {
+        out += std::to_string(to->data_2[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_3:";
+    for (size_t i = 0; i < sizeof(to->data_3); i++)
+    {
+        out += std::to_string(to->data_3[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
 }
 
 void copy_TurnAnim(TurnAnim* to, TurnAnim* from)
@@ -870,6 +1605,60 @@ void free_TurnAnim(TurnAnim* to, bool freeself)
     {
         free(to);
     }
+}
+
+std::string print_ChrCtrl(ChrCtrl* to)
+{
+    std::string out = "TurnAnim\n";
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += print_ChrCtrl_AnimationQueue(to->animationQueue);
+    out += print_AnimationMediator(to->animationMediator);
+    out += print_HavokChara(to->havokChara);
+    out += print_ActionCtrl(to->actionctrl);
+
+    out += "Unknown data_1:";
+    for (size_t i = 0; i < sizeof(to->data_1); i++)
+    {
+        out += std::to_string(to->data_1[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_2:";
+    for (size_t i = 0; i < sizeof(to->data_2); i++)
+    {
+        out += std::to_string(to->data_2[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += print_WalkAnim_Twist(to->walkAnim_Twist);
+
+    out += "Unknown data_3:";
+    for (size_t i = 0; i < sizeof(to->data_3); i++)
+    {
+        out += std::to_string(to->data_3[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_4:";
+    for (size_t i = 0; i < sizeof(to->data_4); i++)
+    {
+        out += std::to_string(to->data_4[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
 }
 
 void copy_ChrCtrl(ChrCtrl* to, ChrCtrl* from, bool to_game)
@@ -913,6 +1702,59 @@ void free_ChrCtrl(ChrCtrl* to, bool freeself)
     }
 }
 
+std::string print_WalkAnim_Twist(WalkAnim_Twist* to)
+{
+    std::string out = "WalkAnim_Twist\n";
+
+    out += "Unknown data_0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_1:";
+    for (size_t i = 0; i < sizeof(to->data_1); i++)
+    {
+        out += std::to_string(to->data_1[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_2:";
+    for (size_t i = 0; i < sizeof(to->data_2); i++)
+    {
+        out += std::to_string(to->data_2[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += print_SpinJoint(to->Upper_Root_Joint);
+    out += print_SpinJoint(to->master_joint);
+    out += print_SpinJoint(to->neck_joint);
+
+    out += "Unknown data_3:";
+    for (size_t i = 0; i < sizeof(to->data_3); i++)
+    {
+        out += std::to_string(to->data_3[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += print_WalkAnim_Twist_Field0x228Elem(&to->walkAnim_Twist_Field0x228Elem);
+
+    out += "Unknown data_4:";
+    for (size_t i = 0; i < sizeof(to->data_4); i++)
+    {
+        out += std::to_string(to->data_4[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
+}
+
 void copy_WalkAnim_Twist(WalkAnim_Twist* to, WalkAnim_Twist* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
@@ -948,6 +1790,21 @@ void free_WalkAnim_Twist(WalkAnim_Twist* to)
     free_WalkAnim_Twist_Field0x228Elem(&to->walkAnim_Twist_Field0x228Elem, false);
 
     free(to);
+}
+
+std::string print_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* to)
+{
+    std::string out = "WalkAnim_Twist_Field0x228Elem\n";
+
+    for (size_t i = 0; i < to->field0x10_len; i++)
+    {
+        if (to->field0x10[i] != NULL)
+        {
+            out += print_WalkAnim_Twist_Field0x228Elem_field0x10elem(to->field0x10[i]);
+        }
+    }
+
+    return out;
 }
 
 void copy_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* to, WalkAnim_Twist_Field0x228Elem* from, bool to_game)
@@ -1031,9 +1888,58 @@ void free_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* to, bool 
     }
 }
 
+std::string print_WalkAnim_Twist_Field0x228Elem_field0x10elem(WalkAnim_Twist_Field0x228Elem_field0x10elem* to)
+{
+    std::string out = "WalkAnim_Twist_Field0x228Elem_field0x10elem\n";
+
+    out += "Unknown data_0:";
+    for (size_t i = 0; i < sizeof(to->data_0)/4; i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
+}
+
 void copy_WalkAnim_Twist_Field0x228Elem_field0x10elem(WalkAnim_Twist_Field0x228Elem_field0x10elem* to, WalkAnim_Twist_Field0x228Elem_field0x10elem* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+}
+
+std::string print_ActionCtrl(ActionCtrl* to)
+{
+    std::string out = "ActionCtrl\n";
+
+    out += "Unknown data_0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += print_ActionCtrl_0x30Substruct(&to->passive_state);
+    out += print_ActionCtrl_0x30Substruct(&to->active_state);
+
+    out += "Unknown data_1:";
+    for (size_t i = 0; i < sizeof(to->data_1); i++)
+    {
+        out += std::to_string(to->data_1[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_2:";
+    for (size_t i = 0; i < sizeof(to->data_2); i++)
+    {
+        out += std::to_string(to->data_2[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
 }
 
 void copy_ActionCtrl(ActionCtrl* to, ActionCtrl* from, bool to_game)
@@ -1063,10 +1969,61 @@ void free_ActionCtrl(ActionCtrl* to)
     free(to);
 }
 
+std::string print_ActionCtrl_0x30Substruct(ActionCtrl_0x30Substruct* to)
+{
+    std::string out = "ActionCtrl_0x30Substruct\n";
+
+    out += print_EzState_detail_EzStateMachineImpl(to->EzStateMachineImpl);
+
+    out += "Unknown data_0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
+}
+
 void copy_ActionCtrl_0x30Substruct(ActionCtrl_0x30Substruct* to, ActionCtrl_0x30Substruct* from, bool to_game)
 {
     copy_EzState_detail_EzStateMachineImpl(to->EzStateMachineImpl, from->EzStateMachineImpl, to_game);
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+}
+
+std::string print_EzState_detail_EzStateMachineImpl(EzState_detail_EzStateMachineImpl* to)
+{
+    std::string out = "EzState_detail_EzStateMachineImpl\n";
+
+    out += "Unknown data_0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += print_EzStateRegisterSet(&to->EzStateRegisterSet1);
+    out += print_EzStateRegisterSet(&to->EzStateRegisterSet2);
+
+    out += "Unknown data_1:";
+    for (size_t i = 0; i < sizeof(to->data_1); i++)
+    {
+        out += std::to_string(to->data_1[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_2:";
+    for (size_t i = 0; i < sizeof(to->data_2); i++)
+    {
+        out += std::to_string(to->data_2[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
 }
 
 void copy_EzState_detail_EzStateMachineImpl(EzState_detail_EzStateMachineImpl* to, EzState_detail_EzStateMachineImpl* from, bool to_game)
@@ -1113,6 +2070,23 @@ void free_EzState_detail_EzStateMachineImpl(EzState_detail_EzStateMachineImpl* t
     free(to);
 }
 
+std::string print_EzStateRegisterSet(EzStateRegisterSet* to)
+{
+    std::string out = "EzStateRegisterSet\n";
+
+    for (size_t i = 0; i < 8; i++)
+    {
+        for (size_t j = 0; j < sizeof(to->arry[i].data_0); j++)
+        {
+            out += std::to_string(to->arry[i].data_0[j]) + " ";
+        }
+        out += ";";
+    }
+    out += "\n";
+
+    return out;
+}
+
 void copy_EzStateRegisterSet(EzStateRegisterSet* to, EzStateRegisterSet* from, bool to_game)
 {
     if (!to_game)
@@ -1150,6 +2124,55 @@ void free_EzStateRegisterSet(EzStateRegisterSet* to, bool freeself)
     }
 }
 
+std::string print_HavokChara(HavokChara* to)
+{
+    std::string out = "EzState_detail_EzStateMachineImpl\n";
+
+    out += "Unknown data_0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += print_hkpCharacterProxy(to->char_proxy);
+
+    out += "Unknown data_1:";
+    for (size_t i = 0; i < sizeof(to->data_1); i++)
+    {
+        out += std::to_string(to->data_1[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_2:";
+    for (size_t i = 0; i < sizeof(to->data_2); i++)
+    {
+        out += std::to_string(to->data_2[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_3:";
+    for (size_t i = 0; i < sizeof(to->data_3); i++)
+    {
+        out += std::to_string(to->data_3[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_4:";
+    for (size_t i = 0; i < sizeof(to->data_4); i++)
+    {
+        out += std::to_string(to->data_4[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
+}
+
 void copy_HavokChara(HavokChara* to, HavokChara* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
@@ -1175,6 +2198,28 @@ void free_HavokChara(HavokChara* to)
     free_HitIns(to->padding_hitIns);
 
     free(to);
+}
+
+std::string print_HitIns(HitIns* to)
+{
+    std::string out = "HitIns\n";
+
+    out += "data_0: " + std::to_string(to->data_0) + "\n";
+
+    out += "Unknown data_1:";
+    for (size_t i = 0; i < sizeof(to->data_1); i++)
+    {
+        out += std::to_string(to->data_1[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "data_2: " + std::to_string(to->data_2) + "\n";
+    out += "data_3: " + std::to_string(to->data_3) + "\n";
+    out += "data_4: " + std::to_string(to->data_4) + "\n";
+    out += "data_5: " + std::to_string(to->data_5) + "\n";
+
+    return out;
 }
 
 void copy_HitIns(HitIns* to, HitIns* from)
@@ -1203,6 +2248,41 @@ void free_HitIns(HitIns* to)
     free(to);
 }
 
+std::string print_hkpCharacterProxy(hkpCharacterProxy* to)
+{
+    std::string out = "hkpCharacterProxy\n";
+
+    out += "data_0: " + std::to_string(to->data_0) + "\n";
+
+    out += "Unknown data_1:";
+    for (size_t i = 0; i < sizeof(to->data_1); i++)
+    {
+        out += std::to_string(to->data_1[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += print_hkpSimpleShapePhantom(to->HkpSimpleShapePhantom);
+
+    out += "Unknown data_2:";
+    for (size_t i = 0; i < sizeof(to->data_2); i++)
+    {
+        out += std::to_string(to->data_2[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_3:";
+    for (size_t i = 0; i < sizeof(to->data_3); i++)
+    {
+        out += std::to_string(to->data_3[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
+}
+
 void copy_hkpCharacterProxy(hkpCharacterProxy* to, hkpCharacterProxy* from)
 {
     to->data_0 = from->data_0;
@@ -1227,6 +2307,15 @@ void free_hkpCharacterProxy(hkpCharacterProxy* to)
     free(to);
 }
 
+std::string print_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to)
+{
+    std::string out = "hkpSimpleShapePhantom\n";
+
+    out += print_hkpSimpleShapePhantom_field0x30(to->field0x30);
+
+    return out;
+}
+
 void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, hkpSimpleShapePhantom* from)
 {
     copy_hkpSimpleShapePhantom_field0x30(to->field0x30, from->field0x30);
@@ -1247,6 +2336,21 @@ void free_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to)
     free(to);
 }
 
+std::string print_hkpSimpleShapePhantom_field0x30(hkpSimpleShapePhantom_field0x30* to)
+{
+    std::string out = "hkpSimpleShapePhantom_field0x30\n";
+
+    out += "Unknown position:";
+    for (size_t i = 0; i < sizeof(to->position)/4; i++)
+    {
+        out += std::to_string(to->position[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
+}
+
 void copy_hkpSimpleShapePhantom_field0x30(hkpSimpleShapePhantom_field0x30* to, hkpSimpleShapePhantom_field0x30* from)
 {
     memcpy(to->position, from->position, sizeof(to->position));
@@ -1262,6 +2366,27 @@ hkpSimpleShapePhantom_field0x30* init_hkpSimpleShapePhantom_field0x30()
 void free_hkpSimpleShapePhantom_field0x30(hkpSimpleShapePhantom_field0x30* to)
 {
     free(to);
+}
+
+std::string print_AnimationMediator(AnimationMediator* to)
+{
+    std::string out = "hkpSimpleShapePhantom_field0x30\n";
+
+    for (int i = 0; i < 31; i++)
+    {
+        out += print_AnimationMediatorStateEntry(&to->states_list[i]);
+    }
+    out += print_AnimationQueue(to->animationQueue);
+
+    out += "Unknown data_0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
 }
 
 void copy_AnimationMediator(AnimationMediator* to, AnimationMediator* from)
@@ -1300,6 +2425,29 @@ void free_AnimationMediator(AnimationMediator* to)
     free(to);
 }
 
+std::string print_AnimationMediatorStateEntry(AnimationMediatorStateEntry* to)
+{
+    std::string out = "AnimationMediatorStateEntry\n";
+
+    out += "Unknown data_0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_1:";
+    for (size_t i = 0; i < sizeof(to->data_1); i++)
+    {
+        out += std::to_string(to->data_1[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
+}
+
 void copy_AnimationMediatorStateEntry(AnimationMediatorStateEntry* to, AnimationMediatorStateEntry* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
@@ -1318,6 +2466,58 @@ void free_AnimationMediatorStateEntry(AnimationMediatorStateEntry* to, bool free
     {
         free(to);
     }
+}
+
+std::string print_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to)
+{
+    std::string out = "ChrCtrl_AnimationQueue\n";
+
+    out += "array_length: " + std::to_string(to->array_length) + "\n";
+    out += "data_0: " + std::to_string(to->data_0) + "\n";
+
+    for (size_t i = 0; i < to->array_length; i++)
+    {
+        out += print_ChrCtrl_AnimationQueueEntry(&to->arry[i]);
+    }
+    out += print_ChrCtrl_AnimationQueue_field0x10(to->field0x10);
+    out += print_hkaAnimatedSkeleton(to->HkaAnimatedSkeleton);
+    out += print_ChrCtrl_AnimationQueue_field0x20(to->field0x20);
+
+    out += "Unknown data_1:";
+    for (size_t i = 0; i < sizeof(to->data_1); i++)
+    {
+        out += std::to_string(to->data_1[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_2:";
+    for (size_t i = 0; i < sizeof(to->data_2); i++)
+    {
+        out += std::to_string(to->data_2[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "data_3: " + std::to_string(to->data_3) + "\n";
+
+    out += "Unknown data_4:";
+    for (size_t i = 0; i < sizeof(to->data_4); i++)
+    {
+        out += std::to_string(to->data_4[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_5:";
+    for (size_t i = 0; i < sizeof(to->data_5); i++)
+    {
+        out += std::to_string(to->data_5[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
 }
 
 void copy_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to, ChrCtrl_AnimationQueue* from, bool to_game)
@@ -1377,6 +2577,69 @@ void free_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to)
     free(to);
 }
 
+std::string print_ChrCtrl_AnimationQueue_field0x20(ChrCtrl_AnimationQueue_field0x20* to)
+{
+    std::string out = "ChrCtrl_AnimationQueue_field0x20\n";
+
+    out += "Unknown field0x8:";
+    for (size_t i = 0; i < (0x30 * 64) / 4; i++)
+    {
+        out += std::to_string(((float*)to->field0x8)[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_0:";
+    for (size_t i = 0; i < sizeof(to->data_0)/4; i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown field0x18:";
+    for (size_t i = 0; i < (0x30 * 64) / 4; i++)
+    {
+        out += std::to_string(((float*)to->field0x18)[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_1:";
+    for (size_t i = 0; i < sizeof(to->data_1) / 4; i++)
+    {
+        out += std::to_string(to->data_1[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown field0x28:";
+    for (size_t i = 0; i < 64; i++)
+    {
+        out += std::to_string(to->field0x28[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_2:";
+    for (size_t i = 0; i < sizeof(to->data_2) / 4; i++)
+    {
+        out += std::to_string(to->data_2[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_3:";
+    for (size_t i = 0; i < sizeof(to->data_3) / 4; i++)
+    {
+        out += std::to_string(to->data_3[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
+}
+
 void copy_ChrCtrl_AnimationQueue_field0x20(ChrCtrl_AnimationQueue_field0x20* to, ChrCtrl_AnimationQueue_field0x20* from, bool to_game)
 {
     if (!to_game)
@@ -1415,6 +2678,22 @@ void free_ChrCtrl_AnimationQueue_field0x20(ChrCtrl_AnimationQueue_field0x20* to)
     free(to->field0x28);
 
     free(to);
+}
+
+std::string print_hkaAnimatedSkeleton(hkaAnimatedSkeleton* to)
+{
+    std::string out = "hkaAnimatedSkeleton\n";
+
+    out += "Unknown data_0:" + std::to_string(to->data_0) + "\n";
+    out += "Unknown animCtrl_list_len:" + std::to_string(to->animCtrl_list_len) + "\n";
+    for (uint32_t i = 0; i < to->animCtrl_list_len; i++)
+    {
+        out += print_hkaDefaultAnimationControl(to->animCtrl_list[i]);
+    }
+    out += "Unknown data_1:" + std::to_string(to->data_1) + "\n";
+    out += "Unknown data_2:" + std::to_string(to->data_2) + "\n";
+
+    return out;
 }
 
 void copy_hkaAnimatedSkeleton(hkaAnimatedSkeleton* to, hkaAnimatedSkeleton* from)
@@ -1457,6 +2736,23 @@ void free_hkaAnimatedSkeleton(hkaAnimatedSkeleton* to)
     free(to);
 }
 
+std::string print_hkaDefaultAnimationControl(hkaDefaultAnimationControl* to)
+{
+    std::string out = "hkaDefaultAnimationControl\n";
+
+    out += print_hkaAnimationControl(&to->HkaAnimationControl);
+
+    out += "Unknown data_0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
+}
+
 void copy_hkaDefaultAnimationControl(hkaDefaultAnimationControl* to, hkaDefaultAnimationControl* from)
 {
     copy_hkaAnimationControl(&to->HkaAnimationControl, &from->HkaAnimationControl);
@@ -1479,6 +2775,47 @@ void free_hkaDefaultAnimationControl(hkaDefaultAnimationControl* to)
     free_hkaAnimationControl(&to->HkaAnimationControl, false);
 
     free(to);
+}
+
+std::string print_hkaAnimationControl(hkaAnimationControl* to)
+{
+    std::string out = "hkaAnimationControl\n";
+
+    out += "Unknown data_0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown field0x18:";
+    for (size_t i = 0; i < to->field0x18_len; i++)
+    {
+        out += std::to_string(to->field0x18[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown field0x28:";
+    for (size_t i = 0; i < to->field0x28_len; i++)
+    {
+        out += std::to_string(to->field0x28[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "HkaAnimationBinding:" + std::to_string(to->HkaAnimationBinding) + "\n";
+
+    out += "Unknown data_1:";
+    for (size_t i = 0; i < sizeof(to->data_1)/4; i++)
+    {
+        out += std::to_string(to->data_1[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
 }
 
 void copy_hkaAnimationControl(hkaAnimationControl* to, hkaAnimationControl* from)
@@ -1525,6 +2862,28 @@ void free_hkaAnimationControl(hkaAnimationControl* to, bool freeself)
     {
         free(to);
     }
+}
+
+std::string print_ChrCtrl_AnimationQueue_field0x10(ChrCtrl_AnimationQueue_field0x10* to)
+{
+    std::string out = "ChrCtrl_AnimationQueue_field0x10\n";
+
+    out += "array1_len:" + std::to_string(to->array1_len) + "\n";
+    out += "array2_len:" + std::to_string(to->array2_len) + "\n";
+
+    out += "Unknown arry2:";
+    for (size_t i = 0; i < to->array2_len; i++)
+    {
+        for (size_t j = 0; j < sizeof(ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem); j++)
+        {
+            out += std::to_string(to->arry2[i].data_0[j]);
+            out += " ";
+        }
+        out += ";";
+    }
+    out += "\n";
+
+    return out;
 }
 
 void copy_ChrCtrl_AnimationQueue_field0x10(ChrCtrl_AnimationQueue_field0x10* to, ChrCtrl_AnimationQueue_field0x10* from)
@@ -1578,6 +2937,32 @@ void free_ChrCtrl_AnimationQueue_field0x10(ChrCtrl_AnimationQueue_field0x10* to)
     free(to);
 }
 
+std::string print_ChrCtrl_AnimationQueueEntry(ChrCtrl_AnimationQueueEntry* to)
+{
+    std::string out = "ChrCtrl_AnimationQueueEntry\n";
+
+    out += "Unknown data_0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += print_hkaDefaultAnimationControl(to->defaultAnimationControl);
+    out += "HvkAnim_AnimInfoArrayElem:" + std::to_string(to->HvkAnim_AnimInfoArrayElem) + "\n";
+
+    out += "Unknown data_1:";
+    for (size_t i = 0; i < sizeof(to->data_1); i++)
+    {
+        out += std::to_string(to->data_1[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
+}
+
 void copy_ChrCtrl_AnimationQueueEntry(ChrCtrl_AnimationQueueEntry* to, ChrCtrl_AnimationQueueEntry* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
@@ -1603,6 +2988,18 @@ void free_ChrCtrl_AnimationQueueEntry(ChrCtrl_AnimationQueueEntry* to, bool free
     {
         free(to);
     }
+}
+
+std::string print_AnimationQueue(AnimationQueue* to)
+{
+    std::string out = "AnimationQueue\n";
+
+    for (int i = 0; i < 6; i++)
+    {
+        out += print_AnimationQueue_Entry(to->AnimationQueue_Entries[i]);
+    }
+
+    return out;
 }
 
 void copy_AnimationQueue(AnimationQueue* to, AnimationQueue* from)
@@ -1633,6 +3030,57 @@ void free_AnimationQueue(AnimationQueue* to)
     }
 
     free(to);
+}
+
+std::string print_AnimationQueue_Entry(AnimationQueue_Entry* to)
+{
+    std::string out = "AnimationQueue_Entry\n";
+
+    out += "Unknown data_0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_1:";
+    for (size_t i = 0; i < sizeof(to->data_1); i++)
+    {
+        out += std::to_string(to->data_1[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += print_AnimationQueue_Entry_sub1(&to->sub1);
+
+    out += "Unknown data_2:";
+    for (size_t i = 0; i < sizeof(to->data_2)/8; i++)
+    {
+        out += std::to_string(to->data_2[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    size_t len = ((uint64_t)to->chained_animations_array_end - (uint64_t)to->chained_animations_array_start) / 8;
+    out += "arry len:" + std::to_string(len) + "\n";
+
+    out += "chained_animations_array: ";
+    for (size_t i = 0; i < len; i++)
+    {
+        out += std::to_string(to->chained_animations_array_start[i]) + " ";
+    }
+    out += "\n";
+
+    out += "Unknown data_3:";
+    for (size_t i = 0; i < sizeof(to->data_3); i++)
+    {
+        out += std::to_string(to->data_3[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
 }
 
 void copy_AnimationQueue_Entry(AnimationQueue_Entry* to, AnimationQueue_Entry* from)
@@ -1678,6 +3126,25 @@ void free_AnimationQueue_Entry(AnimationQueue_Entry* to)
     free(to->chained_animations_array_start);
 
     free(to);
+}
+
+std::string print_AnimationQueue_Entry_sub1(AnimationQueue_Entry_sub1* to)
+{
+    std::string out = "AnimationQueue_Entry_sub1\n";
+
+    out += "field0x10_cap: " + std::to_string(to->field0x10_cap) + "\n";
+    out += "unk: " + std::to_string(to->unk) + "\n";
+    out += "field0x10_len: " + std::to_string(to->field0x10_len) + "\n";
+
+    for (size_t i = 0; i < to->field0x10_len; i++)
+    {
+        if (to->field0x10[i] != NULL)
+        {
+            out += print_AnimationQueue_Entry_sub1_field0x10(to->field0x10[i]);
+        }
+    }
+
+    return out;
 }
 
 void copy_AnimationQueue_Entry_sub1(AnimationQueue_Entry_sub1* to, AnimationQueue_Entry_sub1* from)
@@ -1738,6 +3205,21 @@ void free_AnimationQueue_Entry_sub1(AnimationQueue_Entry_sub1* to, bool freeself
     {
         free(to);
     }
+}
+
+std::string print_AnimationQueue_Entry_sub1_field0x10(AnimationQueue_Entry_sub1_field0x10* to)
+{
+    std::string out = "AnimationQueue_Entry\n";
+
+    out += "Unknown data_0:";
+    for (size_t i = 0; i < sizeof(to->data_0)/8; i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
 }
 
 void copy_AnimationQueue_Entry_sub1_field0x10(AnimationQueue_Entry_sub1_field0x10* to, AnimationQueue_Entry_sub1_field0x10* from)

@@ -5,6 +5,8 @@
 #include "MainLoop.h"
 #include "InputUtil.h"
 #include "ModNetworking.h"
+#include <string>
+#include <unordered_map>
 
 PlayerIns* Rollback::saved_playerins = NULL;
 BulletMan* Rollback::saved_bulletman = NULL;
@@ -526,6 +528,8 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
         FATALERROR("Unable to get allocate state for rollback_save_game_state_callback");
     }
 
+    size_t our_checksum = 0;
+
     for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
     {
         auto player_o = Game::get_connected_player(i);
@@ -537,6 +541,7 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
 
         state->playerins[i] = init_PlayerIns();
         copy_PlayerIns(state->playerins[i], player, false);
+        our_checksum ^= std::hash<std::string>{}(print_PlayerIns(player));
     }
 
     state->bulletman = init_BulletMan();
@@ -549,7 +554,7 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
 
     *buffer = (unsigned char*)state;
     *len = sizeof(RollbackState);
-    *checksum = 0;
+    *checksum = our_checksum;
 
     return true;
 }
@@ -610,6 +615,23 @@ bool rollback_on_event_callback(GGPOEvent* info)
 
 bool rollback_log_game_state(char* filename, unsigned char* buffer, int)
 {
+    FILE* fp = nullptr;
+    fopen_s(&fp, filename, "w");
+    if (!fp)
+    {
+        return true;
+    }
+
+    RollbackState* state = (RollbackState*)buffer;
+
+    for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
+    {
+        std::string player = print_PlayerIns(state->playerins[i]);
+        fprintf(fp, "Player %d\n%s", i, player.c_str());
+    }
+    //TODO the rest of the state
+
+    fclose(fp);
     return true;
 }
 

@@ -1,6 +1,132 @@
 #include "AttachSysSlotStructsFunctions.h"
 #include "Rollback.h"
 
+std::string print_AttachSysSlot(AttachSysSlotBaseImpl* to)
+{
+    std::string out = "AttachSysSlotBaseImpl\n";
+
+    switch (to->slotType)
+    {
+    case TypeChrShineTreasureSlot:
+        out = "ChrShineTreasureSlot\n";
+        break;
+    case TypeChrSingleSeSlot:
+        out = "ChrSingleSeSlot\n";
+        break;
+    case TypeChrSingleSfxSlot:
+        out = "ChrSingleSfxSlot\n";
+        break;
+    case TypeChrMultiSfxSlot:
+        out = "ChrMultiSfxSlot\n";
+        break;
+    case TypeChrBurnSlot:
+        out = "ChrBurnSlot\n";
+        break;
+    case TypeChrGasmanSlot:
+        out = "ChrGasmanSlot\n";
+        break;
+    case TypeChrGrassSlot:
+        out = "ChrGrassSlot\n";
+        break;
+    case TypeChrFootEffectSlot:
+        out = "ChrFootEffectSlot\n";
+        break;
+    case TypeChrRigidOffsetSfxSlot:
+        out = "ChrRigidOffsetSfxSlot\n";
+        break;
+    case TypeChrRigidOffsetChrSlot:
+        out = "ChrRigidOffsetChrSlot\n";
+        break;
+    case TypeChrSoulEatSlot:
+        out = "ChrSoulEatSlot\n";
+        break;
+    case TypeChrSorceryWepSlot:
+        out = "ChrSorceryWepSlot\n";
+        break;
+    case TypeChrLanternSlot:
+        out = "ChrLanternSlot\n";
+        break;
+    case TypeChrSingleOneshotSfxSlot:
+        out = "ChrSingleOneshotSfxSlot\n";
+        break;
+    case TypeChrSingleTraceSfxSlot:
+        out = "ChrSingleTraceSfxSlot\n";
+        break;
+    case TypeChrMagicGoodsUseSfxSlot:
+        out = "ChrMagicGoodsUseSfxSlot\n";
+        break;
+    case TypeChrActPntSlot:
+        out = "ChrActPntSlot\n";
+        break;
+    case TypeChrPointLightSlot:
+        out = "ChrPointLightSlot\n";
+        break;
+    case TypeChrWepEnchantSlot:
+        out = "ChrWepEnchantSlot\n";
+        break;
+    case TypeChrFallingControlSlot:
+        out = "ChrFallingControlSlot\n";
+        break;
+    case TypeChrConditionSfxSeSlot:
+        out = "ChrConditionSfxSeSlot\n";
+        break;
+    case TypeChrCamouflageSlot:
+        out = "ChrCamouflageSlot\n";
+        break;
+    case TypeChrSoulDeadSlot:
+        out = "ChrSoulDeadSlot\n";
+        break;
+    case TypeChrShinpanshaHaraSlot:
+        out = "ChrShinpanshaHaraSlot\n";
+        break;
+    case TypeChrLimitInvincibleSlot:
+        out = "ChrLimitInvincibleSlot\n";
+        break;
+    case TypeChrDetectSignSlot:
+        out = "ChrDetectSignSlot\n";
+        break;
+    case TypeChrRescueSignSlot:
+        out = "ChrRescueSignSlot\n";
+        break;
+    case TypeChrTravelItemSlot:
+        out = "ChrTravelItemSlot\n";
+        break;
+    case TypeChrStatueDeadSlot:
+        out = "ChrStatueDeadSlot\n";
+        break;
+    case TypeChrResonanceMagicSlot:
+        out = "ChrResonanceMagicSlot\n";
+        break;
+    case TypeChrRetributionMagicSlot:
+        out = "ChrRetributionMagicSlot\n";
+        break;
+    case TypeChrHellkiteBreathSlot:
+        out = "ChrHellkiteBreathSlot\n";
+        break;
+    case TypeChrColiseumEntrantSlot:
+        out = "ChrColiseumEntrantSlot\n";
+        break;
+    case TypeChrPlayerResidentSlot:
+        out = "ChrPlayerResidentSlot\n";
+        break;
+    case TypeChrFollowSfxSlot:
+        out = "ChrFollowSfxSlot\n";
+        break;
+    default: FATALERROR("Attempted to print AttachSysSlot of type %d", to->slotType);
+    }
+
+    out += "timerId:" + std::to_string(to->timerId) + "\n";
+    out += "slotIsUsable:" + std::to_string(to->slotIsUsable) + "\n";
+    out += "data_0:" + std::to_string(to->data_0) + "\n";
+
+    if (to->next != NULL)
+    {
+        out += print_AttachSysSlot(to->next);
+    }
+
+    return out;
+}
+
 void copy_AttachSysSlot(AttachSysSlotBaseImpl* to, AttachSysSlotBaseImpl* from, bool to_game)
 {
     to->timerId = from->timerId;

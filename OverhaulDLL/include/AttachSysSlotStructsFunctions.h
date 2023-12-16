@@ -3,12 +3,12 @@
 #define SYSSLOTSTRUCTFUNCTIONS_H
 
 #include <stdint.h>
+#include <string>
 #include "AttachSysSlotStructs.h"
 
+std::string print_AttachSysSlot(AttachSysSlotBaseImpl* to);
 void copy_AttachSysSlot(AttachSysSlotBaseImpl* to, AttachSysSlotBaseImpl* from, bool to_game);
-
 AttachSysSlotBaseImpl* init_AttachSysSlot(AttachSysSlotType type, bool to_game);
-
 void free_AttachSysSlot(AttachSysSlotBaseImpl* to);
 
 void copy_ChrShineTreasureSlot(ChrShineTreasureSlot* to, ChrShineTreasureSlot* from, bool to_game);
