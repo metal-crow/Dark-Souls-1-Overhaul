@@ -72,7 +72,7 @@ std::string print_PlayerIns(PlayerIns* to)
     return out;
 }
 
-void copy_PlayerIns(PlayerIns* to, PlayerIns* from, bool to_game)
+void copy_PlayerIns(PlayerIns* to, const PlayerIns* from, bool to_game)
 {
     Game::SuspendThreads();
 
@@ -217,7 +217,7 @@ std::string print_ChrAsm(ChrAsm* to)
     return out;
 }
 
-void copy_ChrAsm(ChrAsm* to, ChrAsm* from)
+void copy_ChrAsm(ChrAsm* to, const ChrAsm* from)
 {
     to->equipped_weapon_style = from->equipped_weapon_style;
     to->l_hand_equipped_index = from->l_hand_equipped_index;
@@ -257,7 +257,7 @@ std::string print_ChrAsmModelRes(ChrAsmModelRes* to)
     return out;
 }
 
-void copy_ChrAsmModelRes(ChrAsmModelRes* to, ChrAsmModelRes* from, bool to_game)
+void copy_ChrAsmModelRes(ChrAsmModelRes* to, const ChrAsmModelRes* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     for (size_t i = 0; i < 14; i++)
@@ -305,7 +305,7 @@ std::string print_ChrAsmModelRes_Elem(ChrAsmModelRes_Elem* to)
     return out;
 }
 
-void copy_ChrAsmModelRes_Elem(ChrAsmModelRes_Elem* to, ChrAsmModelRes_Elem* from, bool to_game)
+void copy_ChrAsmModelRes_Elem(ChrAsmModelRes_Elem* to, const ChrAsmModelRes_Elem* from, bool to_game)
 {
     to->data_0 = from->data_0;
     to->PartsbndFileCap2 = NULL; //this should always be null since it's just tmp storage for 1 frame
@@ -382,7 +382,7 @@ std::string print_ChrAsmModel(ChrAsmModel* to)
     return out;
 }
 
-void copy_ChrAsmModel(ChrAsmModel* to, ChrAsmModel* from, bool to_game)
+void copy_ChrAsmModel(ChrAsmModel* to, const ChrAsmModel* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
@@ -418,7 +418,7 @@ std::string print_ProEquipCtrl(ProEquipCtrl* to)
     return out;
 }
 
-void copy_ProEquipCtrl(ProEquipCtrl* to, ProEquipCtrl* from, bool to_game)
+void copy_ProEquipCtrl(ProEquipCtrl* to, const ProEquipCtrl* from, bool to_game)
 {
     copy_SpecialEffect(to->spEffectList, from->spEffectList, to_game);
     //there should always be 5 armors (4 equip and a hair)
@@ -464,7 +464,7 @@ std::string print_WeaponEquipCtrl(WeaponEquipCtrl* to)
     return out;
 }
 
-void copy_WeaponEquipCtrl(WeaponEquipCtrl* to, WeaponEquipCtrl* from, bool to_game)
+void copy_WeaponEquipCtrl(WeaponEquipCtrl* to, const WeaponEquipCtrl* from, bool to_game)
 {
     copy_SpecialEffect(to->spEffectList, from->spEffectList, to_game);
     //there should always be 2 weapons
@@ -507,7 +507,7 @@ std::string print_RingEquipCtrl(RingEquipCtrl* to)
     return out;
 }
 
-void copy_RingEquipCtrl(RingEquipCtrl* to, RingEquipCtrl* from, bool to_game)
+void copy_RingEquipCtrl(RingEquipCtrl* to, const RingEquipCtrl* from, bool to_game)
 {
     copy_SpecialEffect(to->spEffectList, from->spEffectList, to_game);
     //there should always be 2 rings
@@ -550,7 +550,7 @@ std::string print_PlayerGameData(PlayerGameData* to)
     return out;
 }
 
-void copy_PlayerGameData(PlayerGameData* to, PlayerGameData* from)
+void copy_PlayerGameData(PlayerGameData* to, const PlayerGameData* from)
 {
     copy_PlayerGameData_AttributeInfo(&to->attribs, &from->attribs);
     copy_EquipGameData(&to->equipGameData, &from->equipGameData);
@@ -590,7 +590,7 @@ std::string print_PlayerGameData_ChrProperties(PlayerGameData_ChrProperties* to)
     return out;
 }
 
-void copy_PlayerGameData_ChrProperties(PlayerGameData_ChrProperties* to, PlayerGameData_ChrProperties* from)
+void copy_PlayerGameData_ChrProperties(PlayerGameData_ChrProperties* to, const PlayerGameData_ChrProperties* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 }
@@ -614,7 +614,7 @@ std::string print_EquipGameData(EquipGameData* to)
     return out;
 }
 
-void copy_EquipGameData(EquipGameData* to, EquipGameData* from)
+void copy_EquipGameData(EquipGameData* to, const EquipGameData* from)
 {
     memcpy(to->equippedItemIndexes, from->equippedItemIndexes, sizeof(to->equippedItemIndexes));
     copy_ChrAsm(&to->chrasm, &from->chrasm);
@@ -656,7 +656,7 @@ std::string print_EquipItemData(EquipItemData* to)
     return out;
 }
 
-void copy_EquipItemData(EquipItemData* to, EquipItemData* from)
+void copy_EquipItemData(EquipItemData* to, const EquipItemData* from)
 {
     memcpy(to->quickbar, from->quickbar, sizeof(to->quickbar));
 }
@@ -678,7 +678,7 @@ std::string print_EquipMagicData(EquipMagicData* to)
     return out;
 }
 
-void copy_EquipMagicData(EquipMagicData* to, EquipMagicData* from)
+void copy_EquipMagicData(EquipMagicData* to, const EquipMagicData* from)
 {
     memcpy(to->equippedMagicList, from->equippedMagicList, sizeof(to->equippedMagicList));
     to->curSelectedMagicSlot = from->curSelectedMagicSlot;
@@ -710,7 +710,7 @@ std::string print_PlayerGameData_AttributeInfo(PlayerGameData_AttributeInfo* to)
     return out;
 }
 
-void copy_PlayerGameData_AttributeInfo(PlayerGameData_AttributeInfo* to, PlayerGameData_AttributeInfo* from)
+void copy_PlayerGameData_AttributeInfo(PlayerGameData_AttributeInfo* to, const PlayerGameData_AttributeInfo* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 }
@@ -821,7 +821,7 @@ std::string print_ChrIns(ChrIns* to)
     return out;
 }
 
-void copy_ChrIns(ChrIns* to, ChrIns* from, bool to_game)
+void copy_ChrIns(ChrIns* to, const ChrIns* from, bool to_game)
 {
     //copy_ChrIns_field0x18(to->field0x18, from->field0x18);
     copy_PlayerCtrl(to->playerCtrl, from->playerCtrl, to_game);
@@ -922,7 +922,7 @@ std::string print_ChrAttachSys(ChrAttachSys* to)
     return out;
 }
 
-void copy_ChrAttachSys(ChrAttachSys* to, ChrAttachSys* from, bool to_game)
+void copy_ChrAttachSys(ChrAttachSys* to, const ChrAttachSys* from, bool to_game)
 {
     if (to->SysSlots == NULL && from->SysSlots != NULL)
     {
@@ -967,7 +967,7 @@ std::string print_ChrIns_field0x18(ChrIns_field0x18* to)
     return out;
 }
 
-void copy_ChrIns_field0x18(ChrIns_field0x18* to, ChrIns_field0x18* from)
+void copy_ChrIns_field0x18(ChrIns_field0x18* to, const ChrIns_field0x18* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 }
@@ -1010,7 +1010,7 @@ std::string print_ChrIns_field0x2c8(ChrIns_field0x2c8* to)
     return out;
 }
 
-void copy_ChrIns_field0x2c8(ChrIns_field0x2c8* to, ChrIns_field0x2c8* from)
+void copy_ChrIns_field0x2c8(ChrIns_field0x2c8* to, const ChrIns_field0x2c8* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     to->data_1 = from->data_1;
@@ -1061,7 +1061,7 @@ std::string print_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to)
     return out;
 }
 
-void copy_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to, EntityThrowAnimationStatus* from, bool to_game)
+void copy_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to, const EntityThrowAnimationStatus* from, bool to_game)
 {
     to->playerins_parent = from->playerins_parent;
     to->throw_paramdef = from->throw_paramdef;
@@ -1129,7 +1129,7 @@ std::string print_ThrowSelfEsc(ThrowSelfEsc* to)
     return out;
 }
 
-void copy_ThrowSelfEsc(ThrowSelfEsc* to, ThrowSelfEsc* from)
+void copy_ThrowSelfEsc(ThrowSelfEsc* to, const ThrowSelfEsc* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 }
@@ -1167,7 +1167,7 @@ std::string print_QwcSpEffectEquipCtrl(QwcSpEffectEquipCtrl* to)
     return out;
 }
 
-void copy_QwcSpEffectEquipCtrl(QwcSpEffectEquipCtrl* to, QwcSpEffectEquipCtrl* from)
+void copy_QwcSpEffectEquipCtrl(QwcSpEffectEquipCtrl* to, const QwcSpEffectEquipCtrl* from)
 {
     //we allow up to a max of 64 speffects
     if (from->arry_len > 64)
@@ -1232,7 +1232,7 @@ std::string print_SpecialEffect(SpecialEffect* to)
     return out;
 }
 
-void copy_SpecialEffect(SpecialEffect* to, SpecialEffect* from, bool to_game)
+void copy_SpecialEffect(SpecialEffect* to, const SpecialEffect* from, bool to_game)
 {
     copy_SpecialEffect_Info(to->specialEffect_Info, from->specialEffect_Info, to_game);
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
@@ -1278,7 +1278,7 @@ std::string print_SpecialEffect_Info(SpecialEffect_Info* to)
     return out;
 }
 
-void copy_SpecialEffect_Info(SpecialEffect_Info* to, SpecialEffect_Info* from, bool to_game)
+void copy_SpecialEffect_Info(SpecialEffect_Info* to, const SpecialEffect_Info* from, bool to_game)
 {
     if (!to_game)
     {
@@ -1392,7 +1392,7 @@ std::string print_PlayerCtrl(PlayerCtrl* to)
     return out;
 }
 
-void copy_PlayerCtrl(PlayerCtrl* to, PlayerCtrl* from, bool to_game)
+void copy_PlayerCtrl(PlayerCtrl* to, const PlayerCtrl* from, bool to_game)
 {
     copy_ChrCtrl(&to->chrCtrl, &from->chrCtrl, to_game);
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
@@ -1443,7 +1443,7 @@ std::string print_ArrowTurnAnim(ArrowTurnAnim* to)
     return out;
 }
 
-void copy_ArrowTurnAnim(ArrowTurnAnim* to, ArrowTurnAnim* from)
+void copy_ArrowTurnAnim(ArrowTurnAnim* to, const ArrowTurnAnim* from)
 {
     copy_TurnAnim(&to->turnAnim, &from->turnAnim);
     copy_SpinJoint(to->joint_spine_2, from->joint_spine_2);
@@ -1504,7 +1504,7 @@ std::string print_SpinJoint(SpinJoint* to)
     return out;
 }
 
-void copy_SpinJoint(SpinJoint* to, SpinJoint* from)
+void copy_SpinJoint(SpinJoint* to, const SpinJoint* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
@@ -1567,7 +1567,7 @@ std::string print_TurnAnim(TurnAnim* to)
     return out;
 }
 
-void copy_TurnAnim(TurnAnim* to, TurnAnim* from)
+void copy_TurnAnim(TurnAnim* to, const TurnAnim* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
@@ -1661,7 +1661,7 @@ std::string print_ChrCtrl(ChrCtrl* to)
     return out;
 }
 
-void copy_ChrCtrl(ChrCtrl* to, ChrCtrl* from, bool to_game)
+void copy_ChrCtrl(ChrCtrl* to, const ChrCtrl* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     copy_ChrCtrl_AnimationQueue(to->animationQueue, from->animationQueue, to_game);
@@ -1755,7 +1755,7 @@ std::string print_WalkAnim_Twist(WalkAnim_Twist* to)
     return out;
 }
 
-void copy_WalkAnim_Twist(WalkAnim_Twist* to, WalkAnim_Twist* from, bool to_game)
+void copy_WalkAnim_Twist(WalkAnim_Twist* to, const WalkAnim_Twist* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
@@ -1807,7 +1807,7 @@ std::string print_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* t
     return out;
 }
 
-void copy_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* to, WalkAnim_Twist_Field0x228Elem* from, bool to_game)
+void copy_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* to, const WalkAnim_Twist_Field0x228Elem* from, bool to_game)
 {
     to->field0x10_cap = from->field0x10_cap;
     to->unk = from->unk;
@@ -1903,7 +1903,7 @@ std::string print_WalkAnim_Twist_Field0x228Elem_field0x10elem(WalkAnim_Twist_Fie
     return out;
 }
 
-void copy_WalkAnim_Twist_Field0x228Elem_field0x10elem(WalkAnim_Twist_Field0x228Elem_field0x10elem* to, WalkAnim_Twist_Field0x228Elem_field0x10elem* from)
+void copy_WalkAnim_Twist_Field0x228Elem_field0x10elem(WalkAnim_Twist_Field0x228Elem_field0x10elem* to, const WalkAnim_Twist_Field0x228Elem_field0x10elem* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 }
@@ -1942,7 +1942,7 @@ std::string print_ActionCtrl(ActionCtrl* to)
     return out;
 }
 
-void copy_ActionCtrl(ActionCtrl* to, ActionCtrl* from, bool to_game)
+void copy_ActionCtrl(ActionCtrl* to, const ActionCtrl* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     copy_ActionCtrl_0x30Substruct(&to->passive_state, &from->passive_state, to_game);
@@ -1986,7 +1986,7 @@ std::string print_ActionCtrl_0x30Substruct(ActionCtrl_0x30Substruct* to)
     return out;
 }
 
-void copy_ActionCtrl_0x30Substruct(ActionCtrl_0x30Substruct* to, ActionCtrl_0x30Substruct* from, bool to_game)
+void copy_ActionCtrl_0x30Substruct(ActionCtrl_0x30Substruct* to, const ActionCtrl_0x30Substruct* from, bool to_game)
 {
     copy_EzState_detail_EzStateMachineImpl(to->EzStateMachineImpl, from->EzStateMachineImpl, to_game);
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
@@ -2026,7 +2026,7 @@ std::string print_EzState_detail_EzStateMachineImpl(EzState_detail_EzStateMachin
     return out;
 }
 
-void copy_EzState_detail_EzStateMachineImpl(EzState_detail_EzStateMachineImpl* to, EzState_detail_EzStateMachineImpl* from, bool to_game)
+void copy_EzState_detail_EzStateMachineImpl(EzState_detail_EzStateMachineImpl* to, const EzState_detail_EzStateMachineImpl* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 
@@ -2087,7 +2087,7 @@ std::string print_EzStateRegisterSet(EzStateRegisterSet* to)
     return out;
 }
 
-void copy_EzStateRegisterSet(EzStateRegisterSet* to, EzStateRegisterSet* from, bool to_game)
+void copy_EzStateRegisterSet(EzStateRegisterSet* to, const EzStateRegisterSet* from, bool to_game)
 {
     if (!to_game)
     {
@@ -2173,7 +2173,7 @@ std::string print_HavokChara(HavokChara* to)
     return out;
 }
 
-void copy_HavokChara(HavokChara* to, HavokChara* from, bool to_game)
+void copy_HavokChara(HavokChara* to, const HavokChara* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     copy_hkpCharacterProxy(to->char_proxy, from->char_proxy);
@@ -2222,7 +2222,7 @@ std::string print_HitIns(HitIns* to)
     return out;
 }
 
-void copy_HitIns(HitIns* to, HitIns* from)
+void copy_HitIns(HitIns* to, const HitIns* from)
 {
     if (to == NULL || from == NULL)
     {
@@ -2283,7 +2283,7 @@ std::string print_hkpCharacterProxy(hkpCharacterProxy* to)
     return out;
 }
 
-void copy_hkpCharacterProxy(hkpCharacterProxy* to, hkpCharacterProxy* from)
+void copy_hkpCharacterProxy(hkpCharacterProxy* to, const hkpCharacterProxy* from)
 {
     to->data_0 = from->data_0;
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
@@ -2316,7 +2316,7 @@ std::string print_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to)
     return out;
 }
 
-void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, hkpSimpleShapePhantom* from)
+void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapePhantom* from)
 {
     copy_hkpSimpleShapePhantom_field0x30(to->field0x30, from->field0x30);
 }
@@ -2351,7 +2351,7 @@ std::string print_hkpSimpleShapePhantom_field0x30(hkpSimpleShapePhantom_field0x3
     return out;
 }
 
-void copy_hkpSimpleShapePhantom_field0x30(hkpSimpleShapePhantom_field0x30* to, hkpSimpleShapePhantom_field0x30* from)
+void copy_hkpSimpleShapePhantom_field0x30(hkpSimpleShapePhantom_field0x30* to, const hkpSimpleShapePhantom_field0x30* from)
 {
     memcpy(to->position, from->position, sizeof(to->position));
 }
@@ -2389,7 +2389,7 @@ std::string print_AnimationMediator(AnimationMediator* to)
     return out;
 }
 
-void copy_AnimationMediator(AnimationMediator* to, AnimationMediator* from)
+void copy_AnimationMediator(AnimationMediator* to, const AnimationMediator* from)
 {
     for (int i = 0; i < 31; i++)
     {
@@ -2448,7 +2448,7 @@ std::string print_AnimationMediatorStateEntry(AnimationMediatorStateEntry* to)
     return out;
 }
 
-void copy_AnimationMediatorStateEntry(AnimationMediatorStateEntry* to, AnimationMediatorStateEntry* from)
+void copy_AnimationMediatorStateEntry(AnimationMediatorStateEntry* to, const AnimationMediatorStateEntry* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
@@ -2520,7 +2520,7 @@ std::string print_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to)
     return out;
 }
 
-void copy_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to, ChrCtrl_AnimationQueue* from, bool to_game)
+void copy_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to, const ChrCtrl_AnimationQueue* from, bool to_game)
 {
     //we allow up to a max of 32 ChrCtrl_AnimationQueueEntry entries in the array
     if (from->array_length > 32)
@@ -2640,7 +2640,7 @@ std::string print_ChrCtrl_AnimationQueue_field0x20(ChrCtrl_AnimationQueue_field0
     return out;
 }
 
-void copy_ChrCtrl_AnimationQueue_field0x20(ChrCtrl_AnimationQueue_field0x20* to, ChrCtrl_AnimationQueue_field0x20* from, bool to_game)
+void copy_ChrCtrl_AnimationQueue_field0x20(ChrCtrl_AnimationQueue_field0x20* to, const ChrCtrl_AnimationQueue_field0x20* from, bool to_game)
 {
     if (!to_game)
     {
@@ -2696,7 +2696,7 @@ std::string print_hkaAnimatedSkeleton(hkaAnimatedSkeleton* to)
     return out;
 }
 
-void copy_hkaAnimatedSkeleton(hkaAnimatedSkeleton* to, hkaAnimatedSkeleton* from)
+void copy_hkaAnimatedSkeleton(hkaAnimatedSkeleton* to, const hkaAnimatedSkeleton* from)
 {
     to->data_0 = from->data_0;
     if (from->animCtrl_list_len > 32)
@@ -2753,7 +2753,7 @@ std::string print_hkaDefaultAnimationControl(hkaDefaultAnimationControl* to)
     return out;
 }
 
-void copy_hkaDefaultAnimationControl(hkaDefaultAnimationControl* to, hkaDefaultAnimationControl* from)
+void copy_hkaDefaultAnimationControl(hkaDefaultAnimationControl* to, const hkaDefaultAnimationControl* from)
 {
     copy_hkaAnimationControl(&to->HkaAnimationControl, &from->HkaAnimationControl);
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
@@ -2818,7 +2818,7 @@ std::string print_hkaAnimationControl(hkaAnimationControl* to)
     return out;
 }
 
-void copy_hkaAnimationControl(hkaAnimationControl* to, hkaAnimationControl* from)
+void copy_hkaAnimationControl(hkaAnimationControl* to, const hkaAnimationControl* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 
@@ -2886,7 +2886,7 @@ std::string print_ChrCtrl_AnimationQueue_field0x10(ChrCtrl_AnimationQueue_field0
     return out;
 }
 
-void copy_ChrCtrl_AnimationQueue_field0x10(ChrCtrl_AnimationQueue_field0x10* to, ChrCtrl_AnimationQueue_field0x10* from)
+void copy_ChrCtrl_AnimationQueue_field0x10(ChrCtrl_AnimationQueue_field0x10* to, const ChrCtrl_AnimationQueue_field0x10* from)
 {
     if (from->array1_len != 4)
     {
@@ -2963,7 +2963,7 @@ std::string print_ChrCtrl_AnimationQueueEntry(ChrCtrl_AnimationQueueEntry* to)
     return out;
 }
 
-void copy_ChrCtrl_AnimationQueueEntry(ChrCtrl_AnimationQueueEntry* to, ChrCtrl_AnimationQueueEntry* from, bool to_game)
+void copy_ChrCtrl_AnimationQueueEntry(ChrCtrl_AnimationQueueEntry* to, const ChrCtrl_AnimationQueueEntry* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     copy_hkaDefaultAnimationControl(to->defaultAnimationControl, from->defaultAnimationControl);
@@ -3002,7 +3002,7 @@ std::string print_AnimationQueue(AnimationQueue* to)
     return out;
 }
 
-void copy_AnimationQueue(AnimationQueue* to, AnimationQueue* from)
+void copy_AnimationQueue(AnimationQueue* to, const AnimationQueue* from)
 {
     for (int i = 0; i < 6; i++)
     {
@@ -3083,7 +3083,7 @@ std::string print_AnimationQueue_Entry(AnimationQueue_Entry* to)
     return out;
 }
 
-void copy_AnimationQueue_Entry(AnimationQueue_Entry* to, AnimationQueue_Entry* from)
+void copy_AnimationQueue_Entry(AnimationQueue_Entry* to, const AnimationQueue_Entry* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
@@ -3147,7 +3147,7 @@ std::string print_AnimationQueue_Entry_sub1(AnimationQueue_Entry_sub1* to)
     return out;
 }
 
-void copy_AnimationQueue_Entry_sub1(AnimationQueue_Entry_sub1* to, AnimationQueue_Entry_sub1* from)
+void copy_AnimationQueue_Entry_sub1(AnimationQueue_Entry_sub1* to, const AnimationQueue_Entry_sub1* from)
 {
     to->field0x10_cap = from->field0x10_cap;
     to->unk = from->unk;
@@ -3222,7 +3222,7 @@ std::string print_AnimationQueue_Entry_sub1_field0x10(AnimationQueue_Entry_sub1_
     return out;
 }
 
-void copy_AnimationQueue_Entry_sub1_field0x10(AnimationQueue_Entry_sub1_field0x10* to, AnimationQueue_Entry_sub1_field0x10* from)
+void copy_AnimationQueue_Entry_sub1_field0x10(AnimationQueue_Entry_sub1_field0x10* to, const AnimationQueue_Entry_sub1_field0x10* from)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 }
