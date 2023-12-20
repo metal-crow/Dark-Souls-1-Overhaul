@@ -89,7 +89,7 @@ std::string exception_record_tostring(struct _EXCEPTION_RECORD *ExceptionRecord)
     snprintf(scratch, sizeof(scratch), "-------------------\nExceptionRecord:\n");
     out.append(scratch);
 
-    snprintf(scratch, sizeof(scratch), "ExceptionCode=%u\nExceptionFlags=%u\n", ExceptionRecord->ExceptionCode, ExceptionRecord->ExceptionFlags);
+    snprintf(scratch, sizeof(scratch), "ExceptionCode=%x\nExceptionFlags=%u\n", ExceptionRecord->ExceptionCode, ExceptionRecord->ExceptionFlags);
     out.append(scratch);
 
     if (ExceptionRecord->ExceptionRecord != NULL) {
