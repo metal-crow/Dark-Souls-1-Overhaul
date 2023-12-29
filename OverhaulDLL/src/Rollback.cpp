@@ -24,6 +24,7 @@ GGPOSessionCallbacks Rollback::ggpoCallbacks = {
     .save_game_state = rollback_save_game_state_callback,
     .load_game_state = rollback_load_game_state_callback,
     .log_game_state = rollback_log_game_state,
+    .copy_buffer = rollback_copy_buffer,
     .free_buffer = rollback_free_buffer,
     .advance_frame = rollback_advance_frame_callback,
     .on_event = rollback_on_event_callback,
@@ -349,7 +350,7 @@ void rollback_game_frame_sync_inputs_helper()
                 //send out our input
                 RollbackInput localInput{};
                 PackRollbackInput(&localInput, player);
-                SteamNetworkingIdentity target;
+                SteamNetworkingIdentity target{};
                 target.SetSteamID(guest->steamPlayerData->steamOnlineIDData->steam_id);
                 ModNetworking::SteamNetMessages->SendMessageToUser(target, &localInput, sizeof(localInput), k_nSteamNetworkingSend_UnreliableNoNagle, 1);
 
@@ -409,6 +410,8 @@ extern "C" {
     bool* ggpoStarted_ptr;
 }
 
+bool rollback_await_init(void* steamMsgs);
+
 void Rollback::start()
 {
     ConsoleWrite("Rollback...");
@@ -447,6 +450,9 @@ void Rollback::start()
     MainLoop::setup_mainloop_callback(input_test, NULL, "input_test");
     MainLoop::setup_mainloop_callback(ggpo_toggle, NULL, "ggpo_toggle");
     MainLoop::setup_mainloop_callback(network_toggle, NULL, "network_toggle");
+
+    //used for GGPO SyncTest
+    //MainLoop::setup_mainloop_callback(rollback_await_init, NULL, "rollback_await_init");
 }
 
 bool rollback_begin_game_callback(const char*)
@@ -475,9 +481,9 @@ bool rollback_advance_frame_callback(int)
 
     //step next frame
     Game::Step_GameSimulation(true);
-    ggpo_advance_frame(Rollback::ggpo);
-
+    //restore the slots list so we if we save, it's saved correctly
     player->chrins.chrattachsys.SysSlots = saved_list;
+    ggpo_advance_frame(Rollback::ggpo);
 
     //ConsoleWrite("rollback_advance_frame_callback finished");
     return true;
@@ -554,9 +560,28 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
 
     *buffer = (unsigned char*)state;
     *len = sizeof(RollbackState);
-    *checksum = our_checksum;
+    *checksum = (int)our_checksum;
 
     return true;
+}
+
+void rollback_copy_buffer(void* buffer_dst, void* buffer_src)
+{
+    RollbackState* state_src = (RollbackState*)buffer_src;
+    RollbackState* state_dst = (RollbackState*)buffer_dst;
+
+    for (size_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
+    {
+        state_dst->playerins[i] = init_PlayerIns();
+        copy_PlayerIns(state_dst->playerins[i], state_src->playerins[i], false);
+    }
+    //TODO copy_FXManager
+    state_dst->bulletman = init_BulletMan();
+    copy_BulletMan(state_dst->bulletman, state_src->bulletman, false);
+    state_dst->damageman = init_DamageMan();
+    copy_DamageMan(state_dst->damageman, state_src->damageman, false);
+    state_dst->throwman = init_ThrowMan();
+    copy_ThrowMan(state_dst->throwman, state_src->throwman, false);
 }
 
 void rollback_free_buffer(void* buffer)
@@ -652,6 +677,11 @@ void Rollback::rollback_end_session()
 
 bool rollback_await_init(void* steamMsgs)
 {
+    if (!Rollback::rollbackEnabled)
+    {
+        return true;
+    }
+
     //Wait for all the players to be loaded in before we start ggpo
     if (!Game::playerchar_is_loaded())
     {
@@ -683,6 +713,8 @@ bool rollback_await_init(void* steamMsgs)
         }
     }
 
+    //For GGPO SyncTest
+    //GGPOErrorCode result = ggpo_start_synctest(&Rollback::ggpo, &Rollback::ggpoCallbacks, (char*)"DSR_GGPO", Rollback::ggpoCurrentPlayerCount, sizeof(RollbackInput), 1);
     //Start ggpo
     GGPOErrorCode result = ggpo_start_session(&Rollback::ggpo, &Rollback::ggpoCallbacks, (ISteamNetworkingMessages*)steamMsgs, "DSR_GGPO", Rollback::ggpoCurrentPlayerCount, sizeof(RollbackInput));
     if (!GGPO_SUCCEEDED(result))

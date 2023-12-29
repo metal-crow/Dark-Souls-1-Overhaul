@@ -134,6 +134,7 @@ bool rollback_begin_game_callback(const char*);
 bool rollback_advance_frame_callback(int);
 bool rollback_load_game_state_callback(unsigned char* buffer, int);
 bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int);
+void rollback_copy_buffer(void* buffer_dst, void* buffer_src);
 void rollback_free_buffer(void* buffer);
 bool rollback_on_event_callback(GGPOEvent* info);
 bool rollback_log_game_state(char* filename, unsigned char* buffer, int);
