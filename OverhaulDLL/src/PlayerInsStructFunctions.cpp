@@ -6,6 +6,8 @@ typedef void* falloc(uint64_t, uint64_t, uint32_t);
 
 std::string print_PlayerIns(PlayerIns* to)
 {
+    Game::SuspendThreads();
+
     std::string out = "PlayerIns\n";
     out += print_ChrIns(&to->chrins);
     out += print_PlayerGameData(to->playergamedata);
@@ -68,6 +70,8 @@ std::string print_PlayerIns(PlayerIns* to)
         out += " ";
     }
     out += "\n";
+
+    Game::ResumeThreads();
 
     return out;
 }
@@ -2089,7 +2093,7 @@ std::string print_EzStateRegisterSet(EzStateRegisterSet* to)
 
 void copy_EzStateRegisterSet(EzStateRegisterSet* to, const EzStateRegisterSet* from, bool to_game)
 {
-    if (!to_game)
+    if (!to_game && from->arry_cur != NULL && from->arry != NULL)
     {
         size_t arry_size = (from->arry_cur - (uint64_t)from->arry) / sizeof(EzStateRegister);
         if (arry_size != 8)
@@ -2642,7 +2646,7 @@ std::string print_ChrCtrl_AnimationQueue_field0x20(ChrCtrl_AnimationQueue_field0
 
 void copy_ChrCtrl_AnimationQueue_field0x20(ChrCtrl_AnimationQueue_field0x20* to, const ChrCtrl_AnimationQueue_field0x20* from, bool to_game)
 {
-    if (!to_game)
+    if (!to_game && from->padding_0 != NULL)
     {
         uint32_t field0x28_len = *(uint32_t*)(from->padding_0 + 0x30);
         if (field0x28_len != 61)
