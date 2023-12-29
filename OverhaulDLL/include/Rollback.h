@@ -38,7 +38,11 @@ public:
     static GGPOSession* ggpo;
     static GGPOSessionCallbacks ggpoCallbacks;
     static GGPOPlayerHandle ggpoHandles[GGPO_MAX_PLAYERS];
+#ifdef GGPO_SYNCTEST
+    static const size_t ggpoCurrentPlayerCount = 1;
+#else
     static const size_t ggpoCurrentPlayerCount = 2;
+#endif
 
     static void rollback_start_session(ISteamNetworkingMessages* steamMsgs);
     static void rollback_end_session();

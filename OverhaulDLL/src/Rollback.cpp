@@ -451,8 +451,10 @@ void Rollback::start()
     MainLoop::setup_mainloop_callback(ggpo_toggle, NULL, "ggpo_toggle");
     MainLoop::setup_mainloop_callback(network_toggle, NULL, "network_toggle");
 
+#ifdef GGPO_SYNCTEST
     //used for GGPO SyncTest
-    //MainLoop::setup_mainloop_callback(rollback_await_init, NULL, "rollback_await_init");
+    MainLoop::setup_mainloop_callback(rollback_await_init, NULL, "rollback_await_init");
+#endif
 }
 
 bool rollback_begin_game_callback(const char*)
@@ -713,10 +715,12 @@ bool rollback_await_init(void* steamMsgs)
         }
     }
 
-    //For GGPO SyncTest
-    //GGPOErrorCode result = ggpo_start_synctest(&Rollback::ggpo, &Rollback::ggpoCallbacks, (char*)"DSR_GGPO", Rollback::ggpoCurrentPlayerCount, sizeof(RollbackInput), 1);
+#ifdef GGPO_SYNCTEST
+    GGPOErrorCode result = ggpo_start_synctest(&Rollback::ggpo, &Rollback::ggpoCallbacks, (char*)"DSR_GGPO", Rollback::ggpoCurrentPlayerCount, sizeof(RollbackInput), 1);
+#else
     //Start ggpo
     GGPOErrorCode result = ggpo_start_session(&Rollback::ggpo, &Rollback::ggpoCallbacks, (ISteamNetworkingMessages*)steamMsgs, "DSR_GGPO", Rollback::ggpoCurrentPlayerCount, sizeof(RollbackInput));
+#endif
     if (!GGPO_SUCCEEDED(result))
     {
         FATALERROR("unable to start ggpo. %d", result);
