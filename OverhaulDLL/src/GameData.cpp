@@ -1576,7 +1576,8 @@ void Game::Step_GameSimulation(bool renderFrame)
     }
     else
     {
-        MoveMapStep_Step_13(MoveMapStep, FRAMETIME);
+        //Don't use this, since at 14024f356 it dynamically computes the step time based on timestamp, which can fuck stuff up
+        //MoveMapStep_Step_13(MoveMapStep, FRAMETIME);
     }
     Step_Havok(*(void**)Game::frpg_havok_man_imp, FRAMETIME);
     FinishStep_Havok(*(void**)Game::frpg_havok_man_imp);
