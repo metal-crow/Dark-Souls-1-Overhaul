@@ -1266,13 +1266,29 @@ std::string print_SpecialEffect_Info(SpecialEffect_Info* to)
 {
     std::string out = "SpecialEffect_Info\n";
 
-    out += "Unknown data 0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "Life: " + std::to_string(to->data_0_struct.life) + "\n";
+    out += "intervalLength: " + std::to_string(to->data_0_struct.intervalLength) + "\n";
+    out += "intervalCountdownTimer: " + std::to_string(to->data_0_struct.intervalCountdownTimer) + "\n";
+    out += "unk0: " + std::to_string(to->data_0_struct.unk0) + "\n";
+    out += "unk1: " + std::to_string(to->data_0_struct.unk1) + "\n";
+    out += "unk2: " + std::to_string(to->data_0_struct.unk2) + "\n";
+    out += "unk3: " + std::to_string(to->data_0_struct.unk3) + "\n";
+    out += "unk4: " + std::to_string(to->data_0_struct.unk4) + "\n";
+    out += "unk5: " + std::to_string(to->data_0_struct.unk5) + "\n";
+    out += "unk6: " + std::to_string(to->data_0_struct.unk6) + "\n";
+    out += "unk7: " + std::to_string(to->data_0_struct.unk7) + "\n";
+    out += "unk8: " + std::to_string(to->data_0_struct.unk8) + "\n";
+    out += "unk9: " + std::to_string(to->data_0_struct.unk9) + "\n";
+    out += "unk10: " + std::to_string(to->data_0_struct.unk10) + "\n";
+    out += "target: " + std::to_string(to->data_0_struct.target) + "\n";
+    out += "attacker: " + std::to_string(to->data_0_struct.attacker) + "\n";
+    out += "unk11: " + std::to_string(to->data_0_struct.unk11) + "\n";
+    out += "isDead: " + std::to_string(to->data_0_struct.isDead) + "\n";
+    out += "unk12: " + std::to_string(to->data_0_struct.unk12) + "\n";
+    out += "unk13: " + std::to_string(to->data_0_struct.unk13) + "\n";
+    out += "unk14: " + std::to_string(to->data_0_struct.unk14) + "\n";
+    out += "speffect_id: " + std::to_string(to->data_0_struct.speffect_id) + "\n";
+    out += "unk15: " + std::to_string(to->data_0_struct.unk15) + "\n";
 
     if (to->next != NULL)
     {
@@ -2588,7 +2604,7 @@ std::string print_ChrCtrl_AnimationQueue_field0x20(ChrCtrl_AnimationQueue_field0
     out += "Unknown field0x8:";
     for (size_t i = 0; i < (0x30 * 64) / 4; i++)
     {
-        out += std::to_string(((float*)to->field0x8)[i]);
+        out += std::to_string( (int)( (((float*)to->field0x8)[i]) * 100) / 100.0f);
         out += " ";
     }
     out += "\n";
@@ -2604,7 +2620,7 @@ std::string print_ChrCtrl_AnimationQueue_field0x20(ChrCtrl_AnimationQueue_field0
     out += "Unknown field0x18:";
     for (size_t i = 0; i < (0x30 * 64) / 4; i++)
     {
-        out += std::to_string(((float*)to->field0x18)[i]);
+        out += std::to_string( (int)( (((float*)to->field0x18)[i]) * 100) / 100.0f);
         out += " ";
     }
     out += "\n";

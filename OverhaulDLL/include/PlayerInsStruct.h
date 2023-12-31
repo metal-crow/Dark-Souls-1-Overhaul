@@ -677,7 +677,36 @@ static_assert(sizeof(ItemUsed) == 0x8);
 
 struct SpecialEffect_Info
 {
-    uint8_t data_0[0x38];
+    union
+    {
+        uint8_t data_0[0x38];
+        struct SpecialEffect_Info_data_0
+        {
+            float life;
+            float intervalLength;
+            float intervalCountdownTimer;
+            float unk0;
+            float unk1;
+            uint32_t unk2;
+            uint8_t unk3;
+            uint8_t unk4;
+            uint8_t unk5;
+            uint8_t unk6;
+            uint8_t unk7;
+            uint8_t unk8;
+            uint8_t unk9;
+            uint8_t unk10;
+            uint32_t target;
+            uint32_t attacker;
+            uint8_t unk11;
+            bool isDead;
+            uint8_t unk12;
+            uint8_t unk13;
+            uint32_t unk14;
+            uint32_t speffect_id;
+            uint32_t unk15;
+        } data_0_struct;
+    };
     uint64_t paramRowBytes; //this is a pointer to a const struct, so just read/write the pointer itself
     SpecialEffect_Info* next;
     SpecialEffect_Info* prev;
