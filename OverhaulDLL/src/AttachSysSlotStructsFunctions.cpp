@@ -115,6 +115,7 @@ std::string print_AttachSysSlot(AttachSysSlotBaseImpl* to)
     default: FATALERROR("Attempted to print AttachSysSlot of type %d", to->slotType);
     }
 
+    out += "vtable:" + std::to_string(to->vtable) + "\n";
     out += "timerId:" + std::to_string(to->timerId) + "\n";
     out += "slotIsUsable:" + std::to_string(to->slotIsUsable) + "\n";
     out += "data_0:" + std::to_string(to->data_0) + "\n";
@@ -129,6 +130,7 @@ std::string print_AttachSysSlot(AttachSysSlotBaseImpl* to)
 
 void copy_AttachSysSlot(AttachSysSlotBaseImpl* to, AttachSysSlotBaseImpl* from, bool to_game)
 {
+    to->vtable = from->vtable;
     to->timerId = from->timerId;
     to->slotType = from->slotType;
     to->slotIsUsable = from->slotIsUsable;
@@ -154,9 +156,9 @@ void copy_AttachSysSlot(AttachSysSlotBaseImpl* to, AttachSysSlotBaseImpl* from, 
     case TypeChrGasmanSlot:
         copy_ChrGasmanSlot((ChrGasmanSlot*)to, (ChrGasmanSlot*)from, to_game);
         break;
-    case TypeChrGrassSlot:
-        copy_ChrGrassSlot((ChrGrassSlot*)to, (ChrGrassSlot*)from, to_game);
-        break;
+    //case TypeChrGrassSlot:
+    //    copy_ChrGrassSlot((ChrGrassSlot*)to, (ChrGrassSlot*)from, to_game);
+    //    break;
     case TypeChrFootEffectSlot:
         copy_ChrFootEffectSlot((ChrFootEffectSlot*)to, (ChrFootEffectSlot*)from, to_game);
         break;
@@ -199,9 +201,9 @@ void copy_AttachSysSlot(AttachSysSlotBaseImpl* to, AttachSysSlotBaseImpl* from, 
     case TypeChrConditionSfxSeSlot:
         copy_ChrConditionSfxSeSlot((ChrConditionSfxSeSlot*)to, (ChrConditionSfxSeSlot*)from, to_game);
         break;
-    case TypeChrCamouflageSlot:
-        copy_ChrCamouflageSlot((ChrCamouflageSlot*)to, (ChrCamouflageSlot*)from, to_game);
-        break;
+    //case TypeChrCamouflageSlot:
+    //    copy_ChrCamouflageSlot((ChrCamouflageSlot*)to, (ChrCamouflageSlot*)from, to_game);
+    //    break;
     case TypeChrSoulDeadSlot:
         copy_ChrSoulDeadSlot((ChrSoulDeadSlot*)to, (ChrSoulDeadSlot*)from, to_game);
         break;
@@ -370,11 +372,10 @@ void free_AttachSysSlot(AttachSysSlotBaseImpl* to)
     free(to);
 }
 
-//TODO need to handle the bullets in these structs
-
 void copy_ChrShineTreasureSlot(ChrShineTreasureSlot* to, ChrShineTreasureSlot* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    copy_BulletIns_FollowupBullet(&to->bullet, &from->bullet, to_game);
 }
 
 void copy_ChrSingleSeSlot(ChrSingleSeSlot* to, ChrSingleSeSlot* from, bool to_game)
@@ -385,12 +386,13 @@ void copy_ChrSingleSeSlot(ChrSingleSeSlot* to, ChrSingleSeSlot* from, bool to_ga
 void copy_ChrSingleSfxSlot(ChrSingleSfxSlot* to, ChrSingleSfxSlot* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    copy_BulletIns_FollowupBullet(&to->bullet, &from->bullet, to_game);
 }
 
 void copy_ChrMultiSfxSlot(ChrMultiSfxSlot* to, ChrMultiSfxSlot* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-    to->bullet = NULL;
+    copy_BulletIns_FollowupBullet(to->bullet, from->bullet, to_game);
 }
 
 void copy_ChrBurnSlot(ChrBurnSlot* to, ChrBurnSlot* from, bool to_game)
@@ -415,12 +417,13 @@ void copy_ChrGrassSlot(ChrGrassSlot* to, ChrGrassSlot* from, bool to_game)
 void copy_ChrFootEffectSlot(ChrFootEffectSlot* to, ChrFootEffectSlot* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-    to->bullet = NULL;
+    copy_BulletIns_FollowupBullet(to->bullet, from->bullet, to_game);
 }
 
 void copy_ChrRigidOffsetSfxSlot(ChrRigidOffsetSfxSlot* to, ChrRigidOffsetSfxSlot* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    copy_BulletIns_FollowupBullet(&to->bullet, &from->bullet, to_game);
 }
 
 void copy_ChrRigidOffsetChrSlot(ChrRigidOffsetChrSlot* to, ChrRigidOffsetChrSlot* from, bool to_game)
@@ -431,33 +434,42 @@ void copy_ChrRigidOffsetChrSlot(ChrRigidOffsetChrSlot* to, ChrRigidOffsetChrSlot
 void copy_ChrSoulEatSlot(ChrSoulEatSlot* to, ChrSoulEatSlot* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    copy_BulletIns_FollowupBullet(&to->bullet, &from->bullet, to_game);
 }
 
 void copy_ChrSorceryWepSlot(ChrSorceryWepSlot* to, ChrSorceryWepSlot* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     to->data_1 = from->data_1;
+    copy_BulletIns_FollowupBullet(&to->bullet1, &from->bullet1, to_game);
     to->data_2 = from->data_2;
+    copy_BulletIns_FollowupBullet(&to->bullet2, &from->bullet2, to_game);
 }
 
 void copy_ChrLanternSlot(ChrLanternSlot* to, ChrLanternSlot* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    copy_BulletIns_FollowupBullet(&to->bullet1, &from->bullet1, to_game);
+    copy_BulletIns_FollowupBullet(&to->bullet2, &from->bullet2, to_game);
+    copy_BulletIns_FollowupBullet(&to->bullet3, &from->bullet3, to_game);
 }
 
 void copy_ChrSingleOneshotSfxSlot(ChrSingleOneshotSfxSlot* to, ChrSingleOneshotSfxSlot* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    copy_BulletIns_FollowupBullet(&to->bullet, &from->bullet, to_game);
 }
 
 void copy_ChrSingleTraceSfxSlot(ChrSingleTraceSfxSlot* to, ChrSingleTraceSfxSlot* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    copy_BulletIns_FollowupBullet(&to->bullet, &from->bullet, to_game);
 }
 
 void copy_ChrMagicGoodsUseSfxSlot(ChrMagicGoodsUseSfxSlot* to, ChrMagicGoodsUseSfxSlot* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    copy_BulletIns_FollowupBullet(&to->bullet, &from->bullet, to_game);
 }
 
 void copy_ChrActPntSlot(ChrActPntSlot* to, ChrActPntSlot* from, bool to_game)
@@ -499,6 +511,7 @@ void copy_ChrSoulDeadSlot(ChrSoulDeadSlot* to, ChrSoulDeadSlot* from, bool to_ga
 void copy_ChrShinpanshaHaraSlot(ChrShinpanshaHaraSlot* to, ChrShinpanshaHaraSlot* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    copy_BulletIns_FollowupBullet(&to->bullet, &from->bullet, to_game);
 }
 
 void copy_ChrLimitInvincibleSlot(ChrLimitInvincibleSlot* to, ChrLimitInvincibleSlot* from, bool to_game)
@@ -536,5 +549,6 @@ void copy_ChrPlayerResidentSlot(ChrPlayerResidentSlot* to, ChrPlayerResidentSlot
 void copy_ChrFollowSfxSlot(ChrFollowSfxSlot* to, ChrFollowSfxSlot* from, bool to_game)
 {
     to->data_0 = from->data_0;
+    copy_BulletIns_FollowupBullet(&to->bullet, &from->bullet, to_game);
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
 }

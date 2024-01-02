@@ -84,7 +84,7 @@ typedef struct ChrFallingControlSlot ChrFallingControlSlot;
 
 struct AttachSysSlotBaseImpl
 {
-    uint64_t padding_0;
+    uint64_t vtable;
     uint16_t timerId;
     uint16_t slotType: 14;
     uint16_t slotIsUsable: 1;
