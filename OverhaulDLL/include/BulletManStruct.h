@@ -27,8 +27,12 @@ typedef struct ChrExFollowCam ChrExFollowCam;
 
 struct BulletIns_FollowupBullet
 {
-    uint64_t FXManager;
-    uint64_t padding_1[5]; //unknown
+    uint64_t padding_vtable;
+    uint64_t FXManager; //const ptr
+    FXEntry_Substruct* FXEntry_Substruct_a;
+    BulletIns_FollowupBullet* next;
+    BulletIns_FollowupBullet* prev;
+    FXEntry_Substruct* FXEntry_Substruct_b;
 };
 static_assert(sizeof(BulletIns_FollowupBullet) == 0x30);
 

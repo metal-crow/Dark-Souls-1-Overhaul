@@ -194,8 +194,79 @@ void free_BulletIns(BulletIns* to, bool freeself)
     }
 }
 
+uint64_t* HeapPtr = (uint64_t*)(0x0141B67450 + 8);
+
 void copy_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, BulletIns_FollowupBullet* from, bool to_game)
 {
+    //Assuming that we're already saving/restoring SfxMan, then this is just a const ptr to the FXManager in the SfxMan global
+    to->FXManager = from->FXManager;
+
+    //FXEntry_Substruct_a
+    if (from->FXEntry_Substruct_a != NULL)
+    {
+        if (to->FXEntry_Substruct_a == NULL)
+        {
+            if (to_game)
+            {
+                to->FXEntry_Substruct_a = (FXEntry_Substruct*)smallObject_internal_malloc(*HeapPtr, sizeof(FXEntry_Substruct), 8);
+            }
+            else
+            {
+                to->FXEntry_Substruct_a = init_FXEntry_Substruct();
+            }
+        }
+        copy_FXEntry_Substruct(to->FXEntry_Substruct_a, from->FXEntry_Substruct_a, to_game, parent);
+    }
+    if (from->FXEntry_Substruct_a == NULL)
+    {
+        if (to->FXEntry_Substruct_a != NULL)
+        {
+            if (to_game)
+            {
+                smallObject_internal_dealloc(*HeapPtr, to->FXEntry_Substruct_a, sizeof(FXEntry_Substruct), 8);
+            }
+            else
+            {
+                free_FXEntry_Substruct(to->FXEntry_Substruct_a);
+            }
+            to->FXEntry_Substruct_a = NULL;
+        }
+    }
+
+    //FXEntry_Substruct_b
+    if (from->FXEntry_Substruct_b != NULL)
+    {
+        if (to->FXEntry_Substruct_b == NULL)
+        {
+            if (to_game)
+            {
+                to->FXEntry_Substruct_b = (FXEntry_Substruct*)smallObject_internal_malloc(*HeapPtr, sizeof(FXEntry_Substruct), 8);
+            }
+            else
+            {
+                to->FXEntry_Substruct_b = init_FXEntry_Substruct();
+            }
+        }
+        copy_FXEntry_Substruct(to->FXEntry_Substruct_b, from->FXEntry_Substruct_b, to_game, parent);
+    }
+    if (from->FXEntry_Substruct_b == NULL)
+    {
+        if (to->FXEntry_Substruct_b != NULL)
+        {
+            if (to_game)
+            {
+                smallObject_internal_dealloc(*HeapPtr, to->FXEntry_Substruct_b, sizeof(FXEntry_Substruct), 8);
+            }
+            else
+            {
+                free_FXEntry_Substruct(to->FXEntry_Substruct_b);
+            }
+            to->FXEntry_Substruct_b = NULL;
+        }
+    }
+
+    //TODO how should i handle next and prev?
+
     return;
 }
 

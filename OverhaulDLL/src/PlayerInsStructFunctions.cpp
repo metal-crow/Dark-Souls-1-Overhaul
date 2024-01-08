@@ -850,7 +850,7 @@ void copy_ChrIns(ChrIns* to, const ChrIns* from, bool to_game)
     copy_HitIns(to->hitins_1, from->hitins_1);
     copy_HitIns(to->hitins_2, from->hitins_2);
     to->data_0b = from->data_0b;
-    //copy_ChrAttachSys(&to->chrattachsys, &from->chrattachsys, to_game);
+    copy_ChrAttachSys(&to->chrattachsys, &from->chrattachsys, to_game);
     to->curHp = from->curHp;
     to->maxHp = from->maxHp;
     to->curSp = from->curSp;
@@ -884,9 +884,9 @@ ChrIns* init_ChrIns()
     local_ChrIns->field0x2c8 = init_ChrIns_field0x2c8();
     local_ChrIns->hitins_1 = init_HitIns();
     local_ChrIns->hitins_2 = init_HitIns();
-    //auto local_chrattach_sys = init_ChrAttachSys();
-    //local_ChrIns->chrattachsys = *local_chrattach_sys;
-    //free(local_chrattach_sys);
+    auto local_chrattach_sys = init_ChrAttachSys();
+    local_ChrIns->chrattachsys = *local_chrattach_sys;
+    free(local_chrattach_sys);
     local_ChrIns->throw_animation_info = init_EntityThrowAnimationStatus();
 
     return local_ChrIns;
@@ -903,7 +903,7 @@ void free_ChrIns(ChrIns* to, bool freeself)
     free_ChrIns_field0x2c8(to->field0x2c8);
     free_HitIns(to->hitins_1);
     free_HitIns(to->hitins_2);
-    //free_ChrAttachSys(&to->chrattachsys, false);
+    free_ChrAttachSys(&to->chrattachsys, false);
     free_EntityThrowAnimationStatus(to->throw_animation_info);
 
     if (freeself)

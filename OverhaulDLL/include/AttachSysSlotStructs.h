@@ -117,7 +117,9 @@ struct ChrPlayerResidentSlot
     AttachSysSlotBaseImpl base;
     uint64_t data_0; //ptr to data we already save
     uint64_t data_1;
-    uint64_t data_2[4]; //we can probably get away with saving these as raw pointers
+    //These are pointers to PlayerGameData's from players in FrpgSessionManagerImp->connected_player_info.
+    //Since we save Players already these can just be treated as raw pointers
+    uint64_t data_2[4];
 };
 static_assert(sizeof(ChrPlayerResidentSlot) == 0x50);
 
