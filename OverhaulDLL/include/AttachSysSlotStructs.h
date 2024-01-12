@@ -271,7 +271,7 @@ struct ChrLimitInvincibleSlot
 {
     AttachSysSlotBaseImpl base;
     uint64_t data_0;
-    void* unk1;
+    ChrIns* chr; //can treat as raw ptr
 };
 static_assert(sizeof(ChrLimitInvincibleSlot) == 0x30);
 
