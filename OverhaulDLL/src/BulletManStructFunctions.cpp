@@ -214,6 +214,8 @@ void copy_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, BulletIns_Follo
                 to->FXEntry_Substruct_a = init_FXEntry_Substruct();
             }
         }
+        //should just be able to treat the parent as a raw ptr i think
+        //assuming we're also saveing/restoring the sfxman, it should ptr to an object in that
         copy_FXEntry_Substruct(to->FXEntry_Substruct_a, from->FXEntry_Substruct_a, to_game, from->FXEntry_Substruct_a->parent);
     }
     if (from->FXEntry_Substruct_a == NULL)
