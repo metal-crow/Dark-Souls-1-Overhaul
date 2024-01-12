@@ -7,6 +7,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include "SfxManStruct.h"
 
 typedef struct BulletMan BulletMan;
 typedef struct BulletIns BulletIns;

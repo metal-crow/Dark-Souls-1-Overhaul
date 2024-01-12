@@ -193,7 +193,7 @@ void free_BulletIns(BulletIns* to, bool freeself)
     }
 }
 
-uint64_t* HeapPtr = (uint64_t*)(0x0141B67450 + 8);
+static uint64_t* HeapPtr = (uint64_t*)(0x0141B67450 + 8);
 
 void copy_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, BulletIns_FollowupBullet* from, bool to_game)
 {

@@ -29,7 +29,7 @@ void free_FXManager(FXManager* to)
 
 static const size_t max_preallocated_SFXEntries = 256;
 
-uint64_t* HeapPtr = (uint64_t*)(0x0141B67450 + 8);
+static uint64_t* HeapPtr = (uint64_t*)(0x0141B67450 + 8);
 
 void copy_SFXEntryList(SFXEntry* to, SFXEntry* from, bool to_game, FXManager* to_parent, FXManager* from_parent)
 {
