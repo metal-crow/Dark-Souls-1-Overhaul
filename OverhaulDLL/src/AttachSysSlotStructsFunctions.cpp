@@ -484,7 +484,88 @@ void copy_ChrPointLightSlot(ChrPointLightSlot* to, ChrPointLightSlot* from, bool
 
 void copy_ChrWepEnchantSlot(ChrWepEnchantSlot* to, ChrWepEnchantSlot* from, bool to_game)
 {
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 
+    if (from->followup_bullet_list == NULL)
+    {
+        if (to->followup_bullet_list != NULL)
+        {
+            if (to_game)
+            {
+                Game::game_free(to->followup_bullet_list, sizeof(BulletIns_FollowupBullet) * to->followup_bullet_list_len);
+            }
+            else
+            {
+                free(to->followup_bullet_list);
+            }
+        }
+        to->followup_bullet_list = NULL;
+    }
+    else
+    {
+        //Resize the list
+        size_t from_list_size = from->followup_bullet_list_len;
+        size_t to_list_size = to->followup_bullet_list_len;
+        if (to_list_size != from_list_size)
+        {
+            size_t copy_size = 0;
+            if (to_list_size < from_list_size)
+            {
+                //upsizing
+                copy_size = to_list_size;
+            }
+            else
+            {
+                //downsizing
+                copy_size = from_list_size;
+            }
+
+            //allocate all the entities as a block, and copy over the old values
+            if (to_game)
+            {
+                auto new_followup_bullet_list = (BulletIns_FollowupBullet*)Game::game_malloc(sizeof(BulletIns_FollowupBullet) * from_list_size, 0x10, *(uint64_t*)Game::internal_heap_3);
+                if (to->followup_bullet_list != NULL)
+                {
+                    memcpy(new_followup_bullet_list, to->followup_bullet_list, sizeof(BulletIns_FollowupBullet) * copy_size);
+                    Game::game_free(to->followup_bullet_list, sizeof(BulletIns_FollowupBullet) * to_list_size);
+                }
+                to->followup_bullet_list = new_followup_bullet_list;
+            }
+            else
+            {
+                auto new_followup_bullet_list = (BulletIns_FollowupBullet*)malloc_(sizeof(BulletIns_FollowupBullet) * from_list_size);
+                if (to->followup_bullet_list != NULL)
+                {
+                    memcpy(new_followup_bullet_list, to->followup_bullet_list, sizeof(BulletIns_FollowupBullet) * copy_size);
+                    free(to->followup_bullet_list);
+                }
+                to->followup_bullet_list = new_followup_bullet_list;
+            }
+        }
+
+        //Copy the bullet entries
+        for (size_t list_i = 0; list_i < to->followup_bullet_list_len; list_i++)
+        {
+            BulletIns_FollowupBullet* to_bullet = &to->followup_bullet_list[list_i];
+            BulletIns_FollowupBullet* from_bullet = &from->followup_bullet_list[list_i];
+
+            copy_BulletIns_FollowupBullet(to_bullet, from_bullet, to_game);
+            //set up the next ptr. We can probably ignore prev
+            if (from_bullet->next != NULL)
+            {
+                size_t from_next_offset = ((uint64_t)from_bullet->next) - ((uint64_t)from->followup_bullet_list);
+                to_bullet->next = (BulletIns_FollowupBullet*)(((uint64_t)to->followup_bullet_list) + from_next_offset);
+            }
+            else
+            {
+                to_bullet->next = NULL;
+            }
+            to_bullet->prev = NULL;
+        }
+    }
+    to->followup_bullet_list_len = from->followup_bullet_list_len;
+
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
 }
 
 void copy_ChrFallingControlSlot(ChrFallingControlSlot* to, ChrFallingControlSlot* from, bool to_game)

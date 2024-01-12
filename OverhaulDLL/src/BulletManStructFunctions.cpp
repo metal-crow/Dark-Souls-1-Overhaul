@@ -181,13 +181,12 @@ BulletIns* init_BulletIns()
 {
     BulletIns* local_BulletIns = (BulletIns*)malloc_(sizeof(BulletIns));
 
-    //none of the substruct have pointers, so can save some code here
-
     return local_BulletIns;
 }
 
 void free_BulletIns(BulletIns* to, bool freeself)
 {
+    free_BulletIns_FollowupBullet(&to->FollowupBullet, false, true);
     if (freeself)
     {
         free(to);
@@ -215,7 +214,7 @@ void copy_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, BulletIns_Follo
                 to->FXEntry_Substruct_a = init_FXEntry_Substruct();
             }
         }
-        copy_FXEntry_Substruct(to->FXEntry_Substruct_a, from->FXEntry_Substruct_a, to_game, parent);
+        copy_FXEntry_Substruct(to->FXEntry_Substruct_a, from->FXEntry_Substruct_a, to_game, from->FXEntry_Substruct_a->parent);
     }
     if (from->FXEntry_Substruct_a == NULL)
     {
@@ -247,7 +246,7 @@ void copy_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, BulletIns_Follo
                 to->FXEntry_Substruct_b = init_FXEntry_Substruct();
             }
         }
-        copy_FXEntry_Substruct(to->FXEntry_Substruct_b, from->FXEntry_Substruct_b, to_game, parent);
+        copy_FXEntry_Substruct(to->FXEntry_Substruct_b, from->FXEntry_Substruct_b, to_game, from->FXEntry_Substruct_a->parent);
     }
     if (from->FXEntry_Substruct_b == NULL)
     {
@@ -265,9 +264,32 @@ void copy_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, BulletIns_Follo
         }
     }
 
-    //TODO how should i handle next and prev?
+    //the next/prev ptrs have to be handled by the caller
 
     return;
+}
+
+void free_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, bool freeself, bool freenext)
+{
+    if (to->FXEntry_Substruct_a != NULL)
+    {
+        free_FXEntry_Substruct(to->FXEntry_Substruct_a);
+    }
+
+    if (freenext && to->next != NULL)
+    {
+        free_BulletIns_FollowupBullet(to->next, true, freenext);
+    }
+
+    if (to->FXEntry_Substruct_b != NULL)
+    {
+        free_FXEntry_Substruct(to->FXEntry_Substruct_b);
+    }
+
+    if (freeself)
+    {
+        free(to);
+    }
 }
 
 void copy_BulletIns_Field0x90_Field0x1a0(BulletIns_Field0x90_Field0x1a0* to, BulletIns_Field0x90_Field0x1a0* from, bool to_game)

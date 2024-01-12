@@ -22,6 +22,7 @@ BulletIns* init_BulletIns();
 void free_BulletIns(BulletIns* to, bool freeself);
 
 void copy_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, BulletIns_FollowupBullet* from, bool to_game);
+void free_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, bool freeself, bool freenext);
 
 void copy_BulletIns_Field0x90_Field0x1a0(BulletIns_Field0x90_Field0x1a0* to, BulletIns_Field0x90_Field0x1a0* from, bool to_game);
 

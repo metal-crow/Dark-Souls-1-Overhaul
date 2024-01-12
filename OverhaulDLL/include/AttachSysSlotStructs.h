@@ -149,9 +149,12 @@ static_assert(sizeof(ChrActPntSlot) == 0x28);
 struct ChrWepEnchantSlot
 {
     AttachSysSlotBaseImpl base;
-
+    uint8_t data_0[30];
+    int16_t followup_bullet_list_len;
+    BulletIns_FollowupBullet* followup_bullet_list;
+    uint8_t data_1[8];
 };
-//static_assert(sizeof(ChrWepEnchantSlot) == 0x50);
+static_assert(sizeof(ChrWepEnchantSlot) == 0x50);
 
 struct ChrStatueDeadSlot
 {
