@@ -372,6 +372,91 @@ void free_AttachSysSlot(AttachSysSlotBaseImpl* to)
     free(to);
 }
 
+static void helper_copy_followup_bullet_list(
+    BulletIns_FollowupBullet** to_followup_bullet_list_ptr, int16_t* to_followup_bullet_list_len_ptr,
+    BulletIns_FollowupBullet** from_followup_bullet_list_ptr, int16_t* from_followup_bullet_list_len_ptr,
+    bool to_game)
+{
+    if (*from_followup_bullet_list_ptr == NULL)
+    {
+        if (*to_followup_bullet_list_ptr != NULL)
+        {
+            if (to_game)
+            {
+                Game::game_free(*to_followup_bullet_list_ptr, sizeof(BulletIns_FollowupBullet) * *(to_followup_bullet_list_len_ptr));
+            }
+            else
+            {
+                free(*to_followup_bullet_list_ptr);
+            }
+        }
+        *to_followup_bullet_list_ptr = NULL;
+    }
+    else
+    {
+        //Resize the list
+        size_t from_list_size = *from_followup_bullet_list_len_ptr;
+        size_t to_list_size = *to_followup_bullet_list_len_ptr;
+        if (to_list_size != from_list_size)
+        {
+            size_t copy_size = 0;
+            if (to_list_size < from_list_size)
+            {
+                //upsizing
+                copy_size = to_list_size;
+            }
+            else
+            {
+                //downsizing
+                copy_size = from_list_size;
+            }
+
+            //allocate all the entities as a block, and copy over the old values
+            if (to_game)
+            {
+                auto new_followup_bullet_list = (BulletIns_FollowupBullet*)Game::game_malloc(sizeof(BulletIns_FollowupBullet) * from_list_size, 0x10, *(uint64_t*)Game::internal_heap_3);
+                if (*to_followup_bullet_list_ptr != NULL)
+                {
+                    memcpy(new_followup_bullet_list, *to_followup_bullet_list_ptr, sizeof(BulletIns_FollowupBullet) * copy_size);
+                    Game::game_free(*to_followup_bullet_list_ptr, sizeof(BulletIns_FollowupBullet) * to_list_size);
+                }
+                *to_followup_bullet_list_ptr = new_followup_bullet_list;
+            }
+            else
+            {
+                auto new_followup_bullet_list = (BulletIns_FollowupBullet*)malloc_(sizeof(BulletIns_FollowupBullet) * from_list_size);
+                if (*to_followup_bullet_list_ptr != NULL)
+                {
+                    memcpy(new_followup_bullet_list, *to_followup_bullet_list_ptr, sizeof(BulletIns_FollowupBullet) * copy_size);
+                    free(*to_followup_bullet_list_ptr);
+                }
+                *to_followup_bullet_list_ptr = new_followup_bullet_list;
+            }
+        }
+
+        //Copy the bullet entries
+        for (size_t list_i = 0; list_i < *to_followup_bullet_list_len_ptr; list_i++)
+        {
+            BulletIns_FollowupBullet* to_bullet = &(*to_followup_bullet_list_ptr)[list_i];
+            BulletIns_FollowupBullet* from_bullet = &(*from_followup_bullet_list_ptr)[list_i];
+
+            copy_BulletIns_FollowupBullet(to_bullet, from_bullet, to_game);
+            //set up the next ptr. We can probably ignore prev
+            if (from_bullet->next != NULL)
+            {
+                size_t from_next_offset = ((uint64_t)from_bullet->next) - ((uint64_t)(*from_followup_bullet_list_ptr));
+                to_bullet->next = (BulletIns_FollowupBullet*)(((uint64_t)(*to_followup_bullet_list_ptr)) + from_next_offset);
+            }
+            else
+            {
+                to_bullet->next = NULL;
+            }
+            to_bullet->prev = NULL;
+        }
+    }
+    *to_followup_bullet_list_len_ptr = *from_followup_bullet_list_len_ptr;
+}
+
 void copy_ChrShineTreasureSlot(ChrShineTreasureSlot* to, ChrShineTreasureSlot* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
@@ -486,84 +571,7 @@ void copy_ChrWepEnchantSlot(ChrWepEnchantSlot* to, ChrWepEnchantSlot* from, bool
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 
-    if (from->followup_bullet_list == NULL)
-    {
-        if (to->followup_bullet_list != NULL)
-        {
-            if (to_game)
-            {
-                Game::game_free(to->followup_bullet_list, sizeof(BulletIns_FollowupBullet) * to->followup_bullet_list_len);
-            }
-            else
-            {
-                free(to->followup_bullet_list);
-            }
-        }
-        to->followup_bullet_list = NULL;
-    }
-    else
-    {
-        //Resize the list
-        size_t from_list_size = from->followup_bullet_list_len;
-        size_t to_list_size = to->followup_bullet_list_len;
-        if (to_list_size != from_list_size)
-        {
-            size_t copy_size = 0;
-            if (to_list_size < from_list_size)
-            {
-                //upsizing
-                copy_size = to_list_size;
-            }
-            else
-            {
-                //downsizing
-                copy_size = from_list_size;
-            }
-
-            //allocate all the entities as a block, and copy over the old values
-            if (to_game)
-            {
-                auto new_followup_bullet_list = (BulletIns_FollowupBullet*)Game::game_malloc(sizeof(BulletIns_FollowupBullet) * from_list_size, 0x10, *(uint64_t*)Game::internal_heap_3);
-                if (to->followup_bullet_list != NULL)
-                {
-                    memcpy(new_followup_bullet_list, to->followup_bullet_list, sizeof(BulletIns_FollowupBullet) * copy_size);
-                    Game::game_free(to->followup_bullet_list, sizeof(BulletIns_FollowupBullet) * to_list_size);
-                }
-                to->followup_bullet_list = new_followup_bullet_list;
-            }
-            else
-            {
-                auto new_followup_bullet_list = (BulletIns_FollowupBullet*)malloc_(sizeof(BulletIns_FollowupBullet) * from_list_size);
-                if (to->followup_bullet_list != NULL)
-                {
-                    memcpy(new_followup_bullet_list, to->followup_bullet_list, sizeof(BulletIns_FollowupBullet) * copy_size);
-                    free(to->followup_bullet_list);
-                }
-                to->followup_bullet_list = new_followup_bullet_list;
-            }
-        }
-
-        //Copy the bullet entries
-        for (size_t list_i = 0; list_i < to->followup_bullet_list_len; list_i++)
-        {
-            BulletIns_FollowupBullet* to_bullet = &to->followup_bullet_list[list_i];
-            BulletIns_FollowupBullet* from_bullet = &from->followup_bullet_list[list_i];
-
-            copy_BulletIns_FollowupBullet(to_bullet, from_bullet, to_game);
-            //set up the next ptr. We can probably ignore prev
-            if (from_bullet->next != NULL)
-            {
-                size_t from_next_offset = ((uint64_t)from_bullet->next) - ((uint64_t)from->followup_bullet_list);
-                to_bullet->next = (BulletIns_FollowupBullet*)(((uint64_t)to->followup_bullet_list) + from_next_offset);
-            }
-            else
-            {
-                to_bullet->next = NULL;
-            }
-            to_bullet->prev = NULL;
-        }
-    }
-    to->followup_bullet_list_len = from->followup_bullet_list_len;
+    helper_copy_followup_bullet_list(&to->followup_bullet_list, &to->followup_bullet_list_len, &from->followup_bullet_list, &from->followup_bullet_list_len, to_game);
 
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
 }
@@ -608,6 +616,11 @@ void copy_ChrTravelItemSlot(ChrTravelItemSlot* to, ChrTravelItemSlot* from, bool
 void copy_ChrStatueDeadSlot(ChrStatueDeadSlot* to, ChrStatueDeadSlot* from, bool to_game)
 {
     to->data_0 = from->data_0;
+    int16_t to_followup_bullet_list_len = to->followup_bullet_list_len;
+    int16_t from_followup_bullet_list_len = from->followup_bullet_list_len;
+    helper_copy_followup_bullet_list(&to->followup_bullet_list, &to_followup_bullet_list_len, &from->followup_bullet_list, &from_followup_bullet_list_len, to_game);
+    to->followup_bullet_list_len = to_followup_bullet_list_len;
+    from->followup_bullet_list_len = from_followup_bullet_list_len;
 }
 
 void copy_ChrResonanceMagicSlot(ChrResonanceMagicSlot* to, ChrResonanceMagicSlot* from, bool to_game)
