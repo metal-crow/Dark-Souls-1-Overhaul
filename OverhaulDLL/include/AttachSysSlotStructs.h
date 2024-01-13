@@ -77,6 +77,7 @@ typedef struct ChrGasmanSlot_ListElem ChrGasmanSlot_ListElem;
 typedef struct ChrGasmanSlot ChrGasmanSlot;
 typedef struct ChrConditionSfxSeSlot ChrConditionSfxSeSlot;
 typedef struct ChrCamouflageSlot ChrCamouflageSlot;
+typedef struct ChrBurnSlot_ListElem ChrBurnSlot_ListElem;
 typedef struct ChrBurnSlot ChrBurnSlot;
 typedef struct ObjRigidOffsetSfxSlot ObjRigidOffsetSfxSlot;
 typedef struct ChrFollowSfxSlot ChrFollowSfxSlot;
@@ -327,15 +328,29 @@ struct ChrCamouflageSlot
 };
 //static_assert(sizeof(ChrCamouflageSlot) == 0x40);
 
+struct ChrBurnSlot_ListElem
+{
+    uint64_t data_0;
+    BulletIns_FollowupBullet bullet;
+};
+static_assert(sizeof(ChrBurnSlot_ListElem) == 0x38);
+
 struct ChrBurnSlot
 {
     AttachSysSlotBaseImpl base;
-    uint8_t data_0[16];
-    void* unk1;
-    uint64_t data_1;
-    void* unk2;
+    uint8_t data_0[10];
+    int16_t floatlist_len;
+    uint32_t data_1;
+    float* floatlist;
+    int32_t list_len;
+    uint32_t data_2;
+    ChrBurnSlot_ListElem* list;
     uint8_t data_2[16];
 };
+static_assert(offsetof(ChrBurnSlot, floatlist_len) == 0x2a);
+static_assert(offsetof(ChrBurnSlot, floatlist) == 0x30);
+static_assert(offsetof(ChrBurnSlot, list_len) == 0x38);
+static_assert(offsetof(ChrBurnSlot, list) == 0x40);
 static_assert(sizeof(ChrBurnSlot) == 0x58);
 
 struct ObjRigidOffsetSfxSlot
