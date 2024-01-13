@@ -492,6 +492,99 @@ void copy_ChrBurnSlot(ChrBurnSlot* to, ChrBurnSlot* from, bool to_game)
 void copy_ChrGasmanSlot(ChrGasmanSlot* to, ChrGasmanSlot* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+
+    if (from->list == NULL)
+    {
+        if (to->list != NULL)
+        {
+            if (to_game)
+            {
+                Game::game_free(to->list, sizeof(ChrGasmanSlot_ListElem) * to->list_len);
+            }
+            else
+            {
+                free(to->list);
+            }
+        }
+        to->list = NULL;
+    }
+    else
+    {
+        //Resize the list
+        size_t from_list_size = from->list_len;
+        size_t to_list_size = to->list_len;
+        if (to_list_size != from_list_size)
+        {
+            size_t copy_size = 0;
+            if (to_list_size < from_list_size)
+            {
+                //upsizing
+                copy_size = to_list_size;
+            }
+            else
+            {
+                //downsizing
+                copy_size = from_list_size;
+            }
+
+            //allocate all the entities as a block, and copy over the old values
+            if (to_game)
+            {
+                auto new_ChrGasmanSlot_ListElem_list = (ChrGasmanSlot_ListElem*)Game::game_malloc(sizeof(ChrGasmanSlot_ListElem) * from_list_size, 0x10, *(uint64_t*)Game::internal_heap_3);
+                if (to->list != NULL)
+                {
+                    memcpy(new_ChrGasmanSlot_ListElem_list, to->list, sizeof(ChrGasmanSlot_ListElem) * copy_size);
+                    Game::game_free(to->list, sizeof(ChrGasmanSlot_ListElem) * to_list_size);
+                }
+                to->list = new_ChrGasmanSlot_ListElem_list;
+            }
+            else
+            {
+                auto new_ChrGasmanSlot_ListElem_list = (ChrGasmanSlot_ListElem*)malloc_(sizeof(ChrGasmanSlot_ListElem) * from_list_size);
+                if (to->list != NULL)
+                {
+                    memcpy(new_ChrGasmanSlot_ListElem_list, to->list, sizeof(ChrGasmanSlot_ListElem) * copy_size);
+                    free(to->list);
+                }
+                to->list = new_ChrGasmanSlot_ListElem_list;
+            }
+        }
+
+        //Copy the entries
+        for (size_t list_i = 0; list_i < to->list_len; list_i++)
+        {
+            ChrGasmanSlot_ListElem* to_elem = &to->list[list_i];
+            ChrGasmanSlot_ListElem* from_elem = &from->list[list_i];
+
+            memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+
+            copy_BulletIns_FollowupBullet(&to_elem->bullet_a, &from_elem->bullet_a, to_game);
+            //set up the next ptr. We can probably ignore prev
+            if (from_elem->bullet_a.next != NULL)
+            {
+                size_t from_next_offset = ((uint64_t)from_elem->bullet_a.next) - ((uint64_t)(from->list));
+                to_elem->bullet_a.next = (BulletIns_FollowupBullet*)(((uint64_t)(to->list)) + from_next_offset);
+            }
+            else
+            {
+                to_elem->bullet_a.next = NULL;
+            }
+            to_elem->bullet_a.prev = NULL;
+
+            copy_BulletIns_FollowupBullet(&to_elem->bullet_b, &from_elem->bullet_b, to_game);
+            if (from_elem->bullet_b.next != NULL)
+            {
+                size_t from_next_offset = ((uint64_t)from_elem->bullet_b.next) - ((uint64_t)(from->list));
+                to_elem->bullet_b.next = (BulletIns_FollowupBullet*)(((uint64_t)(to->list)) + from_next_offset);
+            }
+            else
+            {
+                to_elem->bullet_b.next = NULL;
+            }
+            to_elem->bullet_b.prev = NULL;
+        }
+    }
+    to->list_len = from->list_len;
 }
 
 void copy_ChrGrassSlot(ChrGrassSlot* to, ChrGrassSlot* from, bool to_game)

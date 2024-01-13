@@ -73,6 +73,7 @@ typedef struct ChrPointLightSlot ChrPointLightSlot;
 typedef struct ChrLimitInvincibleSlot ChrLimitInvincibleSlot;
 typedef struct ChrLanternSlot ChrLanternSlot;
 typedef struct ChrGrassSlot ChrGrassSlot;
+typedef struct ChrGasmanSlot_ListElem ChrGasmanSlot_ListElem;
 typedef struct ChrGasmanSlot ChrGasmanSlot;
 typedef struct ChrConditionSfxSeSlot ChrConditionSfxSeSlot;
 typedef struct ChrCamouflageSlot ChrCamouflageSlot;
@@ -292,11 +293,20 @@ struct ChrGrassSlot
 };
 //static_assert(sizeof(ChrGrassSlot) == 0x50);
 
+struct ChrGasmanSlot_ListElem
+{
+    uint8_t data_0[0x20];
+    BulletIns_FollowupBullet bullet_a;
+    BulletIns_FollowupBullet bullet_b;
+};
+static_assert(sizeof(ChrGasmanSlot_ListElem) == 0x80);
+
 struct ChrGasmanSlot
 {
     AttachSysSlotBaseImpl base;
-    uint8_t data_0[8];
-    void* unk1;
+    uint8_t data_0[6];
+    int16_t list_len;
+    ChrGasmanSlot_ListElem* list;
 };
 static_assert(sizeof(ChrGasmanSlot) == 0x30);
 
