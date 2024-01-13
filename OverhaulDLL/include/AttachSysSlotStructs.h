@@ -273,7 +273,7 @@ struct ChrLimitInvincibleSlot
 {
     AttachSysSlotBaseImpl base;
     uint64_t data_0;
-    ChrIns* chr; //can treat as raw ptr
+    void* chr; //ChrIns*, can treat as raw ptr
 };
 static_assert(sizeof(ChrLimitInvincibleSlot) == 0x30);
 
@@ -345,7 +345,7 @@ struct ChrBurnSlot
     int32_t list_len;
     uint32_t data_2;
     ChrBurnSlot_ListElem* list;
-    uint8_t data_2[16];
+    uint8_t data_3[16];
 };
 static_assert(offsetof(ChrBurnSlot, floatlist_len) == 0x2a);
 static_assert(offsetof(ChrBurnSlot, floatlist) == 0x30);

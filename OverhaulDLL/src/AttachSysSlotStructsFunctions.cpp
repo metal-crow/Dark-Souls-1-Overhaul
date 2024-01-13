@@ -589,6 +589,8 @@ void copy_ChrBurnSlot(ChrBurnSlot* to, ChrBurnSlot* from, bool to_game)
     }
     to->list_len = from->list_len;
 
+    to->data_2 = from->data_2;
+    memcpy(to->data_3, from->data_3, sizeof(to->data_3));
 }
 
 void copy_ChrGasmanSlot(ChrGasmanSlot* to, ChrGasmanSlot* from, bool to_game)
