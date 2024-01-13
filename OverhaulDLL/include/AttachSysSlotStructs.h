@@ -313,8 +313,9 @@ static_assert(sizeof(ChrGasmanSlot) == 0x30);
 struct ChrConditionSfxSeSlot
 {
     AttachSysSlotBaseImpl base;
-    uint8_t data_0[24];
-    void* unk1;
+    uint8_t data_0[22];
+    int16_t followupbullet_list_len;
+    BulletIns_FollowupBullet* followupbullet_list;
     uint64_t data_1;
 };
 static_assert(sizeof(ChrConditionSfxSeSlot) == 0x48);

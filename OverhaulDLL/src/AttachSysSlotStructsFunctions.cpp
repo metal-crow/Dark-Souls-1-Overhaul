@@ -677,6 +677,9 @@ void copy_ChrFallingControlSlot(ChrFallingControlSlot* to, ChrFallingControlSlot
 void copy_ChrConditionSfxSeSlot(ChrConditionSfxSeSlot* to, ChrConditionSfxSeSlot* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+
+    helper_copy_followup_bullet_list(&to->followupbullet_list, &to->followupbullet_list_len, &from->followupbullet_list, &from->followupbullet_list_len, to_game);
+
     to->data_1 = from->data_1;
 }
 
