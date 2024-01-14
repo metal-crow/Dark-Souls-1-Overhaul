@@ -460,7 +460,7 @@ std::string print_ChrShineTreasureSlot(ChrShineTreasureSlot* to)
         out += " ";
     }
     out += "\n";
-    out += print_BulletIns_FollowupBullet(to->bullet);
+    out += print_BulletIns_FollowupBullet(&to->bullet);
 
     return out;
 }
@@ -510,7 +510,7 @@ std::string print_ChrSingleSfxSlot(ChrSingleSfxSlot* to)
         out += " ";
     }
     out += "\n";
-    out += print_BulletIns_FollowupBullet(to->bullet);
+    out += print_BulletIns_FollowupBullet(&to->bullet);
 
     return out;
 }
@@ -578,7 +578,7 @@ std::string print_ChrBurnSlot(ChrBurnSlot* to)
     {
         out += std::to_string(to->list[i].data_0);
         out += ",";
-        out += print_BulletIns_FollowupBullet(to->list[i].bullet);
+        out += print_BulletIns_FollowupBullet(&to->list[i].bullet);
         out += " ";
     }
     out += "\n";
@@ -748,9 +748,9 @@ std::string print_ChrGasmanSlot(ChrGasmanSlot* to)
             out += " ";
         }
         out += ",";
-        out += print_BulletIns_FollowupBullet(to->list[i].bullet_a);
+        out += print_BulletIns_FollowupBullet(&to->list[i].bullet_a);
         out += ",";
-        out += print_BulletIns_FollowupBullet(to->list[i].bullet_b);
+        out += print_BulletIns_FollowupBullet(&to->list[i].bullet_b);
         out += "|";
     }
     out += "\n";
@@ -899,7 +899,7 @@ std::string print_ChrRigidOffsetSfxSlot(ChrRigidOffsetSfxSlot* to)
         out += " ";
     }
     out += "\n";
-    out += print_BulletIns_FollowupBullet(to->bullet);
+    out += print_BulletIns_FollowupBullet(&to->bullet);
 
     return out;
 }
@@ -949,7 +949,7 @@ std::string print_ChrSoulEatSlot(ChrSoulEatSlot* to)
         out += " ";
     }
     out += "\n";
-    out += print_BulletIns_FollowupBullet(to->bullet);
+    out += print_BulletIns_FollowupBullet(&to->bullet);
 
     return out;
 }
@@ -1166,7 +1166,7 @@ std::string print_ChrWepEnchantSlot(ChrWepEnchantSlot* to)
     out += "followup_bullet_list [" + std::to_string(to->followup_bullet_list_len) + "]:";
     for (size_t i = 0; i < to->followup_bullet_list_len; i++)
     {
-        out += print_BulletIns_FollowupBullet(to->followup_bullet_list[i]);
+        out += print_BulletIns_FollowupBullet(&to->followup_bullet_list[i]);
         out += " ";
     }
     out += "\n";
@@ -1228,7 +1228,7 @@ std::string print_ChrConditionSfxSeSlot(ChrConditionSfxSeSlot* to)
     out += "followup_bullet_list [" + std::to_string(to->followupbullet_list_len) + "]:";
     for (size_t i = 0; i < to->followupbullet_list_len; i++)
     {
-        out += print_BulletIns_FollowupBullet(to->followupbullet_list[i]);
+        out += print_BulletIns_FollowupBullet(&to->followupbullet_list[i]);
         out += " ";
     }
     out += "\n";
@@ -1359,7 +1359,7 @@ std::string print_ChrStatueDeadSlot(ChrStatueDeadSlot* to)
     out += "followup_bullet_list [" + std::to_string(to->followup_bullet_list_len) + "]:";
     for (size_t i = 0; i < to->followup_bullet_list_len; i++)
     {
-        out += print_BulletIns_FollowupBullet(to->followup_bullet_list[i]);
+        out += print_BulletIns_FollowupBullet(&to->followup_bullet_list[i]);
         out += " ";
     }
     out += "\n";
