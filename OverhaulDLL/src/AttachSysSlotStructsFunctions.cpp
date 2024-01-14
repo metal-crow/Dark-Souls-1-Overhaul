@@ -8,79 +8,79 @@ std::string print_AttachSysSlot(AttachSysSlotBaseImpl* to)
     switch (to->slotType)
     {
     case TypeChrShineTreasureSlot:
-        out = "ChrShineTreasureSlot\n";
+        out += print_ChrShineTreasureSlot((ChrShineTreasureSlot*)to);
         break;
     case TypeChrSingleSeSlot:
-        out = "ChrSingleSeSlot\n";
+        out += print_ChrSingleSeSlot((ChrSingleSeSlot*)to);
         break;
     case TypeChrSingleSfxSlot:
-        out = "ChrSingleSfxSlot\n";
+        out += print_ChrSingleSfxSlot((ChrSingleSfxSlot*)to);
         break;
     case TypeChrMultiSfxSlot:
-        out = "ChrMultiSfxSlot\n";
+        out += print_ChrMultiSfxSlot((ChrMultiSfxSlot*)to);
         break;
     case TypeChrBurnSlot:
-        out = "ChrBurnSlot\n";
+        out += print_ChrBurnSlot((ChrBurnSlot*)to);
         break;
     case TypeChrGasmanSlot:
-        out = "ChrGasmanSlot\n";
+        out += print_ChrGasmanSlot((ChrGasmanSlot*)to);
         break;
     case TypeChrGrassSlot:
-        out = "ChrGrassSlot\n";
+        out += print_ChrGrassSlot((ChrGrassSlot*)to);
         break;
     case TypeChrFootEffectSlot:
-        out = "ChrFootEffectSlot\n";
+        out += print_ChrFootEffectSlot((ChrFootEffectSlot*)to);
         break;
     case TypeChrRigidOffsetSfxSlot:
-        out = "ChrRigidOffsetSfxSlot\n";
+        out += print_ChrRigidOffsetSfxSlot((ChrRigidOffsetSfxSlot*)to);
         break;
     case TypeChrRigidOffsetChrSlot:
-        out = "ChrRigidOffsetChrSlot\n";
+        out += print_ChrRigidOffsetChrSlot((ChrRigidOffsetChrSlot*)to);
         break;
     case TypeChrSoulEatSlot:
-        out = "ChrSoulEatSlot\n";
+        out += print_ChrSoulEatSlot((ChrSoulEatSlot*)to);
         break;
     case TypeChrSorceryWepSlot:
-        out = "ChrSorceryWepSlot\n";
+        out += print_ChrSorceryWepSlot((ChrSorceryWepSlot*)to);
         break;
     case TypeChrLanternSlot:
-        out = "ChrLanternSlot\n";
+        out += print_ChrLanternSlot((ChrLanternSlot*)to);
         break;
     case TypeChrSingleOneshotSfxSlot:
-        out = "ChrSingleOneshotSfxSlot\n";
+        out += print_ChrSingleOneshotSfxSlot((ChrSingleOneshotSfxSlot*)to);
         break;
     case TypeChrSingleTraceSfxSlot:
-        out = "ChrSingleTraceSfxSlot\n";
+        out += print_ChrSingleTraceSfxSlot((ChrSingleTraceSfxSlot*)to);
         break;
     case TypeChrMagicGoodsUseSfxSlot:
-        out = "ChrMagicGoodsUseSfxSlot\n";
+        out += print_ChrMagicGoodsUseSfxSlot((ChrMagicGoodsUseSfxSlot*)to);
         break;
     case TypeChrActPntSlot:
-        out = "ChrActPntSlot\n";
+        out += print_ChrActPntSlot((ChrActPntSlot*)to);
         break;
     case TypeChrPointLightSlot:
-        out = "ChrPointLightSlot\n";
+        out += print_ChrPointLightSlot((ChrPointLightSlot*)to);
         break;
     case TypeChrWepEnchantSlot:
-        out = "ChrWepEnchantSlot\n";
+        out += print_ChrWepEnchantSlot((ChrWepEnchantSlot*)to);
         break;
     case TypeChrFallingControlSlot:
-        out = "ChrFallingControlSlot\n";
+        out += print_ChrFallingControlSlot((ChrFallingControlSlot*)to);
         break;
     case TypeChrConditionSfxSeSlot:
-        out = "ChrConditionSfxSeSlot\n";
+        out += print_ChrConditionSfxSeSlot((ChrConditionSfxSeSlot*)to);
         break;
     case TypeChrCamouflageSlot:
-        out = "ChrCamouflageSlot\n";
+        out += print_ChrCamouflageSlot((ChrCamouflageSlot*)to);
         break;
     case TypeChrSoulDeadSlot:
-        out = "ChrSoulDeadSlot\n";
+        out += print_ChrSoulDeadSlot((ChrSoulDeadSlot*)to);
         break;
     case TypeChrShinpanshaHaraSlot:
-        out = "ChrShinpanshaHaraSlot\n";
+        out += print_ChrShinpanshaHaraSlot((ChrShinpanshaHaraSlot*)to);
         break;
     case TypeChrLimitInvincibleSlot:
-        out = "ChrLimitInvincibleSlot\n";
+        out += print_ChrLimitInvincibleSlot((ChrLimitInvincibleSlot*)to);
         break;
     case TypeChrDetectSignSlot:
         out = "ChrDetectSignSlot\n";
@@ -89,16 +89,16 @@ std::string print_AttachSysSlot(AttachSysSlotBaseImpl* to)
         out = "ChrRescueSignSlot\n";
         break;
     case TypeChrTravelItemSlot:
-        out = "ChrTravelItemSlot\n";
+        out += print_ChrTravelItemSlot((ChrTravelItemSlot*)to);
         break;
     case TypeChrStatueDeadSlot:
-        out = "ChrStatueDeadSlot\n";
+        out += print_ChrStatueDeadSlot((ChrStatueDeadSlot*)to);
         break;
     case TypeChrResonanceMagicSlot:
-        out = "ChrResonanceMagicSlot\n";
+        out += print_ChrResonanceMagicSlot((ChrResonanceMagicSlot*)to);
         break;
     case TypeChrRetributionMagicSlot:
-        out = "ChrRetributionMagicSlot\n";
+        out += print_ChrRetributionMagicSlot((ChrRetributionMagicSlot*)to);
         break;
     case TypeChrHellkiteBreathSlot:
         out = "ChrHellkiteBreathSlot\n";
@@ -107,10 +107,10 @@ std::string print_AttachSysSlot(AttachSysSlotBaseImpl* to)
         out = "ChrColiseumEntrantSlot\n";
         break;
     case TypeChrPlayerResidentSlot:
-        out = "ChrPlayerResidentSlot\n";
+        out += print_ChrPlayerResidentSlot((ChrPlayerResidentSlot*)to);
         break;
     case TypeChrFollowSfxSlot:
-        out = "ChrFollowSfxSlot\n";
+        out += print_ChrFollowSfxSlot((ChrFollowSfxSlot*)to);
         break;
     default: FATALERROR("Attempted to print AttachSysSlot of type %d", to->slotType);
     }
@@ -372,6 +372,7 @@ void free_AttachSysSlot(AttachSysSlotBaseImpl* to)
     free(to);
 }
 
+
 static void helper_copy_followup_bullet_list(
     BulletIns_FollowupBullet** to_followup_bullet_list_ptr, int16_t* to_followup_bullet_list_len_ptr,
     BulletIns_FollowupBullet** from_followup_bullet_list_ptr, int16_t* from_followup_bullet_list_len_ptr,
@@ -443,15 +444,75 @@ static void helper_copy_followup_bullet_list(
     *to_followup_bullet_list_len_ptr = *from_followup_bullet_list_len_ptr;
 }
 
+
+std::string print_ChrShineTreasureSlot(ChrShineTreasureSlot* to)
+{
+    std::string out = "ChrShineTreasureSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+    out += print_BulletIns_FollowupBullet(to->bullet);
+
+    return out;
+}
+
 void copy_ChrShineTreasureSlot(ChrShineTreasureSlot* to, ChrShineTreasureSlot* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     copy_BulletIns_FollowupBullet(&to->bullet, &from->bullet, to_game);
 }
 
+std::string print_ChrSingleSeSlot(ChrSingleSeSlot* to)
+{
+    std::string out = "ChrSingleSeSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
+}
+
 void copy_ChrSingleSeSlot(ChrSingleSeSlot* to, ChrSingleSeSlot* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+}
+
+std::string print_ChrSingleSfxSlot(ChrSingleSfxSlot* to)
+{
+    std::string out = "ChrSingleSfxSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+    out += print_BulletIns_FollowupBullet(to->bullet);
+
+    return out;
 }
 
 void copy_ChrSingleSfxSlot(ChrSingleSfxSlot* to, ChrSingleSfxSlot* from, bool to_game)
@@ -460,10 +521,79 @@ void copy_ChrSingleSfxSlot(ChrSingleSfxSlot* to, ChrSingleSfxSlot* from, bool to
     copy_BulletIns_FollowupBullet(&to->bullet, &from->bullet, to_game);
 }
 
+std::string print_ChrMultiSfxSlot(ChrMultiSfxSlot* to)
+{
+    std::string out = "ChrMultiSfxSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+    out += print_BulletIns_FollowupBullet(to->bullet);
+
+    return out;
+}
+
 void copy_ChrMultiSfxSlot(ChrMultiSfxSlot* to, ChrMultiSfxSlot* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     copy_BulletIns_FollowupBullet(to->bullet, from->bullet, to_game);
+}
+
+std::string print_ChrBurnSlot(ChrBurnSlot* to)
+{
+    std::string out = "ChrBurnSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data 1:" + std::to_string(to->data_1) + "\n";
+
+    out += "Unknown float list [" + std::to_string(to->floatlist_len) + "]:";
+    for (size_t i = 0; i < to->floatlist_len; i++)
+    {
+        out += std::to_string(to->floatlist[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown list [" + std::to_string(to->list_len) + "]:";
+    for (size_t i = 0; i < to->list_len; i++)
+    {
+        out += std::to_string(to->list[i].data_0);
+        out += ",";
+        out += print_BulletIns_FollowupBullet(to->list[i].bullet);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data 2:" + std::to_string(to->data_2) + "\n";
+
+    out += "Unknown data 3:";
+    for (size_t i = 0; i < sizeof(to->data_3); i++)
+    {
+        out += std::to_string(to->data_3[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
 }
 
 void copy_ChrBurnSlot(ChrBurnSlot* to, ChrBurnSlot* from, bool to_game)
@@ -593,6 +723,41 @@ void copy_ChrBurnSlot(ChrBurnSlot* to, ChrBurnSlot* from, bool to_game)
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
 }
 
+std::string print_ChrGasmanSlot(ChrGasmanSlot* to)
+{
+    std::string out = "ChrGasmanSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown list [" + std::to_string(to->list_len) + "]:";
+    for (size_t i = 0; i < to->list_len; i++)
+    {
+        for (size_t j = 0; j < sizeof(to->list[i].data_0); j++)
+        {
+            out += std::to_string(to->list[i].data_0[j]);
+            out += " ";
+        }
+        out += ",";
+        out += print_BulletIns_FollowupBullet(to->list[i].bullet_a);
+        out += ",";
+        out += print_BulletIns_FollowupBullet(to->list[i].bullet_b);
+        out += "|";
+    }
+    out += "\n";
+
+    return out;
+}
+
 void copy_ChrGasmanSlot(ChrGasmanSlot* to, ChrGasmanSlot* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
@@ -677,9 +842,40 @@ void copy_ChrGasmanSlot(ChrGasmanSlot* to, ChrGasmanSlot* from, bool to_game)
     to->list_len = from->list_len;
 }
 
+std::string print_ChrGrassSlot(ChrGrassSlot* to)
+{
+    std::string out = "ChrGrassSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    return out;
+}
+
 void copy_ChrGrassSlot(ChrGrassSlot* to, ChrGrassSlot* from, bool to_game)
 {
 
+}
+
+std::string print_ChrFootEffectSlot(ChrFootEffectSlot* to)
+{
+    std::string out = "ChrFootEffectSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+    out += print_BulletIns_FollowupBullet(to->bullet);
+
+    return out;
 }
 
 void copy_ChrFootEffectSlot(ChrFootEffectSlot* to, ChrFootEffectSlot* from, bool to_game)
@@ -688,15 +884,74 @@ void copy_ChrFootEffectSlot(ChrFootEffectSlot* to, ChrFootEffectSlot* from, bool
     copy_BulletIns_FollowupBullet(to->bullet, from->bullet, to_game);
 }
 
+std::string print_ChrRigidOffsetSfxSlot(ChrRigidOffsetSfxSlot* to)
+{
+    std::string out = "ChrRigidOffsetSfxSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+    out += print_BulletIns_FollowupBullet(to->bullet);
+
+    return out;
+}
+
 void copy_ChrRigidOffsetSfxSlot(ChrRigidOffsetSfxSlot* to, ChrRigidOffsetSfxSlot* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     copy_BulletIns_FollowupBullet(&to->bullet, &from->bullet, to_game);
 }
 
+std::string print_ChrRigidOffsetChrSlot(ChrRigidOffsetChrSlot* to)
+{
+    std::string out = "ChrRigidOffsetChrSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
+}
+
 void copy_ChrRigidOffsetChrSlot(ChrRigidOffsetChrSlot* to, ChrRigidOffsetChrSlot* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+}
+
+std::string print_ChrSoulEatSlot(ChrSoulEatSlot* to)
+{
+    std::string out = "ChrSoulEatSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+    out += print_BulletIns_FollowupBullet(to->bullet);
+
+    return out;
 }
 
 void copy_ChrSoulEatSlot(ChrSoulEatSlot* to, ChrSoulEatSlot* from, bool to_game)
@@ -705,13 +960,60 @@ void copy_ChrSoulEatSlot(ChrSoulEatSlot* to, ChrSoulEatSlot* from, bool to_game)
     copy_BulletIns_FollowupBullet(&to->bullet, &from->bullet, to_game);
 }
 
+std::string print_ChrSorceryWepSlot(ChrSorceryWepSlot* to)
+{
+    std::string out = "ChrSorceryWepSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += print_BulletIns_FollowupBullet(&to->bullet1);
+
+    out += "Unknown data 1:" + std::to_string(to->data_1) + "\n";
+
+    out += print_BulletIns_FollowupBullet(&to->bullet2);
+
+    return out;
+}
+
 void copy_ChrSorceryWepSlot(ChrSorceryWepSlot* to, ChrSorceryWepSlot* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-    to->data_1 = from->data_1;
     copy_BulletIns_FollowupBullet(&to->bullet1, &from->bullet1, to_game);
-    to->data_2 = from->data_2;
+    to->data_1 = from->data_1;
     copy_BulletIns_FollowupBullet(&to->bullet2, &from->bullet2, to_game);
+}
+
+std::string print_ChrLanternSlot(ChrLanternSlot* to)
+{
+    std::string out = "ChrLanternSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += print_BulletIns_FollowupBullet(&to->bullet1);
+    out += print_BulletIns_FollowupBullet(&to->bullet2);
+    out += print_BulletIns_FollowupBullet(&to->bullet3);
+
+    return out;
 }
 
 void copy_ChrLanternSlot(ChrLanternSlot* to, ChrLanternSlot* from, bool to_game)
@@ -722,10 +1024,52 @@ void copy_ChrLanternSlot(ChrLanternSlot* to, ChrLanternSlot* from, bool to_game)
     copy_BulletIns_FollowupBullet(&to->bullet3, &from->bullet3, to_game);
 }
 
+std::string print_ChrSingleOneshotSfxSlot(ChrSingleOneshotSfxSlot* to)
+{
+    std::string out = "ChrSingleOneshotSfxSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += print_BulletIns_FollowupBullet(&to->bullet);
+
+    return out;
+}
+
 void copy_ChrSingleOneshotSfxSlot(ChrSingleOneshotSfxSlot* to, ChrSingleOneshotSfxSlot* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     copy_BulletIns_FollowupBullet(&to->bullet, &from->bullet, to_game);
+}
+
+std::string print_ChrSingleTraceSfxSlot(ChrSingleTraceSfxSlot* to)
+{
+    std::string out = "ChrSingleTraceSfxSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += print_BulletIns_FollowupBullet(&to->bullet);
+
+    return out;
 }
 
 void copy_ChrSingleTraceSfxSlot(ChrSingleTraceSfxSlot* to, ChrSingleTraceSfxSlot* from, bool to_game)
@@ -734,10 +1078,44 @@ void copy_ChrSingleTraceSfxSlot(ChrSingleTraceSfxSlot* to, ChrSingleTraceSfxSlot
     copy_BulletIns_FollowupBullet(&to->bullet, &from->bullet, to_game);
 }
 
+std::string print_ChrMagicGoodsUseSfxSlot(ChrMagicGoodsUseSfxSlot* to)
+{
+    std::string out = "ChrMagicGoodsUseSfxSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += print_BulletIns_FollowupBullet(&to->bullet);
+
+    return out;
+}
+
 void copy_ChrMagicGoodsUseSfxSlot(ChrMagicGoodsUseSfxSlot* to, ChrMagicGoodsUseSfxSlot* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     copy_BulletIns_FollowupBullet(&to->bullet, &from->bullet, to_game);
+}
+
+std::string print_ChrActPntSlot(ChrActPntSlot* to)
+{
+    std::string out = "ChrActPntSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:" + std::to_string(to->data_0) + "\n";
+
+    return out;
 }
 
 void copy_ChrActPntSlot(ChrActPntSlot* to, ChrActPntSlot* from, bool to_game)
@@ -745,9 +1123,63 @@ void copy_ChrActPntSlot(ChrActPntSlot* to, ChrActPntSlot* from, bool to_game)
     to->data_0 = from->data_0;
 }
 
+std::string print_ChrPointLightSlot(ChrPointLightSlot* to)
+{
+    std::string out = "ChrPointLightSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
+}
+
 void copy_ChrPointLightSlot(ChrPointLightSlot* to, ChrPointLightSlot* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+}
+
+std::string print_ChrWepEnchantSlot(ChrWepEnchantSlot* to)
+{
+    std::string out = "ChrWepEnchantSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "followup_bullet_list [" + std::to_string(to->followup_bullet_list_len) + "]:";
+    for (size_t i = 0; i < to->followup_bullet_list_len; i++)
+    {
+        out += print_BulletIns_FollowupBullet(to->followup_bullet_list[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data 1:";
+    for (size_t i = 0; i < sizeof(to->data_1); i++)
+    {
+        out += std::to_string(to->data_1[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
 }
 
 void copy_ChrWepEnchantSlot(ChrWepEnchantSlot* to, ChrWepEnchantSlot* from, bool to_game)
@@ -759,9 +1191,51 @@ void copy_ChrWepEnchantSlot(ChrWepEnchantSlot* to, ChrWepEnchantSlot* from, bool
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
 }
 
+std::string print_ChrFallingControlSlot(ChrFallingControlSlot* to)
+{
+    std::string out = "ChrFallingControlSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:" + std::to_string(to->data_0) + "\n";
+
+    return out;
+}
+
 void copy_ChrFallingControlSlot(ChrFallingControlSlot* to, ChrFallingControlSlot* from, bool to_game)
 {
     to->data_0 = from->data_0;
+}
+
+std::string print_ChrConditionSfxSeSlot(ChrConditionSfxSeSlot* to)
+{
+    std::string out = "ChrConditionSfxSeSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "followup_bullet_list [" + std::to_string(to->followupbullet_list_len) + "]:";
+    for (size_t i = 0; i < to->followupbullet_list_len; i++)
+    {
+        out += print_BulletIns_FollowupBullet(to->followupbullet_list[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unknown data 1:" + std::to_string(to->data_1) + "\n";
+
+    return out;
 }
 
 void copy_ChrConditionSfxSeSlot(ChrConditionSfxSeSlot* to, ChrConditionSfxSeSlot* from, bool to_game)
@@ -773,14 +1247,59 @@ void copy_ChrConditionSfxSeSlot(ChrConditionSfxSeSlot* to, ChrConditionSfxSeSlot
     to->data_1 = from->data_1;
 }
 
+std::string print_ChrCamouflageSlot(ChrCamouflageSlot* to)
+{
+    std::string out = "ChrCamouflageSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    return out;
+}
+
 void copy_ChrCamouflageSlot(ChrCamouflageSlot* to, ChrCamouflageSlot* from, bool to_game)
 {
 
 }
 
+std::string print_ChrSoulDeadSlot(ChrSoulDeadSlot* to)
+{
+    std::string out = "ChrSoulDeadSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:" + std::to_string(to->data_0) + "\n";
+
+    return out;
+}
+
 void copy_ChrSoulDeadSlot(ChrSoulDeadSlot* to, ChrSoulDeadSlot* from, bool to_game)
 {
     to->data_0 = from->data_0;
+}
+
+std::string print_ChrShinpanshaHaraSlot(ChrShinpanshaHaraSlot* to)
+{
+    std::string out = "ChrShinpanshaHaraSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += print_BulletIns_FollowupBullet(&to->bullet);
+
+    return out;
 }
 
 void copy_ChrShinpanshaHaraSlot(ChrShinpanshaHaraSlot* to, ChrShinpanshaHaraSlot* from, bool to_game)
@@ -789,15 +1308,63 @@ void copy_ChrShinpanshaHaraSlot(ChrShinpanshaHaraSlot* to, ChrShinpanshaHaraSlot
     copy_BulletIns_FollowupBullet(&to->bullet, &from->bullet, to_game);
 }
 
+std::string print_ChrLimitInvincibleSlot(ChrLimitInvincibleSlot* to)
+{
+    std::string out = "ChrLimitInvincibleSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:" + std::to_string(to->data_0) + "\n";
+    out += "ChrIns:" + std::to_string((uint64_t)(to->chr)) + "\n";
+
+    return out;
+}
+
 void copy_ChrLimitInvincibleSlot(ChrLimitInvincibleSlot* to, ChrLimitInvincibleSlot* from, bool to_game)
 {
     to->data_0 = from->data_0;
     to->chr = from->chr;
 }
 
+std::string print_ChrTravelItemSlot(ChrTravelItemSlot* to)
+{
+    std::string out = "ChrTravelItemSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:" + std::to_string(to->data_0) + "\n";
+
+    return out;
+}
+
 void copy_ChrTravelItemSlot(ChrTravelItemSlot* to, ChrTravelItemSlot* from, bool to_game)
 {
     to->data_0 = from->data_0;
+}
+
+std::string print_ChrStatueDeadSlot(ChrStatueDeadSlot* to)
+{
+    std::string out = "ChrStatueDeadSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:" + std::to_string(to->data_0) + "\n";
+
+    out += "followup_bullet_list [" + std::to_string(to->followup_bullet_list_len) + "]:";
+    for (size_t i = 0; i < to->followup_bullet_list_len; i++)
+    {
+        out += print_BulletIns_FollowupBullet(to->followup_bullet_list[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
 }
 
 void copy_ChrStatueDeadSlot(ChrStatueDeadSlot* to, ChrStatueDeadSlot* from, bool to_game)
@@ -810,9 +1377,47 @@ void copy_ChrStatueDeadSlot(ChrStatueDeadSlot* to, ChrStatueDeadSlot* from, bool
     from->followup_bullet_list_len = from_followup_bullet_list_len;
 }
 
+std::string print_ChrResonanceMagicSlot(ChrResonanceMagicSlot* to)
+{
+    std::string out = "ChrResonanceMagicSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
+}
+
 void copy_ChrResonanceMagicSlot(ChrResonanceMagicSlot* to, ChrResonanceMagicSlot* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+}
+
+std::string print_ChrRetributionMagicSlot(ChrRetributionMagicSlot* to)
+{
+    std::string out = "ChrRetributionMagicSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
 }
 
 void copy_ChrRetributionMagicSlot(ChrRetributionMagicSlot* to, ChrRetributionMagicSlot* from, bool to_game)
@@ -820,11 +1425,52 @@ void copy_ChrRetributionMagicSlot(ChrRetributionMagicSlot* to, ChrRetributionMag
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 }
 
+std::string print_ChrPlayerResidentSlot(ChrPlayerResidentSlot* to)
+{
+    std::string out = "ChrPlayerResidentSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:" + std::to_string(to->data_0) + "\n";
+    out += "Unknown data 1:" + std::to_string(to->data_1) + "\n";
+    out += "Unknown data 2:" + std::to_string(to->data_2[0]) + "\n";
+    out += "Unknown data 2:" + std::to_string(to->data_2[1]) + "\n";
+    out += "Unknown data 2:" + std::to_string(to->data_2[2]) + "\n";
+    out += "Unknown data 2:" + std::to_string(to->data_2[3]) + "\n";
+
+    return out;
+}
+
 void copy_ChrPlayerResidentSlot(ChrPlayerResidentSlot* to, ChrPlayerResidentSlot* from, bool to_game)
 {
     to->data_0 = from->data_0;
     to->data_1 = from->data_1;
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+}
+
+std::string print_ChrFollowSfxSlot(ChrFollowSfxSlot* to)
+{
+    std::string out = "ChrFollowSfxSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:" + std::to_string(to->data_0) + "\n";
+
+    out += print_BulletIns_FollowupBullet(&to->bullet);
+
+    out += "Unknown data 1:";
+    for (size_t i = 0; i < sizeof(to->data_1); i++)
+    {
+        out += std::to_string(to->data_1[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
 }
 
 void copy_ChrFollowSfxSlot(ChrFollowSfxSlot* to, ChrFollowSfxSlot* from, bool to_game)

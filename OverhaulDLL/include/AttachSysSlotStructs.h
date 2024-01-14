@@ -185,10 +185,9 @@ static_assert(sizeof(ChrSoulDeadSlot) == 0x28);
 struct ChrSorceryWepSlot
 {
     AttachSysSlotBaseImpl base;
-    uint8_t data_0[8];
-    uint64_t data_1;
+    uint8_t data_0[16];
     BulletIns_FollowupBullet bullet1;
-    uint64_t data_2;
+    uint64_t data_1;
     BulletIns_FollowupBullet bullet2;
 };
 static_assert(sizeof(ChrSorceryWepSlot) == 0x98);
