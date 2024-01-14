@@ -319,8 +319,6 @@ void grab_destruct_thread_handle_helper(HANDLE h)
     }
 }
 
-static bool resolve_current_player_animation_speed();
-
 /*
  * Help speedup some functions by, whenever we're loaded into an area,
  * preload/preresolve some pointers and values so they can be much more quickly read when we need them
@@ -419,15 +417,6 @@ void Game::preload_function_caches() {
     Game::get_player_animationMediator();
     Game::get_host_player_gamedata();
     Game::get_MP_AreaID_ptr();
-
-    Sleep(10);
-    //this pointer is a bit late to resolve on load
-    uint_fast8_t i;
-    for(i=0;i<16;i++) {
-        if (resolve_current_player_animation_speed()) break;
-        Sleep(1);
-    }
-    if (i>=16) FATALERROR("Unable to set_current_player_animation_speed.");
 }
 
 // Stop Durability Damage
@@ -584,29 +573,6 @@ void Game::set_memory_limit()
                            0x800000);
 }
 
-
-static bool resolve_current_player_animation_speed() {
-    sp::mem::pointer speed_ptr = sp::mem::pointer<float>((void*)Game::world_chr_man_imp, { 0x68, 0x68, 0x18, 0xA8 });
-    if (speed_ptr.resolve() == NULL) {
-        return false;
-    }
-
-    set_current_player_animation_speed_cache = (float*)speed_ptr.resolve();
-    return true;
-}
-
-// Set the current animation speed for the player character
-bool Game::set_current_player_animation_speed(float speed) {
-    if (set_current_player_animation_speed_cache) {
-        *set_current_player_animation_speed_cache = speed;
-    }
-
-    if (!resolve_current_player_animation_speed()) {
-        return false;
-    }
-    *set_current_player_animation_speed_cache = speed;
-    return true;
-}
 
 // Returns current player character body animation ID (attacking, rolling, gestures, etc)
 std::optional<int32_t> Game::get_player_body_anim_id()
@@ -1537,7 +1503,12 @@ std::optional<int32_t*> Game::get_MP_AreaID_ptr()
 
 void* Game::game_malloc(size_t size, size_t alignment, uint64_t heap)
 {
-    return InGame_Malloc(size, alignment, (void*)heap);
+    auto new_ptr = InGame_Malloc(size, alignment, (void*)heap);
+    if (new_ptr == NULL)
+    {
+        FATALERROR("InGame_Malloc returned NULL");
+    }
+    return new_ptr;
 }
 
 void Game::game_free(void* p, size_t size)

@@ -1338,9 +1338,13 @@ void copy_SpecialEffect_Info(SpecialEffect_Info* to, const SpecialEffect_Info* f
             //handle if the game's list isn't long enough, and we need to alloc more slots
             if (from->next != NULL && to->next == NULL)
             {
+                //This warning is invalid since game_malloc cannot return null
+                #pragma warning(push)
+                #pragma warning(disable:6011)
                 to->next = (SpecialEffect_Info*)Game::game_malloc(sizeof(SpecialEffect_Info), 8, *(uint64_t*)Game::internal_heap_3);
                 to->next->next = NULL;
                 to->next->prev = to;
+                #pragma warning(pop)
             }
 
             //handle if the game's list is too long, and we need to free it's extra slots
@@ -2116,6 +2120,10 @@ void copy_EzStateRegisterSet(EzStateRegisterSet* to, const EzStateRegisterSet* f
         {
             FATALERROR("EzStateRegisterSet (%p) has a size of %d, not 8", from, arry_size);
         }
+    }
+    if (from->arry == NULL)
+    {
+        FATALERROR("EzStateRegisterSet->arry is null");
     }
     for (size_t i = 0; i < 8; i++)
     {

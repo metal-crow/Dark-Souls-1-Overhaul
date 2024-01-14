@@ -1,4 +1,5 @@
 #include "BulletManStructFunctions.h"
+#include "SfxManStructFunctions.h"
 #include "Rollback.h"
 
 typedef void* falloc(uint64_t, uint64_t, uint32_t);
@@ -128,7 +129,7 @@ BulletMan* init_BulletMan()
 {
     BulletMan* local_BulletMan = (BulletMan*)malloc_(sizeof(BulletMan));
 
-    local_BulletMan->bulletins_arry = (BulletIns*)malloc(sizeof(BulletIns) * 128);
+    local_BulletMan->bulletins_arry = (BulletIns*)malloc_(sizeof(BulletIns) * 128);
     for (size_t i = 0; i < 128; i++)
     {
         BulletIns* local_bulletins = init_BulletIns();
@@ -136,7 +137,7 @@ BulletMan* init_BulletMan()
         free(local_bulletins);
     }
 
-    local_BulletMan->field0x20 = (BulletMan_Field0x20*)malloc(sizeof(BulletMan_Field0x20) * 40);
+    local_BulletMan->field0x20 = (BulletMan_Field0x20*)malloc_(sizeof(BulletMan_Field0x20) * 40);
     for (size_t i = 0; i < 40; i++)
     {
         BulletMan_Field0x20* local_BulletMan_Field0x20 = init_BulletMan_Field0x20();
@@ -144,7 +145,7 @@ BulletMan* init_BulletMan()
         free(local_BulletMan_Field0x20);
     }
 
-    local_BulletMan->field0x40 = (BulletMan_Field0x40*)malloc(sizeof(BulletMan_Field0x40) * 4);
+    local_BulletMan->field0x40 = (BulletMan_Field0x40*)malloc_(sizeof(BulletMan_Field0x40) * 4);
     for (size_t i = 0; i < 4; i++)
     {
         BulletMan_Field0x40* local_BulletMan_Field0x40 = init_BulletMan_Field0x40();
@@ -154,7 +155,7 @@ BulletMan* init_BulletMan()
 
     local_BulletMan->chrCam = init_ChrCam();
 
-    local_BulletMan->field0x78 = (BulletMan_field0x78Elem**)malloc(sizeof(BulletMan_field0x78Elem*) * 3);
+    local_BulletMan->field0x78 = (BulletMan_field0x78Elem**)malloc_(sizeof(BulletMan_field0x78Elem*) * 3);
     for (size_t i = 0; i < 3; i++)
     {
         local_BulletMan->field0x78[i] = init_BulletMan_field0x78Elem();
@@ -675,7 +676,7 @@ std::string print_BulletMan_Field0x20(BulletMan_Field0x20* to)
     out += print_BulletIns_Field0x90_Field0x1a0(&to->field0x1a0);
 
     out += "Data 1:";
-    for (size_t i = 0; i < sizeof(to->data_1); i++)
+    for (size_t i = 0; i < sizeof(to->data_1)/sizeof(to->data_1[0]); i++)
     {
         out += std::to_string(to->data_1[i]);
         out += " ";
@@ -724,7 +725,7 @@ std::string print_BulletMan_Field0x40(BulletMan_Field0x40* to)
     out += "Data 0:" + std::to_string(to->data_0) + "\n";
 
     out += "Data 1:";
-    for (size_t i = 0; i < sizeof(to->data_1); i++)
+    for (size_t i = 0; i < sizeof(to->data_1)/sizeof(to->data_1[0]); i++)
     {
         out += std::to_string(to->data_1[i]);
         out += " ";

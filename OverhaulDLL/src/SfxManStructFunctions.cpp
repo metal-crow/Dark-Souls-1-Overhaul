@@ -2,6 +2,19 @@
 #include "SfxManStructFunctions.h"
 #include "Rollback.h"
 
+std::string print_FXManager(FXManager* to)
+{
+    std::string out = "FXManager\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += print_SFXEntryList(to->SFXEntryList);
+
+    return out;
+}
+
 void copy_FXManager(FXManager* to, FXManager* from, bool to_game)
 {
     Game::SuspendThreads();
@@ -30,6 +43,19 @@ void free_FXManager(FXManager* to)
 static const size_t max_preallocated_SFXEntries = 256;
 
 static uint64_t* HeapPtr = (uint64_t*)(0x0141B67450 + 8);
+
+std::string print_SFXEntryList(SFXEntry* to)
+{
+    std::string out;
+
+    while (to)
+    {
+        out += "SFXEntry\n";
+        
+    }
+
+    return out;
+}
 
 void copy_SFXEntryList(SFXEntry* to, SFXEntry* from, bool to_game, FXManager* to_parent, FXManager* from_parent)
 {
@@ -204,6 +230,55 @@ void free_SFXEntryList(SFXEntry* to)
         head = (SFXEntry*)((uint64_t)(head)+sizeof(SFXEntry));
     }
     free(to);
+}
+
+std::string print_FXEntry_Substruct(FXEntry_Substruct* to)
+{
+    std::string out = "FXEntry_Substruct\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Data 0:";
+    for (size_t i = 0; i < sizeof(to->data_0); i++)
+    {
+        out += std::to_string(to->data_0[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Data 1:";
+    for (size_t i = 0; i < sizeof(to->data_1); i++)
+    {
+        out += std::to_string(to->data_1[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unk1:" + std::to_string((uint64_t)to->unk1) + "\n";
+
+    out += "Data 2:";
+    for (size_t i = 0; i < sizeof(to->data_2); i++)
+    {
+        out += std::to_string(to->data_2[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    out += "Unk5:" + std::to_string((uint64_t)to->unk5) + "\n";
+
+    out += "Str len:" + std::to_string(to->str.len) + "\n";
+
+    out += "Data 3:";
+    for (size_t i = 0; i < sizeof(to->data_3); i++)
+    {
+        out += std::to_string(to->data_3[i]);
+        out += " ";
+    }
+    out += "\n";
+
+    return out;
 }
 
 void copy_FXEntry_Substruct(FXEntry_Substruct* to, FXEntry_Substruct* from, bool to_game, SFXEntry* parent)

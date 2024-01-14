@@ -238,9 +238,6 @@ public:
     // Enables/Disables automatic game disconnection when low framerate is detected
     static void disable_low_fps_disconnect(bool enable);
 
-    // Set the current animation speed for the player character
-    static bool set_current_player_animation_speed(float speed);
-
     // Returns current player character body animation ID (attacking, rolling, gestures, etc)
     static std::optional<int32_t> get_player_body_anim_id();
 

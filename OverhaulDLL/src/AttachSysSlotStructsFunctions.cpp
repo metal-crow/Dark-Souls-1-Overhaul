@@ -1,4 +1,5 @@
 #include "AttachSysSlotStructsFunctions.h"
+#include "BulletManStructFunctions.h"
 #include "Rollback.h"
 
 std::string print_AttachSysSlot(AttachSysSlotBaseImpl* to)
@@ -690,7 +691,11 @@ void copy_ChrBurnSlot(ChrBurnSlot* to, ChrBurnSlot* from, bool to_game)
                 auto new_list = (ChrBurnSlot_ListElem*)malloc_(sizeof(ChrBurnSlot_ListElem) * from_list_size);
                 if (to->list != NULL)
                 {
+                    //This warning is invalid since on first init this if won't get hit, and on later init's the above mallocs it
+                    #pragma warning(push)
+                    #pragma warning(disable:6001)
                     free(to->list);
+                    #pragma warning(pop)
                 }
                 to->list = new_list;
             }

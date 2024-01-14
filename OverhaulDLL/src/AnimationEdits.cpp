@@ -111,6 +111,10 @@ void read_body_aid_injection_helper_function(float* speed, int32_t animation_id)
         else {
             //need the args to be on the heap. It will get cleaned up by the using function
             SpeedAlterStruct* thread_data = (SpeedAlterStruct*)malloc(sizeof(SpeedAlterStruct));
+            if (thread_data == NULL)
+            {
+                FATALERROR("SpeedAlterStruct thread_data is NULL");
+            }
 
             thread_data->new_animation_speed = std::get<0>(ajust_aid->second);
 
