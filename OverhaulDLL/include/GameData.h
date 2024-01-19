@@ -359,7 +359,7 @@ public:
 
     static void* game_malloc(size_t size, size_t alignment, uint64_t heap);
 
-    static void game_free(void* p, size_t size);
+    static void game_free(void* p);
 
     static void game_free_alt(void* p);
 
@@ -533,7 +533,7 @@ static MoveMapStep_Step_13_FUNC* MoveMapStep_Step_13 = (MoveMapStep_Step_13_FUNC
 typedef uint64_t* FUN_140cbede0_FUNC(void* p);
 static FUN_140cbede0_FUNC* FUN_140cbede0 = (FUN_140cbede0_FUNC*)0x140cc29c0;
 
-typedef void InGame_Free_FUNC(void* p, size_t size);
+typedef void InGame_Free_FUNC(void* p);
 static InGame_Free_FUNC* InGame_Free = (InGame_Free_FUNC*)0x1410e3f6c;
 
 typedef void* InGame_Malloc_FUNC(size_t size, size_t alignment, void* heap);

@@ -54,6 +54,8 @@ typedef struct ChrResonanceMagicSlot ChrResonanceMagicSlot;
 typedef struct ChrPlayerResidentSlot ChrPlayerResidentSlot;
 typedef struct ChrMultiSfxSlot ChrMultiSfxSlot;
 typedef struct ChrFootEffectSlot ChrFootEffectSlot;
+typedef struct ChrActPntSlot_ArrayElem_Field0x8 ChrActPntSlot_ArrayElem_Field0x8;
+typedef struct ChrActPntSlot_ArrayElem ChrActPntSlot_ArrayElem;
 typedef struct ChrActPntSlot ChrActPntSlot;
 typedef struct ChrWepEnchantSlot ChrWepEnchantSlot;
 typedef struct ChrStatueDeadSlot ChrStatueDeadSlot;
@@ -141,12 +143,24 @@ struct ChrFootEffectSlot
 };
 static_assert(sizeof(ChrFootEffectSlot) == 0x38);
 
+struct ChrActPntSlot_ArrayElem
+{
+    uint64_t data_0;
+    void* ActPntManImp_Entry; //always non-null. Points to a ActPntManImp_Entry in the ActPntManImp global list, so if we save that this can just be a raw pointer
+};
+static_assert(sizeof(ChrActPntSlot_ArrayElem) == 0x10);
+
 struct ChrActPntSlot
 {
     AttachSysSlotBaseImpl base;
-    uint64_t data_0;
+    uint16_t data_0;
+    int16_t array_len;
+    uint32_t data_1;
+    ChrActPntSlot_ArrayElem arry[10]; //variable length array, we just have to preallocate a safe max
 };
-static_assert(sizeof(ChrActPntSlot) == 0x28);
+static_assert(offsetof(ChrActPntSlot, array_len) == 0x22);
+static_assert(offsetof(ChrActPntSlot, arry) == 0x28);
+static_assert(sizeof(ChrActPntSlot) == 0x28 + sizeof(ChrActPntSlot_ArrayElem)*10);
 
 struct ChrWepEnchantSlot
 {

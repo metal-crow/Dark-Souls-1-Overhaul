@@ -7,7 +7,7 @@
 #include "AttachSysSlotStructs.h"
 
 std::string print_AttachSysSlot(AttachSysSlotBaseImpl* to);
-void copy_AttachSysSlot(AttachSysSlotBaseImpl* to, AttachSysSlotBaseImpl* from, bool to_game);
+void copy_AttachSysSlot(AttachSysSlotBaseImpl** to, AttachSysSlotBaseImpl* from, bool to_game);
 AttachSysSlotBaseImpl* init_AttachSysSlot(AttachSysSlotType type, bool to_game);
 void free_AttachSysSlot(AttachSysSlotBaseImpl* to);
 
@@ -59,8 +59,11 @@ void copy_ChrSingleTraceSfxSlot(ChrSingleTraceSfxSlot* to, ChrSingleTraceSfxSlot
 std::string print_ChrMagicGoodsUseSfxSlot(ChrMagicGoodsUseSfxSlot* to);
 void copy_ChrMagicGoodsUseSfxSlot(ChrMagicGoodsUseSfxSlot* to, ChrMagicGoodsUseSfxSlot* from, bool to_game);
 
+std::string print_ChrActPntSlot_ArrayElem(ChrActPntSlot_ArrayElem* to);
+void copy_ChrActPntSlot_ArrayElem(ChrActPntSlot_ArrayElem* to, ChrActPntSlot_ArrayElem* from, bool to_game);
+
 std::string print_ChrActPntSlot(ChrActPntSlot* to);
-void copy_ChrActPntSlot(ChrActPntSlot* to, ChrActPntSlot* from, bool to_game);
+void copy_ChrActPntSlot(ChrActPntSlot** to, ChrActPntSlot* from, bool to_game);
 
 std::string print_ChrPointLightSlot(ChrPointLightSlot* to);
 void copy_ChrPointLightSlot(ChrPointLightSlot* to, ChrPointLightSlot* from, bool to_game);

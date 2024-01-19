@@ -129,120 +129,142 @@ std::string print_AttachSysSlot(AttachSysSlotBaseImpl* to)
     return out;
 }
 
-void copy_AttachSysSlot(AttachSysSlotBaseImpl* to, AttachSysSlotBaseImpl* from, bool to_game)
+//Need to to be a ** since ChrActPntSlot may need to resize it
+void copy_AttachSysSlot(AttachSysSlotBaseImpl** to, AttachSysSlotBaseImpl* from, bool to_game)
 {
-    to->vtable = from->vtable;
-    to->timerId = from->timerId;
-    to->slotType = from->slotType;
-    to->slotIsUsable = from->slotIsUsable;
-    to->data_0 = from->data_0;
-
     switch (from->slotType)
     {
     case TypeChrShineTreasureSlot:
-        copy_ChrShineTreasureSlot((ChrShineTreasureSlot*)to, (ChrShineTreasureSlot*)from, to_game);
+        copy_ChrShineTreasureSlot((ChrShineTreasureSlot*)*to, (ChrShineTreasureSlot*)from, to_game);
         break;
     case TypeChrSingleSeSlot:
-        copy_ChrSingleSeSlot((ChrSingleSeSlot*)to, (ChrSingleSeSlot*)from, to_game);
+        copy_ChrSingleSeSlot((ChrSingleSeSlot*)*to, (ChrSingleSeSlot*)from, to_game);
         break;
     case TypeChrSingleSfxSlot:
-        copy_ChrSingleSfxSlot((ChrSingleSfxSlot*)to, (ChrSingleSfxSlot*)from, to_game);
+        copy_ChrSingleSfxSlot((ChrSingleSfxSlot*)*to, (ChrSingleSfxSlot*)from, to_game);
         break;
     case TypeChrMultiSfxSlot:
-        copy_ChrMultiSfxSlot((ChrMultiSfxSlot*)to, (ChrMultiSfxSlot*)from, to_game);
+        copy_ChrMultiSfxSlot((ChrMultiSfxSlot*)*to, (ChrMultiSfxSlot*)from, to_game);
         break;
     case TypeChrBurnSlot:
-        copy_ChrBurnSlot((ChrBurnSlot*)to, (ChrBurnSlot*)from, to_game);
+        copy_ChrBurnSlot((ChrBurnSlot*)*to, (ChrBurnSlot*)from, to_game);
         break;
     case TypeChrGasmanSlot:
-        copy_ChrGasmanSlot((ChrGasmanSlot*)to, (ChrGasmanSlot*)from, to_game);
+        copy_ChrGasmanSlot((ChrGasmanSlot*)*to, (ChrGasmanSlot*)from, to_game);
         break;
     //case TypeChrGrassSlot:
-    //    copy_ChrGrassSlot((ChrGrassSlot*)to, (ChrGrassSlot*)from, to_game);
+    //    copy_ChrGrassSlot((ChrGrassSlot*)*to, (ChrGrassSlot*)from, to_game);
     //    break;
     case TypeChrFootEffectSlot:
-        copy_ChrFootEffectSlot((ChrFootEffectSlot*)to, (ChrFootEffectSlot*)from, to_game);
+        copy_ChrFootEffectSlot((ChrFootEffectSlot*)*to, (ChrFootEffectSlot*)from, to_game);
         break;
     case TypeChrRigidOffsetSfxSlot:
-        copy_ChrRigidOffsetSfxSlot((ChrRigidOffsetSfxSlot*)to, (ChrRigidOffsetSfxSlot*)from, to_game);
+        copy_ChrRigidOffsetSfxSlot((ChrRigidOffsetSfxSlot*)*to, (ChrRigidOffsetSfxSlot*)from, to_game);
         break;
     case TypeChrRigidOffsetChrSlot:
-        copy_ChrRigidOffsetChrSlot((ChrRigidOffsetChrSlot*)to, (ChrRigidOffsetChrSlot*)from, to_game);
+        copy_ChrRigidOffsetChrSlot((ChrRigidOffsetChrSlot*)*to, (ChrRigidOffsetChrSlot*)from, to_game);
         break;
     case TypeChrSoulEatSlot:
-        copy_ChrSoulEatSlot((ChrSoulEatSlot*)to, (ChrSoulEatSlot*)from, to_game);
+        copy_ChrSoulEatSlot((ChrSoulEatSlot*)*to, (ChrSoulEatSlot*)from, to_game);
         break;
     case TypeChrSorceryWepSlot:
-        copy_ChrSorceryWepSlot((ChrSorceryWepSlot*)to, (ChrSorceryWepSlot*)from, to_game);
+        copy_ChrSorceryWepSlot((ChrSorceryWepSlot*)*to, (ChrSorceryWepSlot*)from, to_game);
         break;
     case TypeChrLanternSlot:
-        copy_ChrLanternSlot((ChrLanternSlot*)to, (ChrLanternSlot*)from, to_game);
+        copy_ChrLanternSlot((ChrLanternSlot*)*to, (ChrLanternSlot*)from, to_game);
         break;
     case TypeChrSingleOneshotSfxSlot:
-        copy_ChrSingleOneshotSfxSlot((ChrSingleOneshotSfxSlot*)to, (ChrSingleOneshotSfxSlot*)from, to_game);
+        copy_ChrSingleOneshotSfxSlot((ChrSingleOneshotSfxSlot*)*to, (ChrSingleOneshotSfxSlot*)from, to_game);
         break;
     case TypeChrSingleTraceSfxSlot:
-        copy_ChrSingleTraceSfxSlot((ChrSingleTraceSfxSlot*)to, (ChrSingleTraceSfxSlot*)from, to_game);
+        copy_ChrSingleTraceSfxSlot((ChrSingleTraceSfxSlot*)*to, (ChrSingleTraceSfxSlot*)from, to_game);
         break;
     case TypeChrMagicGoodsUseSfxSlot:
-        copy_ChrMagicGoodsUseSfxSlot((ChrMagicGoodsUseSfxSlot*)to, (ChrMagicGoodsUseSfxSlot*)from, to_game);
+        copy_ChrMagicGoodsUseSfxSlot((ChrMagicGoodsUseSfxSlot*)*to, (ChrMagicGoodsUseSfxSlot*)from, to_game);
         break;
     case TypeChrActPntSlot:
-        copy_ChrActPntSlot((ChrActPntSlot*)to, (ChrActPntSlot*)from, to_game);
+        copy_ChrActPntSlot((ChrActPntSlot**)*to, (ChrActPntSlot*)from, to_game);
         break;
     case TypeChrPointLightSlot:
-        copy_ChrPointLightSlot((ChrPointLightSlot*)to, (ChrPointLightSlot*)from, to_game);
+        copy_ChrPointLightSlot((ChrPointLightSlot*)*to, (ChrPointLightSlot*)from, to_game);
         break;
     case TypeChrWepEnchantSlot:
-        copy_ChrWepEnchantSlot((ChrWepEnchantSlot*)to, (ChrWepEnchantSlot*)from, to_game);
+        copy_ChrWepEnchantSlot((ChrWepEnchantSlot*)*to, (ChrWepEnchantSlot*)from, to_game);
         break;
     case TypeChrFallingControlSlot:
-        copy_ChrFallingControlSlot((ChrFallingControlSlot*)to, (ChrFallingControlSlot*)from, to_game);
+        copy_ChrFallingControlSlot((ChrFallingControlSlot*)*to, (ChrFallingControlSlot*)from, to_game);
         break;
     case TypeChrConditionSfxSeSlot:
-        copy_ChrConditionSfxSeSlot((ChrConditionSfxSeSlot*)to, (ChrConditionSfxSeSlot*)from, to_game);
+        copy_ChrConditionSfxSeSlot((ChrConditionSfxSeSlot*)*to, (ChrConditionSfxSeSlot*)from, to_game);
         break;
     //case TypeChrCamouflageSlot:
-    //    copy_ChrCamouflageSlot((ChrCamouflageSlot*)to, (ChrCamouflageSlot*)from, to_game);
+    //    copy_ChrCamouflageSlot((ChrCamouflageSlot*)*to, (ChrCamouflageSlot*)from, to_game);
     //    break;
     case TypeChrSoulDeadSlot:
-        copy_ChrSoulDeadSlot((ChrSoulDeadSlot*)to, (ChrSoulDeadSlot*)from, to_game);
+        copy_ChrSoulDeadSlot((ChrSoulDeadSlot*)*to, (ChrSoulDeadSlot*)from, to_game);
         break;
     case TypeChrShinpanshaHaraSlot:
-        copy_ChrShinpanshaHaraSlot((ChrShinpanshaHaraSlot*)to, (ChrShinpanshaHaraSlot*)from, to_game);
+        copy_ChrShinpanshaHaraSlot((ChrShinpanshaHaraSlot*)*to, (ChrShinpanshaHaraSlot*)from, to_game);
         break;
     case TypeChrLimitInvincibleSlot:
-        copy_ChrLimitInvincibleSlot((ChrLimitInvincibleSlot*)to, (ChrLimitInvincibleSlot*)from, to_game);
+        copy_ChrLimitInvincibleSlot((ChrLimitInvincibleSlot*)*to, (ChrLimitInvincibleSlot*)from, to_game);
         break;
     case TypeChrTravelItemSlot:
-        copy_ChrTravelItemSlot((ChrTravelItemSlot*)to, (ChrTravelItemSlot*)from, to_game);
+        copy_ChrTravelItemSlot((ChrTravelItemSlot*)*to, (ChrTravelItemSlot*)from, to_game);
         break;
     case TypeChrStatueDeadSlot:
-        copy_ChrStatueDeadSlot((ChrStatueDeadSlot*)to, (ChrStatueDeadSlot*)from, to_game);
+        copy_ChrStatueDeadSlot((ChrStatueDeadSlot*)*to, (ChrStatueDeadSlot*)from, to_game);
         break;
     case TypeChrResonanceMagicSlot:
-        copy_ChrResonanceMagicSlot((ChrResonanceMagicSlot*)to, (ChrResonanceMagicSlot*)from, to_game);
+        copy_ChrResonanceMagicSlot((ChrResonanceMagicSlot*)*to, (ChrResonanceMagicSlot*)from, to_game);
         break;
     case TypeChrRetributionMagicSlot:
-        copy_ChrRetributionMagicSlot((ChrRetributionMagicSlot*)to, (ChrRetributionMagicSlot*)from, to_game);
+        copy_ChrRetributionMagicSlot((ChrRetributionMagicSlot*)*to, (ChrRetributionMagicSlot*)from, to_game);
         break;
     case TypeChrPlayerResidentSlot:
-        copy_ChrPlayerResidentSlot((ChrPlayerResidentSlot*)to, (ChrPlayerResidentSlot*)from, to_game);
+        copy_ChrPlayerResidentSlot((ChrPlayerResidentSlot*)*to, (ChrPlayerResidentSlot*)from, to_game);
         break;
     case TypeChrFollowSfxSlot:
-        copy_ChrFollowSfxSlot((ChrFollowSfxSlot*)to, (ChrFollowSfxSlot*)from, to_game);
+        copy_ChrFollowSfxSlot((ChrFollowSfxSlot*)*to, (ChrFollowSfxSlot*)from, to_game);
         break;
     default: FATALERROR("Attempted to copy AttachSysSlot of type %d", from->slotType);
     }
 
+    //Copy these after the parent class since the parent class may need to be resized, and thus change
+    (*to)->vtable = from->vtable;
+    (*to)->timerId = from->timerId;
+    (*to)->slotType = from->slotType;
+    (*to)->slotIsUsable = from->slotIsUsable;
+    (*to)->data_0 = from->data_0;
+
     if (from->next != NULL)
     {
-        to->next = init_AttachSysSlot((AttachSysSlotType)(from->next->slotType), to_game);
-        copy_AttachSysSlot(to->next, from->next, to_game);
+        if ((*to)->next != NULL)
+        {
+            if (to_game)
+            {
+                Game::game_free((*to)->next);
+            }
+            else
+            {
+                free((*to)->next);
+            }
+            (*to)->next = NULL;
+        }
+        (*to)->next = init_AttachSysSlot((AttachSysSlotType)(from->next->slotType), to_game);
+        copy_AttachSysSlot(&((*to)->next), from->next, to_game);
     }
     else
     {
-        to->next = NULL;
+        if (to_game)
+        {
+            Game::game_free((*to)->next);
+        }
+        else
+        {
+            free((*to)->next);
+        }
+        (*to)->next = NULL;
     }
 }
 
@@ -385,7 +407,7 @@ static void helper_copy_followup_bullet_list(
         {
             if (to_game)
             {
-                Game::game_free(*to_followup_bullet_list_ptr, sizeof(BulletIns_FollowupBullet) * *(to_followup_bullet_list_len_ptr));
+                Game::game_free(*to_followup_bullet_list_ptr);
             }
             else
             {
@@ -407,7 +429,7 @@ static void helper_copy_followup_bullet_list(
                 auto new_followup_bullet_list = (BulletIns_FollowupBullet*)Game::game_malloc(sizeof(BulletIns_FollowupBullet) * from_list_size, 0x10, *(uint64_t*)Game::internal_heap_3);
                 if (*to_followup_bullet_list_ptr != NULL)
                 {
-                    Game::game_free(*to_followup_bullet_list_ptr, sizeof(BulletIns_FollowupBullet) * to_list_size);
+                    Game::game_free(*to_followup_bullet_list_ptr);
                 }
                 *to_followup_bullet_list_ptr = new_followup_bullet_list;
             }
@@ -609,7 +631,7 @@ void copy_ChrBurnSlot(ChrBurnSlot* to, ChrBurnSlot* from, bool to_game)
         {
             if (to_game)
             {
-                Game::game_free(to->floatlist, sizeof(float) * to->floatlist_len);
+                Game::game_free(to->floatlist);
             }
             else
             {
@@ -631,7 +653,7 @@ void copy_ChrBurnSlot(ChrBurnSlot* to, ChrBurnSlot* from, bool to_game)
                 auto new_floatlist = (float*)Game::game_malloc(sizeof(float) * from_list_size, 0x10, *(uint64_t*)Game::internal_heap_3);
                 if (to->floatlist != NULL)
                 {
-                    Game::game_free(to->list, sizeof(float) * to_list_size);
+                    Game::game_free(to->list);
                 }
                 to->floatlist = new_floatlist;
             }
@@ -660,7 +682,7 @@ void copy_ChrBurnSlot(ChrBurnSlot* to, ChrBurnSlot* from, bool to_game)
         {
             if (to_game)
             {
-                Game::game_free(to->list, sizeof(ChrBurnSlot_ListElem) * to->list_len);
+                Game::game_free(to->list);
             }
             else
             {
@@ -682,7 +704,7 @@ void copy_ChrBurnSlot(ChrBurnSlot* to, ChrBurnSlot* from, bool to_game)
                 auto new_list = (ChrBurnSlot_ListElem*)Game::game_malloc(sizeof(ChrBurnSlot_ListElem) * from_list_size, 0x10, *(uint64_t*)Game::internal_heap_3);
                 if (to->list != NULL)
                 {
-                    Game::game_free(to->list, sizeof(ChrBurnSlot_ListElem) * to_list_size);
+                    Game::game_free(to->list);
                 }
                 to->list = new_list;
             }
@@ -773,7 +795,7 @@ void copy_ChrGasmanSlot(ChrGasmanSlot* to, ChrGasmanSlot* from, bool to_game)
         {
             if (to_game)
             {
-                Game::game_free(to->list, sizeof(ChrGasmanSlot_ListElem) * to->list_len);
+                Game::game_free(to->list);
             }
             else
             {
@@ -795,7 +817,7 @@ void copy_ChrGasmanSlot(ChrGasmanSlot* to, ChrGasmanSlot* from, bool to_game)
                 auto new_ChrGasmanSlot_ListElem_list = (ChrGasmanSlot_ListElem*)Game::game_malloc(sizeof(ChrGasmanSlot_ListElem) * from_list_size, 0x10, *(uint64_t*)Game::internal_heap_3);
                 if (to->list != NULL)
                 {
-                    Game::game_free(to->list, sizeof(ChrGasmanSlot_ListElem) * to_list_size);
+                    Game::game_free(to->list);
                 }
                 to->list = new_ChrGasmanSlot_ListElem_list;
             }
@@ -1110,6 +1132,26 @@ void copy_ChrMagicGoodsUseSfxSlot(ChrMagicGoodsUseSfxSlot* to, ChrMagicGoodsUseS
     copy_BulletIns_FollowupBullet(&to->bullet, &from->bullet, to_game);
 }
 
+std::string print_ChrActPntSlot_ArrayElem(ChrActPntSlot_ArrayElem* to)
+{
+    std::string out = "ChrActPntSlot\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += "Unknown data 0:" + std::to_string(to->data_0) + "\n";
+    out += "ActPntManImp_Entry:" + std::to_string((uint64_t)to->ActPntManImp_Entry) + "\n";
+
+    return out;
+}
+
+void copy_ChrActPntSlot_ArrayElem(ChrActPntSlot_ArrayElem* to, ChrActPntSlot_ArrayElem* from, bool to_game)
+{
+    to->data_0 = from->data_0;
+    to->ActPntManImp_Entry = from->ActPntManImp_Entry;
+}
+
 std::string print_ChrActPntSlot(ChrActPntSlot* to)
 {
     std::string out = "ChrActPntSlot\n";
@@ -1119,13 +1161,38 @@ std::string print_ChrActPntSlot(ChrActPntSlot* to)
     }
 
     out += "Unknown data 0:" + std::to_string(to->data_0) + "\n";
+    out += "Unknown data 1:" + std::to_string(to->data_1) + "\n";
+
+    out += "Array [" + std::to_string(to->array_len) + "]:\n";
+    for (int16_t i = 0; i < to->array_len; i++)
+    {
+        out += print_ChrActPntSlot_ArrayElem(&to->arry[i]);
+    }
 
     return out;
 }
 
-void copy_ChrActPntSlot(ChrActPntSlot* to, ChrActPntSlot* from, bool to_game)
+void copy_ChrActPntSlot(ChrActPntSlot** to, ChrActPntSlot* from, bool to_game)
 {
-    to->data_0 = from->data_0;
+    if (!to_game && from->array_len > sizeof(from->arry)/sizeof(from->arry[0]))
+    {
+        FATALERROR("ChrActPntSlot arry larger then preallocated max. Size is %d", (*to)->array_len);
+    }
+    if (to_game && from->array_len > (*to)->array_len)
+    {
+        //increase game alloc size
+        ChrActPntSlot* new_arry = (ChrActPntSlot*)Game::game_malloc(0x28 + sizeof(ChrActPntSlot_ArrayElem) * from->array_len, 0x10, *(uint64_t*)Game::internal_heap_3);
+        Game::game_free(*to);
+        *to = new_arry;
+    }
+    for (int16_t i = 0; i < from->array_len; i++)
+    {
+        copy_ChrActPntSlot_ArrayElem(&((*to)->arry[i]), &from->arry[i], to_game);
+    }
+
+    (*to)->data_0 = from->data_0;
+    (*to)->data_1 = from->data_1;
+    (*to)->array_len = from->array_len;
 }
 
 std::string print_ChrPointLightSlot(ChrPointLightSlot* to)

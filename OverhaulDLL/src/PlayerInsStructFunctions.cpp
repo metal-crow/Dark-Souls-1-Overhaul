@@ -934,7 +934,7 @@ void copy_ChrAttachSys(ChrAttachSys* to, const ChrAttachSys* from, bool to_game)
     }
     if (to->SysSlots != NULL)
     {
-        copy_AttachSysSlot(to->SysSlots, from->SysSlots, to_game);
+        copy_AttachSysSlot(&(to->SysSlots), from->SysSlots, to_game);
     }
 }
 
@@ -1086,7 +1086,7 @@ void copy_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to, const Entit
     {
         if (to_game)
         {
-            Game::game_free(to->throwSelfEsc, sizeof(ThrowSelfEsc));
+            Game::game_free(to->throwSelfEsc);
         }
         else
         {

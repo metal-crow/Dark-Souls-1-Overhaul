@@ -1511,9 +1511,9 @@ void* Game::game_malloc(size_t size, size_t alignment, uint64_t heap)
     return new_ptr;
 }
 
-void Game::game_free(void* p, size_t size)
+void Game::game_free(void* p)
 {
-    return InGame_Free(p, size);
+    return InGame_Free(p);
 }
 
 typedef void heapObjFreeFunc(void* heapObj, void* p);
