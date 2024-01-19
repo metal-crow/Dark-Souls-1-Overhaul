@@ -183,7 +183,7 @@ void copy_AttachSysSlot(AttachSysSlotBaseImpl** to, AttachSysSlotBaseImpl* from,
         copy_ChrMagicGoodsUseSfxSlot((ChrMagicGoodsUseSfxSlot*)*to, (ChrMagicGoodsUseSfxSlot*)from, to_game);
         break;
     case TypeChrActPntSlot:
-        copy_ChrActPntSlot((ChrActPntSlot**)*to, (ChrActPntSlot*)from, to_game);
+        copy_ChrActPntSlot((ChrActPntSlot**)to, (ChrActPntSlot*)from, to_game);
         break;
     case TypeChrPointLightSlot:
         copy_ChrPointLightSlot((ChrPointLightSlot*)*to, (ChrPointLightSlot*)from, to_game);
