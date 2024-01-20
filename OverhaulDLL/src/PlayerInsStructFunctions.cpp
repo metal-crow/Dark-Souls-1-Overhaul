@@ -775,6 +775,7 @@ std::string print_ChrIns(ChrIns* to)
     out += print_HitIns(to->hitins_1);
     out += print_HitIns(to->hitins_2);
     out += "data_0b:" + std::to_string(to->data_0b) + "\n";
+    out += print_ChrAttachSys(&to->chrattachsys);
     out += "curHp:" + std::to_string(to->curHp) + "\n";
     out += "maxHp:" + std::to_string(to->maxHp) + "\n";
     out += "curSp:" + std::to_string(to->curSp) + "\n";
