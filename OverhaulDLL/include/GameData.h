@@ -530,8 +530,8 @@ static FinishStep_Havok_FUNC* FinishStep_Havok = (FinishStep_Havok_FUNC*)0x1402a
 typedef void MoveMapStep_Step_13_FUNC(void* movemapstep, float frame_time);
 static MoveMapStep_Step_13_FUNC* MoveMapStep_Step_13 = (MoveMapStep_Step_13_FUNC*)0x14024f6b0;
 
-typedef uint64_t* FUN_140cbede0_FUNC(void* p);
-static FUN_140cbede0_FUNC* FUN_140cbede0 = (FUN_140cbede0_FUNC*)0x140cc29c0;
+typedef uint64_t* FUN_140cc29c0_FUNC(void* p);
+static FUN_140cc29c0_FUNC* FUN_140cc29c0 = (FUN_140cc29c0_FUNC*)0x140cc29c0;
 
 typedef void InGame_Free_FUNC(void* p);
 static InGame_Free_FUNC* InGame_Free = (InGame_Free_FUNC*)0x1410e3f6c;

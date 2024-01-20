@@ -1520,7 +1520,7 @@ typedef void heapObjFreeFunc(void* heapObj, void* p);
 
 void Game::game_free_alt(void* p)
 {
-    uint64_t* heapObj = FUN_140cbede0(p);
+    uint64_t* heapObj = FUN_140cc29c0(p);
     uint64_t heapObjVtable = *heapObj;
     heapObjFreeFunc* freeFunc = (heapObjFreeFunc*)*(uint64_t*)(heapObjVtable + 0x68);
     freeFunc(heapObj, p);

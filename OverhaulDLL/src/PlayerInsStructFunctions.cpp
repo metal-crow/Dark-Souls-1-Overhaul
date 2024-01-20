@@ -928,6 +928,18 @@ std::string print_ChrAttachSys(ChrAttachSys* to)
 
 void copy_ChrAttachSys(ChrAttachSys* to, const ChrAttachSys* from, bool to_game)
 {
+    if (to->SysSlots != NULL && from->SysSlots != NULL)
+    {
+        if (to_game)
+        {
+            Game::game_free_alt(to->SysSlots);
+        }
+        else
+        {
+            free(to->SysSlots);
+        }
+        to->SysSlots = NULL;
+    }
     if (to->SysSlots == NULL && from->SysSlots != NULL)
     {
         to->SysSlots = init_AttachSysSlot((AttachSysSlotType)from->SysSlots->slotType, to_game);

@@ -243,7 +243,7 @@ void copy_AttachSysSlot(AttachSysSlotBaseImpl** to, AttachSysSlotBaseImpl* from,
         {
             if (to_game)
             {
-                Game::game_free((*to)->next);
+                Game::game_free_alt((*to)->next);
             }
             else
             {
@@ -258,7 +258,7 @@ void copy_AttachSysSlot(AttachSysSlotBaseImpl** to, AttachSysSlotBaseImpl* from,
     {
         if (to_game)
         {
-            Game::game_free((*to)->next);
+            Game::game_free_alt((*to)->next);
         }
         else
         {
@@ -1182,7 +1182,7 @@ void copy_ChrActPntSlot(ChrActPntSlot** to, ChrActPntSlot* from, bool to_game)
     {
         //increase game alloc size
         ChrActPntSlot* new_arry = (ChrActPntSlot*)Game::game_malloc(0x28 + sizeof(ChrActPntSlot_ArrayElem) * from->array_len, 0x10, *(uint64_t*)Game::internal_heap_3);
-        Game::game_free(*to);
+        Game::game_free_alt(*to);
         *to = new_arry;
     }
     for (int16_t i = 0; i < from->array_len; i++)
