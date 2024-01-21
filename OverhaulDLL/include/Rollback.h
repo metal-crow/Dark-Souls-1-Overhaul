@@ -48,7 +48,11 @@ public:
     static void rollback_end_session();
 
     //used for testing only
+#ifdef GGPO_SYNCTEST
+    static const bool rollbackVisual = false; //a visual indicator of rollback for testing
+#else
     static const bool rollbackVisual = true; //a visual indicator of rollback for testing
+#endif
     static bool gsave;
     static bool gload;
     static bool isave;
