@@ -644,6 +644,8 @@ bool rollback_log_game_state(char* filename, unsigned char* buffer, int)
         std::string player = print_PlayerIns(state->playerins[i]);
         fprintf(fp, "Player %d\n%s", i, player.c_str());
     }
+    std::string bulletman = print_BulletMan(state->bulletman);
+    fprintf(fp, "%s", bulletman.c_str());
     //TODO the rest of the state
 
     fclose(fp);
