@@ -541,6 +541,7 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
 
     state->bulletman = init_BulletMan();
     copy_BulletMan(state->bulletman, *(BulletMan**)Game::bullet_man, false);
+    our_checksum ^= std::hash<std::string>{}(print_BulletMan(*(BulletMan**)Game::bullet_man));
     //TODO copy_FXManager;
     state->damageman = init_DamageMan();
     copy_DamageMan(state->damageman, *(DamageMan**)Game::damage_man, false);
