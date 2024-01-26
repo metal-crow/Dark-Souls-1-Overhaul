@@ -243,7 +243,11 @@ void copy_AttachSysSlot(AttachSysSlotBaseImpl** to, AttachSysSlotBaseImpl* from,
         {
             if (to_game)
             {
-                Game::game_free_alt((*to)->next);
+                //HACK: getting an issue where sometimes the next ptr is invalid. Unsure why (race condition?).
+                if (((uint64_t)((*to)->next) & 0xfffff) != 0)
+                {
+                    Game::game_free_alt((*to)->next);
+                }
             }
             else
             {

@@ -485,6 +485,9 @@ static smallObject_internal_malloc_FUNC* smallObject_internal_malloc = (smallObj
 typedef void* smallObject_internal_dealloc_FUNC(uint64_t heap, void* obj, uint64_t size, uint64_t align);
 static smallObject_internal_dealloc_FUNC* smallObject_internal_dealloc = (smallObject_internal_dealloc_FUNC*)0x140cc2370;
 
+typedef void FXEntry_Substruct_internal_dealloc_FUNC(uint64_t heap, void* obj, uint64_t size);
+static FXEntry_Substruct_internal_dealloc_FUNC* FXEntry_Substruct_internal_dealloc = (FXEntry_Substruct_internal_dealloc_FUNC*)0x140cc2250;
+
 typedef bool ok_to_enter_equipment_menu_FUNC(void* playerins);
 static ok_to_enter_equipment_menu_FUNC* ok_to_enter_equipment_menu = (ok_to_enter_equipment_menu_FUNC*)0x140361140;
 

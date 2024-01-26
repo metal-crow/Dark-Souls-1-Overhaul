@@ -306,7 +306,7 @@ void copy_FXEntry_Substruct(FXEntry_Substruct* to, FXEntry_Substruct* from, bool
         {
             if (to_game)
             {
-                smallObject_internal_dealloc(*HeapPtr, to->linked, sizeof(FXEntry_Substruct), 8);
+                FXEntry_Substruct_internal_dealloc(*HeapPtr, to->linked, sizeof(FXEntry_Substruct));
             }
             else
             {
@@ -337,7 +337,7 @@ void copy_FXEntry_Substruct(FXEntry_Substruct* to, FXEntry_Substruct* from, bool
         {
             if (to_game)
             {
-                smallObject_internal_dealloc(*HeapPtr, to->next, sizeof(FXEntry_Substruct), 8);
+                FXEntry_Substruct_internal_dealloc(*HeapPtr, to->next, sizeof(FXEntry_Substruct));
             }
             else
             {

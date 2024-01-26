@@ -399,7 +399,7 @@ void copy_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, BulletIns_Follo
         {
             if (to_game)
             {
-                smallObject_internal_dealloc(*HeapPtr, to->FXEntry_Substruct_a, sizeof(FXEntry_Substruct), 8);
+                FXEntry_Substruct_internal_dealloc(*HeapPtr, to->FXEntry_Substruct_a, sizeof(FXEntry_Substruct));
             }
             else
             {
@@ -431,7 +431,7 @@ void copy_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, BulletIns_Follo
         {
             if (to_game)
             {
-                smallObject_internal_dealloc(*HeapPtr, to->FXEntry_Substruct_b, sizeof(FXEntry_Substruct), 8);
+                FXEntry_Substruct_internal_dealloc(*HeapPtr, to->FXEntry_Substruct_b, sizeof(FXEntry_Substruct));
             }
             else
             {
