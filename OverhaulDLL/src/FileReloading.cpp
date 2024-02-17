@@ -100,7 +100,7 @@ void FileReloading::ReloadPlayer(ModMode currentmode, ModMode newmode)
     if (
         (currentmode == ModMode::Overhaul && newmode != ModMode::Overhaul) ||
         (currentmode != ModMode::Overhaul && newmode == ModMode::Overhaul) ||
-        (currentmode == ModMode::Compatability && newmode == ModMode::Legacy)
+        !(currentmode == ModMode::Compatability && newmode == ModMode::Legacy)
         )
     {
         //we need to wait on unlocking this mutex until the player is fully reloaded
