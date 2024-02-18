@@ -243,11 +243,7 @@ void copy_AttachSysSlot(AttachSysSlotBaseImpl** to, AttachSysSlotBaseImpl* from,
         {
             if (to_game)
             {
-                //HACK: getting an issue where sometimes the next ptr is invalid. Unsure why (race condition?).
-                if (((uint64_t)((*to)->next) & 0xfffff) != 0)
-                {
-                    Game::game_free_alt((*to)->next);
-                }
+                Game::game_free_alt((*to)->next);
             }
             else
             {
@@ -397,78 +393,6 @@ void free_AttachSysSlot(AttachSysSlotBaseImpl* to)
         free_AttachSysSlot(to->next);
     }
     free(to);
-}
-
-
-static void helper_copy_followup_bullet_list(
-    BulletIns_FollowupBullet** to_followup_bullet_list_ptr, int16_t* to_followup_bullet_list_len_ptr,
-    BulletIns_FollowupBullet** from_followup_bullet_list_ptr, int16_t* from_followup_bullet_list_len_ptr,
-    bool to_game)
-{
-    if (*from_followup_bullet_list_ptr == NULL)
-    {
-        if (*to_followup_bullet_list_ptr != NULL)
-        {
-            if (to_game)
-            {
-                Game::game_free(*to_followup_bullet_list_ptr);
-            }
-            else
-            {
-                free(*to_followup_bullet_list_ptr);
-            }
-        }
-        *to_followup_bullet_list_ptr = NULL;
-    }
-    else
-    {
-        //Resize the list
-        size_t from_list_size = *from_followup_bullet_list_len_ptr;
-        size_t to_list_size = *to_followup_bullet_list_len_ptr;
-        if (to_list_size != from_list_size)
-        {
-            //allocate all the entities as a block
-            if (to_game)
-            {
-                auto new_followup_bullet_list = (BulletIns_FollowupBullet*)Game::game_malloc(sizeof(BulletIns_FollowupBullet) * from_list_size, 0x10, *(uint64_t*)Game::internal_heap_3);
-                if (*to_followup_bullet_list_ptr != NULL)
-                {
-                    Game::game_free(*to_followup_bullet_list_ptr);
-                }
-                *to_followup_bullet_list_ptr = new_followup_bullet_list;
-            }
-            else
-            {
-                auto new_followup_bullet_list = (BulletIns_FollowupBullet*)malloc_(sizeof(BulletIns_FollowupBullet) * from_list_size);
-                if (*to_followup_bullet_list_ptr != NULL)
-                {
-                    free(*to_followup_bullet_list_ptr);
-                }
-                *to_followup_bullet_list_ptr = new_followup_bullet_list;
-            }
-        }
-
-        //Copy the bullet entries
-        for (size_t list_i = 0; list_i < *from_followup_bullet_list_len_ptr; list_i++)
-        {
-            BulletIns_FollowupBullet* to_bullet = &(*to_followup_bullet_list_ptr)[list_i];
-            BulletIns_FollowupBullet* from_bullet = &(*from_followup_bullet_list_ptr)[list_i];
-
-            copy_BulletIns_FollowupBullet(to_bullet, from_bullet, to_game);
-            //set up the next ptr. We can probably ignore prev
-            if (from_bullet->next != NULL)
-            {
-                size_t from_next_offset = ((uint64_t)from_bullet->next) - ((uint64_t)(*from_followup_bullet_list_ptr));
-                to_bullet->next = (BulletIns_FollowupBullet*)(((uint64_t)(*to_followup_bullet_list_ptr)) + from_next_offset);
-            }
-            else
-            {
-                to_bullet->next = NULL;
-            }
-            to_bullet->prev = NULL;
-        }
-    }
-    *to_followup_bullet_list_len_ptr = *from_followup_bullet_list_len_ptr;
 }
 
 
@@ -734,7 +658,7 @@ void copy_ChrBurnSlot(ChrBurnSlot* to, ChrBurnSlot* from, bool to_game)
 
             to_elem->data_0 = from_elem->data_0;
 
-            copy_BulletIns_FollowupBullet(&to_elem->bullet, &from_elem->bullet, to_game);
+            copy_BulletIns_FollowupBullet_Data(&to_elem->bullet, &from_elem->bullet, to_game);
             //set up the next ptr. We can probably ignore prev
             if (from_elem->bullet.next != NULL)
             {
@@ -844,7 +768,7 @@ void copy_ChrGasmanSlot(ChrGasmanSlot* to, ChrGasmanSlot* from, bool to_game)
 
             memcpy(to_elem->data_0, from_elem->data_0, sizeof(to_elem->data_0));
 
-            copy_BulletIns_FollowupBullet(&to_elem->bullet_a, &from_elem->bullet_a, to_game);
+            copy_BulletIns_FollowupBullet_Data(&to_elem->bullet_a, &from_elem->bullet_a, to_game);
             //set up the next ptr. We can probably ignore prev
             if (from_elem->bullet_a.next != NULL)
             {
@@ -857,7 +781,7 @@ void copy_ChrGasmanSlot(ChrGasmanSlot* to, ChrGasmanSlot* from, bool to_game)
             }
             to_elem->bullet_a.prev = NULL;
 
-            copy_BulletIns_FollowupBullet(&to_elem->bullet_b, &from_elem->bullet_b, to_game);
+            copy_BulletIns_FollowupBullet_Data(&to_elem->bullet_b, &from_elem->bullet_b, to_game);
             if (from_elem->bullet_b.next != NULL)
             {
                 size_t from_next_offset = ((uint64_t)from_elem->bullet_b.next) - ((uint64_t)(from->list));
@@ -1262,7 +1186,7 @@ void copy_ChrWepEnchantSlot(ChrWepEnchantSlot* to, ChrWepEnchantSlot* from, bool
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 
-    helper_copy_followup_bullet_list(&to->followup_bullet_list, &to->followup_bullet_list_len, &from->followup_bullet_list, &from->followup_bullet_list_len, to_game);
+    copy_BulletIns_FollowupBullet_List(&to->followup_bullet_list, &to->followup_bullet_list_len, &from->followup_bullet_list, &from->followup_bullet_list_len, to_game);
 
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
 }
@@ -1318,7 +1242,7 @@ void copy_ChrConditionSfxSeSlot(ChrConditionSfxSeSlot* to, ChrConditionSfxSeSlot
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 
-    helper_copy_followup_bullet_list(&to->followupbullet_list, &to->followupbullet_list_len, &from->followupbullet_list, &from->followupbullet_list_len, to_game);
+    copy_BulletIns_FollowupBullet_List(&to->followupbullet_list, &to->followupbullet_list_len, &from->followupbullet_list, &from->followupbullet_list_len, to_game);
 
     to->data_1 = from->data_1;
 }
@@ -1448,7 +1372,7 @@ void copy_ChrStatueDeadSlot(ChrStatueDeadSlot* to, ChrStatueDeadSlot* from, bool
     to->data_0 = from->data_0;
     int16_t to_followup_bullet_list_len = to->followup_bullet_list_len;
     int16_t from_followup_bullet_list_len = from->followup_bullet_list_len;
-    helper_copy_followup_bullet_list(&to->followup_bullet_list, &to_followup_bullet_list_len, &from->followup_bullet_list, &from_followup_bullet_list_len, to_game);
+    copy_BulletIns_FollowupBullet_List(&to->followup_bullet_list, &to_followup_bullet_list_len, &from->followup_bullet_list, &from_followup_bullet_list_len, to_game);
     to->followup_bullet_list_len = to_followup_bullet_list_len;
     from->followup_bullet_list_len = from_followup_bullet_list_len;
 }

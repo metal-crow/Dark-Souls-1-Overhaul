@@ -262,6 +262,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>include;lib/Cpp-Utilities/include;lib/Dark-Souls-Game-Files-Lib/include;lib;d3d11-wrapper/include;d3d11-wrapper/lib;d3d11-wrapper/lib/inih;d3d11-wrapper/lib/inih/cpp;lib/StackWalker/include;ui;lib/Google-Cloud-Cpp/include;lib/steam;lib/ggpo_steamapi/src/include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

@@ -27,7 +27,12 @@ BulletIns* init_BulletIns();
 void free_BulletIns(BulletIns* to, bool freeself);
 
 std::string print_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to);
+void copy_BulletIns_FollowupBullet_Data(BulletIns_FollowupBullet* to, BulletIns_FollowupBullet* from, bool to_game);
 void copy_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, BulletIns_FollowupBullet* from, bool to_game);
+void copy_BulletIns_FollowupBullet_List(
+    BulletIns_FollowupBullet** to_followup_bullet_list_ptr, int16_t* to_followup_bullet_list_len_ptr,
+    BulletIns_FollowupBullet** from_followup_bullet_list_ptr, int16_t* from_followup_bullet_list_len_ptr,
+    bool to_game);
 void free_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, bool freeself, bool freenext);
 
 std::string print_BulletIns_Field0x90_Field0x1a0(BulletIns_Field0x90_Field0x1a0* to);

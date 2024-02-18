@@ -370,7 +370,9 @@ std::string print_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to)
     return out;
 }
 
-void copy_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, BulletIns_FollowupBullet* from, bool to_game)
+//This only handles the data in the struct. The next/prev ptrs have to be handled by the caller
+//This is because otherwise we may allocate a new bullet struct for the next ptr, but the correct answer is to point to an already existing bullet struct
+void copy_BulletIns_FollowupBullet_Data(BulletIns_FollowupBullet* to, BulletIns_FollowupBullet* from, bool to_game)
 {
     //Assuming that we're already saving/restoring SfxMan, then this is just a const ptr to the FXManager in the SfxMan global
     to->FXManager = from->FXManager;
@@ -441,10 +443,120 @@ void copy_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, BulletIns_Follo
         }
     }
 
-    //the next/prev ptrs have to be handled by the caller
-
     return;
 }
+
+//This handles copying a single BulletIns_FollowupBullet, where the next/prev pointers may go to an unseen object
+void copy_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, BulletIns_FollowupBullet* from, bool to_game)
+{
+    copy_BulletIns_FollowupBullet_Data(to, from, to_game);
+    //ignore prev, because fuck it
+    to->prev = NULL;
+    if (from->next == NULL)
+    {
+        if (to->next != NULL)
+        {
+            if (to_game)
+            {
+                FATALERROR(__FUNCTION__":free a in-game BulletIns_FollowupBullet");
+            }
+            else
+            {
+                free_BulletIns_FollowupBullet(to->next, true, true);
+            }
+        }
+        to->next = NULL;
+    }
+    else
+    {
+        if (to->next == NULL)
+        {
+            if (to_game)
+            {
+                FATALERROR(__FUNCTION__":Malloc a in-game BulletIns_FollowupBullet");
+            }
+            else
+            {
+                to->next = (BulletIns_FollowupBullet*)malloc_(sizeof(BulletIns_FollowupBullet));
+            }
+        }
+        copy_BulletIns_FollowupBullet(to->next, from->next, to_game);
+    }
+}
+
+//This handles copying a list of BulletIns_FollowupBullet elements
+//This uses copy_BulletIns_FollowupBullet_Data and handles setting the next/prev pointers, since they will be pointing to other elems in this list
+void copy_BulletIns_FollowupBullet_List(
+    BulletIns_FollowupBullet** to_followup_bullet_list_ptr, int16_t* to_followup_bullet_list_len_ptr,
+    BulletIns_FollowupBullet** from_followup_bullet_list_ptr, int16_t* from_followup_bullet_list_len_ptr,
+    bool to_game)
+{
+    if (*from_followup_bullet_list_ptr == NULL)
+    {
+        if (*to_followup_bullet_list_ptr != NULL)
+        {
+            if (to_game)
+            {
+                Game::game_free(*to_followup_bullet_list_ptr);
+            }
+            else
+            {
+                free(*to_followup_bullet_list_ptr);
+            }
+        }
+        *to_followup_bullet_list_ptr = NULL;
+    }
+    else
+    {
+        //Resize the list
+        size_t from_list_size = *from_followup_bullet_list_len_ptr;
+        size_t to_list_size = *to_followup_bullet_list_len_ptr;
+        if (to_list_size != from_list_size)
+        {
+            //allocate all the entities as a block
+            if (to_game)
+            {
+                auto new_followup_bullet_list = (BulletIns_FollowupBullet*)Game::game_malloc(sizeof(BulletIns_FollowupBullet) * from_list_size, 0x10, *(uint64_t*)Game::internal_heap_3);
+                if (*to_followup_bullet_list_ptr != NULL)
+                {
+                    Game::game_free(*to_followup_bullet_list_ptr);
+                }
+                *to_followup_bullet_list_ptr = new_followup_bullet_list;
+            }
+            else
+            {
+                auto new_followup_bullet_list = (BulletIns_FollowupBullet*)malloc_(sizeof(BulletIns_FollowupBullet) * from_list_size);
+                if (*to_followup_bullet_list_ptr != NULL)
+                {
+                    free(*to_followup_bullet_list_ptr);
+                }
+                *to_followup_bullet_list_ptr = new_followup_bullet_list;
+            }
+        }
+
+        //Copy the bullet entries
+        for (size_t list_i = 0; list_i < *from_followup_bullet_list_len_ptr; list_i++)
+        {
+            BulletIns_FollowupBullet* to_bullet = &(*to_followup_bullet_list_ptr)[list_i];
+            BulletIns_FollowupBullet* from_bullet = &(*from_followup_bullet_list_ptr)[list_i];
+
+            copy_BulletIns_FollowupBullet_Data(to_bullet, from_bullet, to_game);
+            //set up the next ptr. We can probably ignore prev
+            if (from_bullet->next != NULL)
+            {
+                size_t from_next_offset = ((uint64_t)from_bullet->next) - ((uint64_t)(*from_followup_bullet_list_ptr));
+                to_bullet->next = (BulletIns_FollowupBullet*)(((uint64_t)(*to_followup_bullet_list_ptr)) + from_next_offset);
+            }
+            else
+            {
+                to_bullet->next = NULL;
+            }
+            to_bullet->prev = NULL;
+        }
+    }
+    *to_followup_bullet_list_len_ptr = *from_followup_bullet_list_len_ptr;
+}
+
 
 void free_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, bool freeself, bool freenext)
 {
