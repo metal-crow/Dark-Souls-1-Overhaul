@@ -239,6 +239,7 @@ void copy_AttachSysSlot(AttachSysSlotBaseImpl** to, AttachSysSlotBaseImpl* from,
 
     if (from->next != NULL)
     {
+        //need to free and realloc the slot since the type will probably differ and thus the struct size will differ
         if ((*to)->next != NULL)
         {
             if (to_game)
@@ -254,17 +255,20 @@ void copy_AttachSysSlot(AttachSysSlotBaseImpl** to, AttachSysSlotBaseImpl* from,
         (*to)->next = init_AttachSysSlot((AttachSysSlotType)(from->next->slotType), to_game);
         copy_AttachSysSlot(&((*to)->next), from->next, to_game);
     }
-    else
+    else if (from->next == NULL)
     {
-        if (to_game)
+        if ((*to)->next != NULL)
         {
-            Game::game_free_alt((*to)->next);
+            if (to_game)
+            {
+                Game::game_free_alt((*to)->next);
+            }
+            else
+            {
+                free((*to)->next);
+            }
+            (*to)->next = NULL;
         }
-        else
-        {
-            free((*to)->next);
-        }
-        (*to)->next = NULL;
     }
 }
 

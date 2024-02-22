@@ -204,6 +204,8 @@ struct ChrSorceryWepSlot
     uint64_t data_1;
     BulletIns_FollowupBullet bullet2;
 };
+static_assert(offsetof(ChrSorceryWepSlot, bullet1) == 0x30);
+static_assert(offsetof(ChrSorceryWepSlot, bullet2) == 0x68);
 static_assert(sizeof(ChrSorceryWepSlot) == 0x98);
 
 struct ChrSingleTraceSfxSlot

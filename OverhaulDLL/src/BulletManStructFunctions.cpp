@@ -458,7 +458,7 @@ void copy_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, BulletIns_Follo
         {
             if (to_game)
             {
-                FATALERROR(__FUNCTION__":free a in-game BulletIns_FollowupBullet");
+                FATALERROR(__FUNCTION__":free a in-game BulletIns_FollowupBullet %p %p", to, to->next);
             }
             else
             {
