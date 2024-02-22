@@ -130,6 +130,8 @@ std::string print_AttachSysSlot(AttachSysSlotBaseImpl* to)
 }
 
 //Need to to be a ** since ChrActPntSlot may need to resize it
+//If any called func it does resize it, it must ensure that the AttachSysSlotBaseImpl base obj is correctly init'd
+//For now only copy_ChrActPntSlot uses this
 void copy_AttachSysSlot(AttachSysSlotBaseImpl** to, AttachSysSlotBaseImpl* from, bool to_game)
 {
     switch (from->slotType)
@@ -1115,6 +1117,10 @@ void copy_ChrActPntSlot(ChrActPntSlot** to, ChrActPntSlot* from, bool to_game)
         //increase game alloc size
         ChrActPntSlot* new_arry = (ChrActPntSlot*)Game::game_malloc(0x28 + sizeof(ChrActPntSlot_ArrayElem) * from->array_len, 0x10, *(uint64_t*)Game::internal_heap_3);
         Game::game_free_alt(*to);
+        //set the required base object values
+        new_arry->base.slotType = TypeChrActPntSlot;
+        new_arry->base.next = NULL;
+
         *to = new_arry;
     }
     for (int16_t i = 0; i < from->array_len; i++)
