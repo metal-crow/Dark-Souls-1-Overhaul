@@ -391,6 +391,7 @@ void copy_ChrAsmModel(ChrAsmModel* to, const ChrAsmModel* from, bool to_game)
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    to->data_3a = from->data_3a;
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
     memcpy(to->data_4, from->data_4, sizeof(to->data_4));
     memcpy(to->data_5, from->data_5, sizeof(to->data_5));

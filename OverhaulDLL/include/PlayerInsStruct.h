@@ -1094,7 +1094,9 @@ struct ChrAsmModel
     uint64_t unk1;
     uint64_t unk2;
     uint64_t unk3;
-    uint8_t data_3[0x30];
+    uint32_t data_3a;
+    uint32_t updatePhantomColor;
+    uint8_t data_3[0x28];
     uint64_t unk4;
     uint8_t data_4[0x80];
     uint64_t padding_3; //duplicate pointer from parent
@@ -1111,7 +1113,9 @@ static_assert(offsetof(ChrAsmModel, data_2) == 0x68);
 static_assert(offsetof(ChrAsmModel, unk1) == 0x80);
 static_assert(offsetof(ChrAsmModel, unk2) == 0x88);
 static_assert(offsetof(ChrAsmModel, unk3) == 0x90);
-static_assert(offsetof(ChrAsmModel, data_3) == 0x98);
+static_assert(offsetof(ChrAsmModel, data_3a) == 0x98);
+static_assert(offsetof(ChrAsmModel, updatePhantomColor) == 0x9c);
+static_assert(offsetof(ChrAsmModel, data_3) == 0xa0);
 static_assert(offsetof(ChrAsmModel, unk4) == 0xc8);
 static_assert(offsetof(ChrAsmModel, data_4) == 0xd0);
 static_assert(offsetof(ChrAsmModel, padding_3) == 0x150);
