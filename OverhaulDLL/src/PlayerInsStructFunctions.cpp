@@ -118,6 +118,7 @@ void copy_PlayerIns(PlayerIns* to, const PlayerIns* from, bool to_game)
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
     memcpy(to->data_4, from->data_4, sizeof(to->data_4));
     memcpy(to->data_5, from->data_5, sizeof(to->data_5));
+    memcpy(to->data_5a, from->data_5a, sizeof(to->data_5a));
     memcpy(to->data_6, from->data_6, sizeof(to->data_6));
 
     if (to_game)

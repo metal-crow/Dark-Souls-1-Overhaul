@@ -1173,7 +1173,9 @@ struct PlayerIns
     uint64_t padding_5;
     uint8_t data_4[0x50];
     uint8_t unk_BulletIns_FollowupBullet[0x30];
-    uint8_t data_5[0xb0];
+    uint8_t data_5[0x49];
+    uint8_t unk_flags;
+    uint8_t data_5a[0x66];
     uint64_t padding_6;
     uint8_t data_6[24];
 };
@@ -1204,6 +1206,8 @@ static_assert(offsetof(PlayerIns, padding_5) == 0x878);
 static_assert(offsetof(PlayerIns, data_4) == 0x880);
 static_assert(offsetof(PlayerIns, unk_BulletIns_FollowupBullet) == 0x8d0);
 static_assert(offsetof(PlayerIns, data_5) == 0x900);
+static_assert(offsetof(PlayerIns, unk_flags) == 0x949);
+static_assert(offsetof(PlayerIns, data_5a) == 0x94a);
 static_assert(offsetof(PlayerIns, padding_6) == 0x9b0);
 static_assert(offsetof(PlayerIns, data_6) == 0x9b8);
 
