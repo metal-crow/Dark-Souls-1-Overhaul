@@ -2245,6 +2245,11 @@ void free_HavokChara(HavokChara* to)
 
 std::string print_HitIns(HitIns* to)
 {
+    if (to == NULL)
+    {
+        return "HitIns: NULL\n";
+    }
+
     std::string out = "HitIns\n";
 
     out += "data_0: " + std::to_string(to->data_0) + "\n";

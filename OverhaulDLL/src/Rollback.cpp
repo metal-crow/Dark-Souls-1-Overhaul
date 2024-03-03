@@ -694,6 +694,14 @@ bool rollback_await_init(void* steamMsgs)
         {
             return true;
         }
+        if (player->chrins.playerCtrl == NULL)
+        {
+            return true;
+        }
+        if (player->chrins.playerCtrl->chrCtrl.havokChara == NULL)
+        {
+            return true;
+        }
         float x_pos = *(float*)(((uint64_t)player->chrins.playerCtrl->chrCtrl.havokChara) + 0x10);
         if (x_pos == 0.0f)
         {
