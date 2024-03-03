@@ -1544,12 +1544,13 @@ void Game::Step_GameSimulation(bool renderFrame)
         Step_MapArea_MapAreaObjects_and_NearbyMapAreas(FieldArea, FRAMETIME, 1, 1, 0);
         Step_Chr(MoveMapStep, FRAMETIME, 1);
         Step_Bullet(*(void**)Game::bullet_man, FRAMETIME);
+        void* chrCam = *(void**)(((uint64_t)MoveMapStep) + 0x68);
+        //Compute_ChrCam(chrCam, uVar30, pNVar26, PhysWorld, bVar17);
         Step_DamageMan(*(void**)Game::damage_man, FRAMETIME);
     }
     else
     {
-        //Don't use this, since at 14024f356 it dynamically computes the step time based on timestamp, which can fuck stuff up
-        //MoveMapStep_Step_13(MoveMapStep, FRAMETIME);
+        MoveMapStep_Step_13(MoveMapStep, FRAMETIME);
     }
     Step_Havok(*(void**)Game::frpg_havok_man_imp, FRAMETIME);
     FinishStep_Havok(*(void**)Game::frpg_havok_man_imp);

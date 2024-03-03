@@ -365,7 +365,7 @@ public:
 
 	static void* get_MoveMapStep();
 
-	static void Step_GameSimulation(bool renderFrame = false);
+	static void Step_GameSimulation(bool renderFrame = true);
 
     static void SuspendThreads();
 
