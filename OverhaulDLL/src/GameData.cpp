@@ -1508,6 +1508,7 @@ void* Game::game_malloc(size_t size, size_t alignment, uint64_t heap)
     {
         FATALERROR("InGame_Malloc returned NULL");
     }
+    memset(new_ptr, 0, size);
     return new_ptr;
 }
 

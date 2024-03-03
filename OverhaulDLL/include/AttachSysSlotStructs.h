@@ -300,6 +300,9 @@ struct ChrLanternSlot
     BulletIns_FollowupBullet bullet2;
     BulletIns_FollowupBullet bullet3;
 };
+static_assert(offsetof(ChrLanternSlot, bullet1) == 0x28);
+static_assert(offsetof(ChrLanternSlot, bullet2) == 0x58);
+static_assert(offsetof(ChrLanternSlot, bullet3) == 0x88);
 static_assert(sizeof(ChrLanternSlot) == 0xb8);
 
 struct ChrGrassSlot
