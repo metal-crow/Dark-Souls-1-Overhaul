@@ -130,8 +130,9 @@ static_assert(sizeof(ChrPlayerResidentSlot) == 0x50);
 struct ChrMultiSfxSlot
 {
     AttachSysSlotBaseImpl base;
-    uint8_t data_0[16];
-    BulletIns_FollowupBullet* bullet;
+    uint8_t data_0[14];
+    int16_t bullet_list_len;
+    BulletIns_FollowupBullet* bullet_list;
 };
 static_assert(sizeof(ChrMultiSfxSlot) == 0x38);
 
@@ -139,9 +140,9 @@ struct ChrFootEffectSlot
 {
     AttachSysSlotBaseImpl base;
     uint8_t data_0[16];
-    BulletIns_FollowupBullet* bullet;
+    BulletIns_FollowupBullet bullet;
 };
-static_assert(sizeof(ChrFootEffectSlot) == 0x38);
+static_assert(sizeof(ChrFootEffectSlot) == 0x60);
 
 struct ChrActPntSlot_ArrayElem
 {

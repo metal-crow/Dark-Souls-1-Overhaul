@@ -493,7 +493,8 @@ std::string print_ChrMultiSfxSlot(ChrMultiSfxSlot* to)
         out += " ";
     }
     out += "\n";
-    out += print_BulletIns_FollowupBullet(to->bullet);
+    out += "bullet_list len:"+ std::to_string(to->bullet_list_len)+"\n";
+    out += print_BulletIns_FollowupBullet(to->bullet_list);
 
     return out;
 }
@@ -501,7 +502,7 @@ std::string print_ChrMultiSfxSlot(ChrMultiSfxSlot* to)
 void copy_ChrMultiSfxSlot(ChrMultiSfxSlot* to, ChrMultiSfxSlot* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-    copy_BulletIns_FollowupBullet(to->bullet, from->bullet, to_game);
+    copy_BulletIns_FollowupBullet_List(&to->bullet_list, &to->bullet_list_len, &from->bullet_list, &from->bullet_list_len, to_game);
 }
 
 std::string print_ChrBurnSlot(ChrBurnSlot* to)
@@ -834,7 +835,7 @@ std::string print_ChrFootEffectSlot(ChrFootEffectSlot* to)
         out += " ";
     }
     out += "\n";
-    out += print_BulletIns_FollowupBullet(to->bullet);
+    out += print_BulletIns_FollowupBullet(&to->bullet);
 
     return out;
 }
@@ -842,7 +843,7 @@ std::string print_ChrFootEffectSlot(ChrFootEffectSlot* to)
 void copy_ChrFootEffectSlot(ChrFootEffectSlot* to, ChrFootEffectSlot* from, bool to_game)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-    copy_BulletIns_FollowupBullet(to->bullet, from->bullet, to_game);
+    copy_BulletIns_FollowupBullet(&to->bullet, &from->bullet, to_game);
 }
 
 std::string print_ChrRigidOffsetSfxSlot(ChrRigidOffsetSfxSlot* to)
