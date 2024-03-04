@@ -523,6 +523,7 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
         FATALERROR("Unable to get allocate state for rollback_save_game_state_callback");
     }
 
+    //The checksum is only used when we run the GGPO synctest, disable otherwise
     size_t our_checksum = 0;
 
     for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
@@ -536,12 +537,16 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
 
         state->playerins[i] = init_PlayerIns();
         copy_PlayerIns(state->playerins[i], player, false);
+#ifdef GGPO_SYNCTEST
         our_checksum ^= std::hash<std::string>{}(print_PlayerIns(player));
+#endif
     }
 
     state->bulletman = init_BulletMan();
     copy_BulletMan(state->bulletman, *(BulletMan**)Game::bullet_man, false);
+#ifdef GGPO_SYNCTEST
     our_checksum ^= std::hash<std::string>{}(print_BulletMan(*(BulletMan**)Game::bullet_man));
+#endif
     //TODO copy_FXManager;
     state->damageman = init_DamageMan();
     copy_DamageMan(state->damageman, *(DamageMan**)Game::damage_man, false);
