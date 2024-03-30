@@ -598,6 +598,11 @@ void AntiAntiCheat::start() {
     uint8_t nop5[] = { 0xB0, 0x01, 0x90, 0x90, 0x90 }; //mov al, 1. Then nop
     write_address = (uint8_t*)(AntiAntiCheat::SendBuild_RequestUpdatePlayerStatus_GeneralRequestTask_alt2_injection_offset + Game::ds1_base);
     sp::mem::patch_bytes(write_address, nop5, sizeof(nop5));
+
+    //Disable the CSCheatDetectionTitleModule thread
+    uint8_t retnop[5] = { 0xC3, 0x90, 0x90, 0x90, 0x90 };
+    write_address = (uint8_t*)(AntiAntiCheat::InitAndStart_CSCheatDetectionTitleModule_offset + Game::ds1_base);
+    sp::mem::patch_bytes(write_address, retnop, sizeof(retnop));
 }
 
 

@@ -27,6 +27,7 @@ private:
     static const uint64_t finish_construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_offset = 0xbd8209;
     static const uint64_t set_MemberFlags_bitflag_offset = 0xbae8fe;
     static const uint64_t SendBuild_RequestUpdatePlayerStatus_GeneralRequestTask_alt2_injection_offset = 0xbde3ef;
+    static const uint64_t InitAndStart_CSCheatDetectionTitleModule_offset = 0x15c779;
 };
 
 #endif
