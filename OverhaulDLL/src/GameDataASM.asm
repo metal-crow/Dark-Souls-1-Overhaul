@@ -2,6 +2,13 @@ _DATA SEGMENT
 
 aUnnamed_1      dq  1414a5f80h
 LAB_1401ad106   dq  1401ad106h
+FUN_140d7c7c0   dq  140d7c7c0h
+LAB_140d696b0   dq  140d696b0h
+FUN_140e435d0   dq  140e435d0h
+FUN_140cc5600   dq  140cc5600h
+LAB_1410826e5   dq  1410826e5h
+FUN_1410c4f60   dq  1410c4f60h
+LAB_1410ce1ce   dq  1410ce1ceh
 
 _DATA ENDS
 
@@ -193,47 +200,6 @@ jmp     grab_movemapstep_return
 grab_movemapstep_injection ENDP
 
 
-EXTERN grab_thread_handle_return: qword
-extern grab_thread_handle_helper: proc
-
-PUBLIC grab_thread_handle_injection
-grab_thread_handle_injection PROC
-
-FUNC_PROLOGUE
-mov     rcx, qword ptr [rsi + 8h] ;handle
-call    grab_thread_handle_helper
-FUNC_EPILOGUE
-
-;original code
-mov     [rsi+10h], eax
-mov     rdx, aUnnamed_1
-test    rdi, rdi
-cmovnz  rdx, rdi
-
-jmp     grab_thread_handle_return
-
-grab_thread_handle_injection ENDP
-
-
-EXTERN grab_destruct_thread_handle_return: qword
-extern grab_destruct_thread_handle_helper: proc
-
-PUBLIC grab_destruct_thread_handle_injection
-grab_destruct_thread_handle_injection PROC
-
-FUNC_PROLOGUE_LITE
-mov     rcx, qword ptr [rcx + 8h] ;handle
-call    grab_destruct_thread_handle_helper
-FUNC_EPILOGUE_LITE
-
-;original code
-push    rdi
-sub     rsp, 30h
-mov     qword ptr [rsp+20h], -2
-jmp     grab_destruct_thread_handle_return
-grab_destruct_thread_handle_injection ENDP
-
-
 extern ReadInputs_allowed: byte
 EXTERN Step_PadManipulator_GetInputs_return: qword
 
@@ -255,6 +221,198 @@ push    r14
 push    r15
 jmp     Step_PadManipulator_GetInputs_return
 Step_PadManipulator_GetInputs_injection ENDP
+
+
+extern GameSuspendCheck_helper: proc
+
+EXTERN PostProcessor_MainLoop_SuspendCheck_return: qword
+
+PUBLIC PostProcessor_MainLoop_SuspendCheck_injection
+PostProcessor_MainLoop_SuspendCheck_injection PROC
+
+FUNC_PROLOGUE
+call    GameSuspendCheck_helper
+FUNC_EPILOGUE
+
+;original code
+LEA     R8, [RBP - 59h]
+LEA     RDX, [RBP - 31h]
+MOV     RCX, RSI
+CALL    qword ptr [FUN_140d7c7c0]
+jmp     PostProcessor_MainLoop_SuspendCheck_return
+PostProcessor_MainLoop_SuspendCheck_injection ENDP
+
+
+EXTERN FileLoader_MainLoop_SuspendCheck_return: qword
+
+PUBLIC FileLoader_MainLoop_SuspendCheck_injection
+FileLoader_MainLoop_SuspendCheck_injection PROC
+
+FUNC_PROLOGUE
+call    GameSuspendCheck_helper
+FUNC_EPILOGUE
+
+;original code
+LEA     RAX, [RBP + 0D0h]
+MOV     qword ptr [RSP + 28h], RAX
+LEA     RAX, [RBP - 60h]
+jmp     FileLoader_MainLoop_SuspendCheck_return
+FileLoader_MainLoop_SuspendCheck_injection ENDP
+
+
+EXTERN FileLoader_MainLoopAlt_SuspendCheck_return: qword
+
+PUBLIC FileLoader_MainLoopAlt_SuspendCheck_injection
+FileLoader_MainLoopAlt_SuspendCheck_injection PROC
+
+FUNC_PROLOGUE
+call    GameSuspendCheck_helper
+FUNC_EPILOGUE
+
+;original code
+LEA     RAX, [RBP + 30h]
+MOV     qword ptr [RSP + 28h], RAX
+LEA     RAX, [RBP - 8]
+MOV     qword ptr [RSP + 20h], RAX
+jmp     FileLoader_MainLoopAlt_SuspendCheck_return
+FileLoader_MainLoopAlt_SuspendCheck_injection ENDP
+
+
+EXTERN TransferTaskManager_MainLoop_SuspendCheck_return: qword
+
+PUBLIC TransferTaskManager_MainLoop_SuspendCheck_injection
+TransferTaskManager_MainLoop_SuspendCheck_injection PROC
+
+FUNC_PROLOGUE
+call    GameSuspendCheck_helper
+FUNC_EPILOGUE
+
+;original code
+MOV     RAX, qword ptr [RBP + 20h]
+LEA     RCX, [RBP + 20h]
+CALL    qword ptr [RAX + 18h]
+TEST    EAX, EAX
+JZ      exit
+jmp     qword ptr [LAB_140d696b0]
+exit:
+jmp     TransferTaskManager_MainLoop_SuspendCheck_return
+TransferTaskManager_MainLoop_SuspendCheck_injection ENDP
+
+
+EXTERN EventManager_MainLoop_SuspendCheck_return: qword
+
+PUBLIC EventManager_MainLoop_SuspendCheck_injection
+EventManager_MainLoop_SuspendCheck_injection PROC
+
+FUNC_PROLOGUE
+call    GameSuspendCheck_helper
+FUNC_EPILOGUE
+
+;original code
+MOV     RAX, qword ptr [RBX]
+MOV     RCX, RBX
+CALL    qword ptr [RAX + 20h]
+MOVZX   EAX, byte ptr [RBX + 40h]
+TEST    AL, AL
+jmp     EventManager_MainLoop_SuspendCheck_return
+EventManager_MainLoop_SuspendCheck_injection ENDP
+
+
+EXTERN EventManager_MainLoop2_SuspendCheck_return: qword
+
+PUBLIC EventManager_MainLoop2_SuspendCheck_injection
+EventManager_MainLoop2_SuspendCheck_injection PROC
+
+FUNC_PROLOGUE
+call    GameSuspendCheck_helper
+FUNC_EPILOGUE
+
+;original code
+MOV     RBX, qword ptr [RSP + 28h]
+MOV     RCX, qword ptr [RSP + 30h]
+CMP     RBX, RCX
+JNZ     exit
+JMP     qword ptr [LAB_1410826e5]
+exit:
+jmp     EventManager_MainLoop2_SuspendCheck_return
+EventManager_MainLoop2_SuspendCheck_injection ENDP
+
+
+EXTERN SocketChannelManager_MainLoop_SuspendCheck_return: qword
+
+PUBLIC SocketChannelManager_MainLoop_SuspendCheck_injection
+SocketChannelManager_MainLoop_SuspendCheck_injection PROC
+
+FUNC_PROLOGUE
+call    GameSuspendCheck_helper
+FUNC_EPILOGUE
+
+;original code
+MOV     qword ptr [RSP + 28h], R15
+MOV     RAX, qword ptr [R15]
+OR      EDX, 0ffffffffh
+MOV     RCX, R15
+jmp     SocketChannelManager_MainLoop_SuspendCheck_return
+SocketChannelManager_MainLoop_SuspendCheck_injection ENDP
+
+
+EXTERN SLSessionRunnable_MainLoop_SuspendCheck_return: qword
+
+PUBLIC SLSessionRunnable_MainLoop_SuspendCheck_injection
+SLSessionRunnable_MainLoop_SuspendCheck_injection PROC
+
+FUNC_PROLOGUE
+call    GameSuspendCheck_helper
+FUNC_EPILOGUE
+
+;original code
+OR      EDX, 0ffffffffh
+LEA     RCX, [RBX + 18h]
+CALL    qword ptr [FUN_140e435d0]
+MOV     byte ptr [RSP + 30h], 1
+jmp     SLSessionRunnable_MainLoop_SuspendCheck_return
+SLSessionRunnable_MainLoop_SuspendCheck_injection ENDP
+
+
+EXTERN SLSessionRunnable_MainLoop2_SuspendCheck_return: qword
+
+PUBLIC SLSessionRunnable_MainLoop2_SuspendCheck_injection
+SLSessionRunnable_MainLoop2_SuspendCheck_injection PROC
+
+FUNC_PROLOGUE
+call    GameSuspendCheck_helper
+FUNC_EPILOGUE
+
+;original code
+MOVZX   EAX, byte ptr [RSP + 30h]
+TEST    AL,AL
+JNZ     continue
+jmp     qword ptr [LAB_1410ce1ce]
+continue:
+MOV     RCX,qword ptr [RBX + 8h]
+CALL    qword ptr [FUN_1410c4f60]
+jmp     SLSessionRunnable_MainLoop2_SuspendCheck_return
+SLSessionRunnable_MainLoop2_SuspendCheck_injection ENDP
+
+
+EXTERN FrpgTrophyMan_MainLoop_SuspendCheck_return: qword
+
+PUBLIC FrpgTrophyMan_MainLoop_SuspendCheck_injection
+FrpgTrophyMan_MainLoop_SuspendCheck_injection PROC
+
+FUNC_PROLOGUE
+call    GameSuspendCheck_helper
+FUNC_EPILOGUE
+
+;original code
+MOV     R15 ,RAX
+MOV     R8, qword ptr [R14 + 10h]
+OR      EDX, 0ffffffffh
+LEA     RCX, [R14 + 10h]
+jmp     FrpgTrophyMan_MainLoop_SuspendCheck_return
+FrpgTrophyMan_MainLoop_SuspendCheck_injection ENDP
+
+
 
 _TEXT    ENDS
 

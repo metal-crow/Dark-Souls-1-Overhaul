@@ -175,6 +175,8 @@ public:
 
     static uint64_t LockTgtManImp;
 
+    static uint64_t DLHeapManager;
+
     static const uint64_t calculate_attack_damage_offset = 0x2f11bf2;
 
     static const uint64_t char_loaded_injection_offset = 0x24f1b0;
@@ -184,13 +186,31 @@ public:
 
     static const uint64_t MoveMapStep_New_injection_offset = 0x24e600;
 
-    static const uint64_t InitAndStart_DLThread_injection_offset = 0xcc5c9c;
-
-    static const uint64_t Destruct_DLThread_injection_offset = 0xcc5d60;
-
     static const uint64_t LogoSkip_offset = 0x70f130;
 
     static const uint64_t Step_PadManipulator_GetInputs_offset = 0x396860;
+
+    static const uint64_t PostProcessor_MainLoop_SuspendCheck_offset = 0xd7c530;
+
+    static const uint64_t FileLoader_MainLoop_SuspendCheck_offset = 0xd79ce3;
+
+    static const uint64_t FileLoader_MainLoopAlt_SuspendCheck_offset = 0xd72b42;
+
+    static const uint64_t TransferTaskManager_MainLoop_SuspendCheck_offset = 0xd69690;
+
+    static const uint64_t EventManager_MainLoop_SuspendCheck_offset = 0x1095537;
+
+    static const uint64_t EventManager_MainLoop2_SuspendCheck_offset = 0x10826b1;
+
+    static const uint64_t SocketChannelManager_MainLoop_SuspendCheck_offset = 0x10a8c80;
+
+    static const uint64_t SLSessionRunnable_MainLoop_SuspendCheck_offset = 0x10ce190;
+
+    static const uint64_t SLSessionRunnable_MainLoop2_SuspendCheck_offset = 0x10ce1b0;
+
+    static const uint64_t FrpgTrophyMan_MainLoop_SuspendCheck_offset = 0x198ebb;
+
+    static HANDLE suspend_game_threads;
 
     // Player character status (loading, human, co-op, invader, hollow)
     static sp::mem::pointer<int32_t> player_char_status;
@@ -363,6 +383,8 @@ public:
 
     static void game_free_alt(void* p);
 
+    static bool Check_DLHeapManager_DLReadWriteLock_IsUnlocked(DWORD timeoutms);
+
 	static void* get_MoveMapStep();
 
 	static void Step_GameSimulation(bool renderFrame = true);
@@ -534,7 +556,7 @@ typedef void MoveMapStep_Step_13_FUNC(void* movemapstep, float frame_time);
 static MoveMapStep_Step_13_FUNC* MoveMapStep_Step_13 = (MoveMapStep_Step_13_FUNC*)0x14024f6b0;
 
 typedef uint64_t* FUN_140cc29c0_FUNC(void* p);
-static FUN_140cc29c0_FUNC* FUN_140cc29c0 = (FUN_140cc29c0_FUNC*)0x140cc29c0;
+static FUN_140cc29c0_FUNC* Get_HeapAllocator_For_allocation = (FUN_140cc29c0_FUNC*)0x140cc29c0;
 
 typedef void InGame_Free_FUNC(void* p);
 static InGame_Free_FUNC* InGame_Free = (InGame_Free_FUNC*)0x1410e3f6c;

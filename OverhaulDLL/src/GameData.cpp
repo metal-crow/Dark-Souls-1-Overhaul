@@ -77,6 +77,10 @@ uint64_t Game::InputDirectionMovementMan = NULL;
 
 uint64_t Game::LockTgtManImp = NULL;
 
+uint64_t Game::DLHeapManager = NULL;
+
+HANDLE Game::suspend_game_threads;
+
 // Player character status (loading, human, co-op, invader, hollow)
 sp::mem::pointer<int32_t> Game::player_char_status;
 
@@ -94,17 +98,41 @@ extern "C" {
     void grab_movemapstep_injection();
     uint64_t grab_movemapstep_value;
 
-    uint64_t grab_thread_handle_return;
-    void grab_thread_handle_injection();
-    void grab_thread_handle_helper(HANDLE);
-
-    uint64_t grab_destruct_thread_handle_return;
-    void grab_destruct_thread_handle_injection();
-    void grab_destruct_thread_handle_helper(HANDLE);
-
     bool ReadInputs_allowed = true;
     uint64_t Step_PadManipulator_GetInputs_return;
     void Step_PadManipulator_GetInputs_injection();
+
+    void GameSuspendCheck_helper();
+
+    uint64_t PostProcessor_MainLoop_SuspendCheck_return;
+    void PostProcessor_MainLoop_SuspendCheck_injection();
+
+    uint64_t FileLoader_MainLoop_SuspendCheck_return;
+    void FileLoader_MainLoop_SuspendCheck_injection();
+
+    uint64_t FileLoader_MainLoopAlt_SuspendCheck_return;
+    void FileLoader_MainLoopAlt_SuspendCheck_injection();
+
+    uint64_t TransferTaskManager_MainLoop_SuspendCheck_return;
+    void TransferTaskManager_MainLoop_SuspendCheck_injection();
+
+    uint64_t EventManager_MainLoop_SuspendCheck_return;
+    void EventManager_MainLoop_SuspendCheck_injection();
+
+    uint64_t EventManager_MainLoop2_SuspendCheck_return;
+    void EventManager_MainLoop2_SuspendCheck_injection();
+
+    uint64_t SocketChannelManager_MainLoop_SuspendCheck_return;
+    void SocketChannelManager_MainLoop_SuspendCheck_injection();
+
+    uint64_t SLSessionRunnable_MainLoop_SuspendCheck_return;
+    void SLSessionRunnable_MainLoop_SuspendCheck_injection();
+
+    uint64_t SLSessionRunnable_MainLoop2_SuspendCheck_return;
+    void SLSessionRunnable_MainLoop2_SuspendCheck_injection();
+
+    uint64_t FrpgTrophyMan_MainLoop_SuspendCheck_return;
+    void FrpgTrophyMan_MainLoop_SuspendCheck_injection();
 }
 
 // Flag to determine if a character have been loaded since the game was launched (useful if player had a character loaded but returned to main menu)
@@ -197,6 +225,8 @@ void Game::init()
     Game::InputDirectionMovementMan = Game::ds1_base + 0x1c6a680;
 
     Game::LockTgtManImp = Game::ds1_base + 0x1c7a138;
+
+    Game::DLHeapManager = Game::ds1_base + 0x1cb5620;
 }
 
 void Game::injections_init()
@@ -218,13 +248,6 @@ void Game::injections_init()
     write_address = (uint8_t*)(Game::MoveMapStep_New_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &grab_movemapstep_return, 1, &grab_movemapstep_injection);
 
-    //inject code to save the handles of DLThreads dark souls starts, so they can be paused/resumed
-    write_address = (uint8_t*)(Game::InitAndStart_DLThread_injection_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &grab_thread_handle_return, 3, &grab_thread_handle_injection);
-    //remove the handles when they get destroyed
-    write_address = (uint8_t*)(Game::Destruct_DLThread_injection_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &grab_destruct_thread_handle_return, 1, &grab_destruct_thread_handle_injection);
-
     //inject code to skip the logos
     //set the state of the logo class to always be "next menu"
     uint8_t pat[] = { 0xb9, 0x03, 0x0, 0x0, 0x0, 0x90 };
@@ -234,6 +257,53 @@ void Game::injections_init()
     //inject code to control if Step_PadManipulator can read inputs or not
     write_address = (uint8_t*)(Game::Step_PadManipulator_GetInputs_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &Step_PadManipulator_GetInputs_return, 0, &Step_PadManipulator_GetInputs_injection);
+
+    //code and injections to see if the suspend flag is set, and block threads if so
+    //Set as signaled by default
+    Game::suspend_game_threads = CreateEvent(NULL, TRUE, TRUE, NULL);
+
+    write_address = (uint8_t*)(Game::PostProcessor_MainLoop_SuspendCheck_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &PostProcessor_MainLoop_SuspendCheck_return, 2, &PostProcessor_MainLoop_SuspendCheck_injection);
+
+    write_address = (uint8_t*)(Game::FileLoader_MainLoop_SuspendCheck_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &FileLoader_MainLoop_SuspendCheck_return, 2, &FileLoader_MainLoop_SuspendCheck_injection);
+
+    write_address = (uint8_t*)(Game::FileLoader_MainLoopAlt_SuspendCheck_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &FileLoader_MainLoopAlt_SuspendCheck_return, 4, &FileLoader_MainLoopAlt_SuspendCheck_injection);
+
+    write_address = (uint8_t*)(Game::TransferTaskManager_MainLoop_SuspendCheck_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &TransferTaskManager_MainLoop_SuspendCheck_return, 1, &TransferTaskManager_MainLoop_SuspendCheck_injection);
+
+    write_address = (uint8_t*)(Game::EventManager_MainLoop_SuspendCheck_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &EventManager_MainLoop_SuspendCheck_return, 1, &EventManager_MainLoop_SuspendCheck_injection);
+
+    write_address = (uint8_t*)(Game::EventManager_MainLoop2_SuspendCheck_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &EventManager_MainLoop2_SuspendCheck_return, 1, &EventManager_MainLoop2_SuspendCheck_injection);
+
+    write_address = (uint8_t*)(Game::SocketChannelManager_MainLoop_SuspendCheck_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &SocketChannelManager_MainLoop_SuspendCheck_return, 0, &SocketChannelManager_MainLoop_SuspendCheck_injection);
+
+    write_address = (uint8_t*)(Game::SLSessionRunnable_MainLoop_SuspendCheck_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &SLSessionRunnable_MainLoop_SuspendCheck_return, 3, &SLSessionRunnable_MainLoop_SuspendCheck_injection);
+
+    write_address = (uint8_t*)(Game::SLSessionRunnable_MainLoop2_SuspendCheck_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &SLSessionRunnable_MainLoop2_SuspendCheck_return, 4, &SLSessionRunnable_MainLoop2_SuspendCheck_injection);
+
+    write_address = (uint8_t*)(Game::FrpgTrophyMan_MainLoop_SuspendCheck_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &FrpgTrophyMan_MainLoop_SuspendCheck_return, 0, &FrpgTrophyMan_MainLoop_SuspendCheck_injection);
+}
+
+void GameSuspendCheck_helper()
+{
+    // Wait for the event to be Signaled in order to return. Nonsignaled blocks indefinitly
+    DWORD dwWaitResult = WaitForSingleObject(Game::suspend_game_threads, INFINITE);
+    switch (dwWaitResult)
+    {
+    case WAIT_OBJECT_0:
+        return;
+    default:
+        FATALERROR("Unexpected wait result in GameSuspendCheck_helper: %d", dwWaitResult);
+    }
 }
 
 static bool character_reload_run = false;
@@ -299,24 +369,6 @@ bool Game::on_character_load(void* unused)
     }
 
     return true;
-}
-
-std::unordered_set<HANDLE> thread_handles;
-
-void grab_thread_handle_helper(HANDLE h)
-{
-    if (h != NULL)
-    {
-        thread_handles.emplace(h);
-    }
-}
-
-void grab_destruct_thread_handle_helper(HANDLE h)
-{
-    if (h != NULL)
-    {
-        thread_handles.erase(h);
-    }
 }
 
 /*
@@ -1521,10 +1573,29 @@ typedef void heapObjFreeFunc(void* heapObj, void* p);
 
 void Game::game_free_alt(void* p)
 {
-    uint64_t* heapObj = FUN_140cc29c0(p);
+    uint64_t* heapObj = Get_HeapAllocator_For_allocation(p);
     uint64_t heapObjVtable = *heapObj;
     heapObjFreeFunc* freeFunc = (heapObjFreeFunc*)*(uint64_t*)(heapObjVtable + 0x68);
     freeFunc(heapObj, p);
+}
+
+bool Game::Check_DLHeapManager_DLReadWriteLock_IsUnlocked(DWORD timeoutms)
+{
+    uint64_t DLHeapManager = (*(uint64_t*)Game::DLHeapManager);
+    uint64_t DLReadWriteLock = DLHeapManager + 0x490;
+
+    HANDLE field0x18 = *(HANDLE*)(DLReadWriteLock + 0x18);
+    DWORD waitResult = WaitForSingleObject(field0x18, timeoutms);
+    switch (waitResult)
+    {
+    case WAIT_OBJECT_0:
+        ReleaseMutex(field0x18);
+        break;
+    default:
+        return false;
+    }
+
+    return true;
 }
 
 void* Game::get_MoveMapStep()
@@ -1558,34 +1629,17 @@ void Game::Step_GameSimulation(bool renderFrame)
 
 void Game::SuspendThreads()
 {
-    for (const auto& handle : thread_handles)
+    if (!Game::Check_DLHeapManager_DLReadWriteLock_IsUnlocked(5))
     {
-        DWORD out;
-        do
-        {
-            out = SuspendThread(handle);
-        } while (out != (DWORD)-1 && out > 0);
-        if (out == (DWORD)-1)
-        {
-            FATALERROR("Unable to suspend thread correctly. Error=%x", GetLastError());
-        }
+        FATALERROR("Unable to suspend threads because DLReadWriteLock mutex is locked");
     }
+    //Set to nonsignaled, so that the Wait functions in the thread will block
+    ResetEvent(Game::suspend_game_threads);
 }
 
 void Game::ResumeThreads()
 {
-    for (const auto& handle : thread_handles)
-    {
-        DWORD out;
-        do
-        {
-            out = ResumeThread(handle);
-        } while (out != (DWORD)-1 && out > 0);
-        if (out == (DWORD)-1)
-        {
-            FATALERROR("Unable to resume thread correctly. Error=%x", GetLastError());
-        }
-    }
+    SetEvent(Game::suspend_game_threads);
 }
 
 uint8_t* ConnectedPlayerData_Get_SteamId(uint64_t connectedplayerdata)
