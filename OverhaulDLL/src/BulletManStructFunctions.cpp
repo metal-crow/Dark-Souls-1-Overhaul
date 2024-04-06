@@ -384,7 +384,7 @@ void copy_BulletIns_FollowupBullet_Data(BulletIns_FollowupBullet* to, BulletIns_
         {
             if (to_game)
             {
-                to->FXEntry_Substruct_a = (FXEntry_Substruct*)smallObject_internal_malloc(*HeapPtr, sizeof(FXEntry_Substruct), 8);
+                to->FXEntry_Substruct_a = (FXEntry_Substruct*)Game::game_smallObject_malloc(*HeapPtr, sizeof(FXEntry_Substruct), 8);
             }
             else
             {
@@ -418,7 +418,7 @@ void copy_BulletIns_FollowupBullet_Data(BulletIns_FollowupBullet* to, BulletIns_
         {
             if (to_game)
             {
-                to->FXEntry_Substruct_b = (FXEntry_Substruct*)smallObject_internal_malloc(*HeapPtr, sizeof(FXEntry_Substruct), 8);
+                to->FXEntry_Substruct_b = (FXEntry_Substruct*)Game::game_smallObject_malloc(*HeapPtr, sizeof(FXEntry_Substruct), 8);
             }
             else
             {

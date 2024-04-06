@@ -379,6 +379,8 @@ public:
 
     static void* game_malloc(size_t size, size_t alignment, uint64_t heap);
 
+    static void* game_smallObject_malloc(uint64_t heap, size_t size, size_t alignment);
+
     static void game_free(void* p);
 
     static void game_free_alt(void* p);

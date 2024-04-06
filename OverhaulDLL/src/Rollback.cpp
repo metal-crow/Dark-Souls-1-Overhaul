@@ -504,7 +504,7 @@ bool rollback_load_game_state_callback(unsigned char* buffer, int)
 
     if (Rollback::rollbackVisual)
     {
-        *(float*)((uint64_t)Game::get_PlayerIns().value() + 0x328) = 0.0f;
+        *(float*)((uint64_t)Game::get_PlayerIns().value() + 0x328) = 0.4f;
     }
     //ConsoleWrite("rollback_load_game_state_callback finish");
 

@@ -128,7 +128,7 @@ void copy_SFXEntryList(SFXEntry* to, SFXEntry* from, bool to_game, FXManager* to
             ConsoleWrite("Game SFXEntryList too short. Alloc");
             for (to_len; to_len < from_len; to_len++)
             {
-                SFXEntry* newEntry = (SFXEntry*)smallObject_internal_malloc(*HeapPtr, sizeof(SFXEntry), 0x10);
+                SFXEntry* newEntry = (SFXEntry*)Game::game_smallObject_malloc(*HeapPtr, sizeof(SFXEntry), 0x10);
                 newEntry->field0x48_head = NULL;
                 newEntry->field0x48_tail = NULL;
                 newEntry->field0xe0 = NULL;
@@ -174,7 +174,7 @@ void copy_SFXEntry(SFXEntry* to, SFXEntry* from, bool to_game)
         {
             if (to_game)
             {
-                to->field0x48_head = (FXEntry_Substruct*)smallObject_internal_malloc(*HeapPtr, sizeof(FXEntry_Substruct), 8);
+                to->field0x48_head = (FXEntry_Substruct*)Game::game_smallObject_malloc(*HeapPtr, sizeof(FXEntry_Substruct), 8);
             }
             else
             {
@@ -291,7 +291,7 @@ void copy_FXEntry_Substruct(FXEntry_Substruct* to, FXEntry_Substruct* from, bool
         {
             if (to_game)
             {
-                to->linked = (FXEntry_Substruct*)smallObject_internal_malloc(*HeapPtr, sizeof(FXEntry_Substruct), 8);
+                to->linked = (FXEntry_Substruct*)Game::game_smallObject_malloc(*HeapPtr, sizeof(FXEntry_Substruct), 8);
             }
             else
             {
@@ -322,7 +322,7 @@ void copy_FXEntry_Substruct(FXEntry_Substruct* to, FXEntry_Substruct* from, bool
         {
             if (to_game)
             {
-                to->next = (FXEntry_Substruct*)smallObject_internal_malloc(*HeapPtr, sizeof(FXEntry_Substruct), 8);
+                to->next = (FXEntry_Substruct*)Game::game_smallObject_malloc(*HeapPtr, sizeof(FXEntry_Substruct), 8);
             }
             else
             {
