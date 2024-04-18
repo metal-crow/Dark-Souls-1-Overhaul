@@ -6,6 +6,16 @@
 #include "SfxManStruct.h"
 #include <string>
 
+std::string print_SfxMan(SfxMan* to);
+void copy_SfxMan(SfxMan* to, SfxMan* from, bool to_game);
+SfxMan* init_SfxMan();
+void free_SfxMan(SfxMan* to);
+
+std::string print_frpgFxManagerBase(frpgFxManagerBase* to);
+void copy_frpgFxManagerBase(frpgFxManagerBase* to, frpgFxManagerBase* from, bool to_game);
+frpgFxManagerBase* init_frpgFxManagerBase();
+void free_frpgFxManagerBase(frpgFxManagerBase* to);
+
 std::string print_FXManager(FXManager* to);
 void copy_FXManager(FXManager* to, FXManager* from, bool to_game);
 FXManager* init_FXManager();

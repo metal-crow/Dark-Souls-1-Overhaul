@@ -122,7 +122,7 @@ struct RollbackState
 {
     PlayerIns* playerins[GGPO_MAX_PLAYERS];
     BulletMan* bulletman;
-    SfxMan* sfman;
+    SfxMan* sfxman;
     DamageMan* damageman;
     ThrowMan* throwman;
 };

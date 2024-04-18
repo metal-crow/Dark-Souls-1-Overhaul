@@ -2,6 +2,72 @@
 #include "SfxManStructFunctions.h"
 #include "Rollback.h"
 
+std::string print_SfxMan(SfxMan* to)
+{
+    std::string out = "SfxMan\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += print_frpgFxManagerBase(to->FrpgFxManagerBase);
+
+    return out;
+}
+
+void copy_SfxMan(SfxMan* to, SfxMan* from, bool to_game)
+{
+    copy_frpgFxManagerBase(to->FrpgFxManagerBase, from->FrpgFxManagerBase, to_game);
+}
+
+SfxMan* init_SfxMan()
+{
+    SfxMan* local = (SfxMan*)malloc_(sizeof(SfxMan));
+
+    local->FrpgFxManagerBase = init_frpgFxManagerBase();
+
+    return local;
+}
+
+void free_SfxMan(SfxMan* to)
+{
+    free_frpgFxManagerBase(to->FrpgFxManagerBase);
+    free(to);
+}
+
+std::string print_frpgFxManagerBase(frpgFxManagerBase* to)
+{
+    std::string out = "frpgFxManagerBase\n";
+    if (to == NULL)
+    {
+        return out;
+    }
+
+    out += print_FXManager(to->base.fXManager);
+
+    return out;
+}
+
+void copy_frpgFxManagerBase(frpgFxManagerBase* to, frpgFxManagerBase* from, bool to_game)
+{
+    copy_FXManager(to->base.fXManager, from->base.fXManager, to_game);
+}
+
+frpgFxManagerBase* init_frpgFxManagerBase()
+{
+    frpgFxManagerBase* local = (frpgFxManagerBase*)malloc_(sizeof(frpgFxManagerBase));
+
+    local->base.fXManager = init_FXManager();
+
+    return local;
+}
+
+void free_frpgFxManagerBase(frpgFxManagerBase* to)
+{
+    free_FXManager(to->base.fXManager);
+    free(to);
+}
+
 std::string print_FXManager(FXManager* to)
 {
     std::string out = "FXManager\n";
@@ -20,7 +86,7 @@ void copy_FXManager(FXManager* to, FXManager* from, bool to_game)
     Game::SuspendThreads();
 
     copy_SFXEntryList(to->SFXEntryList, from->SFXEntryList, to_game, to, from);
-    ConsoleWrite("--------------------------------------------");
+    //copy_FXEntry_Substruct(to->unk, from->unk, to_game, to);
 
     Game::ResumeThreads();
 }
@@ -364,51 +430,10 @@ void copy_FXEntry_Substruct_Obj(FXEntry_Substruct* to, FXEntry_Substruct* from, 
     to->unk6 = NULL;
     to->vtable = 0x141519DA0;
     to->self = to;
-    to->unk8 = NULL;
-    to->unk9 = NULL;
-    to->unk10 = NULL;
+    to->filecap1 = from->filecap1;
+    to->filecap2 = from->filecap2;
+    to->linked_followupBullet = NULL;
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
-
-#if 0
-    FXEntry_Substruct* printer;
-    const size_t len = 4092;
-    size_t ofst = 0;
-    char buf[len];
-    if (!to_game)
-    {
-        printer = from;
-    }
-    else
-    {
-        printer = to;
-    }
-
-    ofst += snprintf(buf+ofst, len,"parent sfxid=%d addr=%p ", *(uint32_t*)(((uint64_t)parent) + 0x14), printer);
-    for (size_t i = 0; i < sizeof(printer->data_0); i+=4)
-    {
-        ofst += snprintf(buf + ofst, len, "%x ", *(uint32_t*)(&printer->data_0[i]));
-    }
-    ofst += snprintf(buf + ofst, len, "self_substruct2 offset=%llx ", (uint64_t)printer->self_substruct2-(uint64_t)printer);
-    for (size_t i = 0; i < sizeof(printer->data_1); i += 2)
-    {
-        ofst += snprintf(buf + ofst, len, "%x ", *(uint16_t*)(&printer->data_1[i]));
-    }
-    ofst += snprintf(buf + ofst, len, "%llx ", (uint64_t)printer->unk1);
-    for (size_t i = 0; i < sizeof(printer->data_2); i += 2)
-    {
-        ofst += snprintf(buf + ofst, len, "%x ", *(uint16_t*)(&printer->data_2[i]));
-    }
-    ofst += snprintf(buf + ofst, len, "next=%llx ", (uint64_t)printer->next);
-    ofst += snprintf(buf + ofst, len, "linked=%llx ", (uint64_t)printer->linked);
-    ofst += snprintf(buf + ofst, len, "%llx ", (uint64_t)printer->unk5);
-    ofst += snprintf(buf + ofst, len, "strptr=%llx ", (uint64_t)printer->str.ptr);
-    ofst += snprintf(buf + ofst, len, "parent=%llx ", (uint64_t)printer->parent);
-    for (size_t i = 0; i < sizeof(printer->data_3); i += 4)
-    {
-        ofst += snprintf(buf + ofst, len, "%x ", *(uint32_t*)(&printer->data_3[i]));
-    }
-    ConsoleWrite(buf);
-#endif
 }
 
 FXEntry_Substruct* init_FXEntry_Substruct()

@@ -498,7 +498,7 @@ bool rollback_load_game_state_callback(unsigned char* buffer, int)
     }
 
     copy_BulletMan(*(BulletMan**)Game::bullet_man, state->bulletman, true);
-    //TODO copy_FXManager
+    //copy_SfxMan(*(SfxMan**)Game::sfx_man, state->sfxman, true);
     copy_DamageMan(*(DamageMan**)Game::damage_man, state->damageman, true);
     copy_ThrowMan(*(ThrowMan**)Game::throw_man, state->throwman, true);
 
@@ -544,14 +544,15 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
 
     state->bulletman = init_BulletMan();
     copy_BulletMan(state->bulletman, *(BulletMan**)Game::bullet_man, false);
-#ifdef GGPO_SYNCTEST
-    our_checksum ^= std::hash<std::string>{}(print_BulletMan(*(BulletMan**)Game::bullet_man));
-#endif
-    //TODO copy_FXManager;
+    //state->sfxman = init_SfxMan();
+    //copy_SfxMan(state->sfxman, *(SfxMan**)Game::sfx_man, false);
     state->damageman = init_DamageMan();
     copy_DamageMan(state->damageman, *(DamageMan**)Game::damage_man, false);
     state->throwman = init_ThrowMan();
     copy_ThrowMan(state->throwman, *(ThrowMan**)Game::throw_man, false);
+#ifdef GGPO_SYNCTEST
+    our_checksum ^= std::hash<std::string>{}(print_BulletMan(*(BulletMan**)Game::bullet_man));
+#endif
 
     *buffer = (unsigned char*)state;
     *len = sizeof(RollbackState);
@@ -570,9 +571,10 @@ void rollback_copy_buffer(void* buffer_dst, void* buffer_src)
         state_dst->playerins[i] = init_PlayerIns();
         copy_PlayerIns(state_dst->playerins[i], state_src->playerins[i], false);
     }
-    //TODO copy_FXManager
     state_dst->bulletman = init_BulletMan();
     copy_BulletMan(state_dst->bulletman, state_src->bulletman, false);
+    //state_dst->sfxman = init_SfxMan();
+    //copy_SfxMan(state_dst->sfxman, state_src->sfxman, false);
     state_dst->damageman = init_DamageMan();
     copy_DamageMan(state_dst->damageman, state_src->damageman, false);
     state_dst->throwman = init_ThrowMan();
@@ -588,9 +590,10 @@ void rollback_free_buffer(void* buffer)
         free_PlayerIns(state->playerins[i]);
         state->playerins[i] = NULL;
     }
-    //TODO free_FXManager
     free_BulletMan(state->bulletman);
     state->bulletman = NULL;
+    //free_SfxMan(state->sfxman);
+    //state->sfxman = NULL;
     free_DamageMan(state->damageman);
     state->damageman = NULL;
     free_ThrowMan(state->throwman);
@@ -651,7 +654,12 @@ bool rollback_log_game_state(char* filename, unsigned char* buffer, int)
     }
     std::string bulletman = print_BulletMan(state->bulletman);
     fprintf(fp, "%s", bulletman.c_str());
-    //TODO the rest of the state
+    //std::string sfxman = print_SfxMan(state->sfxman);
+    //fprintf(fp, "%s", sfxman.c_str());
+    //std::string damage = print_DamageMan(state->damageman);
+    //fprintf(fp, "%s", damage.c_str());
+    //std::string throwman = print_ThrowMan(state->throwman);
+    //fprintf(fp, "%s", throwman.c_str());
 
     fclose(fp);
     return true;

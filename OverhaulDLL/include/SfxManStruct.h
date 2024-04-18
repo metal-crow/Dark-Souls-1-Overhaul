@@ -30,6 +30,7 @@ static_assert(sizeof(wstring) == 0x28);
 
 struct FXEntry_Substruct
 {
+    //substruct_1
     uint8_t data_0[0x58];
     uint64_t self_substruct2; //&self + 0xe0
     uint8_t data_1[16];
@@ -42,11 +43,12 @@ struct FXEntry_Substruct
     wstring str;
     SFXEntry* parent;
     uint64_t unk6; //can be nulled without error
+    //substruct_2
     uint64_t vtable;
     FXEntry_Substruct* self; //needed, otherwise game crashes.
-    void* unk8; //can be nulled without error
-    void* unk9; //can be nulled without error
-    void* unk10; //can be nulled without error
+    uint64_t filecap1; //can treat as const ptr
+    uint64_t filecap2; //can treat as const ptr
+    void* linked_followupBullet; //can be nulled without error
     uint8_t data_3[28+8];
 };
 
@@ -104,8 +106,11 @@ struct FXManager
     uint64_t padding_0[3];
     SFXEntry* SFXEntryList;
     SFXEntry* SFXEntryList_tail; //can ignore since it's unchanging after alloc. Need to check to ensure we don't go past it, since it represents the last "valid" entry.
+    uint8_t padding[88];
+    FXEntry_Substruct* unk;
 };
 static_assert(offsetof(FXManager, SFXEntryList) == 0x18);
+static_assert(offsetof(FXManager, unk) == 0x80);
 
 struct FXHGManagerBase
 {
