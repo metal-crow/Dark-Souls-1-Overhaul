@@ -55,7 +55,7 @@ void inline ConsoleWrite(const char* str, ...)
 {
     if (logfile == NULL)
     {
-        fopen_s(&logfile, logfilename, "w");
+        logfile = _fsopen(logfilename, "w", _SH_DENYWR);
     }
 
     char dest[1024];
