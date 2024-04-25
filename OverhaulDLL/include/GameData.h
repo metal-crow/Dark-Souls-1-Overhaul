@@ -611,4 +611,7 @@ static Build_EquipParamProtectorInfo_FUNC* Build_EquipParamProtectorInfo = (Buil
 typedef void Vector_IncreaseSize_FUNC(void* vector, uint64_t spaceToAdd);
 static Vector_IncreaseSize_FUNC* Vector_IncreaseSize = (Vector_IncreaseSize_FUNC*)0x1403ab910;
 
+typedef void Update_SfxMan_FUNC(float frameTime);
+static Update_SfxMan_FUNC* Update_SfxMan = (Update_SfxMan_FUNC*)0x1404f9a20;
+
 #endif // _DS1_OVERHAUL_GAME_DATA_H_

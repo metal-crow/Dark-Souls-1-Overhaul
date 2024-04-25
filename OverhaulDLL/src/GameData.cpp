@@ -1635,6 +1635,7 @@ void Game::Step_GameSimulation(bool renderFrame)
         MoveMapStep_Step_13(MoveMapStep, FRAMETIME);
     }
     Step_Havok(*(void**)Game::frpg_havok_man_imp, FRAMETIME);
+    Update_SfxMan(FRAMETIME);
     FinishStep_Havok(*(void**)Game::frpg_havok_man_imp);
 }
 
