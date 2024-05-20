@@ -357,10 +357,8 @@ std::string print_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to)
     }
 
     out += "FXManager:" + std::to_string(to->FXManager) + "\n";
-
-    out += print_FXEntry_Substruct(to->FXEntry_Substruct_a);
-
-    out += print_FXEntry_Substruct(to->FXEntry_Substruct_b);
+    out += "FXEntry_Substruct_a:" + std::to_string(to->FXEntry_Substruct_a) + "\n";
+    out += "FXEntry_Substruct_b:" + std::to_string(to->FXEntry_Substruct_b) + "\n";
 
     if (to->next != NULL)
     {
@@ -376,72 +374,9 @@ void copy_BulletIns_FollowupBullet_Data(BulletIns_FollowupBullet* to, BulletIns_
 {
     //Assuming that we're already saving/restoring SfxMan, then this is just a const ptr to the FXManager in the SfxMan global
     to->FXManager = from->FXManager;
-
-    //FXEntry_Substruct_a
-    if (from->FXEntry_Substruct_a != NULL)
-    {
-        if (to->FXEntry_Substruct_a == NULL)
-        {
-            if (to_game)
-            {
-                to->FXEntry_Substruct_a = (FXEntry_Substruct*)Game::game_smallObject_malloc(*HeapPtr, sizeof(FXEntry_Substruct), 8);
-            }
-            else
-            {
-                to->FXEntry_Substruct_a = init_FXEntry_Substruct();
-            }
-        }
-        //should just be able to treat the parent as a raw ptr i think
-        //assuming we're also saveing/restoring the sfxman, it should ptr to an object in that
-        copy_FXEntry_Substruct(to->FXEntry_Substruct_a, from->FXEntry_Substruct_a, to_game, from->FXEntry_Substruct_a->parent);
-    }
-    if (from->FXEntry_Substruct_a == NULL)
-    {
-        if (to->FXEntry_Substruct_a != NULL)
-        {
-            if (to_game)
-            {
-                FXEntry_Substruct_internal_dealloc(*HeapPtr, to->FXEntry_Substruct_a, sizeof(FXEntry_Substruct));
-            }
-            else
-            {
-                free_FXEntry_Substruct(to->FXEntry_Substruct_a);
-            }
-            to->FXEntry_Substruct_a = NULL;
-        }
-    }
-
-    //FXEntry_Substruct_b
-    if (from->FXEntry_Substruct_b != NULL)
-    {
-        if (to->FXEntry_Substruct_b == NULL)
-        {
-            if (to_game)
-            {
-                to->FXEntry_Substruct_b = (FXEntry_Substruct*)Game::game_smallObject_malloc(*HeapPtr, sizeof(FXEntry_Substruct), 8);
-            }
-            else
-            {
-                to->FXEntry_Substruct_b = init_FXEntry_Substruct();
-            }
-        }
-        copy_FXEntry_Substruct(to->FXEntry_Substruct_b, from->FXEntry_Substruct_b, to_game, from->FXEntry_Substruct_b->parent);
-    }
-    if (from->FXEntry_Substruct_b == NULL)
-    {
-        if (to->FXEntry_Substruct_b != NULL)
-        {
-            if (to_game)
-            {
-                FXEntry_Substruct_internal_dealloc(*HeapPtr, to->FXEntry_Substruct_b, sizeof(FXEntry_Substruct));
-            }
-            else
-            {
-                free_FXEntry_Substruct(to->FXEntry_Substruct_b);
-            }
-            to->FXEntry_Substruct_b = NULL;
-        }
-    }
+    //Similar to above for these
+    to->FXEntry_Substruct_a = from->FXEntry_Substruct_a;
+    to->FXEntry_Substruct_b = from->FXEntry_Substruct_b;
 
     return;
 }
@@ -560,19 +495,9 @@ void copy_BulletIns_FollowupBullet_List(
 
 void free_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, bool freeself, bool freenext)
 {
-    if (to->FXEntry_Substruct_a != NULL)
-    {
-        free_FXEntry_Substruct(to->FXEntry_Substruct_a);
-    }
-
     if (freenext && to->next != NULL)
     {
         free_BulletIns_FollowupBullet(to->next, true, freenext);
-    }
-
-    if (to->FXEntry_Substruct_b != NULL)
-    {
-        free_FXEntry_Substruct(to->FXEntry_Substruct_b);
     }
 
     if (freeself)
