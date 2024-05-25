@@ -614,4 +614,7 @@ static Vector_IncreaseSize_FUNC* Vector_IncreaseSize = (Vector_IncreaseSize_FUNC
 typedef void Update_SfxMan_FUNC(float frameTime);
 static Update_SfxMan_FUNC* Update_SfxMan = (Update_SfxMan_FUNC*)0x1404f9a20;
 
+typedef void Steam_CreateLobby_APICallResult_FUNC(void* SteamSessionLight, void* LobbyCreated_t);
+static Steam_CreateLobby_APICallResult_FUNC* Steam_CreateLobby_APICallResult = (Steam_CreateLobby_APICallResult_FUNC*)0x1410b81b0;
+
 #endif // _DS1_OVERHAUL_GAME_DATA_H_

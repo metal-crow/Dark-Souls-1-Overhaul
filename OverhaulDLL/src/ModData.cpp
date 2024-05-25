@@ -216,6 +216,7 @@ void Mod::change_mode(ModMode mode)
         FileReloading::SetParamsToUse(mode != ModMode::Overhaul);
         FileReloading::ReloadPlayer(Mod::current_mode, mode);
         FileReloading::RefreshPlayerStats();
+        ModNetworking::UpdatePersistentLobbyData(mode);
         Mod::current_mode = mode;
     }
 

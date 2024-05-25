@@ -271,6 +271,42 @@ mov     qword ptr [rsp+20h], -2
 jmp     Start_SessionDisconnect_Task_injection_return
 Start_SessionDisconnect_Task_injection ENDP
 
+
+EXTERN Steam_LeaveLobby_injection_helper: PROC
+EXTERN Steam_LeaveLobby_injection_return: qword
+
+PUBLIC Steam_LeaveLobby_injection
+Steam_LeaveLobby_injection PROC
+
+FUNC_PROLOGUE_LITE
+mov     rcx, qword ptr [rcx + 3f0h]
+call    Steam_LeaveLobby_injection_helper
+FUNC_EPILOGUE_LITE
+
+;original code
+PUSH    RDI
+SUB     RSP, 30h
+MOV     qword ptr [RSP + 20h], -2
+jmp     Steam_LeaveLobby_injection_return
+Steam_LeaveLobby_injection ENDP
+
+
+EXTERN Steam_CreateLobby_injection_helper: PROC
+EXTERN Steam_CreateLobby_injection_return: qword
+
+PUBLIC Steam_CreateLobby_injection
+Steam_CreateLobby_injection PROC
+
+FUNC_PROLOGUE_LITE
+call    Steam_CreateLobby_injection_helper
+FUNC_EPILOGUE_LITE
+
+;don't keep original code
+;just return true, since we are replacing this function all together
+mov     al, 1
+ret
+Steam_CreateLobby_injection ENDP
+
 _TEXT    ENDS
 
 END

@@ -5,6 +5,7 @@
 
 #include <cstdint>
 #include <unordered_map>
+#include <atomic>
 #pragma warning( push )
 #pragma warning( disable : 4996 )
 #include "steam/steam_api.h"
@@ -33,23 +34,26 @@ public:
     //callback for the new ISteamNetworkingMessages api
     STEAM_CALLBACK(ModNetworking, SteamNetworkingMessagesSessionRequestCallback, SteamNetworkingMessagesSessionRequest_t);
 
-    static uint64_t currentLobby; //Set upon entry into a lobby; set to 0 upon exit
+    //Create a persistant lobby when a host, so it isn't JIT'd for new connecting users
+    static void CreatePersistentLobby();
+    //Register a LobbyCreated call result so we can handle the new persistant lobby we create
+    static CCallResult<ModNetworking, LobbyCreated_t> LobbyCreatedCallResult;
+    void LobbyCreatedCallback(LobbyCreated_t* result, bool bIOFailure);
+
+    //The persistant lobby this player will always be in
+    static void UpdatePersistentLobbyData(ModMode mode);
+    static std::atomic<uint64_t> selfPersisantLobby;
+
+    //Set upon entry into someone else's lobby; set to 0 upon exit
+    static std::atomic<uint64_t> currentLobby;
+
+    static std::atomic<uint64_t> incoming_guest_to_not_accept;
 
     //configuration options for who can connect if you're host/how to change settings if you're guest
     static bool allow_connect_with_non_mod_host;
     static bool allow_connect_with_legacy_mod_host;
     static bool allow_connect_with_overhaul_mod_host;
     static bool allow_connect_with_non_mod_guest;
-
-    //info about the current host/guest
-    static bool host_got_info;
-    static bool host_mod_installed;
-    static ModMode host_mod_mode;
-    static bool incoming_guest_got_info;
-    static bool incoming_guest_mod_installed;
-    static ModMode incoming_guest_mod_mode;
-    static uint64_t incoming_guest_to_not_accept;
-    static bool new_guest_incoming;
 
 private:
     static const uint64_t AcceptP2PSessionWithUser_injection_offset = 0x10b6ce0;
@@ -61,6 +65,8 @@ private:
     static const uint64_t CloseP2PSessionWithUser_Replacement_injection_offset = 0x10bdf55;
     static const uint64_t sendType34SteamMessage_data_offset = 0x108bb78;
     static const uint64_t Start_SessionDisconnect_Task_offset = 0x1089190;
+    static const uint64_t Steam_LeaveLobby_offset = 0x10b9b20;
+    static const uint64_t Steam_CreateLobby_offset = 0x10b7c40;
 };
 
 #endif
