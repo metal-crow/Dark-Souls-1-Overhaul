@@ -600,9 +600,10 @@ void AntiAntiCheat::start() {
     sp::mem::patch_bytes(write_address, nop5, sizeof(nop5));
 
     //Disable the CSCheatDetectionTitleModule thread
+    //Doing this causes the game to trigger a crash at an unaligned RIP, so disable for now
     uint8_t retnop[5] = { 0xC3, 0x90, 0x90, 0x90, 0x90 };
     write_address = (uint8_t*)(AntiAntiCheat::InitAndStart_CSCheatDetectionTitleModule_offset + Game::ds1_base);
-    sp::mem::patch_bytes(write_address, retnop, sizeof(retnop));
+    //sp::mem::patch_bytes(write_address, retnop, sizeof(retnop));
 }
 
 
