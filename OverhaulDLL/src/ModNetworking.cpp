@@ -436,32 +436,6 @@ bool AcceptP2PSessionWithUser_injection_helper(uint64_t incoming_steamid)
         return false;
     }
 
-    //If we're getting this callback, they're trying to connect with the Networking api, so we should just accept them using that
-    //It also means we can immediatly tell they're non-mod
-    //As the host, we only change our settings if the connecting user is non-mod and we allow non-mod connections
-    uint64_t curLobby = ModNetworking::currentLobby.load();
-    if (curLobby == ModNetworking::selfPersisantLobby)
-    {
-        ConsoleWrite("Host detects incoming guest is non-mod user.");
-        if (ModNetworking::allow_connect_with_non_mod_guest == true && Mod::get_mode() != ModMode::Compatability)
-        {
-            Mod::set_mode(ModMode::Compatability);
-            //Let guests know the host approves this user
-            std::string approveduser = std::to_string(incoming_steamid);
-            ModNetworking::SteamMatchmaking->SetLobbyData(curLobby, MOD_LOBBY_USERAPPROVED_KEY, approveduser.c_str());
-            //We now know this user's API, so we can send the queued packets
-            SteamAPIStatusKnown_Users.insert_or_assign(incoming_steamid, false);
-            SendQueuedPackets();
-        }
-        // If specified in options, we must disconnect the non-mod player, since they won't on their own
-        else if (ModNetworking::allow_connect_with_non_mod_guest == false)
-        {
-            ConsoleWrite("Incoming guest is non-mod user, and host do not allow connections with non-mod users.");
-            HostForceDisconnectGuest(incoming_steamid, L"Incoming guest is non-mod user, and you do not allow connections with non-mod users.", true);
-            return false;
-        }
-    }
-
     ConsoleWrite("AcceptP2PSessionWithUser %llx", incoming_steamid);
     return ModNetworking::SteamNetworking->AcceptP2PSessionWithUser(id);
 }
@@ -530,7 +504,36 @@ bool ReadP2PPacket_Replacement_injection_helper(void *pubDest, uint32 cubDest, u
     //otherwise see if there's a message from the Networking interface and return that
     else
     {
-        return ModNetworking::SteamNetworking->ReadP2PPacket(pubDest, cubDest, pcubMsgSize, psteamIDRemote, nChannel);
+        bool read_packet_old = ModNetworking::SteamNetworking->ReadP2PPacket(pubDest, cubDest, pcubMsgSize, psteamIDRemote, nChannel);
+
+        //If we're getting this old networking response, they're trying to connect with the Networking api, so we should just accept them using that
+        //It also means we can immediatly tell they're non-mod
+        //As the host, we only change our settings if the connecting user is non-mod and we allow non-mod connections
+        uint64_t curLobby = ModNetworking::currentLobby.load();
+        if (read_packet_old && !SteamAPIStatusKnown_Users.contains(psteamIDRemote->ConvertToUint64()) && curLobby == ModNetworking::selfPersisantLobby)
+        {
+            ConsoleWrite("Host detects incoming guest is non-mod user.");
+            if (ModNetworking::allow_connect_with_non_mod_guest == true && Mod::get_mode() != ModMode::Compatability)
+            {
+                Mod::set_mode(ModMode::Compatability);
+                //Let guests know the host approves this user
+                std::string approveduser = std::to_string(psteamIDRemote->ConvertToUint64());
+                ModNetworking::SteamMatchmaking->SetLobbyData(curLobby, MOD_LOBBY_USERAPPROVED_KEY, approveduser.c_str());
+                //We now know this user's API, and we already sent their queued packets, so clear them
+                SteamAPIStatusKnown_Users.insert_or_assign(psteamIDRemote->ConvertToUint64(), false);
+                ClearQueuedPackets();
+            }
+            // If specified in options, we must disconnect the non-mod player, since they won't on their own
+            else if (ModNetworking::allow_connect_with_non_mod_guest == false)
+            {
+                ConsoleWrite("Incoming guest is non-mod user, and host do not allow connections with non-mod users.");
+                HostForceDisconnectGuest(psteamIDRemote->ConvertToUint64(), L"Incoming guest is non-mod user, and you do not allow connections with non-mod users.", true);
+                ClearQueuedPackets();
+                return false;
+            }
+        }
+
+        return read_packet_old;
     }
 }
 
@@ -563,9 +566,20 @@ bool SendP2PPacket_Replacement_injection_helper(CSteamID steamIDRemote, void *pu
             {
                 queued_packets.push_back(new PacketStorageData(steamIDRemote, pubData, cubData, eP2PSendType, nChannel));
                 ConsoleWrite("Saving queued packet type %d for %llx: total %d", ((uint8_t*)pubData)[1], steamIDRemote.ConvertToUint64(), queued_packets.size());
-                return true;
+                break;
             }
         }
+
+        //However, if we don't know them and we are the host, we need to send the packet on the old API, as a bait for non-mod guests
+        //If they respond (which mod users will not since they instantly on join know we are mod), we know they are non-mod
+        uint64_t curLobby = ModNetworking::currentLobby.load();
+        if (curLobby == ModNetworking::selfPersisantLobby)
+        {
+            PlayerVisualsValidationFix::sanitizePacketData((uint8_t*)pubData, cubData);
+            return ModNetworking::SteamNetworking->SendP2PPacket(steamIDRemote, pubData, cubData, eP2PSendType, nChannel);
+        }
+
+        return true;
     }
 
     if (SteamNetworkingMessages_Supported(steamIDRemote))
