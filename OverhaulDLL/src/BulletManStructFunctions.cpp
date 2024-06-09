@@ -372,6 +372,7 @@ std::string print_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to)
 //This is because otherwise we may allocate a new bullet struct for the next ptr, but the correct answer is to point to an already existing bullet struct
 void copy_BulletIns_FollowupBullet_Data(BulletIns_FollowupBullet* to, BulletIns_FollowupBullet* from, bool to_game)
 {
+    to->vtable = from->vtable;
     //This is just a const ptr to the FXManager in the SfxMan global
     to->FXManager = from->FXManager;
     //Similar to above for these

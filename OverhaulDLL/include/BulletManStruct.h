@@ -28,7 +28,7 @@ typedef struct ChrExFollowCam ChrExFollowCam;
 
 struct BulletIns_FollowupBullet
 {
-    uint64_t padding_vtable;
+    uint64_t vtable;
     uint64_t FXManager; //const ptr
     uint64_t FXEntry_Substruct_a; //const ptr to existing object
     BulletIns_FollowupBullet* next;
