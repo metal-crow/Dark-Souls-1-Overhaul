@@ -408,6 +408,21 @@ extern "C" {
     uint64_t MoveMapStep_SetPlayerLockOn_FromController_offset_return;
     void MoveMapStep_SetPlayerLockOn_FromController_offset_injection();
     bool* ggpoStarted_ptr;
+
+    uint64_t followupBullet_loop_return;
+    void followupBullet_loop_injection();
+    void followupBullet_loop_helper(uint64_t);
+}
+
+//manually set the fxentry_a ptr in the followupbullet
+//I can't figure out why it's sometimes not set (caused by my code somehow),
+//so i'm patching it this way to fix it.
+void followupBullet_loop_helper(uint64_t FXEntry_Substruct_2)
+{
+    uint64_t followupBullet = *(uint64_t*)(FXEntry_Substruct_2 + 0x20);
+    uint64_t FXEntry_Substruct = *(uint64_t*)(FXEntry_Substruct_2 + 0x8);
+    uint64_t* fxentry_a = (uint64_t*)(followupBullet + 0x10);
+    *fxentry_a = FXEntry_Substruct;
 }
 
 bool rollback_await_init(void* steamMsgs);
@@ -434,6 +449,10 @@ void Rollback::start()
     write_address = (uint8_t*)(Rollback::MoveMapStep_SetPlayerLockOn_FromController_offset + Game::ds1_base);
     ggpoStarted_ptr = &Rollback::ggpoStarted;
     sp::mem::code::x64::inject_jmp_14b(write_address, &MoveMapStep_SetPlayerLockOn_FromController_offset_return, 2, &MoveMapStep_SetPlayerLockOn_FromController_offset_injection);
+
+    //fix an issue where the FollowupBullet doesn't have the right ptr to it's parent sometimes
+    write_address = (uint8_t*)(Rollback::Build_BulletIns_FollowupBullet_loop_fix_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &followupBullet_loop_return, 2, &followupBullet_loop_injection);
 
     //Testing rollback related stuff
     Rollback::saved_playerins = init_PlayerIns();

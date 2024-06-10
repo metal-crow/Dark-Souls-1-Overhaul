@@ -382,42 +382,101 @@ void copy_BulletIns_FollowupBullet_Data(BulletIns_FollowupBullet* to, BulletIns_
     return;
 }
 
-//This handles copying a single BulletIns_FollowupBullet, where the next/prev pointers may go to an unseen object
-void copy_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, BulletIns_FollowupBullet* from, bool to_game)
+static void _copy_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, BulletIns_FollowupBullet* from, std::unordered_map<uint64_t, uint64_t>* processed_elems, bool to_game)
 {
     copy_BulletIns_FollowupBullet_Data(to, from, to_game);
-    //ignore prev, because fuck it
-    to->prev = NULL;
-    if (from->next == NULL)
+
+    //Check if this from node has already been saved. If not, make a new to node and save it. If it has, just refer to that existing to node.
+    if (!processed_elems->contains((uint64_t)from->next))
     {
-        if (to->next != NULL)
+        if (from->next == NULL)
         {
-            if (to_game)
+            if (to->next != NULL)
             {
-                FATALERROR(__FUNCTION__":free a in-game BulletIns_FollowupBullet %p %p", to, to->next);
+                if (to_game)
+                {
+                    FATALERROR(__FUNCTION__":free a in-game BulletIns_FollowupBullet %p %p", to, to->next);
+                }
+                else
+                {
+                    free_BulletIns_FollowupBullet(to->next, true, true);
+                }
             }
-            else
-            {
-                free_BulletIns_FollowupBullet(to->next, true, true);
-            }
+            to->next = NULL;
+            processed_elems->insert({ (uint64_t)from->next, (uint64_t)to->next });
         }
-        to->next = NULL;
+        else
+        {
+            if (to->next == NULL)
+            {
+                if (to_game)
+                {
+                    FATALERROR(__FUNCTION__":Malloc a in-game BulletIns_FollowupBullet");
+                }
+                else
+                {
+                    to->next = (BulletIns_FollowupBullet*)malloc_(sizeof(BulletIns_FollowupBullet));
+                }
+            }
+            processed_elems->insert({ (uint64_t)from->next, (uint64_t)to->next });
+            _copy_BulletIns_FollowupBullet(to->next, from->next, processed_elems, to_game);
+        }
     }
     else
     {
-        if (to->next == NULL)
-        {
-            if (to_game)
-            {
-                FATALERROR(__FUNCTION__":Malloc a in-game BulletIns_FollowupBullet");
-            }
-            else
-            {
-                to->next = (BulletIns_FollowupBullet*)malloc_(sizeof(BulletIns_FollowupBullet));
-            }
-        }
-        copy_BulletIns_FollowupBullet(to->next, from->next, to_game);
+        uint64_t processed_next = processed_elems->at((uint64_t)from->next);
+        to->next = (BulletIns_FollowupBullet*)processed_next;
     }
+
+    if (!processed_elems->contains((uint64_t)from->prev))
+    {
+        if (from->prev == NULL)
+        {
+            if (to->prev != NULL)
+            {
+                if (to_game)
+                {
+                    FATALERROR(__FUNCTION__":free a in-game BulletIns_FollowupBullet %p %p", to, to->prev);
+                }
+                else
+                {
+                    free_BulletIns_FollowupBullet(to->prev, true, true);
+                }
+            }
+            to->prev = NULL;
+            processed_elems->insert({ (uint64_t)from->prev, (uint64_t)to->prev });
+        }
+        else
+        {
+            if (to->prev == NULL)
+            {
+                if (to_game)
+                {
+                    FATALERROR(__FUNCTION__":Malloc a in-game BulletIns_FollowupBullet");
+                }
+                else
+                {
+                    to->prev = (BulletIns_FollowupBullet*)malloc_(sizeof(BulletIns_FollowupBullet));
+                }
+            }
+            processed_elems->insert({ (uint64_t)from->prev, (uint64_t)to->prev });
+            _copy_BulletIns_FollowupBullet(to->prev, from->prev, processed_elems, to_game);
+        }
+    }
+    else
+    {
+        uint64_t processed_prev = processed_elems->at((uint64_t)from->prev);
+        to->prev = (BulletIns_FollowupBullet*)processed_prev;
+    }
+}
+
+//This handles copying a single BulletIns_FollowupBullet, where the next/prev pointers may go to an unseen object
+void copy_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, BulletIns_FollowupBullet* from, bool to_game)
+{
+    //Need to keep track of what elements we have processed, since we are going to go through this graph in both directions and we don't know anything about it's layout
+    std::unordered_map<uint64_t, uint64_t>* processed_elems = new std::unordered_map<uint64_t, uint64_t>();
+    _copy_BulletIns_FollowupBullet(to, from, processed_elems, to_game);
+    delete processed_elems;
 }
 
 //This handles copying a list of BulletIns_FollowupBullet elements
@@ -477,7 +536,7 @@ void copy_BulletIns_FollowupBullet_List(
             BulletIns_FollowupBullet* from_bullet = &(*from_followup_bullet_list_ptr)[list_i];
 
             copy_BulletIns_FollowupBullet_Data(to_bullet, from_bullet, to_game);
-            //set up the next ptr. We can probably ignore prev
+            //set up the next and prev ptrs.
             if (from_bullet->next != NULL)
             {
                 size_t from_next_offset = ((uint64_t)from_bullet->next) - ((uint64_t)(*from_followup_bullet_list_ptr));
@@ -487,7 +546,15 @@ void copy_BulletIns_FollowupBullet_List(
             {
                 to_bullet->next = NULL;
             }
-            to_bullet->prev = NULL;
+            if (from_bullet->prev != NULL)
+            {
+                size_t from_prev_offset = ((uint64_t)from_bullet->prev) - ((uint64_t)(*from_followup_bullet_list_ptr));
+                to_bullet->prev = (BulletIns_FollowupBullet*)(((uint64_t)(*to_followup_bullet_list_ptr)) + from_prev_offset);
+            }
+            else
+            {
+                to_bullet->prev = NULL;
+            }
         }
     }
     *to_followup_bullet_list_len_ptr = *from_followup_bullet_list_len_ptr;

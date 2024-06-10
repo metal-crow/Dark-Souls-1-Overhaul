@@ -32,7 +32,7 @@ struct BulletIns_FollowupBullet
     uint64_t FXManager; //const ptr
     uint64_t FXEntry_Substruct_a; //const ptr to existing object
     BulletIns_FollowupBullet* next;
-    BulletIns_FollowupBullet* prev; //should be able to ignore this
+    BulletIns_FollowupBullet* prev;
     uint64_t FXEntry_Substruct_b;  //const ptr to existing object
 };
 static_assert(sizeof(BulletIns_FollowupBullet) == 0x30);

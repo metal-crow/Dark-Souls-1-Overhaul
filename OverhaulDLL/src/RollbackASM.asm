@@ -2,7 +2,7 @@ _DATA SEGMENT
 
 sub_1401862A0   dq  1401862A0h
 nullsub_78     dq  140185470h
-
+Build_BulletIns_FollowupBullet  dq  140fdcac0h
 _DATA ENDS
 
 _TEXT    SEGMENT
@@ -241,6 +241,24 @@ mov     [rcx+1431h], al
 exit:
 jmp     MoveMapStep_SetPlayerLockOn_FromController_offset_return
 MoveMapStep_SetPlayerLockOn_FromController_offset_injection ENDP
+
+
+EXTERN followupBullet_loop_return: qword
+extern followupBullet_loop_helper: proc
+
+PUBLIC followupBullet_loop_injection
+followupBullet_loop_injection PROC
+floop:
+MOV     RCX,qword ptr [RDI + 20h]
+FUNC_PROLOGUE
+mov     rcx, rdi
+call    followupBullet_loop_helper
+FUNC_EPILOGUE
+CALL    qword ptr [Build_BulletIns_FollowupBullet]
+CMP     qword ptr [RDI + 20h],0
+JNZ     floop
+jmp     followupBullet_loop_return
+followupBullet_loop_injection ENDP
 
 _TEXT    ENDS
 

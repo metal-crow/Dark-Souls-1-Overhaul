@@ -75,6 +75,8 @@ private:
     static const uint64_t MainUpdate_end_offset = 0x15d701;
     static const uint64_t MoveMapStep_SetPlayerLockOn_FromController_offset = 0x24fd0b;
 
+    static const uint64_t Build_BulletIns_FollowupBullet_loop_fix_offset = 0x0fe6100;
+
     static const uint64_t PlayerIns_Is_NetworkedPlayer_offsets[];
     static const uint64_t PlayerIns_IsHostPlayerIns_offsets[];
 
