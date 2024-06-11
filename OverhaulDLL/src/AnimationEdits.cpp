@@ -143,7 +143,7 @@ void read_body_aid_injection_helper_function(float* speed, int32_t animation_id)
 extern "C" {
     uint64_t disable_whiff_animations_injection_return;
     void disable_whiff_animations_injection();
-    uint8_t disable_whiff_animations_injection_helper(uint8_t);
+    uint8_t disable_whiff_animations_injection_helper(uint64_t, uint32_t);
 }
 
 void AnimationEdits::disable_whiff_animations() {
@@ -154,7 +154,9 @@ void AnimationEdits::disable_whiff_animations() {
     sp::mem::code::x64::inject_jmp_14b(write_address, &disable_whiff_animations_injection_return, 2, &disable_whiff_animations_injection);
 }
 
-uint8_t disable_whiff_animations_injection_helper(uint8_t whiff) {
+uint8_t disable_whiff_animations_injection_helper(uint64_t ChrCtrl_AnimationQueue, uint32_t param2) {
+    uint8_t whiff = sub_1404363c0(ChrCtrl_AnimationQueue, param2);
+
     //Disable feature
     if (Mod::get_mode() != ModMode::Overhaul) {
         return whiff;

@@ -617,4 +617,7 @@ static Update_SfxMan_FUNC* Update_SfxMan = (Update_SfxMan_FUNC*)0x1404f9a20;
 typedef void Steam_CreateLobby_APICallResult_FUNC(void* SteamSessionLight, void* LobbyCreated_t);
 static Steam_CreateLobby_APICallResult_FUNC* Steam_CreateLobby_APICallResult = (Steam_CreateLobby_APICallResult_FUNC*)0x1410b81b0;
 
+typedef bool sub_1404363c0_FUNC(uint64_t ChrCtrl_AnimationQueue, uint32_t param2);
+static sub_1404363c0_FUNC* sub_1404363c0 = (sub_1404363c0_FUNC*)0x1404363c0;
+
 #endif // _DS1_OVERHAUL_GAME_DATA_H_

@@ -91,6 +91,27 @@ FUNC_EPILOGUE_NORAX macro
     popfq 
 endm
 
+FUNC_EPILOGUE macro
+    mov     r15,[rsp+00000290h]
+    mov     r14,[rsp+00000288h]
+    mov     r13,[rsp+00000280h]
+    mov     r12,[rsp+00000278h]
+    mov     r11,[rsp+00000270h]
+    mov     r10,[rsp+00000268h]
+    mov     r9, [rsp+00000260h]
+    mov     r8, [rsp+00000258h]
+    mov     rbp,[rsp+00000250h]
+    mov     rdi,[rsp+00000240h]
+    mov     rsi,[rsp+00000238h]
+    mov     rdx,[rsp+00000230h]
+    mov     rcx,[rsp+00000228h]
+    mov     rbx,[rsp+00000220h]
+    fxrstor [rsp+20h]
+    mov     rsp,[rsp+00000248h]
+    pop     rax
+    popfq 
+endm
+
 EXTERN read_body_aid_injection_helper_function: PROC
 EXTERN animation_entry_set_return: qword
 
@@ -122,13 +143,7 @@ disable_whiff_animations_injection PROC
 mov     esi, [rdi+80h]
 add     esi, 28h
 mov     edx, esi
-call    qword ptr [sub_1404363c0]
-
-FUNC_PROLOGUE
-mov     cl, al ;pass in the value that determines if we whiff as the arg
 call    disable_whiff_animations_injection_helper
-FUNC_EPILOGUE_NORAX
-
 jmp     disable_whiff_animations_injection_return
 disable_whiff_animations_injection ENDP
 
