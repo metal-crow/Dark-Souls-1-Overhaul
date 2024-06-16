@@ -295,6 +295,7 @@ void rollback_game_frame_sync_inputs_helper()
 {
     if (Rollback::rollbackEnabled && Rollback::ggpoStarted)
     {
+        //this is where the game state is loaded/a rollback is triggered
         ggpo_idle(Rollback::ggpo, 0); //timeout isn't actually used by this function
 
         if (Rollback::ggpoReady == GGPOREADY::ReadyAwaitingFrameHead)
@@ -383,6 +384,7 @@ void dsr_frame_finished_helper()
         //only start telling ggpo we're running once the players are synced
         if (Rollback::ggpoReady == GGPOREADY::Ready)
         {
+            //this is where the game state is actually saved (and also loaded if we are in SyncTest)
             ggpo_advance_frame(Rollback::ggpo);
 
             if (Rollback::rollbackVisual)
