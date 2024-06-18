@@ -354,20 +354,25 @@ void RemoveQueuedPackets(uint64_t steamid)
     ConsoleWrite("Queued packets remaining: %d", queued_packets.size());
 }
 
-void SendQueuedPackets()
+void ProcessQueuedPackets(uint64_t steamid)
 {
-    //send out all the packets that were queued during this time, and remove them as we send them
-    ConsoleWrite("Sending queued packets: total %d", queued_packets.size());
+    //send out all the packets for this user that were queued during this time, and remove them as we send them
+    ConsoleWrite("Sending queued packets for %llx. Total %d", steamid, queued_packets.size());
     std::vector<PacketStorageData*>::iterator pkt_it = queued_packets.begin();
     while (pkt_it != queued_packets.end())
     {
         auto elem = *pkt_it;
-        if (SteamAPIStatusKnown_Users.contains(elem->steamIDRemote.ConvertToUint64()))
+        //Only send packets if it's for this specific user and we know the user's api status
+        if (elem->steamIDRemote.ConvertToUint64() == steamid && SteamAPIStatusKnown_Users.contains(steamid))
         {
-            bool sent = SendP2PPacket_Replacement_injection_helper(elem->steamIDRemote, elem->pubData, elem->cubData, elem->eP2PSendType, elem->nChannel);
-            if (!sent)
+            //If their api status is non-mod, since we would have already sent the packet then just delete it
+            if (SteamAPIStatusKnown_Users[steamid] != false)
             {
-                ConsoleWrite("WARNING: failed sending queued packet type %d", ((uint8_t*)elem->pubData)[1]);
+                bool sent = SendP2PPacket_Replacement_injection_helper(elem->steamIDRemote, elem->pubData, elem->cubData, elem->eP2PSendType, elem->nChannel);
+                if (!sent)
+                {
+                    ConsoleWrite("WARNING: failed sending queued packet type %d", ((uint8_t*)elem->pubData)[1]);
+                }
             }
             pkt_it = queued_packets.erase(pkt_it);
             delete elem;
@@ -526,14 +531,14 @@ bool ReadP2PPacket_Replacement_injection_helper(void *pubDest, uint32 cubDest, u
                     ModNetworking::SteamMatchmaking->SetLobbyData(curLobby, MOD_LOBBY_USERAPPROVED_KEY, approveduser.c_str());
                     //We now know this user's API, and we already sent their queued packets, so clear them
                     SteamAPIStatusKnown_Users.insert_or_assign(psteamIDRemote->ConvertToUint64(), false);
-                    ClearQueuedPackets();
+                    RemoveQueuedPackets(psteamIDRemote->ConvertToUint64());
                 }
                 // If specified in options, we must disconnect the non-mod player, since they won't on their own
                 else if (ModNetworking::allow_connect_with_non_mod_guest == false)
                 {
                     ConsoleWrite("Incoming guest is non-mod user, and host do not allow connections with non-mod users.");
                     HostForceDisconnectGuest(psteamIDRemote->ConvertToUint64(), L"Incoming guest is non-mod user, and you do not allow connections with non-mod users.", true);
-                    ClearQueuedPackets();
+                    RemoveQueuedPackets(psteamIDRemote->ConvertToUint64());
                     return false;
                 }
             }
@@ -542,7 +547,7 @@ bool ReadP2PPacket_Replacement_injection_helper(void *pubDest, uint32 cubDest, u
             {
                 ConsoleWrite("Guest auto-approves incoming guest in non-mod host world.");
                 SteamAPIStatusKnown_Users.insert_or_assign(psteamIDRemote->ConvertToUint64(), false);
-                ClearQueuedPackets();
+                RemoveQueuedPackets(psteamIDRemote->ConvertToUint64());
             }
         }
 
@@ -566,7 +571,7 @@ bool SendP2PPacket_Replacement_injection_helper(CSteamID steamIDRemote, void *pu
         return false;
     }
 
-    //Any packet sent during this period where we don't know the other user's API nature, save them to send later.
+    //Any packet sent during this period where we don't know the other user's API nature, send it on the old api and save to send later if they use the new api.
     if (!SteamAPIStatusKnown_Users.contains(steamIDRemote.ConvertToUint64()))
     {
         uint64_t currentLobby = ModNetworking::currentLobby.load();
@@ -764,6 +769,9 @@ void ModNetworking::LobbyEnterCallback(LobbyEnter_t* pCallback)
         ModNetworking::SteamMatchmaking->SetLobbyMemberData(pCallback->m_ulSteamIDLobby, MOD_LOBBY_DATA_KEY, ModModes_To_String.at(Mod::get_mode()));
         ConsoleWrite("Guest set member data = %hhx", Mod::get_mode());
 
+        //now that we know the host, we can send the queued packets (only if they are a mod user, otherwise we already sent them)
+        ProcessQueuedPackets(lobbyowner.ConvertToUint64());
+
         //we now lookup the status of the guest and any connected hosts
         //we can safely assume their lobby member data is set before we get there
         //This is only really useful if >1 mod users are connected in a non-mod lobby
@@ -781,17 +789,9 @@ void ModNetworking::LobbyEnterCallback(LobbyEnter_t* pCallback)
                     user_mod_value = String_To_ModModes.at(user_mod_value_str);
                 }
                 SteamAPIStatusKnown_Users.insert_or_assign(member.ConvertToUint64(), user_mod_value != ModMode::InvalidMode);
+                ProcessQueuedPackets(member.ConvertToUint64());
                 ConsoleWrite("Guest read user %llx = %hhx", member.ConvertToUint64(), user_mod_value);
             }
-        }
-        //now that we know the host, we can send the queued packets (only if they are a mod user, otherwise we already sent them)
-        if (mod_value != ModMode::InvalidMode)
-        {
-            SendQueuedPackets();
-        }
-        else
-        {
-            ClearQueuedPackets();
         }
 
         //Kick off ggpo
@@ -862,14 +862,7 @@ void ModNetworking::LobbyDataUpdateCallback(LobbyDataUpdate_t* pCallback)
                 ConsoleWrite("Guest approves user = \"%s\"/%llx", approve_user_str, approve_user_value);
                 SteamAPIStatusKnown_Users.insert_or_assign(approve_user_value, user_mode != ModMode::InvalidMode);
                 //now that we know the user, we can send the queued packets (only if they are a mod user, otherwise we already sent them)
-                if (user_mode != ModMode::InvalidMode)
-                {
-                    SendQueuedPackets();
-                }
-                else
-                {
-                    ClearQueuedPackets();
-                }
+                ProcessQueuedPackets(approve_user_value);
             }
         }
     }
@@ -883,7 +876,7 @@ void ModNetworking::LobbyDataUpdateCallback(LobbyDataUpdate_t* pCallback)
         {
             ConsoleWrite("Guest read user %llx is mod user", pCallback->m_ulSteamIDMember);
             SteamAPIStatusKnown_Users.insert_or_assign(pCallback->m_ulSteamIDMember, true);
-            SendQueuedPackets();
+            ProcessQueuedPackets(pCallback->m_ulSteamIDMember);
         }
     }
 
@@ -915,7 +908,7 @@ void ModNetworking::LobbyDataUpdateCallback(LobbyDataUpdate_t* pCallback)
 
             //We now know this user's API, so we can send the queued packets
             SteamAPIStatusKnown_Users.insert_or_assign(pCallback->m_ulSteamIDMember, true);
-            SendQueuedPackets();
+            ProcessQueuedPackets(pCallback->m_ulSteamIDMember);
 
             //Start GGPO for this session (new session or re-create with new players)
             Rollback::rollback_end_session();
@@ -988,13 +981,13 @@ void ModNetworking::LobbyChatUpdateCallback(LobbyChatUpdate_t* pCallback)
     // (Guest packets are required for a new guest to connect)
     // We won't know if they use the API until either the host approves them, or they set their lobby data, however.
     // So we do nothing for now and pretend they are non-mod.
-    if (lobbyowner != selfsteamid && pCallback->m_rgfChatMemberStateChange == EChatMemberStateChange::k_EChatMemberStateChangeEntered && pCallback->m_ulSteamIDUserChanged != selfsteamid.ConvertToUint64())
+    if (lobbyowner != selfsteamid && pCallback->m_rgfChatMemberStateChange & EChatMemberStateChange::k_EChatMemberStateChangeEntered && pCallback->m_ulSteamIDUserChanged != selfsteamid.ConvertToUint64())
     {
         ConsoleWrite("Guest detected new guest is trying to join.");
     }
 
     // Guest: Handle the case where the guest disconnects
-    if (lobbyowner != selfsteamid && pCallback->m_rgfChatMemberStateChange == EChatMemberStateChange::k_EChatMemberStateChangeLeft && pCallback->m_ulSteamIDUserChanged != selfsteamid.ConvertToUint64())
+    if (lobbyowner != selfsteamid && pCallback->m_rgfChatMemberStateChange & EChatMemberStateChange::k_EChatMemberStateChangeLeft && pCallback->m_ulSteamIDUserChanged != selfsteamid.ConvertToUint64())
     {
         ConsoleWrite("Guest detected another guest has D/C'd.");
 
