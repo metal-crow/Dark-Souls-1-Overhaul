@@ -28,8 +28,8 @@
 // Preprocessor definition utilized by the Dark Souls Game Files C++ library (DsGameFiles.lib)
 #define __DS1_OVERHAUL_MOD
 
-static const uint64_t VERSION_RAW = 2024061500;
-#define VERSION_STRING  "Beta21"
+static const uint64_t VERSION_RAW = 2024061900;
+#define VERSION_STRING  "Beta22"
 #define DS1_OVERHAUL_TXT_INTRO "\n+------------------------------------------------------+\n|      Dark Souls Overhaul   ["VERSION_STRING"]                 |\n+------------------------------------------------------+"
 
 extern HMODULE d3d11_module;
