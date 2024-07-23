@@ -141,6 +141,11 @@ void ModNetworking::CreatePersistentLobby()
 //Await the result of creating the persistant lobby, and set it's data for the current mode
 void ModNetworking::LobbyCreatedCallback(LobbyCreated_t* pCallback, bool bIOFailure)
 {
+    //if we're offline, just don't bother doing anything
+    if (pCallback->m_eResult == k_EResultNoConnection)
+    {
+        return;
+    }
     if (bIOFailure || pCallback->m_eResult != k_EResultOK)
     {
         FATALERROR("LobbyCreatedCallback failed");
