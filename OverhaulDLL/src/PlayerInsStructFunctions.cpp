@@ -107,11 +107,11 @@ void copy_PlayerIns(PlayerIns* to, const PlayerIns* from, bool to_game)
         }
     }
     copy_ProEquipCtrl(to->proequipctrl, from->proequipctrl, to_game);
-
     to->curSelectedMagicId = from->curSelectedMagicId;
     to->curUsedItem = from->curUsedItem;
-    to->itemId = from->itemId;
+    to->override_itemId = from->override_itemId;
     to->override_equipped_magicId = from->override_equipped_magicId;
+    to->using_override = from->using_override;
     copy_ChrAsm(to->chrasm, from->chrasm);
     copy_ChrAsmModelRes(to->chrAsmModelRes, from->chrAsmModelRes, to_game);
     copy_ChrAsmModel(to->chrAsmModel, from->chrAsmModel, to_game);
@@ -606,9 +606,9 @@ std::string print_EquipGameData(EquipGameData* to)
     std::string out = "EquipGameData\n";
 
     out += "equippedItemIndexes:";
-    for (size_t i = 0; i < sizeof(to->equippedItemIndexes)/4; i++)
+    for (size_t i = 0; i < sizeof(to->EquipItemToInventoryIndexMap)/4; i++)
     {
-        out += std::to_string(to->equippedItemIndexes[i]);
+        out += std::to_string(to->EquipItemToInventoryIndexMap[i]);
         out += " ";
     }
     out += "\n";
@@ -622,10 +622,13 @@ std::string print_EquipGameData(EquipGameData* to)
 
 void copy_EquipGameData(EquipGameData* to, const EquipGameData* from)
 {
-    memcpy(to->equippedItemIndexes, from->equippedItemIndexes, sizeof(to->equippedItemIndexes));
+    memcpy(to->EquipItemToInventoryIndexMap, from->EquipItemToInventoryIndexMap, sizeof(to->EquipItemToInventoryIndexMap)); //Part of input
+    memcpy(to->EquipItemToInventoryIndexMap_index_updated, from->EquipItemToInventoryIndexMap_index_updated, sizeof(to->EquipItemToInventoryIndexMap_index_updated)); //Part of input
     copy_ChrAsm(&to->chrasm, &from->chrasm);
     copy_EquipMagicData(to->equipMagicData, from->equipMagicData);
     copy_EquipItemData(&to->equippedItemsInQuickbar, &from->equippedItemsInQuickbar);
+    to->amountOfItemUsedFromInventory = from->amountOfItemUsedFromInventory;
+    to->itemInventoryIdCurrentlyBeingUsedFromInventory = from->itemInventoryIdCurrentlyBeingUsedFromInventory;
 }
 
 EquipGameData* init_EquipGameData()
@@ -659,12 +662,15 @@ std::string print_EquipItemData(EquipItemData* to)
     }
     out += "\n";
 
+    out += "selectedQuickbarItem:" + std::to_string(to->selectedQuickbarItem) + "\n";
+
     return out;
 }
 
 void copy_EquipItemData(EquipItemData* to, const EquipItemData* from)
 {
     memcpy(to->quickbar, from->quickbar, sizeof(to->quickbar));
+    to->selectedQuickbarItem = from->selectedQuickbarItem;
 }
 
 std::string print_EquipMagicData(EquipMagicData* to)
@@ -832,7 +838,7 @@ void copy_ChrIns(ChrIns* to, const ChrIns* from, bool to_game)
 {
     //copy_ChrIns_field0x18(to->field0x18, from->field0x18);
     copy_PlayerCtrl(to->playerCtrl, from->playerCtrl, to_game);
-    //copy_PadManipulator(to->padManipulator, from->padManipulator);
+    copy_PadManipulator(to->padManipulator, from->padManipulator);
     to->CharaInitParamID = from->CharaInitParamID;
     memcpy(to->data_5, from->data_5, sizeof(to->data_5));
     to->lowerThrowAnim = from->lowerThrowAnim;
@@ -880,7 +886,7 @@ ChrIns* init_ChrIns()
 
     //local_ChrIns->field0x18 = init_ChrIns_field0x18();
     local_ChrIns->playerCtrl = init_PlayerCtrl();
-    //local_ChrIns->padManipulator = init_PadManipulator();
+    local_ChrIns->padManipulator = init_PadManipulator();
     local_ChrIns->player_handing_state = (uint32_t*)malloc_(sizeof(uint32_t)*3);
     local_ChrIns->specialEffects = init_SpecialEffect();
     local_ChrIns->qwcSpEffectEquipCtrl = init_QwcSpEffectEquipCtrl();

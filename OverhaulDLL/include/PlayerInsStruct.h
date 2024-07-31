@@ -58,6 +58,7 @@ typedef struct ChrIns_field0x18 ChrIns_field0x18;
 typedef struct ChrIns ChrIns;
 typedef struct PlayerGameData_AttributeInfo PlayerGameData_AttributeInfo;
 typedef struct EquipInventoryData EquipInventoryData;
+typedef struct EquipInventoryDataItem EquipInventoryDataItem;
 typedef struct MagicSlot MagicSlot;
 typedef struct EquipMagicData EquipMagicData;
 typedef struct EquipItemData EquipItemData;
@@ -836,7 +837,8 @@ struct ChrIns
     uint32_t toughnessUnk2;
     int32_t curSelectedMagicId;
     ItemUsed curUsedItem;
-    uint8_t padding_5[8];
+    uint32_t itemid;
+    uint32_t override_equipped_magicId;
     SpecialEffect* specialEffects;
     QwcSpEffectEquipCtrl* qwcSpEffectEquipCtrl;
     uint8_t data_0[0x48];
@@ -854,14 +856,14 @@ struct ChrIns
     uint32_t maxSp;
     float damage_taken_scalar;
     uint8_t padding_9[20];
-    float PoisonResist;
-    float ToxicResist;
-    float BleedResist;
-    float CurseResist;
-    float resistPoisonTotal;
-    float resistPlagueTotal;
-    float resistBleedingTotal;
-    float resistCurseTotal;
+    uint32_t PoisonResist;
+    uint32_t ToxicResist;
+    uint32_t BleedResist;
+    uint32_t CurseResist;
+    uint32_t resistPoisonTotal;
+    uint32_t resistPlagueTotal;
+    uint32_t resistBleedingTotal;
+    uint32_t resistCurseTotal;
     uint8_t padding_10[0x10];
     EntityThrowAnimationStatus* throw_animation_info;
     uint8_t data_1[0x18];
@@ -921,10 +923,30 @@ struct PlayerGameData_AttributeInfo
 
 static_assert(sizeof(PlayerGameData_AttributeInfo) == 0x1a4);
 
+struct EquipInventoryDataItem
+{
+    uint32_t item_category;
+    uint32_t item_id;
+    uint8_t padding_0[20];
+};
+
+static_assert(sizeof(EquipInventoryDataItem) == 0x1c);
+
 struct EquipInventoryData
 {
-    //this only deals with what stuff is in your inventory, not equipped. Probably will never matter for rollback
-    uint8_t padding_0[0x78];
+    //this only deals with what stuff is in your inventory, not equipped.
+    uint8_t padding_0[16];
+    uint32_t itemList2_len;
+    uint32_t padding_1;
+    EquipInventoryDataItem* itemlist_general; //usually null
+    uint32_t itemList1_len;
+    uint32_t padding_2;
+    uint64_t padding_3;
+    EquipInventoryDataItem* itemlist1; //points to same location as list2
+    EquipInventoryDataItem* itemlist2;
+    uint32_t itemCount;
+    uint32_t keyCount;
+    uint8_t padding_4[48];
 };
 
 static_assert(sizeof(EquipInventoryData) == 0x78);
@@ -953,7 +975,8 @@ static_assert(sizeof(EquipMagicData) == 0x7c);
 struct EquipItemData
 {
     uint8_t padding_0[0x18];
-    uint32_t quickbar[6];
+    uint32_t quickbar[5];
+    uint32_t selectedQuickbarItem;
 };
 
 static_assert(offsetof(EquipItemData, quickbar) == 0x18);
@@ -979,22 +1002,28 @@ static_assert(sizeof(ChrAsm) == 0x80);
 struct EquipGameData
 {
     uint8_t padding_0[0x24];
-    uint32_t equippedItemIndexes[20];
-    uint8_t padding_1[12];
+    uint32_t EquipItemToInventoryIndexMap[20];
+    uint8_t EquipItemToInventoryIndexMap_index_updated[6];
+    uint8_t padding_1[6];
     ChrAsm chrasm;
     ChrAsm* chrasm_alt;
     uint8_t padding_2[24];
     EquipInventoryData equippedInventory;
     EquipMagicData* equipMagicData;
     EquipItemData equippedItemsInQuickbar;
-    uint8_t padding_3[0x48];
+    void* gestureEquipData;
+    uint32_t amountOfItemUsedFromInventory;
+    uint32_t itemInventoryIdCurrentlyBeingUsedFromInventory;
+    void* playerGameData_parent;
+    uint8_t padding_3[48];
 };
 
-static_assert(offsetof(EquipGameData, equippedItemIndexes) == 0x24);
+static_assert(offsetof(EquipGameData, EquipItemToInventoryIndexMap) == 0x24);
 static_assert(offsetof(EquipGameData, chrasm) == 0x80);
 static_assert(offsetof(EquipGameData, equippedInventory) == 0x120);
 static_assert(offsetof(EquipGameData, equipMagicData) == 0x198);
 static_assert(offsetof(EquipGameData, equippedItemsInQuickbar) == 0x1a0);
+static_assert(offsetof(EquipGameData, itemInventoryIdCurrentlyBeingUsedFromInventory) == 0x1dc);
 static_assert(sizeof(EquipGameData) == 0x218);
 
 struct PlayerGameData_ChrProperties
@@ -1162,9 +1191,10 @@ struct PlayerIns
     uint8_t padding_2[8];
     int32_t curSelectedMagicId;
     ItemUsed curUsedItem;
-    uint32_t itemId;
+    uint32_t override_itemId;
     uint32_t override_equipped_magicId;
-    uint8_t padding_3[0x24];
+    uint32_t using_override;
+    uint8_t padding_3[0x20];
     ChrAsm* chrasm;
     ChrAsmModelRes* chrAsmModelRes;
     ChrAsmModel* chrAsmModel;
@@ -1195,7 +1225,7 @@ static_assert(offsetof(PlayerIns, weaponequipctrl) == 0x7f0);
 static_assert(offsetof(PlayerIns, proequipctrl) == 0x7f8);
 static_assert(offsetof(PlayerIns, curSelectedMagicId) == 0x808);
 static_assert(offsetof(PlayerIns, curUsedItem) == 0x80c);
-static_assert(offsetof(PlayerIns, itemId) == 0x814);
+static_assert(offsetof(PlayerIns, override_itemId) == 0x814);
 static_assert(offsetof(PlayerIns, override_equipped_magicId) == 0x818);
 static_assert(offsetof(PlayerIns, chrasm) == 0x840);
 static_assert(offsetof(PlayerIns, chrAsmModelRes) == 0x848);

@@ -169,25 +169,6 @@ jmp     getNetMessage_return
 getNetMessage_injection ENDP
 
 
-EXTERN rollback_game_frame_sync_inputs_return: qword
-extern rollback_game_frame_sync_inputs_helper: proc
-
-PUBLIC rollback_game_frame_sync_inputs_injection
-rollback_game_frame_sync_inputs_injection PROC
-;original code
-call    qword ptr [sub_1401862A0]
-mov     rcx, rax
-mov     edx, 2
-call    qword ptr [nullsub_78]
-
-FUNC_PROLOGUE
-call    rollback_game_frame_sync_inputs_helper
-FUNC_EPILOGUE
-
-jmp     rollback_game_frame_sync_inputs_return
-rollback_game_frame_sync_inputs_injection ENDP
-
-
 EXTERN dsr_frame_finished_return: qword
 extern dsr_frame_finished_helper: proc
 
@@ -259,6 +240,28 @@ CMP     qword ptr [RDI + 20h],0
 JNZ     floop
 jmp     followupBullet_loop_return
 followupBullet_loop_injection ENDP
+
+
+
+EXTERN get_item_currently_being_used_return: qword
+extern get_item_currently_being_used_injection_helper: proc
+
+PUBLIC get_item_currently_being_used_injection
+get_item_currently_being_used_injection PROC
+FUNC_PROLOGUE_LITE
+call    get_item_currently_being_used_injection_helper
+FUNC_EPILOGUE_LITE_NORAX
+cmp     al, 0
+je      continue
+mov     rax, rdx
+ret
+continue:
+;original code
+movsxd  rax, dword ptr [rcx+1DCh]
+mov     dword ptr [rdx], 0FFFFFFFFh
+mov     dword ptr [rdx+4], 1
+jmp     get_item_currently_being_used_return
+get_item_currently_being_used_injection ENDP
 
 _TEXT    ENDS
 

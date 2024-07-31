@@ -131,10 +131,34 @@ bool ggpo_toggle(void* unused)
     return true;
 }
 
+
+extern "C" {
+    int32_t ItemIdOverride = -1;
+    uint64_t get_item_currently_being_used_return;
+    void get_item_currently_being_used_injection();
+    uint8_t get_item_currently_being_used_injection_helper(EquipGameData*, ItemUsed*);
+}
+
+//Return 1 if we have an override itemid we want to use
+uint8_t get_item_currently_being_used_injection_helper(EquipGameData* equip, ItemUsed* out)
+{
+    if (Rollback::rollbackEnabled && ItemIdOverride != -1)
+    {
+        out->itemId = ItemIdOverride;
+        out->amountUsed = 1;
+        return 1;
+    }
+    return 0;
+}
+
 void PackRollbackInput(RollbackInput* out, PlayerIns* player)
 {
+    EquipInventoryDataItem* itemlist = player->playergamedata->equipGameData.equippedInventory.itemlist2;
+    uint32_t itemlistlen = player->playergamedata->equipGameData.equippedInventory.itemList2_len;
+
     PadManipulator_to_PadManipulatorPacked(&out->padmanipulator, player->chrins.padManipulator);
     //need to tell if GGPO has actually returned us a real input, or padding
+    //TODO improve this
     out->const1 = 1;
 
     void* PadDevice = PadMan_GetPadDevice(0);
@@ -149,12 +173,22 @@ void PackRollbackInput(RollbackInput* out, PlayerIns* player)
     out->bTargetLocked = *bTargetLocked;
     out->bTargetLocked_Alt = *bTargetLocked_Alt;
 
-    //need to know when the toggle buttons are pressed, instead of the current selected slot
-    out->toggle_right_hand_slot_selected = PadDevice_GetInputI(PadDevice, 0x51); //DpadRight
-    out->toggle_left_hand_slot_selected = PadDevice_GetInputI(PadDevice, 0x52); //DpadLeft
+    //these will only ever be 0 or 1
+    out->right_hand_slot_selected = player->chrins.padManipulator->chrManipulator.right_hand_slot_selected;
+    out->left_hand_slot_selected = player->chrins.padManipulator->chrManipulator.left_hand_slot_selected;
 
-    out->curSelectedMagicId = get_currently_selected_magic_id(player);
-    out->curUsingItemId = (player->chrins).curUsedItem.itemId;
+    //this is used both for what item we are using, and for saving the quickbar selected index
+    out->curSelectedQuickbarItemId = itemlist[player->playergamedata->equipGameData.equippedItemsInQuickbar.selectedQuickbarItem].item_id;
+
+    out->curSelectedMagicSlot = player->playergamedata->equipGameData.equipMagicData->curSelectedMagicSlot;
+
+    //this doesn't actually control the item being used, but just what item will be used when the use button is pressed
+    out->curUsingInventoryItemId = -1;
+    if (player->playergamedata->equipGameData.itemInventoryIdCurrentlyBeingUsedFromInventory != -1)
+    {
+        out->curUsingInventoryItemId = itemlist[player->playergamedata->equipGameData.itemInventoryIdCurrentlyBeingUsedFromInventory].item_id;
+    }
+
     for (size_t i = 0; i < InventorySlots::END; i++)
     {
         out->equipment_array[i] = Game::get_equipped_inventory((uint64_t)player, (InventorySlots)i);
@@ -163,71 +197,69 @@ void PackRollbackInput(RollbackInput* out, PlayerIns* player)
 
 void UnpackRollbackInput(RollbackInput* in, PlayerIns* player)
 {
-    uint32_t* right_hand_slot_selected = &(player->chrins.padManipulator->chrManipulator.right_hand_slot_selected);
-    if (in->toggle_right_hand_slot_selected)
-    {
-        *right_hand_slot_selected ^= 1;
+    EquipInventoryDataItem* itemlist = player->playergamedata->equipGameData.equippedInventory.itemlist2;
+    uint32_t itemlistlen = player->playergamedata->equipGameData.equippedInventory.itemList2_len;
+
+    //Update what hand slot is out
+    //This will actually trigger the toggle animation as well
+    player->chrins.padManipulator->chrManipulator.right_hand_slot_selected = in->right_hand_slot_selected;
+    player->chrins.padManipulator->chrManipulator.left_hand_slot_selected = in->left_hand_slot_selected;
+
+    //Replicate the code from ChrAsm_Set_Equipped_Items
+    //This only updates the chrasm equip items, since the game will dynamically update the chr elsewhere based on this
+    for (uint32_t equip_index = 0; equip_index < InventorySlots::END; equip_index++)
+        {
+        //set the chr's equipped items
+        //setting this here causes the game to update the other values dynamically (and correctly) when we later run PlayerIns_ComputeChanges
+        player->playergamedata->equipGameData.chrasm.equip_items[equip_index] = in->equipment_array[equip_index];
+        if (player->playergamedata->equipGameData.chrasm_alt != NULL)
+        {
+            player->playergamedata->equipGameData.chrasm_alt->equip_items[equip_index] = in->equipment_array[equip_index];
+        }
+
+            //handle changing equipment while 2 handing
+        if (equip_index < 7)
+            {
+            if ((equip_index == player->playergamedata->equipGameData.chrasm.l_hand_equipped_index * 0x2) ||
+                (equip_index == player->playergamedata->equipGameData.chrasm.r_hand_equipped_index * 0x2 + 0x1))
+                {
+                if (player->playergamedata->equipGameData.chrasm.equip_items[equip_index] != in->equipment_array[equip_index])
+                {
+                    player->playergamedata->equipGameData.chrasm.equipped_weapon_style = 0x1;
+                }
+            }
+        }
+
+        //update the mapping for this equipment's location in the inventory
+        uint32_t inventory_index = Game::locate_inventory_index_for_itemid(itemlist, itemlistlen, in->equipment_array[equip_index]);
+        if (equip_index < 7)
+            {
+            player->playergamedata->equipGameData.EquipItemToInventoryIndexMap_index_updated[equip_index] =
+                player->playergamedata->equipGameData.EquipItemToInventoryIndexMap[equip_index] != inventory_index;
+            }
+        player->playergamedata->equipGameData.EquipItemToInventoryIndexMap[equip_index] = inventory_index;
     }
-    uint32_t* left_hand_slot_selected = &(player->chrins.padManipulator->chrManipulator.left_hand_slot_selected);
-    if (in->toggle_left_hand_slot_selected)
-    {
-        *left_hand_slot_selected ^= 1;
-    }
+
+    //Update the current selected spell
+    player->playergamedata->equipGameData.equipMagicData->curSelectedMagicSlot = in->curSelectedMagicSlot;
+
+    //Update the current item to be used
+    //the game relies on the inventory id for getting the current item in use (see get_item_currently_being_used)
+    //this won't work for the remote user (no inventory), so we have manually inject our item id
+    if (in->curUsingInventoryItemId != -1)
+            {
+        ItemIdOverride = in->curUsingInventoryItemId;
+            }
+    //fall back to the quickbar if we don't have an inventory item
+    else
+            {
+        ItemIdOverride = in->curSelectedQuickbarItemId;
+            }
 
     uint32_t playerHandle = *(uint32_t*)(((uint64_t)player) + 8);
     if (playerHandle > Game::PC_Handle && playerHandle < Game::PC_Handle + 10)
     {
         PadManipulatorPacked_to_PadManipulator(player->chrins.padManipulator, &in->padmanipulator, true);
-
-        //only have to do the rest if this is a remote player, if this is the pc the game takes care of it
-        (player->chrins).curSelectedMagicId = in->curSelectedMagicId;
-        PlayerIns_Update_curSelectedMagicId(player, in->curSelectedMagicId);
-        //don't bother to emulate the spell changing, just force it manually
-        player->playergamedata->equipGameData.equipMagicData->equippedMagicList[0].count = 999;
-        player->playergamedata->equipGameData.equipMagicData->equippedMagicList[0].magic_id = in->curSelectedMagicId;
-
-        if (in->curUsingItemId != -1)
-        {
-            (player->chrins).curUsedItem.itemId = in->curUsingItemId;
-            (player->curUsedItem).itemId = in->curUsingItemId;
-            (player->curUsedItem).amountUsed = 1;
-            (player->chrins).curUsedItem.amountUsed = 1;
-        }
-
-        uint64_t itemList = *(uint64_t*)(((uint64_t)(&player->playergamedata->equipGameData.equippedInventory)) + 0x30);
-        for (uint32_t i = 0; i < InventorySlots::END; i++)
-        {
-            //handle changing equipment while 2 handing
-            if ((i == player->playergamedata->equipGameData.chrasm.l_hand_equipped_index * 0x2) ||
-                (i == player->playergamedata->equipGameData.chrasm.r_hand_equipped_index * 0x2 + 0x1))
-            {
-                if (player->playergamedata->equipGameData.chrasm.equip_items[i] != in->equipment_array[i])
-                {
-                    player->playergamedata->equipGameData.chrasm.equipped_weapon_style = 0x1;
-                }
-            }
-
-            //insert into EquipGameData
-            player->playergamedata->equipGameData.chrasm.equip_items[i] = in->equipment_array[i];
-            if (player->playergamedata->equipGameData.chrasm_alt != NULL)
-            {
-                player->playergamedata->equipGameData.chrasm_alt->equip_items[i] = in->equipment_array[i];
-            }
-
-            //inset into EquipInventoryData, and set the equippedItemIndexes
-            player->playergamedata->equipGameData.equippedItemIndexes[i] = i;
-            //category
-            if (i >= InventorySlots::LeftHand1 && i <= InventorySlots::RightHand2)
-            {
-                *(uint32_t*)(itemList + 0x1C * i + 0) = 0;
-            }
-            else if (i >= InventorySlots::ArmorHead && i <= InventorySlots::ArmorLegs)
-            {
-                *(uint32_t*)(itemList + 0x1C * i + 0) = 0x10000000;
-            }
-            *(uint32_t*)(itemList + 0x1C * i + 4) = in->equipment_array[i];
-            *(uint32_t*)(itemList + 0x1C * i + 8) = 1;
-        }
 
         //forcably set the PlayerCtrl->chrctrl_parent.NotLockedOn flag if the player is locked on. Dark souls will never set this itself
         uint32_t LockonTargetHandle = *(uint32_t*)(((uint64_t)(&player->chrins.padManipulator->chrManipulator)) + 0x220);
@@ -250,6 +282,17 @@ void UnpackRollbackInput(RollbackInput* in, PlayerIns* player)
         *bTargetLocked = in->bTargetLocked;
         uint8_t* bTargetLocked_Alt = (uint8_t*)((*(uint64_t*)Game::LockTgtManImp) + 0x1431);
         *bTargetLocked_Alt = in->bTargetLocked_Alt;
+
+        //update the quickbar. only needed for host since it looks it up by inventory index
+        player->playergamedata->equipGameData.equippedItemsInQuickbar.quickbar[0] = Game::locate_inventory_index_for_itemid(itemlist, itemlistlen, in->equipment_array[InventorySlots::Quickbar1]);
+        player->playergamedata->equipGameData.equippedItemsInQuickbar.quickbar[1] = Game::locate_inventory_index_for_itemid(itemlist, itemlistlen, in->equipment_array[InventorySlots::Quickbar2]);
+        player->playergamedata->equipGameData.equippedItemsInQuickbar.quickbar[2] = Game::locate_inventory_index_for_itemid(itemlist, itemlistlen, in->equipment_array[InventorySlots::Quickbar3]);
+        player->playergamedata->equipGameData.equippedItemsInQuickbar.quickbar[3] = Game::locate_inventory_index_for_itemid(itemlist, itemlistlen, in->equipment_array[InventorySlots::Quickbar4]);
+        player->playergamedata->equipGameData.equippedItemsInQuickbar.quickbar[4] = Game::locate_inventory_index_for_itemid(itemlist, itemlistlen, in->equipment_array[InventorySlots::Quickbar5]);
+        player->playergamedata->equipGameData.equippedItemsInQuickbar.selectedQuickbarItem = Game::locate_inventory_index_for_itemid(itemlist, itemlistlen, in->curSelectedQuickbarItemId);
+
+        //update the itemInventoryIdCurrentlyBeingUsedFromInventory. For the local player, we need this so the rollback doesn't clear it next frame and prevent us from continuing to read it
+        player->playergamedata->equipGameData.itemInventoryIdCurrentlyBeingUsedFromInventory = Game::locate_inventory_index_for_itemid(itemlist, itemlistlen, in->curUsingInventoryItemId);
     }
 }
 
@@ -274,6 +317,8 @@ void rollback_sync_inputs()
             FATALERROR("Unable to get playerins in rollback_load_game_state_callback");
         }
         PlayerIns* player = (PlayerIns*)player_o.value();
+        //When ggpo doesn't have the input during it's prediction stage, it just defaults to a controller with nothing pressed (no change from last input)
+        //We handle that by just not loading it at all, so the PadManipulator stays unchanged from the rollback frame it was saved from
         if (inputs[i].const1 == 1)
         {
             UnpackRollbackInput(&inputs[i], player);
@@ -285,13 +330,7 @@ void rollback_sync_inputs()
     }
 }
 
-extern "C" {
-    uint64_t rollback_game_frame_sync_inputs_return;
-    void rollback_game_frame_sync_inputs_injection();
-    void rollback_game_frame_sync_inputs_helper();
-}
-
-void rollback_game_frame_sync_inputs_helper()
+bool rollback_game_frame_start_helper(void* unused)
 {
     if (Rollback::rollbackEnabled && Rollback::ggpoStarted)
     {
@@ -308,17 +347,34 @@ void rollback_game_frame_sync_inputs_helper()
             auto player_o = Game::get_PlayerIns();
             if (!player_o.has_value() || player_o.value() == NULL)
             {
-                FATALERROR("Unable to get playerins for PC in rollback_game_frame_sync_inputs_helper");
+                FATALERROR("Unable to get playerins for PC in rollback_game_frame_start_helper");
             }
             PlayerIns* player = (PlayerIns*)player_o.value();
 
-            //Manually call the PadManipulator function to read the inputs
+            //Manually call the PadMan and PadManipulator functions to read the inputs
             //ONLY allow it to be called here, so we don't have it called normally by the game and overwrite our custom inputs
             Game::set_ReadInputs_allowed(true);
+            //This function is called as part of MainUpdate, and needs to be called first before Step_PadManipulator.
+            //It reads the controller directly and normalizes it post-keybinds
+            Step_PadMan(FRAMETIME);
+            //This function is called as part of the Step_TaskMan list, so we need to directly call it here and block TaskMan from calling it.
+            //It reads the normalized controller and sets a standardized struct
             Step_PadManipulator(player->chrins.padManipulator, FRAMETIME, player->chrins.playerCtrl);
             Game::set_ReadInputs_allowed(false);
 
-            //read local inputs
+            //We need to process the menu actions here and resolve equipment state, since they are effectivly "input"
+            //So they have to be called early so the state is resolved and we can read its outcome, then overwrite it
+            //Which means we also have to block them from being called later by Step_TaskMan, which might cause side effects since the function is called twice
+            //It also probably directly reads from the controller/PadDevice struct, so need to do it here anyway because we don't overwrite that. We overwrite the PadManipulator
+            //This includes "menus" like toggling equipped spells
+            Game::set_StepInGameMenu_allowed(true);
+            uint64_t ingamestep = (uint64_t)Game::get_InGameStep();
+            uint64_t taskitem = *(uint64_t*)(ingamestep + 0x5ae0);
+            uint64_t ingamemenustep = *(uint64_t*)(taskitem + 0x20);
+            Step_InGameMenus((void*)ingamemenustep, FRAMETIME, (void*)taskitem);
+            Game::set_StepInGameMenu_allowed(false);
+
+            //read the local inputs the above calls have resolved to
             RollbackInput localInput{};
             PackRollbackInput(&localInput, player);
 
@@ -367,6 +423,8 @@ void rollback_game_frame_sync_inputs_helper()
             }
         }
     }
+
+    return true;
 }
 
 extern "C" {
@@ -439,9 +497,7 @@ void Rollback::start()
     Rollback::NetcodeFix();
 
     //Synchronize input at the start of each frame
-    //do this anytime after the game reads the inputs, but before MoveMapStep_Step_13
-    write_address = (uint8_t*)(Rollback::rollback_game_frame_sync_inputs_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &rollback_game_frame_sync_inputs_return, 4, &rollback_game_frame_sync_inputs_injection);
+    MainLoop::setup_mainloop_callback(rollback_game_frame_start_helper, NULL, "rollback_game_frame_start_helper");
 
     //Inform ggpo after a frame has been rendered
     write_address = (uint8_t*)(Rollback::MainUpdate_end_offset + Game::ds1_base);
@@ -455,6 +511,16 @@ void Rollback::start()
     //fix an issue where the FollowupBullet doesn't have the right ptr to it's parent sometimes
     write_address = (uint8_t*)(Rollback::Build_BulletIns_FollowupBullet_loop_fix_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &followupBullet_loop_return, 2, &followupBullet_loop_injection);
+
+    //manually specify the item ID being used, instead of the inventory id
+    write_address = (uint8_t*)(Rollback::get_item_currently_being_used_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &get_item_currently_being_used_return, 6, &get_item_currently_being_used_injection);
+
+    //fix an issue where the itemInventoryIdCurrentlyBeingUsedFromInventory is getting instantly cleared after 1 frame. We need it to stay around for the whole animation
+    //unclear why this happens, but this call is what's doing it. Normally it's cleared by the TAE
+    write_address = (uint8_t*)(Rollback::call_EquipGameData_Reset_ItemBeingUsedFromInventory_offset + Game::ds1_base);
+    uint8_t nop[5] = { 0x90, 0x90, 0x90, 0x90, 0x90 };
+    sp::mem::patch_bytes(write_address, nop, 5);
 
     //Testing rollback related stuff
     Rollback::saved_playerins = init_PlayerIns();

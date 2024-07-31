@@ -71,11 +71,12 @@ private:
     static const uint64_t init_playerins_with_padmanip_offset = 0x27ba143;
     static const uint64_t isPacketTypeValid_offset = 0x50f2d0;
 
-    static const uint64_t rollback_game_frame_sync_inputs_offset = 0x15d4d5;
     static const uint64_t MainUpdate_end_offset = 0x15d701;
     static const uint64_t MoveMapStep_SetPlayerLockOn_FromController_offset = 0x24fd0b;
 
     static const uint64_t Build_BulletIns_FollowupBullet_loop_fix_offset = 0x0fe6100;
+    static const uint64_t get_item_currently_being_used_offset = 0x74a0e0;
+    static const uint64_t call_EquipGameData_Reset_ItemBeingUsedFromInventory_offset = 0x3577c9;
 
     static const uint64_t PlayerIns_Is_NetworkedPlayer_offsets[];
     static const uint64_t PlayerIns_IsHostPlayerIns_offsets[];
@@ -104,15 +105,16 @@ struct RollbackInput
     unsigned int bTargetLocked : 1;
     unsigned int bTargetLocked_Alt : 1;
 
-    unsigned int toggle_left_hand_slot_selected : 1;
-    unsigned int toggle_right_hand_slot_selected : 1;
-    PadManipulatorPacked padmanipulator;
-    uint16_t curSelectedMagicId; //this could be simulated, but let's not
-    uint32_t curUsingItemId; //we can't simulate the inventory menus for non-host
+    unsigned int left_hand_slot_selected : 1;
+    unsigned int right_hand_slot_selected : 1;
 
+    PadManipulatorPacked padmanipulator;
+    uint8_t curSelectedMagicSlot; //this could be simulated, but let's not
+    uint32_t curUsingInventoryItemId; //we can't simulate the inventory menus
+    uint32_t curSelectedQuickbarItemId;
     //uint8_t equipment_change_index;
     //uint32_t equipment_change_id;
-    uint32_t equipment_array[20];//we can't simulate the inventory menus for non-host. can optimize this since only 1 item will change per-frame (except for dragon body)
+    uint32_t equipment_array[20];//we can't simulate the inventory menus. can optimize this since only 1 item will change per-frame, just need to figure out how to get what equip changed
 };
 
 #pragma pack(pop)

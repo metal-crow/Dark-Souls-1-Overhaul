@@ -9,6 +9,7 @@ FUN_140cc5600   dq  140cc5600h
 LAB_1410826e5   dq  1410826e5h
 FUN_1410c4f60   dq  1410c4f60h
 LAB_1410ce1ce   dq  1410ce1ceh
+Step_PadMan     dq  1401af3b0h
 
 _DATA ENDS
 
@@ -200,16 +201,32 @@ jmp     grab_movemapstep_return
 grab_movemapstep_injection ENDP
 
 
+EXTERN grab_ingamestep_return: qword
+EXTERN grab_ingamestep_value: qword
+
+PUBLIC grab_ingamestep_injection
+grab_ingamestep_injection PROC
+mov qword ptr [grab_ingamestep_value], rcx
+;original code
+mov     [rsp+8], rcx
+push    rdi
+sub     rsp, 30h
+mov     qword ptr [rsp+20h], 0FFFFFFFFFFFFFFFEh
+jmp     grab_ingamestep_return
+grab_ingamestep_injection ENDP
+
+
 extern ReadInputs_allowed: byte
+
 EXTERN Step_PadManipulator_GetInputs_return: qword
 
 PUBLIC Step_PadManipulator_GetInputs_injection
 Step_PadManipulator_GetInputs_injection PROC
 ;custom code to check bool
 cmp     ReadInputs_allowed, 0
-jnz     do_read
+jnz     do_read_input
 ret
-do_read:
+do_read_input:
 ;original code
 mov     rax, rsp
 push    rbp
@@ -221,6 +238,41 @@ push    r14
 push    r15
 jmp     Step_PadManipulator_GetInputs_return
 Step_PadManipulator_GetInputs_injection ENDP
+
+
+EXTERN Step_PadMan_return: qword
+
+PUBLIC Step_PadMan_injection
+Step_PadMan_injection PROC
+;custom code to check bool
+cmp     ReadInputs_allowed, 0
+jnz     do_read_pad_input
+jmp     Step_PadMan_return
+do_read_pad_input:
+;original code
+movaps  xmm0, xmm6
+CALL    qword ptr [Step_PadMan]
+jmp     Step_PadMan_return
+Step_PadMan_injection ENDP
+
+
+extern StepInGameMenu_allowed: byte
+EXTERN Step_InGameMenu_return: qword
+
+PUBLIC Step_InGameMenu_injection
+Step_InGameMenu_injection PROC
+;custom code to check bool
+cmp     StepInGameMenu_allowed, 0
+jnz     do_read_ingamemenu
+ret
+do_read_ingamemenu:
+;original code
+mov     [rsp+8h], rbx
+mov     [rsp+10h], rsi
+push    rdi
+sub     rsp, 30h
+jmp     Step_InGameMenu_return
+Step_InGameMenu_injection ENDP
 
 
 extern GameSuspendCheck_helper: proc

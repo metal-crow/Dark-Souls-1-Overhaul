@@ -9,6 +9,7 @@ void PadManipulator_to_PadManipulatorPacked(PadManipulatorPacked* to, PadManipul
     to->l1_magic_attack_input = from->chrManipulator.CurrentFrame_ActionInputs.l1_magic_attack_input;
     to->r2_input = from->chrManipulator.CurrentFrame_ActionInputs.r2_input;
     to->backstep_input = from->chrManipulator.CurrentFrame_ActionInputs.backstep_input;
+    to->use_button_pressed = from->chrManipulator.CurrentFrame_ActionInputs.use_ButtonPressed;
     to->roll_forward_input = from->chrManipulator.CurrentFrame_ActionInputs.roll_forward_input;
     to->lefthand_weapon_attack = from->chrManipulator.CurrentFrame_ActionInputs.lefthand_weapon_attack;
     to->parry_input = from->chrManipulator.CurrentFrame_ActionInputs.parry_input;
@@ -72,6 +73,7 @@ void PadManipulatorPacked_to_PadManipulator(PadManipulator* to, PadManipulatorPa
     to->chrManipulator.CurrentFrame_ActionInputs.l1_magic_attack_input = from->l1_magic_attack_input;
     to->chrManipulator.CurrentFrame_ActionInputs.r2_input = from->r2_input;
     to->chrManipulator.CurrentFrame_ActionInputs.backstep_input = from->backstep_input;
+    to->chrManipulator.CurrentFrame_ActionInputs.use_ButtonPressed = from->use_button_pressed;
     to->chrManipulator.CurrentFrame_ActionInputs.roll_forward_input = from->roll_forward_input;
     to->chrManipulator.CurrentFrame_ActionInputs.lefthand_weapon_attack = from->lefthand_weapon_attack;
     to->chrManipulator.CurrentFrame_ActionInputs.parry_input = from->parry_input;

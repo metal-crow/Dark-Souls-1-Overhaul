@@ -186,9 +186,15 @@ public:
 
     static const uint64_t MoveMapStep_New_injection_offset = 0x24e600;
 
+    static const uint64_t InGameStep_New_injection_offset = 0x27a3c0;
+
     static const uint64_t LogoSkip_offset = 0x70f130;
 
+    static const uint64_t Step_PadMan_offset = 0x15d4c8;
+
     static const uint64_t Step_PadManipulator_GetInputs_offset = 0x396860;
+
+    static const uint64_t Step_InGameMenus_offset = 0x288d10;
 
     static const uint64_t PostProcessor_MainLoop_SuspendCheck_offset = 0xd7c530;
 
@@ -389,6 +395,8 @@ public:
 
 	static void* get_MoveMapStep();
 
+    static void* get_InGameStep();
+
 	static void Step_GameSimulation(bool renderFrame = true);
 
     static void SuspendThreads();
@@ -396,6 +404,8 @@ public:
     static void ResumeThreads();
 
     static int32_t get_SessionPlayerNumber_For_ConnectedPlayerData(uint64_t connectedplayerdata);
+
+    static void set_StepInGameMenu_allowed(bool allow);
 
     static void set_ReadInputs_allowed(bool allow);
 
@@ -410,6 +420,7 @@ public:
 
     static void update_ChrAsmModelRes_model(uint64_t ChrAsmModelRes, uint64_t ChrAsmModelResElem, uint32_t newModelId, bool useProtector, bool useWeapon);
 
+    static int32_t locate_inventory_index_for_itemid(EquipInventoryDataItem* inventory, uint32_t inventory_len, int32_t itemid);
 
 
                     /////////////////////////////////////////
@@ -619,5 +630,30 @@ static Steam_CreateLobby_APICallResult_FUNC* Steam_CreateLobby_APICallResult = (
 
 typedef bool sub_1404363c0_FUNC(uint64_t ChrCtrl_AnimationQueue, uint32_t param2);
 static sub_1404363c0_FUNC* sub_1404363c0 = (sub_1404363c0_FUNC*)0x1404363c0;
+
+typedef bool Step_MenuMan_And_MouseMan_FUNC(float frametime);
+static Step_MenuMan_And_MouseMan_FUNC* Step_MenuMan_And_MouseMan = (Step_MenuMan_And_MouseMan_FUNC*)0x14071ab90;
+
+typedef bool Step_InGameMenus_FUNC(void* InGameMenuStep, float frametime, void* TaskItem);
+static Step_InGameMenus_FUNC* Step_InGameMenus = (Step_InGameMenus_FUNC*)0x140288d10;
+
+typedef bool Step_TaskMan_FUNC(void* taskman, float frametime);
+static Step_TaskMan_FUNC* Step_TaskMan = (Step_TaskMan_FUNC*)0x14024af10;
+
+typedef bool Step_FileMan_EneDatMan_FUNC();
+static Step_FileMan_EneDatMan_FUNC* Step_FileMan_EneDatMan = (Step_FileMan_EneDatMan_FUNC*)0x1405194d0;
+
+typedef bool Update_GameMan_FUNC(float frametime);
+static Update_GameMan_FUNC* Update_GameMan = (Update_GameMan_FUNC*)0x1402c8920;
+
+typedef bool Step_HgManImp_FUNC();
+static Step_HgManImp_FUNC* Step_HgManImp = (Step_HgManImp_FUNC*)0x14015e650;
+
+typedef bool InGameMenuStep_Step_AllMenus_FUNC(void* InGameMenuStep, float frametime);
+static InGameMenuStep_Step_AllMenus_FUNC* InGameMenuStep_Step_AllMenus = (InGameMenuStep_Step_AllMenus_FUNC*)0x1402879c0;
+
+typedef void Step_FrpgMenuSys_FUNC(void* frpgmenusys, float frametime);
+static Step_FrpgMenuSys_FUNC* Step_FrpgMenuSys = (Step_FrpgMenuSys_FUNC*)0x140716690;
+
 
 #endif // _DS1_OVERHAUL_GAME_DATA_H_

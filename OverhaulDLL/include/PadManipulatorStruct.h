@@ -25,6 +25,7 @@ struct PadManipulatorPacked
     unsigned int l1_magic_attack_input : 1;
     unsigned int r2_input : 1;
     unsigned int backstep_input : 1;
+    unsigned int use_button_pressed : 1;
     unsigned int roll_forward_input : 1;
     unsigned int lefthand_weapon_attack : 1;
     unsigned int parry_input : 1;
@@ -128,7 +129,7 @@ struct ChrManipulator_ActionInputted
     bool field11_0xb;
     bool field12_0xc;
     bool field13_0xd;
-    bool field14_0xe;
+    bool use_ButtonPressed;
     bool roll_forward_input;
     bool field16_0x10;
     bool field17_0x11;

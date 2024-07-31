@@ -98,7 +98,17 @@ extern "C" {
     void grab_movemapstep_injection();
     uint64_t grab_movemapstep_value;
 
+    uint64_t grab_ingamestep_return;
+    void grab_ingamestep_injection();
+    uint64_t grab_ingamestep_value;
+
+    bool StepInGameMenu_allowed = true;
+    uint64_t Step_InGameMenu_return;
+    void Step_InGameMenu_injection();
+
     bool ReadInputs_allowed = true;
+    uint64_t Step_PadMan_return;
+    void Step_PadMan_injection();
     uint64_t Step_PadManipulator_GetInputs_return;
     void Step_PadManipulator_GetInputs_injection();
 
@@ -247,6 +257,9 @@ void Game::injections_init()
     //inject the code to save the movemapstep pointer (using the pointer chain from frpg_system is sometimes unreliable)
     write_address = (uint8_t*)(Game::MoveMapStep_New_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &grab_movemapstep_return, 1, &grab_movemapstep_injection);
+    //same for InGameStep
+    write_address = (uint8_t*)(Game::InGameStep_New_injection_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &grab_ingamestep_return, 5, &grab_ingamestep_injection);
 
     //inject code to skip the logos
     //set the state of the logo class to always be "next menu"
@@ -254,9 +267,17 @@ void Game::injections_init()
     write_address = (uint8_t*)(Game::LogoSkip_offset + Game::ds1_base);
     sp::mem::patch_bytes(write_address, pat, 6);
 
+    //inject code to control if Step_PadMan can run or not
+    write_address = (uint8_t*)(Game::Step_PadMan_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &Step_PadMan_return, 4, &Step_PadMan_injection);
+
     //inject code to control if Step_PadManipulator can read inputs or not
     write_address = (uint8_t*)(Game::Step_PadManipulator_GetInputs_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &Step_PadManipulator_GetInputs_return, 0, &Step_PadManipulator_GetInputs_injection);
+
+    //inject code to control if Step_InGameMenus can run or not
+    write_address = (uint8_t*)(Game::Step_InGameMenus_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &Step_InGameMenu_return, 1, &Step_InGameMenu_injection);
 
     //code and injections to see if the suspend flag is set, and block threads if so
     //Set as signaled by default
@@ -1617,6 +1638,11 @@ void* Game::get_MoveMapStep()
     return (void*)grab_movemapstep_value;
 }
 
+void* Game::get_InGameStep()
+{
+    return (void*)grab_ingamestep_value;
+}
+
 void Game::Step_GameSimulation(bool renderFrame)
 {
     void* MoveMapStep = Game::get_MoveMapStep();
@@ -1682,6 +1708,11 @@ int32_t Game::get_SessionPlayerNumber_For_ConnectedPlayerData(uint64_t connected
     return -1;
 }
 
+void Game::set_StepInGameMenu_allowed(bool allow)
+{
+    StepInGameMenu_allowed = allow;
+}
+
 void Game::set_ReadInputs_allowed(bool allow)
 {
     ReadInputs_allowed = allow;
@@ -1690,7 +1721,8 @@ void Game::set_ReadInputs_allowed(bool allow)
 typedef struct
 {
     void* ptr;
-    union{
+    union
+    {
         wchar_t buf[8];
         wchar_t* bufPtr;
     };
@@ -1735,10 +1767,25 @@ void Game::update_ChrAsmModelRes_model(uint64_t ChrAsmModelRes, uint64_t ChrAsmM
     {
         //build the filecap from the part id string
         swprintf(part_filename, 50, L"parts:/%s.partsbnd", part_id_wstr.bufPtr);
-        void* newPartsFileCap = Construct_PartsbndFileCap(part_filename, ChrAsmModelRes+0x10);
+        void* newPartsFileCap = Construct_PartsbndFileCap(part_filename, ChrAsmModelRes + 0x10);
         //free the old PartsbndFileCap1
-        PartsbndFileCap_Free(*(void**)Game::delay_delete_man, 0x1, *(void**)(ChrAsmModelResElem+8), 0x140195870);
+        PartsbndFileCap_Free(*(void**)Game::delay_delete_man, 0x1, *(void**)(ChrAsmModelResElem + 8), 0x140195870);
         //set PartsbndFileCap1 to the new filecap
         *(void**)(ChrAsmModelResElem + 8) = newPartsFileCap;
     }
+}
+
+int32_t Game::locate_inventory_index_for_itemid(EquipInventoryDataItem* inventory, uint32_t inventory_len, int32_t itemid)
+{
+    if (itemid == -1)
+    {
+        return -1;
+    }
+    for (uint32_t i = 0; i < inventory_len; i++)
+    {
+        if (inventory[i].item_id == itemid) {
+            return i;
+        }
+    }
+    return -1;
 }
