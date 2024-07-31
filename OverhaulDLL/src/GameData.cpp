@@ -1772,6 +1772,8 @@ void Game::update_ChrAsmModelRes_model(uint64_t ChrAsmModelRes, uint64_t ChrAsmM
         PartsbndFileCap_Free(*(void**)Game::delay_delete_man, 0x1, *(void**)(ChrAsmModelResElem + 8), 0x140195870);
         //set PartsbndFileCap1 to the new filecap
         *(void**)(ChrAsmModelResElem + 8) = newPartsFileCap;
+        //set the new model id
+        *(uint32_t*)(ChrAsmModelResElem + 4) = newModelId;
     }
 }
 
