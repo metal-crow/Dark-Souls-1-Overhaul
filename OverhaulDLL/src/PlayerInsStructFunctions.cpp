@@ -80,32 +80,13 @@ void copy_PlayerIns(PlayerIns* to, const PlayerIns* from, bool to_game)
 {
     Game::SuspendThreads();
 
-    uint32_t newModelIds[6] = { 0, 0, 0, 0, 0, 0 }; //used to set the chrAsmModelRes if any equipment changes
-
     copy_ChrIns(&to->chrins, &from->chrins, to_game);
     copy_PlayerGameData(to->playergamedata, from->playergamedata);
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     to->data_2 = from->data_2;
     copy_RingEquipCtrl(to->ringequipctrl, from->ringequipctrl, to_game);
-
-    if (to->weaponequipctrl->equipped_weapons_ids[0] != from->weaponequipctrl->equipped_weapons_ids[0])
-    {
-        newModelIds[0] = from->weaponequipctrl->equipped_weapons_ids[0];
-    }
-    if (to->weaponequipctrl->equipped_weapons_ids[1] != from->weaponequipctrl->equipped_weapons_ids[1])
-    {
-        newModelIds[1] = from->weaponequipctrl->equipped_weapons_ids[1];
-    }
     copy_WeaponEquipCtrl(to->weaponequipctrl, from->weaponequipctrl, to_game);
-
-    for (size_t i = 0; i < 4; i++)
-    {
-        if (to->proequipctrl->equipped_armors_ids[i] != from->proequipctrl->equipped_armors_ids[i])
-        {
-            newModelIds[i + 2] = from->proequipctrl->equipped_armors_ids[i];
-        }
-    }
     copy_ProEquipCtrl(to->proequipctrl, from->proequipctrl, to_game);
     to->curSelectedMagicId = from->curSelectedMagicId;
     to->curUsedItem = from->curUsedItem;
@@ -113,45 +94,13 @@ void copy_PlayerIns(PlayerIns* to, const PlayerIns* from, bool to_game)
     to->override_equipped_magicId = from->override_equipped_magicId;
     to->using_override = from->using_override;
     copy_ChrAsm(to->chrasm, from->chrasm);
-    copy_ChrAsmModelRes(to->chrAsmModelRes, from->chrAsmModelRes, to_game);
+    //copy_ChrAsmModelRes(to->chrAsmModelRes, from->chrAsmModelRes, to_game); //This is dynamically re-drawn every frame by the game
     copy_ChrAsmModel(to->chrAsmModel, from->chrAsmModel, to_game);
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
     memcpy(to->data_4, from->data_4, sizeof(to->data_4));
     memcpy(to->data_5, from->data_5, sizeof(to->data_5));
     memcpy(to->data_5a, from->data_5a, sizeof(to->data_5a));
     memcpy(to->data_6, from->data_6, sizeof(to->data_6));
-
-    if (to_game)
-    {
-        for (size_t i = 0; i < 6; i++)
-        {
-            //trigger the game to reload the models only if any visual changes happened
-            if (newModelIds[i] != 0)
-            {
-                switch (i)
-                {
-                case 0://l hand
-                    Game::update_ChrAsmModelRes_model((uint64_t)to->chrAsmModelRes, (uint64_t)(&to->chrAsmModelRes->arry[6]), newModelIds[i], false, true);
-                    break;
-                case 1://r hand
-                    Game::update_ChrAsmModelRes_model((uint64_t)to->chrAsmModelRes, (uint64_t)(&to->chrAsmModelRes->arry[7]), newModelIds[i], false, true);
-                    break;
-                case 2://head
-                    Game::update_ChrAsmModelRes_model((uint64_t)to->chrAsmModelRes, (uint64_t)(&to->chrAsmModelRes->arry[1]), newModelIds[i], true, false);
-                    break;
-                case 3://body
-                    Game::update_ChrAsmModelRes_model((uint64_t)to->chrAsmModelRes, (uint64_t)(&to->chrAsmModelRes->arry[2]), newModelIds[i], true, false);
-                    break;
-                case 4://arms
-                    Game::update_ChrAsmModelRes_model((uint64_t)to->chrAsmModelRes, (uint64_t)(&to->chrAsmModelRes->arry[3]), newModelIds[i], true, false);
-                    break;
-                case 5://legs
-                    Game::update_ChrAsmModelRes_model((uint64_t)to->chrAsmModelRes, (uint64_t)(&to->chrAsmModelRes->arry[4]), newModelIds[i], true, false);
-                    break;
-                }
-            }
-        }
-    }
 
     Game::ResumeThreads();
 }
