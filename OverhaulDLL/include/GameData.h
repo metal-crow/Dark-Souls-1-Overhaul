@@ -387,9 +387,13 @@ public:
 
     static void* game_smallObject_malloc(uint64_t heap, size_t size, size_t alignment);
 
+    static void* thread_malloc(size_t size);
+
     static void game_free(void* p);
 
-    static void game_free_alt(void* p);
+    static void game_free_alt(void* heapObjArg = NULL, void* p);
+
+    static void thread_free(void* p, size_t size);
 
     static bool Check_DLHeapManager_DLReadWriteLock_IsUnlocked(DWORD timeoutms);
 
@@ -654,6 +658,12 @@ static InGameMenuStep_Step_AllMenus_FUNC* InGameMenuStep_Step_AllMenus = (InGame
 
 typedef void Step_FrpgMenuSys_FUNC(void* frpgmenusys, float frametime);
 static Step_FrpgMenuSys_FUNC* Step_FrpgMenuSys = (Step_FrpgMenuSys_FUNC*)0x140716690;
+
+typedef void* hkThreadMemory_alloc_FUNC(void* hkThreadMemory, uint32_t size);
+static hkThreadMemory_alloc_FUNC* hkThreadMemory_alloc = (hkThreadMemory_alloc_FUNC*)0x14099c110;
+
+typedef void hkThreadMemory_free_FUNC(void* hkThreadMemory, void* ptr, uint32_t size);
+static hkThreadMemory_free_FUNC* hkThreadMemory_free = (hkThreadMemory_free_FUNC*)0x14099c190;
 
 
 #endif // _DS1_OVERHAUL_GAME_DATA_H_

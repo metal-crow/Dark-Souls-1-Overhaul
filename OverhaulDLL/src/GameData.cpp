@@ -1596,6 +1596,12 @@ void* Game::game_smallObject_malloc(uint64_t heap, size_t size, size_t alignment
     return new_ptr;
 }
 
+void* Game::thread_malloc(size_t size)
+{
+    void* threadObj = (void*)0x141C96ED0;
+    return hkThreadMemory_alloc(threadObj, size);
+}
+
 void Game::game_free(void* p)
 {
     return InGame_Free(p);
@@ -1603,12 +1609,23 @@ void Game::game_free(void* p)
 
 typedef void heapObjFreeFunc(void* heapObj, void* p);
 
-void Game::game_free_alt(void* p)
+void Game::game_free_alt(void* heapObjArg = NULL, void* p)
 {
-    uint64_t* heapObj = Get_HeapAllocator_For_allocation(p);
+    uint64_t* heapObj = (uint64_t*)heapObjArg;
+    if (heapObjArg == NULL)
+    {
+        heapObj = Get_HeapAllocator_For_allocation(p);
+    }
     uint64_t heapObjVtable = *heapObj;
     heapObjFreeFunc* freeFunc = (heapObjFreeFunc*)*(uint64_t*)(heapObjVtable + 0x68);
     freeFunc(heapObj, p);
+}
+
+
+void Game::thread_free(void* p, size_t size)
+{
+    void* threadObj = (void*)0x141C96ED0;
+    hkThreadMemory_free(threadObj, p, size);
 }
 
 bool Game::Check_DLHeapManager_DLReadWriteLock_IsUnlocked(DWORD timeoutms)
