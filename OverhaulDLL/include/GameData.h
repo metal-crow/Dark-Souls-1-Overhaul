@@ -391,7 +391,7 @@ public:
 
     static void game_free(void* p);
 
-    static void game_free_alt(void* heapObjArg = NULL, void* p);
+    static void game_free_alt(void* p, void* heapObjArg = NULL);
 
     static void thread_free(void* p, size_t size);
 

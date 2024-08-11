@@ -1609,7 +1609,7 @@ void Game::game_free(void* p)
 
 typedef void heapObjFreeFunc(void* heapObj, void* p);
 
-void Game::game_free_alt(void* heapObjArg = NULL, void* p)
+void Game::game_free_alt(void* p, void* heapObjArg)
 {
     uint64_t* heapObj = (uint64_t*)heapObjArg;
     if (heapObjArg == NULL)
