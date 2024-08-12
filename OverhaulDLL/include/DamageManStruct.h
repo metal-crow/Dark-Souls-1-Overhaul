@@ -17,6 +17,44 @@ typedef struct hkpCapsuleShape hkpCapsuleShape;
 typedef struct DamageEntryField0x118 DamageEntryField0x118;
 typedef struct FrpgPhysWorld FrpgPhysWorld;
 
+struct FrpgPhysWorld
+{
+    uint64_t vtable;
+};
+//static_assert(sizeof(FrpgPhysWorld) == 0x30);
+
+struct hkpCapsuleShape
+{
+    uint64_t vtable;
+    uint8_t data_0[0x48];
+};
+static_assert(sizeof(hkpCapsuleShape) == 0x50);
+
+struct hkpSphereShape
+{
+    uint64_t vtable;
+    uint8_t data_0[0x30];
+};
+static_assert(sizeof(hkpSphereShape) == 0x38);
+
+struct FrpgPhysShapePhantomIns
+{
+    uint64_t vtable;
+    uint64_t data_0;
+    uint64_t damageEntry; //this points to an existing DamageEntry in the list, so treat as const
+    FrpgPhysWorld* physWorld;
+    hkpSimpleShapePhantom* _hkpSimpleShapePhantom;
+    void* self;
+    uint64_t data_1;
+    hkpCapsuleShape* _hkpCapsuleShape;
+};
+static_assert(offsetof(FrpgPhysShapePhantomIns, damageEntry) == 0x10);
+static_assert(offsetof(FrpgPhysShapePhantomIns, physWorld) == 0x18);
+static_assert(offsetof(FrpgPhysShapePhantomIns, _hkpSimpleShapePhantom) == 0x20);
+static_assert(offsetof(FrpgPhysShapePhantomIns, self) == 0x28);
+static_assert(offsetof(FrpgPhysShapePhantomIns, _hkpCapsuleShape) == 0x38);
+static_assert(sizeof(FrpgPhysShapePhantomIns) == 0x40);
+
 struct DamageEntryField0x118
 {
     uint8_t data_0[0x20];
@@ -26,32 +64,30 @@ static_assert(sizeof(DamageEntryField0x118) == 0x20);
 struct DamageEntry
 {
     uint64_t data_0;
-    FrpgPhysShapePhantomIns* PhysShapePhantomIns;
+    void* PhysShapePhantomIns1;
     FrpgPhysShapePhantomIns* FrpgPhysShapePhantomIns_Sphere;
     FrpgPhysShapePhantomIns* FrpgPhysShapePhantomIns_Capsule;
     hkpSphereShape* hkpSphereShape1;
     hkpCapsuleShape* hkpCapsuleShape1;
     uint64_t data_1;
-    uint64_t padding_0;
+    void* PhysShapePhantomIns1_ptr;
     uint8_t data_2[216];
     DamageEntryField0x118* field0x118;
-    uint64_t data_3;
-    uint64_t padding_1;
-    uint8_t data_4[168];
+    uint8_t data_4[184];
     uint64_t padding_2[2];
-    FrpgPhysWorld* physWorld;
-    hkpSimpleShapePhantom* simpleShapePhantom;
-    uint64_t padding_3;
-    uint64_t data_5;
-    hkpSphereShape* hkpSphereShape2;
-    uint64_t data_6;
-    uint64_t padding_4;
+    FrpgPhysWorld* physWorld; //this is just a const ptr to FrpgHavokManImp->FrpgPhysWorld
+    //these point to other entries in the DamageMan list. So treat as offsets, not objs
+    DamageEntry* followup_a;
+    DamageEntry* followup_b;
+    DamageEntry* followup_c;
+    void* dbgNode;
+    uint8_t data_6[16];
     DamageEntry* next;
     uint64_t data_7;
 };
 
 static_assert(offsetof(DamageEntry, data_0) == 0);
-static_assert(offsetof(DamageEntry, PhysShapePhantomIns) == 8);
+static_assert(offsetof(DamageEntry, PhysShapePhantomIns1) == 8);
 static_assert(offsetof(DamageEntry, FrpgPhysShapePhantomIns_Sphere) == 0x10);
 static_assert(offsetof(DamageEntry, FrpgPhysShapePhantomIns_Capsule) == 0x18);
 static_assert(offsetof(DamageEntry, hkpSphereShape1) == 0x20);
@@ -59,12 +95,9 @@ static_assert(offsetof(DamageEntry, hkpCapsuleShape1) == 0x28);
 static_assert(offsetof(DamageEntry, data_1) == 0x30);
 static_assert(offsetof(DamageEntry, data_2) == 0x40);
 static_assert(offsetof(DamageEntry, field0x118) == 0x118);
-static_assert(offsetof(DamageEntry, data_3) == 0x120);
-static_assert(offsetof(DamageEntry, data_4) == 0x130);
+static_assert(offsetof(DamageEntry, data_4) == 0x120);
 static_assert(offsetof(DamageEntry, physWorld) == 0x1e8);
-static_assert(offsetof(DamageEntry, simpleShapePhantom) == 0x1f0);
-static_assert(offsetof(DamageEntry, data_5) == 0x200);
-static_assert(offsetof(DamageEntry, hkpSphereShape2) == 0x208);
+static_assert(offsetof(DamageEntry, dbgNode) == 0x208);
 static_assert(offsetof(DamageEntry, data_6) == 0x210);
 static_assert(offsetof(DamageEntry, data_7) == 0x228);
 static_assert(sizeof(DamageEntry) == 0x230);
