@@ -74,7 +74,8 @@ struct DamageEntry
     uint8_t data_2[216];
     DamageEntryField0x118* field0x118;
     uint8_t data_4[184];
-    uint64_t padding_2[2];
+    void* DmgHitRecordManImp_field0x10Elem; //ptr to an entry in DmgHitRecordManImp
+    uint64_t padding_2;
     FrpgPhysWorld* physWorld; //this is just a const ptr to FrpgHavokManImp->FrpgPhysWorld
     //these point to other entries in the DamageMan list. So treat as offsets, not objs
     DamageEntry* followup_a;
@@ -96,6 +97,7 @@ static_assert(offsetof(DamageEntry, data_1) == 0x30);
 static_assert(offsetof(DamageEntry, data_2) == 0x40);
 static_assert(offsetof(DamageEntry, field0x118) == 0x118);
 static_assert(offsetof(DamageEntry, data_4) == 0x120);
+static_assert(offsetof(DamageEntry, DmgHitRecordManImp_field0x10Elem) == 0x1d8);
 static_assert(offsetof(DamageEntry, physWorld) == 0x1e8);
 static_assert(offsetof(DamageEntry, dbgNode) == 0x208);
 static_assert(offsetof(DamageEntry, data_6) == 0x210);

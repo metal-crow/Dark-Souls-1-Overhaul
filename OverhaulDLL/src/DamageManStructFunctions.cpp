@@ -134,6 +134,7 @@ void copy_DamageEntry(DamageEntry* to, DamageEntry* from, bool to_game)
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
     copy_DamageEntryField0x118(&to->field0x118, &from->field0x118, to_game);
     memcpy(to->data_4, from->data_4, sizeof(to->data_4));
+    to->DmgHitRecordManImp_field0x10Elem = from->DmgHitRecordManImp_field0x10Elem;
     to->physWorld = from->physWorld;
     //ignore followup, that's handled by the caller
     memcpy(to->data_6, from->data_6, sizeof(to->data_6));
