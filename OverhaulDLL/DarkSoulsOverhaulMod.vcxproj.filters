@@ -141,6 +141,9 @@
     <ClCompile Include="src\AttachSysSlotStructsFunctions.cpp">
       <Filter>Source Files\Rollback</Filter>
     </ClCompile>
+    <ClCompile Include="src\DmgHitRecordManImpStructFunctions.cpp">
+      <Filter>Source Files\Rollback</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3d11-wrapper\include\d3d11\exports.h">
@@ -246,6 +249,12 @@
       <Filter>Header Files\Rollback</Filter>
     </ClInclude>
     <ClInclude Include="include\AttachSysSlotStructsFunctions.h">
+      <Filter>Header Files\Rollback</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DmgHitRecordManImpStruct.h">
+      <Filter>Header Files\Rollback</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DmgHitRecordManImpStructFunctions.h">
       <Filter>Header Files\Rollback</Filter>
     </ClInclude>
   </ItemGroup>

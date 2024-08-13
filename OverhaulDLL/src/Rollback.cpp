@@ -12,6 +12,8 @@ PlayerIns* Rollback::saved_playerins = NULL;
 BulletMan* Rollback::saved_bulletman = NULL;
 FXManager* Rollback::saved_sfxobjs = NULL;
 DamageMan* Rollback::saved_damageman = NULL;
+ThrowMan* Rollback::saved_throwman = NULL;
+DmgHitRecordManImp* Rollback::saved_DmgHitRecordMan = NULL;
 PadManipulator** Rollback::saved_PadManipulator = NULL;
 
 GGPOSession* Rollback::ggpo = NULL;
@@ -42,6 +44,8 @@ bool state_test(void* unused)
         copy_BulletMan(Rollback::saved_bulletman, *(BulletMan**)Game::bullet_man, false);
         //copy_FXManager(Rollback::saved_sfxobjs, (*(SfxMan**)Game::sfx_man)->FrpgFxManagerBase->base.fXManager, false);
         copy_DamageMan(Rollback::saved_damageman, *(DamageMan**)Game::damage_man, false);
+        copy_ThrowMan(Rollback::saved_throwman, *(ThrowMan**)Game::throw_man, false);
+        copy_DmgHitRecordManImp(Rollback::saved_DmgHitRecordMan, *(DmgHitRecordManImp**)Game::dmg_hit_record_man, false);
 
         Rollback::gsave = false;
     }
@@ -54,6 +58,8 @@ bool state_test(void* unused)
         copy_BulletMan(*(BulletMan**)Game::bullet_man, Rollback::saved_bulletman, true);
         //copy_FXManager((*(SfxMan**)Game::sfx_man)->FrpgFxManagerBase->base.fXManager, Rollback::saved_sfxobjs, true);
         copy_DamageMan(*(DamageMan**)Game::damage_man, Rollback::saved_damageman, true);
+        copy_ThrowMan(*(ThrowMan**)Game::throw_man, Rollback::saved_throwman, true);
+        copy_DmgHitRecordManImp(*(DmgHitRecordManImp**)Game::dmg_hit_record_man, Rollback::saved_DmgHitRecordMan, true);
 
         Game::Step_GameSimulation();
 
@@ -528,6 +534,7 @@ void Rollback::start()
     Rollback::saved_sfxobjs = init_FXManager();
     Rollback::saved_damageman = init_DamageMan();
     Rollback::saved_PadManipulator = (PadManipulator**)malloc_(sizeof(PadManipulator*) * INPUT_ROLLBACK_LENGTH);
+    Rollback::saved_DmgHitRecordMan = init_DmgHitRecordManImp();
     for (size_t i = 0; i < INPUT_ROLLBACK_LENGTH; i++)
     {
         Rollback::saved_PadManipulator[i] = (PadManipulator*)malloc(sizeof(PadManipulator));
@@ -588,6 +595,7 @@ bool rollback_load_game_state_callback(unsigned char* buffer, int)
     //copy_SfxMan(*(SfxMan**)Game::sfx_man, state->sfxman, true);
     copy_DamageMan(*(DamageMan**)Game::damage_man, state->damageman, true);
     copy_ThrowMan(*(ThrowMan**)Game::throw_man, state->throwman, true);
+    copy_DmgHitRecordManImp(*(DmgHitRecordManImp**)Game::dmg_hit_record_man, state->dmghitrecordman, true);
 
     if (Rollback::rollbackVisual)
     {
@@ -637,6 +645,8 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
     copy_DamageMan(state->damageman, *(DamageMan**)Game::damage_man, false);
     state->throwman = init_ThrowMan();
     copy_ThrowMan(state->throwman, *(ThrowMan**)Game::throw_man, false);
+    state->dmghitrecordman = init_DmgHitRecordManImp();
+    copy_DmgHitRecordManImp(state->dmghitrecordman, *(DmgHitRecordManImp**)Game::dmg_hit_record_man, false);
 #ifdef GGPO_SYNCTEST
     our_checksum ^= std::hash<std::string>{}(print_BulletMan(*(BulletMan**)Game::bullet_man));
 #endif
@@ -666,6 +676,8 @@ void rollback_copy_buffer(void* buffer_dst, void* buffer_src)
     copy_DamageMan(state_dst->damageman, state_src->damageman, false);
     state_dst->throwman = init_ThrowMan();
     copy_ThrowMan(state_dst->throwman, state_src->throwman, false);
+    state_dst->dmghitrecordman = init_DmgHitRecordManImp();
+    copy_DmgHitRecordManImp(state_dst->dmghitrecordman, state_src->dmghitrecordman, false);
 }
 
 void rollback_free_buffer(void* buffer)
@@ -685,6 +697,8 @@ void rollback_free_buffer(void* buffer)
     state->damageman = NULL;
     free_ThrowMan(state->throwman);
     state->throwman = NULL;
+    free_DmgHitRecordManImp(state->dmghitrecordman);
+    state->dmghitrecordman = NULL;
 
     free(state);
 }

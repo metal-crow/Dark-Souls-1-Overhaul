@@ -167,6 +167,8 @@ public:
 
     static uint64_t throw_man;
 
+    static uint64_t dmg_hit_record_man;
+
     static uint64_t delay_delete_man;
 
     static uint64_t QInputMgrWindowsFantasy;

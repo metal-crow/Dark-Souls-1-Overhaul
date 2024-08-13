@@ -13,6 +13,7 @@
 #include "DamageManStructFunctions.h"
 #include "PadManipulatorStructFunctions.h"
 #include "ThrowManStructFunctions.h"
+#include "DmgHitRecordManImpStructFunctions.h"
 
 #include "ggponet.h"
 
@@ -63,6 +64,8 @@ public:
     static BulletMan* saved_bulletman;
     static FXManager* saved_sfxobjs;
     static DamageMan* saved_damageman;
+    static ThrowMan* saved_throwman;
+    static DmgHitRecordManImp* saved_DmgHitRecordMan;
     static PadManipulator** saved_PadManipulator;
 
 private:
@@ -129,6 +132,7 @@ struct RollbackState
     SfxMan* sfxman;
     DamageMan* damageman;
     ThrowMan* throwman;
+    DmgHitRecordManImp* dmghitrecordman;
 };
 
 inline void* malloc_(size_t size)

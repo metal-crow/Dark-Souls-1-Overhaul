@@ -69,6 +69,8 @@ uint64_t Game::sfx_man = NULL;
 
 uint64_t Game::throw_man = NULL;
 
+uint64_t Game::dmg_hit_record_man = NULL;
+
 uint64_t Game::delay_delete_man = NULL;
 
 uint64_t Game::QInputMgrWindowsFantasy = NULL;
@@ -227,6 +229,8 @@ void Game::init()
     Game::sfx_man = Game::ds1_base + 0x1c7c758;
 
     Game::throw_man = Game::ds1_base + 0x1c79ad0;
+
+    Game::dmg_hit_record_man = Game::ds1_base + 0x1c7a048;
 
     Game::delay_delete_man = Game::ds1_base + 0x1c6a8e8;
 
