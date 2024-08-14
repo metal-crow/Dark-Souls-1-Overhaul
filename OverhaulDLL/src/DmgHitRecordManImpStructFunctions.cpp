@@ -6,8 +6,6 @@ static const size_t max_preallocated_DmgHitRecordManImp_field0x28Elem = 96;
 
 void copy_DmgHitRecordManImp(DmgHitRecordManImp* to, DmgHitRecordManImp* from, bool to_game)
 {
-    Game::SuspendThreads();
-
     uint64_t offset0x10 = ((uint64_t)from->field0x10_array) - ((uint64_t)from->field0x10_array_start);
     to->field0x10_array = (DmgHitRecordManImp_field0x10Elem*)(((uint64_t)to->field0x10_array_start) + offset0x10);
     for (size_t i = 0; i < max_preallocated_DmgHitRecordManImp_field0x10Elem; i++)
@@ -56,8 +54,6 @@ void copy_DmgHitRecordManImp(DmgHitRecordManImp* to, DmgHitRecordManImp* from, b
     to->data_0 = from->data_0;
     to->field0x28_array_len = from->field0x28_array_len;
     to->data_1 = from->data_1;
-
-    Game::ResumeThreads();
 }
 
 DmgHitRecordManImp* init_DmgHitRecordManImp()
