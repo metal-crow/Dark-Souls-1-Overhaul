@@ -179,10 +179,6 @@ void PackRollbackInput(RollbackInput* out, PlayerIns* player)
     out->bTargetLocked = *bTargetLocked;
     out->bTargetLocked_Alt = *bTargetLocked_Alt;
 
-    //these will only ever be 0 or 1
-    out->right_hand_slot_selected = player->chrins.padManipulator->chrManipulator.right_hand_slot_selected;
-    out->left_hand_slot_selected = player->chrins.padManipulator->chrManipulator.left_hand_slot_selected;
-
     //this is used both for what item we are using, and for saving the quickbar selected index
     out->curSelectedQuickbarItemId = itemlist[player->playergamedata->equipGameData.equippedItemsInQuickbar.selectedQuickbarItem].item_id;
 
@@ -205,11 +201,6 @@ void UnpackRollbackInput(RollbackInput* in, PlayerIns* player)
 {
     EquipInventoryDataItem* itemlist = player->playergamedata->equipGameData.equippedInventory.itemlist2;
     uint32_t itemlistlen = player->playergamedata->equipGameData.equippedInventory.itemList2_len;
-
-    //Update what hand slot is out
-    //This will actually trigger the toggle animation as well
-    player->chrins.padManipulator->chrManipulator.right_hand_slot_selected = in->right_hand_slot_selected;
-    player->chrins.padManipulator->chrManipulator.left_hand_slot_selected = in->left_hand_slot_selected;
 
     //Replicate the code from ChrAsm_Set_Equipped_Items
     //This only updates the chrasm equip items, since the game will dynamically update the chr elsewhere based on this

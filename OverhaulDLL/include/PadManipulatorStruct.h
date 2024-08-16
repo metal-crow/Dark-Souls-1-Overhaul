@@ -36,7 +36,10 @@ struct PadManipulatorPacked
     unsigned int isSprintingAnim : 1;
     unsigned int not_getting_movement_input : 1;
     unsigned int change_2handing_state : 2;
+    unsigned int left_hand_slot_selected : 1;
+    unsigned int right_hand_slot_selected : 1;
 
+    uint8_t movement_related_flags;
     float camera_x_direction_movement_input_amount;
     float camera_y_direction_movement_input_amount;
     float continuous_weapon_controlled_angle;
@@ -49,7 +52,6 @@ struct PadManipulatorPacked
     float camera_x_rotation;
     float movement_velocity[4];
     uint32_t LockonTargetHandle;
-    uint8_t movement_related_flags;
     float y_movement_input;
     float x_movement_input;
     uint32_t cur_movement_input_index_to_use;
@@ -251,7 +253,7 @@ struct ChrManipulator
     float field77_0x20c;
     uint32_t field78_0x210[4];
     uint32_t LockonTargetHandle;
-    uint32_t field80_0x224;
+    int32_t CurrentFrame_ActionInputs_ButtonId;
     uint8_t field81_0x228;
     uint8_t field82_0x229;
     uint8_t field83_0x22a;
