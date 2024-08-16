@@ -71,12 +71,12 @@ struct ChrManipulator_ActionInputtedTimeHeld
     float field11_0x2c;
     float field12_0x30;
     float field13_0x34;
-    float field14_0x38;
-    float field15_0x3c;
+    float Use_ButtonPressed_held;
+    float roll_forward_input_held;
     float field16_0x40;
     float field17_0x44;
     float field18_0x48;
-    float field19_0x4c;
+    float lefthand_weapon_attack_held;
     float time_parry_held;
     float time_block_held;
     float field22_0x58;
@@ -99,7 +99,7 @@ struct ChrManipulator_ActionInputtedTimeHeld
     float field39_0x9c;
     float field40_0xa0;
     float field41_0xa4;
-    float field42_0xa8;
+    float jump_input_held;
     float field43_0xac;
     float field44_0xb0;
     float field45_0xb4;
@@ -108,10 +108,11 @@ struct ChrManipulator_ActionInputtedTimeHeld
     float field48_0xc0;
     float field49_0xc4;
     float field50_0xc8;
-    float field51_0xcc;
+    float l1_weapon_attack_held;
+    float l2_weapon_attack_held;
 };
 
-static_assert(sizeof(ChrManipulator_ActionInputtedTimeHeld) == 0xd0);
+static_assert(sizeof(ChrManipulator_ActionInputtedTimeHeld) == 0xd4);
 
 struct ChrManipulator_ActionInputted
 {
@@ -214,12 +215,8 @@ struct ChrManipulator
     uint8_t field37_0xee;
     uint8_t field38_0xef;
     ChrManipulator_ActionInputtedTimeHeld ActionInputtedTimeHeld;
-    uint8_t field40_0x1c0;
-    uint8_t field41_0x1c1;
-    uint8_t field42_0x1c2;
-    uint8_t field43_0x1c3;
     bool AnyActionInputted;
-    uint8_t field45_0x1c5;
+    bool buttonInteract_pressed;
     uint8_t field46_0x1c6;
     uint8_t field47_0x1c7;
     uint32_t change_2handing_state;
@@ -252,7 +249,7 @@ struct ChrManipulator
     float field75_0x204;
     float field76_0x208;
     float field77_0x20c;
-    float field78_0x210[4];
+    uint32_t field78_0x210[4];
     uint32_t LockonTargetHandle;
     uint32_t field80_0x224;
     uint8_t field81_0x228;
