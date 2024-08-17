@@ -108,9 +108,6 @@ struct RollbackInput
     unsigned int bTargetLocked : 1;
     unsigned int bTargetLocked_Alt : 1;
 
-    unsigned int left_hand_slot_selected : 1;
-    unsigned int right_hand_slot_selected : 1;
-
     PadManipulatorPacked padmanipulator;
     uint8_t curSelectedMagicSlot; //this could be simulated, but let's not
     uint32_t curUsingInventoryItemId; //we can't simulate the inventory menus
