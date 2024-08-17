@@ -40,26 +40,8 @@ void PadManipulator_to_PadManipulatorPacked(PadManipulatorPacked* to, PadManipul
     to->LockonTargetHandle = from->chrManipulator.LockonTargetHandle;
     to->movement_related_flags = from->movement_related_flags;
     to->not_getting_movement_input = from->not_getting_movement_input;
-    to->y_movement_input = from->y_movement_input[0];
-    //debugging
-    if (from->y_movement_input[0] != from->y_movement_input[1] ||
-        from->y_movement_input[0] != from->y_movement_input[2] ||
-        from->y_movement_input[0] != from->y_movement_input[3] ||
-        from->y_movement_input[0] != from->y_movement_input[4] ||
-        from->y_movement_input[0] != from->y_movement_input[5])
-    {
-        FATALERROR("y_movement_input not all the same");
-    }
-    to->x_movement_input = from->x_movement_input[0];
-    //debugging
-    if (from->x_movement_input[0] != from->x_movement_input[1] ||
-        from->x_movement_input[0] != from->x_movement_input[2] ||
-        from->x_movement_input[0] != from->x_movement_input[3] ||
-        from->x_movement_input[0] != from->x_movement_input[4] ||
-        from->x_movement_input[0] != from->x_movement_input[5])
-    {
-        FATALERROR("x_movement_input not all the same");
-    }
+    to->y_movement_input = from->y_movement_input[from->cur_movement_input_index_to_use];
+    to->x_movement_input = from->x_movement_input[from->cur_movement_input_index_to_use];
     to->cur_movement_input_index_to_use = from->cur_movement_input_index_to_use;
 }
 
@@ -133,18 +115,8 @@ void PadManipulatorPacked_to_PadManipulator(PadManipulator* to, PadManipulatorPa
     to->movement_related_flags = from->movement_related_flags;
     to->not_getting_movement_input = from->not_getting_movement_input;
     //DashInputTimer
-    to->y_movement_input[0] = from->y_movement_input;
-    to->y_movement_input[1] = from->y_movement_input;
-    to->y_movement_input[2] = from->y_movement_input;
-    to->y_movement_input[3] = from->y_movement_input;
-    to->y_movement_input[4] = from->y_movement_input;
-    to->y_movement_input[5] = from->y_movement_input;
-    to->x_movement_input[0] = from->x_movement_input;
-    to->x_movement_input[1] = from->x_movement_input;
-    to->x_movement_input[2] = from->x_movement_input;
-    to->x_movement_input[3] = from->x_movement_input;
-    to->x_movement_input[4] = from->x_movement_input;
-    to->x_movement_input[5] = from->x_movement_input;
+    to->y_movement_input[from->cur_movement_input_index_to_use] = from->y_movement_input;
+    to->x_movement_input[from->cur_movement_input_index_to_use] = from->x_movement_input;
     to->cur_movement_input_index_to_use = from->cur_movement_input_index_to_use;
     //time_spend_forward_strafing
     //time_spend_back_strafing
