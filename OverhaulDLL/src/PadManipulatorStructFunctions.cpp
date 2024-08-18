@@ -135,7 +135,7 @@ void PadManipulatorPacked_to_PadManipulator(PadManipulator* to, PadManipulatorPa
 
 void copy_PadManipulator(PadManipulator* to, PadManipulator* from)
 {
-    memcpy(to, from, sizeof(to));
+    memcpy(to, from, sizeof(PadManipulator));
 }
 
 PadManipulator* init_PadManipulator()
