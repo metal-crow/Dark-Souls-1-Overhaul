@@ -13,6 +13,8 @@ void PadManipulator_to_PadManipulatorPacked(PadManipulatorPacked* to, PadManipul
     to->delta_camera_x_rotation_perframe = from->chrManipulator.delta_camera_x_rotation_perframe;
     to->camera_y_rotation = from->chrManipulator.camera_y_rotation;
     to->camera_x_rotation = from->chrManipulator.camera_x_rotation;
+    to->camera_x_direction_movement_input_amount_alt = from->chrManipulator.camera_x_direction_movement_input_amount_alt;
+    to->camera_y_direction_movement_input_amount_alt = from->chrManipulator.camera_y_direction_movement_input_amount_alt;
     to->movement_velocity[0] = from->chrManipulator.movement_velocity[0];
     to->movement_velocity[1] = from->chrManipulator.movement_velocity[1];
     to->movement_velocity[2] = from->chrManipulator.movement_velocity[2];
@@ -57,8 +59,8 @@ void PadManipulatorPacked_to_PadManipulator(PadManipulator* to, PadManipulatorPa
     to->chrManipulator.delta_camera_x_rotation_perframe = from->delta_camera_x_rotation_perframe;
     to->chrManipulator.camera_y_rotation = from->camera_y_rotation;
     to->chrManipulator.camera_x_rotation = from->camera_x_rotation;
-    to->chrManipulator.camera_x_direction_movement_input_amount_alt = from->camera_x_direction_movement_input_amount;
-    to->chrManipulator.camera_y_direction_movement_input_amount_alt = from->camera_y_direction_movement_input_amount;
+    to->chrManipulator.camera_x_direction_movement_input_amount_alt = from->camera_x_direction_movement_input_amount_alt;
+    to->chrManipulator.camera_y_direction_movement_input_amount_alt = from->camera_y_direction_movement_input_amount_alt;
     to->chrManipulator.movement_velocity[0] = from->movement_velocity[0];
     to->chrManipulator.movement_velocity[1] = from->movement_velocity[1]; 
     to->chrManipulator.movement_velocity[2] = from->movement_velocity[2]; 

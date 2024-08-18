@@ -41,7 +41,9 @@ struct PadManipulatorPacked
 
     uint8_t movement_related_flags;
     float camera_x_direction_movement_input_amount;
+    float camera_x_direction_movement_input_amount_alt;
     float camera_y_direction_movement_input_amount;
+    float camera_y_direction_movement_input_amount_alt;
     float continuous_weapon_controlled_angle;
     float delta_pc_rotation_perframe;
     float weapon_controlled_angle;
