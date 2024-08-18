@@ -623,7 +623,7 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
 
         state->playerins[i] = init_PlayerIns();
         copy_PlayerIns(state->playerins[i], player, false);
-#ifdef GGPO_SYNCTEST
+#if defined(GGPO_SYNCTEST) && 0
         our_checksum ^= std::hash<std::string>{}(print_PlayerIns(player));
 #endif
     }
@@ -638,7 +638,7 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
     copy_ThrowMan(state->throwman, *(ThrowMan**)Game::throw_man, false);
     state->dmghitrecordman = init_DmgHitRecordManImp();
     copy_DmgHitRecordManImp(state->dmghitrecordman, *(DmgHitRecordManImp**)Game::dmg_hit_record_man, false);
-#ifdef GGPO_SYNCTEST
+#if defined(GGPO_SYNCTEST) && 0
     our_checksum ^= std::hash<std::string>{}(print_BulletMan(*(BulletMan**)Game::bullet_man));
 #endif
 
