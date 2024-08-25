@@ -393,13 +393,20 @@ bool rollback_game_frame_start_helper(void* unused)
         {
             PlayerIns* player = (PlayerIns*)player_o.value();
 
-            Game::set_ReadInputs_allowed(true);
-            Step_PadManipulator(player->chrins.padManipulator, FRAMETIME, player->chrins.playerCtrl);
-            Game::set_ReadInputs_allowed(false);
-
             auto guest_o = Game::get_connected_player(1);
             if (guest_o.has_value() && guest_o.value() != NULL)
             {
+            Game::set_ReadInputs_allowed(true);
+                Step_PadMan(FRAMETIME);
+            Step_PadManipulator(player->chrins.padManipulator, FRAMETIME, player->chrins.playerCtrl);
+            Game::set_ReadInputs_allowed(false);
+                Game::set_StepInGameMenu_allowed(true);
+                uint64_t ingamestep = (uint64_t)Game::get_InGameStep();
+                uint64_t taskitem = *(uint64_t*)(ingamestep + 0x5ae0);
+                uint64_t ingamemenustep = *(uint64_t*)(taskitem + 0x20);
+                Step_InGameMenus((void*)ingamemenustep, FRAMETIME, (void*)taskitem);
+                Game::set_StepInGameMenu_allowed(false);
+
                 PlayerIns* guest = (PlayerIns*)guest_o.value();
                 //send out our input
                 RollbackInput localInput{};
@@ -408,14 +415,24 @@ bool rollback_game_frame_start_helper(void* unused)
                 target.SetSteamID(guest->steamPlayerData->steamOnlineIDData->steam_id);
                 ModNetworking::SteamNetMessages->SendMessageToUser(target, &localInput, sizeof(localInput), k_nSteamNetworkingSend_UnreliableNoNagle, 1);
 
-                //read in and set the other player input
+                //read in and set the other player input. Do this in lockstep
                 SteamNetworkingMessage_t* new_message;
-                int num_messages = ModNetworking::SteamNetMessages->ReceiveMessagesOnChannel(1, &new_message, 1);
+                int num_messages = 0;
+                int i = 0;
+                do
+                {
+                    num_messages = ModNetworking::SteamNetMessages->ReceiveMessagesOnChannel(1, &new_message, 1);
+                    i++;
+                } while (num_messages < 1 && i < 5);
                 if (num_messages == 1)
                 {
                     RollbackInput* remoteInput = (RollbackInput*)new_message->GetData();
                     UnpackRollbackInput(remoteInput, guest);
                     new_message->Release();
+                }
+                else
+                {
+                    ConsoleWrite("Missed input");
                 }
             }
         }
