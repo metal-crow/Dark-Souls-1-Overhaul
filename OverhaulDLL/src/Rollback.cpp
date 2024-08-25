@@ -205,7 +205,7 @@ void UnpackRollbackInput(RollbackInput* in, PlayerIns* player)
     //Replicate the code from ChrAsm_Set_Equipped_Items
     //This only updates the chrasm equip items, since the game will dynamically update the chr elsewhere based on this
     for (uint32_t equip_index = 0; equip_index < InventorySlots::END; equip_index++)
-        {
+    {
         //set the chr's equipped items
         //setting this here causes the game to update the other values dynamically (and correctly) when we later run PlayerIns_ComputeChanges
         player->playergamedata->equipGameData.chrasm.equip_items[equip_index] = in->equipment_array[equip_index];
@@ -214,12 +214,12 @@ void UnpackRollbackInput(RollbackInput* in, PlayerIns* player)
             player->playergamedata->equipGameData.chrasm_alt->equip_items[equip_index] = in->equipment_array[equip_index];
         }
 
-            //handle changing equipment while 2 handing
+        //handle changing equipment while 2 handing
         if (equip_index < 7)
-            {
+        {
             if ((equip_index == player->playergamedata->equipGameData.chrasm.l_hand_equipped_index * 0x2) ||
                 (equip_index == player->playergamedata->equipGameData.chrasm.r_hand_equipped_index * 0x2 + 0x1))
-                {
+            {
                 if (player->playergamedata->equipGameData.chrasm.equip_items[equip_index] != in->equipment_array[equip_index])
                 {
                     player->playergamedata->equipGameData.chrasm.equipped_weapon_style = 0x1;
@@ -230,10 +230,10 @@ void UnpackRollbackInput(RollbackInput* in, PlayerIns* player)
         //update the mapping for this equipment's location in the inventory
         uint32_t inventory_index = Game::locate_inventory_index_for_itemid(itemlist, itemlistlen, in->equipment_array[equip_index]);
         if (equip_index < 7)
-            {
+        {
             player->playergamedata->equipGameData.EquipItemToInventoryIndexMap_index_updated[equip_index] =
                 player->playergamedata->equipGameData.EquipItemToInventoryIndexMap[equip_index] != inventory_index;
-            }
+        }
         player->playergamedata->equipGameData.EquipItemToInventoryIndexMap[equip_index] = inventory_index;
     }
 
@@ -244,14 +244,14 @@ void UnpackRollbackInput(RollbackInput* in, PlayerIns* player)
     //the game relies on the inventory id for getting the current item in use (see get_item_currently_being_used)
     //this won't work for the remote user (no inventory), so we have manually inject our item id
     if (in->curUsingInventoryItemId != -1)
-            {
+    {
         ItemIdOverride = in->curUsingInventoryItemId;
-            }
+    }
     //fall back to the quickbar if we don't have an inventory item
     else
-            {
+    {
         ItemIdOverride = in->curSelectedQuickbarItemId;
-            }
+    }
 
     uint32_t playerHandle = *(uint32_t*)(((uint64_t)player) + 8);
     if (playerHandle > Game::PC_Handle && playerHandle < Game::PC_Handle + 10)
