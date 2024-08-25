@@ -406,10 +406,7 @@ struct PadManipulator
     bool EnableBackStep_forward;
     uint8_t field134_0x32a;
     uint8_t field135_0x32b;
-    uint8_t field136_0x32c;
-    uint8_t field137_0x32d;
-    uint8_t field138_0x32e;
-    uint8_t field139_0x32f;
+    float field136_0x32c;
     float x_movement_input_reversed;
     float field141_0x334;
     float y_movement_input_reversed;
