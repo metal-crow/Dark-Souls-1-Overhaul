@@ -355,7 +355,7 @@ bool rollback_game_frame_start_helper(void* unused)
             //It reads the controller directly and normalizes it post-keybinds
             Step_PadMan(FRAMETIME);
             //This function is called as part of the Step_TaskMan list, so we need to directly call it here and block TaskMan from calling it.
-            //It reads the normalized controller and sets a standardized struct
+            //It reads the normalized controller, post processes inputs based on game state (camera, weapons, etc), and sets a standardized struct
             Step_PadManipulator(player->chrins.padManipulator, FRAMETIME, player->chrins.playerCtrl);
             Game::set_ReadInputs_allowed(false);
 
@@ -396,10 +396,10 @@ bool rollback_game_frame_start_helper(void* unused)
             auto guest_o = Game::get_connected_player(1);
             if (guest_o.has_value() && guest_o.value() != NULL)
             {
-            Game::set_ReadInputs_allowed(true);
+                Game::set_ReadInputs_allowed(true);
                 Step_PadMan(FRAMETIME);
-            Step_PadManipulator(player->chrins.padManipulator, FRAMETIME, player->chrins.playerCtrl);
-            Game::set_ReadInputs_allowed(false);
+                Step_PadManipulator(player->chrins.padManipulator, FRAMETIME, player->chrins.playerCtrl);
+                Game::set_ReadInputs_allowed(false);
                 Game::set_StepInGameMenu_allowed(true);
                 uint64_t ingamestep = (uint64_t)Game::get_InGameStep();
                 uint64_t taskitem = *(uint64_t*)(ingamestep + 0x5ae0);
