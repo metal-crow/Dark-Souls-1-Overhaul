@@ -1,6 +1,52 @@
 #include "PadManipulatorStructFunctions.h"
 #include "Rollback.h"
 
+std::string print_PadManipulatorPacked(PadManipulatorPacked* to)
+{
+    std::string out = "PadManipulatorPacked\n";
+    out += std::to_string(to->camera_x_direction_movement_input_amount) + "\n";
+    out += std::to_string(to->camera_y_direction_movement_input_amount) + "\n";
+    out += std::to_string(to->continuous_weapon_controlled_angle) + "\n";
+    out += std::to_string(to->delta_pc_rotation_perframe) + "\n";
+    out += std::to_string(to->weapon_controlled_angle) + "\n";
+    out += std::to_string(to->pc_rotation) + "\n";
+    out += std::to_string(to->delta_camera_y_rotation_perframe) + "\n";
+    out += std::to_string(to->delta_camera_x_rotation_perframe) + "\n";
+    out += std::to_string(to->camera_y_rotation) + "\n";
+    out += std::to_string(to->camera_x_rotation) + "\n";
+    out += std::to_string(to->camera_x_direction_movement_input_amount_alt) + "\n";
+    out += std::to_string(to->camera_y_direction_movement_input_amount_alt) + "\n";
+    out += std::to_string(to->movement_velocity[0]) + "\n";
+    out += std::to_string(to->movement_velocity[1]) + "\n";
+    out += std::to_string(to->movement_velocity[2]) + "\n";
+    out += std::to_string(to->movement_velocity[3]) + "\n";
+    out += std::to_string(to->r1_weapon_attack_input) + "\n";
+    out += std::to_string(to->l1_input) + "\n";
+    out += std::to_string(to->r1_magic_attack_input) + "\n";
+    out += std::to_string(to->l1_magic_attack_input) + "\n";
+    out += std::to_string(to->r2_input) + "\n";
+    out += std::to_string(to->backstep_input) + "\n";
+    out += std::to_string(to->use_button_pressed) + "\n";
+    out += std::to_string(to->roll_forward_input) + "\n";
+    out += std::to_string(to->lefthand_weapon_attack) + "\n";
+    out += std::to_string(to->parry_input) + "\n";
+    out += std::to_string(to->block_input) + "\n";
+    out += std::to_string(to->jump_input) + "\n";
+    out += std::to_string(to->l1_weapon_attack) + "\n";
+    out += std::to_string(to->l2_weapon_attack) + "\n";
+    out += std::to_string(to->change_2handing_state) + "\n";
+    out += std::to_string(to->left_hand_slot_selected) + "\n";
+    out += std::to_string(to->right_hand_slot_selected) + "\n";
+    out += std::to_string(to->isSprintingAnim) + "\n";
+    out += std::to_string(to->LockonTargetHandle) + "\n";
+    out += std::to_string(to->movement_related_flags) + "\n";
+    out += std::to_string(to->not_getting_movement_input) + "\n";
+    out += std::to_string(to->y_movement_input) + "\n";
+    out += std::to_string(to->x_movement_input) + "\n";
+    out += std::to_string(to->cur_movement_input_index_to_use) + "\n";
+    return out;
+}
+
 void PadManipulator_to_PadManipulatorPacked(PadManipulatorPacked* to, PadManipulator* from)
 {
     to->camera_x_direction_movement_input_amount = from->chrManipulator.camera_x_direction_movement_input_amount;

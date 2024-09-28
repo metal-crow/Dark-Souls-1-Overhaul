@@ -3,8 +3,10 @@
 #define PadManipulatorSTRUCTFUNCTIONS_H
 
 #include <stdint.h>
+#include <string>
 #include "PadManipulatorStruct.h"
 
+std::string print_PadManipulatorPacked(PadManipulatorPacked* to);
 void PadManipulator_to_PadManipulatorPacked(PadManipulatorPacked* to, PadManipulator* from);
 void PadManipulatorPacked_to_PadManipulator(PadManipulator* to, PadManipulatorPacked* from, bool networkedPc);
 
