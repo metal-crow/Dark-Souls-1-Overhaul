@@ -99,6 +99,7 @@ void FileReloading::ReloadPlayer(ModMode currentmode, ModMode newmode)
     //avoid a player reload if not needed
     if (
         (currentmode == ModMode::Overhaul && newmode == ModMode::Legacy) ||
+        (currentmode == ModMode::Overhaul && newmode == ModMode::Compatability) ||
         (currentmode == ModMode::Legacy && newmode == ModMode::Overhaul) ||
         (currentmode == ModMode::Compatability && newmode == ModMode::Overhaul)
         )
