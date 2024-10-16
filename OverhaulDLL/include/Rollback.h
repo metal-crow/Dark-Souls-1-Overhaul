@@ -66,7 +66,7 @@ public:
     static DamageMan* saved_damageman;
     static ThrowMan* saved_throwman;
     static DmgHitRecordManImp* saved_DmgHitRecordMan;
-    static PadManipulator** saved_PadManipulator;
+    static PadManipulatorPacked** saved_PadManipulator;
 
 private:
     static const uint64_t sendNetMessage_offset = 0x50b6b0;

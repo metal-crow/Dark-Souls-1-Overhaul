@@ -14,7 +14,7 @@ FXManager* Rollback::saved_sfxobjs = NULL;
 DamageMan* Rollback::saved_damageman = NULL;
 ThrowMan* Rollback::saved_throwman = NULL;
 DmgHitRecordManImp* Rollback::saved_DmgHitRecordMan = NULL;
-PadManipulator** Rollback::saved_PadManipulator = NULL;
+PadManipulatorPacked** Rollback::saved_PadManipulator = NULL;
 
 GGPOSession* Rollback::ggpo = NULL;
 GGPOPlayerHandle Rollback::ggpoHandles[GGPO_MAX_PLAYERS] = {};
@@ -79,7 +79,7 @@ bool input_test(void* unused)
     {
         auto player_o = Game::get_PlayerIns();
         PlayerIns* player = (PlayerIns*)player_o.value();
-        copy_PadManipulator(Rollback::saved_PadManipulator[inputSaveFrameI], player->chrins.padManipulator);
+        PadManipulator_to_PadManipulatorPacked(Rollback::saved_PadManipulator[inputSaveFrameI], player->chrins.padManipulator);
 
         inputSaveFrameI++;
         if (inputSaveFrameI >= INPUT_ROLLBACK_LENGTH)
@@ -96,7 +96,7 @@ bool input_test(void* unused)
 
         auto player_o = Game::get_PlayerIns();
         PlayerIns* player = (PlayerIns*)player_o.value();
-        copy_PadManipulator(player->chrins.padManipulator, Rollback::saved_PadManipulator[inputSaveFrameI]);
+        PadManipulatorPacked_to_PadManipulator(player->chrins.padManipulator, Rollback::saved_PadManipulator[inputSaveFrameI], true);
 
         inputSaveFrameI++;
         if (inputSaveFrameI >= INPUT_ROLLBACK_LENGTH)
@@ -541,11 +541,11 @@ void Rollback::start()
     Rollback::saved_bulletman = init_BulletMan();
     Rollback::saved_sfxobjs = init_FXManager();
     Rollback::saved_damageman = init_DamageMan();
-    Rollback::saved_PadManipulator = (PadManipulator**)malloc_(sizeof(PadManipulator*) * INPUT_ROLLBACK_LENGTH);
+    Rollback::saved_PadManipulator = (PadManipulatorPacked**)malloc_(sizeof(PadManipulatorPacked*) * INPUT_ROLLBACK_LENGTH);
     Rollback::saved_DmgHitRecordMan = init_DmgHitRecordManImp();
     for (size_t i = 0; i < INPUT_ROLLBACK_LENGTH; i++)
     {
-        Rollback::saved_PadManipulator[i] = (PadManipulator*)malloc(sizeof(PadManipulator));
+        Rollback::saved_PadManipulator[i] = (PadManipulatorPacked*)malloc(sizeof(PadManipulatorPacked));
     }
     //Testing save/restore with a hotkey
     MainLoop::setup_mainloop_callback(state_test, NULL, "state_test");
