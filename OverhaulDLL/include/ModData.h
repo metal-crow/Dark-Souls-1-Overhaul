@@ -25,6 +25,7 @@
 #define _DS1_OVERHAUL_PREF_USE_STEAM_NAMES_ "UseSteamNames"
 #define _DS1_OVERHAUL_PREF_FIX_HP_BAR_SIZE_ "FixHpBarSize"
 #define _DS1_OVERHAUL_PREF_STOP_DURABILITY_DAMAGE_ "StopDurabilityDamage"
+#define _DS1_OVERHAUL_PREF_ENABLE_FAIRNESS_ "AllowArmorSwapOnlyWithModPlayers"
 // Keybinds:
 #define _DS1_OVERHAUL_KEYBIND_NONMOD_HOST_CONNECT_ "ToggleAllowConnectNonModHost"
 #define _DS1_OVERHAUL_KEYBIND_LEGACYMODE_HOST_CONNECT_ "ToggleAllowConnectLegacyModeHost"
@@ -106,6 +107,8 @@ public:
 
     // Enables stopDurabilityDamage function
     static bool stop_durability_damage;
+
+    static bool fairness_flag;
 
     // Custom game archive files to load instead of the vanilla game files
     static std::wstring custom_game_archive_path;

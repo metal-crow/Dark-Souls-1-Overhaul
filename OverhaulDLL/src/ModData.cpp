@@ -49,6 +49,10 @@ bool Mod::use_steam_names = false;
 // Enables stopDurabilityDamage function
 bool Mod::stop_durability_damage = false;
 
+// Make any current non-symmetric options symmetric only
+// For example, armor can now only be swapped if 2 players have the mod
+bool Mod::fairness_flag = false;
+
 // Custom game archive files to load instead of the vanilla game files
 std::wstring Mod::custom_game_archive_path;
 
@@ -97,6 +101,8 @@ void Mod::get_init_preferences()
     Mod::fix_hp_bar_size = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_FIX_HP_BAR_SIZE_, (int)Mod::fix_hp_bar_size, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
 
     Mod::stop_durability_damage = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_STOP_DURABILITY_DAMAGE_, (int)Mod::stop_durability_damage, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+
+    Mod::fairness_flag = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_ENABLE_FAIRNESS_, (int)Mod::fairness_flag, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
 }
 
 bool check_hotkeys(void* unused)
