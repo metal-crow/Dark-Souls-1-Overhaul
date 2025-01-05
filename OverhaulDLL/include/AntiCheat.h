@@ -20,8 +20,7 @@ namespace AntiCheat {
 
 void start();
 
-static const uint64_t NpcGuard_offset = 0x2e191ae;
-static const uint64_t BossGuard_offset = 0x322915;
+static const uint64_t DmgGuard_offset = 0x322915;
 static const uint64_t TeleBackstab_getBSAnimation_offset = 0x3ac6f3;
 static const uint64_t TeleBackstab_setPlayerLocation_offset = 0x2bb56a;
 static const uint64_t NameCrash_prevention_offset = 0x761041;

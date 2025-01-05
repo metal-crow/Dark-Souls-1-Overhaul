@@ -74,33 +74,11 @@ FUNC_EPILOGUE_NORCX macro
     popfq 
 endm
 
-extern npc_guard_check_exit: qword
-extern npc_guard_asm_check_helper: proc
+extern dmg_guard_return: qword
+extern dmg_guard_asm_check_helper: proc
 
-PUBLIC npc_guard_asm_check
-npc_guard_asm_check PROC
-
-FUNC_PROLOGUE
-mov     rcx, r15 ; r15 is entityPointer of the attacker
-mov     rdx, rbx ; rbx is entityPointer of target; check if they are a non-hostile NPC
-mov     r8d, edi ; current damage amount
-call    npc_guard_asm_check_helper
-mov     edi, eax ;use the return value as the new damage amount
-FUNC_EPILOGUE
-
-;original code
-MOV     EDX,dword ptr [RBX + 3e8h]
-MOV     RCX,RBX
-ADD     EDX,EDI
-jmp     npc_guard_check_exit
-npc_guard_asm_check ENDP
-
-
-extern boss_guard_return: qword
-extern boss_guard_asm_check_helper: proc
-
-PUBLIC boss_guard_asm_check
-boss_guard_asm_check PROC
+PUBLIC dmg_guard_asm_check
+dmg_guard_asm_check PROC
 ;original code
 SUB     RSP,20h
 TEST    byte ptr [RCX+524h],40h
@@ -108,8 +86,10 @@ MOV     RBX,RCX
 jnz     label_jmp_skip_hp_set
 
 FUNC_PROLOGUE
-;boss entity ptr passed implicitly as rcx
-call    boss_guard_asm_check_helper
+;target entity ptr passed implicitly as rcx
+;damage amount passed implicitly as rdx
+mov     r8, r15 ; r15 is entityPointer of the attacker
+call    dmg_guard_asm_check_helper
 mov     rcx, rax ;grab the result
 FUNC_EPILOGUE_NORCX
 
@@ -120,8 +100,8 @@ jz      normal_exit
 label_jmp_skip_hp_set:
 jmp     qword ptr [jmp_skip_hp_set]
 normal_exit:
-jmp     boss_guard_return
-boss_guard_asm_check ENDP
+jmp     dmg_guard_return
+dmg_guard_asm_check ENDP
 
 
 extern TeleBackstabProtect_setPosition_return: qword

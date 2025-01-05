@@ -17,13 +17,9 @@
 #include "PlayerInsStruct.h"
 
 extern "C" {
-    uint64_t npc_guard_check_exit;
-    void npc_guard_asm_check();
-    uint32_t npc_guard_asm_check_helper(uint64_t attacker, uint64_t target, uint32_t damage);
-
-    uint64_t boss_guard_return;
-    void boss_guard_asm_check();
-    uint64_t boss_guard_asm_check_helper(ChrIns* target);
+    uint64_t dmg_guard_return;
+    void dmg_guard_asm_check();
+    uint64_t dmg_guard_asm_check_helper(ChrIns* target, uint32_t damage, uint64_t attacker);
 
     uint64_t TeleBackstabProtect_store_AnimationId_return;
     void TeleBackstabProtect_store_AnimationId();
@@ -51,17 +47,10 @@ namespace AntiCheat {
 
 void start() {
     ConsoleWrite("Starting anti-cheat protections:");
-
-    // Start NpcGuard anti-cheat
-    ConsoleWrite("    Enabling NpcGuard...");
-    uint64_t write_address = Game::ds1_base + NpcGuard_offset;
-    sp::mem::code::x64::inject_jmp_14b((void*)write_address, &npc_guard_check_exit, 2, &npc_guard_asm_check, true);
-    //npc_guard_check_exit = 0x140322a98; //normally we'd overwrite, but this is chained so need to return into the handler
-
-    // Start BossGuard anti-cheat
-    ConsoleWrite("    Enabling BossGuard...");
-    write_address = Game::ds1_base + BossGuard_offset;
-    sp::mem::code::x64::inject_jmp_14b((void*)write_address, &boss_guard_return, 2, &boss_guard_asm_check);
+    // Start DmgGuard anti-cheat
+    ConsoleWrite("    Enabling DmgGuard...");
+    uint64_t write_address = Game::ds1_base + DmgGuard_offset;
+    sp::mem::code::x64::inject_jmp_14b((void*)write_address, &dmg_guard_return, 2, &dmg_guard_asm_check);
 
     // Start TeleBackstabProtect anti-cheat
     ConsoleWrite("    Enabling TeleBackstabProtect...");
@@ -82,26 +71,60 @@ void start() {
 
     write_address = Game::ds1_base + ReadParseType35_packet_offset;
     sp::mem::code::x64::inject_jmp_14b((void*)write_address, &ReadParseType35_packet_return, 3, &ReadParseType35_packet_injection);
+
+    // Monster VAC protection. Prevent people from changing chr positions to the void
+
 }
 
 } // namespace AntiCheat
 
-uint32_t npc_guard_asm_check_helper(uint64_t attacker, uint64_t target, uint32_t damage)
+//return 0 if we shouldn't interfer, !0 if we prevent the hp from being set
+uint64_t dmg_guard_asm_check_helper(ChrIns* target, uint32_t damage, uint64_t attacker)
 {
-    // If local player is attacking, do not protect NPCs
-    auto playerins_o = Game::get_PlayerIns();
-    if (!playerins_o.has_value())
+    uint32_t entityId = *(uint32_t*)(((uint64_t)target) + 0x2B0);
+    uint32_t NpcParamId = *(uint32_t*)(((uint64_t)target) + 0xC0);
+    uint8_t EnableLogic = *(uint32_t*)((uint64_t)(&target->playerCtrl->chrCtrl) + 0x100) & 1;
+    uint32_t attackerId = 0;
+    if (attacker != NULL)
     {
-        return 0;
+        attackerId = *(uint32_t*)(((uint64_t)attacker) + 0x8);
     }
-    void* playerins = playerins_o.value();
-    if ((uint64_t)playerins == attacker)
+
+    //Check if target is a boss
+    switch (entityId)
     {
-        return damage;
+    case 1000800: // Gaping Dragon
+    case 1010700: // Taurus Demon
+    case 1010750: // Caprademon
+    case 1010800: // Bell Gargoyles
+    case 1100160: // Crossbreed Priscilla
+    case 1200800: // Sif, the Great Gray Wolf
+    case 1200801: // Moonlight Butterfly
+    case 1210401: // Kalameet
+    case 1210800: // Sanctuary Guardian
+    case 1210820: // Knight Artorias
+    case 1210840: // Manus, Father of the Abyss
+    case 1300800: // Pinwheel
+    case 1310800: // Gravelord Nito
+    case 1400800: // Quelaag
+    case 1410400: // Demon Firesage
+    case 1410600: // Ceaseless Discharge
+    case 1410700: // Unlucky Demon (cut content?)
+    case 1410800: // Bed of Chaos
+    case 1500800: // Iron Golem
+    case 1510650: // Dark Sun Gwyndolin
+    case 1510801: // Ornstein
+    case 1510811: // Smough
+    case 1700800: // Seath
+    case 1800800: // Gwyn
+    case 1810800: // Asylum Demon
+    case 1810810: // Stray Demon
+    //case 160080: Four Kings (can't support, since they don't use EnableLogic)
+        return EnableLogic == 0; //if boss is disabled, don't allow to kill
     }
 
     // Check if the target is a non-hostile npc
-    switch (target)
+    switch (NpcParamId)
     {
     case 0x1798: // Griggs of Vinheim (Undead Burg)
     case 0x179A: // Griggs of Vinheim (Firelink Shrine)
@@ -172,51 +195,10 @@ uint32_t npc_guard_asm_check_helper(uint64_t attacker, uint64_t target, uint32_t
     case 0x1A59: // Lord's Blade Ciaran
     case 0x64578: // Hawkeye Gough
     case 0x6476C: // Hawkeye Gough (No textures)
-        return 0;
-    default:
-        return damage;
+        return attackerId != Game::PC_Handle; //If local player is attacking, do not protect NPCs;
     }
-}
 
-uint64_t boss_guard_asm_check_helper(ChrIns* target)
-{
-    uint32_t entityId = *(uint32_t*)(((uint64_t)target) + 0x2B0);
-    uint8_t EnableLogic = *(uint32_t*)((uint64_t)(&target->playerCtrl->chrCtrl) + 0x100) & 1;
-
-    switch (entityId)
-    {
-    case 1000800: // Gaping Dragon
-    case 1010700: // Taurus Demon
-    case 1010750: // Caprademon
-    case 1010800: // Bell Gargoyles
-    case 1100160: // Crossbreed Priscilla
-    case 1200800: // Sif, the Great Gray Wolf
-    case 1200801: // Moonlight Butterfly
-    case 1210401: // Kalameet
-    case 1210800: // Sanctuary Guardian
-    case 1210820: // Knight Artorias
-    case 1210840: // Manus, Father of the Abyss
-    case 1300800: // Pinwheel
-    case 1310800: // Gravelord Nito
-    case 1400800: // Quelaag
-    case 1410400: // Demon Firesage
-    case 1410600: // Ceaseless Discharge
-    case 1410700: // Unlucky Demon (cut content?)
-    case 1410800: // Bed of Chaos
-    case 1500800: // Iron Golem
-    case 1510650: // Dark Sun Gwyndolin
-    case 1510801: // Ornstein
-    case 1510811: // Smough
-    case 1700800: // Seath
-    case 1800800: // Gwyn
-    case 1810800: // Asylum Demon
-    case 1810810: // Stray Demon
-        return EnableLogic == 0; //if boss is disabled, don't allow to kill
-
-    case 1600800: // Four Kings (can't support, since they don't use EnableLogic)
-    default:
-        return 0; //non boss, allow to kill
-    }
+    return 0;
 }
 
 void TeleBackstabProtect_helper_check(float* old_position) {
