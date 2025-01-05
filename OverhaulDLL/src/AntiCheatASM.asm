@@ -3,6 +3,7 @@ _DATA SEGMENT
 jmp_skip_hp_set dq  14032295bh
 LAB_1405088d9   dq  1405088d9h
 thunk_FUN_142656a04 dq  142656a04h
+LAB_140352e6f   dq  140352e6fh
 
 _DATA ENDS
 
@@ -202,6 +203,31 @@ JNZ     normal_exit
 jmp     qword ptr [LAB_1405088d9]
 normal_exit:
 JMP     qword ptr [thunk_FUN_142656a04]
+ReadParseType35_packet_injection ENDP
+
+_TEXT    ENDS
+
+
+extern ReadParseType3_packet_return: qword
+extern ReadParseType3_packet_injection_helper: proc
+
+PUBLIC ReadParseType3_packet_injection
+ReadParseType3_packet_injection PROC
+
+FUNC_PROLOGUE
+lea     rcx, rax ;pointer to the target chr
+call    ReadParseType3_packet_injection_helper
+;preserve rax here if we want to set the position
+FUNC_EPILOGUE
+
+CMP    rax, 0
+JNZ    normal_exit
+jmp    qword ptr [LAB_140352e6f]
+normal_exit:
+;original code
+MOVSD   XMM0,qword ptr [RAX + 130h]
+MOV     EAX,dword ptr [RAX + 138h]
+JMP     ReadParseType3_packet_return
 ReadParseType35_packet_injection ENDP
 
 _TEXT    ENDS

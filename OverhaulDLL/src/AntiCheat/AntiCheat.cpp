@@ -41,6 +41,10 @@ extern "C" {
     uint64_t ReadParseType35_packet_return;
     void ReadParseType35_packet_injection();
     void ReadParseType35_packet_injection_helper(uint64_t packet);
+
+    uint64_t ReadParseType3_packet_return;
+    void ReadParseType3_packet_injection();
+    uint64_t ReadParseType3_packet_injection_helper(ChrIns* target);
 }
 
 namespace AntiCheat {
@@ -73,7 +77,8 @@ void start() {
     sp::mem::code::x64::inject_jmp_14b((void*)write_address, &ReadParseType35_packet_return, 3, &ReadParseType35_packet_injection);
 
     // Monster VAC protection. Prevent people from changing chr positions to the void
-
+    write_address = Game::ds1_base + ReadParseType3_packet_offset;
+    sp::mem::code::x64::inject_jmp_14b((void*)write_address, &ReadParseType3_packet_return, 0, &ReadParseType3_packet_injection);
 }
 
 } // namespace AntiCheat
@@ -195,7 +200,7 @@ uint64_t dmg_guard_asm_check_helper(ChrIns* target, uint32_t damage, uint64_t at
     case 0x1A59: // Lord's Blade Ciaran
     case 0x64578: // Hawkeye Gough
     case 0x6476C: // Hawkeye Gough (No textures)
-        return attackerId != Game::PC_Handle; //If local player is attacking, do not protect NPCs;
+        return attackerId != Game::PC_Handle; //If it's not the local player attacking, protect NPCs
     }
 
     return 0;
@@ -287,4 +292,14 @@ void ReadParseType35_packet_injection_helper(uint64_t packet)
     }
 
     return;
+}
+
+//return target if we shouldn't interfer, 0 if we prevent the position from changing
+uint64_t ReadParseType3_packet_injection_helper(ChrIns* target)
+{
+    if (dmg_guard_asm_check_helper(target, 1, NULL) != 0)
+    {
+        return 0;
+    }
+    return (uint64_t)target;
 }
