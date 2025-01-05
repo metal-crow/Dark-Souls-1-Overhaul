@@ -4,6 +4,7 @@ jmp_skip_hp_set dq  14032295bh
 LAB_1405088d9   dq  1405088d9h
 thunk_FUN_142656a04 dq  142656a04h
 LAB_140352e6f   dq  140352e6fh
+LAB_14035226c   dq  14035226ch
 
 _DATA ENDS
 
@@ -205,8 +206,6 @@ normal_exit:
 JMP     qword ptr [thunk_FUN_142656a04]
 ReadParseType35_packet_injection ENDP
 
-_TEXT    ENDS
-
 
 extern ReadParseType3_packet_return: qword
 extern ReadParseType3_packet_injection_helper: proc
@@ -215,7 +214,7 @@ PUBLIC ReadParseType3_packet_injection
 ReadParseType3_packet_injection PROC
 
 FUNC_PROLOGUE
-lea     rcx, rax ;pointer to the target chr
+mov     rcx, rax ;pointer to the target chr
 call    ReadParseType3_packet_injection_helper
 ;preserve rax here if we want to set the position
 FUNC_EPILOGUE
@@ -228,7 +227,30 @@ normal_exit:
 MOVSD   XMM0,qword ptr [RAX + 130h]
 MOV     EAX,dword ptr [RAX + 138h]
 JMP     ReadParseType3_packet_return
-ReadParseType35_packet_injection ENDP
+ReadParseType3_packet_injection ENDP
+
+
+extern ReadParseType39_packet_return: qword
+extern ReadParseType39_packet_injection_helper: proc
+
+PUBLIC ReadParseType39_packet_injection
+ReadParseType39_packet_injection PROC
+
+FUNC_PROLOGUE
+mov     rcx, rax ;pointer to the target chr
+call    ReadParseType39_packet_injection_helper
+;preserve rax here if we want to set the position
+FUNC_EPILOGUE
+
+CMP    rax, 0
+JNZ    normal_exit
+jmp    qword ptr [LAB_14035226c]
+normal_exit:
+;original code
+MOVAPS  XMM2,xmmword ptr [R12 + 140h]
+LEA     RDX,[RSP + 40h]
+JMP     ReadParseType39_packet_return
+ReadParseType39_packet_injection ENDP
 
 _TEXT    ENDS
 

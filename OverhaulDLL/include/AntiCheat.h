@@ -27,6 +27,7 @@ static const uint64_t NameCrash_prevention_offset = 0x761041;
 static const uint64_t ReadParseType18_packet_offset = 0x23b4342;
 static const uint64_t ReadParseType35_packet_offset = 0x2a5ec57;
 static const uint64_t ReadParseType3_packet_offset = 0x352dd9;
+static const uint64_t ReadParseType39_packet_offset = 0x3521fe;
 
 } // namespace AntiCheat
 

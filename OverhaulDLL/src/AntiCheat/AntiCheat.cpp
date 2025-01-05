@@ -45,6 +45,10 @@ extern "C" {
     uint64_t ReadParseType3_packet_return;
     void ReadParseType3_packet_injection();
     uint64_t ReadParseType3_packet_injection_helper(ChrIns* target);
+
+    uint64_t ReadParseType39_packet_return;
+    void ReadParseType39_packet_injection();
+    uint64_t ReadParseType39_packet_injection_helper(ChrIns* target);
 }
 
 namespace AntiCheat {
@@ -79,6 +83,8 @@ void start() {
     // Monster VAC protection. Prevent people from changing chr positions to the void
     write_address = Game::ds1_base + ReadParseType3_packet_offset;
     sp::mem::code::x64::inject_jmp_14b((void*)write_address, &ReadParseType3_packet_return, 0, &ReadParseType3_packet_injection);
+    write_address = Game::ds1_base + ReadParseType39_packet_offset;
+    sp::mem::code::x64::inject_jmp_14b((void*)write_address, &ReadParseType39_packet_return, 0, &ReadParseType39_packet_injection);
 }
 
 } // namespace AntiCheat
@@ -296,6 +302,15 @@ void ReadParseType35_packet_injection_helper(uint64_t packet)
 
 //return target if we shouldn't interfer, 0 if we prevent the position from changing
 uint64_t ReadParseType3_packet_injection_helper(ChrIns* target)
+{
+    if (dmg_guard_asm_check_helper(target, 1, NULL) != 0)
+    {
+        return 0;
+    }
+    return (uint64_t)target;
+}
+
+uint64_t ReadParseType39_packet_injection_helper(ChrIns* target)
 {
     if (dmg_guard_asm_check_helper(target, 1, NULL) != 0)
     {
