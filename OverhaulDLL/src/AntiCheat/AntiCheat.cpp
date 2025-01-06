@@ -49,6 +49,10 @@ extern "C" {
     uint64_t ReadParseType39_packet_return;
     void ReadParseType39_packet_injection();
     uint64_t ReadParseType39_packet_injection_helper(ChrIns* target);
+
+    uint64_t ReadParseType34_packet_return;
+    void ReadParseType34_packet_injection();
+    uint64_t ReadParseType34_packet_injection_helper(ChrIns* target, uint32_t speffect);
 }
 
 namespace AntiCheat {
@@ -85,6 +89,11 @@ void start() {
     sp::mem::code::x64::inject_jmp_14b((void*)write_address, &ReadParseType3_packet_return, 0, &ReadParseType3_packet_injection);
     write_address = Game::ds1_base + ReadParseType39_packet_offset;
     sp::mem::code::x64::inject_jmp_14b((void*)write_address, &ReadParseType39_packet_return, 0, &ReadParseType39_packet_injection);
+
+    // Prevent inactive bosses/NPCS from having speffects applied to them by others
+    write_address = Game::ds1_base + ReadParseType34_packet_offset;
+    sp::mem::code::x64::inject_jmp_14b((void*)write_address, &ReadParseType34_packet_return, 2, &ReadParseType34_packet_injection);
+
 }
 
 } // namespace AntiCheat
@@ -311,6 +320,16 @@ uint64_t ReadParseType3_packet_injection_helper(ChrIns* target)
 }
 
 uint64_t ReadParseType39_packet_injection_helper(ChrIns* target)
+{
+    if (dmg_guard_asm_check_helper(target, 1, NULL) != 0)
+    {
+        return 0;
+    }
+    return (uint64_t)target;
+}
+
+//return target if we shouldn't interfer, 0 if we prevent the speffect from being applied
+uint64_t ReadParseType34_packet_injection_helper(ChrIns* target, uint32_t speffect)
 {
     if (dmg_guard_asm_check_helper(target, 1, NULL) != 0)
     {

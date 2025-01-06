@@ -5,6 +5,7 @@ LAB_1405088d9   dq  1405088d9h
 thunk_FUN_142656a04 dq  142656a04h
 LAB_140352e6f   dq  140352e6fh
 LAB_14035226c   dq  14035226ch
+LAB_140508632   dq  140508632h
 
 _DATA ENDS
 
@@ -52,6 +53,27 @@ FUNC_EPILOGUE macro
     fxrstor [rsp+20h]
     mov     rsp,[rsp+00000248h]
     pop     rax
+    popfq 
+endm
+
+FUNC_EPILOGUE_NORAX macro
+    mov     r15,[rsp+00000290h]
+    mov     r14,[rsp+00000288h]
+    mov     r13,[rsp+00000280h]
+    mov     r12,[rsp+00000278h]
+    mov     r11,[rsp+00000270h]
+    mov     r10,[rsp+00000268h]
+    mov     r9, [rsp+00000260h]
+    mov     r8, [rsp+00000258h]
+    mov     rbp,[rsp+00000250h]
+    mov     rdi,[rsp+00000240h]
+    mov     rsi,[rsp+00000238h]
+    mov     rdx,[rsp+00000230h]
+    mov     rcx,[rsp+00000228h]
+    mov     rbx,[rsp+00000220h]
+    fxrstor [rsp+20h]
+    mov     rsp,[rsp+00000248h]
+    add     rsp, 8
     popfq 
 endm
 
@@ -217,7 +239,7 @@ FUNC_PROLOGUE
 mov     rcx, rax ;pointer to the target chr
 call    ReadParseType3_packet_injection_helper
 ;preserve rax here if we want to set the position
-FUNC_EPILOGUE
+FUNC_EPILOGUE_NORAX
 
 CMP    rax, 0
 JNZ    normal_exit
@@ -240,7 +262,7 @@ FUNC_PROLOGUE
 mov     rcx, rax ;pointer to the target chr
 call    ReadParseType39_packet_injection_helper
 ;preserve rax here if we want to set the position
-FUNC_EPILOGUE
+FUNC_EPILOGUE_NORAX
 
 CMP    rax, 0
 JNZ    normal_exit
@@ -251,6 +273,29 @@ MOVAPS  XMM2,xmmword ptr [R12 + 140h]
 LEA     RDX,[RSP + 40h]
 JMP     ReadParseType39_packet_return
 ReadParseType39_packet_injection ENDP
+
+
+EXTERN ReadParseType34_packet_return: PROC
+EXTERN ReadParseType34_packet_injection_helper: qword
+
+PUBLIC ReadParseType34_packet_injection
+ReadParseType34_packet_injection PROC
+;original code
+SHR     R8, 22h
+MOV     EDX, ECX
+MOV     RCX, RAX
+AND     R8D, 3fffffffh
+
+FUNC_PROLOGUE
+call    ReadParseType34_packet_injection_helper
+FUNC_EPILOGUE_NORAX
+
+cmp     rax, 0
+jnz     normal_exit
+jmp     qword ptr [LAB_140508632]
+normal_exit:
+jmp     ReadParseType34_packet_return
+ReadParseType34_packet_injection ENDP
 
 _TEXT    ENDS
 
