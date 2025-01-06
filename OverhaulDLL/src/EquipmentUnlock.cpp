@@ -69,7 +69,14 @@ bool equipment_change_unlock_injection_helper(InventorySlots menu_slot)
 
     if (Mod::fairness_flag)
     {
-        return ok_to_enter_equipment_menu(playerIns);
+        if (Mod::get_mode() == ModMode::Legacy || Mod::get_mode() == ModMode::Overhaul)
+        {
+            return (menu_slot > RightHand2 || ok_to_enter_equipment_menu(playerIns));
+        }
+        else
+        {
+            return ok_to_enter_equipment_menu(playerIns);
+        }
     }
     else
     {
