@@ -6,6 +6,8 @@ thunk_FUN_142656a04 dq  142656a04h
 LAB_140352e6f   dq  140352e6fh
 LAB_14035226c   dq  14035226ch
 LAB_140508632   dq  140508632h
+LAB_140353b41   dq  140353b41h
+get_ChrIns_from_Handle  dq  140371b50h
 
 _DATA ENDS
 
@@ -296,6 +298,28 @@ jmp     qword ptr [LAB_140508632]
 normal_exit:
 jmp     ReadParseType34_packet_return
 ReadParseType34_packet_injection ENDP
+
+
+EXTERN ReadParseType50_packet_return: PROC
+EXTERN ReadParseType50_packet_injection_helper: qword
+
+PUBLIC ReadParseType50_packet_injection
+ReadParseType50_packet_injection PROC
+;original code
+CALL    qword ptr [get_ChrIns_from_Handle]
+
+FUNC_PROLOGUE
+call    ReadParseType50_packet_injection_helper
+FUNC_EPILOGUE_NORAX
+
+cmp     rax, 0
+jnz     normal_exit
+jmp     qword ptr [LAB_140353b41]
+normal_exit:
+;original code
+MOV     RCX,qword ptr [RAX + 18h]
+jmp     ReadParseType50_packet_return
+ReadParseType50_packet_injection ENDP
 
 _TEXT    ENDS
 
