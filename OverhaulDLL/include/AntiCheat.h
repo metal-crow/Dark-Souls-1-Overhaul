@@ -30,7 +30,7 @@ static const uint64_t ReadParseType3_packet_offset = 0x352dd9;
 static const uint64_t ReadParseType39_packet_offset = 0x3521fe;
 static const uint64_t ReadParseType34_packet_offset = 0x50861d;
 static const uint64_t ReadParseType50_packet_offset = 0x353b1b;
-static const uint64_t ApplyType33_packet_offset = 0x35091b;
+static const uint64_t ApplyType33_packet_offset = 0x350903;
 
 } // namespace AntiCheat
 

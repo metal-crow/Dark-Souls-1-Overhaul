@@ -108,7 +108,7 @@ void start() {
 
     // Prevent inactive bosses/NPCS from having animations applied to them by others
     write_address = Game::ds1_base + ApplyType33_packet_offset;
-    sp::mem::code::x64::inject_jmp_14b((void*)write_address, &ApplyType33_packet_return, 1, &ApplyType33_packet_injection);
+    sp::mem::code::x64::inject_jmp_14b((void*)write_address, &ApplyType33_packet_return, 0, &ApplyType33_packet_injection);
 }
 
 } // namespace AntiCheat
