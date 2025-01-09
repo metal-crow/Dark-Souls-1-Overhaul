@@ -117,7 +117,7 @@ void start() {
 uint64_t dmg_guard_asm_check_helper(ChrIns* target, uint32_t damage, uint64_t attacker)
 {
     uint32_t entityId = *(uint32_t*)(((uint64_t)target) + 0x2B0);
-    uint32_t NpcParamId = *(uint32_t*)(((uint64_t)target) + 0xC0);
+    uint32_t NpcParamId = *(uint32_t*)(((uint64_t)target) + 0xC8);
     uint8_t EnableLogic = *(uint32_t*)((uint64_t)(&target->playerCtrl->chrCtrl) + 0x100) & 1;
     bool attackerIdIsPC = false;
     auto playerins_o = Game::get_PlayerIns();
