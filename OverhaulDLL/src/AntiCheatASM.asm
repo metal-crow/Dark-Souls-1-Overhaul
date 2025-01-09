@@ -8,7 +8,7 @@ LAB_14035226c   dq  14035226ch
 LAB_140508632   dq  140508632h
 LAB_140353b41   dq  140353b41h
 get_ChrIns_from_Handle  dq  140371b50h
-LAB_140350913   dq  140350913h
+LAB_14035098b   dq  14035098bh
 get_Chr_From_WorldBlock dq  14033ec10h
 
 _DATA ENDS
@@ -279,8 +279,8 @@ JMP     ReadParseType39_packet_return
 ReadParseType39_packet_injection ENDP
 
 
-EXTERN ReadParseType34_packet_return: PROC
-EXTERN ReadParseType34_packet_injection_helper: qword
+EXTERN ReadParseType34_packet_return: qword
+EXTERN ReadParseType34_packet_injection_helper: PROC
 
 PUBLIC ReadParseType34_packet_injection
 ReadParseType34_packet_injection PROC
@@ -302,15 +302,14 @@ jmp     ReadParseType34_packet_return
 ReadParseType34_packet_injection ENDP
 
 
-EXTERN ReadParseType50_packet_return: PROC
-EXTERN ReadParseType50_packet_injection_helper: qword
+EXTERN ReadParseType50_packet_return: qword
+EXTERN ReadParseType50_packet_injection_helper: PROC
 
 PUBLIC ReadParseType50_packet_injection
 ReadParseType50_packet_injection PROC
+FUNC_PROLOGUE
 ;original code
 CALL    qword ptr [get_ChrIns_from_Handle]
-
-FUNC_PROLOGUE
 mov     rcx, rax
 call    ReadParseType50_packet_injection_helper
 FUNC_EPILOGUE_NORAX
@@ -325,22 +324,21 @@ jmp     ReadParseType50_packet_return
 ReadParseType50_packet_injection ENDP
 
 
-EXTERN ApplyType33_packet_return: PROC
-EXTERN ApplyType33_packet_injection_helper: qword
+EXTERN ApplyType33_packet_return: qword
+EXTERN ApplyType33_packet_injection_helper: PROC
 
 PUBLIC ApplyType33_packet_injection
 ApplyType33_packet_injection PROC
+FUNC_PROLOGUE
 ;original code
 CALL    qword ptr [get_Chr_From_WorldBlock]
-
-FUNC_PROLOGUE
 mov     rcx, rax
 call    ApplyType33_packet_injection_helper
 FUNC_EPILOGUE_NORAX
 
 cmp     rax, 0
 jnz     normal_exit
-jmp     qword ptr [LAB_140350913]
+jmp     qword ptr [LAB_14035098b]
 normal_exit:
 ;original code
 MOV     R12,qword ptr [RAX + 68h]

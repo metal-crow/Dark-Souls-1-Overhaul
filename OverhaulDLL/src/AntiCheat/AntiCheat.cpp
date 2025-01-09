@@ -119,10 +119,15 @@ uint64_t dmg_guard_asm_check_helper(ChrIns* target, uint32_t damage, uint64_t at
     uint32_t entityId = *(uint32_t*)(((uint64_t)target) + 0x2B0);
     uint32_t NpcParamId = *(uint32_t*)(((uint64_t)target) + 0xC0);
     uint8_t EnableLogic = *(uint32_t*)((uint64_t)(&target->playerCtrl->chrCtrl) + 0x100) & 1;
-    uint32_t attackerId = 0;
-    if (attacker != NULL)
+    bool attackerIdIsPC = false;
+    auto playerins_o = Game::get_PlayerIns();
+    if (playerins_o.has_value())
     {
-        attackerId = *(uint32_t*)(((uint64_t)attacker) + 0x8);
+        void* playerins = playerins_o.value();
+        if ((uint64_t)playerins == attacker)
+        {
+            attackerIdIsPC = true;
+        }
     }
 
     //Check if target is a boss
@@ -230,7 +235,7 @@ uint64_t dmg_guard_asm_check_helper(ChrIns* target, uint32_t damage, uint64_t at
     case 0x1A59: // Lord's Blade Ciaran
     case 0x64578: // Hawkeye Gough
     case 0x6476C: // Hawkeye Gough (No textures)
-        return attackerId != Game::PC_Handle; //If it's not the local player attacking, protect NPCs
+        return !attackerIdIsPC; //If it's not the local player attacking, protect NPCs
     }
 
     return 0;
