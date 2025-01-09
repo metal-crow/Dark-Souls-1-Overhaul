@@ -8,6 +8,7 @@ LAB_14035226c   dq  14035226ch
 LAB_140508632   dq  140508632h
 LAB_140353b41   dq  140353b41h
 get_ChrIns_from_Handle  dq  140371b50h
+LAB_14035098b   dq  14035098bh
 
 _DATA ENDS
 
@@ -320,6 +321,29 @@ normal_exit:
 MOV     RCX,qword ptr [RAX + 18h]
 jmp     ReadParseType50_packet_return
 ReadParseType50_packet_injection ENDP
+
+
+EXTERN ApplyType33_packet_return: PROC
+EXTERN ApplyType33_packet_injection_helper: qword
+
+PUBLIC ApplyType33_packet_injection
+ApplyType33_packet_injection PROC
+
+FUNC_PROLOGUE
+call    ApplyType33_packet_injection_helper
+FUNC_EPILOGUE_NORAX
+
+cmp     rax, 0
+jnz     normal_exit
+jmp     qword ptr [LAB_14035098b]
+normal_exit:
+;original code
+MOV     RBP, qword ptr [R13 + 20h]
+LEA     RDX, [RSP + 60h]
+MOV     RCX, R12
+ADD     RBP, R14
+jmp     ApplyType33_packet_return
+ApplyType33_packet_injection ENDP
 
 _TEXT    ENDS
 
