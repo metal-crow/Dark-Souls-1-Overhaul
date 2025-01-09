@@ -330,6 +330,7 @@ PUBLIC ApplyType33_packet_injection
 ApplyType33_packet_injection PROC
 
 FUNC_PROLOGUE
+MOV     rcx, r12
 call    ApplyType33_packet_injection_helper
 FUNC_EPILOGUE_NORAX
 
