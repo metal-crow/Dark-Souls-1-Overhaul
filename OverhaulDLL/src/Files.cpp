@@ -5,6 +5,7 @@
 #include "SP/memory/injection/asm/x64.h"
 #include <algorithm>
 #include <iterator>
+#include <filesystem>
 
 
 int Files::save_file_index = 0;
@@ -490,7 +491,7 @@ void Files::check_custom_archive_file_path()
 }
 
 
-// Checks if custom save file (.sl2) exists
+// Checks if custom save file (.sl2) exists and back it up if it does
 void Files::check_custom_save_file_path()
 {
     if ((int)Files::save_file.length() == 0)
@@ -501,6 +502,35 @@ void Files::check_custom_save_file_path()
     if (FileUtil::file_exists(Files::save_file.c_str()))
     {
         ConsoleWrite("SUCCESS: Custom save file will be loaded (\"%s\"",Files::save_file.c_str());
+
+        std::filesystem::path parent_dir = std::filesystem::path(Files::save_file).parent_path();
+        std::filesystem::path backup_dir = parent_dir / "backup";
+        // Create parent backup folder if it doesn't exist
+        if (!std::filesystem::exists(backup_dir))
+        {
+            std::filesystem::create_directories(backup_dir);
+        }
+
+        // Compute backup number and generate folder
+        int counter = 1;
+        std::filesystem::path destination;
+        do
+        {
+            destination = std::filesystem::path(backup_dir) / std::format("{}", counter);
+            ++counter;
+        } while (std::filesystem::exists(destination));
+        std::filesystem::create_directories(destination);
+
+        // Copy the overhaul save files to the new destination
+        for (const auto& entry : std::filesystem::directory_iterator(parent_dir))
+        {
+            if (std::filesystem::is_regular_file(entry))
+            {
+                std::filesystem::path sourcePath = entry.path();
+                std::filesystem::path destinationPath = std::filesystem::path(destination) / sourcePath.filename();
+                std::filesystem::copy(sourcePath, destinationPath, std::filesystem::copy_options::overwrite_existing);
+            }
+        }
     }
     else
     {
