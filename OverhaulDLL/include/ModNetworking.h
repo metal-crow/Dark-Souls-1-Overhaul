@@ -47,6 +47,8 @@ public:
     //Set upon entry into someone else's lobby; set to 0 upon exit
     static std::atomic<uint64_t> currentLobby;
 
+    static std::unordered_map<uint64_t, bool> SteamAPIStatusKnown_Users;
+
     static std::atomic<uint64_t> incoming_guest_to_not_accept;
 
     //configuration options for who can connect if you're host/how to change settings if you're guest

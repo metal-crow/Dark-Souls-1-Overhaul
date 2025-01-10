@@ -15,6 +15,7 @@
 #include <cmath>
 #include <unordered_set>
 #include "PlayerInsStruct.h"
+#include "ModNetworking.h"
 
 extern "C" {
     uint64_t dmg_guard_return;
@@ -116,9 +117,15 @@ void start() {
 //return 0 if we shouldn't interfer, !0 if we prevent the hp from being set
 uint64_t dmg_guard_asm_check_helper(ChrIns* target, uint32_t damage, uint64_t attacker)
 {
+    if (ModNetworking::SteamAPIStatusKnown_Users.size() == 0 || ModNetworking::currentLobby.load() != ModNetworking::selfPersisantLobby.load())
+    {
+        //don't do anything if we're not online or we're a guest
+        return 0;
+    }
+
     uint32_t entityId = *(uint32_t*)(((uint64_t)target) + 0x2B0);
     uint32_t NpcParamId = *(uint32_t*)(((uint64_t)target) + 0xC8);
-    uint8_t EnableLogic = *(uint32_t*)((uint64_t)(&target->playerCtrl->chrCtrl) + 0x100) & 1;
+    uint8_t EnableLogic = (*(uint32_t*)((uint64_t)(&target->playerCtrl->chrCtrl) + 0x100)) & 1;
     bool attackerIdIsPC = false;
     auto playerins_o = Game::get_PlayerIns();
     if (playerins_o.has_value())
