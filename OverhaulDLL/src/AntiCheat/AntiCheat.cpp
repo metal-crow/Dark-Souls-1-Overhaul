@@ -95,7 +95,7 @@ void start() {
 
     // Monster VAC protection. Prevent people from changing chr positions to the void
     write_address = Game::ds1_base + ReadParseType3_packet_offset;
-    sp::mem::code::x64::inject_jmp_14b((void*)write_address, &ReadParseType3_packet_return, 0, &ReadParseType3_packet_injection);
+    sp::mem::code::x64::inject_jmp_14b((void*)write_address, &ReadParseType3_packet_return, 4, &ReadParseType3_packet_injection);
     write_address = Game::ds1_base + ReadParseType39_packet_offset;
     sp::mem::code::x64::inject_jmp_14b((void*)write_address, &ReadParseType39_packet_return, 0, &ReadParseType39_packet_injection);
 

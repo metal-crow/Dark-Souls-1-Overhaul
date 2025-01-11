@@ -3,7 +3,6 @@ _DATA SEGMENT
 jmp_skip_hp_set dq  14032295bh
 LAB_1405088d9   dq  1405088d9h
 thunk_FUN_142656a04 dq  142656a04h
-LAB_140352e6f   dq  140352e6fh
 LAB_14035226c   dq  14035226ch
 LAB_140508632   dq  140508632h
 LAB_140353b41   dq  140353b41h
@@ -11,6 +10,7 @@ get_ChrIns_from_Handle  dq  140371b50h
 get_Chr_From_WorldBlock dq  14033ec10h
 LAB_140350913   dq  140350913h
 LAB_140350916   dq  140350916h
+LAB_140352e23   dq  140352e23h
 
 _DATA ENDS
 
@@ -241,18 +241,17 @@ PUBLIC ReadParseType3_packet_injection
 ReadParseType3_packet_injection PROC
 
 FUNC_PROLOGUE
+CALL    qword ptr [get_Chr_From_WorldBlock]
 mov     rcx, rax ;pointer to the target chr
 call    ReadParseType3_packet_injection_helper
-;preserve rax here if we want to set the position
 FUNC_EPILOGUE_NORAX
 
-CMP    rax, 0
-JNZ    normal_exit
-jmp    qword ptr [LAB_140352e6f]
+TEST    RAX,RAX
+JNZ     normal_exit
+jmp     qword ptr [LAB_140352e23]
 normal_exit:
 ;original code
 MOVSD   XMM0,qword ptr [RAX + 130h]
-MOV     EAX,dword ptr [RAX + 138h]
 JMP     ReadParseType3_packet_return
 ReadParseType3_packet_injection ENDP
 
