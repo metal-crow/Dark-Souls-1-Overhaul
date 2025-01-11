@@ -8,8 +8,9 @@ LAB_14035226c   dq  14035226ch
 LAB_140508632   dq  140508632h
 LAB_140353b41   dq  140353b41h
 get_ChrIns_from_Handle  dq  140371b50h
-LAB_14035098b   dq  14035098bh
 get_Chr_From_WorldBlock dq  14033ec10h
+LAB_140350913   dq  140350913h
+LAB_140350916   dq  140350916h
 
 _DATA ENDS
 
@@ -336,13 +337,12 @@ mov     rcx, rax
 call    ApplyType33_packet_injection_helper
 FUNC_EPILOGUE_NORAX
 
-cmp     rax, 0
-jnz     normal_exit
-jmp     qword ptr [LAB_14035098b]
-normal_exit:
-;original code
+TEST    RAX,RAX
+JNZ     part2
+jmp     qword ptr [LAB_140350913]
+part2:
 MOV     R12,qword ptr [RAX + 68h]
-jmp     ApplyType33_packet_return
+JMP     qword ptr [LAB_140350916]
 ApplyType33_packet_injection ENDP
 
 _TEXT    ENDS
