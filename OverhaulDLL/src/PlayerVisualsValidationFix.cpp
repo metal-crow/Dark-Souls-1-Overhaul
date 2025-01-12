@@ -10,9 +10,11 @@ void PlayerVisualsValidationFix::start()
     uint8_t* write_address;
 
     //inject code to skip validating the player face/hair/body data
-    uint8_t Validate_Type6FaceData_patch[] = { 0xB0, 0x1, 0x90, 0x90, 0x90 }; //mov al, 1
+    uint8_t Validate_patch[] = { 0xB0, 0x1, 0x90, 0x90, 0x90 }; //mov al, 1
     write_address = (uint8_t*)(PlayerVisualsValidationFix::Validate_Type6FaceData_offset + Game::ds1_base);
-    sp::mem::patch_bytes(write_address, Validate_Type6FaceData_patch, 5);
+    sp::mem::patch_bytes(write_address, Validate_patch, 5);
+    write_address = (uint8_t*)(PlayerVisualsValidationFix::Validate_Type10BodyData_offset + Game::ds1_base);
+    sp::mem::patch_bytes(write_address, Validate_patch, 5);
 }
 
 float clamp(float d, float min, float max)
@@ -40,5 +42,18 @@ void PlayerVisualsValidationFix::sanitizePacketData(uint8_t* data, uint32_t len)
         eyes[1] = clamp(eyes[1], -1.0f, 1.0f);
         eyes[2] = clamp(eyes[2], -1.0f, 1.0f);
         eyes[3] = clamp(eyes[3], -1.0f, 1.0f);
+    }
+
+    //type 10
+    if (data[1] == 10 && len == 0x6C + 8 + 1)
+    {
+        uint8_t* type10pktdata = data + 8 + 1;
+
+        float* body = (float*)(type10pktdata + 0x58);
+        body[0] = clamp(body[0], -1.0f, 1.0f);
+        body[1] = clamp(body[1], -1.0f, 1.0f);
+        body[2] = clamp(body[2], -1.0f, 1.0f);
+        body[3] = clamp(body[3], -1.0f, 1.0f);
+        body[4] = clamp(body[4], -1.0f, 1.0f);
     }
 }

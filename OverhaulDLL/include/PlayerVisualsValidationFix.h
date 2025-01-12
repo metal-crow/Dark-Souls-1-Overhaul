@@ -12,6 +12,7 @@ public:
 
 private:
     static const uint64_t Validate_Type6FaceData_offset = 0x506e04;
+    static const uint64_t Validate_Type10BodyData_offset = 0x761367;
 };
 
 #endif
