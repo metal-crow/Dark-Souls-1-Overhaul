@@ -10,7 +10,7 @@ get_ChrIns_from_Handle  dq  140371b50h
 get_Chr_From_WorldBlock dq  14033ec10h
 LAB_140350913   dq  140350913h
 LAB_140350916   dq  140350916h
-LAB_140352e23   dq  140352e23h
+LAB_140352e6f   dq  140352e6fh
 
 _DATA ENDS
 
@@ -248,7 +248,7 @@ FUNC_EPILOGUE_NORAX
 
 TEST    RAX,RAX
 JNZ     normal_exit
-jmp     qword ptr [LAB_140352e23]
+jmp     qword ptr [LAB_140352e6f]
 normal_exit:
 ;original code
 MOVSD   XMM0,qword ptr [RAX + 130h]
