@@ -20,7 +20,7 @@
 extern "C" {
     uint64_t dmg_guard_return;
     void dmg_guard_asm_check();
-    uint64_t dmg_guard_asm_check_helper(ChrIns* target, uint32_t damage, uint64_t attacker);
+    uint64_t dmg_guard_asm_check_helper(ChrIns* target, uint32_t hp, uint64_t attacker);
 
     uint64_t TeleBackstabProtect_store_AnimationId_return;
     void TeleBackstabProtect_store_AnimationId();
@@ -115,7 +115,7 @@ void start() {
 } // namespace AntiCheat
 
 //return 0 if we shouldn't interfer, !0 if we prevent the hp from being set
-uint64_t dmg_guard_asm_check_helper(ChrIns* target, uint32_t damage, uint64_t attacker)
+uint64_t dmg_guard_asm_check_helper(ChrIns* target, uint32_t hp, uint64_t attacker)
 {
     if (ModNetworking::SteamAPIStatusKnown_Users.size() == 0 || ModNetworking::currentLobby.load() != ModNetworking::selfPersisantLobby.load())
     {
@@ -167,6 +167,18 @@ uint64_t dmg_guard_asm_check_helper(ChrIns* target, uint32_t damage, uint64_t at
     case 1810800: // Asylum Demon
     case 1810810: // Stray Demon
     //case 160080: Four Kings (can't support, since they don't use EnableLogic)
+        //allow the hp change if it's being done by the game or host directly, and isn't 0
+        //this allows the boss hp to change for more summons
+        //in this case the attacker is a ActionCtrl which points back to the enemyIns which is the boss
+        if ((*(uint64_t*)attacker) == 0x14132d318)
+        {
+            uint64_t chrins = (uint64_t)((ActionCtrl*)attacker)->chrctrl_parent->chrins;
+            uint32_t entity_id_attacker = *(uint32_t*)(chrins + 0x2b0);
+            if (entity_id_attacker == entityId && hp > 1)
+            {
+                return 0;
+            }
+        }
         return EnableLogic == 0; //if boss is disabled, don't allow to kill
     }
 

@@ -489,7 +489,8 @@ struct ActionCtrl
 {
     uint8_t padding_0[8];
     uint8_t data_0[8];
-    uint8_t padding_1[32];
+    ChrCtrl* chrctrl_parent;
+    uint8_t padding_1[24];
     ActionCtrl_0x30Substruct passive_state;
     ActionCtrl_0x30Substruct active_state;
     uint8_t data_1[0x4d0];
@@ -550,7 +551,7 @@ struct ChrCtrl
 {
     uint8_t padding_0[8];
     uint8_t data_0[8];
-    uint8_t padding_1[8];
+    ChrIns* chrins;
     ChrCtrl_AnimationQueue* animationQueue;
     AnimationMediator* animationMediator;
     HavokChara* havokChara;
