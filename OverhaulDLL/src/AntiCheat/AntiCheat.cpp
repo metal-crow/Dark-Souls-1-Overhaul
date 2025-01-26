@@ -131,6 +131,7 @@ uint64_t dmg_guard_asm_check_helper(ChrIns* target, uint32_t hp, uint64_t attack
     if (playerins_o.has_value())
     {
         void* playerins = playerins_o.value();
+        //the attacker ptr is totally unreliable here, frankly i shouldn't even be using it at all
         if ((uint64_t)playerins == attacker)
         {
             attackerIdIsPC = true;
@@ -167,17 +168,11 @@ uint64_t dmg_guard_asm_check_helper(ChrIns* target, uint32_t hp, uint64_t attack
     case 1810800: // Asylum Demon
     case 1810810: // Stray Demon
     //case 160080: Four Kings (can't support, since they don't use EnableLogic)
-        //allow the hp change if it's being done by the game or host directly, and isn't 0
+        //allow the hp change if it isn't 0
         //this allows the boss hp to change for more summons
-        //in this case the attacker is a ActionCtrl which points back to the enemyIns which is the boss
-        if ((*(uint64_t*)attacker) == 0x14132d318)
-        {
-            uint64_t chrins = (uint64_t)((ActionCtrl*)attacker)->chrctrl_parent->chrins;
-            uint32_t entity_id_attacker = *(uint32_t*)(chrins + 0x2b0);
-            if (entity_id_attacker == entityId && hp > 1)
-            {
-                return 0;
-            }
+        //ideally we would want to check if the attacker is the boss enemyIns themselves, but can't rn
+        if (hp > 1) {
+            return 0;
         }
         return EnableLogic == 0; //if boss is disabled, don't allow to kill
     }
