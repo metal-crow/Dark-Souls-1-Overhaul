@@ -117,6 +117,7 @@ bool network_toggle(void* unused)
 {
     if (Rollback::networkToggle)
     {
+        //must be toggled before other player joins
         Rollback::networkTest = !Rollback::networkTest;
         ConsoleWrite("Netcode %d", Rollback::networkTest);
         Rollback::networkToggle = false;
@@ -352,10 +353,12 @@ bool rollback_game_frame_start_helper(void* unused)
             //ONLY allow it to be called here, so we don't have it called normally by the game and overwrite our custom inputs
             Game::set_ReadInputs_allowed(true);
             //This function is called as part of MainUpdate, and needs to be called first before Step_PadManipulator.
-            //It reads the controller directly and normalizes it post-keybinds
+            //It reads the controller directly and normalizes it post-keybinds. All stored in the PadMan global
             Step_PadMan(FRAMETIME);
             //This function is called as part of the Step_TaskMan list, so we need to directly call it here and block TaskMan from calling it.
             //It reads the normalized controller, post processes inputs based on game state (camera, weapons, etc), and sets a standardized struct
+            //This reads from the PadMan global and puts it's results in the player PadManipulator and player PlayerCtrl structs
+            //These 2 structs are what we actually use for rollback input. PadMan itself is overly complex and too raw.
             Step_PadManipulator(player->chrins.padManipulator, FRAMETIME, player->chrins.playerCtrl);
             Game::set_ReadInputs_allowed(false);
 
@@ -372,6 +375,7 @@ bool rollback_game_frame_start_helper(void* unused)
             Game::set_StepInGameMenu_allowed(false);
 
             //read the local inputs the above calls have resolved to
+            //TODO********! probably wanna get stuff from playerctrl in here also
             RollbackInput localInput{};
             PackRollbackInput(&localInput, player);
 
