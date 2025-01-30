@@ -405,7 +405,7 @@ void ModNetworking::SteamNetworkingMessagesSessionRequestCallback(SteamNetworkin
 
     //Check they're not blocked
     EFriendRelationship relation = ModNetworking::SteamFriends->GetFriendRelationship(user);
-    if (relation == EFriendRelationship::k_EFriendRelationshipIgnored)
+    if (relation == EFriendRelationship::k_EFriendRelationshipIgnored || relation == EFriendRelationship::k_EFriendRelationshipIgnoredFriend)
     {
         return;
     }
@@ -435,7 +435,7 @@ bool AcceptP2PSessionWithUser_injection_helper(uint64_t incoming_steamid)
 
     //Check they're not blocked
     EFriendRelationship relation = ModNetworking::SteamFriends->GetFriendRelationship(id);
-    if (relation == EFriendRelationship::k_EFriendRelationshipIgnored)
+    if (relation == EFriendRelationship::k_EFriendRelationshipIgnored || relation == EFriendRelationship::k_EFriendRelationshipIgnoredFriend)
     {
         return false;
     }
@@ -573,6 +573,13 @@ bool SendP2PPacket_Replacement_injection_helper(CSteamID steamIDRemote, void *pu
     if (incoming_guest_to_not_accept != 0 && incoming_guest_to_not_accept == steamIDRemote.ConvertToUint64())
     {
         ConsoleWrite("Forcing d/c on user %lld", steamIDRemote.ConvertToUint64());
+        return false;
+    }
+
+    //Check they're not blocked
+    EFriendRelationship relation = ModNetworking::SteamFriends->GetFriendRelationship(steamIDRemote);
+    if (relation == EFriendRelationship::k_EFriendRelationshipIgnored || relation == EFriendRelationship::k_EFriendRelationshipIgnoredFriend)
+    {
         return false;
     }
 
