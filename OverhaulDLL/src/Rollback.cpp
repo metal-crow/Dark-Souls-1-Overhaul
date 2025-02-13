@@ -545,8 +545,9 @@ void Rollback::start()
     Rollback::saved_bulletman = init_BulletMan();
     Rollback::saved_sfxobjs = init_FXManager();
     Rollback::saved_damageman = init_DamageMan();
-    Rollback::saved_PadManipulator = (PadManipulatorPacked**)malloc_(sizeof(PadManipulatorPacked*) * INPUT_ROLLBACK_LENGTH);
+    Rollback::saved_throwman = init_ThrowMan();
     Rollback::saved_DmgHitRecordMan = init_DmgHitRecordManImp();
+    Rollback::saved_PadManipulator = (PadManipulatorPacked**)malloc_(sizeof(PadManipulatorPacked*) * INPUT_ROLLBACK_LENGTH);
     for (size_t i = 0; i < INPUT_ROLLBACK_LENGTH; i++)
     {
         Rollback::saved_PadManipulator[i] = (PadManipulatorPacked*)malloc(sizeof(PadManipulatorPacked));
