@@ -501,21 +501,21 @@ enum MemberFlags_IdentifiersEnum
     RegionMatchmaking = 0x53,
     isPlayerHollow = 0x54,
     PlayerSex = 0x55,
-    isPlayerHuman = 0x56,
-    New_Name_87 = 0x57,
+    IsRedInvadable = 0x56,
+    IsBlueInvadable = 0x57,
     New_Name_88 = 0x58,
     New_Name_89 = 0x59,
     hasInvasionTimeLimit = 0x5a,
     New_Name_91 = 0x5b,
     Const0 = 0x5c,
-    New_Name_93 = 0x5d,
+    CurEquipLoad = 0x5d,
     defSAToughnessTotal = 0x5e,
     MaxEquipLoad = 0x5f,
     CharacterName = 0x60,
     New_Name_97 = 0x61,
     New_Name_98 = 0x62,
     recentMPAreasVisited = 0x63,
-    New_Name_100 = 0x64,
+    AntiCheatFlags = 0x64,
     MpRegion = 0x65,
     SessionNatType = 0x66,
     CovenantId = 0x67,
@@ -552,117 +552,20 @@ bool allowed_flags(MemberFlags_IdentifiersEnum id)
     case MemberFlags_IdentifiersEnum::ClearCount:
     case MemberFlags_IdentifiersEnum::MaxWeaponLevel:
     case MemberFlags_IdentifiersEnum::RegulationVersion:
-    case MemberFlags_IdentifiersEnum::isPlayerHuman:
     case MemberFlags_IdentifiersEnum::SessionState:
-        return true;
-    case MemberFlags_IdentifiersEnum::DeathCount:
-    case MemberFlags_IdentifiersEnum::MultiplayerCount:
-    case MemberFlags_IdentifiersEnum::CoopSuccessCount:
-    case MemberFlags_IdentifiersEnum::New_Name_5:
-    case MemberFlags_IdentifiersEnum::New_Name_6:
-    case MemberFlags_IdentifiersEnum::SoulCount:
-    case MemberFlags_IdentifiersEnum::SoulMemory:
-    case MemberFlags_IdentifiersEnum::Archetype:
-    case MemberFlags_IdentifiersEnum::HP:
-    case MemberFlags_IdentifiersEnum::MaxHp:
-    case MemberFlags_IdentifiersEnum::BaseMaxHp_1:
-    case MemberFlags_IdentifiersEnum::Mp:
-    case MemberFlags_IdentifiersEnum::MaxMp:
-    case MemberFlags_IdentifiersEnum::BaseMaxHp_2:
-    case MemberFlags_IdentifiersEnum::Vitality:
-    case MemberFlags_IdentifiersEnum::Attunement:
-    case MemberFlags_IdentifiersEnum::Endurance:
-    case MemberFlags_IdentifiersEnum::Strength:
-    case MemberFlags_IdentifiersEnum::Dexterity:
-    case MemberFlags_IdentifiersEnum::Resistance:
-    case MemberFlags_IdentifiersEnum::Intelligence:
-    case MemberFlags_IdentifiersEnum::Force:
-    case MemberFlags_IdentifiersEnum::ItemDiscoveryRate:
-    case MemberFlags_IdentifiersEnum::attackR1:
-    case MemberFlags_IdentifiersEnum::attackR2:
-    case MemberFlags_IdentifiersEnum::attackL1:
-    case MemberFlags_IdentifiersEnum::attackL2:
-    case MemberFlags_IdentifiersEnum::EstusLevel:
-    case MemberFlags_IdentifiersEnum::RankingRegistration:
-    case MemberFlags_IdentifiersEnum::PlayTime:
-    case MemberFlags_IdentifiersEnum::HumanityCount:
-    case MemberFlags_IdentifiersEnum::Left_Hand_1:
-    case MemberFlags_IdentifiersEnum::Left_Hand_2:
-    case MemberFlags_IdentifiersEnum::Right_Hand_1:
-    case MemberFlags_IdentifiersEnum::Right_Hand_2:
-    case MemberFlags_IdentifiersEnum::ArmorHeadInv:
-    case MemberFlags_IdentifiersEnum::ArmorBodyInv:
-    case MemberFlags_IdentifiersEnum::ArmorArmsInv:
-    case MemberFlags_IdentifiersEnum::ArmorLegsInv:
-    case MemberFlags_IdentifiersEnum::LeftHandHeldWeaponSlot:
-    case MemberFlags_IdentifiersEnum::RightHandHeldWeaponSlot:
-    case MemberFlags_IdentifiersEnum::Stamina:
-    case MemberFlags_IdentifiersEnum::MaxStamina:
-    case MemberFlags_IdentifiersEnum::BaseMaxStamina:
-    case MemberFlags_IdentifiersEnum::WeaponinSlot0:
-    case MemberFlags_IdentifiersEnum::WeaponinSlot2:
-    case MemberFlags_IdentifiersEnum::WeaponinSlot1:
-    case MemberFlags_IdentifiersEnum::WeaponinSlot3:
-    case MemberFlags_IdentifiersEnum::ArmorinSlot0:
-    case MemberFlags_IdentifiersEnum::ArmorinSlot1:
-    case MemberFlags_IdentifiersEnum::ArmorinSlot2:
-    case MemberFlags_IdentifiersEnum::ArmorinSlot3:
-    case MemberFlags_IdentifiersEnum::RinginSlot0:
-    case MemberFlags_IdentifiersEnum::RinginSlot1:
-    case MemberFlags_IdentifiersEnum::IteminQuickbar0:
-    case MemberFlags_IdentifiersEnum::IteminQuickbar1:
-    case MemberFlags_IdentifiersEnum::IteminQuickbar2:
-    case MemberFlags_IdentifiersEnum::IteminQuickbar3:
-    case MemberFlags_IdentifiersEnum::IteminQuickbar4:
-    case MemberFlags_IdentifiersEnum::IteminArrowBoltSlot0:
-    case MemberFlags_IdentifiersEnum::IteminArrowBoltSlot1:
-    case MemberFlags_IdentifiersEnum::IteminArrowBoltSlot2:
-    case MemberFlags_IdentifiersEnum::IteminArrowBoltSlot3:
-    case MemberFlags_IdentifiersEnum::EquippedSpell1:
-    case MemberFlags_IdentifiersEnum::EquippedSpell2:
-    case MemberFlags_IdentifiersEnum::EquippedSpell3:
-    case MemberFlags_IdentifiersEnum::EquippedSpell4:
-    case MemberFlags_IdentifiersEnum::EquippedSpell5:
-    case MemberFlags_IdentifiersEnum::EquippedSpell6:
-    case MemberFlags_IdentifiersEnum::EquippedSpell7:
-    case MemberFlags_IdentifiersEnum::EquippedSpell8:
-    case MemberFlags_IdentifiersEnum::EquippedSpell9:
-    case MemberFlags_IdentifiersEnum::EquippedSpell10:
-    case MemberFlags_IdentifiersEnum::EquippedSpell11:
-    case MemberFlags_IdentifiersEnum::EquippedSpell12:
-    case MemberFlags_IdentifiersEnum::SessionRoleID:
-    case MemberFlags_IdentifiersEnum::New_Name_81:
-    case MemberFlags_IdentifiersEnum::New_Name_82:
-    case MemberFlags_IdentifiersEnum::isPlayerHollow:
-    case MemberFlags_IdentifiersEnum::PlayerSex:
-    case MemberFlags_IdentifiersEnum::New_Name_87:
-    case MemberFlags_IdentifiersEnum::New_Name_88:
+    case MemberFlags_IdentifiersEnum::IsRedInvadable:
+    case MemberFlags_IdentifiersEnum::IsBlueInvadable:
+    case MemberFlags_IdentifiersEnum::New_Name_88: //not sure what these 2 are, but are likely some sort of IsInvadable flags
     case MemberFlags_IdentifiersEnum::New_Name_89:
-    case MemberFlags_IdentifiersEnum::New_Name_91:
-    case MemberFlags_IdentifiersEnum::Const0:
-    case MemberFlags_IdentifiersEnum::New_Name_93:
-    case MemberFlags_IdentifiersEnum::defSAToughnessTotal:
-    case MemberFlags_IdentifiersEnum::MaxEquipLoad:
-    case MemberFlags_IdentifiersEnum::CharacterName:
-    case MemberFlags_IdentifiersEnum::New_Name_97:
-    case MemberFlags_IdentifiersEnum::New_Name_98:
-    case MemberFlags_IdentifiersEnum::recentMPAreasVisited:
-    case MemberFlags_IdentifiersEnum::New_Name_100:
+    //needed just in case
     case MemberFlags_IdentifiersEnum::SessionNatType:
+    case MemberFlags_IdentifiersEnum::SessionRoleID:
+    //needed for forest invasions
     case MemberFlags_IdentifiersEnum::inSession:
-    case MemberFlags_IdentifiersEnum::NormalDefenses:
-    case MemberFlags_IdentifiersEnum::NormalResists:
-    case MemberFlags_IdentifiersEnum::CovenantLevel:
-    case MemberFlags_IdentifiersEnum::New_Name_109:
-    case MemberFlags_IdentifiersEnum::New_Name_110:
-    case MemberFlags_IdentifiersEnum::New_Name_111:
-    case MemberFlags_IdentifiersEnum::New_Name_112:
-    case MemberFlags_IdentifiersEnum::New_Name_113:
-    case MemberFlags_IdentifiersEnum::New_Name_114:
-    case MemberFlags_IdentifiersEnum::New_Name_115:
-    case MemberFlags_IdentifiersEnum::New_Name_116:
-    case MemberFlags_IdentifiersEnum::New_Name_117:
-    case MemberFlags_IdentifiersEnum::New_Name_118:
+    case MemberFlags_IdentifiersEnum::DeathCount:
+    case MemberFlags_IdentifiersEnum::recentMPAreasVisited:
+        return true;
+
     default:
         return false;
     }
@@ -859,10 +762,10 @@ void construct_flatbuffer_from_PlayerStatus_MemberFlags_injection_helper(uint64_
     {
         FATALERROR("UNKNOWN RegulationVersion VALUE: %d", RegulationVersion);
     }
-    uint8_t isPlayerHuman = *(uint8_t*)(input_data + 0x170 + ((MemberFlags_IdentifiersEnum::isPlayerHuman-0x53) * 1));
-    if (isPlayerHuman != 0 && isPlayerHuman != 1)
+    uint8_t IsRedInvadable = *(uint8_t*)(input_data + 0x170 + ((MemberFlags_IdentifiersEnum::IsRedInvadable-0x53) * 1));
+    if (IsRedInvadable != 0 && IsRedInvadable != 1)
     {
-        FATALERROR("UNKNOWN isPlayerHuman VALUE: %d", isPlayerHuman);
+        FATALERROR("UNKNOWN IsRedInvadable VALUE: %d", IsRedInvadable);
     }
 
     //unset all the bitflags we don't whitelist
