@@ -7,6 +7,7 @@
 #include "PadManipulatorStruct.h"
 
 std::string print_PadManipulatorPacked(PadManipulatorPacked* to);
+std::string print_PadManipulator(PadManipulator* pad);
 void PadManipulator_to_PadManipulatorPacked(PadManipulatorPacked* to, PadManipulator* from);
 void PadManipulatorPacked_to_PadManipulator(PadManipulator* to, PadManipulatorPacked* from, bool networkedPc);
 
