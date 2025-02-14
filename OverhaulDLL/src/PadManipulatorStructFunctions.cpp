@@ -413,14 +413,17 @@ void PadManipulator_to_PadManipulatorPacked(PadManipulatorPacked* to, PadManipul
     to->cur_movement_input_index_to_use = from->cur_movement_input_index_to_use;
 }
 
-void PadManipulatorPacked_to_PadManipulator(PadManipulator* to, PadManipulatorPacked* from, bool networkedPc)
+void PadManipulatorPacked_to_PadManipulator(PlayerIns* target, PadManipulatorPacked* from, bool networkedPc)
 {
+    PadManipulator* to = target->chrins.padManipulator;
+
     to->chrManipulator.camera_x_direction_movement_input_amount = from->camera_x_direction_movement_input_amount;
     to->chrManipulator.camera_y_direction_movement_input_amount = from->camera_y_direction_movement_input_amount;
     to->chrManipulator.continuous_weapon_controlled_angle = from->continuous_weapon_controlled_angle;
     to->chrManipulator.delta_pc_rotation_perframe = from->delta_pc_rotation_perframe;
     to->chrManipulator.weapon_controlled_angle = from->weapon_controlled_angle;
     to->chrManipulator.pc_rotation = from->pc_rotation;
+    *(float*)((uint64_t)(target->chrins.playerCtrl->chrCtrl.havokChara) + 4) = from->pc_rotation; //need to write this here since it's the "real" rotation
     to->chrManipulator.delta_camera_y_rotation_perframe = from->delta_camera_y_rotation_perframe;
     to->chrManipulator.delta_camera_x_rotation_perframe = from->delta_camera_x_rotation_perframe;
     to->chrManipulator.camera_y_rotation = from->camera_y_rotation;

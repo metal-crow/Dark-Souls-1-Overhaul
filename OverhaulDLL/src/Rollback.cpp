@@ -257,7 +257,7 @@ void UnpackRollbackInput(RollbackInput* in, PlayerIns* player)
     uint32_t playerHandle = *(uint32_t*)(((uint64_t)player) + 8);
     if (playerHandle > Game::PC_Handle && playerHandle < Game::PC_Handle + 10)
     {
-        PadManipulatorPacked_to_PadManipulator(player->chrins.padManipulator, &in->padmanipulator, true);
+        PadManipulatorPacked_to_PadManipulator(player, &in->padmanipulator, true);
 
         //forcably set the PlayerCtrl->chrctrl_parent.NotLockedOn flag if the player is locked on. Dark souls will never set this itself
         uint32_t LockonTargetHandle = *(uint32_t*)(((uint64_t)(&player->chrins.padManipulator->chrManipulator)) + 0x220);
@@ -273,7 +273,7 @@ void UnpackRollbackInput(RollbackInput* in, PlayerIns* player)
     }
     else
     {
-        PadManipulatorPacked_to_PadManipulator(player->chrins.padManipulator, &in->padmanipulator, false);
+        PadManipulatorPacked_to_PadManipulator(player, &in->padmanipulator, false);
 
         //manually set the LockTgtManImp->bTargetLocked_Alt flags for the host, since the game needs this flag set and directly sets it from the controller input
         uint8_t* bTargetLocked = (uint8_t*)((*(uint64_t*)Game::LockTgtManImp) + 0x1430);
@@ -400,24 +400,35 @@ bool rollback_game_frame_start_helper(void* unused)
             auto guest_o = Game::get_connected_player(1);
             if (guest_o.has_value() && guest_o.value() != NULL)
             {
-                Game::set_ReadInputs_allowed(true);
-                Step_PadMan(FRAMETIME);
-                Step_PadManipulator(player->chrins.padManipulator, FRAMETIME, player->chrins.playerCtrl);
-                Game::set_ReadInputs_allowed(false);
-                Game::set_StepInGameMenu_allowed(true);
-                uint64_t ingamestep = (uint64_t)Game::get_InGameStep();
-                uint64_t taskitem = *(uint64_t*)(ingamestep + 0x5ae0);
-                uint64_t ingamemenustep = *(uint64_t*)(taskitem + 0x20);
-                Step_InGameMenus((void*)ingamemenustep, FRAMETIME, (void*)taskitem);
-                Game::set_StepInGameMenu_allowed(false);
-
                 PlayerIns* guest = (PlayerIns*)guest_o.value();
-                //send out our input
-                RollbackInput localInput{};
-                PackRollbackInput(&localInput, player);
-                SteamNetworkingIdentity target{};
-                target.SetSteamID(guest->steamPlayerData->steamOnlineIDData->steam_id);
-                ModNetworking::SteamNetMessages->SendMessageToUser(target, &localInput, sizeof(localInput), k_nSteamNetworkingSend_UnreliableNoNagle, 1);
+
+                //only allow 1 player to be the controller, otherwise we can get a feedback loop
+                //first ring slot == old witch's ring
+                if (player->chrasm->equip_items[0xD] == 137)
+                {
+                    Game::set_ReadInputs_allowed(true);
+                    Step_PadMan(FRAMETIME);
+                    Step_PadManipulator(player->chrins.padManipulator, FRAMETIME, player->chrins.playerCtrl);
+                    Game::set_ReadInputs_allowed(false);
+                    Game::set_StepInGameMenu_allowed(true);
+                    uint64_t ingamestep = (uint64_t)Game::get_InGameStep();
+                    uint64_t taskitem = *(uint64_t*)(ingamestep + 0x5ae0);
+                    uint64_t ingamemenustep = *(uint64_t*)(taskitem + 0x20);
+                    Step_InGameMenus((void*)ingamemenustep, FRAMETIME, (void*)taskitem);
+                    Game::set_StepInGameMenu_allowed(false);
+
+                    //send out our input
+                    RollbackInput localInput{};
+                    PackRollbackInput(&localInput, player);
+                    SteamNetworkingIdentity target{};
+                    target.SetSteamID(guest->steamPlayerData->steamOnlineIDData->steam_id);
+                    ModNetworking::SteamNetMessages->SendMessageToUser(target, &localInput, sizeof(localInput), k_nSteamNetworkingSend_UnreliableNoNagle, 1);
+                }
+                else
+                {
+                    Game::set_ReadInputs_allowed(false);
+                    Game::set_StepInGameMenu_allowed(false);
+                }
 
                 //read in and set the other player input. Do this in lockstep
                 SteamNetworkingMessage_t* new_message;
@@ -431,12 +442,13 @@ bool rollback_game_frame_start_helper(void* unused)
                 if (num_messages == 1)
                 {
                     RollbackInput* remoteInput = (RollbackInput*)new_message->GetData();
-                    UnpackRollbackInput(remoteInput, guest);
+                    PadManipulatorPacked_to_PadManipulator(guest, &remoteInput->padmanipulator, true);
+                    PadManipulatorPacked_to_PadManipulator(player, &remoteInput->padmanipulator, true); //need to treat as networked pc since they are not doing any input processing
                     new_message->Release();
                 }
                 else
                 {
-                    ConsoleWrite("Missed input");
+                    //ConsoleWrite("Missed input");
                 }
             }
         }
