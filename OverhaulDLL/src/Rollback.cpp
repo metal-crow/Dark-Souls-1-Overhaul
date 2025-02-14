@@ -96,7 +96,7 @@ bool input_test(void* unused)
 
         auto player_o = Game::get_PlayerIns();
         PlayerIns* player = (PlayerIns*)player_o.value();
-        PadManipulatorPacked_to_PadManipulator(player->chrins.padManipulator, Rollback::saved_PadManipulator[inputSaveFrameI], true);
+        PadManipulatorPacked_to_PadManipulator(player, Rollback::saved_PadManipulator[inputSaveFrameI], true);
 
         inputSaveFrameI++;
         if (inputSaveFrameI >= INPUT_ROLLBACK_LENGTH)
