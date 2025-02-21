@@ -17,6 +17,7 @@ void free_EzStateManagerImpl_field0x20(EzStateManagerImpl_field0x20* to)
     free(to);
 }
 
+//This isn't needed for rollback. The game only uses this as per-frame scratch space, it is cleared every frame
 void copy_EzStateManagerImpl(EzStateManagerImpl* to, EzStateManagerImpl* from, bool to_game)
 {
     copy_EzStateManagerImpl_field0x20(to->field0x20, from->field0x20, to_game);
