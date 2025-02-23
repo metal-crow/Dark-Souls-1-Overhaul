@@ -38,6 +38,9 @@ struct PadManipulatorPacked
     unsigned int change_2handing_state : 2;
     unsigned int left_hand_slot_selected : 1;
     unsigned int right_hand_slot_selected : 1;
+    unsigned int any_action_inputted : 1;
+    unsigned int EnableBackStep : 1;
+    unsigned int EnableBackStep_forward : 1;
 
     uint8_t movement_related_flags;
     float camera_x_direction_movement_input_amount;
@@ -53,6 +56,8 @@ struct PadManipulatorPacked
     float camera_y_rotation;
     float camera_x_rotation;
     float movement_velocity[4];
+    float TimeRollButtonHeld;
+    float Backstep_timer;
     uint32_t LockonTargetHandle;
     float y_movement_input;
     float x_movement_input;
@@ -281,7 +286,7 @@ struct PadManipulator
     uint64_t* arry_start;
     uint64_t* arry_end;
     uint64_t field10_0x258;
-    float DashInputTimer;
+    float TimeRollButtonHeld;
     float y_movement_input[6]; //all the same copies
     uint8_t field13_0x27c;
     uint8_t field14_0x27d;

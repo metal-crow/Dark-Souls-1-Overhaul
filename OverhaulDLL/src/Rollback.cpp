@@ -96,7 +96,7 @@ bool input_test(void* unused)
 
         auto player_o = Game::get_PlayerIns();
         PlayerIns* player = (PlayerIns*)player_o.value();
-        PadManipulatorPacked_to_PadManipulator(player, Rollback::saved_PadManipulator[inputSaveFrameI], true);
+        PadManipulatorPacked_to_PadManipulator(player, Rollback::saved_PadManipulator[inputSaveFrameI]);
 
         inputSaveFrameI++;
         if (inputSaveFrameI >= INPUT_ROLLBACK_LENGTH)
@@ -254,11 +254,11 @@ void UnpackRollbackInput(RollbackInput* in, PlayerIns* player)
         ItemIdOverride = in->curSelectedQuickbarItemId;
     }
 
+    PadManipulatorPacked_to_PadManipulator(player, &in->padmanipulator);
+
     uint32_t playerHandle = *(uint32_t*)(((uint64_t)player) + 8);
     if (playerHandle > Game::PC_Handle && playerHandle < Game::PC_Handle + 10)
     {
-        PadManipulatorPacked_to_PadManipulator(player, &in->padmanipulator, true);
-
         //forcably set the PlayerCtrl->chrctrl_parent.NotLockedOn flag if the player is locked on. Dark souls will never set this itself
         uint32_t LockonTargetHandle = *(uint32_t*)(((uint64_t)(&player->chrins.padManipulator->chrManipulator)) + 0x220);
         uint8_t* NotLockedOn = (uint8_t*)(((uint64_t)(&player->chrins.playerCtrl->chrCtrl)) + 0x21D);
@@ -273,8 +273,6 @@ void UnpackRollbackInput(RollbackInput* in, PlayerIns* player)
     }
     else
     {
-        PadManipulatorPacked_to_PadManipulator(player, &in->padmanipulator, false);
-
         //manually set the LockTgtManImp->bTargetLocked_Alt flags for the host, since the game needs this flag set and directly sets it from the controller input
         uint8_t* bTargetLocked = (uint8_t*)((*(uint64_t*)Game::LockTgtManImp) + 0x1430);
         *bTargetLocked = in->bTargetLocked;
@@ -442,8 +440,8 @@ bool rollback_game_frame_start_helper(void* unused)
                 if (num_messages == 1)
                 {
                     RollbackInput* remoteInput = (RollbackInput*)new_message->GetData();
-                    PadManipulatorPacked_to_PadManipulator(guest, &remoteInput->padmanipulator, true);
-                    PadManipulatorPacked_to_PadManipulator(player, &remoteInput->padmanipulator, true); //need to treat as networked pc since they are not doing any input processing
+                    PadManipulatorPacked_to_PadManipulator(guest, &remoteInput->padmanipulator);
+                    PadManipulatorPacked_to_PadManipulator(player, &remoteInput->padmanipulator);
                     new_message->Release();
                 }
                 else

@@ -209,7 +209,7 @@ std::string print_PadManipulator(PadManipulator* pad)
     out += std::format("field5_0x23e: {}\n", pad->field5_0x23e);
     out += std::format("field6_0x23f: {}\n", pad->field6_0x23f);
     out += std::format("field10_0x258: {}lu\n", pad->field10_0x258);
-    out += std::format("DashInputTimer: {}\n", pad->DashInputTimer);
+    out += std::format("TimeRollButtonHeld: {}\n", pad->TimeRollButtonHeld);
     for (int i = 0; i < 6; i++)
     {
         out += std::format("y_movement_input[{}]: {}\n", i, pad->y_movement_input[i]);
@@ -400,6 +400,7 @@ void PadManipulator_to_PadManipulatorPacked(PadManipulatorPacked* to, PadManipul
     to->jump_input = from->chrManipulator.CurrentFrame_ActionInputs.jump_input;
     to->l1_weapon_attack = from->chrManipulator.CurrentFrame_ActionInputs.l1_weapon_attack;
     to->l2_weapon_attack = from->chrManipulator.CurrentFrame_ActionInputs.l2_weapon_attack;
+    to->any_action_inputted = from->chrManipulator.AnyActionInputted;
 
     to->change_2handing_state = from->chrManipulator.change_2handing_state;
     to->left_hand_slot_selected = from->chrManipulator.left_hand_slot_selected;
@@ -408,12 +409,16 @@ void PadManipulator_to_PadManipulatorPacked(PadManipulatorPacked* to, PadManipul
     to->LockonTargetHandle = from->chrManipulator.LockonTargetHandle;
     to->movement_related_flags = from->movement_related_flags;
     to->not_getting_movement_input = from->not_getting_movement_input;
+    to->TimeRollButtonHeld = from->TimeRollButtonHeld;
     to->y_movement_input = from->y_movement_input[from->cur_movement_input_index_to_use];
     to->x_movement_input = from->x_movement_input[from->cur_movement_input_index_to_use];
     to->cur_movement_input_index_to_use = from->cur_movement_input_index_to_use;
+    to->Backstep_timer = from->Backstep_timer;
+    to->EnableBackStep = from->EnableBackStep;
+    to->EnableBackStep_forward = from->EnableBackStep_forward;
 }
 
-void PadManipulatorPacked_to_PadManipulator(PlayerIns* target, PadManipulatorPacked* from, bool networkedPc)
+void PadManipulatorPacked_to_PadManipulator(PlayerIns* target, PadManipulatorPacked* from)
 {
     PadManipulator* to = target->chrins.padManipulator;
 
@@ -436,10 +441,7 @@ void PadManipulatorPacked_to_PadManipulator(PlayerIns* target, PadManipulatorPac
     to->chrManipulator.movement_velocity[3] = from->movement_velocity[3];
 
     //move the CurrentFrame_ActionInputs to the PrevFrame_ActionInputs
-    if (networkedPc)
-    {
-        memcpy(&to->chrManipulator.PrevFrame_ActionInputs, &to->chrManipulator.CurrentFrame_ActionInputs, sizeof(ChrManipulator_ActionInputted));
-    }
+    memcpy(&to->chrManipulator.PrevFrame_ActionInputs, &to->chrManipulator.CurrentFrame_ActionInputs, sizeof(ChrManipulator_ActionInputted));
 
     to->chrManipulator.CurrentFrame_ActionInputs.r1_weapon_attack_input_1 = from->r1_weapon_attack_input;
     to->chrManipulator.CurrentFrame_ActionInputs.l1_input = from->l1_input;
@@ -455,25 +457,21 @@ void PadManipulatorPacked_to_PadManipulator(PlayerIns* target, PadManipulatorPac
     to->chrManipulator.CurrentFrame_ActionInputs.jump_input = from->jump_input;
     to->chrManipulator.CurrentFrame_ActionInputs.l1_weapon_attack = from->l1_weapon_attack;
     to->chrManipulator.CurrentFrame_ActionInputs.l2_weapon_attack = from->l2_weapon_attack;
+    to->chrManipulator.AnyActionInputted = from->any_action_inputted;
 
-    //update the ActionInputtedTimeHeld and AnyActionInputted
-    if (networkedPc)
+    //update the ActionInputtedTimeHeld
+    for (size_t i = 0; i < sizeof(ChrManipulator_ActionInputted); i++)
     {
-        to->chrManipulator.AnyActionInputted = false;
-        for (size_t i = 0; i < sizeof(ChrManipulator_ActionInputted); i++)
-        {
-            bool* buttonPressed = (bool*)((uint64_t)(&to->chrManipulator.CurrentFrame_ActionInputs) + i);
-            float* timeHeld = (float*)((uint64_t)(&to->chrManipulator.ActionInputtedTimeHeld) + i * 4);
+        bool* buttonPressed = (bool*)((uint64_t)(&to->chrManipulator.CurrentFrame_ActionInputs) + i);
+        float* timeHeld = (float*)((uint64_t)(&to->chrManipulator.ActionInputtedTimeHeld) + i * 4);
 
-            if (*buttonPressed)
-            {
-                *timeHeld += FRAMETIME;
-                to->chrManipulator.AnyActionInputted |= true;
-            }
-            else
-            {
-                *timeHeld = 0.0f;
-            }
+        if (*buttonPressed)
+        {
+            *timeHeld += FRAMETIME;
+        }
+        else
+        {
+            *timeHeld = 0.0f;
         }
     }
 
@@ -485,7 +483,7 @@ void PadManipulatorPacked_to_PadManipulator(PlayerIns* target, PadManipulatorPac
     //CurrentFrame_ActionInputs_ButtonId
     to->movement_related_flags = from->movement_related_flags;
     to->not_getting_movement_input = from->not_getting_movement_input;
-    //DashInputTimer
+    to->TimeRollButtonHeld = from->TimeRollButtonHeld;
     to->y_movement_input[from->cur_movement_input_index_to_use] = from->y_movement_input;
     to->x_movement_input[from->cur_movement_input_index_to_use] = from->x_movement_input;
     to->cur_movement_input_index_to_use = from->cur_movement_input_index_to_use;
@@ -494,9 +492,9 @@ void PadManipulatorPacked_to_PadManipulator(PlayerIns* target, PadManipulatorPac
     //time_spend_left_strafing
     //time_spend_right_strafing
     //camera_xaxis_rotation
-    //Backstep_timer
-    //EnableBackStep
-    //EnableBackStep_forward
+    to->Backstep_timer = from->Backstep_timer;
+    to->EnableBackStep = from->EnableBackStep;
+    to->EnableBackStep_forward = from->EnableBackStep_forward;
     //x_movement_input_reversed
     //y_movement_input_reversed
     //jump_trigger_time_remaining
