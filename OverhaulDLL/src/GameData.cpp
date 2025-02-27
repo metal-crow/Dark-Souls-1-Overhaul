@@ -580,7 +580,7 @@ void Game::disable_low_fps_disconnect(bool enable)
     {
         ConsoleWrite("Enabling low FPS disconnect...");
         *fps_warn = 0xEB;
-        *(fps_warn+1) = 0x5;
+        *(fps_warn+1) = 0xD;
     }
     else
     {
