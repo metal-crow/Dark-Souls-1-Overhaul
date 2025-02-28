@@ -13,9 +13,9 @@ void copy_DamageEntry(DamageEntry* to, DamageEntry* from, bool to_game);
 DamageEntry* init_DamageEntry();
 void free_DamageEntry(DamageEntry* to, bool freeself);
 
-void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePhantomIns** from, bool to_game);
-FrpgPhysShapePhantomIns* init_FrpgPhysShapePhantomIns(bool to_game);
-void free_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns* to, bool to_game);
+void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePhantomIns** from, bool is_sphere, bool to_game);
+FrpgPhysShapePhantomIns* init_FrpgPhysShapePhantomIns(bool is_sphere, bool to_game);
+void free_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns* to, bool is_sphere, bool to_game);
 
 void copy_hkpSphereShape(hkpSphereShape** to, hkpSphereShape** from, bool to_game);
 hkpSphereShape* init_hkpSphereShape(bool to_game);

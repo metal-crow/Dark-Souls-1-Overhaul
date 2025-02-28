@@ -46,7 +46,11 @@ struct FrpgPhysShapePhantomIns
     hkpSimpleShapePhantom* _hkpSimpleShapePhantom;
     void* self;
     uint64_t data_1;
-    hkpCapsuleShape* _hkpCapsuleShape;
+    union
+    {
+        hkpCapsuleShape* _hkpCapsuleShape;
+        hkpSphereShape* _hkpSphereShape;
+    };
 };
 static_assert(offsetof(FrpgPhysShapePhantomIns, damageEntry) == 0x10);
 static_assert(offsetof(FrpgPhysShapePhantomIns, physWorld) == 0x18);
@@ -64,13 +68,13 @@ static_assert(sizeof(DamageEntryField0x118) == 0x20);
 struct DamageEntry
 {
     uint64_t data_0;
-    void* PhysShapePhantomIns1;
+    void* PhysShapePhantomIns1; //this always points to 1 of the 2 FrpgPhysShapePhantomIns and can be treated as data
     FrpgPhysShapePhantomIns* FrpgPhysShapePhantomIns_Sphere;
     FrpgPhysShapePhantomIns* FrpgPhysShapePhantomIns_Capsule;
-    hkpSphereShape* hkpSphereShape1;
-    hkpCapsuleShape* hkpCapsuleShape1;
-    uint64_t data_1;
-    void* PhysShapePhantomIns1_ptr;
+    void* hkpSphereShape1; //these 2 are already handled by the FrpgPhysShapePhantomIns an can be treated as data
+    void* hkpCapsuleShape1;
+    void* PhysShapePhantomIns1_altPtr_A; //these 2 are just copies of PhysShapePhantomIns1 and can be treated as data
+    void* PhysShapePhantomIns1_altPtr_B;
     uint8_t data_2[216];
     DamageEntryField0x118* field0x118;
     uint8_t data_4[184];
@@ -93,7 +97,7 @@ static_assert(offsetof(DamageEntry, FrpgPhysShapePhantomIns_Sphere) == 0x10);
 static_assert(offsetof(DamageEntry, FrpgPhysShapePhantomIns_Capsule) == 0x18);
 static_assert(offsetof(DamageEntry, hkpSphereShape1) == 0x20);
 static_assert(offsetof(DamageEntry, hkpCapsuleShape1) == 0x28);
-static_assert(offsetof(DamageEntry, data_1) == 0x30);
+static_assert(offsetof(DamageEntry, PhysShapePhantomIns1_altPtr_A) == 0x30);
 static_assert(offsetof(DamageEntry, data_2) == 0x40);
 static_assert(offsetof(DamageEntry, field0x118) == 0x118);
 static_assert(offsetof(DamageEntry, data_4) == 0x120);

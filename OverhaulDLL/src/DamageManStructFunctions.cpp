@@ -100,9 +100,12 @@ void copy_DamageEntry(DamageEntry* to, DamageEntry* from, bool to_game)
 {
     to->data_0 = from->data_0;
     //these need to be run first
-    copy_FrpgPhysShapePhantomIns(&to->FrpgPhysShapePhantomIns_Sphere, &from->FrpgPhysShapePhantomIns_Sphere, to_game);
-    copy_FrpgPhysShapePhantomIns(&to->FrpgPhysShapePhantomIns_Capsule, &from->FrpgPhysShapePhantomIns_Capsule, to_game);
-    //this always points to either the sphere or the capsule
+    copy_FrpgPhysShapePhantomIns(&to->FrpgPhysShapePhantomIns_Sphere, &from->FrpgPhysShapePhantomIns_Sphere, true, to_game);
+    copy_FrpgPhysShapePhantomIns(&to->FrpgPhysShapePhantomIns_Capsule, &from->FrpgPhysShapePhantomIns_Capsule, false, to_game);
+    //these are handled by the above FrpgPhysShapePhantomIns
+    to->hkpSphereShape1 = to->FrpgPhysShapePhantomIns_Sphere->_hkpSphereShape;
+    to->hkpCapsuleShape1 = to->FrpgPhysShapePhantomIns_Capsule->_hkpCapsuleShape;
+    //these always points to either the sphere or the capsule
     if (from->PhysShapePhantomIns1 == from->FrpgPhysShapePhantomIns_Sphere)
     {
         to->PhysShapePhantomIns1 = to->FrpgPhysShapePhantomIns_Sphere;
@@ -120,16 +123,39 @@ void copy_DamageEntry(DamageEntry* to, DamageEntry* from, bool to_game)
         FATALERROR("PhysShapePhantomIns1 %p FrpgPhysShapePhantomIns_Sphere %p FrpgPhysShapePhantomIns_Capsule %p",
             to->PhysShapePhantomIns1, to->FrpgPhysShapePhantomIns_Sphere, to->FrpgPhysShapePhantomIns_Capsule);
     }
-    copy_hkpSphereShape(&to->hkpSphereShape1, &from->hkpSphereShape1, to_game);
-    copy_hkpCapsuleShape(&to->hkpCapsuleShape1, &from->hkpCapsuleShape1, to_game);
-    to->data_1 = from->data_1;
-    if (from->PhysShapePhantomIns1_ptr == NULL)
+    if (from->PhysShapePhantomIns1_altPtr_A == from->FrpgPhysShapePhantomIns_Sphere)
     {
-        to->PhysShapePhantomIns1_ptr = NULL;
+        to->PhysShapePhantomIns1_altPtr_A = to->FrpgPhysShapePhantomIns_Sphere;
+    }
+    else if (from->PhysShapePhantomIns1_altPtr_A == from->FrpgPhysShapePhantomIns_Capsule)
+    {
+        to->PhysShapePhantomIns1_altPtr_A = to->FrpgPhysShapePhantomIns_Capsule;
+    }
+    else if (from->PhysShapePhantomIns1_altPtr_A == NULL)
+    {
+        to->PhysShapePhantomIns1_altPtr_A = NULL;
     }
     else
     {
-        to->PhysShapePhantomIns1_ptr = to->PhysShapePhantomIns1;
+        FATALERROR("PhysShapePhantomIns1_altPtr_A %p FrpgPhysShapePhantomIns_Sphere %p FrpgPhysShapePhantomIns_Capsule %p",
+            to->PhysShapePhantomIns1_altPtr_A, to->FrpgPhysShapePhantomIns_Sphere, to->FrpgPhysShapePhantomIns_Capsule);
+    }
+    if (from->PhysShapePhantomIns1_altPtr_B == from->FrpgPhysShapePhantomIns_Sphere)
+    {
+        to->PhysShapePhantomIns1_altPtr_B = to->FrpgPhysShapePhantomIns_Sphere;
+    }
+    else if (from->PhysShapePhantomIns1_altPtr_B == from->FrpgPhysShapePhantomIns_Capsule)
+    {
+        to->PhysShapePhantomIns1_altPtr_B = to->FrpgPhysShapePhantomIns_Capsule;
+    }
+    else if (from->PhysShapePhantomIns1_altPtr_B == NULL)
+    {
+        to->PhysShapePhantomIns1_altPtr_B = NULL;
+    }
+    else
+    {
+        FATALERROR("PhysShapePhantomIns1_altPtr_B %p FrpgPhysShapePhantomIns_Sphere %p FrpgPhysShapePhantomIns_Capsule %p",
+            to->PhysShapePhantomIns1_altPtr_B, to->FrpgPhysShapePhantomIns_Sphere, to->FrpgPhysShapePhantomIns_Capsule);
     }
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
     copy_DamageEntryField0x118(&to->field0x118, &from->field0x118, to_game);
@@ -146,10 +172,10 @@ DamageEntry* init_DamageEntry()
 {
     DamageEntry* local_DamageEntry = (DamageEntry*)malloc_(sizeof(DamageEntry));
 
-    local_DamageEntry->FrpgPhysShapePhantomIns_Sphere = init_FrpgPhysShapePhantomIns(false);
-    local_DamageEntry->FrpgPhysShapePhantomIns_Capsule = init_FrpgPhysShapePhantomIns(false);
-    local_DamageEntry->hkpSphereShape1 = init_hkpSphereShape(false);
-    local_DamageEntry->hkpCapsuleShape1 = init_hkpCapsuleShape(false);
+    local_DamageEntry->FrpgPhysShapePhantomIns_Sphere = init_FrpgPhysShapePhantomIns(true, false);
+    local_DamageEntry->FrpgPhysShapePhantomIns_Capsule = init_FrpgPhysShapePhantomIns(false, false);
+    local_DamageEntry->hkpSphereShape1 = local_DamageEntry->FrpgPhysShapePhantomIns_Sphere->_hkpSphereShape;
+    local_DamageEntry->hkpCapsuleShape1 = local_DamageEntry->FrpgPhysShapePhantomIns_Capsule->_hkpCapsuleShape;
     local_DamageEntry->field0x118 = init_DamageEntryField0x118(false);
 
     return local_DamageEntry;
@@ -157,10 +183,10 @@ DamageEntry* init_DamageEntry()
 
 void free_DamageEntry(DamageEntry* to, bool freeself)
 {
-    free_FrpgPhysShapePhantomIns(to->FrpgPhysShapePhantomIns_Sphere, false);
-    free_FrpgPhysShapePhantomIns(to->FrpgPhysShapePhantomIns_Capsule, false);
-    free_hkpSphereShape(to->hkpSphereShape1, false);
-    free_hkpCapsuleShape(to->hkpCapsuleShape1, false);
+    free_FrpgPhysShapePhantomIns(to->FrpgPhysShapePhantomIns_Sphere, true, false);
+    free_FrpgPhysShapePhantomIns(to->FrpgPhysShapePhantomIns_Capsule, false, false);
+    to->hkpSphereShape1 = NULL;
+    to->hkpCapsuleShape1 = NULL;
     free_DamageEntryField0x118(to->field0x118, false);
 
     if (freeself)
@@ -169,15 +195,15 @@ void free_DamageEntry(DamageEntry* to, bool freeself)
     }
 }
 
-void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePhantomIns** from, bool to_game)
+void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePhantomIns** from, bool is_sphere, bool to_game)
 {
     if (*to == NULL && *from != NULL)
     {
-        *to = init_FrpgPhysShapePhantomIns(to_game);
+        *to = init_FrpgPhysShapePhantomIns(is_sphere, to_game);
     }
     if (*to != NULL && *from == NULL)
     {
-        free_FrpgPhysShapePhantomIns(*to, to_game);
+        free_FrpgPhysShapePhantomIns(*to, is_sphere, to_game);
         *to = NULL;
     }
     if (*to != NULL && *from != NULL)
@@ -188,11 +214,18 @@ void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePha
         copy_hkpSimpleShapePhantom((*to)->_hkpSimpleShapePhantom, (*from)->_hkpSimpleShapePhantom);
         (*to)->self = (*to);
         (*to)->data_1 = (*from)->data_1;
-        copy_hkpCapsuleShape(&(*to)->_hkpCapsuleShape, &(*from)->_hkpCapsuleShape, to_game);
+        if (is_sphere)
+        {
+            copy_hkpSphereShape(&(*to)->_hkpSphereShape, &(*from)->_hkpSphereShape, to_game);
+        }
+        else
+        {
+            copy_hkpCapsuleShape(&(*to)->_hkpCapsuleShape, &(*from)->_hkpCapsuleShape, to_game);
+        }
     }
 }
 
-FrpgPhysShapePhantomIns* init_FrpgPhysShapePhantomIns(bool to_game)
+FrpgPhysShapePhantomIns* init_FrpgPhysShapePhantomIns(bool is_sphere, bool to_game)
 {
     FrpgPhysShapePhantomIns* local;
     if (to_game)
@@ -206,11 +239,18 @@ FrpgPhysShapePhantomIns* init_FrpgPhysShapePhantomIns(bool to_game)
         local->_hkpSimpleShapePhantom = init_hkpSimpleShapePhantom();
     }
 
-    local->_hkpCapsuleShape = init_hkpCapsuleShape(to_game);
+    if (is_sphere)
+    {
+        local->_hkpSphereShape = init_hkpSphereShape(to_game);
+    }
+    else
+    {
+        local->_hkpCapsuleShape = init_hkpCapsuleShape(to_game);
+    }
     return local;
 }
 
-void free_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns* to, bool to_game)
+void free_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns* to, bool is_sphere, bool to_game)
 {
     if (to_game)
     {
@@ -220,7 +260,14 @@ void free_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns* to, bool to_game)
     {
         free_hkpSimpleShapePhantom(to->_hkpSimpleShapePhantom);
     }
-    free_hkpCapsuleShape(to->_hkpCapsuleShape, to_game);
+    if (is_sphere)
+    {
+        free_hkpSphereShape(to->_hkpSphereShape, to_game);
+    }
+    else
+    {
+        free_hkpCapsuleShape(to->_hkpCapsuleShape, to_game);
+    }
     if (to_game)
     {
         Game::game_free(to);
