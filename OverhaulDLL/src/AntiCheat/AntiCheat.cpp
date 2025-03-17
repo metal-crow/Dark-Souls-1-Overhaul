@@ -335,7 +335,7 @@ void ReadParseType35_packet_injection_helper(uint64_t packet)
 //return target if we shouldn't interfer, 0 if we prevent the position from changing
 uint64_t ReadParseType3_packet_injection_helper(ChrIns* target)
 {
-    if (dmg_guard_asm_check_helper(target, 1, NULL) != 0)
+    if (dmg_guard_asm_check_helper(target, 1) != 0)
     {
         return 0;
     }
@@ -344,7 +344,7 @@ uint64_t ReadParseType3_packet_injection_helper(ChrIns* target)
 
 uint64_t ReadParseType39_packet_injection_helper(ChrIns* target)
 {
-    if (dmg_guard_asm_check_helper(target, 1, NULL) != 0)
+    if (dmg_guard_asm_check_helper(target, 1) != 0)
     {
         return 0;
     }
@@ -354,7 +354,7 @@ uint64_t ReadParseType39_packet_injection_helper(ChrIns* target)
 //return target if we shouldn't interfer, 0 if we prevent the speffect from being applied
 uint64_t ReadParseType34_packet_injection_helper(ChrIns* target, uint32_t speffect)
 {
-    if (dmg_guard_asm_check_helper(target, 1, NULL) != 0)
+    if (dmg_guard_asm_check_helper(target, 1) != 0)
     {
         return 0;
     }
@@ -364,7 +364,7 @@ uint64_t ReadParseType34_packet_injection_helper(ChrIns* target, uint32_t speffe
 //return target if we shouldn't interfer, 0 if we prevent the animation from being applied
 uint64_t ReadParseType50_packet_injection_helper(ChrIns* target)
 {
-    if (dmg_guard_asm_check_helper(target, 1, NULL) != 0)
+    if (dmg_guard_asm_check_helper(target, 1) != 0)
     {
         return 0;
     }
@@ -374,7 +374,7 @@ uint64_t ReadParseType50_packet_injection_helper(ChrIns* target)
 //return target if we shouldn't interfer, 0 if we prevent the animations from being applied
 uint64_t ApplyType33_packet_injection_helper(ChrIns* target)
 {
-    if (dmg_guard_asm_check_helper(target, 1, NULL) != 0)
+    if (dmg_guard_asm_check_helper(target, 1) != 0)
     {
         return 0;
     }
