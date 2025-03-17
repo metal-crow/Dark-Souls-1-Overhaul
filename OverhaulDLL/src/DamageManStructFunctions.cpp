@@ -1,5 +1,6 @@
 #include "DamageManStructFunctions.h"
 #include "PlayerInsStructFunctions.h"
+#include "FrpgHavokManImpStructFunctions.h"
 #include "Rollback.h"
 
 static const size_t max_preallocated_DamageEntry = 128;
@@ -271,92 +272,6 @@ void free_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns* to, bool is_sphere, b
     if (to_game)
     {
         Game::game_free(to);
-    }
-    else
-    {
-        free(to);
-    }
-}
-
-void copy_hkpSphereShape(hkpSphereShape** to, hkpSphereShape** from, bool to_game)
-{
-    if (*to == NULL && *from != NULL)
-    {
-        *to = init_hkpSphereShape(to_game);
-    }
-    if (*to != NULL && *from == NULL)
-    {
-        free_hkpSphereShape(*to, to_game);
-        *to = NULL;
-    }
-    if (*to != NULL && *from != NULL)
-    {
-        memcpy((*to)->data_0, (*from)->data_0, sizeof((*to)->data_0));
-    }
-}
-
-hkpSphereShape* init_hkpSphereShape(bool to_game)
-{
-    hkpSphereShape* local;
-    if (to_game)
-    {
-        local = (hkpSphereShape*)Game::thread_malloc(sizeof(hkpSphereShape));
-    }
-    else
-    {
-        local = (hkpSphereShape*)malloc_(sizeof(hkpSphereShape));
-    }
-    return local;
-}
-
-void free_hkpSphereShape(hkpSphereShape* to, bool to_game)
-{
-    if (to_game)
-    {
-        Game::thread_free(to, sizeof(hkpSphereShape));
-    }
-    else
-    {
-        free(to);
-    }
-}
-
-void copy_hkpCapsuleShape(hkpCapsuleShape** to, hkpCapsuleShape** from, bool to_game)
-{
-    if (*to == NULL && *from != NULL)
-    {
-        *to = init_hkpCapsuleShape(to_game);
-    }
-    if (*to != NULL && *from == NULL)
-    {
-        free_hkpCapsuleShape(*to, to_game);
-        *to = NULL;
-    }
-    if (*to != NULL && *from != NULL)
-    {
-        memcpy((*to)->data_0, (*from)->data_0, sizeof((*to)->data_0));
-    }
-}
-
-hkpCapsuleShape* init_hkpCapsuleShape(bool to_game)
-{
-    hkpCapsuleShape* local;
-    if (to_game)
-    {
-        local = (hkpCapsuleShape*)Game::thread_malloc(sizeof(hkpCapsuleShape));
-    }
-    else
-    {
-        local = (hkpCapsuleShape*)malloc_(sizeof(hkpCapsuleShape));
-    }
-    return local;
-}
-
-void free_hkpCapsuleShape(hkpCapsuleShape* to, bool to_game)
-{
-    if (to_game)
-    {
-        Game::thread_free(to, sizeof(hkpCapsuleShape));
     }
     else
     {

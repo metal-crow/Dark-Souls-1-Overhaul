@@ -181,21 +181,6 @@ void copy_HitIns(HitIns* to, const HitIns* from);
 HitIns* init_HitIns();
 void free_HitIns(HitIns* to);
 
-std::string print_hkpCharacterProxy(hkpCharacterProxy* to);
-void copy_hkpCharacterProxy(hkpCharacterProxy* to, const hkpCharacterProxy* from);
-hkpCharacterProxy* init_hkpCharacterProxy();
-void free_hkpCharacterProxy(hkpCharacterProxy* to);
-
-std::string print_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to);
-void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapePhantom* from);
-hkpSimpleShapePhantom* init_hkpSimpleShapePhantom();
-void free_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to);
-
-std::string print_hkpSimpleShapePhantom_field0x30(hkpSimpleShapePhantom_field0x30* to);
-void copy_hkpSimpleShapePhantom_field0x30(hkpSimpleShapePhantom_field0x30* to, const hkpSimpleShapePhantom_field0x30* from);
-hkpSimpleShapePhantom_field0x30* init_hkpSimpleShapePhantom_field0x30();
-void free_hkpSimpleShapePhantom_field0x30(hkpSimpleShapePhantom_field0x30* to);
-
 std::string print_AnimationMediator(AnimationMediator* to);
 void copy_AnimationMediator(AnimationMediator* to, const AnimationMediator* from);
 AnimationMediator* init_AnimationMediator();

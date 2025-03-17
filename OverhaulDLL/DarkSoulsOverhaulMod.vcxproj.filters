@@ -147,6 +147,9 @@
     <ClCompile Include="src\EzStateManagerImplStructFunctions.cpp">
       <Filter>Source Files\Rollback</Filter>
     </ClCompile>
+    <ClCompile Include="src\FrpgHavokManImpStructFunctions.cpp">
+      <Filter>Source Files\Rollback</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3d11-wrapper\include\d3d11\exports.h">
@@ -264,6 +267,12 @@
       <Filter>Header Files\Rollback</Filter>
     </ClInclude>
     <ClInclude Include="include\EzStateManagerImplStructFunctions.h">
+      <Filter>Header Files\Rollback</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FrpgHavokManImpStruct.h">
+      <Filter>Header Files\Rollback</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FrpgHavokManImpStructFunctions.h">
       <Filter>Header Files\Rollback</Filter>
     </ClInclude>
   </ItemGroup>

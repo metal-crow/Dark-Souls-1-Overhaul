@@ -39,6 +39,7 @@ public:
     static GGPOSession* ggpo;
     static GGPOSessionCallbacks ggpoCallbacks;
     static GGPOPlayerHandle ggpoHandles[GGPO_MAX_PLAYERS];
+//#define GGPO_SYNCTEST 1
 #ifdef GGPO_SYNCTEST
     static const size_t ggpoCurrentPlayerCount = 1;
 #else

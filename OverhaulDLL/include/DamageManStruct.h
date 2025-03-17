@@ -8,41 +8,19 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "PlayerInsStruct.h"
+#include "FrpgHavokManImpStruct.h"
 
 typedef struct DamageMan DamageMan;
 typedef struct DamageEntry DamageEntry;
 typedef struct FrpgPhysShapePhantomIns FrpgPhysShapePhantomIns;
-typedef struct hkpSphereShape hkpSphereShape;
-typedef struct hkpCapsuleShape hkpCapsuleShape;
 typedef struct DamageEntryField0x118 DamageEntryField0x118;
-typedef struct FrpgPhysWorld FrpgPhysWorld;
-
-struct FrpgPhysWorld
-{
-    uint64_t vtable;
-};
-//static_assert(sizeof(FrpgPhysWorld) == 0x30);
-
-struct hkpCapsuleShape
-{
-    uint64_t vtable;
-    uint8_t data_0[0x48];
-};
-static_assert(sizeof(hkpCapsuleShape) == 0x50);
-
-struct hkpSphereShape
-{
-    uint64_t vtable;
-    uint8_t data_0[0x30];
-};
-static_assert(sizeof(hkpSphereShape) == 0x38);
 
 struct FrpgPhysShapePhantomIns
 {
     uint64_t vtable;
     uint64_t data_0;
     uint64_t damageEntry; //this points to an existing DamageEntry in the list, so treat as const
-    FrpgPhysWorld* physWorld;
+    void* physWorld; //this is just a const ptr to FrpgHavokManImp->FrpgPhysWorld
     hkpSimpleShapePhantom* _hkpSimpleShapePhantom;
     void* self;
     uint64_t data_1;
@@ -80,7 +58,7 @@ struct DamageEntry
     uint8_t data_4[184];
     void* DmgHitRecordManImp_field0x10Elem; //ptr to an entry in DmgHitRecordManImp
     uint64_t padding_2;
-    FrpgPhysWorld* physWorld; //this is just a const ptr to FrpgHavokManImp->FrpgPhysWorld
+    void* physWorld; //this is just a const ptr to FrpgHavokManImp->FrpgPhysWorld
     //these point to other entries in the DamageMan list. So treat as offsets, not objs
     DamageEntry* followup_a;
     DamageEntry* followup_b;

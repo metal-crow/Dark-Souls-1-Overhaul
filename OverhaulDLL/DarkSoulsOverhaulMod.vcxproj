@@ -43,6 +43,7 @@
     <ClCompile Include="src\EquipmentUnlock.cpp" />
     <ClCompile Include="src\Files.cpp" />
     <ClCompile Include="src\FixAnkles.cpp" />
+    <ClCompile Include="src\FrpgHavokManImpStructFunctions.cpp" />
     <ClCompile Include="src\GameData.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -86,6 +87,8 @@
     <ClInclude Include="include\FileReloading.h" />
     <ClInclude Include="include\EquipmentUnlock.h" />
     <ClInclude Include="include\FixAnkles.h" />
+    <ClInclude Include="include\FrpgHavokManImpStruct.h" />
+    <ClInclude Include="include\FrpgHavokManImpStructFunctions.h" />
     <ClInclude Include="include\InvisibleBackstabAttackFix.h" />
     <ClInclude Include="include\MainLoop.h" />
     <ClInclude Include="include\ModNetworking.h" />
