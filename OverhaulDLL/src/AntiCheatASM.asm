@@ -117,7 +117,6 @@ jnz     label_jmp_skip_hp_set
 FUNC_PROLOGUE
 ;target entity ptr passed implicitly as rcx
 ;damage amount passed implicitly as rdx
-mov     r8, r15 ; r15 is entityPointer of the attacker
 call    dmg_guard_asm_check_helper
 mov     rcx, rax ;grab the result
 FUNC_EPILOGUE_NORCX

@@ -20,7 +20,7 @@
 extern "C" {
     uint64_t dmg_guard_return;
     void dmg_guard_asm_check();
-    uint64_t dmg_guard_asm_check_helper(ChrIns* target, uint32_t hp, uint64_t attacker);
+    uint64_t dmg_guard_asm_check_helper(ChrIns* target, uint32_t hp);
 
     uint64_t TeleBackstabProtect_store_AnimationId_return;
     void TeleBackstabProtect_store_AnimationId();
@@ -115,7 +115,7 @@ void start() {
 } // namespace AntiCheat
 
 //return 0 if we shouldn't interfer, !0 if we prevent the hp from being set
-uint64_t dmg_guard_asm_check_helper(ChrIns* target, uint32_t hp, uint64_t attacker)
+uint64_t dmg_guard_asm_check_helper(ChrIns* target, uint32_t hp)
 {
     if (ModNetworking::SteamAPIStatusKnown_Users.size() == 0 || ModNetworking::currentLobby.load() != ModNetworking::selfPersisantLobby.load())
     {
@@ -126,17 +126,6 @@ uint64_t dmg_guard_asm_check_helper(ChrIns* target, uint32_t hp, uint64_t attack
     uint32_t entityId = *(uint32_t*)(((uint64_t)target) + 0x2B0);
     uint32_t NpcParamId = *(uint32_t*)(((uint64_t)target) + 0xC8);
     uint8_t EnableLogic = (*(uint32_t*)((uint64_t)(&target->playerCtrl->chrCtrl) + 0x100)) & 1;
-    bool attackerIdIsPC = false;
-    auto playerins_o = Game::get_PlayerIns();
-    if (playerins_o.has_value())
-    {
-        void* playerins = playerins_o.value();
-        //the attacker ptr is totally unreliable here, frankly i shouldn't even be using it at all
-        if ((uint64_t)playerins == attacker)
-        {
-            attackerIdIsPC = true;
-        }
-    }
 
     //Check if target is a boss
     switch (entityId)
@@ -249,7 +238,7 @@ uint64_t dmg_guard_asm_check_helper(ChrIns* target, uint32_t hp, uint64_t attack
     case 0x1A59: // Lord's Blade Ciaran
     case 0x64578: // Hawkeye Gough
     case 0x6476C: // Hawkeye Gough (No textures)
-        return !attackerIdIsPC; //If it's not the local player attacking, protect NPCs
+        return 1; //always protect the NPCs when online
     }
 
     return 0;
