@@ -30,6 +30,7 @@
 #include "UIFeatures.h"
 #include "Rollback.h"
 #include "PlayerVisualsValidationFix.h"
+#include "ServerMonitor.h"
 
 HMODULE d3d11_module;
 FILE* logfile = NULL;
@@ -160,6 +161,7 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     PhantomUnshackle::start();
     FixAnkles::start();
     ModNetworking::start();
+    ServerMonitor::start();
     FileReloading::start();
     CustomInvasionTypes::start();
     //UIFeatures::start();

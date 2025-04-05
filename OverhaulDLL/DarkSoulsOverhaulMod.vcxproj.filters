@@ -150,6 +150,9 @@
     <ClCompile Include="src\FrpgHavokManImpStructFunctions.cpp">
       <Filter>Source Files\Rollback</Filter>
     </ClCompile>
+    <ClCompile Include="src\ServerMonitor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3d11-wrapper\include\d3d11\exports.h">
@@ -275,6 +278,9 @@
     <ClInclude Include="include\FrpgHavokManImpStructFunctions.h">
       <Filter>Header Files\Rollback</Filter>
     </ClInclude>
+    <ClInclude Include="include\ServerMonitor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="d3d11-wrapper\src\d3d11\exports.def">
@@ -372,6 +378,9 @@
       <Filter>Source Files\Rollback</Filter>
     </MASM>
     <MASM Include="src\AntiCheatASM.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="src\ServerMonitorASM.asm">
       <Filter>Source Files</Filter>
     </MASM>
   </ItemGroup>

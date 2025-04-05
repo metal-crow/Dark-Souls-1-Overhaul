@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -60,6 +60,7 @@
     <ClCompile Include="src\PlayerInsStructFunctions.cpp" />
     <ClCompile Include="src\PlayerVisualsValidationFix.cpp" />
     <ClCompile Include="src\Rollback.cpp" />
+    <ClCompile Include="src\ServerMonitor.cpp" />
     <ClCompile Include="src\SfxManStructFunctions.cpp" />
     <ClCompile Include="src\SpellDesyncFixes.cpp" />
     <ClCompile Include="src\ThrowManStructFunctions.cpp" />
@@ -99,6 +100,7 @@
     <ClInclude Include="include\PlayerVisualsValidationFix.h" />
     <ClInclude Include="include\Rollback.h" />
     <ClInclude Include="include\PlayerInsStruct.h" />
+    <ClInclude Include="include\ServerMonitor.h" />
     <ClInclude Include="include\SfxManStruct.h" />
     <ClInclude Include="include\SfxManStructFunctions.h" />
     <ClInclude Include="include\SpellDesyncFixes.h" />
@@ -182,6 +184,7 @@
     <MASM Include="src\PhantomUnshackleASM.asm" />
     <MASM Include="src\InputUtilASM.asm" />
     <MASM Include="src\RollbackASM.asm" />
+    <MASM Include="src\ServerMonitorASM.asm" />
     <MASM Include="src\SpellDesyncFixesASM.asm" />
     <MASM Include="src\UIFeaturesASM.asm" />
   </ItemGroup>
