@@ -16,6 +16,7 @@
 #include <unordered_set>
 #include "PlayerInsStruct.h"
 #include "ModNetworking.h"
+#include "ServerMonitor.h"
 
 extern "C" {
     uint64_t dmg_guard_return;
@@ -62,6 +63,10 @@ extern "C" {
     uint64_t ApplyType33_packet_return;
     void ApplyType33_packet_injection();
     uint64_t ApplyType33_packet_injection_helper(ChrIns* target);
+
+    uint64_t getNetMessageAC_return;
+    void getNetMessageAC_injection();
+    bool getNetMessageAC_helper(uint32_t type, uint64_t steamId);
 }
 
 namespace AntiCheat {
@@ -110,6 +115,10 @@ void start() {
     // Prevent inactive bosses/NPCS from having animations applied to them by others
     write_address = Game::ds1_base + ApplyType33_packet_offset;
     sp::mem::code::x64::inject_jmp_14b((void*)write_address, &ApplyType33_packet_return, 0, &ApplyType33_packet_injection);
+
+    // Monitor all incoming packets so we can drop certain ones from invaders
+    write_address = getNetMessageAC_offset + Game::ds1_base;
+    sp::mem::code::x64::inject_jmp_14b((void*)write_address, &getNetMessageAC_return, 4, &getNetMessageAC_injection);
 }
 
 } // namespace AntiCheat
@@ -379,4 +388,30 @@ uint64_t ApplyType33_packet_injection_helper(ChrIns* target)
         return 0;
     }
     return (uint64_t)target;
+}
+
+//return true if we should allow this message through, false if not
+bool getNetMessageAC_helper(uint32_t type, uint64_t steamId)
+{
+    if (ServerMonitor::checkIfUserIsBreakin(steamId))
+    {
+        switch (type)
+        {
+            //these are types of packets an invader should never be sending
+            //aparently the vanilla game does send them, but removing them shouldn't break anything
+            case 3:
+            case 4:
+            case 19:
+            case 20:
+            case 33:
+            case 34:
+            case 47:
+            case 50:
+            case 53:
+                return false;
+            default:
+                return true;
+        }
+    }
+    return true;
 }

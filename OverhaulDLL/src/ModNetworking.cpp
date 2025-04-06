@@ -11,6 +11,7 @@
 #include "Rollback.h"
 #include "ggponet.h"
 #include "PlayerVisualsValidationFix.h"
+#include "ServerMonitor.h"
 
 //This is needed for the steam callbacks to work
 static ModNetworking modnet = ModNetworking();
@@ -134,6 +135,8 @@ CCallResult<ModNetworking, LobbyCreated_t> ModNetworking::LobbyCreatedCallResult
 
 void ModNetworking::CreatePersistentLobby()
 {
+    //clear the list of breakin users since we've gone back to our home lobby
+    ServerMonitor::clearBreakinList();
     SteamAPICall_t lobby_created = ModNetworking::SteamMatchmaking->CreateLobby(ELobbyType::k_ELobbyTypePublic, 6);
     ModNetworking::LobbyCreatedCallResult.Set(lobby_created, &modnet, &ModNetworking::LobbyCreatedCallback);
 }

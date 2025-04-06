@@ -11,6 +11,8 @@ get_Chr_From_WorldBlock dq  14033ec10h
 LAB_140350913   dq  140350913h
 LAB_140350916   dq  140350916h
 LAB_140352e6f   dq  140352e6fh
+LAB_14050b5fc   dq  14050b5fch
+getPacketData   dq  140517590h
 
 _DATA ENDS
 
@@ -342,6 +344,32 @@ part2:
 MOV     R12,qword ptr [RAX + 68h]
 JMP     qword ptr [LAB_140350916]
 ApplyType33_packet_injection ENDP
+
+
+extern getNetMessageAC_return: qword
+extern getNetMessageAC_helper: proc
+
+PUBLIC getNetMessageAC_injection
+getNetMessageAC_injection PROC
+FUNC_PROLOGUE
+mov     ecx, ebx ;type
+;steamId is implicitly passed in RDX
+call    getNetMessageAC_helper
+FUNC_EPILOGUE_NORAX
+cmp     al, 0
+jne     continue
+xor     eax, eax
+jmp     qword ptr [LAB_14050b5fc]
+
+continue:
+;original code
+MOV     R9D,dword ptr [RSP + 50h]
+MOV     R8,R14
+MOV     EDX,EBX
+MOV     RCX,R10
+CALL    qword ptr [getPacketData]
+jmp     getNetMessageAC_return
+getNetMessageAC_injection ENDP
 
 _TEXT    ENDS
 
