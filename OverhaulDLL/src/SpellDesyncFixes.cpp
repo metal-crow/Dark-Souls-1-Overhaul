@@ -54,7 +54,7 @@ void SpellDesync::start() {
 
     //inject into the type1 packet parsing function and handle if we detect a magic specific packet
     write_address = (uint8_t*)(SpellDesync::type1_p2pPacket_parsing_injection_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &type1_p2pPacket_parse_injection_return, 0, &type1_p2pPacket_parse_injection);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &type1_p2pPacket_parse_injection_return, 1, &type1_p2pPacket_parse_injection);
 
     //inject into the function that determines if the homing bullet should be fired, and sets the target id to fire it
     write_address = (uint8_t*)(SpellDesync::homing_spell_checkIfTriggered_injection_offset + Game::ds1_base);

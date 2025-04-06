@@ -1,6 +1,8 @@
 _DATA SEGMENT
 
 sub_140426ba0   dq  140426ba0h
+FUN_140504620   dq  140504620h
+LAB_1405045b5   dq  1405045b5h
 
 _DATA ENDS
 
@@ -92,19 +94,17 @@ cmp     dword ptr [rsp+30h], 7fc00001h
 jne     normal_exit
 
 lea     rcx, [rsp+30h] ;the incoming packet data
-sub     rsp, 30h ;align the stack and add shadow stack space
+FUNC_PROLOGUE
 call    type1_p2pPacket_parse_injection_helper_function
-;exit the function we've injected into
-add     rsp, 90h
-pop     rdi
-ret
+FUNC_EPILOGUE
+jmp     qword ptr [LAB_1405045b5]
 
 ;original code
 normal_exit:
-movups  xmm0, [rsp+30h]
-movzx   eax,bpl
-movups  xmm1, [rsp+40h]
-
+LEA     RDX,[RSP + 30h]
+MOV     RCX,RBX
+CALL    qword ptr [FUN_140504620]
+TEST    AL,AL
 jmp     type1_p2pPacket_parse_injection_return
 type1_p2pPacket_parse_injection ENDP
 
