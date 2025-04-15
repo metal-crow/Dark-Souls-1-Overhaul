@@ -33,13 +33,5 @@ void copy_hkpCharacterProxy(hkpCharacterProxy* to, const hkpCharacterProxy* from
 hkpCharacterProxy* init_hkpCharacterProxy();
 void free_hkpCharacterProxy(hkpCharacterProxy* to);
 
-/* ---------------- HAVOK MAN ------------------ */
-
-void copy_FrpgHavokManImp(FrpgHavokManImp* to, FrpgHavokManImp* from, bool to_game);
-FrpgHavokManImp* init_FrpgHavokManImp();
-void free_FrpgHavokManImp(FrpgHavokManImp* to);
-
-void serialize_hkpWorld(hkpWorld* to);
-
 
 #endif

@@ -672,7 +672,7 @@ static hkThreadMemory_free_FUNC* hkThreadMemory_free = (hkThreadMemory_free_FUNC
 typedef void hkpWorldSnapshot_SnapshotWorld_FUNC(void* hkpWorldSnapshot, hkpWorld* world, bool saveContacts);
 static hkpWorldSnapshot_SnapshotWorld_FUNC* hkpWorldSnapshot_SnapshotWorld = (hkpWorldSnapshot_SnapshotWorld_FUNC*)0x140a89bd0;
 
-typedef void hkpWorldSnapshot_LoadSnapshot_FUNC(void* hkpWorldSnapshot, bool param2);
+typedef hkpWorld* hkpWorldSnapshot_LoadSnapshot_FUNC(void* hkpWorldSnapshot, bool param2);
 static hkpWorldSnapshot_LoadSnapshot_FUNC* hkpWorldSnapshot_LoadSnapshot = (hkpWorldSnapshot_LoadSnapshot_FUNC*)0x140a89d00;
 
 #endif // _DS1_OVERHAUL_GAME_DATA_H_

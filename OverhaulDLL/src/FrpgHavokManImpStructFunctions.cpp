@@ -214,12 +214,3 @@ void free_hkpCharacterProxy(hkpCharacterProxy* to)
     free_hkpSimpleShapePhantom(to->HkpSimpleShapePhantom);
     free(to);
 }
-
-
-/* ---------------- HAVOK MAN ------------------ */
-
-void serialize_hkpWorld(hkpWorld* world)
-{
-    void* snapshot = malloc_(0x28);
-    hkpWorldSnapshot_SnapshotWorld(snapshot, world, true);
-}
