@@ -99,10 +99,13 @@ struct hkpSimpleShapePhantom_field0x30
 
 struct hkpSimpleShapePhantom
 {
-    uint8_t padding_0[0x30];
+    void* vtable;
+    uint32_t data_0;
+    uint8_t padding_0[36];
     hkpSimpleShapePhantom_field0x30* field0x30;
     uint8_t padding_1[0x188];
 };
+static_assert(offsetof(hkpSimpleShapePhantom, data_0) == 0x8);
 static_assert(sizeof(hkpSimpleShapePhantom) == 0x1c0);
 
 struct hkpCharacterProxy

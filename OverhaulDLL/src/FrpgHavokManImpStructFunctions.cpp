@@ -14,6 +14,7 @@ std::string print_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to)
 
 void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapePhantom* from)
 {
+    to->data_0 = from->data_0;
     copy_hkpSimpleShapePhantom_field0x30(to->field0x30, from->field0x30);
 }
 
@@ -101,7 +102,7 @@ void free_hkpSphereShape(hkpSphereShape* to, bool to_game)
 {
     if (to_game)
     {
-        Game::thread_free(to, sizeof(hkpSphereShape));
+        hkReferencedObject_deref((void*)to);
     }
     else
     {
@@ -145,7 +146,7 @@ void free_hkpCapsuleShape(hkpCapsuleShape* to, bool to_game)
 {
     if (to_game)
     {
-        Game::thread_free(to, sizeof(hkpCapsuleShape));
+        hkReferencedObject_deref((void*)to);
     }
     else
     {

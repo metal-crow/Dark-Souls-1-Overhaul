@@ -211,7 +211,7 @@ void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePha
     {
         (*to)->data_0 = (*from)->data_0;
         (*to)->damageEntry = (*from)->damageEntry;
-        (*to)->physWorld = (*from)->physWorld;
+        (*to)->physWorld = NULL; //This will be restored to the correct ptr every DamageMan step, and for some reason copying it causes a crash
         copy_hkpSimpleShapePhantom((*to)->_hkpSimpleShapePhantom, (*from)->_hkpSimpleShapePhantom);
         (*to)->self = (*to);
         (*to)->data_1 = (*from)->data_1;
@@ -255,7 +255,7 @@ void free_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns* to, bool is_sphere, b
 {
     if (to_game)
     {
-        Game::thread_free(to->_hkpSimpleShapePhantom, sizeof(hkpSimpleShapePhantom));
+        hkReferencedObject_deref((void*)to->_hkpSimpleShapePhantom);
     }
     else
     {

@@ -675,4 +675,7 @@ static hkpWorldSnapshot_SnapshotWorld_FUNC* hkpWorldSnapshot_SnapshotWorld = (hk
 typedef hkpWorld* hkpWorldSnapshot_LoadSnapshot_FUNC(void* hkpWorldSnapshot, bool param2);
 static hkpWorldSnapshot_LoadSnapshot_FUNC* hkpWorldSnapshot_LoadSnapshot = (hkpWorldSnapshot_LoadSnapshot_FUNC*)0x140a89d00;
 
+typedef void hkReferencedObject_deref_FUNC(void* obj);
+static hkReferencedObject_deref_FUNC* hkReferencedObject_deref = (hkReferencedObject_deref_FUNC*)0x1408e4d10;
+
 #endif // _DS1_OVERHAUL_GAME_DATA_H_
