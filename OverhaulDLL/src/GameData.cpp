@@ -570,8 +570,10 @@ int Game::get_node_count()
 static const uint64_t disable_low_fps_disconnect_offset = 0x77c269;
 
 // Disables automatic game disconnection when low framerate is detected
+// This code is broken, and breaks orange soapstone when enabled. But i still wanna keep it for debugging ability
 void Game::disable_low_fps_disconnect(bool enable)
 {
+#ifdef DEBUG
     uint8_t *fps_warn = (uint8_t *)(Game::ds1_base + disable_low_fps_disconnect_offset);
 
     sp::mem::set_protection(fps_warn, 1, MEM_PROTECT_RWX);
@@ -588,6 +590,7 @@ void Game::disable_low_fps_disconnect(bool enable)
         *fps_warn = 0x75;
         *(fps_warn + 1) = 0xD;
     }
+#endif
 }
 
 static void set_memory_limit_chunk(uint64_t default_chunk_size, uint64_t new_chunk_size)

@@ -100,9 +100,6 @@ public:
     // This sets the default mode when the user is hosting/in their own world. I.e the mode the game is biased towards.
     static ModMode user_selected_default_mode;
 
-    // Determines to disable the game's "Framerate insufficient for online play" disconnection
-    static bool disable_low_fps_disconnect;
-
     // If the user wants to use the default broken UI for the HP bar
     static bool fix_hp_bar_size;
 

@@ -166,7 +166,7 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     CustomInvasionTypes::start();
     //UIFeatures::start();
     //Rollback::start();
-    Game::disable_low_fps_disconnect(Mod::disable_low_fps_disconnect);
+    Game::disable_low_fps_disconnect(true);
     PlayerVisualsValidationFix::start();
 
     ConsoleWrite("All initial loading finished!");

@@ -37,9 +37,6 @@ ModMode Mod::next_mode = ModMode::InvalidMode;
 // This should start as legacy, and only change once game is first loaded and we've set up everything needed for overhaul mode
 ModMode Mod::current_mode = ModMode::Legacy;
 
-// Determines to disable the game's "Low framerate detected" disconnection
-bool Mod::disable_low_fps_disconnect = false;
-
 // If the user wants to use the default broken UI for the HP bar
 bool Mod::fix_hp_bar_size = true;
 
@@ -93,8 +90,6 @@ void Mod::get_init_preferences()
 
     // Check for custom game files
     Mod::get_custom_game_files();
-
-    Mod::disable_low_fps_disconnect = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_DISABLE_LOW_FPS_DISCONNECT_, (int)Mod::disable_low_fps_disconnect, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
 
     Mod::use_steam_names = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_USE_STEAM_NAMES_, (int)Mod::use_steam_names, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
 
