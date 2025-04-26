@@ -103,6 +103,11 @@ void Mod::get_init_preferences()
     Mod::stop_durability_damage = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_STOP_DURABILITY_DAMAGE_, (int)Mod::stop_durability_damage, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
 
     Mod::fairness_flag = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_ENABLE_FAIRNESS_, (int)Mod::fairness_flag, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+
+    ModNetworking::allow_connect_with_non_mod_host = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_CONNECT_NONMODHOST_, (int)ModNetworking::allow_connect_with_non_mod_host, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    ModNetworking::allow_connect_with_legacy_mod_host = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_CONNECT_LEGACYHOST_, (int)ModNetworking::allow_connect_with_legacy_mod_host, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    ModNetworking::allow_connect_with_overhaul_mod_host = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_CONNECT_OVERHAULHOST_, (int)ModNetworking::allow_connect_with_overhaul_mod_host, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
+    ModNetworking::allow_connect_with_non_mod_guest = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_CONNECT_NONMODGUEST_, (int)ModNetworking::allow_connect_with_non_mod_guest, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
 }
 
 bool check_hotkeys(void* unused)

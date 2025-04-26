@@ -26,6 +26,10 @@
 #define _DS1_OVERHAUL_PREF_FIX_HP_BAR_SIZE_ "FixHpBarSize"
 #define _DS1_OVERHAUL_PREF_STOP_DURABILITY_DAMAGE_ "StopDurabilityDamage"
 #define _DS1_OVERHAUL_PREF_ENABLE_FAIRNESS_ "AllowArmorSwapOnlyWithModPlayers"
+#define _DS1_OVERHAUL_PREF_CONNECT_NONMODHOST_ "DefaultAllowConnectionToNonModHosts"
+#define _DS1_OVERHAUL_PREF_CONNECT_LEGACYHOST_ "DefaultAllowConnectionToLegacyHosts"
+#define _DS1_OVERHAUL_PREF_CONNECT_OVERHAULHOST_ "DefaultAllowConnectionToOverhaulHosts"
+#define _DS1_OVERHAUL_PREF_CONNECT_NONMODGUEST_ "DefaultAllowConnectionOfNonModGuests"
 // Keybinds:
 #define _DS1_OVERHAUL_KEYBIND_NONMOD_HOST_CONNECT_ "ToggleAllowConnectNonModHost"
 #define _DS1_OVERHAUL_KEYBIND_LEGACYMODE_HOST_CONNECT_ "ToggleAllowConnectLegacyModeHost"
