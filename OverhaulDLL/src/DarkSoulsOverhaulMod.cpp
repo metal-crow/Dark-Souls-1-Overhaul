@@ -103,6 +103,7 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
 
     Game::init();
     AntiAntiCheat::start();
+#ifndef ANTIBAN_ONLY
     Game::injections_init(); //only do injections after we disable the built in code checking
 
     CreateThread(NULL,  // Default security attributes
@@ -135,6 +136,7 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
 
 #ifndef DEBUG
     set_crash_handlers();
+#endif
 #endif
 
     return TRUE;

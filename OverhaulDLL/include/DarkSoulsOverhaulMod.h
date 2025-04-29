@@ -27,6 +27,7 @@
 
 // Preprocessor definition utilized by the Dark Souls Game Files C++ library (DsGameFiles.lib)
 #define __DS1_OVERHAUL_MOD
+//#define ANTIBAN_ONLY 1
 
 static const uint64_t VERSION_RAW = 2025042600;
 #define VERSION_STRING  "Beta31"
