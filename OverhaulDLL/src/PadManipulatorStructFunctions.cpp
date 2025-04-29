@@ -407,6 +407,7 @@ void PadManipulator_to_PadManipulatorPacked(PadManipulatorPacked* to, PadManipul
     to->right_hand_slot_selected = from->chrManipulator.right_hand_slot_selected;
     to->isSprintingAnim = from->chrManipulator.isSprintingAnim;
     to->LockonTargetHandle = from->chrManipulator.LockonTargetHandle;
+    to->CurrentFrame_ActionInputs_ButtonId = from->chrManipulator.CurrentFrame_ActionInputs_ButtonId;
     to->movement_related_flags = from->movement_related_flags;
     to->not_getting_movement_input = from->not_getting_movement_input;
     to->TimeRollButtonHeld = from->TimeRollButtonHeld;
@@ -480,7 +481,7 @@ void PadManipulatorPacked_to_PadManipulator(PlayerIns* target, PadManipulatorPac
     to->chrManipulator.right_hand_slot_selected = from->right_hand_slot_selected;
     to->chrManipulator.isSprintingAnim = from->isSprintingAnim;
     to->chrManipulator.LockonTargetHandle = from->LockonTargetHandle;
-    //CurrentFrame_ActionInputs_ButtonId
+    to->chrManipulator.CurrentFrame_ActionInputs_ButtonId = from->CurrentFrame_ActionInputs_ButtonId;
     to->movement_related_flags = from->movement_related_flags;
     to->not_getting_movement_input = from->not_getting_movement_input;
     to->TimeRollButtonHeld = from->TimeRollButtonHeld;
