@@ -347,6 +347,12 @@ bool rollback_game_frame_start_helper(void* unused)
             }
             PlayerIns* player = (PlayerIns*)player_o.value();
 
+            //Before we do anything, save the padManipulator PrevFrame_ActionInputs.
+            // This is state that the last GGPO input gave us and we will need to restore it after we get the current input to preserve continuity correctness between frames
+            // Otherwise, for example, if we press roll then this following code will put that in the current frame, and later we will copy the current frame to previous and overwrite only the current
+            ChrManipulator_ActionInputted PrevFrame_ActionInputs_Save = player->chrins.padManipulator->chrManipulator.PrevFrame_ActionInputs;
+            ChrManipulator_ActionInputted CurFrame_ActionInputs_Save = player->chrins.padManipulator->chrManipulator.CurrentFrame_ActionInputs;
+
             //Manually call the PadMan and PadManipulator functions to read the inputs
             //ONLY allow it to be called here, so we don't have it called normally by the game and overwrite our custom inputs
             Game::set_ReadInputs_allowed(true);
@@ -376,6 +382,10 @@ bool rollback_game_frame_start_helper(void* unused)
             //TODO********! probably wanna get stuff from playerctrl in here also
             RollbackInput localInput{};
             PackRollbackInput(&localInput, player);
+
+            //Now that we've saved the padManip data, restore the frame info
+            player->chrins.padManipulator->chrManipulator.PrevFrame_ActionInputs = PrevFrame_ActionInputs_Save;
+            player->chrins.padManipulator->chrManipulator.CurrentFrame_ActionInputs = CurFrame_ActionInputs_Save;
 
             //notify ggpo of the local player's inputs
             GGPOErrorCode result = ggpo_add_local_input(Rollback::ggpo, Rollback::ggpoHandles[0], &localInput, sizeof(RollbackInput));

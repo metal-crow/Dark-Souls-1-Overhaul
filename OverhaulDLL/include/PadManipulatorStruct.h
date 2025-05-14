@@ -273,6 +273,8 @@ struct ChrManipulator
 };
 
 static_assert(sizeof(ChrManipulator) == 0x230);
+static_assert(offsetof(ChrManipulator, CurrentFrame_ActionInputs) == 0x7c + 8);
+static_assert(offsetof(ChrManipulator, PrevFrame_ActionInputs) == 0xb1 + 8);
 
 struct PadManipulator
 {
