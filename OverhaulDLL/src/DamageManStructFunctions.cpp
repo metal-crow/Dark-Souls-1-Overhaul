@@ -101,11 +101,27 @@ void copy_DamageEntry(DamageEntry* to, DamageEntry* from, bool to_game)
 {
     to->data_0 = from->data_0;
     //these need to be run first
+    if (from->FrpgPhysShapePhantomIns_Sphere == NULL || from->FrpgPhysShapePhantomIns_Capsule == NULL)
+    {
+        FATALERROR("FrpgPhysShapePhantomIns can be null??? from=%p sphere=%p cap=%p", from, from->FrpgPhysShapePhantomIns_Sphere, from->FrpgPhysShapePhantomIns_Capsule);
+    }
     copy_FrpgPhysShapePhantomIns(&to->FrpgPhysShapePhantomIns_Sphere, &from->FrpgPhysShapePhantomIns_Sphere, true, to_game);
     copy_FrpgPhysShapePhantomIns(&to->FrpgPhysShapePhantomIns_Capsule, &from->FrpgPhysShapePhantomIns_Capsule, false, to_game);
+
     //these are handled by the above FrpgPhysShapePhantomIns
+    if (from->hkpSphereShape1 != from->FrpgPhysShapePhantomIns_Sphere->_hkpSphereShape)
+    {
+        FATALERROR("hkpSphereShape1 %p not pointing to FrpgPhysShapePhantomIns_Sphere->_hkpSphereShape %p",
+            from->hkpSphereShape1, from->FrpgPhysShapePhantomIns_Sphere->_hkpSphereShape);
+    }
     to->hkpSphereShape1 = to->FrpgPhysShapePhantomIns_Sphere->_hkpSphereShape;
+    if (from->hkpCapsuleShape1 != from->FrpgPhysShapePhantomIns_Capsule->_hkpCapsuleShape)
+    {
+        FATALERROR("hkpCapsuleShape1 %p not pointing to FrpgPhysShapePhantomIns_Capsule->_hkpCapsuleShape %p",
+            from->hkpCapsuleShape1, from->FrpgPhysShapePhantomIns_Capsule->_hkpCapsuleShape);
+    }
     to->hkpCapsuleShape1 = to->FrpgPhysShapePhantomIns_Capsule->_hkpCapsuleShape;
+
     //these always points to either the sphere or the capsule
     if (from->PhysShapePhantomIns1 == from->FrpgPhysShapePhantomIns_Sphere)
     {
@@ -124,6 +140,7 @@ void copy_DamageEntry(DamageEntry* to, DamageEntry* from, bool to_game)
         FATALERROR("PhysShapePhantomIns1 %p FrpgPhysShapePhantomIns_Sphere %p FrpgPhysShapePhantomIns_Capsule %p",
             to->PhysShapePhantomIns1, to->FrpgPhysShapePhantomIns_Sphere, to->FrpgPhysShapePhantomIns_Capsule);
     }
+
     if (from->PhysShapePhantomIns1_altPtr_A == from->FrpgPhysShapePhantomIns_Sphere)
     {
         to->PhysShapePhantomIns1_altPtr_A = to->FrpgPhysShapePhantomIns_Sphere;
@@ -141,6 +158,7 @@ void copy_DamageEntry(DamageEntry* to, DamageEntry* from, bool to_game)
         FATALERROR("PhysShapePhantomIns1_altPtr_A %p FrpgPhysShapePhantomIns_Sphere %p FrpgPhysShapePhantomIns_Capsule %p",
             to->PhysShapePhantomIns1_altPtr_A, to->FrpgPhysShapePhantomIns_Sphere, to->FrpgPhysShapePhantomIns_Capsule);
     }
+
     if (from->PhysShapePhantomIns1_altPtr_B == from->FrpgPhysShapePhantomIns_Sphere)
     {
         to->PhysShapePhantomIns1_altPtr_B = to->FrpgPhysShapePhantomIns_Sphere;
@@ -158,6 +176,7 @@ void copy_DamageEntry(DamageEntry* to, DamageEntry* from, bool to_game)
         FATALERROR("PhysShapePhantomIns1_altPtr_B %p FrpgPhysShapePhantomIns_Sphere %p FrpgPhysShapePhantomIns_Capsule %p",
             to->PhysShapePhantomIns1_altPtr_B, to->FrpgPhysShapePhantomIns_Sphere, to->FrpgPhysShapePhantomIns_Capsule);
     }
+
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
     copy_DamageEntryField0x118(&to->field0x118, &from->field0x118, to_game);
     memcpy(to->data_4, from->data_4, sizeof(to->data_4));
@@ -200,10 +219,12 @@ void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePha
 {
     if (*to == NULL && *from != NULL)
     {
+        FATALERROR("WARNING: I shouldn't have to init the FrpgPhysShapePhantomIns, it should be pre-init'ed either by me or the game");
         *to = init_FrpgPhysShapePhantomIns(is_sphere, to_game);
     }
     if (*to != NULL && *from == NULL)
     {
+        FATALERROR("WARNING: I shouldn't have to free the FrpgPhysShapePhantomIns, it should always exist");
         free_FrpgPhysShapePhantomIns(*to, is_sphere, to_game);
         *to = NULL;
     }
