@@ -180,6 +180,8 @@ HANDLE WINAPI intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesiredAccess,
                     std::wstring custom_buttons2 = L"<?selectUD?>:Select " + custom_buttons;
                     Menu::Saves::set_custom_buttons_msgs(custom_buttons1, custom_buttons, custom_buttons2);
 
+                    Files::backup_save_file();
+
                     first_save_load = false;
                 }
 
@@ -502,35 +504,6 @@ void Files::check_custom_save_file_path()
     if (FileUtil::file_exists(Files::save_file.c_str()))
     {
         ConsoleWrite("SUCCESS: Custom save file will be loaded (\"%s\"",Files::save_file.c_str());
-
-        std::filesystem::path parent_dir = std::filesystem::path(Files::save_file).parent_path();
-        std::filesystem::path backup_dir = parent_dir / "backup";
-        // Create parent backup folder if it doesn't exist
-        if (!std::filesystem::exists(backup_dir))
-        {
-            std::filesystem::create_directories(backup_dir);
-        }
-
-        // Compute backup number and generate folder
-        int counter = 1;
-        std::filesystem::path destination;
-        do
-        {
-            destination = std::filesystem::path(backup_dir) / std::format("{}", counter);
-            ++counter;
-        } while (std::filesystem::exists(destination));
-        std::filesystem::create_directories(destination);
-
-        // Copy the overhaul save files to the new destination
-        for (const auto& entry : std::filesystem::directory_iterator(parent_dir))
-        {
-            if (std::filesystem::is_regular_file(entry))
-            {
-                std::filesystem::path sourcePath = entry.path();
-                std::filesystem::path destinationPath = std::filesystem::path(destination) / sourcePath.filename();
-                std::filesystem::copy(sourcePath, destinationPath, std::filesystem::copy_options::overwrite_existing);
-            }
-        }
     }
     else
     {
@@ -564,6 +537,40 @@ void Files::check_custom_game_config_file_path()
     {
         // Custom config file doesn't exist
         FATALERROR("WARNING: Custom config file was not found (\"%s\")", filename_ch.c_str());
+    }
+}
+
+void Files::backup_save_file()
+{
+    std::filesystem::path parent_dir = std::filesystem::path(Files::save_file).parent_path();
+    std::filesystem::path backup_dir = parent_dir / "backup";
+    // Create parent backup folder if it doesn't exist
+    if (!std::filesystem::exists(backup_dir))
+    {
+        std::filesystem::create_directories(backup_dir);
+    }
+
+    ConsoleWrite("Backing up save files to %s...", backup_dir.c_str());
+
+    // Compute backup number and generate folder
+    int counter = 1;
+    std::filesystem::path destination;
+    do
+    {
+        destination = std::filesystem::path(backup_dir) / std::format("{}", counter);
+        ++counter;
+    } while (std::filesystem::exists(destination));
+    std::filesystem::create_directories(destination);
+
+    // Copy the overhaul save files to the new destination
+    for (const auto& entry : std::filesystem::directory_iterator(parent_dir))
+    {
+        if (std::filesystem::is_regular_file(entry))
+        {
+            std::filesystem::path sourcePath = entry.path();
+            std::filesystem::path destinationPath = std::filesystem::path(destination) / sourcePath.filename();
+            std::filesystem::copy(sourcePath, destinationPath, std::filesystem::copy_options::overwrite_existing);
+        }
     }
 }
 

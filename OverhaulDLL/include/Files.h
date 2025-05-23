@@ -22,6 +22,7 @@ public:
     static void check_custom_archive_file_path();
     static void check_custom_save_file_path();
     static void check_custom_game_config_file_path();
+    static void backup_save_file();
     static std::wstring get_save_file_path();
     static bool saves_menu_is_open();
     static void set_save_file_next();
