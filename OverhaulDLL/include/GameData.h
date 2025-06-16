@@ -194,6 +194,8 @@ public:
 
     static const uint64_t LogoSkip_offset = 0x70f130;
 
+    static const uint64_t SteamBlockIterate_offset = 0x503ea2;
+
     static const uint64_t Step_PadMan_offset = 0x15d4c8;
 
     static const uint64_t Step_PadManipulator_GetInputs_offset = 0x396860;

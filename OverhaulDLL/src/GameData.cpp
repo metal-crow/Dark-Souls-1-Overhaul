@@ -275,6 +275,11 @@ void Game::injections_init()
     write_address = (uint8_t*)(Game::LogoSkip_offset + Game::ds1_base);
     sp::mem::patch_bytes(write_address, pat, 6);
 
+    //inject code to stop debug menu from iterating over all blocked players
+    uint8_t pat2[5] = { 0xb0, 0x01, 0x90, 0x90, 0x90 }; //mov al, 1
+    write_address = (uint8_t*)(Game::SteamBlockIterate_offset + Game::ds1_base);
+    sp::mem::patch_bytes(write_address, pat2, 5);
+
     //inject code to control if Step_PadMan can run or not
     write_address = (uint8_t*)(Game::Step_PadMan_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &Step_PadMan_return, 4, &Step_PadMan_injection);
