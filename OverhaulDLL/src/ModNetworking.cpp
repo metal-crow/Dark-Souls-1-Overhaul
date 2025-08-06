@@ -795,7 +795,7 @@ void ModNetworking::LobbyEnterCallback(LobbyEnter_t* pCallback)
         {
             CSteamID member = ModNetworking::SteamMatchmaking->GetLobbyMemberByIndex(pCallback->m_ulSteamIDLobby, i);
             //Exclude lobby owner (we just read them), and ourselves
-            if (member.ConvertToUint64() != lobbyowner && member.ConvertToUint64() != selfsteamid)
+            if (member.ConvertToUint64() != lobbyowner.ConvertToUint64() && member.ConvertToUint64() != selfsteamid.ConvertToUint64())
             {
                 const char* user_mod_value_str = ModNetworking::SteamMatchmaking->GetLobbyMemberData(pCallback->m_ulSteamIDLobby, member, MOD_LOBBY_DATA_KEY);
                 ModMode user_mod_value = ModMode::InvalidMode;
