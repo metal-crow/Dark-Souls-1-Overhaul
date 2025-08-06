@@ -13,7 +13,7 @@ bool Files::save_file_index_pending_set_next = false;
 bool Files::save_file_index_pending_set_prev = false;
 bool Files::save_file_index_make_new = false;
 bool first_save_load = true;
-const char* OVERHAUL_SAVE_FILE_EXTENSION = ".overhaul";
+const char* OVERHAUL_SAVE_FILE_EXTENSION = ".overhaul.co2"; //end in .co2 so steam will back it up
 std::string Files::save_file;
 
 //Make sure file names are lowercase
@@ -114,6 +114,13 @@ HANDLE WINAPI intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesiredAccess,
                         }
                         std::string orig_save_file = Files::save_file;
                         Files::save_file.append(OVERHAUL_SAVE_FILE_EXTENSION);
+
+                        //check if the old save file exists. if so, rename it
+                        std::string old_save = orig_save_file + ".overhaul";
+                        if (FileUtil::file_exists(old_save.c_str()))
+                        {
+                            std::rename(old_save.c_str(), Files::save_file.c_str());
+                        }
 
                         //create the overhaul save from the default save if it doesn't exist
                         DWORD fileAtribs = GetFileAttributesA(Files::save_file.c_str());
@@ -453,7 +460,7 @@ void Files::check_custom_archive_file_path()
     std::set_union(Files::files_to_intercept_loading_legacy.begin(), Files::files_to_intercept_loading_legacy.end(),
                    Files::files_to_always_intercept_loading.begin(), Files::files_to_always_intercept_loading.end(),
                    std::inserter(custom_files, custom_files.begin()));
-    for (auto custom_file : custom_files)
+    for (auto &custom_file : custom_files)
     {
         std::wstring filepath = std::wstring(Mod::custom_game_archive_path).append(custom_file);
         std::string filepath_cs;
@@ -471,7 +478,7 @@ void Files::check_custom_archive_file_path()
             ConsoleWrite("Found %s", filepath_cs.c_str());
         }
     }
-    for (auto custom_file : Files::files_to_intercept_loading_overhaul)
+    for (auto &custom_file : Files::files_to_intercept_loading_overhaul)
     {
         std::wstring filepath = std::wstring(Mod::custom_game_archive_path + files_to_intercept_loading_overhaul_subpath).append(custom_file);
         std::string filepath_cs;
