@@ -30,7 +30,7 @@
 //#define ANTIBAN_ONLY 1
 
 static const uint64_t VERSION_RAW = 2025052300;
-#define VERSION_STRING  "Beta31"
+#define VERSION_STRING  "Beta34"
 #define DS1_OVERHAUL_TXT_INTRO "\n+------------------------------------------------------+\n|      Dark Souls Overhaul   ["VERSION_STRING"]                 |\n+------------------------------------------------------+"
 
 extern HMODULE d3d11_module;

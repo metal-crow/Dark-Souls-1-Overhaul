@@ -83,6 +83,8 @@ uint64_t Game::LockTgtManImp = NULL;
 
 uint64_t Game::DLHeapManager = NULL;
 
+uint64_t Game::MemHeapAllocator = NULL;
+
 HANDLE Game::suspend_game_threads;
 
 // Player character status (loading, human, co-op, invader, hollow)
@@ -245,6 +247,8 @@ void Game::init()
     Game::LockTgtManImp = Game::ds1_base + 0x1c7a138;
 
     Game::DLHeapManager = Game::ds1_base + 0x1cb5620;
+
+    Game::MemHeapAllocator = Game::ds1_base + 0x1a510c8;
 }
 
 void Game::injections_init()

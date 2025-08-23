@@ -181,6 +181,8 @@ public:
 
     static uint64_t DLHeapManager;
 
+    static uint64_t MemHeapAllocator;
+
     static const uint64_t calculate_attack_damage_offset = 0x2f11bf2;
 
     static const uint64_t char_loaded_injection_offset = 0x24f1b0;
@@ -679,5 +681,8 @@ static hkpWorldSnapshot_LoadSnapshot_FUNC* hkpWorldSnapshot_LoadSnapshot = (hkpW
 
 typedef void hkReferencedObject_deref_FUNC(void* obj);
 static hkReferencedObject_deref_FUNC* hkReferencedObject_deref = (hkReferencedObject_deref_FUNC*)0x1408e4d10;
+
+typedef void increase_list_size_FUNC(uint64_t heap, void* list, int elem_size);
+static increase_list_size_FUNC* increase_list_size = (increase_list_size_FUNC*)0x14090ec50;
 
 #endif // _DS1_OVERHAUL_GAME_DATA_H_

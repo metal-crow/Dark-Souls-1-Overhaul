@@ -6,18 +6,22 @@
 #include <string>
 #include "FrpgHavokManImpStruct.h"
 
-/* ---------------- GENERAL + DAMAGE ENTRY ------------------ */
+/* ---------------- CHRCTRL + DAMAGE MAN ------------------ */
 
 std::string print_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to);
-void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapePhantom* from);
+void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapePhantom* from, bool to_game);
 hkpSimpleShapePhantom* init_hkpSimpleShapePhantom();
 void free_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to);
 
-std::string print_hkpSimpleShapePhantom_field0x30(hkpSimpleShapePhantom_field0x30* to);
-void copy_hkpSimpleShapePhantom_field0x30(hkpSimpleShapePhantom_field0x30* to, const hkpSimpleShapePhantom_field0x30* from);
-hkpSimpleShapePhantom_field0x30* init_hkpSimpleShapePhantom_field0x30();
-void free_hkpSimpleShapePhantom_field0x30(hkpSimpleShapePhantom_field0x30* to);
+void copy_hkpLinkedCollidable(hkpLinkedCollidable* to, const hkpLinkedCollidable* from, bool to_game);
 
+void copy_hkpProperty(hkpProperty* to, hkpProperty* from);
+
+void copy_hkMotionState(hkMotionState* to, const hkMotionState* from);
+
+void copy_hkpCollidable(hkpCollidable* to, const hkpCollidable* from, bool to_game);
+
+bool hkpShape_isSphere(hkpSphereShape* to);
 void copy_hkpSphereShape(hkpSphereShape** to, hkpSphereShape** from, bool to_game);
 hkpSphereShape* init_hkpSphereShape(bool to_game);
 void free_hkpSphereShape(hkpSphereShape* to, bool to_game);

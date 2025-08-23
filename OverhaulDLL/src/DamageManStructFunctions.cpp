@@ -232,7 +232,7 @@ void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePha
     {
         (*to)->data_0 = (*from)->data_0;
         (*to)->damageEntry = (*from)->damageEntry;
-        (*to)->physWorld = NULL; //This will be restored to the correct ptr every DamageMan step, and for some reason copying it causes a crash
+        (*to)->physWorld = (*from)->physWorld;
         copy_hkpSimpleShapePhantom((*to)->_hkpSimpleShapePhantom, (*from)->_hkpSimpleShapePhantom);
         (*to)->self = (*to);
         (*to)->data_1 = (*from)->data_1;

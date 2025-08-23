@@ -15,13 +15,23 @@ typedef struct hkpSimulationIsland hkpSimulationIsland;
 typedef struct hkpEntity hkpEntity;
 typedef struct hkpSphereShape hkpSphereShape;
 typedef struct hkpCapsuleShape hkpCapsuleShape;
-typedef struct hkpSimpleShapePhantom_field0x30 hkpSimpleShapePhantom_field0x30;
 typedef struct hkpSimpleShapePhantom hkpSimpleShapePhantom;
+typedef struct hkpCollidable hkpCollidable;
+typedef struct hkMotionState hkMotionState;
+typedef struct hkpProperty hkpProperty;
+typedef struct hkpLinkedCollidable hkpLinkedCollidable;
+typedef struct hkpTypedBroadPhaseHandle hkpTypedBroadPhaseHandle;
+typedef struct BoundingVolumeData BoundingVolumeData;
+typedef struct hkAabbUint32 hkAabbUint32;
+typedef struct hkpAgentNnEntry hkpAgentNnEntry;
+typedef struct hkpContactMgr hkpContactMgr;
+typedef struct CollisionEntry CollisionEntry;
 typedef struct hkpCharacterProxy_field0x20elem hkpCharacterProxy_field0x20elem;
 typedef struct hkpRigidBody hkpRigidBody;
 typedef struct hkpCharacterProxy hkpCharacterProxy;
 typedef struct ChrInsProxyListener ChrInsProxyListener;
 
+#if 0
 struct FrpgHavokManImp
 {
     void* vtable;
@@ -76,6 +86,9 @@ struct hkpEntity
     void* vtable;
     
 };
+#endif
+
+/* ---------------- CHRCTRL + DAMAGE MAN ------------------ */
 
 struct hkpCapsuleShape
 {
@@ -91,22 +104,191 @@ struct hkpSphereShape
 };
 static_assert(sizeof(hkpSphereShape) == 0x38);
 
-struct hkpSimpleShapePhantom_field0x30
+struct hkpContactMgr
 {
-    uint8_t padding_0[0x30];
-    float position[4];
+    uint64_t vtable;
+    uint64_t data;
+    uint8_t m_type;
 };
+
+struct hkpAgentNnEntry
+{
+    uint8_t m_streamCommand;
+    uint8_t m_agentType;
+    uint8_t m_numContactPoints;
+    uint8_t m_size;
+    uint16_t m_agentIndexOnCollidable[2];
+    hkpContactMgr* m_contactMgr;
+    uint8_t m_collisionQualityIndex;
+    uint8_t m_forceCollideOntoPpu;
+    uint8_t m_nnTrackType;
+    uint8_t m_padding;
+    // Additional 4 bytes padding on 64-bit platforms
+    hkpLinkedCollidable* m_collidable[2];
+};
+
+struct CollisionEntry
+{
+    hkpAgentNnEntry* m_agentEntry;
+    hkpLinkedCollidable* m_partner;
+};
+
+struct hkAabbUint32
+{
+    uint32_t m_min[3];
+    uint8_t m_expansionMin[3];
+    uint8_t m_expansionShift;
+    uint32_t m_max[3];
+    uint8_t m_expansionMax[3];
+    uint8_t m_shapeKeyByte;
+};
+static_assert(offsetof(hkAabbUint32, m_expansionMin) == 0xc);
+static_assert(offsetof(hkAabbUint32, m_expansionShift) == 0xf);
+static_assert(offsetof(hkAabbUint32, m_max) == 0x10);
+static_assert(offsetof(hkAabbUint32, m_expansionMax) == 0x1c);
+static_assert(sizeof(hkAabbUint32) == 0x20);
+
+#pragma pack(push, 1)
+struct BoundingVolumeData
+{
+    hkAabbUint32 base;
+    uint16_t m_numChildShapeAabbs;
+    uint16_t m_capacityChildShapeAabbs;
+    hkAabbUint32* m_childShapeAabbs;
+    uint32_t* m_childShapeKeys;
+    uint32_t padding2;
+};
+#pragma pack(pop)
+static_assert(offsetof(BoundingVolumeData, m_numChildShapeAabbs) == 0x20);
+static_assert(offsetof(BoundingVolumeData, m_capacityChildShapeAabbs) == 0x22);
+static_assert(offsetof(BoundingVolumeData, m_childShapeAabbs) == 0x24);
+static_assert(offsetof(BoundingVolumeData, m_childShapeKeys) == 0x2c);
+static_assert(sizeof(BoundingVolumeData) == 0x38);
+
+struct hkpTypedBroadPhaseHandle
+{
+    uint32_t m_id;
+    uint8_t m_type;
+    uint8_t m_ownerOffset;
+    uint8_t m_objectQualityType;
+    uint8_t padding;
+    uint32_t m_collisionFilterInfo;
+};
+static_assert(offsetof(hkpTypedBroadPhaseHandle, m_objectQualityType) == 0x6);
+static_assert(sizeof(hkpTypedBroadPhaseHandle) == 0xc);
+
+struct hkpCollidable
+{
+    union
+    {
+        hkpCapsuleShape* m_cap_shape;
+        hkpSphereShape* m_sph_shape;
+    };
+    uint32_t m_shapeKey;
+    uint32_t padding1;
+    void* m_motion; //either a hkTransform, or a hkMotionState
+    void* self;
+    uint8_t m_ownerOffset;
+    uint8_t m_forceCollideOntoPpu;
+    uint16_t m_shapeSizeOnSpu;
+    hkpTypedBroadPhaseHandle m_broadPhaseHandle;
+    BoundingVolumeData m_boundingVolumeData;
+    float m_allowedPenetrationDepth;
+    uint32_t padding2;
+};
+static_assert(offsetof(hkpCollidable, m_sph_shape) == 0);
+static_assert(offsetof(hkpCollidable, m_shapeKey) == 8);
+static_assert(offsetof(hkpCollidable, m_motion) == 0x10);
+static_assert(offsetof(hkpCollidable, m_ownerOffset) == 0x20);
+static_assert(offsetof(hkpCollidable, m_forceCollideOntoPpu) == 0x21);
+static_assert(offsetof(hkpCollidable, m_shapeSizeOnSpu) == 0x22);
+static_assert(offsetof(hkpCollidable, m_broadPhaseHandle) == 0x24);
+static_assert(offsetof(hkpCollidable, m_boundingVolumeData) == 0x30);
+static_assert(offsetof(hkpCollidable, m_allowedPenetrationDepth) == 0x68);
+static_assert(sizeof(hkpCollidable) == 0x70);
+
+struct hkpLinkedCollidable
+{
+    hkpCollidable base;
+    CollisionEntry* m_collisionEntries;
+    uint32_t m_collisionEntries_len;
+    uint32_t m_collisionEntries_cap;
+};
+static_assert(offsetof(hkpLinkedCollidable, m_collisionEntries) == 0x70);
+static_assert(sizeof(hkpLinkedCollidable) == 0x80);
+
+struct hkpProperty
+{
+    uint32_t key;
+    uint32_t padding;
+    hkpCharacterProxy* data;
+};
+
+struct hkMotionState
+{
+    float m_rotation0[4];
+    float m_rotation1[4];
+    float m_rotation2[4];
+    float m_translation[4];
+    float m_centerOfMass0[4];
+    float m_centerOfMass1[4];
+    float m_rotation0[4];
+    float m_rotation1[4];
+    float m_centerOfMassLocal[4];
+    float m_deltaAngle[4];
+    float m_objectRadius;
+    uint16_t m_linearDamping;
+    uint16_t m_angularDamping;
+    uint16_t m_timeFactor;
+    uint8_t m_maxLinearVelocity;
+    uint8_t m_maxAngularVelocity;
+    uint8_t m_deactivationClass;
+    uint8_t padding[3];
+};
+static_assert(offsetof(hkMotionState, m_centerOfMass0) == 0x40);
+static_assert(offsetof(hkMotionState, m_deltaAngle) == 0x90);
+static_assert(offsetof(hkMotionState, m_linearDamping) == 0xa4);
+static_assert(sizeof(hkMotionState) == 0xb0);
 
 struct hkpSimpleShapePhantom
 {
     void* vtable;
-    uint32_t data_0;
-    uint8_t padding_0[36];
-    hkpSimpleShapePhantom_field0x30* field0x30;
-    uint8_t padding_1[0x188];
+    uint64_t data_0;
+    void* hkpWorld; //this is just a pointer to the havok world, we should be able to just treat it as a const ptr. Anything important inside it we handle elsewhere
+    void** m_userData; //this is actually a FrpgPhysShapePhantomIns**, but we are saving these already as part of DamageMan, so treat as raw ptrs
+    hkpLinkedCollidable m_collidable;
+    uint8_t data_1[16];
+    void* unk_0;
+    hkpProperty* m_properties;
+    uint32_t m_properties_len;
+    uint32_t m_properties_cap;
+    //i guess we don't have to save the listeners?? maybe?
+    void** m_overlapListeners;
+    uint32_t m_overlapListeners_len;
+    uint32_t m_overlapListeners_cap;
+    void** m_phantomListeners;
+    uint32_t m_phantomListeners_len;
+    uint32_t m_phantomListeners_cap;
+    uint64_t padding_0;
+    hkMotionState m_motionState;
+    hkpCollidable** m_collisionDetails;
+    uint32_t m_collisionDetails_len;
+    uint32_t m_collisionDetails_cap;
+    uint8_t data_2[16];
 };
 static_assert(offsetof(hkpSimpleShapePhantom, data_0) == 0x8);
+static_assert(offsetof(hkpSimpleShapePhantom, m_userData) == 0x18);
+static_assert(offsetof(hkpSimpleShapePhantom, m_collidable) == 0x20);
+static_assert(offsetof(hkpSimpleShapePhantom, data_1) == 0xa0);
+static_assert(offsetof(hkpSimpleShapePhantom, unk_0) == 0xb0);
+static_assert(offsetof(hkpSimpleShapePhantom, m_properties) == 0xb8);
+static_assert(offsetof(hkpSimpleShapePhantom, m_phantomListeners) == 0xd8);
+static_assert(offsetof(hkpSimpleShapePhantom, m_motionState) == 0xf0);
+static_assert(offsetof(hkpSimpleShapePhantom, m_collisionDetails) == 0x1a0);
+static_assert(offsetof(hkpSimpleShapePhantom, data_2) == 0x1b0);
 static_assert(sizeof(hkpSimpleShapePhantom) == 0x1c0);
+
+/* ---------------- CHRCTRL ------------------ */
 
 struct hkpCharacterProxy
 {
