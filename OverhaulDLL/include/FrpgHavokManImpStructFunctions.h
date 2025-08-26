@@ -21,6 +21,14 @@ void copy_hkMotionState(hkMotionState* to, const hkMotionState* from);
 
 void copy_hkpCollidable(hkpCollidable* to, const hkpCollidable* from, bool to_game);
 
+void copy_CollisionEntry(CollisionEntry* to, CollisionEntry* from, hkpLinkedCollidable* parent);
+
+void copy_hkpTypedBroadPhaseHandle(hkpTypedBroadPhaseHandle* to, const hkpTypedBroadPhaseHandle* from);
+
+void copy_BoundingVolumeData(BoundingVolumeData* to, const BoundingVolumeData* from, bool to_game);
+
+void copy_hkpAgentNnEntry(hkpAgentNnEntry* to, hkpAgentNnEntry* from);
+
 bool hkpShape_isSphere(hkpSphereShape* to);
 void copy_hkpSphereShape(hkpSphereShape** to, hkpSphereShape** from, bool to_game);
 hkpSphereShape* init_hkpSphereShape(bool to_game);

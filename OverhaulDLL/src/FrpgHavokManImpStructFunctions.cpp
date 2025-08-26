@@ -21,44 +21,83 @@ void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapeP
     if ((to->m_properties_cap & 0x3fffffff) < from->m_properties_len)
     {
         to->m_properties_len = from->m_properties_len;
-        increase_list_size(Game::MemHeapAllocator, &to->m_properties, 0x10);
+        if (to_game)
+        {
+            increase_list_size(Game::MemHeapAllocator, &to->m_properties, 0x10);
+        }
+        else
+        {
+            to->m_properties = (hkpProperty*)realloc(to->m_properties, (to->m_properties_len + 1) * sizeof(hkpProperty));
+            to->m_properties_cap = to->m_properties_len + 1;
+        }
     }
     for (size_t i = 0; i < from->m_properties_len; i++)
     {
         copy_hkpProperty(&to->m_properties[i], &from->m_properties[i]);
     }
-    //i guess we don't have to save the listeners?? maybe?
-    //void** m_overlapListeners;
-    //uint32_t m_overlapListeners_len;
-    //uint32_t m_overlapListeners_cap;
-    //void** m_phantomListeners;
-    //uint32_t m_phantomListeners_len;
-    //uint32_t m_phantomListeners_cap;
-    //uint64_t padding_0;
+
     copy_hkMotionState(&to->m_motionState, &from->m_motionState);
     if ((to->m_collisionDetails_cap & 0x3fffffff) < from->m_collisionDetails_len)
     {
         to->m_collisionDetails_len = from->m_collisionDetails_len;
-        increase_list_size(Game::MemHeapAllocator, &to->m_collisionDetails, 0x8);
+        if (to_game)
+        {
+            increase_list_size(Game::MemHeapAllocator, &to->m_collisionDetails, 0x8);
+        }
+        else
+        {
+            to->m_collisionDetails = (hkpCollidable**)realloc(to->m_collisionDetails, (to->m_collisionDetails_len + 1) * sizeof(hkpCollidable*));
+            to->m_collisionDetails_cap = to->m_collisionDetails_len + 1;
+        }
     }
     for (size_t i = 0; i < from->m_collisionDetails_len; i++)
     {
-        copy_hkpCollidable(to->m_collisionDetails[i], from->m_collisionDetails[i]);
+        copy_hkpCollidable(to->m_collisionDetails[i], from->m_collisionDetails[i], to_game);
     }
+
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
 }
 
 
+//This is only used in DamageMan and PlayerIns, both of which are garunteed to exist on the game side. So this init is only for dll memory
+//all of it's children arrays are unknown sized, so should be init'd on copy
 hkpSimpleShapePhantom* init_hkpSimpleShapePhantom()
 {
     hkpSimpleShapePhantom* local_hkpSimpleShapePhantom = (hkpSimpleShapePhantom*)malloc_(sizeof(hkpSimpleShapePhantom));
 
+    //don't know if we need a cap or a sphere, so init on copy
+    local_hkpSimpleShapePhantom->m_collidable.base.m_cap_shape = NULL;
+    local_hkpSimpleShapePhantom->m_collidable.base.m_sph_shape = NULL;
+
+    //we don't know how big these should be, so they are init'd on copy
+    local_hkpSimpleShapePhantom->m_collidable.base.m_boundingVolumeData.m_childShapeAabbs = NULL;
+    local_hkpSimpleShapePhantom->m_collidable.base.m_boundingVolumeData.m_childShapeKeys = NULL;
+    local_hkpSimpleShapePhantom->m_collidable.base.m_boundingVolumeData.m_numChildShapeAabbs = 0;
+    local_hkpSimpleShapePhantom->m_collidable.base.m_boundingVolumeData.m_capacityChildShapeAabbs = 0;
+
+    local_hkpSimpleShapePhantom->m_collidable.m_collisionEntries = NULL;
+    local_hkpSimpleShapePhantom->m_collidable.m_collisionEntries_len = 0;
+    local_hkpSimpleShapePhantom->m_collidable.m_collisionEntries_cap = 0;
+
+    local_hkpSimpleShapePhantom->m_properties = NULL;
+    local_hkpSimpleShapePhantom->m_properties_len = 0;
+    local_hkpSimpleShapePhantom->m_properties_cap = 0;
+
+    local_hkpSimpleShapePhantom->m_collisionDetails = NULL;
+    local_hkpSimpleShapePhantom->m_collisionDetails_len = 0;
+    local_hkpSimpleShapePhantom->m_collisionDetails_cap = 0;
 
     return local_hkpSimpleShapePhantom;
 }
 
 void free_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to)
 {
+    free(to->m_collidable.base.m_cap_shape);
+    free(to->m_collidable.base.m_boundingVolumeData.m_childShapeAabbs);
+    free(to->m_collidable.base.m_boundingVolumeData.m_childShapeKeys);
+    free(to->m_collidable.m_collisionEntries);
+    free(to->m_properties);
+    free(to->m_collisionDetails);
     free(to);
 }
 
@@ -69,11 +108,19 @@ void copy_hkpLinkedCollidable(hkpLinkedCollidable* to, const hkpLinkedCollidable
     if ((to->m_collisionEntries_cap & 0x3fffffff) < from->m_collisionEntries_len)
     {
         to->m_collisionEntries_len = from->m_collisionEntries_len;
-        increase_list_size(Game::MemHeapAllocator, &to->m_collisionEntries, 0x10);
+        if (to_game)
+        {
+            increase_list_size(Game::MemHeapAllocator, &to->m_collisionEntries, 0x10);
+        }
+        else
+        {
+            to->m_collisionEntries = (CollisionEntry*)realloc(to->m_collisionEntries, (to->m_collisionEntries_len + 1) * sizeof(CollisionEntry));
+            to->m_collisionEntries_cap = to->m_collisionEntries_len + 1;
+        }
     }
     for (size_t i = 0; i < from->m_collisionEntries_len; i++)
     {
-        copy_CollisionEntry(&to->m_collisionEntries[i], &from->m_collisionEntries[i]);
+        copy_CollisionEntry(&to->m_collisionEntries[i], &from->m_collisionEntries[i], to);
     }
 }
 
@@ -96,22 +143,73 @@ void copy_hkpCollidable(hkpCollidable* to, const hkpCollidable* from, bool to_ga
 {
     if (hkpShape_isSphere(from->m_sph_shape))
     {
-        if (!hkpShape_isSphere(to->m_sph_shape))
+        //if this proves to be an issue, we need to destruct the shape here
+        if (to_game && !hkpShape_isSphere(to->m_sph_shape))
         {
-            FATALERROR(__FUNCTION__" auuuuuuugh fuck me");
+            FATALERROR("Game has non-sphere collidable, we expected sphere");
         }
         copy_hkpSphereShape(&to->m_sph_shape, (hkpSphereShape**)&from->m_sph_shape, to_game);
     }
     else
     {
-        if (hkpShape_isSphere(to->m_sph_shape))
+        if (to_game && hkpShape_isSphere(to->m_sph_shape))
         {
-            FATALERROR(__FUNCTION__" auuuuuuugh fuck me");
+            FATALERROR("Game has sphere collidable, we expected non-sphere");
         }
         copy_hkpCapsuleShape(&to->m_cap_shape, (hkpCapsuleShape**)&from->m_cap_shape, to_game);
     }
     to->m_shapeKey = from->m_shapeKey;
-    void* m_motion;
+    to->m_ownerOffset = from->m_ownerOffset;
+    to->m_forceCollideOntoPpu = from->m_forceCollideOntoPpu;
+    to->m_shapeSizeOnSpu = from->m_shapeSizeOnSpu;
+    copy_hkpTypedBroadPhaseHandle(&to->m_broadPhaseHandle, &from->m_broadPhaseHandle);
+    copy_BoundingVolumeData(&to->m_boundingVolumeData, &from->m_boundingVolumeData, to_game);
+    to->m_allowedPenetrationDepth = from->m_allowedPenetrationDepth;
+}
+
+
+void copy_CollisionEntry(CollisionEntry* to, CollisionEntry* from, hkpLinkedCollidable* parent)
+{
+    copy_hkpAgentNnEntry(to->m_agentEntry, from->m_agentEntry);
+    to->m_partner = parent;
+}
+
+
+void copy_hkpTypedBroadPhaseHandle(hkpTypedBroadPhaseHandle* to, const hkpTypedBroadPhaseHandle* from)
+{
+    memcpy(to, from, sizeof(hkpTypedBroadPhaseHandle));
+}
+
+
+void copy_BoundingVolumeData(BoundingVolumeData* to, const BoundingVolumeData* from, bool to_game)
+{
+    memcpy(&to->base, &from->base, sizeof(to->base));
+
+    if ((to->m_capacityChildShapeAabbs & 0x3fffffff) < from->m_numChildShapeAabbs)
+    {
+        to->m_numChildShapeAabbs = from->m_numChildShapeAabbs;
+        if (to_game)
+        {
+            alloc;
+        }
+        else
+        {
+            to->m_childShapeAabbs = (hkAabbUint32*)realloc(to->m_childShapeAabbs, (to->m_numChildShapeAabbs + 1) * sizeof(hkAabbUint32));
+            to->m_childShapeKeys = (uint32_t*)realloc(to->m_childShapeKeys, (to->m_numChildShapeAabbs + 1) * sizeof(uint32_t));
+            to->m_capacityChildShapeAabbs = to->m_numChildShapeAabbs + 1;
+        }
+    }
+    for (size_t i = 0; i < from->m_numChildShapeAabbs; i++)
+    {
+        memcpy(&to->m_childShapeAabbs[i], &from->m_childShapeAabbs[i], sizeof(hkAabbUint32));
+        to->m_childShapeKeys[i] = from->m_childShapeKeys[i];
+    }
+}
+
+
+void copy_hkpAgentNnEntry(hkpAgentNnEntry* to, hkpAgentNnEntry* from)
+{
+
 }
 
 

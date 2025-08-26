@@ -130,7 +130,7 @@ struct hkpAgentNnEntry
 struct CollisionEntry
 {
     hkpAgentNnEntry* m_agentEntry;
-    hkpLinkedCollidable* m_partner;
+    hkpLinkedCollidable* m_partner; //i'm assuming this is just a pointer to the parent
 };
 
 struct hkAabbUint32
@@ -186,7 +186,7 @@ struct hkpCollidable
     };
     uint32_t m_shapeKey;
     uint32_t padding1;
-    void* m_motion; //either a hkTransform, or a hkMotionState
+    void* m_motion; //either a hkTransform, or a hkMotionState. For our purposes i think this is always just an offset to the parent hkpShapePhantom's inline hkMotionState struct
     void* self;
     uint8_t m_ownerOffset;
     uint8_t m_forceCollideOntoPpu;

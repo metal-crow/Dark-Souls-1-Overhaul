@@ -3,6 +3,7 @@
 #include "FrpgHavokManImpStructFunctions.h"
 #include "Rollback.h"
 
+//the game preallocates the DamageMan active_damage_entries_list to be 128 elements long. Instead of dynamically trying to resize it, lets just never save above the 128 max
 static const size_t max_preallocated_DamageEntry = 128;
 
 void copy_DamageMan(DamageMan* to, DamageMan* from, bool to_game)
@@ -68,6 +69,7 @@ void copy_DamageMan(DamageMan* to, DamageMan* from, bool to_game)
     Game::ResumeThreads();
 }
 
+//Since the game has pre-init'd all of the DamageEntries already, we don't need to ever init for the game, we can copy in place. So this and all child init's are just for the mod memory
 DamageMan* init_DamageMan()
 {
     DamageMan* local_DamageMan = (DamageMan*)malloc_(sizeof(DamageMan));
@@ -220,13 +222,13 @@ void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePha
     if (*to == NULL && *from != NULL)
     {
         FATALERROR("WARNING: I shouldn't have to init the FrpgPhysShapePhantomIns, it should be pre-init'ed either by me or the game");
-        *to = init_FrpgPhysShapePhantomIns(is_sphere, to_game);
+        //*to = init_FrpgPhysShapePhantomIns(is_sphere, to_game);
     }
     if (*to != NULL && *from == NULL)
     {
         FATALERROR("WARNING: I shouldn't have to free the FrpgPhysShapePhantomIns, it should always exist");
-        free_FrpgPhysShapePhantomIns(*to, is_sphere, to_game);
-        *to = NULL;
+        //free_FrpgPhysShapePhantomIns(*to, is_sphere, to_game);
+        //*to = NULL;
     }
     if (*to != NULL && *from != NULL)
     {
