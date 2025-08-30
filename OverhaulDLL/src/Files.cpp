@@ -549,6 +549,7 @@ void Files::check_custom_game_config_file_path()
 
 void Files::backup_save_file()
 {
+    const int maxFolders = 30;
     std::filesystem::path parent_dir = std::filesystem::path(Files::save_file).parent_path();
     std::filesystem::path backup_dir = parent_dir / "backup";
     // Create parent backup folder if it doesn't exist
@@ -559,17 +560,32 @@ void Files::backup_save_file()
 
     ConsoleWrite("Backing up save files to %s...", backup_dir.c_str());
 
-    // Compute backup number and generate folder
-    int counter = 1;
-    std::filesystem::path destination;
-    do
+    //Remove older backups and make a new one
+    std::vector<std::filesystem::directory_entry> folders;
+    for (auto& entry : std::filesystem::directory_iterator(backup_dir))
     {
-        destination = std::filesystem::path(backup_dir) / std::format("{}", counter);
-        ++counter;
-    } while (std::filesystem::exists(destination));
-    std::filesystem::create_directories(destination);
+        if (entry.is_directory())
+        {
+            folders.push_back(entry);
+        }
+    }
+    while (folders.size() >= maxFolders)
+    {
+        auto oldest = std::min_element(
+            folders.begin(), folders.end(),
+            [](auto& a, auto& b) {
+            return std::filesystem::last_write_time(a) < std::filesystem::last_write_time(b);
+        });
+        ConsoleWrite("Deleted oldest: ", oldest->path().c_str());
+        std::filesystem::remove_all(*oldest);
+        folders.erase(oldest);
+    }
 
     // Copy the overhaul save files to the new destination
+    auto now = std::chrono::system_clock::now();
+    auto t = std::chrono::system_clock::to_time_t(now);
+    std::filesystem::path destination = std::filesystem::path(backup_dir) / std::format("{}", t);;
+    std::filesystem::create_directories(destination);
     for (const auto& entry : std::filesystem::directory_iterator(parent_dir))
     {
         if (std::filesystem::is_regular_file(entry))
