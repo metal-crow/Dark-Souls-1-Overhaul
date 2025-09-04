@@ -13,7 +13,7 @@ bool Files::save_file_index_pending_set_next = false;
 bool Files::save_file_index_pending_set_prev = false;
 bool Files::save_file_index_make_new = false;
 bool first_save_load = true;
-const char* OVERHAUL_SAVE_FILE_EXTENSION = ".overhaul.co2"; //end in .co2 so steam will back it up
+const char* OVERHAUL_SAVE_FILE_EXTENSION = ".overhaul.sl2"; //end in .sl2 so steam will back it up
 std::string Files::save_file;
 
 //Make sure file names are lowercase
@@ -136,12 +136,12 @@ HANDLE WINAPI intercept_create_file_w(LPCWSTR lpFileName, DWORD dwDesiredAccess,
                             if (i < 10)
                             {
                                 new_save_file_page = Files::save_file + "_0" + std::to_string(i);
-                                old_save_file_page = orig_save_file + "_0" + std::to_string(i);
+                                old_save_file_page = orig_save_file + ".overhaul_0" + std::to_string(i);
                             }
                             else
                             {
                                 new_save_file_page = Files::save_file + "_" + std::to_string(i);
-                                old_save_file_page = orig_save_file + "_" + std::to_string(i);
+                                old_save_file_page = orig_save_file + ".overhaul_" + std::to_string(i);
                             }
                             DWORD fileAtribs_old = GetFileAttributesA(old_save_file_page.c_str());
                             if (fileAtribs_old != INVALID_FILE_ATTRIBUTES)
