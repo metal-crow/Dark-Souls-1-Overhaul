@@ -226,15 +226,18 @@ struct hkpProperty
 
 struct hkMotionState
 {
-    float m_rotation0[4];
-    float m_rotation1[4];
-    float m_rotation2[4];
-    float m_translation[4];
-    float m_centerOfMass0[4];
-    float m_centerOfMass1[4];
-    float m_rotation0[4];
-    float m_rotation1[4];
-    float m_centerOfMassLocal[4];
+    //hkTransform
+    float m_transform_rotation0[4];
+    float m_transform_rotation1[4];
+    float m_transform_rotation2[4];
+    float m_transform_translation[4];
+    //hkSweptTRansform
+    float m_sweptTransform_centerOfMass0[4];
+    float m_sweptTransform_centerOfMass1[4];
+    float m_sweptTransform_rotation0[4];
+    float m_sweptTransform_rotation1[4];
+    float m_sweptTransform_centerOfMassLocal[4];
+    //
     float m_deltaAngle[4];
     float m_objectRadius;
     uint16_t m_linearDamping;
@@ -245,16 +248,17 @@ struct hkMotionState
     uint8_t m_deactivationClass;
     uint8_t padding[3];
 };
-static_assert(offsetof(hkMotionState, m_centerOfMass0) == 0x40);
+static_assert(offsetof(hkMotionState, m_sweptTransform_centerOfMass0) == 0x40);
 static_assert(offsetof(hkMotionState, m_deltaAngle) == 0x90);
 static_assert(offsetof(hkMotionState, m_linearDamping) == 0xa4);
+static_assert(offsetof(hkMotionState, m_maxAngularVelocity) == 0xab);
 static_assert(sizeof(hkMotionState) == 0xb0);
 
 struct hkpSimpleShapePhantom
 {
     void* vtable;
     uint64_t data_0;
-    void* hkpWorld; //this is just a pointer to the havok world, we should be able to just treat it as a const ptr. Anything important inside it we handle elsewhere
+    void* hkpWorldPtr; //this is just a pointer to the havok world, we should be able to just treat it as a const ptr. Anything important inside it we handle elsewhere
     void** m_userData; //this is actually a FrpgPhysShapePhantomIns**, but we are saving these already as part of DamageMan, so treat as raw ptrs
     hkpLinkedCollidable m_collidable;
     uint8_t data_1[16];
@@ -277,6 +281,7 @@ struct hkpSimpleShapePhantom
     uint8_t data_2[16];
 };
 static_assert(offsetof(hkpSimpleShapePhantom, data_0) == 0x8);
+static_assert(offsetof(hkpSimpleShapePhantom, hkpWorldPtr) == 0x10);
 static_assert(offsetof(hkpSimpleShapePhantom, m_userData) == 0x18);
 static_assert(offsetof(hkpSimpleShapePhantom, m_collidable) == 0x20);
 static_assert(offsetof(hkpSimpleShapePhantom, data_1) == 0xa0);

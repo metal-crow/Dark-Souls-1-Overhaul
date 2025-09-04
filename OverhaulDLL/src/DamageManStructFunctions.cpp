@@ -235,7 +235,7 @@ void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePha
         (*to)->data_0 = (*from)->data_0;
         (*to)->damageEntry = (*from)->damageEntry;
         (*to)->physWorld = (*from)->physWorld;
-        copy_hkpSimpleShapePhantom((*to)->_hkpSimpleShapePhantom, (*from)->_hkpSimpleShapePhantom);
+        copy_hkpSimpleShapePhantom((*to)->_hkpSimpleShapePhantom, (*from)->_hkpSimpleShapePhantom, to_game);
         (*to)->self = (*to);
         (*to)->data_1 = (*from)->data_1;
         if (is_sphere)

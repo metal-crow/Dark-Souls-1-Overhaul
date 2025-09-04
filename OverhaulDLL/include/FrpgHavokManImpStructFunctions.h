@@ -15,7 +15,7 @@ void free_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to);
 
 void copy_hkpLinkedCollidable(hkpLinkedCollidable* to, const hkpLinkedCollidable* from, bool to_game);
 
-void copy_hkpProperty(hkpProperty* to, hkpProperty* from);
+void copy_hkpProperty(hkpProperty* to, hkpProperty* from, bool to_game);
 
 void copy_hkMotionState(hkMotionState* to, const hkMotionState* from);
 
@@ -41,7 +41,7 @@ void free_hkpCapsuleShape(hkpCapsuleShape* to, bool to_game);
 /* ---------------- CHRCTRL ------------------ */
 
 std::string print_hkpCharacterProxy(hkpCharacterProxy* to);
-void copy_hkpCharacterProxy(hkpCharacterProxy* to, const hkpCharacterProxy* from);
+void copy_hkpCharacterProxy(hkpCharacterProxy* to, const hkpCharacterProxy* from, bool to_game);
 hkpCharacterProxy* init_hkpCharacterProxy();
 void free_hkpCharacterProxy(hkpCharacterProxy* to);
 

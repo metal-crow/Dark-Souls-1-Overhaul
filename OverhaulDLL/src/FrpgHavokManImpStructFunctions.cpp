@@ -12,7 +12,7 @@ std::string print_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to)
 void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapePhantom* from, bool to_game)
 {
     to->data_0 = from->data_0;
-    to->hkpWorld = from->hkpWorld;
+    to->hkpWorldPtr = from->hkpWorldPtr;
     to->m_userData = from->m_userData;
     copy_hkpLinkedCollidable(&to->m_collidable, &from->m_collidable, to_game);
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
@@ -33,10 +33,11 @@ void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapeP
     }
     for (size_t i = 0; i < from->m_properties_len; i++)
     {
-        copy_hkpProperty(&to->m_properties[i], &from->m_properties[i]);
+        copy_hkpProperty(&to->m_properties[i], &from->m_properties[i], to_game);
     }
 
     copy_hkMotionState(&to->m_motionState, &from->m_motionState);
+
     if ((to->m_collisionDetails_cap & 0x3fffffff) < from->m_collisionDetails_len)
     {
         to->m_collisionDetails_len = from->m_collisionDetails_len;
@@ -118,18 +119,22 @@ void copy_hkpLinkedCollidable(hkpLinkedCollidable* to, const hkpLinkedCollidable
             to->m_collisionEntries_cap = to->m_collisionEntries_len + 1;
         }
     }
-    for (size_t i = 0; i < from->m_collisionEntries_len; i++)
+    if (from->m_collisionEntries_len > 0)
     {
-        copy_CollisionEntry(&to->m_collisionEntries[i], &from->m_collisionEntries[i], to);
+        FATALERROR("testing hkpLinkedCollidable");
     }
+    //for (size_t i = 0; i < from->m_collisionEntries_len; i++)
+    //{
+    //    copy_CollisionEntry(&to->m_collisionEntries[i], &from->m_collisionEntries[i], to);
+    //}
 }
 
 
-void copy_hkpProperty(hkpProperty* to, hkpProperty* from)
+void copy_hkpProperty(hkpProperty* to, hkpProperty* from, bool to_game)
 {
     to->key = from->key;
     to->padding = from->padding;
-    copy_hkpCharacterProxy(to->data, from->data);
+    copy_hkpCharacterProxy(to->data, from->data, to_game);
 }
 
 
@@ -168,11 +173,11 @@ void copy_hkpCollidable(hkpCollidable* to, const hkpCollidable* from, bool to_ga
 }
 
 
-void copy_CollisionEntry(CollisionEntry* to, CollisionEntry* from, hkpLinkedCollidable* parent)
-{
-    copy_hkpAgentNnEntry(to->m_agentEntry, from->m_agentEntry);
-    to->m_partner = parent;
-}
+//void copy_CollisionEntry(CollisionEntry* to, CollisionEntry* from, hkpLinkedCollidable* parent)
+//{
+//    copy_hkpAgentNnEntry(to->m_agentEntry, from->m_agentEntry);
+//    to->m_partner = parent;
+//}
 
 
 void copy_hkpTypedBroadPhaseHandle(hkpTypedBroadPhaseHandle* to, const hkpTypedBroadPhaseHandle* from)
@@ -185,32 +190,37 @@ void copy_BoundingVolumeData(BoundingVolumeData* to, const BoundingVolumeData* f
 {
     memcpy(&to->base, &from->base, sizeof(to->base));
 
-    if ((to->m_capacityChildShapeAabbs & 0x3fffffff) < from->m_numChildShapeAabbs)
+    if (from->m_numChildShapeAabbs > 0)
     {
-        to->m_numChildShapeAabbs = from->m_numChildShapeAabbs;
-        if (to_game)
-        {
-            alloc;
-        }
-        else
-        {
-            to->m_childShapeAabbs = (hkAabbUint32*)realloc(to->m_childShapeAabbs, (to->m_numChildShapeAabbs + 1) * sizeof(hkAabbUint32));
-            to->m_childShapeKeys = (uint32_t*)realloc(to->m_childShapeKeys, (to->m_numChildShapeAabbs + 1) * sizeof(uint32_t));
-            to->m_capacityChildShapeAabbs = to->m_numChildShapeAabbs + 1;
-        }
+        FATALERROR("testing BoundingVolumeData");
     }
-    for (size_t i = 0; i < from->m_numChildShapeAabbs; i++)
-    {
-        memcpy(&to->m_childShapeAabbs[i], &from->m_childShapeAabbs[i], sizeof(hkAabbUint32));
-        to->m_childShapeKeys[i] = from->m_childShapeKeys[i];
-    }
+
+    //if ((to->m_capacityChildShapeAabbs & 0x3fffffff) < from->m_numChildShapeAabbs)
+    //{
+    //    to->m_numChildShapeAabbs = from->m_numChildShapeAabbs;
+    //    if (to_game)
+    //    {
+    //        //alloc;
+    //    }
+    //    else
+    //    {
+    //        to->m_childShapeAabbs = (hkAabbUint32*)realloc(to->m_childShapeAabbs, (to->m_numChildShapeAabbs + 1) * sizeof(hkAabbUint32));
+    //        to->m_childShapeKeys = (uint32_t*)realloc(to->m_childShapeKeys, (to->m_numChildShapeAabbs + 1) * sizeof(uint32_t));
+    //        to->m_capacityChildShapeAabbs = to->m_numChildShapeAabbs + 1;
+    //    }
+    //}
+    //for (size_t i = 0; i < from->m_numChildShapeAabbs; i++)
+    //{
+    //    memcpy(&to->m_childShapeAabbs[i], &from->m_childShapeAabbs[i], sizeof(hkAabbUint32));
+    //    to->m_childShapeKeys[i] = from->m_childShapeKeys[i];
+    //}
 }
 
 
-void copy_hkpAgentNnEntry(hkpAgentNnEntry* to, hkpAgentNnEntry* from)
-{
-
-}
+//void copy_hkpAgentNnEntry(hkpAgentNnEntry* to, hkpAgentNnEntry* from)
+//{
+//
+//}
 
 
 bool hkpShape_isSphere(hkpSphereShape* to)
@@ -349,11 +359,11 @@ std::string print_hkpCharacterProxy(hkpCharacterProxy* to)
     return out;
 }
 
-void copy_hkpCharacterProxy(hkpCharacterProxy* to, const hkpCharacterProxy* from)
+void copy_hkpCharacterProxy(hkpCharacterProxy* to, const hkpCharacterProxy* from, bool to_game)
 {
     to->data_0 = from->data_0;
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
-    copy_hkpSimpleShapePhantom(to->HkpSimpleShapePhantom, from->HkpSimpleShapePhantom);
+    copy_hkpSimpleShapePhantom(to->HkpSimpleShapePhantom, from->HkpSimpleShapePhantom, to_game);
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
 }
