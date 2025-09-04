@@ -29,7 +29,7 @@
 #define __DS1_OVERHAUL_MOD
 //#define ANTIBAN_ONLY 1
 
-static const uint64_t VERSION_RAW = 2025052300;
+static const uint64_t VERSION_RAW = 2025090400;
 #define VERSION_STRING  "Beta34"
 #define DS1_OVERHAUL_TXT_INTRO "\n+------------------------------------------------------+\n|      Dark Souls Overhaul   ["VERSION_STRING"]                 |\n+------------------------------------------------------+"
 
