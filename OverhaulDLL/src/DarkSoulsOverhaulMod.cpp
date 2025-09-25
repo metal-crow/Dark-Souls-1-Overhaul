@@ -133,10 +133,10 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
 
     // start callback handler
     MainLoop::start();
+#endif
 
 #ifndef DEBUG
     set_crash_handlers();
-#endif
 #endif
 
     return TRUE;

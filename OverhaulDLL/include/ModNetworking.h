@@ -11,6 +11,7 @@
 #include "steam/steam_api.h"
 #pragma warning( pop )
 #include "ModData.h"
+#include "DarkSoulsOverhaulMod.h"
 
 class ModNetworking
 {
@@ -25,6 +26,7 @@ public:
     static ISteamNetworkingMessages* SteamNetMessages;
     static ISteamNetworkingUtils* SteamNetUtils;
 
+#ifndef ANTIBAN_ONLY
     //Register a LobbyEnterCallback so that we can differentiate between mod and non-mod users without even using the ISteamNetworking Interface
     //This allows us to avoid leaking our IP on that interface
     STEAM_CALLBACK(ModNetworking, LobbyEnterCallback, LobbyEnter_t);
@@ -33,6 +35,12 @@ public:
 
     //callback for the new ISteamNetworkingMessages api
     STEAM_CALLBACK(ModNetworking, SteamNetworkingMessagesSessionRequestCallback, SteamNetworkingMessagesSessionRequest_t);
+#else
+    void LobbyEnterCallback(LobbyEnter_t* pCallback);
+    void LobbyChatUpdateCallback(LobbyChatUpdate_t* pCallback);
+    void LobbyDataUpdateCallback(LobbyDataUpdate_t* pCallback);
+    void SteamNetworkingMessagesSessionRequestCallback(SteamNetworkingMessagesSessionRequest_t* pCallback);
+#endif
 
     //Create a persistant lobby when a host, so it isn't JIT'd for new connecting users
     static void CreatePersistentLobby();
