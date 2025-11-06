@@ -5,6 +5,10 @@
 #include <tuple>
 #include <vector>
 #include <string>
+// new libraries for the ramdomized area search
+#include <algorithm>
+#include <random>
+#include <chrono>
 
 extern "C" {
     uint64_t Send_Type17_GeneralRequestTask_injection_return;
@@ -84,6 +88,7 @@ enum InvasionOrb
 static uint32_t last_send_count = 0;
 static size_t current_mpregionid_offset = 0;
 static uint32_t current_soullevel_offset = 0;
+static std::vector<std::tuple<uint32_t, std::wstring>> ShuffledRegionIDs;
 static InvasionOrb current_InvasionOrb = InvasionOrb::NoCustomOrb;
 
 void Send_Type17_GeneralRequestTask_injection_helper(uint64_t RequestGetBreakInTargetList_Data)
@@ -103,38 +108,59 @@ void Send_Type17_GeneralRequestTask_injection_helper(uint64_t RequestGetBreakInT
     {
         current_InvasionOrb = InvasionOrb::AllAreas;
         last_send_count = 0;
+        // initialize randomized area order for this invasion session
+        current_mpregionid_offset = 0;
+        ShuffledRegionIDs = MultiPlayerRegionIDs;
+        if (!ShuffledRegionIDs.empty()) {
+            std::mt19937 rng((uint32_t)std::chrono::high_resolution_clock::now().time_since_epoch().count());
+            std::shuffle(ShuffledRegionIDs.begin(), ShuffledRegionIDs.end(), rng);
+        }
     }
     else if (Game::player_has_speffect((uint64_t)(playerins_o.value()), { CustomInvasionTypes::InfiniteUpwardsInvadingOrbSpEffect_Red, CustomInvasionTypes::InfiniteUpwardsInvadingOrbSpEffect_Blue }))
     {
         current_InvasionOrb = InvasionOrb::InfiniteUp;
         last_send_count = 0;
+        current_soullevel_offset = 0;
     }
     else if (Game::player_has_speffect((uint64_t)(playerins_o.value()), { CustomInvasionTypes::AllAreasAndInfiniteUpwardsInvadingOrbSpEffect_Red, CustomInvasionTypes::AllAreasAndInfiniteUpwardsInvadingOrbSpEffect_Blue }))
     {
         current_InvasionOrb = InvasionOrb::AllAreasAndInfiniteUp;
         last_send_count = 0;
+        current_soullevel_offset = 0;
+        // initialize randomized area order for this invasion session
+        current_mpregionid_offset = 0;
+        ShuffledRegionIDs = MultiPlayerRegionIDs;
+        if (!ShuffledRegionIDs.empty()) {
+            std::mt19937 rng((uint32_t)std::chrono::high_resolution_clock::now().time_since_epoch().count());
+            std::shuffle(ShuffledRegionIDs.begin(), ShuffledRegionIDs.end(), rng);
+        }
     }
     //If the player is doing any other normal multiplayer types, don't do this custom code
     else if (Game::player_has_speffect((uint64_t)(playerins_o.value()), { 4, 10, 11, 16, 26, 27, 15 }))
     {
         current_InvasionOrb = InvasionOrb::NoCustomOrb;
         last_send_count = 0;
-        //reset the area id and SL offset
+        //reset the area id and SL offset and randomized regions
         current_mpregionid_offset = 0;
         current_soullevel_offset = 0;
+        ShuffledRegionIDs.clear();
     }
 
     if (current_InvasionOrb == InvasionOrb::AllAreas)
     {
+        auto& regionList = (ShuffledRegionIDs.size()>0 ? ShuffledRegionIDs : MultiPlayerRegionIDs);
         //use the current area id in the list
-        if (MultiPlayerRegionIDs.size() > 0)
+        if (regionList.size() > 0)
         {
-            *(uint32_t*)(RequestGetBreakInTargetList_Data) = std::get<0>(MultiPlayerRegionIDs[current_mpregionid_offset]);
+            //*(uint32_t*)(RequestGetBreakInTargetList_Data) = std::get<0>(MultiPlayerRegionIDs[current_mpregionid_offset]);
+            *(uint32_t*)(RequestGetBreakInTargetList_Data) = std::get<0>(regionList[current_mpregionid_offset]);
 
-            swprintf(banner_msg, sizeof(banner_msg) / sizeof(wchar_t), L"Searching area: %s", std::get<1>(MultiPlayerRegionIDs[current_mpregionid_offset]).c_str());
+            //swprintf(banner_msg, sizeof(banner_msg) / sizeof(wchar_t), L"Searching area: %s", std::get<1>(MultiPlayerRegionIDs[current_mpregionid_offset]).c_str());
+            swprintf(banner_msg, sizeof(banner_msg) / sizeof(wchar_t), L"Searching area: %s", std::get<1>(regionList[current_mpregionid_offset]).c_str());
             Game::show_banner_message(banner_msg);
 
-            ConsoleWrite("Searching orb: area %d", std::get<0>(MultiPlayerRegionIDs[current_mpregionid_offset]));
+            //ConsoleWrite("Searching orb: area %d", std::get<0>(MultiPlayerRegionIDs[current_mpregionid_offset]));
+            ConsoleWrite("Searching orb: area %d", std::get<0>(regionList[current_mpregionid_offset]));
             last_send_count++;
             if (last_send_count >= 2)
             {
@@ -147,7 +173,7 @@ void Send_Type17_GeneralRequestTask_injection_helper(uint64_t RequestGetBreakInT
             if (last_send_count == 0)
             {
                 current_mpregionid_offset++;
-                if (current_mpregionid_offset >= MultiPlayerRegionIDs.size())
+                if (current_mpregionid_offset >= regionList.size())
                 {
                     current_mpregionid_offset = 0;
                 }
@@ -200,18 +226,22 @@ void Send_Type17_GeneralRequestTask_injection_helper(uint64_t RequestGetBreakInT
 
     if (current_InvasionOrb == InvasionOrb::AllAreasAndInfiniteUp)
     {
-        if (MultiPlayerRegionIDs.size() > 0)
+        auto& regionList = (ShuffledRegionIDs.size()>0 ? ShuffledRegionIDs : MultiPlayerRegionIDs);
+        if (regionList.size() > 0)
         {
-            *(uint32_t*)(RequestGetBreakInTargetList_Data) = std::get<0>(MultiPlayerRegionIDs[current_mpregionid_offset]);
+            //*(uint32_t*)(RequestGetBreakInTargetList_Data) = std::get<0>(MultiPlayerRegionIDs[current_mpregionid_offset]);
+            *(uint32_t*)(RequestGetBreakInTargetList_Data) = std::get<0>(regionList[current_mpregionid_offset]);
 
             uint32_t pc_sl = *(uint32_t*)(RequestGetBreakInTargetList_Data + 28);
             *(uint32_t*)(RequestGetBreakInTargetList_Data + 28) += current_soullevel_offset;
             uint32_t pc_searched_sl = pc_sl + current_soullevel_offset;
 
-            swprintf(banner_msg, sizeof(banner_msg) / sizeof(wchar_t), L"Searching area: %s at SL: %d", std::get<1>(MultiPlayerRegionIDs[current_mpregionid_offset]).c_str(), pc_searched_sl);
+            //swprintf(banner_msg, sizeof(banner_msg) / sizeof(wchar_t), L"Searching area: %s at SL: %d", std::get<1>(MultiPlayerRegionIDs[current_mpregionid_offset]).c_str(), pc_searched_sl);
+            swprintf(banner_msg, sizeof(banner_msg) / sizeof(wchar_t), L"Searching area: %s at SL: %d", std::get<1>(regionList[current_mpregionid_offset]).c_str(), pc_searched_sl);
             Game::show_banner_message(banner_msg);
 
-            ConsoleWrite("Twin eye orb: area %d SL %d", std::get<0>(MultiPlayerRegionIDs[current_mpregionid_offset]), pc_searched_sl);
+            //ConsoleWrite("Twin eye orb: area %d SL %d", std::get<0>(MultiPlayerRegionIDs[current_mpregionid_offset]), pc_searched_sl);
+            ConsoleWrite("Twin eye orb: area %d SL %d", std::get<0>(regionList[current_mpregionid_offset]), pc_searched_sl);
             last_send_count++;
             if (last_send_count >= 2)
             {
@@ -223,27 +253,64 @@ void Send_Type17_GeneralRequestTask_injection_helper(uint64_t RequestGetBreakInT
             //(the two requests are not on the same frame)
             if (last_send_count == 0)
             {
-                //increase the SL offset first
-                current_soullevel_offset += (uint32_t)(1.22222*pc_searched_sl + 22.2222) - pc_searched_sl; //increase by the search's upper and lower bounds
-                //clamp the last search value to 713 if needed
-                if (pc_sl + current_soullevel_offset > 713)
-                {
-                    current_soullevel_offset = 713 - pc_sl;
-                }
-                if (pc_searched_sl >= 713)
-                {
-                    current_soullevel_offset = 0;
-                }
-
-                //once the SL offset has looped around, go to next area
-                if (current_soullevel_offset == 0)
-                {
-                    current_mpregionid_offset++;
-                }
-                if (current_mpregionid_offset >= MultiPlayerRegionIDs.size())
+                // advance area first; then raise SL window when we wrap areas
+                current_mpregionid_offset++;
+                bool wrappedAreas = false;
+                if (current_mpregionid_offset >= regionList.size())
                 {
                     current_mpregionid_offset = 0;
+                    wrappedAreas = true;
                 }
+
+                if (wrappedAreas)
+                {
+                    //increase the SL offset after wraping regions
+                    current_soullevel_offset += (uint32_t)(1.22222 * pc_searched_sl + 22.2222) - pc_searched_sl; //increase by the search's upper and lower bounds
+                    //clamp the last search value to 713 if needed
+                    if (pc_sl + current_soullevel_offset > 713)
+                    {
+                        current_soullevel_offset = 713 - pc_sl;
+                    }
+                    if (pc_searched_sl >= 713)
+                    {
+                        current_soullevel_offset = 0;
+                        ShuffledRegionIDs.clear();
+                    }
+
+                    //once the SL offset has looped around, reset
+                    if (current_soullevel_offset == 0)
+                    {
+                        current_mpregionid_offset++;
+                    }
+                    if (current_mpregionid_offset >= regionList.size())
+                    {
+                        current_mpregionid_offset = 0;
+                    }
+
+                }
+                //----------------------       OLD CODE        ----------------------------------------------------------------------------------------------------
+                //     //increase the SL offset first
+                //     current_soullevel_offset += (uint32_t)(1.22222*pc_searched_sl + 22.2222) - pc_searched_sl; //increase by the search's upper and lower bounds
+                //     //clamp the last search value to 713 if needed
+                //     if (pc_sl + current_soullevel_offset > 713)
+                //     {
+                //         current_soullevel_offset = 713 - pc_sl;
+                //     }
+                //     if (pc_searched_sl >= 713)
+                //     {
+                //         current_soullevel_offset = 0;
+                //     }
+
+                //     //once the SL offset has looped around, go to next area
+                //     if (current_soullevel_offset == 0)
+                //     {
+                //         current_mpregionid_offset++;
+                //     }
+                //     if (current_mpregionid_offset >= MultiPlayerRegionIDs.size())
+                //     {
+                //         current_mpregionid_offset = 0;
+                //     }
+                // }
             }
 
             //set the timer to be closer to the refresh time (30 seconds)
