@@ -46,7 +46,11 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam);
 
     global::cmd_out << dest << "\n";
 
+#ifndef DEBUG
     crash_handler(NULL, dest);
+#else
+    * (int*)0 = 1;
+#endif
 }
 
 static const char* logfilename = "dsoverhaul_logging.txt";
