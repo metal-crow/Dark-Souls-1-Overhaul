@@ -14,6 +14,7 @@
 #include "PadManipulatorStructFunctions.h"
 #include "ThrowManStructFunctions.h"
 #include "DmgHitRecordManImpStructFunctions.h"
+#include "FrpgHavokManImpStructFunctions.h"
 
 #include "ggponet.h"
 
@@ -131,6 +132,7 @@ struct RollbackState
     DamageMan* damageman;
     ThrowMan* throwman;
     DmgHitRecordManImp* dmghitrecordman;
+    FrpgHavokManImp* havokman;
 };
 
 inline void* malloc_(size_t size)
@@ -143,6 +145,21 @@ inline void* malloc_(size_t size)
     memset(out, 0, size);
     return out;
 }
+
+inline void* realloc_(void* dst, size_t size)
+{
+    if (dst == NULL)
+    {
+        return malloc(size);
+    }
+    void* out = realloc(dst, size);
+    if (out == NULL)
+    {
+        FATALERROR("Realloc failure. Unable to allocate %d bytes.", size);
+    }
+    return out;
+}
+
 
 bool rollback_begin_game_callback(const char*);
 bool rollback_advance_frame_callback(int);

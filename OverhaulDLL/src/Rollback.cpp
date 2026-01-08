@@ -629,6 +629,7 @@ bool rollback_load_game_state_callback(unsigned char* buffer, int)
     copy_DamageMan(*(DamageMan**)Game::damage_man, state->damageman, true);
     copy_ThrowMan(*(ThrowMan**)Game::throw_man, state->throwman, true);
     copy_DmgHitRecordManImp(*(DmgHitRecordManImp**)Game::dmg_hit_record_man, state->dmghitrecordman, true);
+    copy_FrpgHavokManImp(*(FrpgHavokManImp**)Game::frpg_havok_man_imp, state->havokman, true);
 
     if (Rollback::rollbackVisual)
     {
@@ -680,6 +681,8 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
     copy_ThrowMan(state->throwman, *(ThrowMan**)Game::throw_man, false);
     state->dmghitrecordman = init_DmgHitRecordManImp();
     copy_DmgHitRecordManImp(state->dmghitrecordman, *(DmgHitRecordManImp**)Game::dmg_hit_record_man, false);
+    state->havokman = init_FrpgHavokManImp();
+    copy_FrpgHavokManImp(state->havokman, *(FrpgHavokManImp**)Game::frpg_havok_man_imp, false);
 #if defined(GGPO_SYNCTEST) && 0
     our_checksum ^= std::hash<std::string>{}(print_BulletMan(*(BulletMan**)Game::bullet_man));
 #endif
@@ -711,6 +714,8 @@ void rollback_copy_buffer(void* buffer_dst, void* buffer_src)
     copy_ThrowMan(state_dst->throwman, state_src->throwman, false);
     state_dst->dmghitrecordman = init_DmgHitRecordManImp();
     copy_DmgHitRecordManImp(state_dst->dmghitrecordman, state_src->dmghitrecordman, false);
+    state_dst->havokman = init_FrpgHavokManImp();
+    copy_FrpgHavokManImp(state_dst->havokman, *(FrpgHavokManImp**)Game::frpg_havok_man_imp, false);
 }
 
 void rollback_free_buffer(void* buffer)
@@ -732,6 +737,8 @@ void rollback_free_buffer(void* buffer)
     state->throwman = NULL;
     free_DmgHitRecordManImp(state->dmghitrecordman);
     state->dmghitrecordman = NULL;
+    free_FrpgHavokManImp(state->havokman);
+    state->havokman = NULL;
 
     free(state);
 }

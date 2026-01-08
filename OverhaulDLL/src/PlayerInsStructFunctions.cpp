@@ -2186,7 +2186,7 @@ HavokChara* init_HavokChara()
 {
     HavokChara* local_HavokChara = (HavokChara*)malloc_(sizeof(HavokChara));
 
-    local_HavokChara->char_proxy = init_hkpCharacterProxy();
+    local_HavokChara->char_proxy = init_hkpCharacterProxy(false);
 
     return local_HavokChara;
 }

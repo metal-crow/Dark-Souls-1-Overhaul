@@ -1,6 +1,161 @@
 #include "FrpgHavokManImpStructFunctions.h"
 #include "Rollback.h"
 
+/* ---------------- HAVOK MAN ------------------ */
+
+void copy_FrpgHavokManImp(FrpgHavokManImp* to, const FrpgHavokManImp* from, bool to_game)
+{
+    copy_FrpgPhysWorld(to->physWorld, from->physWorld, to_game);
+}
+
+//all the Havok Man inits are only for dll memory, game side they always exist
+FrpgHavokManImp* init_FrpgHavokManImp()
+{
+    FrpgHavokManImp* local = (FrpgHavokManImp*)malloc_(sizeof(FrpgHavokManImp));
+
+    local->physWorld = init_FrpgPhysWorld();
+
+    return local;
+}
+
+void free_FrpgHavokManImp(FrpgHavokManImp* to)
+{
+    free_FrpgPhysWorld(to->physWorld);
+    free(to);
+}
+
+void copy_FrpgPhysWorld(FrpgPhysWorld* to, const FrpgPhysWorld* from, bool to_game)
+{
+    copy_hkpWorld(to->_hkpWorld, from->_hkpWorld, to_game);
+}
+
+FrpgPhysWorld* init_FrpgPhysWorld()
+{
+    FrpgPhysWorld* local = (FrpgPhysWorld*)malloc_(sizeof(FrpgPhysWorld));
+
+    local->_hkpWorld = init_hkpWorld();
+
+    return local;
+}
+
+void free_FrpgPhysWorld(FrpgPhysWorld* to)
+{
+    free_hkpWorld(to->_hkpWorld);
+    free(to);
+}
+
+void copy_hkpWorld(hkpWorld* to, const hkpWorld* from, bool to_game)
+{
+    copy_hkp3AxisSweep(to->m_broadPhase, from->m_broadPhase, to_game);
+}
+
+hkpWorld* init_hkpWorld()
+{
+    hkpWorld* local = (hkpWorld*)malloc_(sizeof(hkpWorld));
+
+    local->m_broadPhase = init_hkp3AxisSweep();
+
+    return local;
+}
+
+void free_hkpWorld(hkpWorld* to)
+{
+    free_hkp3AxisSweep(to->m_broadPhase);
+    free(to);
+}
+
+void copy_hkp3AxisSweep(hkp3AxisSweep* to, const hkp3AxisSweep* from, bool to_game)
+{
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    if ((to->m_nodes_cap & 0x3fffffff) < from->m_nodes_len)
+    {
+        to->m_nodes_len = from->m_nodes_len;
+        if (to_game)
+        {
+            increase_list_size(Game::MemHeapAllocator, &to->m_nodes, 0x18);
+        }
+        else
+        {
+            to->m_nodes = (hkpBpNode*)realloc_(to->m_nodes, (to->m_nodes_len + 1) * sizeof(hkpBpNode));
+            to->m_nodes_cap = to->m_nodes_cap + 1;
+        }
+    }
+    for (size_t i = 0; i < to->m_nodes_len; i++)
+    {
+        copy_hkpBpNode(&to->m_nodes[i], &from->m_nodes[i], to_game);
+    }
+    copy_hkpBpAxis(&to->m_axis[0], &from->m_axis[0], to_game);
+    copy_hkpBpAxis(&to->m_axis[1], &from->m_axis[1], to_game);
+    copy_hkpBpAxis(&to->m_axis[2], &from->m_axis[2], to_game);
+    memcpy(to->data_3, from->data_3, sizeof(to->data_3));
+}
+
+hkp3AxisSweep* init_hkp3AxisSweep()
+{
+    hkp3AxisSweep* local = (hkp3AxisSweep*)malloc_(sizeof(hkp3AxisSweep));
+
+    //unknown size, init on copy
+    local->m_nodes = NULL;
+    local->m_axis[0].arry = NULL;
+    local->m_axis[1].arry = NULL;
+    local->m_axis[2].arry = NULL;
+    //always null
+    local->m_markers = NULL;
+
+    return local;
+}
+
+void free_hkp3AxisSweep(hkp3AxisSweep* to)
+{
+    free(to->m_nodes);
+    if (to->m_axis[0].arry != NULL)
+    {
+        free(to->m_axis[0].arry);
+    }
+    if (to->m_axis[1].arry != NULL)
+    {
+        free(to->m_axis[1].arry);
+    }
+    if (to->m_axis[2].arry != NULL)
+    {
+        free(to->m_axis[2].arry);
+    }
+    free(to);
+}
+
+void copy_hkpBpNode(hkpBpNode* to, const hkpBpNode* from, bool to_game)
+{
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+}
+
+void copy_hkpBpAxis(hkpBpAxis* to, const hkpBpAxis* from, bool to_game)
+{
+    if ((to->capacity & 0x3fffffff) < from->len)
+    {
+        to->len = from->len;
+        if (to_game)
+        {
+            increase_list_size(Game::MemHeapAllocator, &to->arry, 0x8);
+        }
+        else
+        {
+            to->arry = (hkpBpEndPoint*)realloc_(to->arry, (to->len + 1) * sizeof(hkpBpEndPoint));
+            to->capacity = to->capacity + 1;
+        }
+    }
+    for (size_t i = 0; i < to->len; i++)
+    {
+        copy_hkpBpEndPoint(&to->arry[i], &from->arry[i], to_game);
+    }
+}
+
+void copy_hkpBpEndPoint(hkpBpEndPoint* to, const hkpBpEndPoint* from, bool to_game)
+{
+    to->data_1 = from->data_1;
+}
+
+
 /* ---------------- CHRCTRL + DAMAGE MAN ------------------ */
 
 std::string print_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to)
@@ -20,6 +175,7 @@ void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapeP
 
     if ((to->m_properties_cap & 0x3fffffff) < from->m_properties_len)
     {
+        uint32_t old_len = to->m_properties_len;
         to->m_properties_len = from->m_properties_len;
         if (to_game)
         {
@@ -27,8 +183,12 @@ void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapeP
         }
         else
         {
-            to->m_properties = (hkpProperty*)realloc(to->m_properties, (to->m_properties_len + 1) * sizeof(hkpProperty));
-            to->m_properties_cap = to->m_properties_len + 1;
+            to->m_properties = (hkpProperty*)realloc_(to->m_properties, to->m_properties_len * sizeof(hkpProperty));
+            to->m_properties_cap = to->m_properties_len;
+        }
+        for (size_t i = old_len; i < to->m_properties_len; i++)
+        {
+            init_hkpProperty(&to->m_properties[i], to_game);
         }
     }
     for (size_t i = 0; i < from->m_properties_len; i++)
@@ -40,6 +200,7 @@ void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapeP
 
     if ((to->m_collisionDetails_cap & 0x3fffffff) < from->m_collisionDetails_len)
     {
+        uint32_t old_len = to->m_collisionDetails_len;
         to->m_collisionDetails_len = from->m_collisionDetails_len;
         if (to_game)
         {
@@ -47,8 +208,12 @@ void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapeP
         }
         else
         {
-            to->m_collisionDetails = (hkpCollidable**)realloc(to->m_collisionDetails, (to->m_collisionDetails_len + 1) * sizeof(hkpCollidable*));
-            to->m_collisionDetails_cap = to->m_collisionDetails_len + 1;
+            to->m_collisionDetails = (hkpCollidable**)realloc_(to->m_collisionDetails, to->m_collisionDetails_len * sizeof(hkpCollidable*));
+            to->m_collisionDetails_cap = to->m_collisionDetails_len;
+        }
+        for (size_t i = old_len; i < to->m_collisionDetails_len; i++)
+        {
+            init_hkpCollidable(&to->m_collisionDetails[i], to_game);
         }
     }
     for (size_t i = 0; i < from->m_collisionDetails_len; i++)
@@ -97,7 +262,15 @@ void free_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to)
     free(to->m_collidable.base.m_boundingVolumeData.m_childShapeAabbs);
     free(to->m_collidable.base.m_boundingVolumeData.m_childShapeKeys);
     free(to->m_collidable.m_collisionEntries);
+    for (size_t i = 0; i < to->m_properties_len; i++)
+    {
+        free_hkpProperty(&to->m_properties[i]);
+    }
     free(to->m_properties);
+    for (size_t i = 0; i < to->m_collisionDetails_len; i++)
+    {
+        free_hkpCollidable(to->m_collisionDetails[i]);
+    }
     free(to->m_collisionDetails);
     free(to);
 }
@@ -106,23 +279,28 @@ void free_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to)
 void copy_hkpLinkedCollidable(hkpLinkedCollidable* to, const hkpLinkedCollidable* from, bool to_game)
 {
     copy_hkpCollidable(&to->base, &from->base, to_game);
-    if ((to->m_collisionEntries_cap & 0x3fffffff) < from->m_collisionEntries_len)
-    {
-        to->m_collisionEntries_len = from->m_collisionEntries_len;
-        if (to_game)
-        {
-            increase_list_size(Game::MemHeapAllocator, &to->m_collisionEntries, 0x10);
-        }
-        else
-        {
-            to->m_collisionEntries = (CollisionEntry*)realloc(to->m_collisionEntries, (to->m_collisionEntries_len + 1) * sizeof(CollisionEntry));
-            to->m_collisionEntries_cap = to->m_collisionEntries_len + 1;
-        }
-    }
     if (from->m_collisionEntries_len > 0)
     {
-        FATALERROR("testing hkpLinkedCollidable");
+        FATALERROR("hkpLinkedCollidable->m_collisionEntries_len > 0");
     }
+    //if ((to->m_collisionEntries_cap & 0x3fffffff) < from->m_collisionEntries_len)
+    //{
+    //    uint32_t old_len = to->m_collisionEntries_len;
+    //    to->m_collisionEntries_len = from->m_collisionEntries_len;
+    //    if (to_game)
+    //    {
+    //        increase_list_size(Game::MemHeapAllocator, &to->m_collisionEntries, 0x10);
+    //    }
+    //    else
+    //    {
+    //        to->m_collisionEntries = (CollisionEntry*)realloc_(to->m_collisionEntries, to->m_collisionEntries_len * sizeof(CollisionEntry));
+    //        to->m_collisionEntries_cap = to->m_collisionEntries_len + 1;
+    //    }
+    //    for (size_t i = old_len; i < to->m_collisionEntries_len; i++)
+    //    {
+    //        init_CollisionEntry(&to->m_collisionEntries[i], to_game);
+    //    }
+    //}
     //for (size_t i = 0; i < from->m_collisionEntries_len; i++)
     //{
     //    copy_CollisionEntry(&to->m_collisionEntries[i], &from->m_collisionEntries[i], to);
@@ -134,9 +312,19 @@ void copy_hkpProperty(hkpProperty* to, hkpProperty* from, bool to_game)
 {
     to->key = from->key;
     to->padding = from->padding;
-    copy_hkpCharacterProxy(to->data, from->data, to_game);
+    to->data = from->data;
+    //copy_hkpCharacterProxy(to->data, from->data, to_game);
 }
 
+void init_hkpProperty(hkpProperty* to, bool to_game)
+{
+    //to->data = init_hkpCharacterProxy(to_game);
+}
+
+void free_hkpProperty(hkpProperty* to)
+{
+    //free_hkpCharacterProxy(to->data);
+}
 
 void copy_hkMotionState(hkMotionState* to, const hkMotionState* from)
 {
@@ -146,23 +334,35 @@ void copy_hkMotionState(hkMotionState* to, const hkMotionState* from)
 
 void copy_hkpCollidable(hkpCollidable* to, const hkpCollidable* from, bool to_game)
 {
-    if (hkpShape_isSphere(from->m_sph_shape))
+    switch (hkpShape_getType(from->base_shape))
     {
+    case ShapeType::Sphere:
         //if this proves to be an issue, we need to destruct the shape here
-        if (to_game && !hkpShape_isSphere(to->m_sph_shape))
+        if (to_game && hkpShape_getType(to->base_shape) != ShapeType::Sphere)
         {
-            FATALERROR("Game has non-sphere collidable, we expected sphere");
+            FATALERROR("Game has mismatched collidable, we expected Sphere");
         }
         copy_hkpSphereShape(&to->m_sph_shape, (hkpSphereShape**)&from->m_sph_shape, to_game);
-    }
-    else
-    {
-        if (to_game && hkpShape_isSphere(to->m_sph_shape))
+        break;
+    case ShapeType::Capsule:
+        if (to_game && hkpShape_getType(to->base_shape) != ShapeType::Capsule)
         {
-            FATALERROR("Game has sphere collidable, we expected non-sphere");
+            FATALERROR("Game has mismatched collidable, we expected Capsule");
         }
         copy_hkpCapsuleShape(&to->m_cap_shape, (hkpCapsuleShape**)&from->m_cap_shape, to_game);
+        break;
+    case ShapeType::MoppBvTree:
+        if (to_game && hkpShape_getType(to->base_shape) != ShapeType::MoppBvTree)
+        {
+            FATALERROR("Game has mismatched collidable, we expected MoppBvTree");
+        }
+        copy_hkpMoppBvTreeShape(&to->m_tree_shape, (hkpMoppBvTreeShape**)&from->m_tree_shape, to_game);
+        break;
+    case ShapeType::InvalidShape:
+        FATALERROR("%p is not a valid shape (vtable %llx)", from->base_shape, *(uint64_t*)from->base_shape);
+        break;
     }
+
     to->m_shapeKey = from->m_shapeKey;
     to->m_ownerOffset = from->m_ownerOffset;
     to->m_forceCollideOntoPpu = from->m_forceCollideOntoPpu;
@@ -170,6 +370,43 @@ void copy_hkpCollidable(hkpCollidable* to, const hkpCollidable* from, bool to_ga
     copy_hkpTypedBroadPhaseHandle(&to->m_broadPhaseHandle, &from->m_broadPhaseHandle);
     copy_BoundingVolumeData(&to->m_boundingVolumeData, &from->m_boundingVolumeData, to_game);
     to->m_allowedPenetrationDepth = from->m_allowedPenetrationDepth;
+}
+
+void init_hkpCollidable(hkpCollidable** to, bool to_game)
+{
+    if (!to_game)
+    {
+        *to = (hkpCollidable*)malloc_(sizeof(hkpCollidable));
+    }
+    else
+    {
+        //TODO how does the game alloc this?
+        FATALERROR("Need to alloc hkpCollidable in game");
+    }
+    //unknown, init on copy
+    (*to)->base_shape = NULL;
+    (*to)->self = (*to);
+    init_BoundingVolumeData(&(*to)->m_boundingVolumeData, to_game);
+}
+
+void free_hkpCollidable(hkpCollidable* to)
+{
+    switch (hkpShape_getType(to->base_shape))
+    {
+    case ShapeType::Sphere:
+        free_hkpSphereShape(to->m_sph_shape, false);
+        break;
+    case ShapeType::Capsule:
+        free_hkpCapsuleShape(to->m_cap_shape, false);
+        break;
+    case ShapeType::MoppBvTree:
+        free_hkpMoppBvTreeShape(to->m_tree_shape, false);
+        break;
+    default:
+        break;
+    }
+    free_BoundingVolumeData(&to->m_boundingVolumeData, false);
+    free(to);
 }
 
 
@@ -204,8 +441,8 @@ void copy_BoundingVolumeData(BoundingVolumeData* to, const BoundingVolumeData* f
     //    }
     //    else
     //    {
-    //        to->m_childShapeAabbs = (hkAabbUint32*)realloc(to->m_childShapeAabbs, (to->m_numChildShapeAabbs + 1) * sizeof(hkAabbUint32));
-    //        to->m_childShapeKeys = (uint32_t*)realloc(to->m_childShapeKeys, (to->m_numChildShapeAabbs + 1) * sizeof(uint32_t));
+    //        to->m_childShapeAabbs = (hkAabbUint32*)realloc_(to->m_childShapeAabbs, (to->m_numChildShapeAabbs + 1) * sizeof(hkAabbUint32));
+    //        to->m_childShapeKeys = (uint32_t*)realloc_(to->m_childShapeKeys, (to->m_numChildShapeAabbs + 1) * sizeof(uint32_t));
     //        to->m_capacityChildShapeAabbs = to->m_numChildShapeAabbs + 1;
     //    }
     //}
@@ -216,6 +453,30 @@ void copy_BoundingVolumeData(BoundingVolumeData* to, const BoundingVolumeData* f
     //}
 }
 
+void init_BoundingVolumeData(BoundingVolumeData* to, bool to_game)
+{
+    if (!to_game)
+    {
+        //init on copy
+    }
+    else
+    {
+        FATALERROR("In-game alloc of BoundingVolumeData");
+    }
+}
+
+void free_BoundingVolumeData(BoundingVolumeData* to, bool to_game)
+{
+    if (!to_game)
+    {
+        free(to->m_childShapeAabbs);
+        free(to->m_childShapeKeys);
+    }
+    else
+    {
+        FATALERROR("In-game free of BoundingVolumeData");
+    }
+}
 
 //void copy_hkpAgentNnEntry(hkpAgentNnEntry* to, hkpAgentNnEntry* from)
 //{
@@ -223,15 +484,21 @@ void copy_BoundingVolumeData(BoundingVolumeData* to, const BoundingVolumeData* f
 //}
 
 
-bool hkpShape_isSphere(hkpSphereShape* to)
+ShapeType hkpShape_getType(void* to)
 {
-    bool sphere = *((uint32_t*)(((uint64_t)to) + 0x10)) == 0x400;
-    bool capsule = *((uint32_t*)(((uint64_t)to) + 0x10)) == 0x404;
-    if (!sphere && !capsule)
+    if (*(uint64_t*)(to) == 0x14141c200) //hkpSphereShape::vftable
     {
-        FATALERROR("%p is not a shape", to);
+        return ShapeType::Sphere;
     }
-    return sphere;
+    if (*(uint64_t*)(to) == 0x14141bf58) //hkpCapsuleShape::vftable
+    {
+        return ShapeType::Capsule;
+    }
+    if (*(uint64_t*)(to) == 0x14141bd68) //hkpMoppBvTreeShape::vftable
+    {
+        return ShapeType::MoppBvTree;
+    }
+    return ShapeType::InvalidShape;
 }
 
 void copy_hkpSphereShape(hkpSphereShape** to, hkpSphereShape** from, bool to_game)
@@ -247,6 +514,7 @@ void copy_hkpSphereShape(hkpSphereShape** to, hkpSphereShape** from, bool to_gam
     }
     if (*to != NULL && *from != NULL)
     {
+        (*to)->vtable = (*from)->vtable;
         memcpy((*to)->data_0, (*from)->data_0, sizeof((*to)->data_0));
     }
 }
@@ -291,6 +559,7 @@ void copy_hkpCapsuleShape(hkpCapsuleShape** to, hkpCapsuleShape** from, bool to_
     }
     if (*to != NULL && *from != NULL)
     {
+        (*to)->vtable = (*from)->vtable;
         memcpy((*to)->data_0, (*from)->data_0, sizeof((*to)->data_0));
     }
 }
@@ -321,6 +590,63 @@ void free_hkpCapsuleShape(hkpCapsuleShape* to, bool to_game)
     }
 }
 
+void copy_hkpMoppBvTreeShape(hkpMoppBvTreeShape** to, hkpMoppBvTreeShape** from, bool to_game)
+{
+    if (*to == NULL && *from != NULL)
+    {
+        *to = init_hkpMoppBvTreeShape(to_game);
+    }
+    if (*to != NULL && *from == NULL)
+    {
+        free_hkpMoppBvTreeShape(*to, to_game);
+        *to = NULL;
+    }
+    if (*to != NULL && *from != NULL)
+    {
+        (*to)->vtable1 = (*from)->vtable1;
+        memcpy((*to)->data_0, (*from)->data_0, sizeof((*to)->data_0));
+        if ((*from)->unk1 != 0)
+        {
+            FATALERROR("hkpMoppBvTreeShape->unk1 is non-0, value %x", (*from)->unk1);
+        }
+        (*to)->unk1 = (*from)->unk1;
+        (*to)->data_1 = (*from)->data_1;
+        //refobject1
+        (*to)->unk2 = (*from)->unk2;
+        memcpy((*to)->data_2, (*from)->data_2, sizeof((*to)->data_2));
+        (*to)->vtable2 = (*from)->vtable2;
+        //refobject2
+        memcpy((*to)->data_3, (*from)->data_3, sizeof((*to)->data_3));
+
+    }
+}
+
+hkpMoppBvTreeShape* init_hkpMoppBvTreeShape(bool to_game)
+{
+    hkpMoppBvTreeShape* local;
+    if (to_game)
+    {
+        local = (hkpMoppBvTreeShape*)Game::thread_malloc(sizeof(hkpMoppBvTreeShape));
+    }
+    else
+    {
+        local = (hkpMoppBvTreeShape*)malloc_(sizeof(hkpMoppBvTreeShape));
+    }
+    return local;
+}
+
+void free_hkpMoppBvTreeShape(hkpMoppBvTreeShape* to, bool to_game)
+{
+    if (to_game)
+    {
+        hkReferencedObject_deref(to->refObject1);
+        hkReferencedObject_deref(to->refObject2);
+    }
+    else
+    {
+        free(to);
+    }
+}
 
 /* ---------------- CHRCTRL ------------------ */
 
@@ -368,13 +694,20 @@ void copy_hkpCharacterProxy(hkpCharacterProxy* to, const hkpCharacterProxy* from
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
 }
 
-hkpCharacterProxy* init_hkpCharacterProxy()
+hkpCharacterProxy* init_hkpCharacterProxy(bool to_game)
 {
-    hkpCharacterProxy* local_hkpCharacterProxy = (hkpCharacterProxy*)malloc_(sizeof(hkpCharacterProxy));
+    if (!to_game)
+    {
+        hkpCharacterProxy* local_hkpCharacterProxy = (hkpCharacterProxy*)malloc_(sizeof(hkpCharacterProxy));
 
-    local_hkpCharacterProxy->HkpSimpleShapePhantom = init_hkpSimpleShapePhantom();
+        local_hkpCharacterProxy->HkpSimpleShapePhantom = init_hkpSimpleShapePhantom();
 
-    return local_hkpCharacterProxy;
+        return local_hkpCharacterProxy;
+    }
+    else
+    {
+        FATALERROR("in-game alloc hkpCharacterProxy");
+    }
 }
 
 void free_hkpCharacterProxy(hkpCharacterProxy* to)

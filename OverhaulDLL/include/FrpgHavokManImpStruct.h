@@ -11,10 +11,13 @@
 typedef struct FrpgHavokManImp FrpgHavokManImp;
 typedef struct FrpgPhysWorld FrpgPhysWorld;
 typedef struct hkpWorld hkpWorld;
-typedef struct hkpSimulationIsland hkpSimulationIsland;
-typedef struct hkpEntity hkpEntity;
+typedef struct hkp3AxisSweep hkp3AxisSweep;
+typedef struct hkpBpNode hkpBpNode;
+typedef struct hkpBpAxis hkpBpAxis;
+typedef struct hkpBpEndPoint hkpBpEndPoint;
 typedef struct hkpSphereShape hkpSphereShape;
 typedef struct hkpCapsuleShape hkpCapsuleShape;
+typedef struct hkpMoppBvTreeShape hkpMoppBvTreeShape;
 typedef struct hkpSimpleShapePhantom hkpSimpleShapePhantom;
 typedef struct hkpCollidable hkpCollidable;
 typedef struct hkMotionState hkMotionState;
@@ -31,7 +34,8 @@ typedef struct hkpRigidBody hkpRigidBody;
 typedef struct hkpCharacterProxy hkpCharacterProxy;
 typedef struct ChrInsProxyListener ChrInsProxyListener;
 
-#if 0
+/* ---------------- HAVOK MAN ------------------ */
+
 struct FrpgHavokManImp
 {
     void* vtable;
@@ -53,40 +57,60 @@ static_assert(offsetof(FrpgPhysWorld, _hkpWorld) == 0x8);
 struct hkpWorld
 {
     void* vtable;
-    uint8_t _[0x38];
-    hkpSimulationIsland**   m_activeSimulationIslands;
-    uint32_t m_activeSimulationIslands_size;
-    uint32_t m_activeSimulationIslands_cap;
-    hkpSimulationIsland**   m_inactiveSimulationIslands;
-    uint32_t m_inactiveSimulationIslands_size;
-    uint32_t m_inactiveSimulationIslands_cap;
+    uint8_t _[0x80];
+    hkp3AxisSweep* m_broadPhase; //DSR always uses a hkp3AxisSweep broadPhase
 };
-static_assert(offsetof(hkpWorld, m_activeSimulationIslands) == 0x40);
-static_assert(offsetof(hkpWorld, m_inactiveSimulationIslands) == 0x50);
+static_assert(offsetof(hkpWorld, m_broadPhase) == 0x88);
 //static_assert(sizeof(hkpWorld) == 0x30);
 
-struct hkpSimulationIsland
+struct hkpBpNode
 {
-    void* vtable;
-    uint8_t _[0x40];
-    void** m_actions;
-    uint32_t m_actions_size;
-    uint32_t m_actions_cap;
-    uint8_t _2[8];
-    hkpEntity** m_entities;
-    uint32_t m_entities_size;
-    uint32_t m_entities_cap;
+    uint8_t data_1[0x18];
 };
-static_assert(offsetof(hkpSimulationIsland, m_actions) == 0x48);
-static_assert(offsetof(hkpSimulationIsland, m_entities) == 0x60);
-//static_assert(sizeof(hkpSimulationIsland) == 0x30);
+static_assert(sizeof(hkpBpNode) == 0x18);
 
-struct hkpEntity
+struct hkpBpAxis
+{
+    hkpBpEndPoint* arry;
+    uint32_t len;
+    uint32_t capacity;
+};
+static_assert(sizeof(hkpBpAxis) == 0x10);
+
+struct hkpBpEndPoint
+{
+    uint64_t data_1;
+};
+static_assert(sizeof(hkpBpEndPoint) == 0x8);
+
+struct hkp3AxisSweep
 {
     void* vtable;
-    
+    uint8_t data_1[0x10];
+    uint8_t m_multiThreadCheck[0x10]; //nosave
+    void* m_criticalSection; //nosave
+    uint8_t data_2[0x80];
+    hkpBpNode* m_nodes;
+    uint32_t m_nodes_len;
+    uint32_t m_nodes_cap;
+    hkpBpAxis m_axis[3];
+    //game does not use markers, always 0/null
+    uint32_t m_numMarkers;
+    uint32_t m_ld2NumMarkers;
+    void* m_markers;
+    uint8_t data_3[0x10];
 };
-#endif
+static_assert(offsetof(hkp3AxisSweep, data_1) == 0x8);
+static_assert(offsetof(hkp3AxisSweep, m_multiThreadCheck) == 0x18);
+static_assert(offsetof(hkp3AxisSweep, m_criticalSection) == 0x28);
+static_assert(offsetof(hkp3AxisSweep, data_2) == 0x30);
+static_assert(offsetof(hkp3AxisSweep, m_nodes) == 0xb0);
+static_assert(offsetof(hkp3AxisSweep, m_axis) == 0xc0);
+static_assert(offsetof(hkp3AxisSweep, m_numMarkers) == 0xf0);
+static_assert(offsetof(hkp3AxisSweep, m_markers) == 0xf8);
+static_assert(offsetof(hkp3AxisSweep, data_3) == 0x100);
+static_assert(sizeof(hkp3AxisSweep) == 0x110);
+
 
 /* ---------------- CHRCTRL + DAMAGE MAN ------------------ */
 
@@ -103,6 +127,25 @@ struct hkpSphereShape
     uint8_t data_0[0x30];
 };
 static_assert(sizeof(hkpSphereShape) == 0x38);
+
+struct hkpMoppBvTreeShape
+{
+    uint64_t vtable1;
+    uint8_t data_0[0x10];
+    uint64_t unk1; //always 0?
+    uint64_t data_1;
+    void* refObject1;
+    void* unk2;
+    uint8_t data_2[0x18];
+    uint64_t vtable2;
+    void* refObject2;
+    uint8_t data_3[0x10];
+};
+static_assert(sizeof(hkpMoppBvTreeShape) == 0x70);
+static_assert(offsetof(hkpMoppBvTreeShape, refObject1) == 0x28);
+static_assert(offsetof(hkpMoppBvTreeShape, unk2) == 0x30);
+static_assert(offsetof(hkpMoppBvTreeShape, vtable2) == 0x50);
+static_assert(offsetof(hkpMoppBvTreeShape, refObject2) == 0x50+0x8);
 
 struct hkpContactMgr
 {
@@ -181,8 +224,10 @@ struct hkpCollidable
 {
     union
     {
+        void* base_shape;
         hkpCapsuleShape* m_cap_shape;
         hkpSphereShape* m_sph_shape;
+        hkpMoppBvTreeShape* m_tree_shape;
     };
     uint32_t m_shapeKey;
     uint32_t padding1;
@@ -221,7 +266,7 @@ struct hkpProperty
 {
     uint32_t key;
     uint32_t padding;
-    hkpCharacterProxy* data;
+    void* data; //this is just a pointer back to the parent hkpCharacterProxy??
 };
 
 struct hkMotionState
