@@ -34,7 +34,6 @@ std::set<std::wstring> Files::files_to_intercept_loading_legacy = {
 
 //These don't have any edits, just additions to support changes
 std::set<std::wstring> Files::files_to_always_intercept_loading = {
-    L"frpg_sfxbnd_commoneffects.ffxbnd.dcx",
     L"fdlc_main.fev",
     L"fdlc_main.fsb",
     L"item.msgbnd.dcx",
