@@ -249,9 +249,33 @@ void ModNetworking::start()
     sp::mem::code::x64::inject_jmp_14b(write_address, &Start_SessionDisconnect_Task_injection_return, 1, &Start_SessionDisconnect_Task_injection);
 }
 
+#include "StackWalker.h"
+
+class MyStackWalker : public StackWalker
+{
+public:
+    MyStackWalker() : StackWalker() {}
+    std::string GetOutput()
+    {
+        std::string output(output_text);
+        output_text.clear();
+        return output;
+    }
+protected:
+    std::string output_text;
+    virtual void OnOutput(LPCSTR szText)
+    {
+        output_text.append(szText);
+    }
+};
+
 void Start_SessionDisconnect_Task_injection_helper(uint32_t reason)
 {
+    MyStackWalker sw;
+    sw.ShowCallstack(); //This interally calls OnOutput, which we overwrite to only save the output
+    std::string stack_info = sw.GetOutput(); // Get the saved output
     ConsoleWrite("Session disconnection. Reason: %llx", reason);
+    ConsoleWrite("DEBUG info: %s", stack_info.c_str());
 }
 
 /*
