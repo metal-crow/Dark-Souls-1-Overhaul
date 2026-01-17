@@ -356,27 +356,29 @@ void copy_hkMotionState(hkMotionState* to, const hkMotionState* from)
 
 void copy_hkpCollidable(hkpCollidable* to, const hkpCollidable* from, StateTarget target)
 {
-    switch (hkpShape_getType(from->base_shape))
+    ShapeType fromshape = hkpShape_getType(from->base_shape);
+    ShapeType toshape = hkpShape_getType(to->base_shape);
+    switch (fromshape)
     {
     case ShapeType::Sphere:
         //if this proves to be an issue, we need to destruct the shape here
-        if (target == StateTarget::ToGame && hkpShape_getType(to->base_shape) != ShapeType::Sphere)
+        if (target == StateTarget::ToGame && toshape != fromshape)
         {
-            FATALERROR("Game has mismatched collidable, we expected Sphere");
+            FATALERROR("Game has mismatched collidable, we have a Sphere and got %d (%llx)", toshape, *(uint64_t*)to->base_shape);
         }
         copy_hkpSphereShape(&to->m_sph_shape, (hkpSphereShape**)&from->m_sph_shape, target);
         break;
     case ShapeType::Capsule:
-        if (target == StateTarget::ToGame && hkpShape_getType(to->base_shape) != ShapeType::Capsule)
+        if (target == StateTarget::ToGame && toshape != fromshape)
         {
-            FATALERROR("Game has mismatched collidable, we expected Capsule");
+            FATALERROR("Game has mismatched collidable, we have a Capsule and got %d (%llx)", toshape, *(uint64_t*)to->base_shape);
         }
         copy_hkpCapsuleShape(&to->m_cap_shape, (hkpCapsuleShape**)&from->m_cap_shape, target);
         break;
     case ShapeType::MoppBvTree:
-        if (target == StateTarget::ToGame && hkpShape_getType(to->base_shape) != ShapeType::MoppBvTree)
+        if (target == StateTarget::ToGame && toshape != fromshape)
         {
-            FATALERROR("Game has mismatched collidable, we expected MoppBvTree");
+            FATALERROR("Game has mismatched collidable, we have a MoppBvTree and got %d (%llx)", toshape, *(uint64_t*)to->base_shape);
         }
         copy_hkpMoppBvTreeShape(&to->m_tree_shape, (hkpMoppBvTreeShape**)&from->m_tree_shape, target);
         break;
