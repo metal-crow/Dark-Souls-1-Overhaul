@@ -1,6 +1,5 @@
 #include "GameData.h"
 #include "SfxManStructFunctions.h"
-#include "Rollback.h"
 
 std::string print_SfxMan(SfxMan* to)
 {
@@ -15,9 +14,9 @@ std::string print_SfxMan(SfxMan* to)
     return out;
 }
 
-void copy_SfxMan(SfxMan* to, SfxMan* from, bool to_game)
+void copy_SfxMan(SfxMan* to, SfxMan* from, StateTarget target)
 {
-    copy_frpgFxManagerBase(to->FrpgFxManagerBase, from->FrpgFxManagerBase, to_game);
+    copy_frpgFxManagerBase(to->FrpgFxManagerBase, from->FrpgFxManagerBase, target);
 }
 
 SfxMan* init_SfxMan()
@@ -48,9 +47,9 @@ std::string print_frpgFxManagerBase(frpgFxManagerBase* to)
     return out;
 }
 
-void copy_frpgFxManagerBase(frpgFxManagerBase* to, frpgFxManagerBase* from, bool to_game)
+void copy_frpgFxManagerBase(frpgFxManagerBase* to, frpgFxManagerBase* from, StateTarget target)
 {
-    copy_FXManager(to->base.fXManager, from->base.fXManager, to_game);
+    copy_FXManager(to->base.fXManager, from->base.fXManager, target);
 }
 
 frpgFxManagerBase* init_frpgFxManagerBase()
@@ -81,12 +80,12 @@ std::string print_FXManager(FXManager* to)
     return out;
 }
 
-void copy_FXManager(FXManager* to, FXManager* from, bool to_game)
+void copy_FXManager(FXManager* to, FXManager* from, StateTarget target)
 {
     Game::SuspendThreads();
 
-    copy_SFXEntryList(to->SFXEntryList, from->SFXEntryList, to_game, to, from);
-    //copy_FXEntry_Substruct(to->unk, from->unk, to_game, to);
+    copy_SFXEntryList(to->SFXEntryList, from->SFXEntryList, target, to, from);
+    //copy_FXEntry_Substruct(to->unk, from->unk, target, to);
 
     Game::ResumeThreads();
 }
@@ -123,9 +122,9 @@ std::string print_SFXEntryList(SFXEntry* to)
     return out;
 }
 
-void copy_SFXEntryList(SFXEntry* to, SFXEntry* from, bool to_game, FXManager* to_parent, FXManager* from_parent)
+void copy_SFXEntryList(SFXEntry* to, SFXEntry* from, StateTarget target, FXManager* to_parent, FXManager* from_parent)
 {
-    if (!to_game)
+    if (target != StateTarget::ToGame)
     {
         size_t to_index = 0;
         while (from)
@@ -135,7 +134,7 @@ void copy_SFXEntryList(SFXEntry* to, SFXEntry* from, bool to_game, FXManager* to
                 ConsoleWrite("Unable to recursivly copy SFXEntry from the game. Out of space.");
                 break;
             }
-            copy_SFXEntry(to, from, to_game);
+            copy_SFXEntry(to, from, target);
 
             //if we reach the tail here, we're at the last valid entry. The next ptr should be null anyway, but just to be safe
             if (from == from_parent->SFXEntryList_tail)
@@ -208,7 +207,7 @@ void copy_SFXEntryList(SFXEntry* to, SFXEntry* from, bool to_game, FXManager* to
         to = to_parent->SFXEntryList;
         while (from)
         {
-            copy_SFXEntry(to, from, to_game);
+            copy_SFXEntry(to, from, target);
             to->parent = to_parent;
 
             // last valid entry failsafe
@@ -225,7 +224,7 @@ void copy_SFXEntryList(SFXEntry* to, SFXEntry* from, bool to_game, FXManager* to
     }
 }
 
-void copy_SFXEntry(SFXEntry* to, SFXEntry* from, bool to_game)
+void copy_SFXEntry(SFXEntry* to, SFXEntry* from, StateTarget target)
 {
     to->vtable = 0x14151c278;
     to->field0x8 = NULL;
@@ -238,7 +237,7 @@ void copy_SFXEntry(SFXEntry* to, SFXEntry* from, bool to_game)
     {
         if (to->field0x48_head == NULL)
         {
-            if (to_game)
+            if (target == StateTarget::ToGame)
             {
                 to->field0x48_head = (FXEntry_Substruct*)Game::game_smallObject_malloc(*HeapPtr, sizeof(FXEntry_Substruct), 8);
             }
@@ -247,7 +246,7 @@ void copy_SFXEntry(SFXEntry* to, SFXEntry* from, bool to_game)
                 to->field0x48_head = init_FXEntry_Substruct();
             }
         }
-        copy_FXEntry_Substruct(to->field0x48_head, from->field0x48_head, to_game, to);
+        copy_FXEntry_Substruct(to->field0x48_head, from->field0x48_head, target, to);
         FXEntry_Substruct* tail = to->field0x48_head;
         while (tail->next != NULL)
         {
@@ -257,7 +256,7 @@ void copy_SFXEntry(SFXEntry* to, SFXEntry* from, bool to_game)
     }
     else if (from->field0x48_head == NULL && to->field0x48_head != NULL)
     {
-        if (to_game)
+        if (target == StateTarget::ToGame)
         {
             smallObject_internal_dealloc(*HeapPtr, to->field0x48_head, sizeof(FXEntry_Substruct), 8);
         }
@@ -347,15 +346,15 @@ std::string print_FXEntry_Substruct(FXEntry_Substruct* to)
     return out;
 }
 
-void copy_FXEntry_Substruct(FXEntry_Substruct* to, FXEntry_Substruct* from, bool to_game, SFXEntry* parent)
+void copy_FXEntry_Substruct(FXEntry_Substruct* to, FXEntry_Substruct* from, StateTarget target, SFXEntry* parent)
 {
-    copy_FXEntry_Substruct_Obj(to, from, to_game, parent);
+    copy_FXEntry_Substruct_Obj(to, from, target, parent);
 
     if (from->linked != NULL)
     {
         if (to->linked == NULL)
         {
-            if (to_game)
+            if (target == StateTarget::ToGame)
             {
                 to->linked = (FXEntry_Substruct*)Game::game_smallObject_malloc(*HeapPtr, sizeof(FXEntry_Substruct), 8);
             }
@@ -364,13 +363,13 @@ void copy_FXEntry_Substruct(FXEntry_Substruct* to, FXEntry_Substruct* from, bool
                 to->linked = init_FXEntry_Substruct();
             }
         }
-        copy_FXEntry_Substruct(to->linked, from->linked, to_game, parent);
+        copy_FXEntry_Substruct(to->linked, from->linked, target, parent);
     }
     if (from->linked == NULL)
     {
         if (to->linked != NULL)
         {
-            if (to_game)
+            if (target == StateTarget::ToGame)
             {
                 FXEntry_Substruct_internal_dealloc(*HeapPtr, to->linked, sizeof(FXEntry_Substruct));
             }
@@ -386,7 +385,7 @@ void copy_FXEntry_Substruct(FXEntry_Substruct* to, FXEntry_Substruct* from, bool
     {
         if (to->next == NULL)
         {
-            if (to_game)
+            if (target == StateTarget::ToGame)
             {
                 to->next = (FXEntry_Substruct*)Game::game_smallObject_malloc(*HeapPtr, sizeof(FXEntry_Substruct), 8);
             }
@@ -395,13 +394,13 @@ void copy_FXEntry_Substruct(FXEntry_Substruct* to, FXEntry_Substruct* from, bool
                 to->next = init_FXEntry_Substruct();
             }
         }
-        copy_FXEntry_Substruct(to->next, from->next, to_game, parent);
+        copy_FXEntry_Substruct(to->next, from->next, target, parent);
     }
     if (from->next == NULL)
     {
         if (to->next != NULL)
         {
-            if (to_game)
+            if (target == StateTarget::ToGame)
             {
                 FXEntry_Substruct_internal_dealloc(*HeapPtr, to->next, sizeof(FXEntry_Substruct));
             }
@@ -414,7 +413,7 @@ void copy_FXEntry_Substruct(FXEntry_Substruct* to, FXEntry_Substruct* from, bool
     }
 }
 
-void copy_FXEntry_Substruct_Obj(FXEntry_Substruct* to, FXEntry_Substruct* from, bool to_game, SFXEntry* parent)
+void copy_FXEntry_Substruct_Obj(FXEntry_Substruct* to, FXEntry_Substruct* from, StateTarget target, SFXEntry* parent)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     to->self_substruct2 = (uint64_t)to + 0xe0;

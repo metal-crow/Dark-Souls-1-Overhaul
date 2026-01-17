@@ -1,14 +1,13 @@
 #include "ThrowManStructFunctions.h"
-#include "Rollback.h"
 
 static const size_t ThrowRequestQueueCapacity = 5;
 
-void copy_ThrowMan(ThrowMan* to, ThrowMan* from, bool to_game)
+void copy_ThrowMan(ThrowMan* to, ThrowMan* from, StateTarget target)
 {
     size_t from_len = from->throw_request_queue_cur - from->throw_request_queue_start;
     size_t to_len = to->throw_request_queue_cur - to->throw_request_queue_start;
 
-    if (!to_game)
+    if (target != StateTarget::ToGame)
     {
         if (from_len > ThrowRequestQueueCapacity)
         {
@@ -38,7 +37,7 @@ void copy_ThrowMan(ThrowMan* to, ThrowMan* from, bool to_game)
 
     for(size_t i=0;i<to_len;i++)
     {
-        copy_ThrowRequestedEntry(to->throw_request_queue_start[i], from->throw_request_queue_start[i], to_game);
+        copy_ThrowRequestedEntry(to->throw_request_queue_start[i], from->throw_request_queue_start[i], target);
     }
     to->throw_request_queue_cur = &to->throw_request_queue_start[to_len];
 
@@ -73,7 +72,7 @@ void free_ThrowMan(ThrowMan* to)
     free(to);
 }
 
-void copy_ThrowRequestedEntry(ThrowRequestedEntry* to, ThrowRequestedEntry* from, bool to_game)
+void copy_ThrowRequestedEntry(ThrowRequestedEntry* to, ThrowRequestedEntry* from, StateTarget target)
 {
     to->attacker = from->attacker;
     to->defender = from->defender;

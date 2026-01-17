@@ -2,6 +2,7 @@
 #include "Rollback.h"
 #include "AttachSysSlotStructsFunctions.h"
 #include "FrpgHavokManImpStructFunctions.h"
+#include "PadManipulatorStructFunctions.h"
 
 typedef void* falloc(uint64_t, uint64_t, uint32_t);
 
@@ -77,26 +78,26 @@ std::string print_PlayerIns(PlayerIns* to)
     return out;
 }
 
-void copy_PlayerIns(PlayerIns* to, const PlayerIns* from, bool to_game)
+void copy_PlayerIns(PlayerIns* to, const PlayerIns* from, StateTarget target)
 {
     Game::SuspendThreads();
 
-    copy_ChrIns(&to->chrins, &from->chrins, to_game);
+    copy_ChrIns(&to->chrins, &from->chrins, target);
     copy_PlayerGameData(to->playergamedata, from->playergamedata);
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     to->data_2 = from->data_2;
-    copy_RingEquipCtrl(to->ringequipctrl, from->ringequipctrl, to_game);
-    copy_WeaponEquipCtrl(to->weaponequipctrl, from->weaponequipctrl, to_game);
-    copy_ProEquipCtrl(to->proequipctrl, from->proequipctrl, to_game);
+    copy_RingEquipCtrl(to->ringequipctrl, from->ringequipctrl, target);
+    copy_WeaponEquipCtrl(to->weaponequipctrl, from->weaponequipctrl, target);
+    copy_ProEquipCtrl(to->proequipctrl, from->proequipctrl, target);
     to->curSelectedMagicId = from->curSelectedMagicId;
     to->curUsedItem = from->curUsedItem;
     to->override_itemId = from->override_itemId;
     to->override_equipped_magicId = from->override_equipped_magicId;
     to->using_override = from->using_override;
     copy_ChrAsm(to->chrasm, from->chrasm);
-    //copy_ChrAsmModelRes(to->chrAsmModelRes, from->chrAsmModelRes, to_game); //This is dynamically re-drawn every frame by the game
-    copy_ChrAsmModel(to->chrAsmModel, from->chrAsmModel, to_game);
+    //copy_ChrAsmModelRes(to->chrAsmModelRes, from->chrAsmModelRes, target); //This is dynamically re-drawn every frame by the game
+    copy_ChrAsmModel(to->chrAsmModel, from->chrAsmModel, target);
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
     memcpy(to->data_4, from->data_4, sizeof(to->data_4));
     memcpy(to->data_5, from->data_5, sizeof(to->data_5));
@@ -212,12 +213,12 @@ std::string print_ChrAsmModelRes(ChrAsmModelRes* to)
     return out;
 }
 
-void copy_ChrAsmModelRes(ChrAsmModelRes* to, const ChrAsmModelRes* from, bool to_game)
+void copy_ChrAsmModelRes(ChrAsmModelRes* to, const ChrAsmModelRes* from, StateTarget target)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     for (size_t i = 0; i < 14; i++)
     {
-        copy_ChrAsmModelRes_Elem(&to->arry[i], &from->arry[i], to_game);
+        copy_ChrAsmModelRes_Elem(&to->arry[i], &from->arry[i], target);
     }
 }
 
@@ -260,7 +261,7 @@ std::string print_ChrAsmModelRes_Elem(ChrAsmModelRes_Elem* to)
     return out;
 }
 
-void copy_ChrAsmModelRes_Elem(ChrAsmModelRes_Elem* to, const ChrAsmModelRes_Elem* from, bool to_game)
+void copy_ChrAsmModelRes_Elem(ChrAsmModelRes_Elem* to, const ChrAsmModelRes_Elem* from, StateTarget target)
 {
     to->data_0 = from->data_0;
     to->PartsbndFileCap2 = NULL; //this should always be null since it's just tmp storage for 1 frame
@@ -337,7 +338,7 @@ std::string print_ChrAsmModel(ChrAsmModel* to)
     return out;
 }
 
-void copy_ChrAsmModel(ChrAsmModel* to, const ChrAsmModel* from, bool to_game)
+void copy_ChrAsmModel(ChrAsmModel* to, const ChrAsmModel* from, StateTarget target)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
@@ -374,9 +375,9 @@ std::string print_ProEquipCtrl(ProEquipCtrl* to)
     return out;
 }
 
-void copy_ProEquipCtrl(ProEquipCtrl* to, const ProEquipCtrl* from, bool to_game)
+void copy_ProEquipCtrl(ProEquipCtrl* to, const ProEquipCtrl* from, StateTarget target)
 {
-    copy_SpecialEffect(to->spEffectList, from->spEffectList, to_game);
+    copy_SpecialEffect(to->spEffectList, from->spEffectList, target);
     //there should always be 5 armors (4 equip and a hair)
     if (from->array_len != 5)
     {
@@ -420,9 +421,9 @@ std::string print_WeaponEquipCtrl(WeaponEquipCtrl* to)
     return out;
 }
 
-void copy_WeaponEquipCtrl(WeaponEquipCtrl* to, const WeaponEquipCtrl* from, bool to_game)
+void copy_WeaponEquipCtrl(WeaponEquipCtrl* to, const WeaponEquipCtrl* from, StateTarget target)
 {
-    copy_SpecialEffect(to->spEffectList, from->spEffectList, to_game);
+    copy_SpecialEffect(to->spEffectList, from->spEffectList, target);
     //there should always be 2 weapons
     if (from->array_len != 2)
     {
@@ -463,9 +464,9 @@ std::string print_RingEquipCtrl(RingEquipCtrl* to)
     return out;
 }
 
-void copy_RingEquipCtrl(RingEquipCtrl* to, const RingEquipCtrl* from, bool to_game)
+void copy_RingEquipCtrl(RingEquipCtrl* to, const RingEquipCtrl* from, StateTarget target)
 {
-    copy_SpecialEffect(to->spEffectList, from->spEffectList, to_game);
+    copy_SpecialEffect(to->spEffectList, from->spEffectList, target);
     //there should always be 2 rings
     if (from->array_len != 2)
     {
@@ -784,10 +785,10 @@ std::string print_ChrIns(ChrIns* to)
     return out;
 }
 
-void copy_ChrIns(ChrIns* to, const ChrIns* from, bool to_game)
+void copy_ChrIns(ChrIns* to, const ChrIns* from, StateTarget target)
 {
     //copy_ChrIns_field0x18(to->field0x18, from->field0x18);
-    copy_PlayerCtrl(to->playerCtrl, from->playerCtrl, to_game);
+    copy_PlayerCtrl(to->playerCtrl, from->playerCtrl, target);
     copy_PadManipulator(to->padManipulator, from->padManipulator);
     to->CharaInitParamID = from->CharaInitParamID;
     memcpy(to->data_5, from->data_5, sizeof(to->data_5));
@@ -801,7 +802,7 @@ void copy_ChrIns(ChrIns* to, const ChrIns* from, bool to_game)
     to->toughnessUnk2 = from->toughnessUnk2;
     to->curSelectedMagicId = from->curSelectedMagicId;
     to->curUsedItem = from->curUsedItem;
-    copy_SpecialEffect(to->specialEffects, from->specialEffects, to_game);
+    copy_SpecialEffect(to->specialEffects, from->specialEffects, target);
     copy_QwcSpEffectEquipCtrl(to->qwcSpEffectEquipCtrl, from->qwcSpEffectEquipCtrl);
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     copy_ChrIns_field0x2c8(to->field0x2c8, from->field0x2c8);
@@ -809,7 +810,7 @@ void copy_ChrIns(ChrIns* to, const ChrIns* from, bool to_game)
     copy_HitIns(to->hitins_1, from->hitins_1);
     copy_HitIns(to->hitins_2, from->hitins_2);
     to->data_0b = from->data_0b;
-    copy_ChrAttachSys(&to->chrattachsys, &from->chrattachsys, to_game);
+    copy_ChrAttachSys(&to->chrattachsys, &from->chrattachsys, target);
     to->curHp = from->curHp;
     to->maxHp = from->maxHp;
     to->curSp = from->curSp;
@@ -823,7 +824,7 @@ void copy_ChrIns(ChrIns* to, const ChrIns* from, bool to_game)
     to->resistPlagueTotal = from->resistPlagueTotal;
     to->resistBleedingTotal = from->resistBleedingTotal;
     to->resistCurseTotal = from->resistCurseTotal;
-    copy_EntityThrowAnimationStatus(to->throw_animation_info, from->throw_animation_info, to_game);
+    copy_EntityThrowAnimationStatus(to->throw_animation_info, from->throw_animation_info, target);
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
@@ -885,27 +886,29 @@ std::string print_ChrAttachSys(ChrAttachSys* to)
     return out;
 }
 
-void copy_ChrAttachSys(ChrAttachSys* to, const ChrAttachSys* from, bool to_game)
+void copy_ChrAttachSys(ChrAttachSys* to, const ChrAttachSys* from, StateTarget target)
 {
     if (to->SysSlots != NULL && from->SysSlots != NULL)
     {
-        if (to_game)
+        switch (target)
         {
+        case StateTarget::ToGame:
             Game::game_free_alt(to->SysSlots);
-        }
-        else
-        {
+            break;
+        case StateTarget::ToLocal:
+        case StateTarget::Copy:
             free(to->SysSlots);
+            break;
         }
         to->SysSlots = NULL;
     }
     if (to->SysSlots == NULL && from->SysSlots != NULL)
     {
-        to->SysSlots = init_AttachSysSlot((AttachSysSlotType)from->SysSlots->slotType, to_game);
+        to->SysSlots = init_AttachSysSlot((AttachSysSlotType)from->SysSlots->slotType, target);
     }
     if (to->SysSlots != NULL)
     {
-        copy_AttachSysSlot(&(to->SysSlots), from->SysSlots, to_game);
+        copy_AttachSysSlot(&(to->SysSlots), from->SysSlots, target);
     }
 }
 
@@ -1036,7 +1039,7 @@ std::string print_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to)
     return out;
 }
 
-void copy_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to, const EntityThrowAnimationStatus* from, bool to_game)
+void copy_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to, const EntityThrowAnimationStatus* from, StateTarget target)
 {
     to->playerins_parent = from->playerins_parent;
     to->throw_paramdef = from->throw_paramdef;
@@ -1044,24 +1047,27 @@ void copy_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to, const Entit
 
     if (to->throwSelfEsc == NULL && from->throwSelfEsc != NULL)
     {
-        if (to_game)
-        {
+        switch (target) {
+        case StateTarget::ToGame:
             to->throwSelfEsc = (ThrowSelfEsc*)Game::game_malloc(sizeof(ThrowSelfEsc), 8, *(uint64_t*)Game::internal_heap_2);
-        }
-        else
-        {
+            break;
+        case StateTarget::ToLocal:
+        case StateTarget::Copy:
             to->throwSelfEsc = init_ThrowSelfEsc();
+            break;
         }
     }
     if (to->throwSelfEsc != NULL && from->throwSelfEsc == NULL)
     {
-        if (to_game)
+        switch (target)
         {
+        case StateTarget::ToGame:
             Game::game_free(to->throwSelfEsc);
-        }
-        else
-        {
+            break;
+        case StateTarget::ToLocal:
+        case StateTarget::Copy:
             free_ThrowSelfEsc(to->throwSelfEsc);
+            break;
         }
         to->throwSelfEsc = NULL;
     }
@@ -1207,9 +1213,9 @@ std::string print_SpecialEffect(SpecialEffect* to)
     return out;
 }
 
-void copy_SpecialEffect(SpecialEffect* to, const SpecialEffect* from, bool to_game)
+void copy_SpecialEffect(SpecialEffect* to, const SpecialEffect* from, StateTarget target)
 {
-    copy_SpecialEffect_Info(to->specialEffect_Info, from->specialEffect_Info, to_game);
+    copy_SpecialEffect_Info(to->specialEffect_Info, from->specialEffect_Info, target);
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
@@ -1269,9 +1275,9 @@ std::string print_SpecialEffect_Info(SpecialEffect_Info* to)
     return out;
 }
 
-void copy_SpecialEffect_Info(SpecialEffect_Info* to, const SpecialEffect_Info* from, bool to_game)
+void copy_SpecialEffect_Info(SpecialEffect_Info* to, const SpecialEffect_Info* from, StateTarget target)
 {
-    if (!to_game)
+    if (target != StateTarget::ToGame)
     {
         size_t to_index = 0;
         while (from)
@@ -1387,9 +1393,9 @@ std::string print_PlayerCtrl(PlayerCtrl* to)
     return out;
 }
 
-void copy_PlayerCtrl(PlayerCtrl* to, const PlayerCtrl* from, bool to_game)
+void copy_PlayerCtrl(PlayerCtrl* to, const PlayerCtrl* from, StateTarget target)
 {
-    copy_ChrCtrl(&to->chrCtrl, &from->chrCtrl, to_game);
+    copy_ChrCtrl(&to->chrCtrl, &from->chrCtrl, target);
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     copy_TurnAnim(to->turnAnim, from->turnAnim);
     copy_ArrowTurnAnim(to->arrowTurnAnim, from->arrowTurnAnim);
@@ -1656,16 +1662,16 @@ std::string print_ChrCtrl(ChrCtrl* to)
     return out;
 }
 
-void copy_ChrCtrl(ChrCtrl* to, const ChrCtrl* from, bool to_game)
+void copy_ChrCtrl(ChrCtrl* to, const ChrCtrl* from, StateTarget target)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-    copy_ChrCtrl_AnimationQueue(to->animationQueue, from->animationQueue, to_game);
+    copy_ChrCtrl_AnimationQueue(to->animationQueue, from->animationQueue, target);
     copy_AnimationMediator(to->animationMediator, from->animationMediator);
-    copy_HavokChara(to->havokChara, from->havokChara, to_game);
-    copy_ActionCtrl(to->actionctrl, from->actionctrl, to_game);
+    copy_HavokChara(to->havokChara, from->havokChara, target);
+    copy_ActionCtrl(to->actionctrl, from->actionctrl, target);
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
-    copy_WalkAnim_Twist(to->walkAnim_Twist, from->walkAnim_Twist, to_game);
+    copy_WalkAnim_Twist(to->walkAnim_Twist, from->walkAnim_Twist, target);
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
     memcpy(to->data_4, from->data_4, sizeof(to->data_4));
 }
@@ -1750,7 +1756,7 @@ std::string print_WalkAnim_Twist(WalkAnim_Twist* to)
     return out;
 }
 
-void copy_WalkAnim_Twist(WalkAnim_Twist* to, const WalkAnim_Twist* from, bool to_game)
+void copy_WalkAnim_Twist(WalkAnim_Twist* to, const WalkAnim_Twist* from, StateTarget target)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
@@ -1759,7 +1765,7 @@ void copy_WalkAnim_Twist(WalkAnim_Twist* to, const WalkAnim_Twist* from, bool to
     copy_SpinJoint(to->master_joint, from->master_joint);
     copy_SpinJoint(to->neck_joint, from->neck_joint);
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
-    copy_WalkAnim_Twist_Field0x228Elem(&to->walkAnim_Twist_Field0x228Elem, &from->walkAnim_Twist_Field0x228Elem, to_game);
+    copy_WalkAnim_Twist_Field0x228Elem(&to->walkAnim_Twist_Field0x228Elem, &from->walkAnim_Twist_Field0x228Elem, target);
     memcpy(to->data_4, from->data_4, sizeof(to->data_4));
 }
 
@@ -1802,7 +1808,7 @@ std::string print_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* t
     return out;
 }
 
-void copy_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* to, const WalkAnim_Twist_Field0x228Elem* from, bool to_game)
+void copy_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* to, const WalkAnim_Twist_Field0x228Elem* from, StateTarget target)
 {
     to->field0x10_cap = from->field0x10_cap;
     to->unk = from->unk;
@@ -1815,7 +1821,7 @@ void copy_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* to, const
     if (to->field0x10_cap > 0 && to->field0x10 == NULL)
     {
         //need to manually alloc the array for the game
-        if (to_game)
+        if (target == StateTarget::ToGame)
         {
             to->field0x10 = (WalkAnim_Twist_Field0x228Elem_field0x10elem**)(*(falloc*)*(uint64_t*)(*((uint64_t*)to->padding_1[0]) + 0x50))(to->padding_1[0], (to->field0x10_cap) * 8, 8);
             memset(to->field0x10, 0, to->field0x10_cap * 8);
@@ -1831,7 +1837,7 @@ void copy_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* to, const
     {
         if (from->field0x10[i] == NULL && to->field0x10[i] != NULL)
         {
-            if (!to_game)
+            if (target != StateTarget::ToGame)
             {
                 free(to->field0x10[i]);
             }
@@ -1840,7 +1846,7 @@ void copy_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* to, const
         if (to->field0x10[i] == NULL && from->field0x10[i] != NULL)
         {
             //need to manually alloc the entry for the game
-            if (to_game)
+            if (target == StateTarget::ToGame)
             {
                 to->field0x10[i] = (WalkAnim_Twist_Field0x228Elem_field0x10elem*)(*(falloc*)*(uint64_t*)(*((uint64_t*)to->padding_1[0]) + 0x50))(to->padding_1[0], 4 * 4, 4);
             }
@@ -1937,11 +1943,11 @@ std::string print_ActionCtrl(ActionCtrl* to)
     return out;
 }
 
-void copy_ActionCtrl(ActionCtrl* to, const ActionCtrl* from, bool to_game)
+void copy_ActionCtrl(ActionCtrl* to, const ActionCtrl* from, StateTarget target)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-    copy_ActionCtrl_0x30Substruct(&to->passive_state, &from->passive_state, to_game);
-    copy_ActionCtrl_0x30Substruct(&to->active_state, &from->active_state, to_game);
+    copy_ActionCtrl_0x30Substruct(&to->passive_state, &from->passive_state, target);
+    copy_ActionCtrl_0x30Substruct(&to->active_state, &from->active_state, target);
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
 }
@@ -1981,9 +1987,9 @@ std::string print_ActionCtrl_0x30Substruct(ActionCtrl_0x30Substruct* to)
     return out;
 }
 
-void copy_ActionCtrl_0x30Substruct(ActionCtrl_0x30Substruct* to, const ActionCtrl_0x30Substruct* from, bool to_game)
+void copy_ActionCtrl_0x30Substruct(ActionCtrl_0x30Substruct* to, const ActionCtrl_0x30Substruct* from, StateTarget target)
 {
-    copy_EzState_detail_EzStateMachineImpl(to->EzStateMachineImpl, from->EzStateMachineImpl, to_game);
+    copy_EzState_detail_EzStateMachineImpl(to->EzStateMachineImpl, from->EzStateMachineImpl, target);
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 }
 
@@ -2021,7 +2027,7 @@ std::string print_EzState_detail_EzStateMachineImpl(EzState_detail_EzStateMachin
     return out;
 }
 
-void copy_EzState_detail_EzStateMachineImpl(EzState_detail_EzStateMachineImpl* to, const EzState_detail_EzStateMachineImpl* from, bool to_game)
+void copy_EzState_detail_EzStateMachineImpl(EzState_detail_EzStateMachineImpl* to, const EzState_detail_EzStateMachineImpl* from, StateTarget target)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 
@@ -2029,11 +2035,11 @@ void copy_EzState_detail_EzStateMachineImpl(EzState_detail_EzStateMachineImpl* t
 
     if (from->padding_unk3[1] != NULL) { FATALERROR("EzState_detail_EzStateMachineImpl->field0x38.arry = %p, not null", from->padding_unk3[1]); }
 
-    copy_EzStateRegisterSet(&to->EzStateRegisterSet1, &from->EzStateRegisterSet1, to_game);
+    copy_EzStateRegisterSet(&to->EzStateRegisterSet1, &from->EzStateRegisterSet1, target);
 
     if (from->unk4 != NULL) { FATALERROR("EzState_detail_EzStateMachineImpl->unk4 = %p, not null", from->unk4); }
 
-    copy_EzStateRegisterSet(&to->EzStateRegisterSet2, &from->EzStateRegisterSet2, to_game);
+    copy_EzStateRegisterSet(&to->EzStateRegisterSet2, &from->EzStateRegisterSet2, target);
 
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
 
@@ -2082,9 +2088,9 @@ std::string print_EzStateRegisterSet(EzStateRegisterSet* to)
     return out;
 }
 
-void copy_EzStateRegisterSet(EzStateRegisterSet* to, const EzStateRegisterSet* from, bool to_game)
+void copy_EzStateRegisterSet(EzStateRegisterSet* to, const EzStateRegisterSet* from, StateTarget target)
 {
-    if (!to_game && from->arry_cur != NULL && from->arry != NULL)
+    if (target != StateTarget::ToGame && from->arry_cur != NULL && from->arry != NULL)
     {
         size_t arry_size = (from->arry_cur - (uint64_t)from->arry) / sizeof(EzStateRegister);
         if (arry_size != 8)
@@ -2172,10 +2178,10 @@ std::string print_HavokChara(HavokChara* to)
     return out;
 }
 
-void copy_HavokChara(HavokChara* to, const HavokChara* from, bool to_game)
+void copy_HavokChara(HavokChara* to, const HavokChara* from, StateTarget target)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-    copy_hkpCharacterProxy(to->char_proxy, from->char_proxy, to_game);
+    copy_hkpCharacterProxy(to->char_proxy, from->char_proxy, target);
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
@@ -2186,7 +2192,7 @@ HavokChara* init_HavokChara()
 {
     HavokChara* local_HavokChara = (HavokChara*)malloc_(sizeof(HavokChara));
 
-    local_HavokChara->char_proxy = init_hkpCharacterProxy(false);
+    local_HavokChara->char_proxy = init_hkpCharacterProxy(StateTarget::ToLocal);
 
     return local_HavokChara;
 }
@@ -2404,7 +2410,7 @@ std::string print_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to)
     return out;
 }
 
-void copy_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to, const ChrCtrl_AnimationQueue* from, bool to_game)
+void copy_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to, const ChrCtrl_AnimationQueue* from, StateTarget target)
 {
     //we allow up to a max of 32 ChrCtrl_AnimationQueueEntry entries in the array
     if (from->array_length > 32)
@@ -2415,12 +2421,12 @@ void copy_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to, const ChrCtrl_Anima
     to->data_0 = from->data_0;
     for (size_t i = 0; i < from->array_length; i++)
     {
-        copy_ChrCtrl_AnimationQueueEntry(&to->arry[i], &from->arry[i], to_game);
+        copy_ChrCtrl_AnimationQueueEntry(&to->arry[i], &from->arry[i], target);
     }
 
     copy_ChrCtrl_AnimationQueue_field0x10(to->field0x10, from->field0x10);
     copy_hkaAnimatedSkeleton(to->HkaAnimatedSkeleton, from->HkaAnimatedSkeleton);
-    copy_ChrCtrl_AnimationQueue_field0x20(to->field0x20, from->field0x20, to_game);
+    copy_ChrCtrl_AnimationQueue_field0x20(to->field0x20, from->field0x20, target);
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
     to->data_3 = from->data_3;
@@ -2524,9 +2530,9 @@ std::string print_ChrCtrl_AnimationQueue_field0x20(ChrCtrl_AnimationQueue_field0
     return out;
 }
 
-void copy_ChrCtrl_AnimationQueue_field0x20(ChrCtrl_AnimationQueue_field0x20* to, const ChrCtrl_AnimationQueue_field0x20* from, bool to_game)
+void copy_ChrCtrl_AnimationQueue_field0x20(ChrCtrl_AnimationQueue_field0x20* to, const ChrCtrl_AnimationQueue_field0x20* from, StateTarget target)
 {
-    if (!to_game && from->padding_0 != NULL)
+    if (target != StateTarget::ToGame && from->padding_0 != NULL)
     {
         uint32_t field0x28_len = *(uint32_t*)(from->padding_0 + 0x30);
         if (field0x28_len != 61)
@@ -2847,7 +2853,7 @@ std::string print_ChrCtrl_AnimationQueueEntry(ChrCtrl_AnimationQueueEntry* to)
     return out;
 }
 
-void copy_ChrCtrl_AnimationQueueEntry(ChrCtrl_AnimationQueueEntry* to, const ChrCtrl_AnimationQueueEntry* from, bool to_game)
+void copy_ChrCtrl_AnimationQueueEntry(ChrCtrl_AnimationQueueEntry* to, const ChrCtrl_AnimationQueueEntry* from, StateTarget target)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     copy_hkaDefaultAnimationControl(to->defaultAnimationControl, from->defaultAnimationControl);

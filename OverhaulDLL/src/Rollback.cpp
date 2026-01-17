@@ -8,6 +8,15 @@
 #include <string>
 #include <unordered_map>
 
+#include "PlayerInsStructFunctions.h"
+#include "BulletManStructFunctions.h"
+#include "SfxManStructFunctions.h"
+#include "DamageManStructFunctions.h"
+#include "PadManipulatorStructFunctions.h"
+#include "ThrowManStructFunctions.h"
+#include "DmgHitRecordManImpStructFunctions.h"
+#include "FrpgHavokManImpStructFunctions.h"
+
 PlayerIns* Rollback::saved_playerins = NULL;
 BulletMan* Rollback::saved_bulletman = NULL;
 FXManager* Rollback::saved_sfxobjs = NULL;
@@ -40,12 +49,12 @@ bool state_test(void* unused)
     {
         auto player_o = Game::get_PlayerIns();
         PlayerIns* player = (PlayerIns*)player_o.value();
-        copy_PlayerIns(Rollback::saved_playerins, player, false);
-        copy_BulletMan(Rollback::saved_bulletman, *(BulletMan**)Game::bullet_man, false);
-        //copy_FXManager(Rollback::saved_sfxobjs, (*(SfxMan**)Game::sfx_man)->FrpgFxManagerBase->base.fXManager, false);
-        copy_DamageMan(Rollback::saved_damageman, *(DamageMan**)Game::damage_man, false);
-        copy_ThrowMan(Rollback::saved_throwman, *(ThrowMan**)Game::throw_man, false);
-        copy_DmgHitRecordManImp(Rollback::saved_DmgHitRecordMan, *(DmgHitRecordManImp**)Game::dmg_hit_record_man, false);
+        copy_PlayerIns(Rollback::saved_playerins, player, StateTarget::ToLocal);
+        copy_BulletMan(Rollback::saved_bulletman, *(BulletMan**)Game::bullet_man, StateTarget::ToLocal);
+        //copy_FXManager(Rollback::saved_sfxobjs, (*(SfxMan**)Game::sfx_man)->FrpgFxManagerBase->base.fXManager, StateTarget::ToLocal);
+        copy_DamageMan(Rollback::saved_damageman, *(DamageMan**)Game::damage_man, StateTarget::ToLocal);
+        copy_ThrowMan(Rollback::saved_throwman, *(ThrowMan**)Game::throw_man, StateTarget::ToLocal);
+        copy_DmgHitRecordManImp(Rollback::saved_DmgHitRecordMan, *(DmgHitRecordManImp**)Game::dmg_hit_record_man, StateTarget::ToLocal);
 
         Rollback::gsave = false;
     }
@@ -54,12 +63,12 @@ bool state_test(void* unused)
     {
         auto player_o = Game::get_PlayerIns();
         PlayerIns* player = (PlayerIns*)player_o.value();
-        copy_PlayerIns(player, Rollback::saved_playerins, true);
-        copy_BulletMan(*(BulletMan**)Game::bullet_man, Rollback::saved_bulletman, true);
-        //copy_FXManager((*(SfxMan**)Game::sfx_man)->FrpgFxManagerBase->base.fXManager, Rollback::saved_sfxobjs, true);
-        copy_DamageMan(*(DamageMan**)Game::damage_man, Rollback::saved_damageman, true);
-        copy_ThrowMan(*(ThrowMan**)Game::throw_man, Rollback::saved_throwman, true);
-        copy_DmgHitRecordManImp(*(DmgHitRecordManImp**)Game::dmg_hit_record_man, Rollback::saved_DmgHitRecordMan, true);
+        copy_PlayerIns(player, Rollback::saved_playerins, StateTarget::ToGame);
+        copy_BulletMan(*(BulletMan**)Game::bullet_man, Rollback::saved_bulletman, StateTarget::ToGame);
+        //copy_FXManager((*(SfxMan**)Game::sfx_man)->FrpgFxManagerBase->base.fXManager, Rollback::saved_sfxobjs, StateTarget::ToGame);
+        copy_DamageMan(*(DamageMan**)Game::damage_man, Rollback::saved_damageman, StateTarget::ToGame);
+        copy_ThrowMan(*(ThrowMan**)Game::throw_man, Rollback::saved_throwman, StateTarget::ToGame);
+        copy_DmgHitRecordManImp(*(DmgHitRecordManImp**)Game::dmg_hit_record_man, Rollback::saved_DmgHitRecordMan, StateTarget::ToGame);
 
         Game::Step_GameSimulation();
 
@@ -621,15 +630,15 @@ bool rollback_load_game_state_callback(unsigned char* buffer, int)
         }
         PlayerIns* player = (PlayerIns*)player_o.value();
 
-        copy_PlayerIns(player, state->playerins[i], true);
+        copy_PlayerIns(player, state->playerins[i], StateTarget::ToGame);
     }
 
-    copy_BulletMan(*(BulletMan**)Game::bullet_man, state->bulletman, true);
-    //copy_SfxMan(*(SfxMan**)Game::sfx_man, state->sfxman, true);
-    copy_DamageMan(*(DamageMan**)Game::damage_man, state->damageman, true);
-    copy_ThrowMan(*(ThrowMan**)Game::throw_man, state->throwman, true);
-    copy_DmgHitRecordManImp(*(DmgHitRecordManImp**)Game::dmg_hit_record_man, state->dmghitrecordman, true);
-    copy_FrpgHavokManImp(*(FrpgHavokManImp**)Game::frpg_havok_man_imp, state->havokman, true);
+    copy_BulletMan(*(BulletMan**)Game::bullet_man, state->bulletman, StateTarget::ToGame);
+    //copy_SfxMan(*(SfxMan**)Game::sfx_man, state->sfxman, StateTarget::ToGame);
+    copy_DamageMan(*(DamageMan**)Game::damage_man, state->damageman, StateTarget::ToGame);
+    copy_ThrowMan(*(ThrowMan**)Game::throw_man, state->throwman, StateTarget::ToGame);
+    copy_DmgHitRecordManImp(*(DmgHitRecordManImp**)Game::dmg_hit_record_man, state->dmghitrecordman, StateTarget::ToGame);
+    copy_FrpgHavokManImp(*(FrpgHavokManImp**)Game::frpg_havok_man_imp, state->havokman, StateTarget::ToGame);
 
     if (Rollback::rollbackVisual)
     {
@@ -665,24 +674,24 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
         PlayerIns* player = (PlayerIns*)player_o.value();
 
         state->playerins[i] = init_PlayerIns();
-        copy_PlayerIns(state->playerins[i], player, false);
+        copy_PlayerIns(state->playerins[i], player, StateTarget::ToLocal);
 #if defined(GGPO_SYNCTEST) && 0
         our_checksum ^= std::hash<std::string>{}(print_PlayerIns(player));
 #endif
     }
 
     state->bulletman = init_BulletMan();
-    copy_BulletMan(state->bulletman, *(BulletMan**)Game::bullet_man, false);
+    copy_BulletMan(state->bulletman, *(BulletMan**)Game::bullet_man, StateTarget::ToLocal);
     //state->sfxman = init_SfxMan();
-    //copy_SfxMan(state->sfxman, *(SfxMan**)Game::sfx_man, false);
+    //copy_SfxMan(state->sfxman, *(SfxMan**)Game::sfx_man, StateTarget::ToLocal);
     state->damageman = init_DamageMan();
-    copy_DamageMan(state->damageman, *(DamageMan**)Game::damage_man, false);
+    copy_DamageMan(state->damageman, *(DamageMan**)Game::damage_man, StateTarget::ToLocal);
     state->throwman = init_ThrowMan();
-    copy_ThrowMan(state->throwman, *(ThrowMan**)Game::throw_man, false);
+    copy_ThrowMan(state->throwman, *(ThrowMan**)Game::throw_man, StateTarget::ToLocal);
     state->dmghitrecordman = init_DmgHitRecordManImp();
-    copy_DmgHitRecordManImp(state->dmghitrecordman, *(DmgHitRecordManImp**)Game::dmg_hit_record_man, false);
+    copy_DmgHitRecordManImp(state->dmghitrecordman, *(DmgHitRecordManImp**)Game::dmg_hit_record_man, StateTarget::ToLocal);
     state->havokman = init_FrpgHavokManImp();
-    copy_FrpgHavokManImp(state->havokman, *(FrpgHavokManImp**)Game::frpg_havok_man_imp, false);
+    copy_FrpgHavokManImp(state->havokman, *(FrpgHavokManImp**)Game::frpg_havok_man_imp, StateTarget::ToLocal);
 #if defined(GGPO_SYNCTEST) && 0
     our_checksum ^= std::hash<std::string>{}(print_BulletMan(*(BulletMan**)Game::bullet_man));
 #endif
@@ -702,20 +711,20 @@ void rollback_copy_buffer(void* buffer_dst, void* buffer_src)
     for (size_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
     {
         state_dst->playerins[i] = init_PlayerIns();
-        copy_PlayerIns(state_dst->playerins[i], state_src->playerins[i], false);
+        copy_PlayerIns(state_dst->playerins[i], state_src->playerins[i], StateTarget::Copy);
     }
     state_dst->bulletman = init_BulletMan();
-    copy_BulletMan(state_dst->bulletman, state_src->bulletman, false);
+    copy_BulletMan(state_dst->bulletman, state_src->bulletman, StateTarget::Copy);
     //state_dst->sfxman = init_SfxMan();
-    //copy_SfxMan(state_dst->sfxman, state_src->sfxman, false);
+    //copy_SfxMan(state_dst->sfxman, state_src->sfxman, StateTarget::Copy);
     state_dst->damageman = init_DamageMan();
-    copy_DamageMan(state_dst->damageman, state_src->damageman, false);
+    copy_DamageMan(state_dst->damageman, state_src->damageman, StateTarget::Copy);
     state_dst->throwman = init_ThrowMan();
-    copy_ThrowMan(state_dst->throwman, state_src->throwman, false);
+    copy_ThrowMan(state_dst->throwman, state_src->throwman, StateTarget::Copy);
     state_dst->dmghitrecordman = init_DmgHitRecordManImp();
-    copy_DmgHitRecordManImp(state_dst->dmghitrecordman, state_src->dmghitrecordman, false);
+    copy_DmgHitRecordManImp(state_dst->dmghitrecordman, state_src->dmghitrecordman, StateTarget::Copy);
     state_dst->havokman = init_FrpgHavokManImp();
-    copy_FrpgHavokManImp(state_dst->havokman, *(FrpgHavokManImp**)Game::frpg_havok_man_imp, false);
+    copy_FrpgHavokManImp(state_dst->havokman, *(FrpgHavokManImp**)Game::frpg_havok_man_imp, StateTarget::Copy);
 }
 
 void rollback_free_buffer(void* buffer)

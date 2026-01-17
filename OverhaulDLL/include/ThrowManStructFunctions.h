@@ -4,12 +4,13 @@
 
 #include <stdint.h>
 #include "ThrowManStruct.h"
+#include "Rollback.h"
 
-void copy_ThrowMan(ThrowMan* to, ThrowMan* from, bool to_game);
+void copy_ThrowMan(ThrowMan* to, ThrowMan* from, StateTarget target);
 ThrowMan* init_ThrowMan();
 void free_ThrowMan(ThrowMan* to);
 
-void copy_ThrowRequestedEntry(ThrowRequestedEntry* to, ThrowRequestedEntry* from, bool to_game);
+void copy_ThrowRequestedEntry(ThrowRequestedEntry* to, ThrowRequestedEntry* from, StateTarget target);
 ThrowRequestedEntry* init_ThrowRequestedEntry();
 void free_ThrowRequestedEntry(ThrowRequestedEntry* to);
 

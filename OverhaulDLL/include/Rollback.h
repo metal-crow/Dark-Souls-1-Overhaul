@@ -7,14 +7,14 @@
 
 #include "DarkSoulsOverhaulMod.h"
 
-#include "PlayerInsStructFunctions.h"
-#include "BulletManStructFunctions.h"
-#include "SfxManStructFunctions.h"
-#include "DamageManStructFunctions.h"
-#include "PadManipulatorStructFunctions.h"
-#include "ThrowManStructFunctions.h"
-#include "DmgHitRecordManImpStructFunctions.h"
-#include "FrpgHavokManImpStructFunctions.h"
+#include "PlayerInsStruct.h"
+#include "BulletManStruct.h"
+#include "SfxManStruct.h"
+#include "DamageManStruct.h"
+#include "PadManipulatorStruct.h"
+#include "ThrowManStruct.h"
+#include "DmgHitRecordManImpStruct.h"
+#include "FrpgHavokManImpStruct.h"
 
 #include "ggponet.h"
 
@@ -23,6 +23,13 @@ enum class GGPOREADY
     NotReady,
     ReadyAwaitingFrameHead,
     Ready
+};
+
+enum class StateTarget
+{
+    ToGame,
+    ToLocal,
+    Copy
 };
 
 class Rollback
