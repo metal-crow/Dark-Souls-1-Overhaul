@@ -63,7 +63,7 @@ void free_hkpWorld(hkpWorld* to)
     free(to);
 }
 
-void copy_hkp3AxisSweep(hkp3AxisSweep* to, const hkp3AxisSweep* from, bool to_game)
+void copy_hkp3AxisSweep(hkp3AxisSweep* to, const hkp3AxisSweep* from, StateTarget target)
 {
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
@@ -357,7 +357,13 @@ void copy_hkMotionState(hkMotionState* to, const hkMotionState* from)
 void copy_hkpCollidable(hkpCollidable* to, const hkpCollidable* from, StateTarget target)
 {
     ShapeType fromshape = hkpShape_getType(from->base_shape);
-    ShapeType toshape = hkpShape_getType(to->base_shape);
+    ShapeType toshape = ShapeType::InvalidShape;
+    //this is init'd on copy for ToLocal
+    if (target == StateTarget::ToGame)
+    {
+        toshape = hkpShape_getType(to->base_shape);
+    }
+
     switch (fromshape)
     {
     case ShapeType::Sphere:
