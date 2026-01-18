@@ -12,6 +12,8 @@ typedef struct FrpgHavokManImp FrpgHavokManImp;
 typedef struct FrpgPhysWorld FrpgPhysWorld;
 typedef struct hkpWorld hkpWorld;
 typedef struct hkp3AxisSweep hkp3AxisSweep;
+typedef struct hkpSimulationIsland hkpSimulationIsland;
+typedef struct hkpEntity hkpEntity;
 typedef struct hkpBpNode hkpBpNode;
 typedef struct hkpBpAxis hkpBpAxis;
 typedef struct hkpBpEndPoint hkpBpEndPoint;
@@ -57,15 +59,52 @@ static_assert(offsetof(FrpgPhysWorld, _hkpWorld) == 0x8);
 struct hkpWorld
 {
     void* vtable;
-    uint8_t _[0x80];
+    uint8_t _0[0x38];
+    hkpSimulationIsland* m_activeSimulationIslands;
+    uint32_t m_activeSimulationIslands_size;
+    uint32_t m_activeSimulationIslands_cap;
+    hkpSimulationIsland* m_inactiveSimulationIslands;
+    uint32_t m_inactiveSimulationIslands_size;
+    uint32_t m_inactiveSimulationIslands_cap;
+    hkpSimulationIsland* m_dirtySimulationIslands;
+    uint32_t m_dirtySimulationIslands_size;
+    uint32_t m_dirtySimulationIslands_cap;
+    uint8_t _1[0x18];
     hkp3AxisSweep* m_broadPhase; //DSR always uses a hkp3AxisSweep broadPhase
+    uint8_t _2[0xF8];
+    void** m_phantoms;
+    uint32_t m_phantoms_size;
+    uint32_t m_phantoms_cap;
 };
+static_assert(offsetof(hkpWorld, m_activeSimulationIslands) == 0x40);
+static_assert(offsetof(hkpWorld, m_inactiveSimulationIslands) == 0x50);
+static_assert(offsetof(hkpWorld, m_dirtySimulationIslands) == 0x60);
 static_assert(offsetof(hkpWorld, m_broadPhase) == 0x88);
+static_assert(offsetof(hkpWorld, m_phantoms) == 0x188);
 //static_assert(sizeof(hkpWorld) == 0x30);
+
+struct hkpSimulationIsland
+{
+    void* vtable;
+    uint8_t _0[0x58];
+    hkpEntity** m_entities;
+    uint32_t m_entities_size;
+    uint32_t m_entities_cap;
+};
+static_assert(offsetof(hkpSimulationIsland, m_entities) == 0x60);
+//static_assert(sizeof(hkpSimulationIsland) == 0x30);
+
+struct hkpEntity
+{
+    void* vtable;
+    uint8_t padding_0[0x10];
+
+};
 
 struct hkpBpNode
 {
-    uint8_t data_1[0x18];
+    uint8_t data_1[0x10];
+    uint32_t* index_in_array;
 };
 static_assert(sizeof(hkpBpNode) == 0x18);
 
