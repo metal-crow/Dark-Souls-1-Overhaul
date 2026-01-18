@@ -20,7 +20,7 @@ struct FrpgPhysShapePhantomIns
     uint64_t vtable;
     uint64_t data_0;
     uint64_t damageEntry; //this points to an existing DamageEntry in the list, so treat as const
-    void* physWorld; //this is just a const ptr to FrpgHavokManImp->FrpgPhysWorld
+    FrpgPhysWorld* physWorld; //this is just a const ptr to FrpgHavokManImp->FrpgPhysWorld
     hkpSimpleShapePhantom* _hkpSimpleShapePhantom;
     void* self;
     uint64_t data_1;

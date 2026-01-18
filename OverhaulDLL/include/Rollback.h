@@ -157,7 +157,7 @@ inline void* realloc_(void* dst, size_t size)
 {
     if (dst == NULL)
     {
-        return malloc(size);
+        return malloc_(size);
     }
     void* out = realloc(dst, size);
     if (out == NULL)

@@ -10,6 +10,7 @@
 #include "PadManipulatorStruct.h"
 #include "AttachSysSlotStructs.h"
 #include "FrpgHavokManImpStruct.h"
+#include "DamageManStruct.h"
 
 typedef struct AnimationQueue_Entry_sub1_field0x10 AnimationQueue_Entry_sub1_field0x10;
 typedef struct AnimationQueue_Entry_sub1 AnimationQueue_Entry_sub1;
@@ -319,7 +320,7 @@ struct HavokChara
     uint8_t data_0[0x38];
     hkpCharacterProxy* char_proxy;
     void* padding_cap[2]; //neither of these seem to do anything
-    void* padding_physShapePhantomIns[2]; //neither of these seem to do anything
+    FrpgPhysShapePhantomIns* padding_physShapePhantomIns[2]; //neither of these seem to do anything
     uint8_t data_1[0x98];
     uint64_t padding_1;
     uint8_t data_2[0xe8];
