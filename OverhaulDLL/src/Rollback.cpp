@@ -17,6 +17,7 @@
 #include "DmgHitRecordManImpStructFunctions.h"
 #include "FrpgHavokManImpStructFunctions.h"
 
+FrpgHavokManImp* Rollback::saved_havokman = NULL;
 PlayerIns* Rollback::saved_playerins = NULL;
 BulletMan* Rollback::saved_bulletman = NULL;
 FXManager* Rollback::saved_sfxobjs = NULL;
@@ -49,6 +50,7 @@ bool state_test(void* unused)
     {
         auto player_o = Game::get_PlayerIns();
         PlayerIns* player = (PlayerIns*)player_o.value();
+        copy_FrpgHavokManImp(Rollback::saved_havokman , *(FrpgHavokManImp**)Game::frpg_havok_man_imp, StateTarget::ToLocal);
         copy_PlayerIns(Rollback::saved_playerins, player, StateTarget::ToLocal);
         copy_BulletMan(Rollback::saved_bulletman, *(BulletMan**)Game::bullet_man, StateTarget::ToLocal);
         //copy_FXManager(Rollback::saved_sfxobjs, (*(SfxMan**)Game::sfx_man)->FrpgFxManagerBase->base.fXManager, StateTarget::ToLocal);
@@ -63,6 +65,7 @@ bool state_test(void* unused)
     {
         auto player_o = Game::get_PlayerIns();
         PlayerIns* player = (PlayerIns*)player_o.value();
+        copy_FrpgHavokManImp(*(FrpgHavokManImp**)Game::frpg_havok_man_imp, Rollback::saved_havokman, StateTarget::ToGame);
         copy_PlayerIns(player, Rollback::saved_playerins, StateTarget::ToGame);
         copy_BulletMan(*(BulletMan**)Game::bullet_man, Rollback::saved_bulletman, StateTarget::ToGame);
         //copy_FXManager((*(SfxMan**)Game::sfx_man)->FrpgFxManagerBase->base.fXManager, Rollback::saved_sfxobjs, StateTarget::ToGame);
@@ -570,6 +573,7 @@ void Rollback::start()
     sp::mem::patch_bytes(write_address, nop, 5);
 
     //Testing rollback related stuff
+    Rollback::saved_havokman = init_FrpgHavokManImp();
     Rollback::saved_playerins = init_PlayerIns();
     Rollback::saved_bulletman = init_BulletMan();
     Rollback::saved_sfxobjs = init_FXManager();
@@ -621,6 +625,8 @@ bool rollback_load_game_state_callback(unsigned char* buffer, int)
 {
     RollbackState* state = (RollbackState*)buffer;
 
+    //havok has to be copied first
+    copy_FrpgHavokManImp(*(FrpgHavokManImp**)Game::frpg_havok_man_imp, state->havokman, StateTarget::ToGame);
     for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
     {
         auto player_o = Game::get_connected_player(i);
@@ -632,13 +638,11 @@ bool rollback_load_game_state_callback(unsigned char* buffer, int)
 
         copy_PlayerIns(player, state->playerins[i], StateTarget::ToGame);
     }
-
     copy_BulletMan(*(BulletMan**)Game::bullet_man, state->bulletman, StateTarget::ToGame);
     //copy_SfxMan(*(SfxMan**)Game::sfx_man, state->sfxman, StateTarget::ToGame);
     copy_DamageMan(*(DamageMan**)Game::damage_man, state->damageman, StateTarget::ToGame);
     copy_ThrowMan(*(ThrowMan**)Game::throw_man, state->throwman, StateTarget::ToGame);
     copy_DmgHitRecordManImp(*(DmgHitRecordManImp**)Game::dmg_hit_record_man, state->dmghitrecordman, StateTarget::ToGame);
-    copy_FrpgHavokManImp(*(FrpgHavokManImp**)Game::frpg_havok_man_imp, state->havokman, StateTarget::ToGame);
 
     if (Rollback::rollbackVisual)
     {
@@ -664,6 +668,9 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
     //The checksum is only used when we run the GGPO synctest, disable otherwise
     size_t our_checksum = 0;
 
+    //havok has to be copied first
+    state->havokman = init_FrpgHavokManImp();
+    copy_FrpgHavokManImp(state->havokman, *(FrpgHavokManImp**)Game::frpg_havok_man_imp, StateTarget::ToLocal);
     for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
     {
         auto player_o = Game::get_connected_player(i);
@@ -679,7 +686,6 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
         our_checksum ^= std::hash<std::string>{}(print_PlayerIns(player));
 #endif
     }
-
     state->bulletman = init_BulletMan();
     copy_BulletMan(state->bulletman, *(BulletMan**)Game::bullet_man, StateTarget::ToLocal);
     //state->sfxman = init_SfxMan();
@@ -690,8 +696,6 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
     copy_ThrowMan(state->throwman, *(ThrowMan**)Game::throw_man, StateTarget::ToLocal);
     state->dmghitrecordman = init_DmgHitRecordManImp();
     copy_DmgHitRecordManImp(state->dmghitrecordman, *(DmgHitRecordManImp**)Game::dmg_hit_record_man, StateTarget::ToLocal);
-    state->havokman = init_FrpgHavokManImp();
-    copy_FrpgHavokManImp(state->havokman, *(FrpgHavokManImp**)Game::frpg_havok_man_imp, StateTarget::ToLocal);
 #if defined(GGPO_SYNCTEST) && 0
     our_checksum ^= std::hash<std::string>{}(print_BulletMan(*(BulletMan**)Game::bullet_man));
 #endif
@@ -708,6 +712,9 @@ void rollback_copy_buffer(void* buffer_dst, void* buffer_src)
     RollbackState* state_src = (RollbackState*)buffer_src;
     RollbackState* state_dst = (RollbackState*)buffer_dst;
 
+    //havok has to be copied first
+    state_dst->havokman = init_FrpgHavokManImp();
+    copy_FrpgHavokManImp(state_dst->havokman, *(FrpgHavokManImp**)Game::frpg_havok_man_imp, StateTarget::Copy);
     for (size_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
     {
         state_dst->playerins[i] = init_PlayerIns();
@@ -723,8 +730,6 @@ void rollback_copy_buffer(void* buffer_dst, void* buffer_src)
     copy_ThrowMan(state_dst->throwman, state_src->throwman, StateTarget::Copy);
     state_dst->dmghitrecordman = init_DmgHitRecordManImp();
     copy_DmgHitRecordManImp(state_dst->dmghitrecordman, state_src->dmghitrecordman, StateTarget::Copy);
-    state_dst->havokman = init_FrpgHavokManImp();
-    copy_FrpgHavokManImp(state_dst->havokman, *(FrpgHavokManImp**)Game::frpg_havok_man_imp, StateTarget::Copy);
 }
 
 void rollback_free_buffer(void* buffer)
