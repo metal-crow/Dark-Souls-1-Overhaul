@@ -2181,7 +2181,18 @@ std::string print_HavokChara(HavokChara* to)
 void copy_HavokChara(HavokChara* to, const HavokChara* from, StateTarget target)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-    copy_hkpCharacterProxy(to->char_proxy, from->char_proxy, target);
+    switch (target)
+    {
+    case StateTarget::ToGame:
+        copy_hkpCharacterProxy(to->char_proxy, from->char_proxy, to->padding_physShapePhantomIns[0]->physWorld->_hkpWorld, target);
+        break;
+    case StateTarget::ToLocal:
+        copy_hkpCharacterProxy(to->char_proxy, from->char_proxy, from->padding_physShapePhantomIns[0]->physWorld->_hkpWorld, target);
+        break;
+    case StateTarget::Copy:
+        copy_hkpCharacterProxy(to->char_proxy, from->char_proxy, NULL, target);
+        break;
+    }
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));

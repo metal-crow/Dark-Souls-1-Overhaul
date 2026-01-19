@@ -234,7 +234,65 @@ void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePha
         (*to)->data_0 = (*from)->data_0;
         (*to)->damageEntry = (*from)->damageEntry;
         (*to)->physWorld = (*from)->physWorld;
-        copy_hkpSimpleShapePhantom((*to)->_hkpSimpleShapePhantom, (*from)->_hkpSimpleShapePhantom, target);
+
+        hkpSimpleShapePhantom* found = NULL;
+
+        //if the physWorld ptr is null, this phantom isn't in the m_phantoms list and is only linked from here, so we have to copy it
+        if ((*from)->physWorld == NULL)
+        {
+            if ((*to)->_hkpSimpleShapePhantom == NULL)
+            {
+                (*to)->_hkpSimpleShapePhantom = init_hkpSimpleShapePhantom(target);
+            }
+            copy_hkpSimpleShapePhantom((*to)->_hkpSimpleShapePhantom, (*from)->_hkpSimpleShapePhantom, target);
+        }
+        //otherwise, we MAY have copied this phantom as part of havok
+        else
+        {
+            switch (target)
+            {
+            case StateTarget::ToGame:
+                //if the ptr is null, then we just relink it
+                if ((*from)->_hkpSimpleShapePhantom == NULL)
+                {
+                    //havok is restored first so this can find the right entry
+                    //this 'to' pointer is a reliable value since the simpleshapephantom just saves it as a const, and nothing in the DamageMan is reallocated or init'd during runtime
+                    (*to)->_hkpSimpleShapePhantom = get_hkpSimpleShapePhantom(((FrpgPhysWorld*)((*to)->physWorld))->_hkpWorld, *to);
+                }
+                //otherwise it's a copy and we need to fully copy it over
+                else
+                {
+                    copy_hkpSimpleShapePhantom((*to)->_hkpSimpleShapePhantom, (*from)->_hkpSimpleShapePhantom, target);
+                }
+                break;
+            case StateTarget::ToLocal:
+                //let's verify this shape phantom is in the hkpWorld, if not we need to copy it
+                found = find_hkpSimpleShapePhantom(((FrpgPhysWorld*)((*from)->physWorld))->_hkpWorld, *to);
+                if (found == NULL)
+                {
+                    if ((*to)->_hkpSimpleShapePhantom == NULL)
+                    {
+                        (*to)->_hkpSimpleShapePhantom = init_hkpSimpleShapePhantom(target);
+                    }
+                    copy_hkpSimpleShapePhantom((*to)->_hkpSimpleShapePhantom, (*from)->_hkpSimpleShapePhantom, target);
+                }
+                else
+                {
+                    (*to)->_hkpSimpleShapePhantom = NULL;
+                }
+                break;
+            case StateTarget::Copy:
+                if ((*from)->_hkpSimpleShapePhantom == NULL)
+                {
+                    (*to)->_hkpSimpleShapePhantom = NULL;
+                }
+                else
+                {
+                    copy_hkpSimpleShapePhantom((*to)->_hkpSimpleShapePhantom, (*from)->_hkpSimpleShapePhantom, target);
+                }
+                break;
+            }
+        }
         (*to)->self = (*to);
         (*to)->data_1 = (*from)->data_1;
         if (is_sphere)
@@ -254,13 +312,13 @@ FrpgPhysShapePhantomIns* init_FrpgPhysShapePhantomIns(bool is_sphere, StateTarge
     if (target == StateTarget::ToGame)
     {
         local = (FrpgPhysShapePhantomIns*)Game::game_malloc(sizeof(FrpgPhysShapePhantomIns), 8, *(uint64_t*)Game::internal_heap_2);
-        local->_hkpSimpleShapePhantom = (hkpSimpleShapePhantom*)Game::thread_malloc(sizeof(hkpSimpleShapePhantom));
     }
     else
     {
         local = (FrpgPhysShapePhantomIns*)malloc_(sizeof(FrpgPhysShapePhantomIns));
-        local->_hkpSimpleShapePhantom = init_hkpSimpleShapePhantom();
     }
+
+    local->_hkpSimpleShapePhantom = NULL; //init on copy if needed
 
     if (is_sphere)
     {
@@ -275,13 +333,9 @@ FrpgPhysShapePhantomIns* init_FrpgPhysShapePhantomIns(bool is_sphere, StateTarge
 
 void free_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns* to, bool is_sphere, StateTarget target)
 {
-    if (target == StateTarget::ToGame)
+    if (to->_hkpSimpleShapePhantom != NULL)
     {
-        hkReferencedObject_deref((void*)to->_hkpSimpleShapePhantom);
-    }
-    else
-    {
-        free_hkpSimpleShapePhantom(to->_hkpSimpleShapePhantom);
+        free_hkpSimpleShapePhantom(to->_hkpSimpleShapePhantom, target);
     }
     if (is_sphere)
     {

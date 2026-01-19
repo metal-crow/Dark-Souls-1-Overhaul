@@ -7,7 +7,6 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include "PlayerInsStruct.h"
 #include "FrpgHavokManImpStruct.h"
 
 typedef struct DamageMan DamageMan;

@@ -57,7 +57,7 @@ bool state_test(void* unused)
         copy_DamageMan(Rollback::saved_damageman, *(DamageMan**)Game::damage_man, StateTarget::ToLocal);
         copy_ThrowMan(Rollback::saved_throwman, *(ThrowMan**)Game::throw_man, StateTarget::ToLocal);
         copy_DmgHitRecordManImp(Rollback::saved_DmgHitRecordMan, *(DmgHitRecordManImp**)Game::dmg_hit_record_man, StateTarget::ToLocal);
-
+        ConsoleWrite("Rollback saved");
         Rollback::gsave = false;
     }
 
@@ -74,7 +74,7 @@ bool state_test(void* unused)
         copy_DmgHitRecordManImp(*(DmgHitRecordManImp**)Game::dmg_hit_record_man, Rollback::saved_DmgHitRecordMan, StateTarget::ToGame);
 
         Game::Step_GameSimulation();
-
+        ConsoleWrite("Rollback loaded");
         Rollback::gload = false;
     }
 

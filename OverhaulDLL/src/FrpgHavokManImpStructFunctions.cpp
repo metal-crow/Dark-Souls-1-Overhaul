@@ -25,7 +25,7 @@ void free_FrpgHavokManImp(FrpgHavokManImp* to)
 
 void copy_FrpgPhysWorld(FrpgPhysWorld* to, const FrpgPhysWorld* from, StateTarget target)
 {
-    copy_hkpWorld(&to->_hkpWorld, from->_hkpWorld, target);
+    copy_hkpWorld(to->_hkpWorld, from->_hkpWorld, target);
 }
 
 FrpgPhysWorld* init_FrpgPhysWorld()
@@ -43,23 +43,76 @@ void free_FrpgPhysWorld(FrpgPhysWorld* to)
     free(to);
 }
 
-void copy_hkpWorld(hkpWorld** to, const hkpWorld* from, StateTarget target)
+void copy_hkpWorld(hkpWorld* to, const hkpWorld* from, StateTarget target)
 {
-    copy_hkp3AxisSweep(to->m_broadPhase, from->m_broadPhase, to_game);
+    //copy_hkp3AxisSweep(to->m_broadPhase, from->m_broadPhase, target);
+    //don't need to actually save/load the simulation islands themselves, those should be stable for the lifetime of this session
+    //copy_hkpSimulationIsland(to->m_activeSimulationIslands, to->m_activeSimulationIslands_size, from->m_activeSimulationIslands, from->m_activeSimulationIslands_size, target);
+    //copy_hkpSimulationIsland(to->m_inactiveSimulationIslands, to->m_inactiveSimulationIslands_size, from->m_inactiveSimulationIslands, from->m_inactiveSimulationIslands_size, target);
+    //copy_hkpSimulationIsland(to->m_dirtySimulationIslands, to->m_dirtySimulationIslands_size, from->m_dirtySimulationIslands, from->m_dirtySimulationIslands_size, target);
+    to->m_phantoms_size = from->m_phantoms_size;
+    if (to->m_phantoms_cap < from->m_phantoms_size)
+    {
+        switch (target)
+        {
+        case StateTarget::ToGame:
+            increase_list_size(Game::MemHeapAllocator, &to->m_phantoms, 0x8);
+            break;
+        case StateTarget::ToLocal:
+        case StateTarget::Copy:
+            to->m_phantoms = (void**)realloc_(to->m_phantoms, from->m_phantoms_cap * sizeof(void*));
+            to->m_phantoms_cap = from->m_phantoms_cap;
+            break;
+        }
+    }
+    std::unordered_map<uint64_t, size_t> m_phantoms_tracker = {};
+    for (size_t i = 0; i < from->m_phantoms_size; i++)
+    {
+        //there may be duplicate pointers in this list which we need to support
+        if (m_phantoms_tracker.contains((uint64_t)(from->m_phantoms[i])))
+        {
+            //if we need to clear the existing ptr at this entry
+            if (to->m_phantoms[i] != NULL && to->m_phantoms[i] != to->m_phantoms[m_phantoms_tracker[(uint64_t)(from->m_phantoms[i])]])
+            {
+                free_hkpPhantom(to->m_phantoms[i], target);
+            }
+            to->m_phantoms[i] = to->m_phantoms[m_phantoms_tracker[(uint64_t)(from->m_phantoms[i])]];
+        }
+        else
+        {
+            copy_hkpPhantom(&to->m_phantoms[i], from->m_phantoms[i], target);
+            m_phantoms_tracker[(uint64_t)(from->m_phantoms[i])] = i;
+        }
+    }
 }
 
 hkpWorld* init_hkpWorld()
 {
     hkpWorld* local = (hkpWorld*)malloc_(sizeof(hkpWorld));
-
-    local->m_broadPhase = init_hkp3AxisSweep();
+    
+    local->m_activeSimulationIslands = NULL;
+    local->m_inactiveSimulationIslands = NULL;
+    local->m_dirtySimulationIslands = NULL;
+    //local->m_broadPhase = init_hkp3AxisSweep();
+    local->m_phantoms = NULL;
 
     return local;
 }
 
 void free_hkpWorld(hkpWorld* to)
 {
-    free_hkp3AxisSweep(to->m_broadPhase);
+    //free_hkpSimulationIsland(to->m_activeSimulationIslands);
+    //free_hkpSimulationIsland(to->m_inactiveSimulationIslands);
+    //free_hkpSimulationIsland(to->m_dirtySimulationIslands);
+    //free_hkp3AxisSweep(to->m_broadPhase);
+    for (size_t i = 0; i < to->m_phantoms_cap; i++)
+    {
+        if (to->m_phantoms[i] != NULL)
+        {
+            free_hkpPhantom(to->m_phantoms[i], StateTarget::ToLocal);
+        }
+    }
+    free(to->m_phantoms);
     free(to);
 }
 
@@ -133,7 +186,7 @@ void copy_hkpBpNode(hkpBpNode* to, const hkpBpNode* from, StateTarget target)
     if (from->index_in_array == NULL)
     {
         to->index_in_array = NULL;
-}
+    }
     else
     {
         if (to->index_in_array == NULL)
@@ -177,8 +230,97 @@ void copy_hkpBpEndPoint(hkpBpEndPoint* to, const hkpBpEndPoint* from, StateTarge
     to->data_1 = from->data_1;
 }
 
+PhantomType hkpPhantom_getType(void* to)
+{
+    if (to == NULL)
+    {
+        return PhantomType::Null;
+    }
+    if (*(uint64_t*)(to) == 0x14145cb08) //hkpAabbPhantom::vftable (ragdoll)
+    {
+        return PhantomType::Aabb;
+    }
+    if (*(uint64_t*)(to) == 0x14145ccc8) //hkpSimpleShapePhantom::vftable
+    {
+        return PhantomType::SimpleShape;
+    }
+    return PhantomType::InvalidPhantom;
+}
 
-/* ---------------- CHRCTRL + DAMAGE MAN ------------------ */
+void copy_hkpPhantom(void** to, void* from, StateTarget target)
+{
+    PhantomType type = hkpPhantom_getType(from);
+    switch (type)
+    {
+    case PhantomType::SimpleShape:
+        //destroy the target if not the right class
+        if (*to != NULL)
+        {
+            PhantomType totype = hkpPhantom_getType(*to);
+            if (totype != PhantomType::SimpleShape)
+            {
+                free_hkpPhantom((*to), target);
+                *to = NULL;
+            }
+        }
+        //init the target if needed
+        if (*to == NULL)
+        {
+            *to = init_hkpSimpleShapePhantom(target);
+        }
+        copy_hkpSimpleShapePhantom((hkpSimpleShapePhantom*)(*to), (const hkpSimpleShapePhantom*)from, target);
+        break;
+    case PhantomType::Aabb:
+        //don't need to handle copying, this is just for ragdolls
+        if (target == StateTarget::ToGame)
+        {
+            free_hkpPhantom((*to), target);
+            *to = NULL;
+        }
+        else
+        {
+            if (*to == NULL)
+            {
+                *to = malloc_(sizeof(uint64_t));
+            }
+            *(uint64_t*)(*to) = (uint64_t)0x14145cb08;
+        }
+        break;
+    case PhantomType::Null:
+        free_hkpPhantom(*to, target);
+        *to = NULL;
+        return;
+    case PhantomType::InvalidPhantom:
+        FATALERROR("%p is not a valid phantom for copy (vtable %llx)", from, *(uint64_t*)from);
+        break;
+    }
+}
+
+void free_hkpPhantom(void* to, StateTarget target)
+{
+    PhantomType type = hkpPhantom_getType(to);
+    switch (type)
+    {
+    case PhantomType::SimpleShape:
+        free_hkpSimpleShapePhantom((hkpSimpleShapePhantom*)to, target);
+        break;
+    case PhantomType::Aabb:
+        if (target == StateTarget::ToGame)
+        {
+            hkReferencedObject_deref(to);
+        }
+        else
+        {
+            free(to);
+        }
+        break;
+    case PhantomType::Null:
+        break;
+    case PhantomType::InvalidPhantom:
+        FATALERROR("%p is not a valid phantom for free (vtable %llx)", to, *(uint64_t*)to);
+        break;
+    }
+}
 
 std::string print_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to)
 {
@@ -188,6 +330,7 @@ std::string print_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to)
 
 void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapePhantom* from, StateTarget target)
 {
+    to->vtable = from->vtable;
     to->data_0 = from->data_0;
     to->hkpWorldPtr = from->hkpWorldPtr;
     to->m_userData = from->m_userData;
@@ -247,12 +390,19 @@ void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapeP
 }
 
 
-//This is only used in DamageMan and PlayerIns, both of which are garunteed to exist on the game side. So this init is only for dll memory
 //all of it's children arrays are unknown sized, so should be init'd on copy
-hkpSimpleShapePhantom* init_hkpSimpleShapePhantom()
+hkpSimpleShapePhantom* init_hkpSimpleShapePhantom(StateTarget target)
 {
-    hkpSimpleShapePhantom* local_hkpSimpleShapePhantom = (hkpSimpleShapePhantom*)malloc_(sizeof(hkpSimpleShapePhantom));
-
+    hkpSimpleShapePhantom* local_hkpSimpleShapePhantom = NULL;
+    if (target == StateTarget::ToGame)
+    {
+        local_hkpSimpleShapePhantom = (hkpSimpleShapePhantom*)Game::thread_malloc(sizeof(hkpSimpleShapePhantom));
+    }
+    else
+    {
+        local_hkpSimpleShapePhantom = (hkpSimpleShapePhantom*)malloc_(sizeof(hkpSimpleShapePhantom));
+    }
+    local_hkpSimpleShapePhantom->vtable = (void*)0x14145ccc8;
     //don't know if we need a cap or a sphere, so init on copy
     local_hkpSimpleShapePhantom->m_collidable.base.m_cap_shape = NULL;
     local_hkpSimpleShapePhantom->m_collidable.base.m_sph_shape = NULL;
@@ -278,25 +428,62 @@ hkpSimpleShapePhantom* init_hkpSimpleShapePhantom()
     return local_hkpSimpleShapePhantom;
 }
 
-void free_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to)
+void free_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, StateTarget target)
 {
-    free(to->m_collidable.base.m_cap_shape);
-    free(to->m_collidable.base.m_boundingVolumeData.m_childShapeAabbs);
-    free(to->m_collidable.base.m_boundingVolumeData.m_childShapeKeys);
-    free(to->m_collidable.m_collisionEntries);
-    for (size_t i = 0; i < to->m_properties_len; i++)
+    if (target == StateTarget::ToGame)
     {
-        free_hkpProperty(&to->m_properties[i]);
+        hkReferencedObject_deref(to);
     }
-    free(to->m_properties);
-    for (size_t i = 0; i < to->m_collisionDetails_len; i++)
+    else
     {
-        free_hkpCollidable(to->m_collisionDetails[i]);
+        free(to->m_collidable.base.m_cap_shape);
+        free(to->m_collidable.base.m_boundingVolumeData.m_childShapeAabbs);
+        free(to->m_collidable.base.m_boundingVolumeData.m_childShapeKeys);
+        free(to->m_collidable.m_collisionEntries);
+        for (size_t i = 0; i < to->m_properties_len; i++)
+        {
+            free_hkpProperty(&to->m_properties[i]);
+        }
+        free(to->m_properties);
+        for (size_t i = 0; i < to->m_collisionDetails_len; i++)
+        {
+            free_hkpCollidable(to->m_collisionDetails[i]);
+        }
+        free(to->m_collisionDetails);
+        free(to);
     }
-    free(to->m_collisionDetails);
-    free(to);
 }
 
+hkpSimpleShapePhantom* get_hkpSimpleShapePhantom(hkpWorld* world, FrpgPhysShapePhantomIns* parent)
+{
+    auto ret = find_hkpSimpleShapePhantom(world, parent);
+    if (ret == NULL)
+    {
+        FATALERROR("Could not find shape phantom for parent %p", parent);
+    }
+    return ret;
+}
+
+hkpSimpleShapePhantom* find_hkpSimpleShapePhantom(hkpWorld* world, FrpgPhysShapePhantomIns* parent)
+{
+    void** array = world->m_phantoms;
+    for (size_t i = 0; i < world->m_phantoms_size; i++)
+    {
+        void* elem = array[i];
+        PhantomType type = hkpPhantom_getType(elem);
+        if (type == PhantomType::SimpleShape)
+        {
+            hkpSimpleShapePhantom* phantom = (hkpSimpleShapePhantom*)elem;
+            if (*(phantom->m_userData) == parent)
+            {
+                return phantom;
+            }
+        }
+    }
+    return NULL;
+}
+
+/* ---------------- CHRCTRL + DAMAGE MAN ------------------ */
 
 void copy_hkpLinkedCollidable(hkpLinkedCollidable* to, const hkpLinkedCollidable* from, StateTarget target)
 {
@@ -328,6 +515,7 @@ void copy_hkpLinkedCollidable(hkpLinkedCollidable* to, const hkpLinkedCollidable
     //    copy_CollisionEntry(&to->m_collisionEntries[i], &from->m_collisionEntries[i], to);
     //}
 }
+
 
 
 void copy_hkpProperty(hkpProperty* to, hkpProperty* from, StateTarget target)
@@ -715,11 +903,38 @@ std::string print_hkpCharacterProxy(hkpCharacterProxy* to)
     return out;
 }
 
-void copy_hkpCharacterProxy(hkpCharacterProxy* to, const hkpCharacterProxy* from, StateTarget target)
+//CharacterProxy is not in hkpWorld, it's handled by game code. So we can save/restore it from the Chr
+void copy_hkpCharacterProxy(hkpCharacterProxy* to, const hkpCharacterProxy* from, hkpWorld* world, StateTarget target)
 {
     to->data_0 = from->data_0;
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
-    copy_hkpSimpleShapePhantom(to->HkpSimpleShapePhantom, from->HkpSimpleShapePhantom, target);
+    size_t index = -1;
+    switch (target)
+    {
+    case StateTarget::ToGame:
+        //use the value (actually an index) to get the right shape phantom
+        to->HkpSimpleShapePhantom = (hkpSimpleShapePhantom*)world->m_phantoms[(size_t)(from->HkpSimpleShapePhantom)];
+        break;
+    case StateTarget::ToLocal:
+        //save the phantom's index in the m_phantoms list
+        for (size_t i = 0; i < world->m_phantoms_size; i++)
+        {
+            if (world->m_phantoms[i] == from->HkpSimpleShapePhantom)
+            {
+                index = i;
+                break;
+            }
+        }
+        if (index == -1)
+        {
+            FATALERROR("Unable to locate hkpCharacterProxy's shapePhantom (%p) in m_phantoms", from->HkpSimpleShapePhantom);
+        }
+        to->HkpSimpleShapePhantom = (hkpSimpleShapePhantom*)index;
+        break;
+    case StateTarget::Copy:
+        to->HkpSimpleShapePhantom = from->HkpSimpleShapePhantom;
+        break;
+    }
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
 }
@@ -729,9 +944,6 @@ hkpCharacterProxy* init_hkpCharacterProxy(StateTarget target)
     if (target != StateTarget::ToGame)
     {
         hkpCharacterProxy* local_hkpCharacterProxy = (hkpCharacterProxy*)malloc_(sizeof(hkpCharacterProxy));
-
-        local_hkpCharacterProxy->HkpSimpleShapePhantom = init_hkpSimpleShapePhantom();
-
         return local_hkpCharacterProxy;
     }
     else
@@ -742,6 +954,5 @@ hkpCharacterProxy* init_hkpCharacterProxy(StateTarget target)
 
 void free_hkpCharacterProxy(hkpCharacterProxy* to)
 {
-    free_hkpSimpleShapePhantom(to->HkpSimpleShapePhantom);
     free(to);
 }

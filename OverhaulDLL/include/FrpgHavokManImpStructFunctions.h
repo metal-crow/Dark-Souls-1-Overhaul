@@ -17,11 +17,14 @@ void copy_FrpgPhysWorld(FrpgPhysWorld* to, const FrpgPhysWorld* from, StateTarge
 FrpgPhysWorld* init_FrpgPhysWorld();
 void free_FrpgPhysWorld(FrpgPhysWorld* to);
 
-void copy_hkpWorld(hkpWorld** to, const hkpWorld* from, StateTarget target);
+void copy_hkpWorld(hkpWorld* to, const hkpWorld* from, StateTarget target);
 hkpWorld* init_hkpWorld();
 void free_hkpWorld(hkpWorld* to);
 
-void copy_hkp3AxisSweep(hkp3AxisSweep* to, const hkp3AxisSweep* from, bool to_game);
+void copy_hkpSimulationIsland(hkpSimulationIsland* to, uint32_t to_size, hkpSimulationIsland* from, uint32_t from_size, StateTarget target);
+void free_hkpSimulationIsland(hkpSimulationIsland* to);
+
+void copy_hkp3AxisSweep(hkp3AxisSweep* to, const hkp3AxisSweep* from, StateTarget target);
 hkp3AxisSweep* init_hkp3AxisSweep();
 void free_hkp3AxisSweep(hkp3AxisSweep* to);
 
@@ -31,12 +34,19 @@ void copy_hkpBpAxis(hkpBpAxis* to, const hkpBpAxis* from, StateTarget target);
 
 void copy_hkpBpEndPoint(hkpBpEndPoint* to, const hkpBpEndPoint* from, StateTarget target);
 
-/* ---------------- CHRCTRL + DAMAGE MAN ------------------ */
+enum PhantomType { SimpleShape, Aabb, Null, InvalidPhantom };
+PhantomType hkpPhantom_getType(void* to);
+void copy_hkpPhantom(void** to, void* from, StateTarget target);
+void free_hkpPhantom(void* to, StateTarget target);
 
 std::string print_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to);
 void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapePhantom* from, StateTarget target);
-hkpSimpleShapePhantom* init_hkpSimpleShapePhantom();
-void free_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to);
+hkpSimpleShapePhantom* init_hkpSimpleShapePhantom(StateTarget target);
+void free_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, StateTarget target);
+hkpSimpleShapePhantom* get_hkpSimpleShapePhantom(hkpWorld* world, FrpgPhysShapePhantomIns* parent);
+hkpSimpleShapePhantom* find_hkpSimpleShapePhantom(hkpWorld* world, FrpgPhysShapePhantomIns* parent);
+
+/* ---------------- CHRCTRL + DAMAGE MAN ------------------ */
 
 void copy_hkpLinkedCollidable(hkpLinkedCollidable* to, const hkpLinkedCollidable* from, StateTarget target);
 
@@ -78,7 +88,7 @@ void free_hkpMoppBvTreeShape(hkpMoppBvTreeShape* to, StateTarget target);
 /* ---------------- CHRCTRL ------------------ */
 
 std::string print_hkpCharacterProxy(hkpCharacterProxy* to);
-void copy_hkpCharacterProxy(hkpCharacterProxy* to, const hkpCharacterProxy* from, StateTarget target);
+void copy_hkpCharacterProxy(hkpCharacterProxy* to, const hkpCharacterProxy* from, hkpWorld* world, StateTarget target);
 hkpCharacterProxy* init_hkpCharacterProxy(StateTarget target);
 void free_hkpCharacterProxy(hkpCharacterProxy* to);
 
