@@ -32,6 +32,7 @@ static const uint64_t ReadParseType34_packet_offset = 0x50861d;
 static const uint64_t ReadParseType50_packet_offset = 0x353b1b;
 static const uint64_t ApplyType33_packet_offset = 0x350903;
 static const uint64_t getNetMessageAC_offset = 0x50b5e6;
+static const uint64_t ProcessPushRequestType_SendNotificationMessage_offset = 0xbdf000;
 
 } // namespace AntiCheat
 

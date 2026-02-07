@@ -119,6 +119,13 @@ void start() {
     // Monitor all incoming packets so we can drop certain ones from invaders
     write_address = getNetMessageAC_offset + Game::ds1_base;
     sp::mem::code::x64::inject_jmp_14b((void*)write_address, &getNetMessageAC_return, 4, &getNetMessageAC_injection);
+
+    // Disable the SendNotificationMessage packet, since any player can tell the server to send it to any other player
+    //https://www.patreon.com/posts/info-blue-and-of-148777896
+    //i havent tested this for DSR but whatever it's probably fine regardless
+    write_address = ProcessPushRequestType_SendNotificationMessage_offset + Game::ds1_base;
+    uint8_t jmp[] = { 0xE9, 0x4B, 0x2, 0x0, 0x0, 0x90 };
+    sp::mem::patch_bytes((void*)write_address, jmp, sizeof(jmp));
 }
 
 } // namespace AntiCheat
