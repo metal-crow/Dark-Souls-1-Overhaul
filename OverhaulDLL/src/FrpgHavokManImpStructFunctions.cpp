@@ -45,7 +45,7 @@ void free_FrpgPhysWorld(FrpgPhysWorld* to)
 
 void copy_hkpWorld(hkpWorld* to, const hkpWorld* from, StateTarget target)
 {
-    //copy_hkp3AxisSweep(to->m_broadPhase, from->m_broadPhase, target);
+    copy_hkp3AxisSweep(to->m_broadPhase, from->m_broadPhase, target);
     //don't need to actually save/load the simulation islands themselves, those should be stable for the lifetime of this session
     //copy_hkpSimulationIsland(to->m_activeSimulationIslands, to->m_activeSimulationIslands_size, from->m_activeSimulationIslands, from->m_activeSimulationIslands_size, target);
     //copy_hkpSimulationIsland(to->m_inactiveSimulationIslands, to->m_inactiveSimulationIslands_size, from->m_inactiveSimulationIslands, from->m_inactiveSimulationIslands_size, target);
@@ -93,7 +93,7 @@ hkpWorld* init_hkpWorld()
     local->m_activeSimulationIslands = NULL;
     local->m_inactiveSimulationIslands = NULL;
     local->m_dirtySimulationIslands = NULL;
-    //local->m_broadPhase = init_hkp3AxisSweep();
+    local->m_broadPhase = init_hkp3AxisSweep();
     local->m_phantoms = NULL;
 
     return local;
@@ -104,7 +104,7 @@ void free_hkpWorld(hkpWorld* to)
     //free_hkpSimulationIsland(to->m_activeSimulationIslands);
     //free_hkpSimulationIsland(to->m_inactiveSimulationIslands);
     //free_hkpSimulationIsland(to->m_dirtySimulationIslands);
-    //free_hkp3AxisSweep(to->m_broadPhase);
+    free_hkp3AxisSweep(to->m_broadPhase);
     for (size_t i = 0; i < to->m_phantoms_cap; i++)
     {
         if (to->m_phantoms[i] != NULL)
@@ -160,11 +160,14 @@ hkp3AxisSweep* init_hkp3AxisSweep()
 
 void free_hkp3AxisSweep(hkp3AxisSweep* to)
 {
-    for (size_t i = 0; i < to->m_nodes_cap; i++)
+    if (to->m_nodes != NULL)
     {
-        free(to->m_nodes[i].index_in_array);
+        for (size_t i = 0; i < to->m_nodes_cap; i++)
+        {
+            free(to->m_nodes[i].index_in_array);
+        }
+        free(to->m_nodes);
     }
-    free(to->m_nodes);
     if (to->m_axis[0].arry != NULL)
     {
         free(to->m_axis[0].arry);
@@ -206,9 +209,9 @@ void copy_hkpBpNode(hkpBpNode* to, const hkpBpNode* from, StateTarget target)
 
 void copy_hkpBpAxis(hkpBpAxis* to, const hkpBpAxis* from, StateTarget target)
 {
+    to->len = from->len;
     if ((to->capacity & 0x3fffffff) < from->len)
     {
-        to->len = from->len;
         if (target == StateTarget::ToGame)
         {
             increase_list_size(Game::MemHeapAllocator, &to->arry, 0x8);
@@ -216,10 +219,10 @@ void copy_hkpBpAxis(hkpBpAxis* to, const hkpBpAxis* from, StateTarget target)
         else
         {
             to->arry = (hkpBpEndPoint*)realloc_(to->arry, (to->len + 1) * sizeof(hkpBpEndPoint));
-            to->capacity = to->capacity + 1;
+            to->capacity = to->len + 1;
         }
     }
-    for (size_t i = 0; i < to->len; i++)
+    for (size_t i = 0; i < from->len; i++)
     {
         copy_hkpBpEndPoint(&to->arry[i], &from->arry[i], target);
     }
@@ -234,7 +237,7 @@ PhantomType hkpPhantom_getType(void* to)
 {
     if (to == NULL)
     {
-        return PhantomType::Null;
+        return PhantomType::PhantomNull;
     }
     if (*(uint64_t*)(to) == 0x14145cb08) //hkpAabbPhantom::vftable (ragdoll)
     {
@@ -286,7 +289,7 @@ void copy_hkpPhantom(void** to, void* from, StateTarget target)
             *(uint64_t*)(*to) = (uint64_t)0x14145cb08;
         }
         break;
-    case PhantomType::Null:
+    case PhantomType::PhantomNull:
         free_hkpPhantom(*to, target);
         *to = NULL;
         return;
@@ -314,7 +317,7 @@ void free_hkpPhantom(void* to, StateTarget target)
             free(to);
         }
         break;
-    case PhantomType::Null:
+    case PhantomType::PhantomNull:
         break;
     case PhantomType::InvalidPhantom:
         FATALERROR("%p is not a valid phantom for free (vtable %llx)", to, *(uint64_t*)to);
@@ -404,8 +407,7 @@ hkpSimpleShapePhantom* init_hkpSimpleShapePhantom(StateTarget target)
     }
     local_hkpSimpleShapePhantom->vtable = (void*)0x14145ccc8;
     //don't know if we need a cap or a sphere, so init on copy
-    local_hkpSimpleShapePhantom->m_collidable.base.m_cap_shape = NULL;
-    local_hkpSimpleShapePhantom->m_collidable.base.m_sph_shape = NULL;
+    local_hkpSimpleShapePhantom->m_collidable.base.shape = NULL;
 
     //we don't know how big these should be, so they are init'd on copy
     local_hkpSimpleShapePhantom->m_collidable.base.m_boundingVolumeData.m_childShapeAabbs = NULL;
@@ -436,7 +438,7 @@ void free_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, StateTarget target)
     }
     else
     {
-        free(to->m_collidable.base.m_cap_shape);
+        free(to->m_collidable.base.shape);
         free(to->m_collidable.base.m_boundingVolumeData.m_childShapeAabbs);
         free(to->m_collidable.base.m_boundingVolumeData.m_childShapeKeys);
         free(to->m_collidable.m_collisionEntries);
@@ -544,43 +546,7 @@ void copy_hkMotionState(hkMotionState* to, const hkMotionState* from)
 
 void copy_hkpCollidable(hkpCollidable* to, const hkpCollidable* from, StateTarget target)
 {
-    ShapeType fromshape = hkpShape_getType(from->base_shape);
-    ShapeType toshape = ShapeType::InvalidShape;
-    //this is init'd on copy for ToLocal
-    if (target == StateTarget::ToGame)
-    {
-        toshape = hkpShape_getType(to->base_shape);
-    }
-
-    switch (fromshape)
-    {
-    case ShapeType::Sphere:
-        //if this proves to be an issue, we need to destruct the shape here
-        if (target == StateTarget::ToGame && toshape != fromshape)
-        {
-            FATALERROR("Game has mismatched collidable, we have a Sphere and got %d (%llx)", toshape, *(uint64_t*)to->base_shape);
-        }
-        copy_hkpSphereShape(&to->m_sph_shape, (hkpSphereShape**)&from->m_sph_shape, target);
-        break;
-    case ShapeType::Capsule:
-        if (target == StateTarget::ToGame && toshape != fromshape)
-        {
-            FATALERROR("Game has mismatched collidable, we have a Capsule and got %d (%llx)", toshape, *(uint64_t*)to->base_shape);
-        }
-        copy_hkpCapsuleShape(&to->m_cap_shape, (hkpCapsuleShape**)&from->m_cap_shape, target);
-        break;
-    case ShapeType::MoppBvTree:
-        if (target == StateTarget::ToGame && toshape != fromshape)
-        {
-            FATALERROR("Game has mismatched collidable, we have a MoppBvTree and got %d (%llx)", toshape, *(uint64_t*)to->base_shape);
-        }
-        copy_hkpMoppBvTreeShape(&to->m_tree_shape, (hkpMoppBvTreeShape**)&from->m_tree_shape, target);
-        break;
-    case ShapeType::InvalidShape:
-        FATALERROR("%p is not a valid shape (vtable %llx)", from->base_shape, *(uint64_t*)from->base_shape);
-        break;
-    }
-
+    copy_hkpShape(&to->shape, from->shape, target);
     to->m_shapeKey = from->m_shapeKey;
     to->m_ownerOffset = from->m_ownerOffset;
     to->m_forceCollideOntoPpu = from->m_forceCollideOntoPpu;
@@ -602,27 +568,14 @@ void init_hkpCollidable(hkpCollidable** to, StateTarget target)
         FATALERROR("Need to alloc hkpCollidable in game");
     }
     //unknown, init on copy
-    (*to)->base_shape = NULL;
+    (*to)->shape = NULL;
     (*to)->self = (*to);
     init_BoundingVolumeData(&(*to)->m_boundingVolumeData, target);
 }
 
 void free_hkpCollidable(hkpCollidable* to)
 {
-    switch (hkpShape_getType(to->base_shape))
-    {
-    case ShapeType::Sphere:
-        free_hkpSphereShape(to->m_sph_shape, StateTarget::ToLocal);
-        break;
-    case ShapeType::Capsule:
-        free_hkpCapsuleShape(to->m_cap_shape, StateTarget::ToLocal);
-        break;
-    case ShapeType::MoppBvTree:
-        free_hkpMoppBvTreeShape(to->m_tree_shape, StateTarget::ToLocal);
-        break;
-    default:
-        break;
-    }
+    free_hkpShape(to->shape, StateTarget::ToLocal);
     free_BoundingVolumeData(&to->m_boundingVolumeData, StateTarget::ToLocal);
     free(to);
 }
@@ -704,6 +657,10 @@ void free_BoundingVolumeData(BoundingVolumeData* to, StateTarget target)
 
 ShapeType hkpShape_getType(void* to)
 {
+    if (to == NULL)
+    {
+        return ShapeType::ShapeNull;
+    }
     if (*(uint64_t*)(to) == 0x14141c200) //hkpSphereShape::vftable
     {
         return ShapeType::Sphere;
@@ -716,24 +673,103 @@ ShapeType hkpShape_getType(void* to)
     {
         return ShapeType::MoppBvTree;
     }
+    if (*(uint64_t*)(to) == 0x14141c0c0) //hkpConvexVerticesShape::vftable
+    {
+        return ShapeType::ConvexVertices;
+    }
     return ShapeType::InvalidShape;
 }
 
-void copy_hkpSphereShape(hkpSphereShape** to, hkpSphereShape** from, StateTarget target)
+void copy_hkpShape(void** to, void* from, StateTarget target)
 {
-    if (*to == NULL && *from != NULL)
+    ShapeType fromshape = hkpShape_getType(from);
+    ShapeType toshape = hkpShape_getType(*to);
+
+    switch (fromshape)
+    {
+    case ShapeType::Sphere:
+        if (toshape != fromshape)
+        {
+            free_hkpShape(*to, target);
+            *to = init_hkpSphereShape(target);
+        }
+        copy_hkpSphereShape((hkpSphereShape**)to, (hkpSphereShape*)from, target);
+        break;
+    case ShapeType::Capsule:
+        if (toshape != fromshape)
+        {
+            free_hkpShape(*to, target);
+            *to = init_hkpCapsuleShape(target);
+        }
+        copy_hkpCapsuleShape((hkpCapsuleShape**)to, (hkpCapsuleShape*)from, target);
+        break;
+    case ShapeType::MoppBvTree:
+        if (toshape != fromshape)
+        {
+            free_hkpShape(*to, target);
+            *to = init_hkpMoppBvTreeShape(target);
+        }
+        copy_hkpMoppBvTreeShape((hkpMoppBvTreeShape**)to, (hkpMoppBvTreeShape*)from, target);
+        break;
+    case ShapeType::ConvexVertices:
+        FATALERROR("HI %p", from);
+        if (toshape != fromshape)
+        {
+            free_hkpShape(*to, target);
+            *to = init_hkpConvexVerticesShape(target);
+        }
+        copy_hkpConvexVerticesShape((hkpConvexVerticesShape**)to, (hkpConvexVerticesShape*)from, target);
+        break;
+    case ShapeType::ShapeNull:
+        free_hkpShape(*to, target);
+        *to = NULL;
+        break;
+    case ShapeType::InvalidShape:
+        FATALERROR("%p is not a valid shape (vtable %llx)", from, *(uint64_t*)from);
+        break;
+    }
+}
+
+void free_hkpShape(void* to, StateTarget target)
+{
+    switch (hkpShape_getType(to))
+    {
+    case ShapeType::Sphere:
+        free_hkpSphereShape((hkpSphereShape*)to, target);
+        break;
+    case ShapeType::Capsule:
+        free_hkpCapsuleShape((hkpCapsuleShape*)to, target);
+        break;
+    case ShapeType::MoppBvTree:
+        free_hkpMoppBvTreeShape((hkpMoppBvTreeShape*)to, target);
+        break;
+    case ShapeType::ConvexVertices:
+        free_hkpConvexVerticesShape((hkpConvexVerticesShape*)to, target);
+        break;
+    case ShapeType::ShapeNull:
+        break;
+    case ShapeType::InvalidShape:
+        FATALERROR("Unable to free invalid shape %p (vtable %llx)", to, *(uint64_t*)to);
+        break;
+    }
+}
+
+
+void copy_hkpSphereShape(hkpSphereShape** to, hkpSphereShape* from, StateTarget target)
+{
+    if (*to == NULL && from != NULL)
     {
         *to = init_hkpSphereShape(target);
     }
-    if (*to != NULL && *from == NULL)
+    if (*to != NULL && from == NULL)
     {
         free_hkpSphereShape(*to, target);
         *to = NULL;
     }
-    if (*to != NULL && *from != NULL)
+    if (*to != NULL && from != NULL)
     {
-        (*to)->vtable = (*from)->vtable;
-        memcpy((*to)->data_0, (*from)->data_0, sizeof((*to)->data_0));
+        (*to)->vtable = (from)->vtable;
+        memcpy((*to)->data_0, (from)->data_0, sizeof((*to)->data_0));
     }
 }
 
@@ -748,6 +784,7 @@ hkpSphereShape* init_hkpSphereShape(StateTarget target)
     {
         local = (hkpSphereShape*)malloc_(sizeof(hkpSphereShape));
     }
+    local->vtable = 0x14141c200;
     return local;
 }
 
@@ -764,21 +801,21 @@ void free_hkpSphereShape(hkpSphereShape* to, StateTarget target)
 }
 
 
-void copy_hkpCapsuleShape(hkpCapsuleShape** to, hkpCapsuleShape** from, StateTarget target)
+void copy_hkpCapsuleShape(hkpCapsuleShape** to, hkpCapsuleShape* from, StateTarget target)
 {
-    if (*to == NULL && *from != NULL)
+    if (*to == NULL && from != NULL)
     {
         *to = init_hkpCapsuleShape(target);
     }
-    if (*to != NULL && *from == NULL)
+    if (*to != NULL && from == NULL)
     {
         free_hkpCapsuleShape(*to, target);
         *to = NULL;
     }
-    if (*to != NULL && *from != NULL)
+    if (*to != NULL && from != NULL)
     {
-        (*to)->vtable = (*from)->vtable;
-        memcpy((*to)->data_0, (*from)->data_0, sizeof((*to)->data_0));
+        (*to)->vtable = (from)->vtable;
+        memcpy((*to)->data_0, (from)->data_0, sizeof((*to)->data_0));
     }
 }
 
@@ -793,6 +830,7 @@ hkpCapsuleShape* init_hkpCapsuleShape(StateTarget target)
     {
         local = (hkpCapsuleShape*)malloc_(sizeof(hkpCapsuleShape));
     }
+    local->vtable = 0x14141bf58;
     return local;
 }
 
@@ -808,34 +846,33 @@ void free_hkpCapsuleShape(hkpCapsuleShape* to, StateTarget target)
     }
 }
 
-void copy_hkpMoppBvTreeShape(hkpMoppBvTreeShape** to, hkpMoppBvTreeShape** from, StateTarget target)
+void copy_hkpMoppBvTreeShape(hkpMoppBvTreeShape** to, hkpMoppBvTreeShape* from, StateTarget target)
 {
-    if (*to == NULL && *from != NULL)
+    if (*to == NULL && from != NULL)
     {
         *to = init_hkpMoppBvTreeShape(target);
     }
-    if (*to != NULL && *from == NULL)
+    if (*to != NULL && from == NULL)
     {
         free_hkpMoppBvTreeShape(*to, target);
         *to = NULL;
     }
-    if (*to != NULL && *from != NULL)
+    if (*to != NULL && from != NULL)
     {
-        (*to)->vtable1 = (*from)->vtable1;
-        memcpy((*to)->data_0, (*from)->data_0, sizeof((*to)->data_0));
-        if ((*from)->unk1 != 0)
+        (*to)->vtable1 = (from)->vtable1;
+        memcpy((*to)->data_0, (from)->data_0, sizeof((*to)->data_0));
+        if ((from)->unk1 != 0)
         {
-            FATALERROR("hkpMoppBvTreeShape->unk1 is non-0, value %x", (*from)->unk1);
+            FATALERROR("hkpMoppBvTreeShape->unk1 is non-0, value %x", (from)->unk1);
         }
-        (*to)->unk1 = (*from)->unk1;
-        (*to)->data_1 = (*from)->data_1;
+        (*to)->unk1 = (from)->unk1;
+        (*to)->data_1 = (from)->data_1;
         //refobject1
-        (*to)->unk2 = (*from)->unk2;
-        memcpy((*to)->data_2, (*from)->data_2, sizeof((*to)->data_2));
-        (*to)->vtable2 = (*from)->vtable2;
+        (*to)->unk2 = (from)->unk2;
+        memcpy((*to)->data_2, (from)->data_2, sizeof((*to)->data_2));
+        (*to)->vtable2 = (from)->vtable2;
         //refobject2
-        memcpy((*to)->data_3, (*from)->data_3, sizeof((*to)->data_3));
-
+        memcpy((*to)->data_3, (from)->data_3, sizeof((*to)->data_3));
     }
 }
 
@@ -850,6 +887,7 @@ hkpMoppBvTreeShape* init_hkpMoppBvTreeShape(StateTarget target)
     {
         local = (hkpMoppBvTreeShape*)malloc_(sizeof(hkpMoppBvTreeShape));
     }
+    local->vtable1 = 0x14141bd68;
     return local;
 }
 
@@ -864,6 +902,69 @@ void free_hkpMoppBvTreeShape(hkpMoppBvTreeShape* to, StateTarget target)
     {
         free(to);
     }
+}
+
+void copy_hkpConvexVerticesShape(hkpConvexVerticesShape** to, hkpConvexVerticesShape* from, StateTarget target)
+{
+    if (*to == NULL && from != NULL)
+    {
+        *to = init_hkpConvexVerticesShape(target);
+    }
+    if (*to != NULL && from == NULL)
+    {
+        free_hkpConvexVerticesShape(*to, target);
+        *to = NULL;
+    }
+    if (*to != NULL && from != NULL)
+    {
+        (*to)->vtable = (from)->vtable;
+        memcpy((*to)->data_0, (from)->data_0, sizeof((*to)->data_0));
+        //TODO
+    }
+}
+
+hkpConvexVerticesShape* init_hkpConvexVerticesShape(StateTarget target)
+{
+    hkpConvexVerticesShape* local;
+    if (target == StateTarget::ToGame)
+    {
+        local = (hkpConvexVerticesShape*)Game::thread_malloc(sizeof(hkpConvexVerticesShape));
+    }
+    else
+    {
+        local = (hkpConvexVerticesShape*)malloc_(sizeof(hkpConvexVerticesShape));
+    }
+    local->vtable = 0x14141c0c0;
+
+    return local;
+}
+
+void free_hkpConvexVerticesShape(hkpConvexVerticesShape* to, StateTarget target)
+{
+    if (target == StateTarget::ToGame)
+    {
+        hkReferencedObject_deref(to);
+    }
+    else
+    {
+        
+        free(to);
+    }
+}
+
+void copy_hkpConvexVerticesConnectivity(hkpConvexVerticesConnectivity** to, hkpConvexVerticesConnectivity* from, StateTarget target)
+{
+
+}
+
+hkpConvexVerticesConnectivity* init_hkpConvexVerticesConnectivity(StateTarget target)
+{
+
+}
+
+void free_hkpConvexVerticesConnectivity(hkpConvexVerticesConnectivity* to, StateTarget target)
+{
+
 }
 
 /* ---------------- CHRCTRL ------------------ */

@@ -34,7 +34,7 @@ void copy_hkpBpAxis(hkpBpAxis* to, const hkpBpAxis* from, StateTarget target);
 
 void copy_hkpBpEndPoint(hkpBpEndPoint* to, const hkpBpEndPoint* from, StateTarget target);
 
-enum PhantomType { SimpleShape, Aabb, Null, InvalidPhantom };
+enum PhantomType { SimpleShape, Aabb, PhantomNull, InvalidPhantom };
 PhantomType hkpPhantom_getType(void* to);
 void copy_hkpPhantom(void** to, void* from, StateTarget target);
 void free_hkpPhantom(void* to, StateTarget target);
@@ -70,20 +70,30 @@ void free_BoundingVolumeData(BoundingVolumeData* to, StateTarget target);
 
 
 //void copy_hkpAgentNnEntry(hkpAgentNnEntry* to, hkpAgentNnEntry* from);
-enum ShapeType { Sphere, Capsule, MoppBvTree, InvalidShape };
+enum ShapeType { Sphere, Capsule, MoppBvTree, ConvexVertices, ShapeNull, InvalidShape };
 ShapeType hkpShape_getType(void* to);
+void copy_hkpShape(void** to, void* from, StateTarget target);
+void free_hkpShape(void* to, StateTarget target);
 
-void copy_hkpSphereShape(hkpSphereShape** to, hkpSphereShape** from, StateTarget target);
+void copy_hkpSphereShape(hkpSphereShape** to, hkpSphereShape* from, StateTarget target);
 hkpSphereShape* init_hkpSphereShape(StateTarget target);
 void free_hkpSphereShape(hkpSphereShape* to, StateTarget target);
 
-void copy_hkpCapsuleShape(hkpCapsuleShape** to, hkpCapsuleShape** from, StateTarget target);
+void copy_hkpCapsuleShape(hkpCapsuleShape** to, hkpCapsuleShape* from, StateTarget target);
 hkpCapsuleShape* init_hkpCapsuleShape(StateTarget target);
 void free_hkpCapsuleShape(hkpCapsuleShape* to, StateTarget target);
 
-void copy_hkpMoppBvTreeShape(hkpMoppBvTreeShape** to, hkpMoppBvTreeShape** from, StateTarget target);
+void copy_hkpMoppBvTreeShape(hkpMoppBvTreeShape** to, hkpMoppBvTreeShape* from, StateTarget target);
 hkpMoppBvTreeShape* init_hkpMoppBvTreeShape(StateTarget target);
 void free_hkpMoppBvTreeShape(hkpMoppBvTreeShape* to, StateTarget target);
+
+void copy_hkpConvexVerticesShape(hkpConvexVerticesShape** to, hkpConvexVerticesShape* from, StateTarget target);
+hkpConvexVerticesShape* init_hkpConvexVerticesShape(StateTarget target);
+void free_hkpConvexVerticesShape(hkpConvexVerticesShape* to, StateTarget target);
+
+void copy_hkpConvexVerticesConnectivity(hkpConvexVerticesConnectivity** to, hkpConvexVerticesConnectivity* from, StateTarget target);
+hkpConvexVerticesConnectivity* init_hkpConvexVerticesConnectivity(StateTarget target);
+void free_hkpConvexVerticesConnectivity(hkpConvexVerticesConnectivity* to, StateTarget target);
 
 /* ---------------- CHRCTRL ------------------ */
 

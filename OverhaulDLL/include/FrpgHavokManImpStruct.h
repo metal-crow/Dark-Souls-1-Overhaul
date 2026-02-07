@@ -20,6 +20,8 @@ typedef struct hkpBpEndPoint hkpBpEndPoint;
 typedef struct hkpSphereShape hkpSphereShape;
 typedef struct hkpCapsuleShape hkpCapsuleShape;
 typedef struct hkpMoppBvTreeShape hkpMoppBvTreeShape;
+typedef struct hkpConvexVerticesShape hkpConvexVerticesShape;
+typedef struct hkpConvexVerticesConnectivity hkpConvexVerticesConnectivity;
 typedef struct hkpSimpleShapePhantom hkpSimpleShapePhantom;
 typedef struct hkpCollidable hkpCollidable;
 typedef struct hkMotionState hkMotionState;
@@ -186,6 +188,42 @@ static_assert(offsetof(hkpMoppBvTreeShape, unk2) == 0x30);
 static_assert(offsetof(hkpMoppBvTreeShape, vtable2) == 0x50);
 static_assert(offsetof(hkpMoppBvTreeShape, refObject2) == 0x50+0x8);
 
+struct hkpConvexVerticesShape
+{
+    uint64_t vtable;
+    uint8_t data_0[0x10];
+    void* m_userData;
+    uint8_t data_1[0x30];
+    void* m_rotatedVertices;
+    uint32_t m_rotatedVertices_size;
+    uint32_t m_rotatedVertices_cap;
+    uint64_t data_2;
+    void* m_planeEquations;
+    uint32_t m_planeEquations_size;
+    uint32_t m_planeEquations_cap;
+    hkpConvexVerticesConnectivity* m_connectivity;
+};
+static_assert(sizeof(hkpConvexVerticesShape) == 0x80);
+static_assert(offsetof(hkpConvexVerticesShape, m_userData) == 0x18);
+static_assert(offsetof(hkpConvexVerticesShape, m_rotatedVertices) == 0x50);
+static_assert(offsetof(hkpConvexVerticesShape, m_planeEquations) == 0x68);
+static_assert(offsetof(hkpConvexVerticesShape, m_connectivity) == 0x78);
+
+struct hkpConvexVerticesConnectivity
+{
+    uint64_t vtable;
+    uint8_t data_0[0x8];
+    uint16_t* m_vertexIndices;
+    uint32_t m_vertexIndices_size;
+    uint32_t m_vertexIndices_cap;
+    uint8_t* m_numVerticesPerFace;
+    uint32_t m_numVerticesPerFace_size;
+    uint32_t m_numVerticesPerFace_cap;
+};
+static_assert(sizeof(hkpConvexVerticesConnectivity) == 0x30);
+static_assert(offsetof(hkpConvexVerticesConnectivity, m_vertexIndices) == 0x10);
+static_assert(offsetof(hkpConvexVerticesConnectivity, m_numVerticesPerFace) == 0x20);
+
 struct hkpContactMgr
 {
     uint64_t vtable;
@@ -261,13 +299,7 @@ static_assert(sizeof(hkpTypedBroadPhaseHandle) == 0xc);
 
 struct hkpCollidable
 {
-    union
-    {
-        void* base_shape;
-        hkpCapsuleShape* m_cap_shape;
-        hkpSphereShape* m_sph_shape;
-        hkpMoppBvTreeShape* m_tree_shape;
-    };
+    void* shape;
     uint32_t m_shapeKey;
     uint32_t padding1;
     void* m_motion; //either a hkTransform, or a hkMotionState. For our purposes i think this is always just an offset to the parent hkpShapePhantom's inline hkMotionState struct
@@ -280,7 +312,7 @@ struct hkpCollidable
     float m_allowedPenetrationDepth;
     uint32_t padding2;
 };
-static_assert(offsetof(hkpCollidable, m_sph_shape) == 0);
+static_assert(offsetof(hkpCollidable, shape) == 0);
 static_assert(offsetof(hkpCollidable, m_shapeKey) == 8);
 static_assert(offsetof(hkpCollidable, m_motion) == 0x10);
 static_assert(offsetof(hkpCollidable, m_ownerOffset) == 0x20);

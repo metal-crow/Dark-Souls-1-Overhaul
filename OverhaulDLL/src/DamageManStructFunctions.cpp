@@ -288,6 +288,10 @@ void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePha
                 }
                 else
                 {
+                    if ((*to)->_hkpSimpleShapePhantom == NULL)
+                    {
+                        (*to)->_hkpSimpleShapePhantom = init_hkpSimpleShapePhantom(target);
+                    }
                     copy_hkpSimpleShapePhantom((*to)->_hkpSimpleShapePhantom, (*from)->_hkpSimpleShapePhantom, target);
                 }
                 break;
@@ -297,11 +301,11 @@ void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePha
         (*to)->data_1 = (*from)->data_1;
         if (is_sphere)
         {
-            copy_hkpSphereShape(&(*to)->_hkpSphereShape, &(*from)->_hkpSphereShape, target);
+            copy_hkpSphereShape(&(*to)->_hkpSphereShape, (*from)->_hkpSphereShape, target);
         }
         else
         {
-            copy_hkpCapsuleShape(&(*to)->_hkpCapsuleShape, &(*from)->_hkpCapsuleShape, target);
+            copy_hkpCapsuleShape(&(*to)->_hkpCapsuleShape, (*from)->_hkpCapsuleShape, target);
         }
     }
 }
