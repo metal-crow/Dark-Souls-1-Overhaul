@@ -7,7 +7,7 @@
 #include "FrpgHavokManImpStruct.h"
 #include "Rollback.h"
 
-/* ---------------- HAVOK MAN ------------------ */
+/* ---------------- hkpWorld ------------------ */
 
 void copy_FrpgHavokManImp(FrpgHavokManImp* to, const FrpgHavokManImp* from, StateTarget target);
 FrpgHavokManImp* init_FrpgHavokManImp();
@@ -39,14 +39,14 @@ PhantomType hkpPhantom_getType(void* to);
 void copy_hkpPhantom(void** to, void* from, StateTarget target);
 void free_hkpPhantom(void* to, StateTarget target);
 
+/* ---------------- hkpWorld, DamagEntry ------------------ */
+
 std::string print_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to);
 void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapePhantom* from, StateTarget target);
 hkpSimpleShapePhantom* init_hkpSimpleShapePhantom(StateTarget target);
 void free_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, StateTarget target);
 hkpSimpleShapePhantom* get_hkpSimpleShapePhantom(hkpWorld* world, FrpgPhysShapePhantomIns* parent);
 hkpSimpleShapePhantom* find_hkpSimpleShapePhantom(hkpWorld* world, FrpgPhysShapePhantomIns* parent);
-
-/* ---------------- CHRCTRL + DAMAGE MAN ------------------ */
 
 void copy_hkpLinkedCollidable(hkpLinkedCollidable* to, const hkpLinkedCollidable* from, StateTarget target);
 
