@@ -714,7 +714,7 @@ void rollback_copy_buffer(void* buffer_dst, void* buffer_src)
 
     //havok has to be copied first
     state_dst->havokman = init_FrpgHavokManImp();
-    copy_FrpgHavokManImp(state_dst->havokman, *(FrpgHavokManImp**)Game::frpg_havok_man_imp, StateTarget::Copy);
+    copy_FrpgHavokManImp(state_dst->havokman, state_src->havokman, StateTarget::Copy);
     for (size_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
     {
         state_dst->playerins[i] = init_PlayerIns();
