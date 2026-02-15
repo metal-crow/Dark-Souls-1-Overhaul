@@ -48,7 +48,7 @@ void free_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, StateTarget target);
 hkpSimpleShapePhantom* get_hkpSimpleShapePhantom(hkpWorld* world, FrpgPhysShapePhantomIns* parent);
 hkpSimpleShapePhantom* find_hkpSimpleShapePhantom(hkpWorld* world, FrpgPhysShapePhantomIns* parent);
 
-void copy_hkpLinkedCollidable(hkpLinkedCollidable* to, const hkpLinkedCollidable* from, StateTarget target);
+void copy_hkpLinkedCollidable(hkpLinkedCollidable* to, const hkpLinkedCollidable* from, hkMotionState* motion, StateTarget target);
 
 void copy_hkpProperty(hkpProperty* to, hkpProperty* from, StateTarget target);
 void init_hkpProperty(hkpProperty* to, StateTarget target);
@@ -56,7 +56,7 @@ void free_hkpProperty(hkpProperty* to);
 
 void copy_hkMotionState(hkMotionState* to, const hkMotionState* from);
 
-void copy_hkpCollidable(hkpCollidable* to, const hkpCollidable* from, StateTarget target);
+void copy_hkpCollidable(hkpCollidable* to, const hkpCollidable* from, hkMotionState* motion, StateTarget target);
 void init_hkpCollidable(hkpCollidable** to, StateTarget target);
 void free_hkpCollidable(hkpCollidable* to);
 

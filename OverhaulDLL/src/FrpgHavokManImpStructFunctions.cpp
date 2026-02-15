@@ -337,7 +337,7 @@ void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapeP
     to->data_0 = from->data_0;
     to->hkpWorldPtr = from->hkpWorldPtr;
     to->m_userData = from->m_userData;
-    copy_hkpLinkedCollidable(&to->m_collidable, &from->m_collidable, target);
+    copy_hkpLinkedCollidable(&to->m_collidable, &from->m_collidable, &to->m_motionState, target);
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     to->unk_0 = from->unk_0;
 
@@ -386,7 +386,7 @@ void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapeP
     }
     for (size_t i = 0; i < from->m_collisionDetails_len; i++)
     {
-        copy_hkpCollidable(to->m_collisionDetails[i], from->m_collisionDetails[i], target);
+        copy_hkpCollidable(to->m_collisionDetails[i], from->m_collisionDetails[i], &to->m_motionState, target);
     }
 
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
@@ -487,9 +487,9 @@ hkpSimpleShapePhantom* find_hkpSimpleShapePhantom(hkpWorld* world, FrpgPhysShape
 
 /* ---------------- CHRCTRL + DAMAGE MAN ------------------ */
 
-void copy_hkpLinkedCollidable(hkpLinkedCollidable* to, const hkpLinkedCollidable* from, StateTarget target)
+void copy_hkpLinkedCollidable(hkpLinkedCollidable* to, const hkpLinkedCollidable* from, hkMotionState* motion, StateTarget target)
 {
-    copy_hkpCollidable(&to->base, &from->base, target);
+    copy_hkpCollidable(&to->base, &from->base, motion, target);
     if (from->m_collisionEntries_len > 0)
     {
         FATALERROR("hkpLinkedCollidable->m_collisionEntries_len > 0");
@@ -544,10 +544,12 @@ void copy_hkMotionState(hkMotionState* to, const hkMotionState* from)
 }
 
 
-void copy_hkpCollidable(hkpCollidable* to, const hkpCollidable* from, StateTarget target)
+void copy_hkpCollidable(hkpCollidable* to, const hkpCollidable* from, hkMotionState* motion, StateTarget target)
 {
     copy_hkpShape(&to->shape, from->shape, target);
     to->m_shapeKey = from->m_shapeKey;
+    to->m_motion = (void*)motion,
+    to->self = to;
     to->m_ownerOffset = from->m_ownerOffset;
     to->m_forceCollideOntoPpu = from->m_forceCollideOntoPpu;
     to->m_shapeSizeOnSpu = from->m_shapeSizeOnSpu;
