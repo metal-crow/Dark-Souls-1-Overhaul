@@ -89,7 +89,7 @@ void copy_hkpWorld(hkpWorld* to, const hkpWorld* from, StateTarget target)
 hkpWorld* init_hkpWorld()
 {
     hkpWorld* local = (hkpWorld*)malloc_(sizeof(hkpWorld));
-    
+
     local->m_activeSimulationIslands = NULL;
     local->m_inactiveSimulationIslands = NULL;
     local->m_dirtySimulationIslands = NULL;
@@ -120,19 +120,29 @@ void copy_hkp3AxisSweep(hkp3AxisSweep* to, const hkp3AxisSweep* from, StateTarge
 {
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    //update the array object and capacity
     if ((to->m_nodes_cap & 0x3fffffff) < from->m_nodes_len)
     {
-        to->m_nodes_len = from->m_nodes_len;
+        if ((from->m_nodes_cap & 0x3fffffff) < from->m_nodes_len){
+            FATALERROR("m_nodes_cap %x m_nodes_len %x", from->m_nodes_cap, from->m_nodes_len);
+        }
+        uint32_t old_len = to->m_nodes_len;
         if (target == StateTarget::ToGame)
         {
-            increase_list_size(Game::MemHeapAllocator, &to->m_nodes, 0x18);
+            increase_list_size(Game::MemHeapAllocator, &to->m_nodes, sizeof(hkpBpNode));
         }
         else
         {
-            to->m_nodes = (hkpBpNode*)realloc_(to->m_nodes, (to->m_nodes_len + 1) * sizeof(hkpBpNode));
-            to->m_nodes_cap = to->m_nodes_cap + 1;
+            to->m_nodes = (hkpBpNode*)realloc_(to->m_nodes, (from->m_nodes_cap & 0x3fffffff) * sizeof(hkpBpNode));
+            to->m_nodes_cap = from->m_nodes_cap;
+            // Zero out new nodes
+            for (size_t i = old_len; i < (to->m_nodes_cap & 0x3fffffff); i++)
+            {
+                memset(&to->m_nodes[i], 0, sizeof(hkpBpNode));
+            }
         }
     }
+    to->m_nodes_len = from->m_nodes_len;
     for (size_t i = 0; i < to->m_nodes_len; i++)
     {
         copy_hkpBpNode(&to->m_nodes[i], &from->m_nodes[i], target);
