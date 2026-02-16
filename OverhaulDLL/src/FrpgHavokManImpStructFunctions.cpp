@@ -683,6 +683,10 @@ ShapeType hkpShape_getType(void* to)
     {
         return ShapeType::ConvexVertices;
     }
+    if (*(uint64_t*)(to) == 0x14141bff8) //hkpConvexTranslateShape::vftable
+    {
+        return ShapeType::ConvexTranslate;
+    }
     return ShapeType::InvalidShape;
 }
 
@@ -718,13 +722,21 @@ void copy_hkpShape(void** to, void* from, StateTarget target)
         copy_hkpMoppBvTreeShape((hkpMoppBvTreeShape**)to, (hkpMoppBvTreeShape*)from, target);
         break;
     case ShapeType::ConvexVertices:
-        FATALERROR("HI %p", from);
+        FATALERROR("ConvexVertices shape detected %p", from);
         if (toshape != fromshape)
         {
             free_hkpShape(*to, target);
             *to = init_hkpConvexVerticesShape(target);
         }
         copy_hkpConvexVerticesShape((hkpConvexVerticesShape**)to, (hkpConvexVerticesShape*)from, target);
+        break;
+    case ShapeType::ConvexTranslate:
+        if (toshape != fromshape)
+        {
+            free_hkpShape(*to, target);
+            *to = init_hkpConvexTranslateShape(target);
+        }
+        copy_hkpConvexTranslateShape((hkpConvexTranslateShape**)to, (hkpConvexTranslateShape*)from, target);
         break;
     case ShapeType::ShapeNull:
         free_hkpShape(*to, target);
@@ -752,6 +764,9 @@ void free_hkpShape(void* to, StateTarget target)
     case ShapeType::ConvexVertices:
         free_hkpConvexVerticesShape((hkpConvexVerticesShape*)to, target);
         break;
+    case ShapeType::ConvexTranslate:
+        free_hkpConvexTranslateShape((hkpConvexTranslateShape*)to, target);
+        break;
     case ShapeType::ShapeNull:
         break;
     case ShapeType::InvalidShape:
@@ -776,6 +791,11 @@ void copy_hkpSphereShape(hkpSphereShape** to, hkpSphereShape* from, StateTarget 
     {
         (*to)->vtable = (from)->vtable;
         memcpy((*to)->data_0, (from)->data_0, sizeof((*to)->data_0));
+        memcpy((*to)->data_1, (from)->data_1, sizeof((*to)->data_1));
+        if ((from)->m_userData != 0)
+        {
+            FATALERROR("hkpSphereShape->m_userData is non-0, value %x", (from)->m_userData);
+        }
     }
 }
 
@@ -791,6 +811,7 @@ hkpSphereShape* init_hkpSphereShape(StateTarget target)
         local = (hkpSphereShape*)malloc_(sizeof(hkpSphereShape));
     }
     local->vtable = 0x14141c200;
+    local->m_userData = NULL;
     return local;
 }
 
@@ -822,6 +843,11 @@ void copy_hkpCapsuleShape(hkpCapsuleShape** to, hkpCapsuleShape* from, StateTarg
     {
         (*to)->vtable = (from)->vtable;
         memcpy((*to)->data_0, (from)->data_0, sizeof((*to)->data_0));
+        memcpy((*to)->data_1, (from)->data_1, sizeof((*to)->data_1));
+        if ((from)->m_userData != 0)
+        {
+            FATALERROR("hkpCapsuleShape->m_userData is non-0, value %x", (from)->m_userData);
+        }
     }
 }
 
@@ -837,6 +863,7 @@ hkpCapsuleShape* init_hkpCapsuleShape(StateTarget target)
         local = (hkpCapsuleShape*)malloc_(sizeof(hkpCapsuleShape));
     }
     local->vtable = 0x14141bf58;
+    local->m_userData = NULL;
     return local;
 }
 
@@ -851,6 +878,7 @@ void free_hkpCapsuleShape(hkpCapsuleShape* to, StateTarget target)
         free(to);
     }
 }
+
 
 void copy_hkpMoppBvTreeShape(hkpMoppBvTreeShape** to, hkpMoppBvTreeShape* from, StateTarget target)
 {
@@ -867,11 +895,10 @@ void copy_hkpMoppBvTreeShape(hkpMoppBvTreeShape** to, hkpMoppBvTreeShape* from, 
     {
         (*to)->vtable1 = (from)->vtable1;
         memcpy((*to)->data_0, (from)->data_0, sizeof((*to)->data_0));
-        if ((from)->unk1 != 0)
+        if ((from)->m_userData != 0)
         {
-            FATALERROR("hkpMoppBvTreeShape->unk1 is non-0, value %x", (from)->unk1);
+            FATALERROR("hkpMoppBvTreeShape->m_userData is non-0, value %x", (from)->m_userData);
         }
-        (*to)->unk1 = (from)->unk1;
         (*to)->data_1 = (from)->data_1;
         //refobject1
         (*to)->unk2 = (from)->unk2;
@@ -894,6 +921,7 @@ hkpMoppBvTreeShape* init_hkpMoppBvTreeShape(StateTarget target)
         local = (hkpMoppBvTreeShape*)malloc_(sizeof(hkpMoppBvTreeShape));
     }
     local->vtable1 = 0x14141bd68;
+    local->m_userData = NULL;
     return local;
 }
 
@@ -910,8 +938,10 @@ void free_hkpMoppBvTreeShape(hkpMoppBvTreeShape* to, StateTarget target)
     }
 }
 
+
 void copy_hkpConvexVerticesShape(hkpConvexVerticesShape** to, hkpConvexVerticesShape* from, StateTarget target)
 {
+    FATALERROR("TODO");
     if (*to == NULL && from != NULL)
     {
         *to = init_hkpConvexVerticesShape(target);
@@ -925,12 +955,16 @@ void copy_hkpConvexVerticesShape(hkpConvexVerticesShape** to, hkpConvexVerticesS
     {
         (*to)->vtable = (from)->vtable;
         memcpy((*to)->data_0, (from)->data_0, sizeof((*to)->data_0));
-        //TODO
+        if ((from)->m_userData != 0)
+        {
+            FATALERROR("hkpConvexVerticesShape->m_userData is non-0, value %x", (from)->m_userData);
+        }
     }
 }
 
 hkpConvexVerticesShape* init_hkpConvexVerticesShape(StateTarget target)
 {
+    FATALERROR("TODO");
     hkpConvexVerticesShape* local;
     if (target == StateTarget::ToGame)
     {
@@ -941,36 +975,97 @@ hkpConvexVerticesShape* init_hkpConvexVerticesShape(StateTarget target)
         local = (hkpConvexVerticesShape*)malloc_(sizeof(hkpConvexVerticesShape));
     }
     local->vtable = 0x14141c0c0;
-
+    local->m_userData = NULL;
     return local;
 }
 
 void free_hkpConvexVerticesShape(hkpConvexVerticesShape* to, StateTarget target)
 {
+    FATALERROR("TODO");
     if (target == StateTarget::ToGame)
     {
         hkReferencedObject_deref(to);
     }
     else
     {
-        
+
         free(to);
     }
 }
 
 void copy_hkpConvexVerticesConnectivity(hkpConvexVerticesConnectivity** to, hkpConvexVerticesConnectivity* from, StateTarget target)
 {
-
+    FATALERROR("TODO");
 }
 
 hkpConvexVerticesConnectivity* init_hkpConvexVerticesConnectivity(StateTarget target)
 {
-
+    FATALERROR("TODO");
 }
 
 void free_hkpConvexVerticesConnectivity(hkpConvexVerticesConnectivity* to, StateTarget target)
 {
+    FATALERROR("TODO");
+}
 
+
+void copy_hkpConvexTranslateShape(hkpConvexTranslateShape** to, hkpConvexTranslateShape* from, StateTarget target)
+{
+    if (*to == NULL && from != NULL)
+    {
+        *to = init_hkpConvexTranslateShape(target);
+    }
+    if (*to != NULL && from == NULL)
+    {
+        free_hkpConvexTranslateShape(*to, target);
+        *to = NULL;
+    }
+    if (*to != NULL && from != NULL)
+    {
+        (*to)->vtable = (from)->vtable;
+        memcpy((*to)->data_0, (from)->data_0, sizeof((*to)->data_0));
+        (*to)->data_1 = from->data_1;
+        (*to)->vtable2 = (from)->vtable2;
+        copy_hkpShape(&(*to)->m_childShape, from->m_childShape, target);
+        memcpy((*to)->data_2, (from)->data_2, sizeof((*to)->data_2));
+        if ((from)->m_userData != 0)
+        {
+            FATALERROR("hkpConvexTranslateShape->m_userData is non-0, value %x", (from)->m_userData);
+        }
+    }
+}
+
+hkpConvexTranslateShape* init_hkpConvexTranslateShape(StateTarget target)
+{
+    hkpConvexTranslateShape* local;
+    if (target == StateTarget::ToGame)
+    {
+        local = (hkpConvexTranslateShape*)Game::thread_malloc(sizeof(hkpConvexTranslateShape));
+    }
+    else
+    {
+        local = (hkpConvexTranslateShape*)malloc_(sizeof(hkpConvexTranslateShape));
+    }
+    local->vtable = 0x14141bff8;
+    local->m_userData = NULL;
+    local->m_childShape = NULL; //Init on copy
+    return local;
+}
+
+void free_hkpConvexTranslateShape(hkpConvexTranslateShape* to, StateTarget target)
+{
+    if (target == StateTarget::ToGame)
+    {
+        if (to->m_childShape != NULL)
+        {
+            hkReferencedObject_deref((void*)to->m_childShape);
+        }
+        hkReferencedObject_deref((void*)to);
+    }
+    else
+    {
+        free(to);
+    }
 }
 
 /* ---------------- CHRCTRL ------------------ */

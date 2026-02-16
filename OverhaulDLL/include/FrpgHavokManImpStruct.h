@@ -22,6 +22,7 @@ typedef struct hkpCapsuleShape hkpCapsuleShape;
 typedef struct hkpMoppBvTreeShape hkpMoppBvTreeShape;
 typedef struct hkpConvexVerticesShape hkpConvexVerticesShape;
 typedef struct hkpConvexVerticesConnectivity hkpConvexVerticesConnectivity;
+typedef struct hkpConvexTranslateShape hkpConvexTranslateShape;
 typedef struct hkpSimpleShapePhantom hkpSimpleShapePhantom;
 typedef struct hkpCollidable hkpCollidable;
 typedef struct hkMotionState hkMotionState;
@@ -158,22 +159,28 @@ static_assert(sizeof(hkp3AxisSweep) == 0x110);
 struct hkpCapsuleShape
 {
     uint64_t vtable;
-    uint8_t data_0[0x48];
+    uint8_t data_0[0x10];
+    void* m_userData;
+    uint8_t data_1[0x30];
 };
 static_assert(sizeof(hkpCapsuleShape) == 0x50);
+static_assert(offsetof(hkpCapsuleShape, m_userData) == 0x18);
 
 struct hkpSphereShape
 {
     uint64_t vtable;
-    uint8_t data_0[0x30];
+    uint8_t data_0[0x10];
+    void* m_userData;
+    uint8_t data_1[0x18];
 };
 static_assert(sizeof(hkpSphereShape) == 0x38);
+static_assert(offsetof(hkpSphereShape, m_userData) == 0x18);
 
 struct hkpMoppBvTreeShape
 {
     uint64_t vtable1;
     uint8_t data_0[0x10];
-    uint64_t unk1; //always 0?
+    void* m_userData;
     uint64_t data_1;
     void* refObject1;
     void* unk2;
@@ -183,6 +190,7 @@ struct hkpMoppBvTreeShape
     uint8_t data_3[0x10];
 };
 static_assert(sizeof(hkpMoppBvTreeShape) == 0x70);
+static_assert(offsetof(hkpMoppBvTreeShape, m_userData) == 0x18);
 static_assert(offsetof(hkpMoppBvTreeShape, refObject1) == 0x28);
 static_assert(offsetof(hkpMoppBvTreeShape, unk2) == 0x30);
 static_assert(offsetof(hkpMoppBvTreeShape, vtable2) == 0x50);
@@ -223,6 +231,20 @@ struct hkpConvexVerticesConnectivity
 static_assert(sizeof(hkpConvexVerticesConnectivity) == 0x30);
 static_assert(offsetof(hkpConvexVerticesConnectivity, m_vertexIndices) == 0x10);
 static_assert(offsetof(hkpConvexVerticesConnectivity, m_numVerticesPerFace) == 0x20);
+
+struct hkpConvexTranslateShape
+{
+    uint64_t vtable;
+    uint8_t data_0[0x10];
+    void* m_userData;
+    uint64_t data_1;
+    uint64_t vtable2;
+    void* m_childShape;
+    uint8_t data_2[0x18];
+};
+static_assert(sizeof(hkpConvexTranslateShape) == 0x50);
+static_assert(offsetof(hkpConvexTranslateShape, m_userData) == 0x18);
+static_assert(offsetof(hkpConvexTranslateShape, m_childShape) == 0x30);
 
 struct hkpContactMgr
 {
