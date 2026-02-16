@@ -687,6 +687,10 @@ ShapeType hkpShape_getType(void* to)
     {
         return ShapeType::ConvexTranslate;
     }
+    if (*(uint64_t*)(to) == 0x14141be18) //hkpBoxShape::vftable
+    {
+        return ShapeType::Box;
+    }
     return ShapeType::InvalidShape;
 }
 
@@ -738,6 +742,14 @@ void copy_hkpShape(void** to, void* from, StateTarget target)
         }
         copy_hkpConvexTranslateShape((hkpConvexTranslateShape**)to, (hkpConvexTranslateShape*)from, target);
         break;
+    case ShapeType::Box:
+        if (toshape != fromshape)
+        {
+            free_hkpShape(*to, target);
+            *to = init_hkpBoxShape(target);
+        }
+        copy_hkpBoxShape((hkpBoxShape**)to, (hkpBoxShape*)from, target);
+        break;
     case ShapeType::ShapeNull:
         free_hkpShape(*to, target);
         *to = NULL;
@@ -766,6 +778,9 @@ void free_hkpShape(void* to, StateTarget target)
         break;
     case ShapeType::ConvexTranslate:
         free_hkpConvexTranslateShape((hkpConvexTranslateShape*)to, target);
+        break;
+    case ShapeType::Box:
+        free_hkpBoxShape((hkpBoxShape*)to, target);
         break;
     case ShapeType::ShapeNull:
         break;
@@ -1060,6 +1075,58 @@ void free_hkpConvexTranslateShape(hkpConvexTranslateShape* to, StateTarget targe
         {
             hkReferencedObject_deref((void*)to->m_childShape);
         }
+        hkReferencedObject_deref((void*)to);
+    }
+    else
+    {
+        free(to);
+    }
+}
+
+
+void copy_hkpBoxShape(hkpBoxShape** to, hkpBoxShape* from, StateTarget target)
+{
+    if (*to == NULL && from != NULL)
+    {
+        *to = init_hkpBoxShape(target);
+    }
+    if (*to != NULL && from == NULL)
+    {
+        free_hkpBoxShape(*to, target);
+        *to = NULL;
+    }
+    if (*to != NULL && from != NULL)
+    {
+        (*to)->vtable = (from)->vtable;
+        memcpy((*to)->data_0, (from)->data_0, sizeof((*to)->data_0));
+        memcpy((*to)->data_1, (from)->data_1, sizeof((*to)->data_1));
+        if ((from)->m_userData != 0)
+        {
+            FATALERROR("hkpBoxShape->m_userData is non-0, value %x", (from)->m_userData);
+        }
+    }
+}
+
+hkpBoxShape* init_hkpBoxShape(StateTarget target)
+{
+    hkpBoxShape* local;
+    if (target == StateTarget::ToGame)
+    {
+        local = (hkpBoxShape*)Game::thread_malloc(sizeof(hkpBoxShape));
+    }
+    else
+    {
+        local = (hkpBoxShape*)malloc_(sizeof(hkpBoxShape));
+    }
+    local->vtable = 0x14141bff8;
+    local->m_userData = NULL;
+    return local;
+}
+
+void free_hkpBoxShape(hkpBoxShape* to, StateTarget target)
+{
+    if (target == StateTarget::ToGame)
+    {
         hkReferencedObject_deref((void*)to);
     }
     else

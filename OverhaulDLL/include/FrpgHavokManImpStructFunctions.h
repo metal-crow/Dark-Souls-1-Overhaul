@@ -70,7 +70,7 @@ void free_BoundingVolumeData(BoundingVolumeData* to, StateTarget target);
 
 
 //void copy_hkpAgentNnEntry(hkpAgentNnEntry* to, hkpAgentNnEntry* from);
-enum ShapeType { Sphere, Capsule, MoppBvTree, ConvexVertices, ConvexTranslate, ShapeNull, InvalidShape };
+enum ShapeType { Sphere, Capsule, MoppBvTree, ConvexVertices, ConvexTranslate, Box, ShapeNull, InvalidShape };
 ShapeType hkpShape_getType(void* to);
 void copy_hkpShape(void** to, void* from, StateTarget target);
 void free_hkpShape(void* to, StateTarget target);
@@ -98,6 +98,10 @@ void free_hkpConvexVerticesConnectivity(hkpConvexVerticesConnectivity* to, State
 void copy_hkpConvexTranslateShape(hkpConvexTranslateShape** to, hkpConvexTranslateShape* from, StateTarget target);
 hkpConvexTranslateShape* init_hkpConvexTranslateShape(StateTarget target);
 void free_hkpConvexTranslateShape(hkpConvexTranslateShape* to, StateTarget target);
+
+void copy_hkpBoxShape(hkpBoxShape** to, hkpBoxShape* from, StateTarget target);
+hkpBoxShape* init_hkpBoxShape(StateTarget target);
+void free_hkpBoxShape(hkpBoxShape* to, StateTarget target);
 
 /* ---------------- CHRCTRL ------------------ */
 

@@ -23,6 +23,7 @@ typedef struct hkpMoppBvTreeShape hkpMoppBvTreeShape;
 typedef struct hkpConvexVerticesShape hkpConvexVerticesShape;
 typedef struct hkpConvexVerticesConnectivity hkpConvexVerticesConnectivity;
 typedef struct hkpConvexTranslateShape hkpConvexTranslateShape;
+typedef struct hkpBoxShape hkpBoxShape;
 typedef struct hkpSimpleShapePhantom hkpSimpleShapePhantom;
 typedef struct hkpCollidable hkpCollidable;
 typedef struct hkMotionState hkMotionState;
@@ -245,6 +246,16 @@ struct hkpConvexTranslateShape
 static_assert(sizeof(hkpConvexTranslateShape) == 0x50);
 static_assert(offsetof(hkpConvexTranslateShape, m_userData) == 0x18);
 static_assert(offsetof(hkpConvexTranslateShape, m_childShape) == 0x30);
+
+struct hkpBoxShape
+{
+    uint64_t vtable;
+    uint8_t data_0[0x10];
+    void* m_userData;
+    uint8_t data_1[0x20];
+};
+static_assert(sizeof(hkpBoxShape) == 0x40);
+static_assert(offsetof(hkpBoxShape, m_userData) == 0x18);
 
 struct hkpContactMgr
 {
