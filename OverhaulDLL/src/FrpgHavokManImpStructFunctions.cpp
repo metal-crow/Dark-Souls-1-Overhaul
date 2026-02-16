@@ -548,8 +548,12 @@ void copy_hkpCollidable(hkpCollidable* to, const hkpCollidable* from, hkMotionSt
 {
     copy_hkpShape(&to->shape, from->shape, target);
     to->m_shapeKey = from->m_shapeKey;
-    to->m_motion = (void*)motion,
-    to->self = to;
+    to->m_motion = (void*)motion;
+    if (from->m_parent != NULL)
+    {
+        FATALERROR("%p collidable has non null parent. Never seen before", from);
+    }
+    to->m_parent = NULL;
     to->m_ownerOffset = from->m_ownerOffset;
     to->m_forceCollideOntoPpu = from->m_forceCollideOntoPpu;
     to->m_shapeSizeOnSpu = from->m_shapeSizeOnSpu;
@@ -571,7 +575,7 @@ void init_hkpCollidable(hkpCollidable** to, StateTarget target)
     }
     //unknown, init on copy
     (*to)->shape = NULL;
-    (*to)->self = (*to);
+    (*to)->m_parent = NULL;
     init_BoundingVolumeData(&(*to)->m_boundingVolumeData, target);
 }
 

@@ -303,7 +303,7 @@ struct hkpCollidable
     uint32_t m_shapeKey;
     uint32_t padding1;
     void* m_motion; //either a hkTransform, or a hkMotionState. For our purposes i think this is always just an offset to the parent hkpShapePhantom's inline hkMotionState struct
-    void* self;
+    void* m_parent;
     uint8_t m_ownerOffset;
     uint8_t m_forceCollideOntoPpu;
     uint16_t m_shapeSizeOnSpu;
