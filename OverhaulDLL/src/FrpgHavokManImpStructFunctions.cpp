@@ -407,14 +407,8 @@ void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapeP
 hkpSimpleShapePhantom* init_hkpSimpleShapePhantom(StateTarget target)
 {
     hkpSimpleShapePhantom* local_hkpSimpleShapePhantom = NULL;
-    if (target == StateTarget::ToGame)
-    {
-        local_hkpSimpleShapePhantom = (hkpSimpleShapePhantom*)Game::thread_malloc(sizeof(hkpSimpleShapePhantom));
-    }
-    else
-    {
-        local_hkpSimpleShapePhantom = (hkpSimpleShapePhantom*)malloc_(sizeof(hkpSimpleShapePhantom));
-    }
+    //normally this would be a thread malloc'd object game-side but we've disabled that
+    local_hkpSimpleShapePhantom = (hkpSimpleShapePhantom*)malloc_(sizeof(hkpSimpleShapePhantom));
     local_hkpSimpleShapePhantom->vtable = (void*)0x14145ccc8;
     //don't know if we need a cap or a sphere, so init on copy
     local_hkpSimpleShapePhantom->m_collidable.base.shape = NULL;
@@ -827,14 +821,8 @@ void copy_hkpSphereShape(hkpSphereShape** to, hkpSphereShape* from, StateTarget 
 hkpSphereShape* init_hkpSphereShape(StateTarget target)
 {
     hkpSphereShape* local;
-    if (target == StateTarget::ToGame)
-    {
-        local = (hkpSphereShape*)Game::thread_malloc(sizeof(hkpSphereShape));
-    }
-    else
-    {
-        local = (hkpSphereShape*)malloc_(sizeof(hkpSphereShape));
-    }
+    //normally this would be a thread malloc'd object game-side but we've disabled that
+    local = (hkpSphereShape*)malloc_(sizeof(hkpSphereShape));
     local->vtable = 0x14141c200;
     local->m_userData = NULL;
     return local;
@@ -879,14 +867,8 @@ void copy_hkpCapsuleShape(hkpCapsuleShape** to, hkpCapsuleShape* from, StateTarg
 hkpCapsuleShape* init_hkpCapsuleShape(StateTarget target)
 {
     hkpCapsuleShape* local;
-    if (target == StateTarget::ToGame)
-    {
-        local = (hkpCapsuleShape*)Game::thread_malloc(sizeof(hkpCapsuleShape));
-    }
-    else
-    {
-        local = (hkpCapsuleShape*)malloc_(sizeof(hkpCapsuleShape));
-    }
+    //normally this would be a thread malloc'd object game-side but we've disabled that
+    local = (hkpCapsuleShape*)malloc_(sizeof(hkpCapsuleShape));
     local->vtable = 0x14141bf58;
     local->m_userData = NULL;
     return local;
@@ -937,14 +919,8 @@ void copy_hkpMoppBvTreeShape(hkpMoppBvTreeShape** to, hkpMoppBvTreeShape* from, 
 hkpMoppBvTreeShape* init_hkpMoppBvTreeShape(StateTarget target)
 {
     hkpMoppBvTreeShape* local;
-    if (target == StateTarget::ToGame)
-    {
-        local = (hkpMoppBvTreeShape*)Game::thread_malloc(sizeof(hkpMoppBvTreeShape));
-    }
-    else
-    {
-        local = (hkpMoppBvTreeShape*)malloc_(sizeof(hkpMoppBvTreeShape));
-    }
+    //normally this would be a thread malloc'd object game-side but we've disabled that
+    local = (hkpMoppBvTreeShape*)malloc_(sizeof(hkpMoppBvTreeShape));
     local->vtable1 = 0x14141bd68;
     local->m_userData = NULL;
     return local;
@@ -954,8 +930,15 @@ void free_hkpMoppBvTreeShape(hkpMoppBvTreeShape* to, StateTarget target)
 {
     if (target == StateTarget::ToGame)
     {
-        hkReferencedObject_deref(to->refObject1);
-        hkReferencedObject_deref(to->refObject2);
+        if (to->refObject1 != NULL)
+        {
+            hkReferencedObject_deref(to->refObject1);
+        }
+        if (to->refObject2 != NULL)
+        {
+            hkReferencedObject_deref(to->refObject2);
+        }
+        hkReferencedObject_deref(to);
     }
     else
     {
@@ -991,14 +974,8 @@ hkpConvexVerticesShape* init_hkpConvexVerticesShape(StateTarget target)
 {
     FATALERROR("TODO");
     hkpConvexVerticesShape* local;
-    if (target == StateTarget::ToGame)
-    {
-        local = (hkpConvexVerticesShape*)Game::thread_malloc(sizeof(hkpConvexVerticesShape));
-    }
-    else
-    {
-        local = (hkpConvexVerticesShape*)malloc_(sizeof(hkpConvexVerticesShape));
-    }
+    //normally this would be a thread malloc'd object game-side but we've disabled that
+    local = (hkpConvexVerticesShape*)malloc_(sizeof(hkpConvexVerticesShape));
     local->vtable = 0x14141c0c0;
     local->m_userData = NULL;
     return local;
@@ -1063,14 +1040,8 @@ void copy_hkpConvexTranslateShape(hkpConvexTranslateShape** to, hkpConvexTransla
 hkpConvexTranslateShape* init_hkpConvexTranslateShape(StateTarget target)
 {
     hkpConvexTranslateShape* local;
-    if (target == StateTarget::ToGame)
-    {
-        local = (hkpConvexTranslateShape*)Game::thread_malloc(sizeof(hkpConvexTranslateShape));
-    }
-    else
-    {
-        local = (hkpConvexTranslateShape*)malloc_(sizeof(hkpConvexTranslateShape));
-    }
+    //normally this would be a thread malloc'd object game-side but we've disabled that
+    local = (hkpConvexTranslateShape*)malloc_(sizeof(hkpConvexTranslateShape));
     local->vtable = 0x14141bff8;
     local->m_userData = NULL;
     local->m_childShape = NULL; //Init on copy
@@ -1120,14 +1091,8 @@ void copy_hkpBoxShape(hkpBoxShape** to, hkpBoxShape* from, StateTarget target)
 hkpBoxShape* init_hkpBoxShape(StateTarget target)
 {
     hkpBoxShape* local;
-    if (target == StateTarget::ToGame)
-    {
-        local = (hkpBoxShape*)Game::thread_malloc(sizeof(hkpBoxShape));
-    }
-    else
-    {
-        local = (hkpBoxShape*)malloc_(sizeof(hkpBoxShape));
-    }
+    //normally this would be a thread malloc'd object game-side but we've disabled that
+    local = (hkpBoxShape*)malloc_(sizeof(hkpBoxShape));
     local->vtable = 0x14141bff8;
     local->m_userData = NULL;
     return local;

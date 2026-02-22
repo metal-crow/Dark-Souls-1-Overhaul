@@ -537,6 +537,54 @@ void followupBullet_loop_helper(uint64_t FXEntry_Substruct_2)
 
 bool rollback_await_init(void* steamMsgs);
 
+void* hkThreadMemory_BlockAlloc(void* hkThreadMemory, uint32_t size)
+{
+    return malloc_(size);
+}
+
+void hkThreadMemory_BlockFree(void* hkThreadMemory, void* ptr, uint32_t size)
+{
+    return free(ptr);
+}
+
+void* hkThreadMemory_bufAlloc(void* param_1, uint32_t* reqNumInOut)
+{
+    return malloc_(*reqNumInOut);
+}
+
+void hkThreadMemory_bufFree(void* param_1, void* ptr, uint32_t numElem)
+{
+    return free(ptr);
+}
+
+void* hkThreadMemory_bufRealloc(void* param_1, void* ptr, int oldNum, int* reqNumInOut)
+{
+    void* ptr2 = malloc_(*reqNumInOut);
+    uint32_t copySize = oldNum;
+    if (*reqNumInOut < oldNum)
+    {
+        copySize = *reqNumInOut;
+    }
+    memcpy(ptr2, ptr, copySize);
+    free(ptr);
+    return ptr2;
+}
+
+void hkThreadMemory_blockAllocBatch(void* param_1, void** ptrsOut, int numPtrs, int blockSize)
+{
+    for (size_t i = 0; i < numPtrs; i++)
+    {
+        ptrsOut[i] = malloc_(blockSize);
+    }
+}
+void hkThreadMemory_blockFreeBatch(void* param_1, void** ptrsIn, int numPtrs, int blockSize)
+{
+    for (size_t i = 0; i < numPtrs; i++)
+    {
+        free(ptrsIn[i]);
+    }
+}
+
 void Rollback::start()
 {
     ConsoleWrite("Rollback...");
@@ -571,6 +619,19 @@ void Rollback::start()
     write_address = (uint8_t*)(Rollback::call_EquipGameData_Reset_ItemBeingUsedFromInventory_offset + Game::ds1_base);
     uint8_t nop[5] = { 0x90, 0x90, 0x90, 0x90, 0x90 };
     sp::mem::patch_bytes(write_address, nop, 5);
+
+    //Disable all thread specific allocations. Replace it with global malloc/free
+    //this is needed because otherwise we can't know what hkThreadMemory instance to allocate or free an object under
+    uint64_t* hkThreadMemory_vftable = (uint64_t*)0x14144cb48;
+    unsigned long old;
+    VirtualProtect(hkThreadMemory_vftable, 0x68, PAGE_READWRITE, &old);
+    hkThreadMemory_vftable[1] = (uint64_t)(&hkThreadMemory_BlockAlloc);
+    hkThreadMemory_vftable[2] = (uint64_t)(&hkThreadMemory_BlockFree);
+    hkThreadMemory_vftable[3] = (uint64_t)(&hkThreadMemory_bufAlloc);
+    hkThreadMemory_vftable[4] = (uint64_t)(&hkThreadMemory_bufFree);
+    hkThreadMemory_vftable[5] = (uint64_t)(&hkThreadMemory_bufRealloc);
+    hkThreadMemory_vftable[6] = (uint64_t)(&hkThreadMemory_blockAllocBatch);
+    hkThreadMemory_vftable[7] = (uint64_t)(&hkThreadMemory_blockFreeBatch);
 
     //Testing rollback related stuff
     Rollback::saved_havokman = init_FrpgHavokManImp();
