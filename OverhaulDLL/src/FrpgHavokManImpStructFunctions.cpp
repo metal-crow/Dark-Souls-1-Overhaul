@@ -1,4 +1,5 @@
 #include "FrpgHavokManImpStructFunctions.h"
+#include <unordered_set>
 
 /* ---------------- HAVOK MAN ------------------ */
 
@@ -105,10 +106,14 @@ void free_hkpWorld(hkpWorld* to)
     //free_hkpSimulationIsland(to->m_inactiveSimulationIslands);
     //free_hkpSimulationIsland(to->m_dirtySimulationIslands);
     free_hkp3AxisSweep(to->m_broadPhase);
+    // copy_hkpWorld may store the same pointer in multiple slots when the source has
+    // duplicate entries, so track what we've already freed to avoid double-free.
+    std::unordered_set<void*> freed;
     for (size_t i = 0; i < to->m_phantoms_cap; i++)
     {
-        if (to->m_phantoms[i] != NULL)
+        if (to->m_phantoms[i] != NULL && !freed.count(to->m_phantoms[i]))
         {
+            freed.insert(to->m_phantoms[i]);
             free_hkpPhantom(to->m_phantoms[i], StateTarget::ToLocal);
         }
     }
