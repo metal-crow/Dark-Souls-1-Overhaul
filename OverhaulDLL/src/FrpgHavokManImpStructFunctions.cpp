@@ -228,7 +228,7 @@ void copy_hkpBpAxis(hkpBpAxis* to, const hkpBpAxis* from, StateTarget target)
         uint32_t old_len = to->len;
         if (target == StateTarget::ToGame)
         {
-            increase_list_size(Game::MemHeapAllocator, &to->arry, 0x8);
+            increase_list_size(Game::MemHeapAllocator, &to->arry, sizeof(hkpBpEndPoint));
         }
         else
         {
