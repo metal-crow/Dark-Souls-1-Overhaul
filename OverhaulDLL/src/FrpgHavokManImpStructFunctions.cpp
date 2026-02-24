@@ -120,12 +120,13 @@ void copy_hkp3AxisSweep(hkp3AxisSweep* to, const hkp3AxisSweep* from, StateTarge
 {
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    if ((from->m_nodes_cap & 0x3fffffff) < from->m_nodes_len)
+    {
+        FATALERROR("m_nodes_cap %x m_nodes_len %x", from->m_nodes_cap, from->m_nodes_len);
+    }
     //update the array object and capacity
     if ((to->m_nodes_cap & 0x3fffffff) < from->m_nodes_len)
     {
-        if ((from->m_nodes_cap & 0x3fffffff) < from->m_nodes_len){
-            FATALERROR("m_nodes_cap %x m_nodes_len %x", from->m_nodes_cap, from->m_nodes_len);
-        }
         uint32_t old_len = to->m_nodes_len;
         if (target == StateTarget::ToGame)
         {
@@ -361,6 +362,10 @@ void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapeP
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     to->unk_0 = from->unk_0;
 
+    if ((from->m_properties_cap & 0x3fffffff) < from->m_properties_len)
+    {
+        FATALERROR("m_properties_cap %x m_properties_len %x", from->m_properties_cap, from->m_properties_len);
+    }
     if ((to->m_properties_cap & 0x3fffffff) < from->m_properties_len)
     {
         uint32_t old_len = to->m_properties_len;
@@ -370,10 +375,10 @@ void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapeP
         }
         else
         {
-            to->m_properties = (hkpProperty*)realloc_(to->m_properties, to->m_properties_len * sizeof(hkpProperty));
-            to->m_properties_cap = to->m_properties_len;
+            to->m_properties = (hkpProperty*)realloc_(to->m_properties, (from->m_properties_cap & 0x3fffffff) * sizeof(hkpProperty));
+            to->m_properties_cap = (from->m_properties_cap & 0x3fffffff);
         }
-        for (size_t i = old_len; i < to->m_properties_len; i++)
+        for (size_t i = old_len; i < (from->m_properties_cap & 0x3fffffff); i++)
         {
             init_hkpProperty(&to->m_properties[i], target);
         }
@@ -386,6 +391,10 @@ void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapeP
 
     copy_hkMotionState(&to->m_motionState, &from->m_motionState);
 
+    if ((from->m_collisionDetails_cap & 0x3fffffff) < from->m_collisionDetails_len)
+    {
+        FATALERROR("m_collisionDetails_cap %x m_collisionDetails_len %x", from->m_collisionDetails_cap, from->m_collisionDetails_len);
+    }
     if ((to->m_collisionDetails_cap & 0x3fffffff) < from->m_collisionDetails_len)
     {
         uint32_t old_len = to->m_collisionDetails_len;
@@ -395,10 +404,10 @@ void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapeP
         }
         else
         {
-            to->m_collisionDetails = (hkpCollidable**)realloc_(to->m_collisionDetails, to->m_collisionDetails_len * sizeof(hkpCollidable*));
-            to->m_collisionDetails_cap = to->m_collisionDetails_len;
+            to->m_collisionDetails = (hkpCollidable**)realloc_(to->m_collisionDetails, (from->m_collisionDetails_cap & 0x3fffffff) * sizeof(hkpCollidable*));
+            to->m_collisionDetails_cap = (from->m_collisionDetails_cap & 0x3fffffff);
         }
-        for (size_t i = old_len; i < to->m_collisionDetails_len; i++)
+        for (size_t i = old_len; i < (from->m_collisionDetails_cap & 0x3fffffff); i++)
         {
             init_hkpCollidable(&to->m_collisionDetails[i], target);
         }
@@ -508,28 +517,6 @@ void copy_hkpLinkedCollidable(hkpLinkedCollidable* to, const hkpLinkedCollidable
     {
         FATALERROR("hkpLinkedCollidable->m_collisionEntries_len > 0");
     }
-    //if ((to->m_collisionEntries_cap & 0x3fffffff) < from->m_collisionEntries_len)
-    //{
-    //    uint32_t old_len = to->m_collisionEntries_len;
-    //    if (target)
-    //    {
-    //        increase_list_size(Game::MemHeapAllocator, &to->m_collisionEntries, 0x10);
-    //    }
-    //    else
-    //    {
-    //        to->m_collisionEntries = (CollisionEntry*)realloc_(to->m_collisionEntries, to->m_collisionEntries_len * sizeof(CollisionEntry));
-    //        to->m_collisionEntries_cap = to->m_collisionEntries_len + 1;
-    //    }
-    //    for (size_t i = old_len; i < to->m_collisionEntries_len; i++)
-    //    {
-    //        init_CollisionEntry(&to->m_collisionEntries[i], target);
-    //    }
-    //}
-    //to->m_collisionEntries_len = from->m_collisionEntries_len;
-    //for (size_t i = 0; i < from->m_collisionEntries_len; i++)
-    //{
-    //    copy_CollisionEntry(&to->m_collisionEntries[i], &from->m_collisionEntries[i], to);
-    //}
 }
 
 
@@ -622,26 +609,6 @@ void copy_BoundingVolumeData(BoundingVolumeData* to, const BoundingVolumeData* f
     {
         FATALERROR("testing BoundingVolumeData");
     }
-
-    //if ((to->m_capacityChildShapeAabbs & 0x3fffffff) < from->m_numChildShapeAabbs)
-    //{
-    //    to->m_numChildShapeAabbs = from->m_numChildShapeAabbs;
-    //    if (target)
-    //    {
-    //        //alloc;
-    //    }
-    //    else
-    //    {
-    //        to->m_childShapeAabbs = (hkAabbUint32*)realloc_(to->m_childShapeAabbs, (to->m_numChildShapeAabbs + 1) * sizeof(hkAabbUint32));
-    //        to->m_childShapeKeys = (uint32_t*)realloc_(to->m_childShapeKeys, (to->m_numChildShapeAabbs + 1) * sizeof(uint32_t));
-    //        to->m_capacityChildShapeAabbs = to->m_numChildShapeAabbs + 1;
-    //    }
-    //}
-    //for (size_t i = 0; i < from->m_numChildShapeAabbs; i++)
-    //{
-    //    memcpy(&to->m_childShapeAabbs[i], &from->m_childShapeAabbs[i], sizeof(hkAabbUint32));
-    //    to->m_childShapeKeys[i] = from->m_childShapeKeys[i];
-    //}
 }
 
 void init_BoundingVolumeData(BoundingVolumeData* to, StateTarget target)
@@ -960,12 +927,12 @@ void copy_hkpMoppCode(hkpMoppCode* to, hkpMoppCode* from, StateTarget target)
 {
     to->vtable = from->vtable;
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    if ((from->m_data_cap & 0x3fffffff) < from->m_data_len)
+    {
+        FATALERROR("m_data_cap %x m_data_len %x", from->m_data_cap, from->m_data_len);
+    }
     if ((to->m_data_cap & 0x3fffffff) < from->m_data_len)
     {
-        if ((from->m_data_cap & 0x3fffffff) < from->m_data_len)
-        {
-            FATALERROR("m_data_cap %x m_data_len %x", from->m_data_cap, from->m_data_len);
-        }
         uint32_t old_len = to->m_data_len;
         to->m_data = (uint8_t*)realloc_(to->m_data, (from->m_data_cap & 0x3fffffff) * sizeof(uint8_t));
         to->m_data_cap = from->m_data_cap;
