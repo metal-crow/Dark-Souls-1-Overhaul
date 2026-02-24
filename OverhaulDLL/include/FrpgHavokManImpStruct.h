@@ -20,6 +20,7 @@ typedef struct hkpBpEndPoint hkpBpEndPoint;
 typedef struct hkpSphereShape hkpSphereShape;
 typedef struct hkpCapsuleShape hkpCapsuleShape;
 typedef struct hkpMoppBvTreeShape hkpMoppBvTreeShape;
+typedef struct hkpMoppCode hkpMoppCode;
 typedef struct hkpConvexVerticesShape hkpConvexVerticesShape;
 typedef struct hkpConvexVerticesConnectivity hkpConvexVerticesConnectivity;
 typedef struct hkpConvexTranslateShape hkpConvexTranslateShape;
@@ -177,25 +178,40 @@ struct hkpSphereShape
 static_assert(sizeof(hkpSphereShape) == 0x38);
 static_assert(offsetof(hkpSphereShape, m_userData) == 0x18);
 
+struct hkpMoppCode
+{
+    uint64_t vtable;
+    uint8_t data_0[0x18];
+    uint8_t* m_data;
+    uint32_t m_data_len;
+    uint32_t m_data_cap;
+    uint8_t data_1[0x10];
+};
+static_assert(sizeof(hkpMoppCode) == 0x40);
+static_assert(offsetof(hkpMoppCode, m_data) == 0x20);
+
+//this shape is usually only used for large static geometry like level mesh.
+//it should be save to just save and restore it by pointer instead of a full copy (which is complex)
 struct hkpMoppBvTreeShape
 {
     uint64_t vtable1;
     uint8_t data_0[0x10];
     void* m_userData;
     uint64_t data_1;
-    void* refObject1;
-    void* unk2;
-    uint8_t data_2[0x18];
+    hkpMoppCode* m_code;
+    uint8_t* m_moppData;
+    uint32_t m_moppData_size;
+    uint8_t data_2[0x14];
     uint64_t vtable2;
-    void* refObject2;
+    void* m_childShape; //this is a shape type. usually something very complex like a hkpStorageExtendedMeshShape
     uint8_t data_3[0x10];
 };
 static_assert(sizeof(hkpMoppBvTreeShape) == 0x70);
 static_assert(offsetof(hkpMoppBvTreeShape, m_userData) == 0x18);
-static_assert(offsetof(hkpMoppBvTreeShape, refObject1) == 0x28);
-static_assert(offsetof(hkpMoppBvTreeShape, unk2) == 0x30);
+static_assert(offsetof(hkpMoppBvTreeShape, m_code) == 0x28);
+static_assert(offsetof(hkpMoppBvTreeShape, m_moppData) == 0x30);
 static_assert(offsetof(hkpMoppBvTreeShape, vtable2) == 0x50);
-static_assert(offsetof(hkpMoppBvTreeShape, refObject2) == 0x50+0x8);
+static_assert(offsetof(hkpMoppBvTreeShape, m_childShape) == 0x50+0x8);
 
 struct hkpConvexVerticesShape
 {

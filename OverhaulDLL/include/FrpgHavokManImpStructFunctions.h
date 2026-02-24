@@ -86,6 +86,9 @@ void free_hkpCapsuleShape(hkpCapsuleShape* to, StateTarget target);
 void copy_hkpMoppBvTreeShape(hkpMoppBvTreeShape** to, hkpMoppBvTreeShape* from, StateTarget target);
 hkpMoppBvTreeShape* init_hkpMoppBvTreeShape(StateTarget target);
 void free_hkpMoppBvTreeShape(hkpMoppBvTreeShape* to, StateTarget target);
+void copy_hkpMoppCode(hkpMoppCode* to, hkpMoppCode* from, StateTarget target);
+hkpMoppCode* init_hkpMoppCode(StateTarget target);
+void free_hkpMoppCode(hkpMoppCode* to, StateTarget target);
 
 void copy_hkpConvexVerticesShape(hkpConvexVerticesShape** to, hkpConvexVerticesShape* from, StateTarget target);
 hkpConvexVerticesShape* init_hkpConvexVerticesShape(StateTarget target);

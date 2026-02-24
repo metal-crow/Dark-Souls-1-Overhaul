@@ -725,9 +725,9 @@ void copy_hkpShape(void** to, void* from, StateTarget target)
         if (toshape != fromshape)
         {
             free_hkpShape(*to, target);
-            *to = init_hkpMoppBvTreeShape(target);
+            *to = NULL;
         }
-        copy_hkpMoppBvTreeShape((hkpMoppBvTreeShape**)to, (hkpMoppBvTreeShape*)from, target);
+        *to = from;
         break;
     case ShapeType::ConvexVertices:
         FATALERROR("ConvexVertices shape detected %p", from);
@@ -889,59 +889,111 @@ void free_hkpCapsuleShape(hkpCapsuleShape* to, StateTarget target)
 
 void copy_hkpMoppBvTreeShape(hkpMoppBvTreeShape** to, hkpMoppBvTreeShape* from, StateTarget target)
 {
-    if (*to == NULL && from != NULL)
-    {
-        *to = init_hkpMoppBvTreeShape(target);
-    }
-    if (*to != NULL && from == NULL)
-    {
-        free_hkpMoppBvTreeShape(*to, target);
-        *to = NULL;
-    }
-    if (*to != NULL && from != NULL)
-    {
-        (*to)->vtable1 = (from)->vtable1;
-        memcpy((*to)->data_0, (from)->data_0, sizeof((*to)->data_0));
-        if ((from)->m_userData != 0)
-        {
-            FATALERROR("hkpMoppBvTreeShape->m_userData is non-0, value %x", (from)->m_userData);
-        }
-        (*to)->data_1 = (from)->data_1;
-        //refobject1
-        (*to)->unk2 = (from)->unk2;
-        memcpy((*to)->data_2, (from)->data_2, sizeof((*to)->data_2));
-        (*to)->vtable2 = (from)->vtable2;
-        //refobject2
-        memcpy((*to)->data_3, (from)->data_3, sizeof((*to)->data_3));
-    }
+    //if (*to == NULL && from != NULL)
+    //{
+    //    *to = init_hkpMoppBvTreeShape(target);
+    //}
+    //if (*to != NULL && from == NULL)
+    //{
+    //    free_hkpMoppBvTreeShape(*to, target);
+    //    *to = NULL;
+    //}
+    //if (*to != NULL && from != NULL)
+    //{
+    //    (*to)->vtable1 = (from)->vtable1;
+    //    memcpy((*to)->data_0, (from)->data_0, sizeof((*to)->data_0));
+    //    if ((from)->m_userData != 0)
+    //    {
+    //        FATALERROR("hkpMoppBvTreeShape->m_userData is non-0, value %x", (from)->m_userData);
+    //    }
+    //    (*to)->data_1 = (from)->data_1;
+    //    copy_hkpMoppCode((*to)->m_code, (from)->m_code, target);
+    //    (*to)->m_moppData = (*to)->m_code->m_data;
+    //    (*to)->m_moppData_size = (*to)->m_code->m_data_len;
+    //    memcpy((*to)->data_2, (from)->data_2, sizeof((*to)->data_2));
+    //    (*to)->vtable2 = (from)->vtable2;
+    //    copy_hkpShape(&(*to)->m_childShape, from->m_childShape, target);
+    //    memcpy((*to)->data_3, (from)->data_3, sizeof((*to)->data_3));
+    //}
 }
 
 hkpMoppBvTreeShape* init_hkpMoppBvTreeShape(StateTarget target)
 {
-    hkpMoppBvTreeShape* local;
-    //normally this would be a thread malloc'd object game-side but we've disabled that
-    local = (hkpMoppBvTreeShape*)malloc_(sizeof(hkpMoppBvTreeShape));
-    local->vtable1 = 0x14141bd68;
-    local->m_userData = NULL;
-    return local;
+    //hkpMoppBvTreeShape* local;
+    ////normally this would be a thread malloc'd object game-side but we've disabled that
+    //local = (hkpMoppBvTreeShape*)malloc_(sizeof(hkpMoppBvTreeShape));
+    //local->vtable1 = 0x14141bd68;
+    //local->m_userData = NULL;
+    //local->m_code = init_hkpMoppCode(target);
+    //local->m_moppData = local->m_code->m_data;
+    //local->m_moppData_size = local->m_code->m_data_len;
+    //local->m_childShape = NULL; //Init on copy
+    //return local;
+    return NULL;
 }
 
 void free_hkpMoppBvTreeShape(hkpMoppBvTreeShape* to, StateTarget target)
 {
+    //free_hkpMoppCode(to->m_code, target);
+    //free_hkpShape(to->m_childShape, target);
+    //if (target == StateTarget::ToGame)
+    //{
+    //    hkReferencedObject_deref(to);
+    //}
+    //else
+    //{
+    //    free(to);
+    //}
+}
+
+void copy_hkpMoppCode(hkpMoppCode* to, hkpMoppCode* from, StateTarget target)
+{
+    to->vtable = from->vtable;
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    if ((to->m_data_cap & 0x3fffffff) < from->m_data_len)
+    {
+        if ((from->m_data_cap & 0x3fffffff) < from->m_data_len)
+        {
+            FATALERROR("m_data_cap %x m_data_len %x", from->m_data_cap, from->m_data_len);
+        }
+        uint32_t old_len = to->m_data_len;
+        to->m_data = (uint8_t*)realloc_(to->m_data, (from->m_data_cap & 0x3fffffff) * sizeof(uint8_t));
+        to->m_data_cap = from->m_data_cap;
+        // Zero out new values
+        for (size_t i = old_len; i < (to->m_data_cap & 0x3fffffff); i++)
+        {
+            to->m_data[i] = 0;
+        }
+    }
+    to->m_data_len = from->m_data_len;
+    for (size_t i = 0; i < to->m_data_len; i++)
+    {
+        to->m_data[i] = from->m_data[i];
+    }
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+}
+
+hkpMoppCode* init_hkpMoppCode(StateTarget target)
+{
+    hkpMoppCode* local;
+    //normally this would be a thread malloc'd object game-side but we've disabled that
+    local = (hkpMoppCode*)malloc_(sizeof(hkpMoppCode));
+    local->vtable = 0x141460138;
+    local->m_data = NULL; //init on copy
+    local->m_data_len = 0;
+    local->m_data_cap = 0;
+    return local;
+}
+
+void free_hkpMoppCode(hkpMoppCode* to, StateTarget target)
+{
     if (target == StateTarget::ToGame)
     {
-        if (to->refObject1 != NULL)
-        {
-            hkReferencedObject_deref(to->refObject1);
-        }
-        if (to->refObject2 != NULL)
-        {
-            hkReferencedObject_deref(to->refObject2);
-        }
         hkReferencedObject_deref(to);
     }
     else
     {
+        free(to->m_data);
         free(to);
     }
 }
@@ -1050,12 +1102,9 @@ hkpConvexTranslateShape* init_hkpConvexTranslateShape(StateTarget target)
 
 void free_hkpConvexTranslateShape(hkpConvexTranslateShape* to, StateTarget target)
 {
+    free_hkpShape(to->m_childShape, target);
     if (target == StateTarget::ToGame)
     {
-        if (to->m_childShape != NULL)
-        {
-            hkReferencedObject_deref((void*)to->m_childShape);
-        }
         hkReferencedObject_deref((void*)to);
     }
     else
