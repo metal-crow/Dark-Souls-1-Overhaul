@@ -219,19 +219,29 @@ void copy_hkpBpNode(hkpBpNode* to, const hkpBpNode* from, StateTarget target)
 
 void copy_hkpBpAxis(hkpBpAxis* to, const hkpBpAxis* from, StateTarget target)
 {
-    to->len = from->len;
+    if ((from->capacity & 0x3fffffff) < from->len)
+    {
+        FATALERROR("hkpBpAxis cap %x hkpBpAxis len %x", from->capacity, from->len);
+    }
     if ((to->capacity & 0x3fffffff) < from->len)
     {
+        uint32_t old_len = to->len;
         if (target == StateTarget::ToGame)
         {
             increase_list_size(Game::MemHeapAllocator, &to->arry, 0x8);
         }
         else
         {
-            to->arry = (hkpBpEndPoint*)realloc_(to->arry, (to->len + 1) * sizeof(hkpBpEndPoint));
-            to->capacity = to->len + 1;
+            to->arry = (hkpBpEndPoint*)realloc_(to->arry, (from->capacity & 0x3fffffff) * sizeof(hkpBpEndPoint));
+            to->capacity = (from->capacity & 0x3fffffff);
+            // Zero out new nodes
+            for (size_t i = old_len; i < (to->capacity & 0x3fffffff); i++)
+            {
+                memset(&to->arry[i], 0, sizeof(hkpBpEndPoint));
+            }
         }
     }
+    to->len = from->len;
     for (size_t i = 0; i < from->len; i++)
     {
         copy_hkpBpEndPoint(&to->arry[i], &from->arry[i], target);
@@ -354,7 +364,6 @@ void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapeP
     if ((to->m_properties_cap & 0x3fffffff) < from->m_properties_len)
     {
         uint32_t old_len = to->m_properties_len;
-        to->m_properties_len = from->m_properties_len;
         if (target == StateTarget::ToGame)
         {
             increase_list_size(Game::MemHeapAllocator, &to->m_properties, 0x10);
@@ -369,6 +378,7 @@ void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapeP
             init_hkpProperty(&to->m_properties[i], target);
         }
     }
+    to->m_properties_len = from->m_properties_len;
     for (size_t i = 0; i < from->m_properties_len; i++)
     {
         copy_hkpProperty(&to->m_properties[i], &from->m_properties[i], target);
@@ -379,7 +389,6 @@ void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapeP
     if ((to->m_collisionDetails_cap & 0x3fffffff) < from->m_collisionDetails_len)
     {
         uint32_t old_len = to->m_collisionDetails_len;
-        to->m_collisionDetails_len = from->m_collisionDetails_len;
         if (target == StateTarget::ToGame)
         {
             increase_list_size(Game::MemHeapAllocator, &to->m_collisionDetails, 0x8);
@@ -394,6 +403,7 @@ void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapeP
             init_hkpCollidable(&to->m_collisionDetails[i], target);
         }
     }
+    to->m_collisionDetails_len = from->m_collisionDetails_len;
     for (size_t i = 0; i < from->m_collisionDetails_len; i++)
     {
         copy_hkpCollidable(to->m_collisionDetails[i], from->m_collisionDetails[i], &to->m_motionState, target);
@@ -501,7 +511,6 @@ void copy_hkpLinkedCollidable(hkpLinkedCollidable* to, const hkpLinkedCollidable
     //if ((to->m_collisionEntries_cap & 0x3fffffff) < from->m_collisionEntries_len)
     //{
     //    uint32_t old_len = to->m_collisionEntries_len;
-    //    to->m_collisionEntries_len = from->m_collisionEntries_len;
     //    if (target)
     //    {
     //        increase_list_size(Game::MemHeapAllocator, &to->m_collisionEntries, 0x10);
@@ -516,6 +525,7 @@ void copy_hkpLinkedCollidable(hkpLinkedCollidable* to, const hkpLinkedCollidable
     //        init_CollisionEntry(&to->m_collisionEntries[i], target);
     //    }
     //}
+    //to->m_collisionEntries_len = from->m_collisionEntries_len;
     //for (size_t i = 0; i < from->m_collisionEntries_len; i++)
     //{
     //    copy_CollisionEntry(&to->m_collisionEntries[i], &from->m_collisionEntries[i], to);
