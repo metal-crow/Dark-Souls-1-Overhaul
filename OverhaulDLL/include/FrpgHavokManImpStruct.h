@@ -123,9 +123,9 @@ static_assert(sizeof(hkpBpAxis) == 0x10);
 
 struct hkpBpEndPoint
 {
-    uint64_t data_1;
+    uint32_t data_1;
 };
-static_assert(sizeof(hkpBpEndPoint) == 0x8);
+static_assert(sizeof(hkpBpEndPoint) == 0x4);
 
 struct hkp3AxisSweep
 {
