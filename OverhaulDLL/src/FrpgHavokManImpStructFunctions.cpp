@@ -48,9 +48,6 @@ void copy_hkpWorld(hkpWorld* to, const hkpWorld* from, StateTarget target)
 {
     copy_hkp3AxisSweep(to->m_broadPhase, from->m_broadPhase, target);
     //don't need to actually save/load the simulation islands themselves, those should be stable for the lifetime of this session
-    //copy_hkpSimulationIsland(to->m_activeSimulationIslands, to->m_activeSimulationIslands_size, from->m_activeSimulationIslands, from->m_activeSimulationIslands_size, target);
-    //copy_hkpSimulationIsland(to->m_inactiveSimulationIslands, to->m_inactiveSimulationIslands_size, from->m_inactiveSimulationIslands, from->m_inactiveSimulationIslands_size, target);
-    //copy_hkpSimulationIsland(to->m_dirtySimulationIslands, to->m_dirtySimulationIslands_size, from->m_dirtySimulationIslands, from->m_dirtySimulationIslands_size, target);
     to->m_phantoms_size = from->m_phantoms_size;
     if (to->m_phantoms_cap < from->m_phantoms_size)
     {
@@ -85,12 +82,31 @@ void copy_hkpWorld(hkpWorld* to, const hkpWorld* from, StateTarget target)
             m_phantoms_tracker[(uint64_t)(from->m_phantoms[i])] = i;
         }
     }
+    //now that the phantoms are copied, link in the collisions
+    for (size_t i = 0; i < from->m_phantoms_size; i++)
+    {
+        PhantomType type = hkpPhantom_getType(from->m_phantoms[i]);
+        switch (type)
+        {
+        case PhantomType::SimpleShape:
+            copy_hkpSimpleShapePhantom_collisionDetails((hkpSimpleShapePhantom*)(to->m_phantoms[i]), (const hkpSimpleShapePhantom*)(from->m_phantoms[i]), to, from, target);
+            break;
+        case PhantomType::Aabb:
+            //we don't worry about the AABB phantoms for collisions
+            break;
+        case PhantomType::PhantomNull:
+        case PhantomType::InvalidPhantom:
+            break;
+        }
+    }
 }
 
 hkpWorld* init_hkpWorld()
 {
     hkpWorld* local = (hkpWorld*)malloc_(sizeof(hkpWorld));
 
+    local->m_fixedIsland = NULL;
+    local->m_fixedRigidBody = NULL;
     local->m_activeSimulationIslands = NULL;
     local->m_inactiveSimulationIslands = NULL;
     local->m_dirtySimulationIslands = NULL;
@@ -102,9 +118,6 @@ hkpWorld* init_hkpWorld()
 
 void free_hkpWorld(hkpWorld* to)
 {
-    //free_hkpSimulationIsland(to->m_activeSimulationIslands);
-    //free_hkpSimulationIsland(to->m_inactiveSimulationIslands);
-    //free_hkpSimulationIsland(to->m_dirtySimulationIslands);
     free_hkp3AxisSweep(to->m_broadPhase);
     // copy_hkpWorld may store the same pointer in multiple slots when the source has
     // duplicate entries, so track what we've already freed to avoid double-free.
@@ -402,7 +415,6 @@ void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapeP
     }
     if ((to->m_collisionDetails_cap & 0x3fffffff) < from->m_collisionDetails_len)
     {
-        uint32_t old_len = to->m_collisionDetails_len;
         if (target == StateTarget::ToGame)
         {
             increase_list_size(Game::MemHeapAllocator, &to->m_collisionDetails, 0x8);
@@ -412,20 +424,139 @@ void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapeP
             to->m_collisionDetails = (hkpCollidable**)realloc_(to->m_collisionDetails, (from->m_collisionDetails_cap & 0x3fffffff) * sizeof(hkpCollidable*));
             to->m_collisionDetails_cap = (from->m_collisionDetails_cap & 0x3fffffff);
         }
-        for (size_t i = old_len; i < (from->m_collisionDetails_cap & 0x3fffffff); i++)
-        {
-            init_hkpCollidable(&to->m_collisionDetails[i], target);
-        }
     }
     to->m_collisionDetails_len = from->m_collisionDetails_len;
-    for (size_t i = 0; i < from->m_collisionDetails_len; i++)
-    {
-        copy_hkpCollidable(to->m_collisionDetails[i], from->m_collisionDetails[i], &to->m_motionState, target);
-    }
+    //we can't copy the collision details here, since it may rely on all the other phantoms existing. Split out into a seperate function to call later when ready
 
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
 }
 
+void copy_hkpSimpleShapePhantom_collisionDetails(hkpSimpleShapePhantom* to, const hkpSimpleShapePhantom* from, const hkpWorld* to_world, const hkpWorld* from_world, StateTarget target)
+{
+    for (size_t i = 0; i < from->m_collisionDetails_len; i++)
+    {
+        //this collision points to the colliding phantom's m_collidable
+        //we already copy it as part of the other entity's data, locate it and use the pointer here
+        hkpCollidable* collision = from->m_collisionDetails[i];
+        if (collision == NULL)
+        {
+            to->m_collisionDetails[i] = NULL;
+            break;
+        }
+        bool found_colliding = false;
+
+        //check the phantoms list to see if this is a phantom collision, and get the offset into the array for it
+        size_t j = 0;
+        while (j < from_world->m_phantoms_size && !found_colliding)
+        {
+            void* elem_p = from_world->m_phantoms[j];
+            PhantomType type = hkpPhantom_getType(elem_p);
+            switch (type)
+            {
+            case PhantomType::SimpleShape:
+                //linked collidable in hkpPhantom is +0x20
+                if (((uint64_t)elem_p + 0x20) == (uint64_t)collision)
+                {
+                    //get the associated phantom pointer in the target array
+                    void* colliding_phantom_to_addr = to_world->m_phantoms[j];
+                    if (colliding_phantom_to_addr != NULL)
+                    {
+                        hkpCollidable* colliding_phantom_collision_to_addr = (hkpCollidable*)((uint64_t)colliding_phantom_to_addr + 0x20);
+                        to->m_collisionDetails[i] = colliding_phantom_collision_to_addr;
+                    }
+                    else
+                    {
+                        FATALERROR("Found colliding phantom at %d but it was null on the 'to' end: %p(%d) %p", j, collision, i, from);
+                    }
+                    found_colliding = true;
+                }
+                break;
+            case PhantomType::Aabb:
+                //don't include this collision, it's for ragdolls and we discard those
+                if (((uint64_t)elem_p + 0x20) == (uint64_t)collision)
+                {
+                    to->m_collisionDetails[i] = NULL;
+                    found_colliding = true;
+                }
+                break;
+            case PhantomType::PhantomNull:
+                break;
+            case PhantomType::InvalidPhantom:
+                FATALERROR("Got invalid phantom for %p", elem_p);
+                break;
+            }
+            j++;
+        }
+
+        //check the fixed entities list
+        //since this list is fixed and thus we don't saving it, if this is a fixed entity just copy the pointer
+        j = 0;
+        hkpSimulationIsland* fixedIslandtarget = NULL;
+        switch (target)
+        {
+        case StateTarget::ToGame:
+            fixedIslandtarget = to_world->m_fixedIsland;
+            break;
+        case StateTarget::ToLocal:
+            fixedIslandtarget = from_world->m_fixedIsland;
+            break;
+        case StateTarget::Copy:
+            //no way to actual verify if this is a fixed entity here, so just copy it
+            to->m_collisionDetails[i] = from->m_collisionDetails[i];
+            found_colliding = true;
+            break;
+        }
+        while (fixedIslandtarget != NULL && j < fixedIslandtarget->m_entities_size && !found_colliding)
+        {
+            void* elem_p = fixedIslandtarget->m_entities[j];
+            if (((uint64_t)elem_p + 0x20) == (uint64_t)collision)
+            {
+                to->m_collisionDetails[i] = from->m_collisionDetails[i];
+                found_colliding = true;
+            }
+            j++;
+        }
+
+        //check the active entities list
+        //same deal as fixed entities list, it should be stable for our session
+        size_t sim_i = 0;
+        const hkpWorld* activeWorldtarget = NULL;
+        switch (target)
+        {
+        case StateTarget::ToGame:
+            activeWorldtarget = to_world;
+            break;
+        case StateTarget::ToLocal:
+            activeWorldtarget = from_world;
+            break;
+        case StateTarget::Copy:
+            //no way to actual verify if this is a active entity here, so just copy it
+            to->m_collisionDetails[i] = from->m_collisionDetails[i];
+            found_colliding = true;
+            break;
+        }
+        while (activeWorldtarget != NULL && sim_i < activeWorldtarget->m_activeSimulationIslands_size && !found_colliding)
+        {
+            j = 0;
+            while (activeWorldtarget != NULL && j < activeWorldtarget->m_activeSimulationIslands[sim_i].m_entities_size && !found_colliding)
+            {
+                void* elem_p = activeWorldtarget->m_activeSimulationIslands[sim_i].m_entities[j];
+                if (((uint64_t)elem_p + 0x20) == (uint64_t)collision)
+                {
+                    to->m_collisionDetails[i] = from->m_collisionDetails[i];
+                    found_colliding = true;
+                }
+                j++;
+            }
+            sim_i++;
+        }
+
+        if (!found_colliding)
+        {
+            FATALERROR("Unable to find phantom for collision %p %p", collision, from);
+        }
+    }
+}
 
 //all of it's children arrays are unknown sized, so should be init'd on copy
 hkpSimpleShapePhantom* init_hkpSimpleShapePhantom(StateTarget target)
@@ -475,10 +606,10 @@ void free_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, StateTarget target)
             free_hkpProperty(&to->m_properties[i]);
         }
         free(to->m_properties);
-        for (size_t i = 0; i < to->m_collisionDetails_len; i++)
-        {
-            free_hkpCollidable(to->m_collisionDetails[i]);
-        }
+        //for (size_t i = 0; i < to->m_collisionDetails_len; i++)
+        //{
+        //    free_hkpCollidable(to->m_collisionDetails[i]);
+        //}
         free(to->m_collisionDetails);
         free(to);
     }
@@ -511,6 +642,19 @@ hkpSimpleShapePhantom* find_hkpSimpleShapePhantom(hkpWorld* world, FrpgPhysShape
         }
     }
     return NULL;
+}
+
+bool world_contains_phantom(hkpWorld* world, void* phantom)
+{
+    void** array = world->m_phantoms;
+    for (size_t i = 0; i < world->m_phantoms_size; i++)
+    {
+        void* elem = array[i];
+        if (elem == phantom){
+            return true;
+        }
+    }
+    return false;
 }
 
 /* ---------------- CHRCTRL + DAMAGE MAN ------------------ */
@@ -587,9 +731,12 @@ void init_hkpCollidable(hkpCollidable** to, StateTarget target)
 
 void free_hkpCollidable(hkpCollidable* to)
 {
-    free_hkpShape(to->shape, StateTarget::ToLocal);
-    free_BoundingVolumeData(&to->m_boundingVolumeData, StateTarget::ToLocal);
-    free(to);
+    if (to != NULL)
+    {
+        free_hkpShape(to->shape, StateTarget::ToLocal);
+        free_BoundingVolumeData(&to->m_boundingVolumeData, StateTarget::ToLocal);
+        free(to);
+    }
 }
 
 

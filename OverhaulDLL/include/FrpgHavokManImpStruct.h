@@ -64,7 +64,9 @@ static_assert(offsetof(FrpgPhysWorld, _hkpWorld) == 0x8);
 struct hkpWorld
 {
     void* vtable;
-    uint8_t _0[0x38];
+    uint8_t _0[0x28];
+    hkpSimulationIsland* m_fixedIsland;
+    void* m_fixedRigidBody;
     hkpSimulationIsland* m_activeSimulationIslands;
     uint32_t m_activeSimulationIslands_size;
     uint32_t m_activeSimulationIslands_cap;

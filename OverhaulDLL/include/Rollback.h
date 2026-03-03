@@ -90,6 +90,7 @@ private:
     static const uint64_t Build_BulletIns_FollowupBullet_loop_fix_offset = 0x0fe6100;
     static const uint64_t get_item_currently_being_used_offset = 0x74a0e0;
     static const uint64_t call_EquipGameData_Reset_ItemBeingUsedFromInventory_offset = 0x3577c9;
+    static const uint64_t simpleshapephantom_collisionDetails_iterate_offset = 0x9c763f;
 
     static const uint64_t PlayerIns_Is_NetworkedPlayer_offsets[];
     static const uint64_t PlayerIns_IsHostPlayerIns_offsets[];

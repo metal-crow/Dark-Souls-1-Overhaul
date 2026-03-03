@@ -3,6 +3,8 @@ _DATA SEGMENT
 sub_1401862A0   dq  1401862A0h
 nullsub_78     dq  140185470h
 Build_BulletIns_FollowupBullet  dq  140fdcac0h
+LAB_1409c7675   dq  1409c7675h
+
 _DATA ENDS
 
 _TEXT    SEGMENT
@@ -262,6 +264,24 @@ mov     dword ptr [rdx], 0FFFFFFFFh
 mov     dword ptr [rdx+4], 1
 jmp     get_item_currently_being_used_return
 get_item_currently_being_used_injection ENDP
+
+
+
+EXTERN simpleshapephantom_collisionDetails_iterate_return: qword
+
+PUBLIC simpleshapephantom_collisionDetails_iterate_injection
+simpleshapephantom_collisionDetails_iterate_injection PROC
+MOV        RDX,qword ptr [RAX + RBX*8]
+CMP        RDX, 0
+JNE        nonnull
+JMP        qword ptr [LAB_1409c7675]
+nonnull:
+MOV        RAX,qword ptr [R15 + 20h]
+MOVZX      ECX,byte ptr [RAX + 10h]
+MOV        RAX,qword ptr [RDX]
+jmp        simpleshapephantom_collisionDetails_iterate_return
+simpleshapephantom_collisionDetails_iterate_injection ENDP
+
 
 _TEXT    ENDS
 

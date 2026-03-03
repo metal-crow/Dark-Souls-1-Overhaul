@@ -21,9 +21,6 @@ void copy_hkpWorld(hkpWorld* to, const hkpWorld* from, StateTarget target);
 hkpWorld* init_hkpWorld();
 void free_hkpWorld(hkpWorld* to);
 
-void copy_hkpSimulationIsland(hkpSimulationIsland* to, uint32_t to_size, hkpSimulationIsland* from, uint32_t from_size, StateTarget target);
-void free_hkpSimulationIsland(hkpSimulationIsland* to);
-
 void copy_hkp3AxisSweep(hkp3AxisSweep* to, const hkp3AxisSweep* from, StateTarget target);
 hkp3AxisSweep* init_hkp3AxisSweep();
 void free_hkp3AxisSweep(hkp3AxisSweep* to);
@@ -43,10 +40,12 @@ void free_hkpPhantom(void* to, StateTarget target);
 
 std::string print_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to);
 void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapePhantom* from, StateTarget target);
+void copy_hkpSimpleShapePhantom_collisionDetails(hkpSimpleShapePhantom* to, const hkpSimpleShapePhantom* from, const hkpWorld* to_world, const hkpWorld* from_world, StateTarget target);
 hkpSimpleShapePhantom* init_hkpSimpleShapePhantom(StateTarget target);
 void free_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, StateTarget target);
 hkpSimpleShapePhantom* get_hkpSimpleShapePhantom(hkpWorld* world, FrpgPhysShapePhantomIns* parent);
 hkpSimpleShapePhantom* find_hkpSimpleShapePhantom(hkpWorld* world, FrpgPhysShapePhantomIns* parent);
+bool world_contains_phantom(hkpWorld* world, void* phantom);
 
 void copy_hkpLinkedCollidable(hkpLinkedCollidable* to, const hkpLinkedCollidable* from, hkMotionState* motion, StateTarget target);
 

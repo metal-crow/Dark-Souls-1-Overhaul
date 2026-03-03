@@ -54,7 +54,7 @@ bool state_test(void* unused)
         copy_PlayerIns(Rollback::saved_playerins, player, StateTarget::ToLocal);
         copy_BulletMan(Rollback::saved_bulletman, *(BulletMan**)Game::bullet_man, StateTarget::ToLocal);
         //copy_FXManager(Rollback::saved_sfxobjs, (*(SfxMan**)Game::sfx_man)->FrpgFxManagerBase->base.fXManager, StateTarget::ToLocal);
-        copy_DamageMan(Rollback::saved_damageman, *(DamageMan**)Game::damage_man, StateTarget::ToLocal);
+        copy_DamageMan(Rollback::saved_damageman, *(DamageMan**)Game::damage_man, Rollback::saved_havokman->physWorld->_hkpWorld, (*(FrpgHavokManImp**)Game::frpg_havok_man_imp)->physWorld->_hkpWorld, StateTarget::ToLocal);
         copy_ThrowMan(Rollback::saved_throwman, *(ThrowMan**)Game::throw_man, StateTarget::ToLocal);
         copy_DmgHitRecordManImp(Rollback::saved_DmgHitRecordMan, *(DmgHitRecordManImp**)Game::dmg_hit_record_man, StateTarget::ToLocal);
         ConsoleWrite("Rollback saved");
@@ -69,7 +69,7 @@ bool state_test(void* unused)
         copy_PlayerIns(player, Rollback::saved_playerins, StateTarget::ToGame);
         copy_BulletMan(*(BulletMan**)Game::bullet_man, Rollback::saved_bulletman, StateTarget::ToGame);
         //copy_FXManager((*(SfxMan**)Game::sfx_man)->FrpgFxManagerBase->base.fXManager, Rollback::saved_sfxobjs, StateTarget::ToGame);
-        copy_DamageMan(*(DamageMan**)Game::damage_man, Rollback::saved_damageman, StateTarget::ToGame);
+        copy_DamageMan(*(DamageMan**)Game::damage_man, Rollback::saved_damageman, (*(FrpgHavokManImp**)Game::frpg_havok_man_imp)->physWorld->_hkpWorld, Rollback::saved_havokman->physWorld->_hkpWorld, StateTarget::ToGame);
         copy_ThrowMan(*(ThrowMan**)Game::throw_man, Rollback::saved_throwman, StateTarget::ToGame);
         copy_DmgHitRecordManImp(*(DmgHitRecordManImp**)Game::dmg_hit_record_man, Rollback::saved_DmgHitRecordMan, StateTarget::ToGame);
 
@@ -585,6 +585,11 @@ void hkThreadMemory_blockFreeBatch(void* param_1, void** ptrsIn, int numPtrs, in
     }
 }
 
+extern "C" {
+    uint64_t simpleshapephantom_collisionDetails_iterate_return;
+    void simpleshapephantom_collisionDetails_iterate_injection();
+}
+
 void Rollback::start()
 {
     ConsoleWrite("Rollback...");
@@ -632,6 +637,10 @@ void Rollback::start()
     hkThreadMemory_vftable[5] = (uint64_t)(&hkThreadMemory_bufRealloc);
     hkThreadMemory_vftable[6] = (uint64_t)(&hkThreadMemory_blockAllocBatch);
     hkThreadMemory_vftable[7] = (uint64_t)(&hkThreadMemory_blockFreeBatch);
+
+    //Check if a m_collisionDetail is null before trying to use it in-game. This makes life simpler for me when copying them
+    write_address = (uint8_t*)(Game::ds1_base + Rollback::simpleshapephantom_collisionDetails_iterate_offset);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &simpleshapephantom_collisionDetails_iterate_return, 1, &simpleshapephantom_collisionDetails_iterate_injection);
 
     //Testing rollback related stuff
     Rollback::saved_havokman = init_FrpgHavokManImp();
@@ -701,7 +710,7 @@ bool rollback_load_game_state_callback(unsigned char* buffer, int)
     }
     copy_BulletMan(*(BulletMan**)Game::bullet_man, state->bulletman, StateTarget::ToGame);
     //copy_SfxMan(*(SfxMan**)Game::sfx_man, state->sfxman, StateTarget::ToGame);
-    copy_DamageMan(*(DamageMan**)Game::damage_man, state->damageman, StateTarget::ToGame);
+    copy_DamageMan(*(DamageMan**)Game::damage_man, state->damageman, (*(FrpgHavokManImp**)Game::frpg_havok_man_imp)->physWorld->_hkpWorld, state->havokman->physWorld->_hkpWorld, StateTarget::ToGame);
     copy_ThrowMan(*(ThrowMan**)Game::throw_man, state->throwman, StateTarget::ToGame);
     copy_DmgHitRecordManImp(*(DmgHitRecordManImp**)Game::dmg_hit_record_man, state->dmghitrecordman, StateTarget::ToGame);
 
@@ -752,7 +761,7 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
     //state->sfxman = init_SfxMan();
     //copy_SfxMan(state->sfxman, *(SfxMan**)Game::sfx_man, StateTarget::ToLocal);
     state->damageman = init_DamageMan();
-    copy_DamageMan(state->damageman, *(DamageMan**)Game::damage_man, StateTarget::ToLocal);
+    copy_DamageMan(state->damageman, *(DamageMan**)Game::damage_man, state->havokman->physWorld->_hkpWorld, (*(FrpgHavokManImp**)Game::frpg_havok_man_imp)->physWorld->_hkpWorld, StateTarget::ToLocal);
     state->throwman = init_ThrowMan();
     copy_ThrowMan(state->throwman, *(ThrowMan**)Game::throw_man, StateTarget::ToLocal);
     state->dmghitrecordman = init_DmgHitRecordManImp();
@@ -786,7 +795,7 @@ void rollback_copy_buffer(void* buffer_dst, void* buffer_src)
     //state_dst->sfxman = init_SfxMan();
     //copy_SfxMan(state_dst->sfxman, state_src->sfxman, StateTarget::Copy);
     state_dst->damageman = init_DamageMan();
-    copy_DamageMan(state_dst->damageman, state_src->damageman, StateTarget::Copy);
+    copy_DamageMan(state_dst->damageman, state_src->damageman, state_dst->havokman->physWorld->_hkpWorld, state_src->havokman->physWorld->_hkpWorld, StateTarget::Copy);
     state_dst->throwman = init_ThrowMan();
     copy_ThrowMan(state_dst->throwman, state_src->throwman, StateTarget::Copy);
     state_dst->dmghitrecordman = init_DmgHitRecordManImp();

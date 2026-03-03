@@ -5,7 +5,7 @@
 //the game preallocates the DamageMan active_damage_entries_list to be 128 elements long. Instead of dynamically trying to resize it, lets just never save above the 128 max
 static const size_t max_preallocated_DamageEntry = 128;
 
-void copy_DamageMan(DamageMan* to, DamageMan* from, StateTarget target)
+void copy_DamageMan(DamageMan* to, DamageMan* from, const hkpWorld* to_world, const hkpWorld* from_world, StateTarget target)
 {
     Game::SuspendThreads();
 
@@ -20,7 +20,7 @@ void copy_DamageMan(DamageMan* to, DamageMan* from, StateTarget target)
         DamageEntry* from_DamageEntry = &from->all_damage_entries_list_start[i];
         DamageEntry* to_DamageEntry = &to->all_damage_entries_list_start[i];
 
-        copy_DamageEntry(to_DamageEntry, from_DamageEntry, target);
+        copy_DamageEntry(to_DamageEntry, from_DamageEntry, to_world, from_world, target);
 
         if (from_DamageEntry->next != NULL)
         {
@@ -98,7 +98,7 @@ void free_DamageMan(DamageMan* to)
     free(to);
 }
 
-void copy_DamageEntry(DamageEntry* to, DamageEntry* from, StateTarget target)
+void copy_DamageEntry(DamageEntry* to, DamageEntry* from, const hkpWorld* to_world, const hkpWorld* from_world, StateTarget target)
 {
     to->data_0 = from->data_0;
     //these need to be run first
@@ -106,8 +106,8 @@ void copy_DamageEntry(DamageEntry* to, DamageEntry* from, StateTarget target)
     {
         FATALERROR("FrpgPhysShapePhantomIns can be null??? from=%p sphere=%p cap=%p", from, from->FrpgPhysShapePhantomIns_Sphere, from->FrpgPhysShapePhantomIns_Capsule);
     }
-    copy_FrpgPhysShapePhantomIns(&to->FrpgPhysShapePhantomIns_Sphere, &from->FrpgPhysShapePhantomIns_Sphere, true, target);
-    copy_FrpgPhysShapePhantomIns(&to->FrpgPhysShapePhantomIns_Capsule, &from->FrpgPhysShapePhantomIns_Capsule, false, target);
+    copy_FrpgPhysShapePhantomIns(&to->FrpgPhysShapePhantomIns_Sphere, &from->FrpgPhysShapePhantomIns_Sphere, true, to_world, from_world, target);
+    copy_FrpgPhysShapePhantomIns(&to->FrpgPhysShapePhantomIns_Capsule, &from->FrpgPhysShapePhantomIns_Capsule, false, to_world, from_world, target);
 
     //these are handled by the above FrpgPhysShapePhantomIns
     if (from->hkpSphereShape1 != from->FrpgPhysShapePhantomIns_Sphere->_hkpSphereShape)
@@ -216,7 +216,7 @@ void free_DamageEntry(DamageEntry* to, bool freeself)
     }
 }
 
-void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePhantomIns** from, bool is_sphere, StateTarget target)
+void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePhantomIns** from, bool is_sphere, const hkpWorld* to_world, const hkpWorld* from_world, StateTarget target)
 {
     if (*to == NULL && *from != NULL)
     {
@@ -235,25 +235,33 @@ void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePha
         (*to)->damageEntry = (*from)->damageEntry;
         (*to)->physWorld = (*from)->physWorld;
 
-        hkpSimpleShapePhantom* found = NULL;
-
-        //if the physWorld ptr is null, this phantom isn't in the m_phantoms list and is only linked from here, so we have to copy it
-        if ((*from)->physWorld == NULL)
+        //Check if we need to actually copy the phantom
+        // -we don't need to if it's a sentinal value. Ignore it if so
+        // -if the physWorld ptr is null this phantom isn't in the m_phantoms list and is only linked from here, so we have to copy it
+        // -if it's just not in the m_phantoms list in general we have to copy it
+        if ((uint64_t)((*from)->_hkpSimpleShapePhantom) != 0xFF &&
+            ((*from)->physWorld == NULL || !world_contains_phantom(((FrpgPhysWorld*)((*from)->physWorld))->_hkpWorld, (*from)->_hkpSimpleShapePhantom)))
         {
             if ((*to)->_hkpSimpleShapePhantom == NULL)
             {
                 (*to)->_hkpSimpleShapePhantom = init_hkpSimpleShapePhantom(target);
             }
             copy_hkpSimpleShapePhantom((*to)->_hkpSimpleShapePhantom, (*from)->_hkpSimpleShapePhantom, target);
+            //this is fine to call now since the havok copy runs before DamageMan copy, so all phantoms are set up
+            copy_hkpSimpleShapePhantom_collisionDetails((*to)->_hkpSimpleShapePhantom, (*from)->_hkpSimpleShapePhantom, to_world, from_world, target);
         }
-        //otherwise, we MAY have copied this phantom as part of havok
+        //Relink the pointer to the phantom, since we should already have copied this phantom as part of havok
         else
         {
             switch (target)
             {
             case StateTarget::ToGame:
-                //if the ptr is null, then we just relink it
                 if ((*from)->_hkpSimpleShapePhantom == NULL)
+                {
+                    FATALERROR("SimpleShapePhantom ptr for %p is NULL", (*from));
+                }
+                //if the ptr is the sentinal value, then we just relink it
+                if ((*from)->_hkpSimpleShapePhantom == (hkpSimpleShapePhantom*)0xFF)
                 {
                     //havok is restored first so this can find the right entry
                     //this 'to' pointer is a reliable value since the simpleshapephantom just saves it as a const, and nothing in the DamageMan is reallocated or init'd during runtime
@@ -262,38 +270,19 @@ void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePha
                 //otherwise it's a copy and we need to fully copy it over
                 else
                 {
-                    copy_hkpSimpleShapePhantom((*to)->_hkpSimpleShapePhantom, (*from)->_hkpSimpleShapePhantom, target);
+                    FATALERROR("This is only true if we couldn't find_hkpSimpleShapePhantom");
+                    //((FrpgPhysWorld*)((*to)->physWorld))->_hkpWorld, ((FrpgPhysWorld*)((*from)->physWorld))->_hkpWorld,
+                    //copy_hkpSimpleShapePhantom((*to)->_hkpSimpleShapePhantom, (*from)->_hkpSimpleShapePhantom, target);
                 }
                 break;
             case StateTarget::ToLocal:
-                //let's verify this shape phantom is in the hkpWorld, if not we need to copy it
-                found = find_hkpSimpleShapePhantom(((FrpgPhysWorld*)((*from)->physWorld))->_hkpWorld, *to);
-                if (found == NULL)
-                {
-                    if ((*to)->_hkpSimpleShapePhantom == NULL)
-                    {
-                        (*to)->_hkpSimpleShapePhantom = init_hkpSimpleShapePhantom(target);
-                    }
-                    copy_hkpSimpleShapePhantom((*to)->_hkpSimpleShapePhantom, (*from)->_hkpSimpleShapePhantom, target);
-                }
-                else
-                {
-                    (*to)->_hkpSimpleShapePhantom = NULL;
-                }
-                break;
             case StateTarget::Copy:
                 if ((*from)->_hkpSimpleShapePhantom == NULL)
                 {
-                    (*to)->_hkpSimpleShapePhantom = NULL;
+                    FATALERROR("SimpleShapePhantom ptr for %p is NULL", (*from));
                 }
-                else
-                {
-                    if ((*to)->_hkpSimpleShapePhantom == NULL)
-                    {
-                        (*to)->_hkpSimpleShapePhantom = init_hkpSimpleShapePhantom(target);
-                    }
-                    copy_hkpSimpleShapePhantom((*to)->_hkpSimpleShapePhantom, (*from)->_hkpSimpleShapePhantom, target);
-                }
+                //don't copy the phantom since we've already checked and it's a link to an entry in the phantom list. Set to sentinal value so we know that we need to re-link it on to-game
+                (*to)->_hkpSimpleShapePhantom = (hkpSimpleShapePhantom*)0xFF;
                 break;
             }
         }
@@ -337,7 +326,7 @@ FrpgPhysShapePhantomIns* init_FrpgPhysShapePhantomIns(bool is_sphere, StateTarge
 
 void free_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns* to, bool is_sphere, StateTarget target)
 {
-    if (to->_hkpSimpleShapePhantom != NULL)
+    if (to->_hkpSimpleShapePhantom != NULL && (uint64_t)(to->_hkpSimpleShapePhantom) != 0xff)
     {
         free_hkpSimpleShapePhantom(to->_hkpSimpleShapePhantom, target);
     }
