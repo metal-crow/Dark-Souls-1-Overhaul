@@ -441,7 +441,7 @@ void copy_hkpSimpleShapePhantom_collisionDetails(hkpSimpleShapePhantom* to, cons
         if (collision == NULL)
         {
             to->m_collisionDetails[i] = NULL;
-            break;
+            continue;
         }
         bool found_colliding = false;
 
@@ -489,6 +489,10 @@ void copy_hkpSimpleShapePhantom_collisionDetails(hkpSimpleShapePhantom* to, cons
             }
             j++;
         }
+        if (found_colliding)
+        {
+            continue;
+        }
 
         //check the fixed entities list
         //since this list is fixed and thus we don't save it, if this is a fixed entity just copy the pointer to the game-side data
@@ -517,6 +521,10 @@ void copy_hkpSimpleShapePhantom_collisionDetails(hkpSimpleShapePhantom* to, cons
                 found_colliding = true;
             }
             j++;
+        }
+        if (found_colliding)
+        {
+            continue;
         }
 
         //check the active entities list
@@ -551,6 +559,10 @@ void copy_hkpSimpleShapePhantom_collisionDetails(hkpSimpleShapePhantom* to, cons
                 j++;
             }
             sim_i++;
+        }
+        if (found_colliding)
+        {
+            continue;
         }
 
         if (!found_colliding)
