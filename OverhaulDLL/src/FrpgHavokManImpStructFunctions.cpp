@@ -435,8 +435,8 @@ void copy_hkpSimpleShapePhantom_collisionDetails(hkpSimpleShapePhantom* to, cons
 {
     for (size_t i = 0; i < from->m_collisionDetails_len; i++)
     {
-        //this collision points to the colliding phantom's m_collidable
-        //we already copy it as part of the other entity's data, locate it and use the pointer here
+        //this collision points to the colliding entities's m_collidable
+        //we either already copy it as part of the other entity's data, or the entity is stable for our lifetime. Just locate it and use the pointer here
         hkpCollidable* collision = from->m_collisionDetails[i];
         if (collision == NULL)
         {
@@ -445,7 +445,9 @@ void copy_hkpSimpleShapePhantom_collisionDetails(hkpSimpleShapePhantom* to, cons
         }
         bool found_colliding = false;
 
-        //check the phantoms list to see if this is a phantom collision, and get the offset into the array for it
+        //check the phantoms list to see if this is a phantom collision, and get the offset into the 'from' array for it
+        //then link it up with the 'to' side phantom's collision
+        //do this since we save the m_phantoms list, and it's order may change
         size_t j = 0;
         while (j < from_world->m_phantoms_size && !found_colliding)
         {
@@ -489,7 +491,7 @@ void copy_hkpSimpleShapePhantom_collisionDetails(hkpSimpleShapePhantom* to, cons
         }
 
         //check the fixed entities list
-        //since this list is fixed and thus we don't saving it, if this is a fixed entity just copy the pointer
+        //since this list is fixed and thus we don't save it, if this is a fixed entity just copy the pointer to the game-side data
         j = 0;
         hkpSimulationIsland* fixedIslandtarget = NULL;
         switch (target)
