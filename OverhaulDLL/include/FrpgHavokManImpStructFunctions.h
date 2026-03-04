@@ -43,9 +43,9 @@ void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapeP
 void copy_hkpSimpleShapePhantom_collisionDetails(hkpSimpleShapePhantom* to, const hkpSimpleShapePhantom* from, const hkpWorld* to_world, const hkpWorld* from_world, StateTarget target);
 hkpSimpleShapePhantom* init_hkpSimpleShapePhantom(StateTarget target);
 void free_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, StateTarget target);
-hkpSimpleShapePhantom* get_hkpSimpleShapePhantom(hkpWorld* world, FrpgPhysShapePhantomIns* parent);
-hkpSimpleShapePhantom* find_hkpSimpleShapePhantom(hkpWorld* world, FrpgPhysShapePhantomIns* parent);
-bool world_contains_phantom(hkpWorld* world, void* phantom);
+hkpSimpleShapePhantom* get_hkpSimpleShapePhantom(const hkpWorld* world, FrpgPhysShapePhantomIns* parent);
+hkpSimpleShapePhantom* find_hkpSimpleShapePhantom(const hkpWorld* world, FrpgPhysShapePhantomIns* parent);
+bool world_contains_phantom(const hkpWorld* world, void* phantom);
 
 void copy_hkpLinkedCollidable(hkpLinkedCollidable* to, const hkpLinkedCollidable* from, hkMotionState* motion, StateTarget target);
 

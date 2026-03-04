@@ -608,16 +608,12 @@ void free_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, StateTarget target)
             free_hkpProperty(&to->m_properties[i]);
         }
         free(to->m_properties);
-        //for (size_t i = 0; i < to->m_collisionDetails_len; i++)
-        //{
-        //    free_hkpCollidable(to->m_collisionDetails[i]);
-        //}
         free(to->m_collisionDetails);
         free(to);
     }
 }
 
-hkpSimpleShapePhantom* get_hkpSimpleShapePhantom(hkpWorld* world, FrpgPhysShapePhantomIns* parent)
+hkpSimpleShapePhantom* get_hkpSimpleShapePhantom(const hkpWorld* world, FrpgPhysShapePhantomIns* parent)
 {
     auto ret = find_hkpSimpleShapePhantom(world, parent);
     if (ret == NULL)
@@ -627,7 +623,7 @@ hkpSimpleShapePhantom* get_hkpSimpleShapePhantom(hkpWorld* world, FrpgPhysShapeP
     return ret;
 }
 
-hkpSimpleShapePhantom* find_hkpSimpleShapePhantom(hkpWorld* world, FrpgPhysShapePhantomIns* parent)
+hkpSimpleShapePhantom* find_hkpSimpleShapePhantom(const hkpWorld* world, FrpgPhysShapePhantomIns* parent)
 {
     void** array = world->m_phantoms;
     for (size_t i = 0; i < world->m_phantoms_size; i++)
@@ -646,7 +642,7 @@ hkpSimpleShapePhantom* find_hkpSimpleShapePhantom(hkpWorld* world, FrpgPhysShape
     return NULL;
 }
 
-bool world_contains_phantom(hkpWorld* world, void* phantom)
+bool world_contains_phantom(const hkpWorld* world, void* phantom)
 {
     void** array = world->m_phantoms;
     for (size_t i = 0; i < world->m_phantoms_size; i++)
