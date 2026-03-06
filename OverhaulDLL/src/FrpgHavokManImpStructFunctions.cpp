@@ -46,7 +46,6 @@ void free_FrpgPhysWorld(FrpgPhysWorld* to)
 
 void copy_hkpWorld(hkpWorld* to, const hkpWorld* from, StateTarget target)
 {
-    copy_hkp3AxisSweep(to->m_broadPhase, from->m_broadPhase, target);
     //don't need to actually save/load the simulation islands themselves, those should be stable for the lifetime of this session
     to->m_phantoms_size = from->m_phantoms_size;
     if (to->m_phantoms_cap < from->m_phantoms_size)
@@ -99,6 +98,8 @@ void copy_hkpWorld(hkpWorld* to, const hkpWorld* from, StateTarget target)
             break;
         }
     }
+    //this can only be done after the m_phantoms are all copied
+    copy_hkp3AxisSweep(to->m_broadPhase, from->m_broadPhase, to, from, target);
 }
 
 hkpWorld* init_hkpWorld()
@@ -134,7 +135,7 @@ void free_hkpWorld(hkpWorld* to)
     free(to);
 }
 
-void copy_hkp3AxisSweep(hkp3AxisSweep* to, const hkp3AxisSweep* from, StateTarget target)
+void copy_hkp3AxisSweep(hkp3AxisSweep* to, const hkp3AxisSweep* from, const hkpWorld* to_world, const hkpWorld* from_world, StateTarget target)
 {
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
@@ -165,6 +166,20 @@ void copy_hkp3AxisSweep(hkp3AxisSweep* to, const hkp3AxisSweep* from, StateTarge
     for (size_t i = 0; i < to->m_nodes_len; i++)
     {
         copy_hkpBpNode(&to->m_nodes[i], &from->m_nodes[i], target);
+    }
+    //need to correct the pointer address itself to point to the phantom's id. We need to point at the id directly since havok uses *(index_in_array+4) to get the m_type
+    if (target == StateTarget::ToGame)
+    {
+        for (size_t i = 0; i < to_world->m_phantoms_size; i++)
+        {
+            void* phantom = to_world->m_phantoms[i];
+            if (hkpPhantom_getType(phantom) == PhantomType::SimpleShape)
+            {
+                hkpSimpleShapePhantom* ssp = (hkpSimpleShapePhantom*)phantom;
+                uint32_t id = ssp->m_collidable.base.m_broadPhaseHandle.m_id;
+                to->m_nodes[id].index_in_array = &ssp->m_collidable.base.m_broadPhaseHandle.m_id;
+            }
+        }
     }
     copy_hkpBpAxis(&to->m_axis[0], &from->m_axis[0], target);
     copy_hkpBpAxis(&to->m_axis[1], &from->m_axis[1], target);
@@ -215,25 +230,7 @@ void free_hkp3AxisSweep(hkp3AxisSweep* to)
 void copy_hkpBpNode(hkpBpNode* to, const hkpBpNode* from, StateTarget target)
 {
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
-    if (from->index_in_array == NULL)
-    {
-        to->index_in_array = NULL;
-    }
-    else
-    {
-        if (to->index_in_array == NULL)
-        {
-            if (target == StateTarget::ToGame)
-            {
-                FATALERROR("to->index_in_array is NULL");
-            }
-            else
-            {
-                to->index_in_array = (uint32_t*)malloc_(sizeof(int));
-            }
-        }
-        *to->index_in_array = *from->index_in_array;
-    }
+    to->index_in_array = NULL; //set actual value of index_to_array in the caller
 }
 
 void copy_hkpBpAxis(hkpBpAxis* to, const hkpBpAxis* from, StateTarget target)

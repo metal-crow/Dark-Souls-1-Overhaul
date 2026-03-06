@@ -21,7 +21,7 @@ void copy_hkpWorld(hkpWorld* to, const hkpWorld* from, StateTarget target);
 hkpWorld* init_hkpWorld();
 void free_hkpWorld(hkpWorld* to);
 
-void copy_hkp3AxisSweep(hkp3AxisSweep* to, const hkp3AxisSweep* from, StateTarget target);
+void copy_hkp3AxisSweep(hkp3AxisSweep* to, const hkp3AxisSweep* from, const hkpWorld* to_world, const hkpWorld* from_world, StateTarget target);
 hkp3AxisSweep* init_hkp3AxisSweep();
 void free_hkp3AxisSweep(hkp3AxisSweep* to);
 
