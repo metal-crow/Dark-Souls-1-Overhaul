@@ -26,6 +26,7 @@ typedef struct hkpConvexVerticesConnectivity hkpConvexVerticesConnectivity;
 typedef struct hkpConvexTranslateShape hkpConvexTranslateShape;
 typedef struct hkpBoxShape hkpBoxShape;
 typedef struct hkpSimpleShapePhantom hkpSimpleShapePhantom;
+typedef struct hkpAabbPhantom hkpAabbPhantom;
 typedef struct hkpCollidable hkpCollidable;
 typedef struct hkMotionState hkMotionState;
 typedef struct hkpProperty hkpProperty;
@@ -459,6 +460,44 @@ static_assert(offsetof(hkpSimpleShapePhantom, m_motionState) == 0xf0);
 static_assert(offsetof(hkpSimpleShapePhantom, m_collisionDetails) == 0x1a0);
 static_assert(offsetof(hkpSimpleShapePhantom, data_2) == 0x1b0);
 static_assert(sizeof(hkpSimpleShapePhantom) == 0x1c0);
+
+struct hkpAabbPhantom
+{
+    void* vtable;
+    uint64_t data_0;
+    void* hkpWorldPtr;
+    void** m_userData;
+    hkpLinkedCollidable m_collidable;
+    uint8_t data_1[16];
+    void* unk_0;
+    hkpProperty* m_properties;
+    uint32_t m_properties_len;
+    uint32_t m_properties_cap;
+    void** m_overlapListeners;
+    uint32_t m_overlapListeners_len;
+    uint32_t m_overlapListeners_cap;
+    void** m_phantomListeners;
+    uint32_t m_phantomListeners_len;
+    uint32_t m_phantomListeners_cap;
+    void* vtable2;
+    uint8_t data_2[0x20];
+    hkpCollidable** m_overlappingCollidables;
+    uint32_t m_overlappingCollidables_len;
+    uint32_t m_overlappingCollidables_cap;
+    uint8_t data_3[0x10];
+};
+static_assert(sizeof(hkpAabbPhantom) == 0x130);
+static_assert(offsetof(hkpAabbPhantom, data_0) == 0x8);
+static_assert(offsetof(hkpAabbPhantom, hkpWorldPtr) == 0x10);
+static_assert(offsetof(hkpAabbPhantom, m_userData) == 0x18);
+static_assert(offsetof(hkpAabbPhantom, m_collidable) == 0x20);
+static_assert(offsetof(hkpAabbPhantom, data_1) == 0xa0);
+static_assert(offsetof(hkpAabbPhantom, unk_0) == 0xb0);
+static_assert(offsetof(hkpAabbPhantom, m_properties) == 0xb8);
+static_assert(offsetof(hkpAabbPhantom, m_phantomListeners) == 0xd8);
+static_assert(offsetof(hkpAabbPhantom, data_2) == 0xf0);
+static_assert(offsetof(hkpAabbPhantom, m_overlappingCollidables) == 0x110);
+static_assert(offsetof(hkpAabbPhantom, data_3) == 0x120);
 
 /* ---------------- CHRCTRL ------------------ */
 

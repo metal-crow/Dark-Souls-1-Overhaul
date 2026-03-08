@@ -91,7 +91,7 @@ void copy_hkpWorld(hkpWorld* to, const hkpWorld* from, StateTarget target)
             copy_hkpSimpleShapePhantom_collisionDetails((hkpSimpleShapePhantom*)(to->m_phantoms[i]), (const hkpSimpleShapePhantom*)(from->m_phantoms[i]), to, from, target);
             break;
         case PhantomType::Aabb:
-            //we don't worry about the AABB phantoms for collisions
+            copy_hkpAabbPhantom_collisionDetails((hkpAabbPhantom*)(to->m_phantoms[i]), (const hkpAabbPhantom*)(from->m_phantoms[i]), to, from, target);
             break;
         case PhantomType::PhantomNull:
         case PhantomType::InvalidPhantom:
@@ -173,11 +173,24 @@ void copy_hkp3AxisSweep(hkp3AxisSweep* to, const hkp3AxisSweep* from, const hkpW
         for (size_t i = 0; i < to_world->m_phantoms_size; i++)
         {
             void* phantom = to_world->m_phantoms[i];
-            if (hkpPhantom_getType(phantom) == PhantomType::SimpleShape)
+            switch (hkpPhantom_getType(phantom))
+            {
+            case PhantomType::SimpleShape:
             {
                 hkpSimpleShapePhantom* ssp = (hkpSimpleShapePhantom*)phantom;
-                uint32_t id = ssp->m_collidable.base.m_broadPhaseHandle.m_id;
-                to->m_nodes[id].index_in_array = &ssp->m_collidable.base.m_broadPhaseHandle.m_id;
+                uint32_t ssid = ssp->m_collidable.base.m_broadPhaseHandle.m_id;
+                to->m_nodes[ssid].index_in_array = &ssp->m_collidable.base.m_broadPhaseHandle.m_id;
+            }
+                break;
+            case PhantomType::Aabb:
+            {
+                hkpAabbPhantom* aap = (hkpAabbPhantom*)phantom;
+                uint32_t aaid = aap->m_collidable.base.m_broadPhaseHandle.m_id;
+                to->m_nodes[aaid].index_in_array = &aap->m_collidable.base.m_broadPhaseHandle.m_id;
+            }
+                break;
+            default:
+                break;
             }
         }
     }
@@ -310,20 +323,21 @@ void copy_hkpPhantom(void** to, void* from, StateTarget target)
         copy_hkpSimpleShapePhantom((hkpSimpleShapePhantom*)(*to), (const hkpSimpleShapePhantom*)from, target);
         break;
     case PhantomType::Aabb:
-        //don't need to handle copying, this is just for ragdolls
-        if (target == StateTarget::ToGame)
+        if (*to != NULL)
         {
-            free_hkpPhantom((*to), target);
-            *to = NULL;
-        }
-        else
-        {
-            if (*to == NULL)
+            PhantomType totype = hkpPhantom_getType(*to);
+            if (totype != PhantomType::SimpleShape)
             {
-                *to = malloc_(sizeof(uint64_t));
+                free_hkpPhantom((*to), target);
+                *to = NULL;
             }
-            *(uint64_t*)(*to) = (uint64_t)0x14145cb08;
         }
+        //init the target if needed
+        if (*to == NULL)
+        {
+            *to = init_hkpAabbPhantom(target);
+        }
+        copy_hkpAabbPhantom((hkpAabbPhantom*)(*to), (const hkpAabbPhantom*)from, target);
         break;
     case PhantomType::PhantomNull:
         free_hkpPhantom(*to, target);
@@ -344,14 +358,7 @@ void free_hkpPhantom(void* to, StateTarget target)
         free_hkpSimpleShapePhantom((hkpSimpleShapePhantom*)to, target);
         break;
     case PhantomType::Aabb:
-        if (target == StateTarget::ToGame)
-        {
-            hkReferencedObject_deref(to);
-        }
-        else
-        {
-            free(to);
-        }
+        free_hkpAabbPhantom((hkpAabbPhantom*)to, target);
         break;
     case PhantomType::PhantomNull:
         break;
@@ -453,6 +460,7 @@ void copy_hkpSimpleShapePhantom_collisionDetails(hkpSimpleShapePhantom* to, cons
             switch (type)
             {
             case PhantomType::SimpleShape:
+            case PhantomType::Aabb:
                 //linked collidable in hkpPhantom is +0x20
                 if (((uint64_t)elem_p + 0x20) == (uint64_t)collision)
                 {
@@ -467,14 +475,6 @@ void copy_hkpSimpleShapePhantom_collisionDetails(hkpSimpleShapePhantom* to, cons
                     {
                         FATALERROR("Found colliding phantom at %d but it was null on the 'to' end: %p(%d) %p", j, collision, i, from);
                     }
-                    found_colliding = true;
-                }
-                break;
-            case PhantomType::Aabb:
-                //don't include this collision, it's for ragdolls and we discard those
-                if (((uint64_t)elem_p + 0x20) == (uint64_t)collision)
-                {
-                    to->m_collisionDetails[i] = NULL;
                     found_colliding = true;
                 }
                 break;
@@ -662,6 +662,253 @@ bool world_contains_phantom(const hkpWorld* world, void* phantom)
         }
     }
     return false;
+}
+
+
+void copy_hkpAabbPhantom(hkpAabbPhantom* to, const hkpAabbPhantom* from, StateTarget target)
+{
+    to->vtable = from->vtable;
+    to->data_0 = from->data_0;
+    to->hkpWorldPtr = from->hkpWorldPtr;
+    to->m_userData = from->m_userData;
+    copy_hkpLinkedCollidable(&to->m_collidable, &from->m_collidable, NULL, target);
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    to->unk_0 = from->unk_0;
+
+    if ((from->m_properties_cap & 0x3fffffff) < from->m_properties_len)
+    {
+        FATALERROR("m_properties_cap %x m_properties_len %x", from->m_properties_cap, from->m_properties_len);
+    }
+    if ((to->m_properties_cap & 0x3fffffff) < from->m_properties_len)
+    {
+        uint32_t old_len = to->m_properties_len;
+        if (target == StateTarget::ToGame)
+        {
+            increase_list_size(Game::MemHeapAllocator, &to->m_properties, 0x10);
+        }
+        else
+        {
+            to->m_properties = (hkpProperty*)realloc_(to->m_properties, (from->m_properties_cap & 0x3fffffff) * sizeof(hkpProperty));
+            to->m_properties_cap = (from->m_properties_cap & 0x3fffffff);
+        }
+        for (size_t i = old_len; i < (from->m_properties_cap & 0x3fffffff); i++)
+        {
+            init_hkpProperty(&to->m_properties[i], target);
+        }
+    }
+    to->m_properties_len = from->m_properties_len;
+    for (size_t i = 0; i < from->m_properties_len; i++)
+    {
+        copy_hkpProperty(&to->m_properties[i], &from->m_properties[i], target);
+    }
+
+    to->vtable2 = from->vtable2;
+    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+
+    if ((from->m_overlappingCollidables_cap & 0x3fffffff) < from->m_overlappingCollidables_len)
+    {
+        FATALERROR("m_overlappingCollidables_cap %x m_overlappingCollidables_len %x", from->m_overlappingCollidables_cap, from->m_overlappingCollidables_len);
+    }
+    if ((to->m_overlappingCollidables_cap & 0x3fffffff) < from->m_overlappingCollidables_len)
+    {
+        if (target == StateTarget::ToGame)
+        {
+            increase_list_size(Game::MemHeapAllocator, &to->m_overlappingCollidables, 0x8);
+        }
+        else
+        {
+            to->m_overlappingCollidables = (hkpCollidable**)realloc_(to->m_overlappingCollidables, (from->m_overlappingCollidables_cap & 0x3fffffff) * sizeof(hkpCollidable*));
+            to->m_overlappingCollidables_cap = (from->m_overlappingCollidables_cap & 0x3fffffff);
+        }
+    }
+    to->m_overlappingCollidables_len = from->m_overlappingCollidables_len;
+    //we can't copy the collision details here, since it may rely on all the other phantoms existing. Split out into a seperate function to call later when ready
+}
+
+void copy_hkpAabbPhantom_collisionDetails(hkpAabbPhantom* to, const hkpAabbPhantom* from, const hkpWorld* to_world, const hkpWorld* from_world, StateTarget target)
+{
+    for (size_t i = 0; i < from->m_overlappingCollidables_len; i++)
+    {
+        //this collision points to the colliding entities's m_collidable
+        //we either already copy it as part of the other entity's data, or the entity is stable for our lifetime. Just locate it and use the pointer here
+        hkpCollidable* collision = from->m_overlappingCollidables[i];
+        if (collision == NULL)
+        {
+            to->m_overlappingCollidables[i] = NULL;
+            continue;
+        }
+        bool found_colliding = false;
+
+        //check the phantoms list to see if this is a phantom collision, and get the offset into the 'from' array for it
+        //then link it up with the 'to' side phantom's collision
+        //do this since we save the m_phantoms list, and it's order may change
+        size_t j = 0;
+        while (j < from_world->m_phantoms_size && !found_colliding)
+        {
+            void* elem_p = from_world->m_phantoms[j];
+            PhantomType type = hkpPhantom_getType(elem_p);
+            switch (type)
+            {
+            case PhantomType::SimpleShape:
+            case PhantomType::Aabb:
+                //linked collidable in hkpPhantom is +0x20
+                if (((uint64_t)elem_p + 0x20) == (uint64_t)collision)
+                {
+                    //get the associated phantom pointer in the target array
+                    void* colliding_phantom_to_addr = to_world->m_phantoms[j];
+                    if (colliding_phantom_to_addr != NULL)
+                    {
+                        hkpCollidable* colliding_phantom_collision_to_addr = (hkpCollidable*)((uint64_t)colliding_phantom_to_addr + 0x20);
+                        to->m_overlappingCollidables[i] = colliding_phantom_collision_to_addr;
+                    }
+                    else
+                    {
+                        FATALERROR("Found colliding phantom at %d but it was null on the 'to' end: %p(%d) %p", j, collision, i, from);
+                    }
+                    found_colliding = true;
+                }
+                break;
+            case PhantomType::PhantomNull:
+                break;
+            case PhantomType::InvalidPhantom:
+                FATALERROR("Got invalid phantom for %p", elem_p);
+                break;
+            }
+            j++;
+        }
+        if (found_colliding)
+        {
+            continue;
+        }
+
+        //check the fixed entities list
+        //since this list is fixed and thus we don't save it, if this is a fixed entity just copy the pointer to the game-side data
+        j = 0;
+        hkpSimulationIsland* fixedIslandtarget = NULL;
+        switch (target)
+        {
+        case StateTarget::ToGame:
+            fixedIslandtarget = to_world->m_fixedIsland;
+            break;
+        case StateTarget::ToLocal:
+            fixedIslandtarget = from_world->m_fixedIsland;
+            break;
+        case StateTarget::Copy:
+            //no way to actual verify if this is a fixed entity here, so just copy it
+            to->m_overlappingCollidables[i] = from->m_overlappingCollidables[i];
+            found_colliding = true;
+            break;
+        }
+        while (fixedIslandtarget != NULL && j < fixedIslandtarget->m_entities_size && !found_colliding)
+        {
+            void* elem_p = fixedIslandtarget->m_entities[j];
+            if (((uint64_t)elem_p + 0x20) == (uint64_t)collision)
+            {
+                to->m_overlappingCollidables[i] = from->m_overlappingCollidables[i];
+                found_colliding = true;
+            }
+            j++;
+        }
+        if (found_colliding)
+        {
+            continue;
+        }
+
+        //check the active entities list
+        //same deal as fixed entities list, it should be stable for our session
+        size_t sim_i = 0;
+        const hkpWorld* activeWorldtarget = NULL;
+        switch (target)
+        {
+        case StateTarget::ToGame:
+            activeWorldtarget = to_world;
+            break;
+        case StateTarget::ToLocal:
+            activeWorldtarget = from_world;
+            break;
+        case StateTarget::Copy:
+            //no way to actual verify if this is a active entity here, so just copy it
+            to->m_overlappingCollidables[i] = from->m_overlappingCollidables[i];
+            found_colliding = true;
+            break;
+        }
+        while (activeWorldtarget != NULL && sim_i < activeWorldtarget->m_activeSimulationIslands_size && !found_colliding)
+        {
+            j = 0;
+            while (activeWorldtarget != NULL && j < activeWorldtarget->m_activeSimulationIslands[sim_i].m_entities_size && !found_colliding)
+            {
+                void* elem_p = activeWorldtarget->m_activeSimulationIslands[sim_i].m_entities[j];
+                if (((uint64_t)elem_p + 0x20) == (uint64_t)collision)
+                {
+                    to->m_overlappingCollidables[i] = from->m_overlappingCollidables[i];
+                    found_colliding = true;
+                }
+                j++;
+            }
+            sim_i++;
+        }
+        if (found_colliding)
+        {
+            continue;
+        }
+
+        if (!found_colliding)
+        {
+            FATALERROR("Unable to find phantom for collision %p %p", collision, from);
+        }
+    }
+}
+
+hkpAabbPhantom* init_hkpAabbPhantom(StateTarget target)
+{
+    hkpAabbPhantom* local_hkpAabbPhantom = NULL;
+    //normally this would be a thread malloc'd object game-side but we've disabled that
+    local_hkpAabbPhantom = (hkpAabbPhantom*)malloc_(sizeof(hkpAabbPhantom));
+    local_hkpAabbPhantom->vtable = (void*)0x14145cb08;
+    //don't know if we need a cap or a sphere, so init on copy
+    local_hkpAabbPhantom->m_collidable.base.shape = NULL;
+
+    //we don't know how big these should be, so they are init'd on copy
+    local_hkpAabbPhantom->m_collidable.base.m_boundingVolumeData.m_childShapeAabbs = NULL;
+    local_hkpAabbPhantom->m_collidable.base.m_boundingVolumeData.m_childShapeKeys = NULL;
+    local_hkpAabbPhantom->m_collidable.base.m_boundingVolumeData.m_numChildShapeAabbs = 0;
+    local_hkpAabbPhantom->m_collidable.base.m_boundingVolumeData.m_capacityChildShapeAabbs = 0;
+
+    local_hkpAabbPhantom->m_collidable.m_collisionEntries = NULL;
+    local_hkpAabbPhantom->m_collidable.m_collisionEntries_len = 0;
+    local_hkpAabbPhantom->m_collidable.m_collisionEntries_cap = 0;
+
+    local_hkpAabbPhantom->m_properties = NULL;
+    local_hkpAabbPhantom->m_properties_len = 0;
+    local_hkpAabbPhantom->m_properties_cap = 0;
+
+    local_hkpAabbPhantom->m_overlappingCollidables = NULL;
+    local_hkpAabbPhantom->m_overlappingCollidables_len = 0;
+    local_hkpAabbPhantom->m_overlappingCollidables_cap = 0;
+
+    return local_hkpAabbPhantom;
+}
+
+void free_hkpAabbPhantom(hkpAabbPhantom* to, StateTarget target)
+{
+    if (target == StateTarget::ToGame)
+    {
+        hkReferencedObject_deref(to);
+    }
+    else
+    {
+        free(to->m_collidable.base.shape);
+        free(to->m_collidable.base.m_boundingVolumeData.m_childShapeAabbs);
+        free(to->m_collidable.base.m_boundingVolumeData.m_childShapeKeys);
+        free(to->m_collidable.m_collisionEntries);
+        for (size_t i = 0; i < to->m_properties_len; i++)
+        {
+            free_hkpProperty(&to->m_properties[i]);
+        }
+        free(to->m_properties);
+        free(to->m_overlappingCollidables);
+        free(to);
+    }
 }
 
 /* ---------------- CHRCTRL + DAMAGE MAN ------------------ */

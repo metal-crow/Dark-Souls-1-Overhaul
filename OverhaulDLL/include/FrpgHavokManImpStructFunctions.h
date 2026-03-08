@@ -47,6 +47,11 @@ hkpSimpleShapePhantom* get_hkpSimpleShapePhantom(const hkpWorld* world, FrpgPhys
 hkpSimpleShapePhantom* find_hkpSimpleShapePhantom(const hkpWorld* world, FrpgPhysShapePhantomIns* parent);
 bool world_contains_phantom(const hkpWorld* world, void* phantom);
 
+void copy_hkpAabbPhantom(hkpAabbPhantom* to, const hkpAabbPhantom* from, StateTarget target);
+void copy_hkpAabbPhantom_collisionDetails(hkpAabbPhantom* to, const hkpAabbPhantom* from, const hkpWorld* to_world, const hkpWorld* from_world, StateTarget target);
+hkpAabbPhantom* init_hkpAabbPhantom(StateTarget target);
+void free_hkpAabbPhantom(hkpAabbPhantom* to, StateTarget target);
+
 void copy_hkpLinkedCollidable(hkpLinkedCollidable* to, const hkpLinkedCollidable* from, hkMotionState* motion, StateTarget target);
 
 void copy_hkpProperty(hkpProperty* to, hkpProperty* from, StateTarget target);
