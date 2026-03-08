@@ -68,13 +68,13 @@ struct hkpWorld
     uint8_t _0[0x28];
     hkpSimulationIsland* m_fixedIsland;
     void* m_fixedRigidBody;
-    hkpSimulationIsland* m_activeSimulationIslands;
+    hkpSimulationIsland** m_activeSimulationIslands;
     uint32_t m_activeSimulationIslands_size;
     uint32_t m_activeSimulationIslands_cap;
-    hkpSimulationIsland* m_inactiveSimulationIslands;
+    hkpSimulationIsland** m_inactiveSimulationIslands;
     uint32_t m_inactiveSimulationIslands_size;
     uint32_t m_inactiveSimulationIslands_cap;
-    hkpSimulationIsland* m_dirtySimulationIslands;
+    hkpSimulationIsland** m_dirtySimulationIslands;
     uint32_t m_dirtySimulationIslands_size;
     uint32_t m_dirtySimulationIslands_cap;
     uint8_t _1[0x18];
