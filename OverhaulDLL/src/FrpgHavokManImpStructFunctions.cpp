@@ -167,9 +167,10 @@ void copy_hkp3AxisSweep(hkp3AxisSweep* to, const hkp3AxisSweep* from, const hkpW
     {
         copy_hkpBpNode(&to->m_nodes[i], &from->m_nodes[i], target);
     }
-    //need to correct the pointer address itself to point to the phantom's id. We need to point at the id directly since havok uses *(index_in_array+4) to get the m_type
+    //need to correct the pointer address itself to point to the entity's id. We need to point at the id directly since havok uses *(index_in_array+4) to get the m_type
     if (target == StateTarget::ToGame)
     {
+        //check the phantoms list to link up any phantom nodes 
         for (size_t i = 0; i < to_world->m_phantoms_size; i++)
         {
             void* phantom = to_world->m_phantoms[i];
@@ -181,16 +182,67 @@ void copy_hkp3AxisSweep(hkp3AxisSweep* to, const hkp3AxisSweep* from, const hkpW
                 uint32_t ssid = ssp->m_collidable.base.m_broadPhaseHandle.m_id;
                 to->m_nodes[ssid].index_in_array = &ssp->m_collidable.base.m_broadPhaseHandle.m_id;
             }
-                break;
+            break;
             case PhantomType::Aabb:
             {
                 hkpAabbPhantom* aap = (hkpAabbPhantom*)phantom;
                 uint32_t aaid = aap->m_collidable.base.m_broadPhaseHandle.m_id;
                 to->m_nodes[aaid].index_in_array = &aap->m_collidable.base.m_broadPhaseHandle.m_id;
             }
-                break;
+            break;
             default:
                 break;
+            }
+        }
+
+        //check the fixed entities list
+        //since this list is fixed and thus we don't save it, if this is a fixed entity just copy the pointer to the game-side data
+        for (size_t i = 0; i < to_world->m_fixedIsland->m_entities_size; i++)
+        {
+            void* elem_p = to_world->m_fixedIsland->m_entities[i];
+            uint32_t* elem_id_ptr = (uint32_t*)((uint64_t)elem_p + 0x44);
+            to->m_nodes[*elem_id_ptr].index_in_array = elem_id_ptr;
+        }
+
+        //check the active entities list
+        //same deal as fixed entities list, it should be stable for our session
+        for (size_t sim_i = 0; sim_i < to_world->m_activeSimulationIslands_size; sim_i++)
+        {
+            for (size_t i = 0; i < to_world->m_activeSimulationIslands[sim_i]->m_entities_size; i++)
+            {
+                void* elem_p = to_world->m_activeSimulationIslands[sim_i]->m_entities[i];
+                uint32_t* elem_id_ptr = (uint32_t*)((uint64_t)elem_p + 0x44);
+                to->m_nodes[*elem_id_ptr].index_in_array = elem_id_ptr;
+            }
+        }
+
+        for (size_t sim_i = 0; sim_i < to_world->m_inactiveSimulationIslands_size; sim_i++)
+        {
+            for (size_t i = 0; i < to_world->m_inactiveSimulationIslands[sim_i]->m_entities_size; i++)
+            {
+                void* elem_p = to_world->m_inactiveSimulationIslands[sim_i]->m_entities[i];
+                uint32_t* elem_id_ptr = (uint32_t*)((uint64_t)elem_p + 0x44);
+                to->m_nodes[*elem_id_ptr].index_in_array = elem_id_ptr;
+            }
+        }
+
+        //skip checking first element
+        for (size_t i = 1; i < to->m_nodes_len; i++)
+        {
+            if (to->m_nodes[i].index_in_array == NULL)
+            {
+                FATALERROR("ToGame hkp3AxisSweep->m_nodes[%d] (%p) has null index_in_array", i, to->m_nodes[i].index_in_array);
+            }
+        }
+    }
+    if (target == StateTarget::ToLocal)
+    {
+        //skip checking first element
+        for (size_t i = 1; i < from->m_nodes_len; i++)
+        {
+            if (from->m_nodes[i].index_in_array == NULL)
+            {
+                FATALERROR("ToLocal hkp3AxisSweep->m_nodes[%d] (%p) has null index_in_array", i, to->m_nodes[i].index_in_array);
             }
         }
     }
@@ -545,9 +597,9 @@ void copy_hkpSimpleShapePhantom_collisionDetails(hkpSimpleShapePhantom* to, cons
         while (activeWorldtarget != NULL && sim_i < activeWorldtarget->m_activeSimulationIslands_size && !found_colliding)
         {
             j = 0;
-            while (activeWorldtarget != NULL && j < activeWorldtarget->m_activeSimulationIslands[sim_i].m_entities_size && !found_colliding)
+            while (activeWorldtarget != NULL && j < activeWorldtarget->m_activeSimulationIslands[sim_i]->m_entities_size && !found_colliding)
             {
-                void* elem_p = activeWorldtarget->m_activeSimulationIslands[sim_i].m_entities[j];
+                void* elem_p = activeWorldtarget->m_activeSimulationIslands[sim_i]->m_entities[j];
                 if (((uint64_t)elem_p + 0x20) == (uint64_t)collision)
                 {
                     to->m_collisionDetails[i] = from->m_collisionDetails[i];
@@ -835,9 +887,9 @@ void copy_hkpAabbPhantom_collisionDetails(hkpAabbPhantom* to, const hkpAabbPhant
         while (activeWorldtarget != NULL && sim_i < activeWorldtarget->m_activeSimulationIslands_size && !found_colliding)
         {
             j = 0;
-            while (activeWorldtarget != NULL && j < activeWorldtarget->m_activeSimulationIslands[sim_i].m_entities_size && !found_colliding)
+            while (activeWorldtarget != NULL && j < activeWorldtarget->m_activeSimulationIslands[sim_i]->m_entities_size && !found_colliding)
             {
-                void* elem_p = activeWorldtarget->m_activeSimulationIslands[sim_i].m_entities[j];
+                void* elem_p = activeWorldtarget->m_activeSimulationIslands[sim_i]->m_entities[j];
                 if (((uint64_t)elem_p + 0x20) == (uint64_t)collision)
                 {
                     to->m_overlappingCollidables[i] = from->m_overlappingCollidables[i];
