@@ -52,9 +52,7 @@ void copy_hkpWorld(hkpWorld* to, const hkpWorld* from, StateTarget target)
     {
         switch (target)
         {
-        case StateTarget::ToGame:
-            increase_list_size(Game::MemHeapAllocator, &to->m_phantoms, 0x8);
-            break;
+        case StateTarget::ToGame: //normally this would be a thread malloc'd object game-side but we've disabled that
         case StateTarget::ToLocal:
         case StateTarget::Copy:
             to->m_phantoms = (void**)realloc_(to->m_phantoms, from->m_phantoms_cap * sizeof(void*));
@@ -147,19 +145,13 @@ void copy_hkp3AxisSweep(hkp3AxisSweep* to, const hkp3AxisSweep* from, const hkpW
     if ((to->m_nodes_cap & 0x3fffffff) < from->m_nodes_len)
     {
         uint32_t old_len = to->m_nodes_len;
-        if (target == StateTarget::ToGame)
+        //normally this would be a thread malloc'd object game-side but we've disabled that
+        to->m_nodes = (hkpBpNode*)realloc_(to->m_nodes, (from->m_nodes_cap & 0x3fffffff) * sizeof(hkpBpNode));
+        to->m_nodes_cap = from->m_nodes_cap;
+        // Zero out new nodes
+        for (size_t i = old_len; i < (to->m_nodes_cap & 0x3fffffff); i++)
         {
-            increase_list_size(Game::MemHeapAllocator, &to->m_nodes, sizeof(hkpBpNode));
-        }
-        else
-        {
-            to->m_nodes = (hkpBpNode*)realloc_(to->m_nodes, (from->m_nodes_cap & 0x3fffffff) * sizeof(hkpBpNode));
-            to->m_nodes_cap = from->m_nodes_cap;
-            // Zero out new nodes
-            for (size_t i = old_len; i < (to->m_nodes_cap & 0x3fffffff); i++)
-            {
-                memset(&to->m_nodes[i], 0, sizeof(hkpBpNode));
-            }
+            memset(&to->m_nodes[i], 0, sizeof(hkpBpNode));
         }
     }
     to->m_nodes_len = from->m_nodes_len;
@@ -307,19 +299,13 @@ void copy_hkpBpAxis(hkpBpAxis* to, const hkpBpAxis* from, StateTarget target)
     if ((to->capacity & 0x3fffffff) < from->len)
     {
         uint32_t old_len = to->len;
-        if (target == StateTarget::ToGame)
+        //normally this would be a thread malloc'd object game-side but we've disabled that
+        to->arry = (hkpBpEndPoint*)realloc_(to->arry, (from->capacity & 0x3fffffff) * sizeof(hkpBpEndPoint));
+        to->capacity = (from->capacity & 0x3fffffff);
+        // Zero out new nodes
+        for (size_t i = old_len; i < (to->capacity & 0x3fffffff); i++)
         {
-            increase_list_size(Game::MemHeapAllocator, &to->arry, sizeof(hkpBpEndPoint));
-        }
-        else
-        {
-            to->arry = (hkpBpEndPoint*)realloc_(to->arry, (from->capacity & 0x3fffffff) * sizeof(hkpBpEndPoint));
-            to->capacity = (from->capacity & 0x3fffffff);
-            // Zero out new nodes
-            for (size_t i = old_len; i < (to->capacity & 0x3fffffff); i++)
-            {
-                memset(&to->arry[i], 0, sizeof(hkpBpEndPoint));
-            }
+            memset(&to->arry[i], 0, sizeof(hkpBpEndPoint));
         }
     }
     to->len = from->len;
@@ -443,15 +429,10 @@ void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapeP
     if ((to->m_properties_cap & 0x3fffffff) < from->m_properties_len)
     {
         uint32_t old_len = to->m_properties_len;
-        if (target == StateTarget::ToGame)
-        {
-            increase_list_size(Game::MemHeapAllocator, &to->m_properties, 0x10);
-        }
-        else
-        {
-            to->m_properties = (hkpProperty*)realloc_(to->m_properties, (from->m_properties_cap & 0x3fffffff) * sizeof(hkpProperty));
-            to->m_properties_cap = (from->m_properties_cap & 0x3fffffff);
-        }
+        //normally this would be a thread malloc'd object game-side but we've disabled that
+        to->m_properties = (hkpProperty*)realloc_(to->m_properties, (from->m_properties_cap & 0x3fffffff) * sizeof(hkpProperty));
+        to->m_properties_cap = (from->m_properties_cap & 0x3fffffff);
+
         for (size_t i = old_len; i < (from->m_properties_cap & 0x3fffffff); i++)
         {
             init_hkpProperty(&to->m_properties[i], target);
@@ -471,15 +452,9 @@ void copy_hkpSimpleShapePhantom(hkpSimpleShapePhantom* to, const hkpSimpleShapeP
     }
     if ((to->m_collisionDetails_cap & 0x3fffffff) < from->m_collisionDetails_len)
     {
-        if (target == StateTarget::ToGame)
-        {
-            increase_list_size(Game::MemHeapAllocator, &to->m_collisionDetails, 0x8);
-        }
-        else
-        {
-            to->m_collisionDetails = (hkpCollidable**)realloc_(to->m_collisionDetails, (from->m_collisionDetails_cap & 0x3fffffff) * sizeof(hkpCollidable*));
-            to->m_collisionDetails_cap = (from->m_collisionDetails_cap & 0x3fffffff);
-        }
+        //normally this would be a thread malloc'd object game-side but we've disabled that
+        to->m_collisionDetails = (hkpCollidable**)realloc_(to->m_collisionDetails, (from->m_collisionDetails_cap & 0x3fffffff) * sizeof(hkpCollidable*));
+        to->m_collisionDetails_cap = (from->m_collisionDetails_cap & 0x3fffffff);
     }
     to->m_collisionDetails_len = from->m_collisionDetails_len;
     //we can't copy the collision details here, since it may rely on all the other phantoms existing. Split out into a seperate function to call later when ready
@@ -734,15 +709,10 @@ void copy_hkpAabbPhantom(hkpAabbPhantom* to, const hkpAabbPhantom* from, StateTa
     if ((to->m_properties_cap & 0x3fffffff) < from->m_properties_len)
     {
         uint32_t old_len = to->m_properties_len;
-        if (target == StateTarget::ToGame)
-        {
-            increase_list_size(Game::MemHeapAllocator, &to->m_properties, 0x10);
-        }
-        else
-        {
-            to->m_properties = (hkpProperty*)realloc_(to->m_properties, (from->m_properties_cap & 0x3fffffff) * sizeof(hkpProperty));
-            to->m_properties_cap = (from->m_properties_cap & 0x3fffffff);
-        }
+        //normally this would be a thread malloc'd object game-side but we've disabled that
+        to->m_properties = (hkpProperty*)realloc_(to->m_properties, (from->m_properties_cap & 0x3fffffff) * sizeof(hkpProperty));
+        to->m_properties_cap = (from->m_properties_cap & 0x3fffffff);
+
         for (size_t i = old_len; i < (from->m_properties_cap & 0x3fffffff); i++)
         {
             init_hkpProperty(&to->m_properties[i], target);
@@ -763,15 +733,9 @@ void copy_hkpAabbPhantom(hkpAabbPhantom* to, const hkpAabbPhantom* from, StateTa
     }
     if ((to->m_overlappingCollidables_cap & 0x3fffffff) < from->m_overlappingCollidables_len)
     {
-        if (target == StateTarget::ToGame)
-        {
-            increase_list_size(Game::MemHeapAllocator, &to->m_overlappingCollidables, 0x8);
-        }
-        else
-        {
-            to->m_overlappingCollidables = (hkpCollidable**)realloc_(to->m_overlappingCollidables, (from->m_overlappingCollidables_cap & 0x3fffffff) * sizeof(hkpCollidable*));
-            to->m_overlappingCollidables_cap = (from->m_overlappingCollidables_cap & 0x3fffffff);
-        }
+        //normally this would be a thread malloc'd object game-side but we've disabled that
+        to->m_overlappingCollidables = (hkpCollidable**)realloc_(to->m_overlappingCollidables, (from->m_overlappingCollidables_cap & 0x3fffffff) * sizeof(hkpCollidable*));
+        to->m_overlappingCollidables_cap = (from->m_overlappingCollidables_cap & 0x3fffffff);
     }
     to->m_overlappingCollidables_len = from->m_overlappingCollidables_len;
     //we can't copy the collision details here, since it may rely on all the other phantoms existing. Split out into a seperate function to call later when ready
