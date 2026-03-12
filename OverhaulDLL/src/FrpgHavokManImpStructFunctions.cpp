@@ -301,7 +301,7 @@ void copy_hkpBpAxis(hkpBpAxis* to, const hkpBpAxis* from, StateTarget target)
         uint32_t old_len = to->len;
         //normally this would be a thread malloc'd object game-side but we've disabled that
         to->arry = (hkpBpEndPoint*)realloc_(to->arry, (from->capacity & 0x3fffffff) * sizeof(hkpBpEndPoint));
-        to->capacity = (from->capacity & 0x3fffffff);
+        to->capacity = from->capacity;
         // Zero out new nodes
         for (size_t i = old_len; i < (to->capacity & 0x3fffffff); i++)
         {
@@ -364,7 +364,7 @@ void copy_hkpPhantom(void** to, void* from, StateTarget target)
         if (*to != NULL)
         {
             PhantomType totype = hkpPhantom_getType(*to);
-            if (totype != PhantomType::SimpleShape)
+            if (totype != PhantomType::Aabb)
             {
                 free_hkpPhantom((*to), target);
                 *to = NULL;
