@@ -47,36 +47,45 @@ void free_FrpgPhysWorld(FrpgPhysWorld* to)
 void copy_hkpWorld(hkpWorld* to, const hkpWorld* from, StateTarget target)
 {
     //don't need to actually save/load the simulation islands themselves, those should be stable for the lifetime of this session
+
+    //m_phantoms is complicated by the fact that from and to can have multiple elemnts pointed to the same location.
+    //clear out the to array
+    std::unordered_set<void*> to_freed_tracker = {};
+    for (size_t i = 0; i < to->m_phantoms_size; i++)
+    {
+        //duplicate pointer, don't double free
+        if (to_freed_tracker.contains(to->m_phantoms[i]))
+        {
+            to->m_phantoms[i] = NULL;
+        }
+        else
+        {
+            to_freed_tracker.insert(to->m_phantoms[i]);
+            free_hkpPhantom(to->m_phantoms[i], target);
+            to->m_phantoms[i] = NULL;
+        }
+    }
+    //resize the to array
     to->m_phantoms_size = from->m_phantoms_size;
     if (to->m_phantoms_cap < from->m_phantoms_size)
     {
-        switch (target)
-        {
-        case StateTarget::ToGame: //normally this would be a thread malloc'd object game-side but we've disabled that
-        case StateTarget::ToLocal:
-        case StateTarget::Copy:
-            to->m_phantoms = (void**)realloc_(to->m_phantoms, from->m_phantoms_cap * sizeof(void*));
-            to->m_phantoms_cap = from->m_phantoms_cap;
-            break;
-        }
+        //normally this would be a thread malloc'd object game-side but we've disabled that
+        to->m_phantoms = (void**)realloc_(to->m_phantoms, from->m_phantoms_cap * sizeof(void*));
+        to->m_phantoms_cap = from->m_phantoms_cap;
     }
-    std::unordered_map<uint64_t, size_t> m_phantoms_tracker = {};
+    //copy in the from array
+    std::unordered_map<void*, size_t> from_dupe_tracker = {};
     for (size_t i = 0; i < from->m_phantoms_size; i++)
     {
-        //there may be duplicate pointers in this list which we need to support
-        if (m_phantoms_tracker.contains((uint64_t)(from->m_phantoms[i])))
+        //this is a duplicate pointer, link it up to the to side
+        if (from_dupe_tracker.contains(from->m_phantoms[i]))
         {
-            //if we need to clear the existing ptr at this entry
-            if (to->m_phantoms[i] != NULL && to->m_phantoms[i] != to->m_phantoms[m_phantoms_tracker[(uint64_t)(from->m_phantoms[i])]])
-            {
-                free_hkpPhantom(to->m_phantoms[i], target);
-            }
-            to->m_phantoms[i] = to->m_phantoms[m_phantoms_tracker[(uint64_t)(from->m_phantoms[i])]];
+            to->m_phantoms[i] = to->m_phantoms[from_dupe_tracker[from->m_phantoms[i]]];
         }
         else
         {
             copy_hkpPhantom(&to->m_phantoms[i], from->m_phantoms[i], target);
-            m_phantoms_tracker[(uint64_t)(from->m_phantoms[i])] = i;
+            from_dupe_tracker[from->m_phantoms[i]] = i;
         }
     }
     //now that the phantoms are copied, link in the collisions
@@ -339,52 +348,30 @@ PhantomType hkpPhantom_getType(void* to)
 
 void copy_hkpPhantom(void** to, void* from, StateTarget target)
 {
+    if (*to != NULL)
+    {
+        FATALERROR("Called copy_hkpPhantom with non-null to");
+    }
+
     PhantomType type = hkpPhantom_getType(from);
     switch (type)
     {
     case PhantomType::SimpleShape:
-        //destroy the target if not the right class
-        if (*to != NULL)
-        {
-            PhantomType totype = hkpPhantom_getType(*to);
-            if (totype != PhantomType::SimpleShape)
-            {
-                free_hkpPhantom((*to), target);
-                *to = NULL;
-            }
-        }
-        //init the target if needed
-        if (*to == NULL)
-        {
-            *to = init_hkpSimpleShapePhantom(target);
-        }
+        *to = init_hkpSimpleShapePhantom(target);
         copy_hkpSimpleShapePhantom((hkpSimpleShapePhantom*)(*to), (const hkpSimpleShapePhantom*)from, target);
         break;
     case PhantomType::Aabb:
-        if (*to != NULL)
-        {
-            PhantomType totype = hkpPhantom_getType(*to);
-            if (totype != PhantomType::Aabb)
-            {
-                free_hkpPhantom((*to), target);
-                *to = NULL;
-            }
-        }
-        //init the target if needed
-        if (*to == NULL)
-        {
-            *to = init_hkpAabbPhantom(target);
-        }
+        *to = init_hkpAabbPhantom(target);
         copy_hkpAabbPhantom((hkpAabbPhantom*)(*to), (const hkpAabbPhantom*)from, target);
         break;
     case PhantomType::PhantomNull:
-        free_hkpPhantom(*to, target);
         *to = NULL;
-        return;
+        break;
     case PhantomType::InvalidPhantom:
         FATALERROR("%p is not a valid phantom for copy (vtable %llx)", from, *(uint64_t*)from);
         break;
     }
+    return;
 }
 
 void free_hkpPhantom(void* to, StateTarget target)
