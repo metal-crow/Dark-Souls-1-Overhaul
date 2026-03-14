@@ -272,10 +272,7 @@ void free_hkp3AxisSweep(hkp3AxisSweep* to)
 {
     if (to->m_nodes != NULL)
     {
-        for (size_t i = 0; i < to->m_nodes_cap; i++)
-        {
-            free(to->m_nodes[i].index_in_array);
-        }
+        // index_in_array is a pointer to a different entity, not a allocation — do not free it
         free(to->m_nodes);
     }
     if (to->m_axis[0].arry != NULL)
