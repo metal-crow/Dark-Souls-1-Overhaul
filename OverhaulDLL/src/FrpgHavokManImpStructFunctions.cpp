@@ -326,7 +326,8 @@ void copy_hkpBpAxis(hkpBpAxis* to, const hkpBpAxis* from, StateTarget target)
 
 void copy_hkpBpEndPoint(hkpBpEndPoint* to, const hkpBpEndPoint* from, StateTarget target)
 {
-    to->data_1 = from->data_1;
+    to->m_value = from->m_value;
+    to->m_nodeIndex = from->m_nodeIndex;
 }
 
 PhantomType hkpPhantom_getType(void* to)

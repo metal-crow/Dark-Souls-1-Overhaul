@@ -126,7 +126,8 @@ static_assert(sizeof(hkpBpAxis) == 0x10);
 
 struct hkpBpEndPoint
 {
-    uint32_t data_1;
+    uint16_t m_value;
+    uint16_t m_nodeIndex;
 };
 static_assert(sizeof(hkpBpEndPoint) == 0x4);
 
