@@ -236,6 +236,7 @@ void copy_hkp3AxisSweep(hkp3AxisSweep* to, const hkp3AxisSweep* from, const hkpW
             }
         }
     }
+    //we don't need to set this pointer on the dll side, since we dynamically built it when we copy back to the game
     if (target == StateTarget::ToLocal)
     {
         //skip checking first element
@@ -243,7 +244,7 @@ void copy_hkp3AxisSweep(hkp3AxisSweep* to, const hkp3AxisSweep* from, const hkpW
         {
             if (from->m_nodes[i].index_in_array == NULL)
             {
-                FATALERROR("ToLocal hkp3AxisSweep->m_nodes[%d] (%p) has null index_in_array", i, to->m_nodes[i].index_in_array);
+                FATALERROR("ToLocal hkp3AxisSweep->m_nodes[%d] (%p) has null index_in_array", i, from->m_nodes[i]);
             }
         }
     }
