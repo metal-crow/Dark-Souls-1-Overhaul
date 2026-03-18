@@ -428,7 +428,9 @@ struct hkpSimpleShapePhantom
     void* vtable;
     uint64_t data_0;
     void* hkpWorldPtr; //this is just a pointer to the havok world, we should be able to just treat it as a const ptr. Anything important inside it we handle elsewhere
-    void** m_userData; //this is actually a FrpgPhysShapePhantomIns**, but we are saving these already as part of DamageMan, so treat as raw ptrs
+    //this is actually a FrpgPhysShapePhantomIns**, but we are saving these already as part of DamageMan, so treat as raw ptrs.
+    // This is only used when we write to the game, and the target isn't realloc'd when we write to the game so it's stable.
+    void** m_userData;
     hkpLinkedCollidable m_collidable;
     uint8_t data_1[16];
     void* unk_0;
@@ -467,7 +469,7 @@ struct hkpAabbPhantom
     void* vtable;
     uint64_t data_0;
     void* hkpWorldPtr;
-    void** m_userData;
+    void** m_userData; //same as hkpSimpleShapePhantom
     hkpLinkedCollidable m_collidable;
     uint8_t data_1[16];
     void* unk_0;
