@@ -177,6 +177,10 @@ void copy_HavokChara(HavokChara* to, const HavokChara* from, StateTarget target)
 HavokChara* init_HavokChara();
 void free_HavokChara(HavokChara* to);
 
+void copy_hkpCharacterProxy(hkpCharacterProxy* to, const hkpCharacterProxy* from, hkpWorld* world, StateTarget target);
+hkpCharacterProxy* init_hkpCharacterProxy(StateTarget target);
+void free_hkpCharacterProxy(hkpCharacterProxy* to);
+
 std::string print_HitIns(HitIns* to);
 void copy_HitIns(HitIns* to, const HitIns* from);
 HitIns* init_HitIns();

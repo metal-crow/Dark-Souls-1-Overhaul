@@ -1,7 +1,6 @@
 #include "PlayerInsStructFunctions.h"
 #include "Rollback.h"
 #include "AttachSysSlotStructsFunctions.h"
-#include "FrpgHavokManImpStructFunctions.h"
 #include "PadManipulatorStructFunctions.h"
 
 typedef void* falloc(uint64_t, uint64_t, uint32_t);
@@ -2141,7 +2140,7 @@ std::string print_HavokChara(HavokChara* to)
     }
     out += "\n";
 
-    out += print_hkpCharacterProxy(to->char_proxy);
+    out += "print_hkpCharacterProxy";// (to->char_proxy);
 
     out += "Unknown data_1:";
     for (size_t i = 0; i < sizeof(to->data_1); i++)
@@ -2213,6 +2212,60 @@ void free_HavokChara(HavokChara* to)
     free_hkpCharacterProxy(to->char_proxy);
     free_HitIns(to->padding_hitIns);
 
+    free(to);
+}
+
+//CharacterProxy is not in hkpWorld, it's handled by game code. So we can save/restore it from the Chr
+void copy_hkpCharacterProxy(hkpCharacterProxy* to, const hkpCharacterProxy* from, hkpWorld* world, StateTarget target)
+{
+    to->data_0 = from->data_0;
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    size_t index = -1;
+    switch (target)
+    {
+    case StateTarget::ToGame:
+        //use the value (actually an index) to get the right shape phantom
+        to->HkpSimpleShapePhantom = world->m_phantoms[(size_t)(from->HkpSimpleShapePhantom)];
+        break;
+    case StateTarget::ToLocal:
+        //save the phantom's index in the m_phantoms list
+        for (size_t i = 0; i < world->m_phantoms_size; i++)
+        {
+            if (world->m_phantoms[i] == from->HkpSimpleShapePhantom)
+            {
+                index = i;
+                break;
+            }
+        }
+        if (index == -1)
+        {
+            FATALERROR("Unable to locate hkpCharacterProxy's shapePhantom (%p) in m_phantoms", from->HkpSimpleShapePhantom);
+        }
+        to->HkpSimpleShapePhantom = (void*)index;
+        break;
+    case StateTarget::Copy:
+        to->HkpSimpleShapePhantom = from->HkpSimpleShapePhantom;
+        break;
+    }
+    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    memcpy(to->data_3, from->data_3, sizeof(to->data_3));
+}
+
+hkpCharacterProxy* init_hkpCharacterProxy(StateTarget target)
+{
+    if (target != StateTarget::ToGame)
+    {
+        hkpCharacterProxy* local_hkpCharacterProxy = (hkpCharacterProxy*)malloc_(sizeof(hkpCharacterProxy));
+        return local_hkpCharacterProxy;
+    }
+    else
+    {
+        FATALERROR("in-game alloc hkpCharacterProxy");
+    }
+}
+
+void free_hkpCharacterProxy(hkpCharacterProxy* to)
+{
     free(to);
 }
 

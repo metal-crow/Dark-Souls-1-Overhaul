@@ -9,7 +9,6 @@
 #include <stdint.h>
 #include "PadManipulatorStruct.h"
 #include "AttachSysSlotStructs.h"
-#include "FrpgHavokManImpStruct.h"
 #include "DamageManStruct.h"
 
 typedef struct AnimationQueue_Entry_sub1_field0x10 AnimationQueue_Entry_sub1_field0x10;
@@ -28,6 +27,7 @@ typedef struct AnimationMediatorStateEntry AnimationMediatorStateEntry;
 typedef struct AnimationMediator AnimationMediator;
 typedef struct HitIns HitIns;
 typedef struct HavokChara HavokChara;
+typedef struct hkpCharacterProxy hkpCharacterProxy;
 typedef struct EzState_detail_EzStateMachineImpl EzState_detail_EzStateMachineImpl;
 typedef struct EzStateRegister EzStateRegister;
 typedef struct EzStateRegisterSet EzStateRegisterSet;
@@ -342,6 +342,44 @@ static_assert(offsetof(HavokChara, data_3) == 0x1f0);
 static_assert(offsetof(HavokChara, padding_3) == 0x250);
 static_assert(offsetof(HavokChara, data_4) == 0x258);
 static_assert(sizeof(HavokChara) == 0x290);
+
+struct hkpCharacterProxy
+{
+    uint64_t padding_0;
+    uint64_t data_0;
+    uint64_t padding_1[2];
+    void* field0x20; //Ignore this, seems to not be important.
+    uint32_t field0x20_len;
+    uint32_t field0x20_cap;
+    void** field0x30; //Ignore this, seems to not be important.
+    uint32_t field0x30_len;
+    uint32_t field0x30_cap;
+    void* field0x40; //each elem is ?? size. This appears to be unused
+    uint32_t field0x40_len;
+    uint32_t field0x40_cap;
+    void* field0x50; //each elem is ?? size. This appears to be unused
+    uint32_t field0x50_len;
+    uint32_t field0x50_cap;
+    uint8_t data_1[0x20];
+    void* HkpSimpleShapePhantom;
+    uint8_t data_2[0x40];
+    void** field0xc8; //Ignore this, seems to not be important.
+    uint32_t field0xc8_len;
+    uint32_t field0xc8_cap;
+    uint8_t data_3[24];
+};
+
+static_assert(offsetof(hkpCharacterProxy, data_0) == 0x8);
+static_assert(offsetof(hkpCharacterProxy, field0x20) == 0x20);
+static_assert(offsetof(hkpCharacterProxy, field0x30) == 0x30);
+static_assert(offsetof(hkpCharacterProxy, field0x40) == 0x40);
+static_assert(offsetof(hkpCharacterProxy, field0x50) == 0x50);
+static_assert(offsetof(hkpCharacterProxy, data_1) == 0x60);
+static_assert(offsetof(hkpCharacterProxy, HkpSimpleShapePhantom) == 0x80);
+static_assert(offsetof(hkpCharacterProxy, data_2) == 0x88);
+static_assert(offsetof(hkpCharacterProxy, field0xc8) == 0xc8);
+static_assert(offsetof(hkpCharacterProxy, data_3) == 0xd8);
+static_assert(sizeof(hkpCharacterProxy) == 0xf0);
 
 struct EzStateRegister
 {

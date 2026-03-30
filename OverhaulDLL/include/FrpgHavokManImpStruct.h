@@ -15,7 +15,6 @@ typedef struct hkp3AxisSweep hkp3AxisSweep;
 typedef struct hkpSimulationIsland hkpSimulationIsland;
 typedef struct hkpAgentNnSector hkpAgentNnSector;
 typedef struct hkpEntity hkpEntity;
-typedef struct hkpRigidBody hkpRigidBody;
 typedef struct hkpMotion hkpMotion;
 typedef struct hkpBpNode hkpBpNode;
 typedef struct hkpBpAxis hkpBpAxis;
@@ -109,10 +108,10 @@ struct hkpSimulationIsland
     uint32_t m_actions_size;
     uint32_t m_actions_cap;
     uint64_t data_2;
-    hkpRigidBody** m_entities; //this is technically an hkpEntity list but the only possible subclass is hkpRigidBody
+    hkpEntity** m_entities;
     uint32_t m_entities_size;
     uint32_t m_entities_cap;
-    hkpRigidBody* m_entities_inline; //just set to null i think, and clear the cap flags
+    hkpEntity* m_entities_inline; //just set to null i think, and clear the cap flags
     uint64_t data_3;
     hkpAgentNnSector** m_sectorsmidphase;
     uint32_t m_sectorsmidphase_size;
@@ -530,44 +529,6 @@ static_assert(offsetof(hkpAabbPhantom, data_2) == 0xf0);
 static_assert(offsetof(hkpAabbPhantom, m_overlappingCollidables) == 0x110);
 static_assert(offsetof(hkpAabbPhantom, data_3) == 0x120);
 
-struct hkpCharacterProxy
-{
-    uint64_t padding_0;
-    uint64_t data_0;
-    uint64_t padding_1[2];
-    hkpCharacterProxy_field0x20elem* field0x20; //Ignore this, seems to not be important.
-    uint32_t field0x20_len;
-    uint32_t field0x20_cap;
-    hkpRigidBody** field0x30; //Ignore this, seems to not be important.
-    uint32_t field0x30_len;
-    uint32_t field0x30_cap;
-    void* field0x40; //each elem is ?? size. This appears to be unused
-    uint32_t field0x40_len;
-    uint32_t field0x40_cap;
-    void* field0x50; //each elem is ?? size. This appears to be unused
-    uint32_t field0x50_len;
-    uint32_t field0x50_cap;
-    uint8_t data_1[0x20];
-    hkpSimpleShapePhantom* HkpSimpleShapePhantom;
-    uint8_t data_2[0x40];
-    ChrInsProxyListener** field0xc8; //Ignore this, seems to not be important.
-    uint32_t field0xc8_len;
-    uint32_t field0xc8_cap;
-    uint8_t data_3[24];
-};
-
-static_assert(offsetof(hkpCharacterProxy, data_0) == 0x8);
-static_assert(offsetof(hkpCharacterProxy, field0x20) == 0x20);
-static_assert(offsetof(hkpCharacterProxy, field0x30) == 0x30);
-static_assert(offsetof(hkpCharacterProxy, field0x40) == 0x40);
-static_assert(offsetof(hkpCharacterProxy, field0x50) == 0x50);
-static_assert(offsetof(hkpCharacterProxy, data_1) == 0x60);
-static_assert(offsetof(hkpCharacterProxy, HkpSimpleShapePhantom) == 0x80);
-static_assert(offsetof(hkpCharacterProxy, data_2) == 0x88);
-static_assert(offsetof(hkpCharacterProxy, field0xc8) == 0xc8);
-static_assert(offsetof(hkpCharacterProxy, data_3) == 0xd8);
-static_assert(sizeof(hkpCharacterProxy) == 0xf0);
-
 struct ChrInsProxyListener
 {
     uint8_t padding_0[0x30];
@@ -586,13 +547,26 @@ struct hkpCharacterProxy_field0x20elem
 
 static_assert(sizeof(hkpCharacterProxy_field0x20elem) == 0x40);
 
+struct hkpMotion
+{
+    uint64_t vtable;
+    uint8_t data_0[0x120];
+    hkpMotion* m_savedMotion; //hkpSphereMotion/hkpBoxMotion, but the data itself is just hkpMotion
+    uint8_t data_1[0x10];
+};
+static_assert(sizeof(hkpMotion) == 0x140);
+static_assert(offsetof(hkpMotion, data_0) == 0x8);
+static_assert(offsetof(hkpMotion, m_savedMotion) == 0x128);
+static_assert(offsetof(hkpMotion, data_1) == 0x130);
+
 struct hkpEntity
 {
     uint64_t vtable;
     uint64_t data_0;
     hkpWorld* _hkpWorld;
     //TODO
-    FrpgPhysSysIns_Entity* m_userData; //points to the entry in FrpgPhysSysIns's arrays
+    //FrpgPhysSysIns_Entity* m_userData; //points to the entry in FrpgPhysSysIns's arrays
+    void* m_userData;
     hkpLinkedCollidable m_collidable;
     uint8_t data_1[16];
     void* m_name;
@@ -650,72 +624,5 @@ static_assert(offsetof(hkpEntity, m_motion) == 0x150);
 static_assert(offsetof(hkpEntity, m_contactListeners) == 0x290);
 static_assert(offsetof(hkpEntity, m_actions) == 0x2a0);
 static_assert(offsetof(hkpEntity, m_localFrame) == 0x2b0);
-
-struct hkpRigidBody
-{
-    hkpEntity base;
-};
-
-struct hkpMotion
-{
-    uint64_t vtable;
-    uint8_t data_0[0x120];
-    hkpMotion* m_savedMotion; //hkpSphereMotion/hkpBoxMotion, but the data itself is just hkpMotion
-    uint8_t data_1[0x10];
-};
-static_assert(sizeof(hkpMotion) == 0x140);
-static_assert(offsetof(hkpMotion, data_0) == 0x8);
-static_assert(offsetof(hkpMotion, m_savedMotion) == 0x128);
-static_assert(offsetof(hkpMotion, data_1) == 0x130);
-
-//TODO
-struct hkConstraintInternal
-{
-    hkpConstraintInstance* m_constraint;
-    hkpEntity* m_entities[2];
-    hkpConstraintAtom* m_atoms;
-    uint16_t m_atomsSize;
-    uint8_t data_0[0x16];
-    hkpConstraintRuntime* m_runtime;
-    uint16_t m_runtimeSize;
-    uint8_t data_1[14];
-};
-static_assert(sizeof(hkConstraintInternal) == 0x50);
-static_assert(offsetof(hkConstraintInternal, m_constraint) == 0);
-static_assert(offsetof(hkConstraintInternal, m_entities) == 0x8);
-static_assert(offsetof(hkConstraintInternal, m_atoms) == 0x18);
-static_assert(offsetof(hkConstraintInternal, data_0) == 0x22);
-static_assert(offsetof(hkConstraintInternal, m_runtime) == 0x38);
-static_assert(offsetof(hkConstraintInternal, data_1) == 0x42);
-
-//TODO
-struct hkpConstraintInstance
-{
-    uint64_t vtable;
-    uint64_t data_0;
-    hkpConstraintOwner* m_owner;
-    hkpConstraintData* m_data;
-    hkpModifierConstraintAtom* m_constraintModifiers;
-    hkpEntity* m_entities[2];
-    uint64_t data_1;
-    hkpConstraintListener* m_listeners;
-    uint16_t m_listeners_len;
-    uint16_t m_listeners_cap;
-    uint32_t data_2;
-    void* m_name;
-    void* m_userData;
-    hkConstraintInternal* m_internal;
-    uint64_t data_3;
-};
-static_assert(sizeof(hkpConstraintInstance) == 0x70);
-static_assert(offsetof(hkpConstraintInstance, data_0) == 0x8);
-static_assert(offsetof(hkpConstraintInstance, m_owner) == 0x10);
-static_assert(offsetof(hkpConstraintInstance, m_data) == 0x18);
-static_assert(offsetof(hkpConstraintInstance, m_constraintModifiers) == 0x20);
-static_assert(offsetof(hkpConstraintInstance, m_listeners) == 0x40);
-static_assert(offsetof(hkpConstraintInstance, m_name) == 0x50);
-static_assert(offsetof(hkpConstraintInstance, m_userData) == 0x58);
-static_assert(offsetof(hkpConstraintInstance, m_internal) == 0x60);
-
 
 #endif
