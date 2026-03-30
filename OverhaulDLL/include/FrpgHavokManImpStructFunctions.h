@@ -21,6 +21,20 @@ void copy_hkpWorld(hkpWorld* to, const hkpWorld* from, StateTarget target);
 hkpWorld* init_hkpWorld();
 void free_hkpWorld(hkpWorld* to);
 
+void copy_hkpSimulationIsland(hkpSimulationIsland* to, const hkpSimulationIsland* from, StateTarget target);
+hkpSimulationIsland* init_hkpSimulationIsland(StateTarget target);
+void free_hkpSimulationIsland(hkpSimulationIsland* to, StateTarget target);
+
+void copy_hkpRigidBody(hkpRigidBody* to, hkpRigidBody* from, StateTarget target);
+hkpRigidBody* init_hkpRigidBody();
+void free_hkpRigidBody(hkpRigidBody* to);
+
+void copy_hkpMotion(hkpMotion* to, hkpMotion* from, StateTarget target, bool isSaved);
+
+void copy_hkpAgentNnSector(hkpAgentNnSector* to, hkpAgentNnSector* from, StateTarget target);
+hkpAgentNnSector* init_hkpAgentNnSector();
+void free_hkpAgentNnSector(hkpAgentNnSector* to);
+
 void copy_hkp3AxisSweep(hkp3AxisSweep* to, const hkp3AxisSweep* from, const hkpWorld* to_world, const hkpWorld* from_world, StateTarget target);
 hkp3AxisSweep* init_hkp3AxisSweep();
 void free_hkp3AxisSweep(hkp3AxisSweep* to);

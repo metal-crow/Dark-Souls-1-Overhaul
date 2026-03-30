@@ -269,6 +269,7 @@ void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePha
             //We have to do a full copy of the phantom if it's not in the m_phantoms list
             if (!world_contains_phantom(from_world, (*from)->_hkpSimpleShapePhantom))
             {
+                FATALERROR("It IS possible for DamageMan FrpgPhysShapePhantomIns to have a phantom not present in the hkpWorld! %p", from);
                 if ((*to)->_hkpSimpleShapePhantom == NULL)
                 {
                     (*to)->_hkpSimpleShapePhantom = init_hkpSimpleShapePhantom(target);

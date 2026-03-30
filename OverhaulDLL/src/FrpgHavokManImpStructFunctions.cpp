@@ -1,8 +1,6 @@
 #include "FrpgHavokManImpStructFunctions.h"
 #include <unordered_set>
 
-/* ---------------- HAVOK MAN ------------------ */
-
 void copy_FrpgHavokManImp(FrpgHavokManImp* to, const FrpgHavokManImp* from, StateTarget target)
 {
     copy_FrpgPhysWorld(to->physWorld, from->physWorld, target);
@@ -46,9 +44,54 @@ void free_FrpgPhysWorld(FrpgPhysWorld* to)
 
 void copy_hkpWorld(hkpWorld* to, const hkpWorld* from, StateTarget target)
 {
-    //don't need to actually save/load the simulation islands themselves, those should be stable for the lifetime of this session
+    copy_hkpSimulationIsland(to->m_fixedIsland, from->m_fixedIsland, target);
 
-    //m_phantoms is complicated by the fact that from and to can have multiple elemnts pointed to the same location.
+    //free the existing islands
+    for (size_t i = 0; i < to->m_activeSimulationIslands_size; i++)
+    {
+        free_hkpSimulationIsland(to->m_activeSimulationIslands[i], target);
+        to->m_activeSimulationIslands[i] = NULL;
+    }
+    for (size_t i = 0; i < to->m_inactiveSimulationIslands_size; i++)
+    {
+        free_hkpSimulationIsland(to->m_inactiveSimulationIslands[i], target);
+        to->m_inactiveSimulationIslands[i] = NULL;
+    }
+    for (size_t i = 0; i < to->m_dirtySimulationIslands_size; i++)
+    {
+        free_hkpSimulationIsland(to->m_dirtySimulationIslands[i], target);
+        to->m_dirtySimulationIslands[i] = NULL;
+    }
+    //for copy and local, these are going to be null so we can just init them to the right size
+    //for game, we have to realloc this to the correct size
+    //as usually, normally a thread alloc'd object but that's changed
+    to->m_activeSimulationIslands = (hkpSimulationIsland**)realloc_(to->m_activeSimulationIslands, (from->m_activeSimulationIslands_cap & 0x3fffffff) * sizeof(hkpSimulationIsland*));
+    to->m_activeSimulationIslands_cap = from->m_activeSimulationIslands_cap;
+    to->m_activeSimulationIslands_size = from->m_activeSimulationIslands_size;
+    to->m_inactiveSimulationIslands = (hkpSimulationIsland**)realloc_(to->m_inactiveSimulationIslands, (from->m_inactiveSimulationIslands_cap & 0x3fffffff) * sizeof(hkpSimulationIsland*));
+    to->m_inactiveSimulationIslands_cap = from->m_inactiveSimulationIslands_cap;
+    to->m_inactiveSimulationIslands_size = from->m_inactiveSimulationIslands_size;
+    to->m_dirtySimulationIslands = (hkpSimulationIsland**)realloc_(to->m_dirtySimulationIslands, (from->m_dirtySimulationIslands_cap & 0x3fffffff) * sizeof(hkpSimulationIsland*));
+    to->m_dirtySimulationIslands_cap = from->m_dirtySimulationIslands_cap;
+    to->m_dirtySimulationIslands_size = from->m_dirtySimulationIslands_size;
+    //copy in the islands
+    for (size_t i = 0; i < from->m_activeSimulationIslands_size; i++)
+    {
+        to->m_activeSimulationIslands[i] = init_hkpSimulationIsland(target);
+        copy_hkpSimulationIsland(to->m_activeSimulationIslands[i], from->m_activeSimulationIslands[i], target);
+    }
+    for (size_t i = 0; i < from->m_inactiveSimulationIslands_size; i++)
+    {
+        to->m_inactiveSimulationIslands[i] = init_hkpSimulationIsland(target);
+        copy_hkpSimulationIsland(to->m_inactiveSimulationIslands[i], from->m_inactiveSimulationIslands[i], target);
+    }
+    for (size_t i = 0; i < from->m_dirtySimulationIslands_size; i++)
+    {
+        to->m_dirtySimulationIslands[i] = init_hkpSimulationIsland(target);
+        copy_hkpSimulationIsland(to->m_dirtySimulationIslands[i], from->m_dirtySimulationIslands[i], target);
+    }
+
+    //m_phantoms is complicated by the fact that from and to can have multiple elements pointed to the same location.
     //clear out the to array
     std::unordered_set<void*> to_freed_tracker = {};
     for (size_t i = 0; i < to->m_phantoms_size; i++)
@@ -88,7 +131,7 @@ void copy_hkpWorld(hkpWorld* to, const hkpWorld* from, StateTarget target)
             from_dupe_tracker[from->m_phantoms[i]] = i;
         }
     }
-    //now that the phantoms are copied, link in the collisions
+    //now that the phantoms are copied, link in the CollisionDetails
     for (size_t i = 0; i < from->m_phantoms_size; i++)
     {
         PhantomType type = hkpPhantom_getType(from->m_phantoms[i]);
@@ -105,6 +148,9 @@ void copy_hkpWorld(hkpWorld* to, const hkpWorld* from, StateTarget target)
             break;
         }
     }
+    //now that the phantoms and entities are copied, link in the CollisionEntrys for both
+    //TODO
+
     //this can only be done after the m_phantoms are all copied
     copy_hkp3AxisSweep(to->m_broadPhase, from->m_broadPhase, to, from, target);
 }
@@ -113,19 +159,46 @@ hkpWorld* init_hkpWorld()
 {
     hkpWorld* local = (hkpWorld*)malloc_(sizeof(hkpWorld));
 
-    local->m_fixedIsland = NULL;
-    local->m_fixedRigidBody = NULL;
+    local->m_fixedIsland = init_hkpSimulationIsland(StateTarget::ToLocal);
+    local->m_fixedRigidBody = NULL; //leave this alone, it should be static for the entire session and we don't realloc the fixedIsland or the hkpWorld
     local->m_activeSimulationIslands = NULL;
+    local->m_activeSimulationIslands_size = 0;
+    local->m_activeSimulationIslands_cap = 0;
     local->m_inactiveSimulationIslands = NULL;
+    local->m_inactiveSimulationIslands_size = 0;
+    local->m_inactiveSimulationIslands_cap = 0;
     local->m_dirtySimulationIslands = NULL;
+    local->m_dirtySimulationIslands_size = 0;
+    local->m_dirtySimulationIslands_cap = 0;
     local->m_broadPhase = init_hkp3AxisSweep();
     local->m_phantoms = NULL;
+    local->m_phantoms_size = 0;
+    local->m_phantoms_cap = 0;
 
     return local;
 }
 
 void free_hkpWorld(hkpWorld* to)
 {
+    for (size_t i = 0; i < to->m_activeSimulationIslands_size; i++)
+    {
+        free_hkpSimulationIsland(to->m_activeSimulationIslands[i], StateTarget::ToLocal);
+        to->m_activeSimulationIslands[i] = NULL;
+    }
+    free(to->m_activeSimulationIslands);
+    for (size_t i = 0; i < to->m_inactiveSimulationIslands_size; i++)
+    {
+        free_hkpSimulationIsland(to->m_inactiveSimulationIslands[i], StateTarget::ToLocal);
+        to->m_inactiveSimulationIslands[i] = NULL;
+    }
+    free(to->m_inactiveSimulationIslands);
+    for (size_t i = 0; i < to->m_dirtySimulationIslands_size; i++)
+    {
+        free_hkpSimulationIsland(to->m_dirtySimulationIslands[i], StateTarget::ToLocal);
+        to->m_dirtySimulationIslands[i] = NULL;
+    }
+    free(to->m_dirtySimulationIslands);
+
     free_hkp3AxisSweep(to->m_broadPhase);
     // copy_hkpWorld may store the same pointer in multiple slots when the source has
     // duplicate entries, so track what we've already freed to avoid double-free.
@@ -139,6 +212,258 @@ void free_hkpWorld(hkpWorld* to)
         }
     }
     free(to->m_phantoms);
+    free(to);
+}
+
+void copy_hkpSimulationIsland(hkpSimulationIsland* to, const hkpSimulationIsland* from, StateTarget target)
+{
+    to->vtable = from->vtable;
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    to->m_world = from->m_world; //static pointer
+    to->m_numConstraints = from->m_numConstraints;
+    to->m_storageIndex = from->m_storageIndex;
+    to->m_dirtyListIndex = from->m_dirtyListIndex;
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    to->m_timeSinceLastHighFrequencyCheck = from->m_timeSinceLastHighFrequencyCheck;
+    to->m_timeSinceLastLowFrequencyCheck = from->m_timeSinceLastLowFrequencyCheck;
+
+    if (from->m_actions != NULL || from->m_actions_size != 0)
+    {
+        FATALERROR("hkpSimulationIsland %p has actions", from);
+    }
+
+    to->data_2 = from->data_2;
+
+    for (size_t i = 0; i < to->m_entities_size; i++)
+    {
+        free_hkpRigidBody(to->m_entities[i]);
+        to->m_entities[i] = NULL;
+    }
+    to->m_entities = (hkpRigidBody**)realloc_(to->m_entities, (from->m_entities_cap & 0x3fffffff) * sizeof(void*));
+    to->m_entities_cap = from->m_entities_cap & 0x3fffffff;
+    to->m_entities_size = from->m_entities_size;
+    for (size_t i = 0; i < to->m_entities_size; i++)
+    {
+        to->m_entities[i] = init_hkpRigidBody();
+        copy_hkpRigidBody(to->m_entities[i], from->m_entities[i], target);
+    }
+
+    to->data_3 = from->data_3;
+
+    for (size_t i = 0; i < to->m_sectorsmidphase_size; i++)
+    {
+        free_hkpAgentNnSector(to->m_sectorsmidphase[i]);
+        to->m_sectorsmidphase[i] = NULL;
+    }
+    to->m_sectorsmidphase = (hkpAgentNnSector**)realloc_(to->m_sectorsmidphase, (from->m_sectorsmidphase_cap & 0x3fffffff) * sizeof(void*));
+    to->m_sectorsmidphase_cap = from->m_sectorsmidphase_cap & 0x3fffffff;
+    to->m_sectorsmidphase_size = from->m_sectorsmidphase_size;
+    for (size_t i = 0; i < to->m_sectorsmidphase_size; i++)
+    {
+        to->m_sectorsmidphase[i] = init_hkpAgentNnSector();
+        copy_hkpAgentNnSector(to->m_sectorsmidphase[i], from->m_sectorsmidphase[i], target);
+    }
+
+    to->data_4 = from->data_4;
+
+    for (size_t i = 0; i < to->m_sectorsnarrowphase_size; i++)
+    {
+        free_hkpAgentNnSector(to->m_sectorsnarrowphase[i]);
+        to->m_sectorsnarrowphase[i] = NULL;
+    }
+    to->m_sectorsnarrowphase = (hkpAgentNnSector**)realloc_(to->m_sectorsnarrowphase, (from->m_sectorsnarrowphase_cap & 0x3fffffff) * sizeof(void*));
+    to->m_sectorsnarrowphase_cap = from->m_sectorsnarrowphase_cap & 0x3fffffff;
+    to->m_sectorsnarrowphase_size = from->m_sectorsnarrowphase_size;
+    for (size_t i = 0; i < to->m_sectorsnarrowphase_size; i++)
+    {
+        to->m_sectorsnarrowphase[i] = init_hkpAgentNnSector();
+        copy_hkpAgentNnSector(to->m_sectorsnarrowphase[i], from->m_sectorsnarrowphase[i], target);
+    }
+}
+
+hkpSimulationIsland* init_hkpSimulationIsland(StateTarget target)
+{
+    hkpSimulationIsland* local = (hkpSimulationIsland*)malloc_(sizeof(hkpSimulationIsland));
+
+    local->vtable = (void*)0x14145dca0;
+
+    //always empty
+    local->m_actions = NULL;
+    local->m_actions_cap = 0;
+    local->m_actions_size = 0;
+
+    //unknown size, init on copy
+    local->m_entities = NULL;
+    local->m_entities_cap = 0;
+    local->m_entities_size = 0;
+    local->m_entities_inline = NULL;
+
+    local->m_sectorsmidphase = NULL;
+    local->m_sectorsmidphase_cap = 0;
+    local->m_sectorsmidphase_size = 0;
+    local->m_sectorsmidphase_inline = NULL;
+
+    local->m_sectorsnarrowphase = NULL;
+    local->m_sectorsnarrowphase_cap = 0;
+    local->m_sectorsnarrowphase_size = 0;
+    local->m_sectorsnarrowphase_inline = NULL;
+
+    return local;
+}
+
+void free_hkpSimulationIsland(hkpSimulationIsland* to, StateTarget target)
+{
+    for (size_t i = 0; i < to->m_entities_size; i++)
+    {
+        free_hkpRigidBody(to->m_entities[i]);
+        to->m_entities[i] = NULL;
+    }
+    free(to->m_entities);
+
+    for (size_t i = 0; i < to->m_sectorsmidphase_size; i++)
+    {
+        free_hkpAgentNnSector(to->m_sectorsmidphase[i]);
+        to->m_sectorsmidphase[i] = NULL;
+    }
+    free(to->m_sectorsmidphase);
+
+    for (size_t i = 0; i < to->m_sectorsnarrowphase_size; i++)
+    {
+        free_hkpAgentNnSector(to->m_sectorsnarrowphase[i]);
+        to->m_sectorsnarrowphase[i] = NULL;
+    }
+    free(to->m_sectorsnarrowphase);
+}
+
+void copy_hkpRigidBody(hkpRigidBody* to, hkpRigidBody* from, StateTarget target)
+{
+    if (from->base.vtable != 0x14145ba88)
+    {
+        FATALERROR("hkpEntity is not RigidBody, is %llx %p", from->base.vtable, from);
+    }
+    to->base.vtable = from->base.vtable;
+    to->base.data_0 = from->base.data_0;
+    to->base._hkpWorld = from->base._hkpWorld; //this never gets reallocated so fine to just treat as static
+    to->base.m_userData = ???; //TODO
+    //TODO
+    copy_hkpLinkedCollidable(&to->base.m_collidable, &from->base.m_collidable, x, target);
+    memcpy(to->base.data_1, from->base.data_1, sizeof(to->base.data_1));
+    to->base.m_name = from->base.m_name;
+    if (from->base.m_properties_len > 0 || from->base.m_properties != NULL)
+    {
+        FATALERROR("hkpRigidBody %p has properties", from);
+    }
+    memcpy(to->base.m_material, from->base.m_material, sizeof(to->base.m_material));
+    if (from->base.m_limitContactImpulseUtilAndFlag != NULL)
+    {
+        FATALERROR("hkpRigidBody %p has m_limitContactImpulseUtilAndFlag", from);
+    }
+    to->base.data_2 = from->base.data_2;
+    if (from->base.m_breakableBody != NULL)
+    {
+        FATALERROR("hkpRigidBody %p has m_breakableBody", from);
+    }
+    memcpy(to->base.data_3, from->base.data_3, sizeof(to->base.data_3));
+
+    if (from->base.m_constraintsMaster_size > 0 || from->base.m_constraintsMaster != NULL)
+    {
+        //TODO
+    }
+
+    to->base.data_4 = from->base.data_4;
+
+    if (from->base.m_constraintsSlave_size > 0 || from->base.m_constraintsSlave != NULL)
+    {
+        //TODO
+    }
+
+    if (from->base.m_constraintRuntime_size > 0 || from->base.m_constraintRuntime != NULL)
+    {
+        //TODO
+    }
+
+    to->base.m_simulationIsland = from->base.m_simulationIsland; //this should remain static
+    memcpy(to->base.data_5, from->base.data_5, sizeof(to->base.data_5));
+    if (from->base.spuCollisionCallback_m_util != NULL || from->base.spuCollisionCallback_m_capacity != 0)
+    {
+        FATALERROR("hkpRigidBody %p has actions", from);
+    }
+    memcpy(to->base.data_6, from->base.data_6, sizeof(to->base.data_6));
+    copy_hkpMotion(&to->base.m_motion, &from->base.m_motion, target, false);
+    if (from->base.m_contactListeners != NULL || from->base.m_contactListeners_size != 0)
+    {
+        FATALERROR("hkpRigidBody %p has m_contactListeners", from);
+    }
+    to->base.data_8 = from->base.data_8;
+    if (from->base.m_actions != NULL || from->base.m_actions_size != 0)
+    {
+        FATALERROR("hkpRigidBody %p has actions", from);
+    }
+    to->base.data_9 = from->base.data_9;
+    if (from->base.m_localFrame != NULL)
+    {
+        FATALERROR("hkpRigidBody %p has m_localFrame", from);
+    }
+    if (from->base.m_extendedListeners != NULL)
+    {
+        FATALERROR("hkpRigidBody %p has m_extendedListeners", from);
+    }
+}
+
+hkpRigidBody* init_hkpRigidBody()
+{
+    //same as usual, this works for both local and game
+    hkpRigidBody* local = (hkpRigidBody*)malloc_(sizeof(hkpRigidBody));
+
+    return local;
+}
+
+void free_hkpRigidBody(hkpRigidBody* to)
+{
+    free(to->base.m_motion.m_savedMotion);
+    //TODO
+}
+
+void copy_hkpMotion(hkpMotion* to, hkpMotion* from, StateTarget target, bool isSaved)
+{
+    to->vtable = from->vtable;
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    if (isSaved && from->m_savedMotion != NULL)
+    {
+        FATALERROR("hkpMotion savedMotion has non null nested m_savedMotion %p", from);
+    }
+    if (!isSaved)
+    {
+        if (from->m_savedMotion != NULL)
+        {
+            if (to->m_savedMotion == NULL)
+            {
+                to->m_savedMotion = (hkpMotion*)malloc_(sizeof(hkpMotion));
+            }
+            copy_hkpMotion(to->m_savedMotion, from->m_savedMotion, target, true);
+        }
+        else if (from->m_savedMotion == NULL)
+        {
+            free(to->m_savedMotion);
+            to->m_savedMotion = NULL;
+        }
+    }
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+}
+
+void copy_hkpAgentNnSector(hkpAgentNnSector* to, hkpAgentNnSector* from, StateTarget target)
+{
+    memcpy(to->m_data, from->m_data, sizeof(to->m_data));
+}
+
+hkpAgentNnSector* init_hkpAgentNnSector()
+{
+    hkpAgentNnSector* local = (hkpAgentNnSector*)malloc_(sizeof(hkpAgentNnSector));
+    return local;
+}
+
+void free_hkpAgentNnSector(hkpAgentNnSector* to)
+{
     free(to);
 }
 
@@ -504,6 +829,7 @@ void copy_hkpSimpleShapePhantom_collisionDetails(hkpSimpleShapePhantom* to, cons
             continue;
         }
 
+        //TODO
         //check the fixed entities list
         //since this list is fixed and thus we don't save it, if this is a fixed entity just copy the pointer to the game-side data
         j = 0;
@@ -913,18 +1239,27 @@ void free_hkpAabbPhantom(hkpAabbPhantom* to, StateTarget target)
     }
 }
 
-/* ---------------- CHRCTRL + DAMAGE MAN ------------------ */
-
 void copy_hkpLinkedCollidable(hkpLinkedCollidable* to, const hkpLinkedCollidable* from, hkMotionState* motion, StateTarget target)
 {
     copy_hkpCollidable(&to->base, &from->base, motion, target);
-    if (from->m_collisionEntries_len > 0)
+    if ((from->m_collisionEntries_cap & 0x3fffffff) < from->m_collisionEntries_len)
     {
-        FATALERROR("hkpLinkedCollidable->m_collisionEntries_len > 0");
+        FATALERROR("m_collisionEntries_cap %x m_collisionEntries_len %x", from->m_collisionEntries_cap, from->m_collisionEntries_len);
     }
+    if ((to->m_collisionEntries_cap & 0x3fffffff) < from->m_collisionEntries_len)
+    {
+        //normally this would be a thread malloc'd object game-side but we've disabled that
+        to->m_collisionEntries = (CollisionEntry*)realloc_(to->m_collisionEntries, (from->m_collisionEntries_cap & 0x3fffffff) * sizeof(CollisionEntry));
+        to->m_collisionEntries_cap = (from->m_collisionEntries_cap & 0x3fffffff);
+    }
+    to->m_collisionEntries_len = from->m_collisionEntries_len;
+    //we can't copy the CollisionEntrys here, since it may rely on all the other phantoms and entities existing. Split out into a seperate function to call later when ready
 }
 
-
+void copy_hkpLinkedCollidable_collisionEntries(hkpLinkedCollidable* to, const hkpLinkedCollidable* from, const hkpWorld* to_world, const hkpWorld* from_world, StateTarget target)
+{
+    //TODO
+}
 
 void copy_hkpProperty(hkpProperty* to, hkpProperty* from, StateTarget target)
 {
@@ -1543,8 +1878,6 @@ void free_hkpBoxShape(hkpBoxShape* to, StateTarget target)
         free(to);
     }
 }
-
-/* ---------------- CHRCTRL ------------------ */
 
 std::string print_hkpCharacterProxy(hkpCharacterProxy* to)
 {
