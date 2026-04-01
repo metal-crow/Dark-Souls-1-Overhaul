@@ -244,7 +244,7 @@ void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePha
         {
             AddPhantom_Manual((*from)->_hkpSimpleShapePhantom);
         }
-        //since the phantoms are never destroyed due to our graveyard mechanism, it's safe to just use the raw pointer. it should alway be valid
+        //since the phantoms are never destroyed due to our graveyard mechanism, it's safe to just use the raw pointer. it should always be valid
         (*to)->_hkpSimpleShapePhantom = (*from)->_hkpSimpleShapePhantom;
 
         (*to)->self = (*to);

@@ -2180,18 +2180,7 @@ std::string print_HavokChara(HavokChara* to)
 void copy_HavokChara(HavokChara* to, const HavokChara* from, StateTarget target)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-    switch (target)
-    {
-    case StateTarget::ToGame:
-        copy_hkpCharacterProxy(to->char_proxy, from->char_proxy, to->padding_physShapePhantomIns[0]->physWorld->_hkpWorld, target);
-        break;
-    case StateTarget::ToLocal:
-        copy_hkpCharacterProxy(to->char_proxy, from->char_proxy, from->padding_physShapePhantomIns[0]->physWorld->_hkpWorld, target);
-        break;
-    case StateTarget::Copy:
-        copy_hkpCharacterProxy(to->char_proxy, from->char_proxy, NULL, target);
-        break;
-    }
+    copy_hkpCharacterProxy(to->char_proxy, from->char_proxy, target);
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
@@ -2216,37 +2205,14 @@ void free_HavokChara(HavokChara* to)
 }
 
 //CharacterProxy is not in hkpWorld, it's handled by game code. So we can save/restore it from the Chr
-void copy_hkpCharacterProxy(hkpCharacterProxy* to, const hkpCharacterProxy* from, hkpWorld* world, StateTarget target)
+void copy_hkpCharacterProxy(hkpCharacterProxy* to, const hkpCharacterProxy* from, StateTarget target)
 {
     to->data_0 = from->data_0;
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
-    size_t index = -1;
-    switch (target)
-    {
-    case StateTarget::ToGame:
-        //use the value (actually an index) to get the right shape phantom
-        to->HkpSimpleShapePhantom = world->m_phantoms[(size_t)(from->HkpSimpleShapePhantom)];
-        break;
-    case StateTarget::ToLocal:
-        //save the phantom's index in the m_phantoms list
-        for (size_t i = 0; i < world->m_phantoms_size; i++)
-        {
-            if (world->m_phantoms[i] == from->HkpSimpleShapePhantom)
-            {
-                index = i;
-                break;
-            }
-        }
-        if (index == -1)
-        {
-            FATALERROR("Unable to locate hkpCharacterProxy's shapePhantom (%p) in m_phantoms", from->HkpSimpleShapePhantom);
-        }
-        to->HkpSimpleShapePhantom = (void*)index;
-        break;
-    case StateTarget::Copy:
-        to->HkpSimpleShapePhantom = from->HkpSimpleShapePhantom;
-        break;
-    }
+
+    //since the phantoms are never destroyed due to our graveyard mechanism, it's safe to just use the raw pointer. it should always be valid
+    to->HkpSimpleShapePhantom = from->HkpSimpleShapePhantom;
+
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
 }

@@ -177,7 +177,7 @@ void copy_HavokChara(HavokChara* to, const HavokChara* from, StateTarget target)
 HavokChara* init_HavokChara();
 void free_HavokChara(HavokChara* to);
 
-void copy_hkpCharacterProxy(hkpCharacterProxy* to, const hkpCharacterProxy* from, hkpWorld* world, StateTarget target);
+void copy_hkpCharacterProxy(hkpCharacterProxy* to, const hkpCharacterProxy* from, StateTarget target);
 hkpCharacterProxy* init_hkpCharacterProxy(StateTarget target);
 void free_hkpCharacterProxy(hkpCharacterProxy* to);
 
