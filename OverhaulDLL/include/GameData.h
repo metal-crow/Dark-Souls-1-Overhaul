@@ -679,10 +679,28 @@ static hkpWorldSnapshot_SnapshotWorld_FUNC* hkpWorldSnapshot_SnapshotWorld = (hk
 typedef hkpWorld* hkpWorldSnapshot_LoadSnapshot_FUNC(void* hkpWorldSnapshot, bool param2);
 static hkpWorldSnapshot_LoadSnapshot_FUNC* hkpWorldSnapshot_LoadSnapshot = (hkpWorldSnapshot_LoadSnapshot_FUNC*)0x140a89d00;
 
-typedef void hkReferencedObject_deref_FUNC(void* obj);
-static hkReferencedObject_deref_FUNC* hkReferencedObject_deref = (hkReferencedObject_deref_FUNC*)0x1408e4d10;
-
 typedef void increase_list_size_FUNC(uint64_t heap, void* list, int elem_size);
 static increase_list_size_FUNC* increase_list_size = (increase_list_size_FUNC*)0x14090ec50;
+
+typedef void  (*hkReferencedObject_ref_fn)(void* obj);
+static const hkReferencedObject_ref_fn hk_ref = (hkReferencedObject_ref_fn)0x1408e4cb0;
+
+typedef void  (*hkReferencedObject_deref_fn)(void* obj);
+static const hkReferencedObject_deref_fn hk_deref = (hkReferencedObject_deref_fn)0x1408e4d10;
+
+typedef hkpEntity* (*hkpWorld_addEntity_fn)(hkpWorld* world, hkpEntity* entity, uint32_t activationState);
+static const hkpWorld_addEntity_fn hk_addEntity = (hkpWorld_addEntity_fn)0x1409b0c40;
+
+typedef void  (*hkpWorld_removeEntities_fn)(hkpWorld* world, hkpEntity** entityBatch, int numEntities);
+static const hkpWorld_removeEntities_fn hk_removeEntities = (hkpWorld_removeEntities_fn)0x1409b1600;
+
+typedef void* (*hkpWorld_addPhantom_fn)(hkpWorld* world, void* phantom);
+static const hkpWorld_addPhantom_fn hk_addPhantom = (hkpWorld_addPhantom_fn)0x1409b2160;
+
+typedef void  (*hkpWorld_removePhantom_fn)(hkpWorld* world, void* phantom);
+static const hkpWorld_removePhantom_fn hk_removePhantom = (hkpWorld_removePhantom_fn)0x1409b2760;
+
+typedef void (*hkpWorld_stepDeltaTime_t)(hkpWorld* world, float dt);
+static const hkpWorld_stepDeltaTime_t hkpWorld_stepDeltaTime = (hkpWorld_stepDeltaTime_t)0x1409b6280;
 
 #endif // _DS1_OVERHAUL_GAME_DATA_H_

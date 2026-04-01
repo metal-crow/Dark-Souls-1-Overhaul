@@ -235,80 +235,18 @@ void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePha
         (*to)->damageEntry = (*from)->damageEntry;
         (*to)->physWorld = (*from)->physWorld;
 
-        switch (target)
+        if ((*from)->_hkpSimpleShapePhantom == NULL)
         {
-        case StateTarget::ToGame:
-            if ((*from)->_hkpSimpleShapePhantom == NULL)
-            {
-                FATALERROR("ToGame: SimpleShapePhantom ptr for %p is NULL", (*from));
-            }
-            //if the ptr is the sentinal value, then we just relink it
-            if ((*from)->_hkpSimpleShapePhantom == (hkpSimpleShapePhantom*)0xFF)
-            {
-                //havok is restored first so this can find the right entry
-                //this 'to' pointer is a reliable value since the simpleshapephantom just saves it as a const, and nothing in the DamageMan is reallocated or init'd during runtime
-                (*to)->_hkpSimpleShapePhantom = get_hkpSimpleShapePhantom(to_world, *to);
-            }
-            //otherwise it's a copy and we need to fully copy it over
-            else
-            {
-                if ((*to)->_hkpSimpleShapePhantom == NULL)
-                {
-                    (*to)->_hkpSimpleShapePhantom = init_hkpSimpleShapePhantom(target);
-                }
-                copy_hkpSimpleShapePhantom((*to)->_hkpSimpleShapePhantom, (*from)->_hkpSimpleShapePhantom, target);
-                //this is fine to call now since the havok copy runs before DamageMan copy, so all phantoms are set up
-                copy_hkpSimpleShapePhantom_collisionDetails((*to)->_hkpSimpleShapePhantom, (*from)->_hkpSimpleShapePhantom, to_world, from_world, target);
-            }
-            break;
-        case StateTarget::ToLocal:
-            if ((*from)->_hkpSimpleShapePhantom == NULL)
-            {
-                FATALERROR("ToLocal: SimpleShapePhantom ptr for %p is NULL", (*from));
-            }
-            //We have to do a full copy of the phantom if it's not in the m_phantoms list
-            if (!world_contains_phantom(from_world, (*from)->_hkpSimpleShapePhantom))
-            {
-                FATALERROR("It IS possible for DamageMan FrpgPhysShapePhantomIns to have a phantom not present in the hkpWorld! %p", from);
-                if ((*to)->_hkpSimpleShapePhantom == NULL)
-                {
-                    (*to)->_hkpSimpleShapePhantom = init_hkpSimpleShapePhantom(target);
-                }
-                copy_hkpSimpleShapePhantom((*to)->_hkpSimpleShapePhantom, (*from)->_hkpSimpleShapePhantom, target);
-                //this is fine to call now since the havok copy runs before DamageMan copy, so all phantoms are set up
-                copy_hkpSimpleShapePhantom_collisionDetails((*to)->_hkpSimpleShapePhantom, (*from)->_hkpSimpleShapePhantom, to_world, from_world, target);
-            }
-            //Don't need to copy. Set to sentinal value so we know that we need to re-link it on to-game
-            else
-            {
-                (*to)->_hkpSimpleShapePhantom = (hkpSimpleShapePhantom*)0xFF;
-            }
-            break;
-        case StateTarget::Copy:
-            if ((*from)->_hkpSimpleShapePhantom == NULL)
-            {
-                FATALERROR("Copy: SimpleShapePhantom ptr for %p is NULL", (*from));
-            }
-            //if the ptr is the sentinal value, then just copy
-            if ((*from)->_hkpSimpleShapePhantom == (hkpSimpleShapePhantom*)0xFF)
-            {
-                (*to)->_hkpSimpleShapePhantom = (*from)->_hkpSimpleShapePhantom;
-            }
-            //otherwise this is a full copy and we need to copy it
-            else
-            {
-                if ((*to)->_hkpSimpleShapePhantom == NULL)
-                {
-                    (*to)->_hkpSimpleShapePhantom = init_hkpSimpleShapePhantom(target);
-                }
-                copy_hkpSimpleShapePhantom((*to)->_hkpSimpleShapePhantom, (*from)->_hkpSimpleShapePhantom, target);
-                //this needs to be called so we update the collisions that are phantom collisions
-                // but since we have access to fixed collision bodies (they aren't saved dll side) we can't check them
-                // so this copy will ignore those checks
-                copy_hkpSimpleShapePhantom_collisionDetails((*to)->_hkpSimpleShapePhantom, (*from)->_hkpSimpleShapePhantom, to_world, from_world, target);
-            }
-            break;
+            FATALERROR("ToGame: SimpleShapePhantom ptr for %p is NULL", (*from));
         }
+        //the hkpSimpleShapePhantom has only been added to the hkpWorld if physWorld is non-null. If not we have to add it to our graveyard to prevent it's destruction
+        if ((*from)->physWorld == NULL)
+        {
+            AddPhantom_Manual((*from)->_hkpSimpleShapePhantom);
+        }
+        //since the phantoms are never destroyed due to our graveyard mechanism, it's safe to just use the raw pointer. it should alway be valid
+        (*to)->_hkpSimpleShapePhantom = (*from)->_hkpSimpleShapePhantom;
+
         (*to)->self = (*to);
         (*to)->data_1 = (*from)->data_1;
         if (is_sphere)
@@ -334,7 +272,7 @@ FrpgPhysShapePhantomIns* init_FrpgPhysShapePhantomIns(bool is_sphere, StateTarge
         local = (FrpgPhysShapePhantomIns*)malloc_(sizeof(FrpgPhysShapePhantomIns));
     }
 
-    local->_hkpSimpleShapePhantom = NULL; //init on copy if needed
+    local->_hkpSimpleShapePhantom = NULL;
 
     if (is_sphere)
     {
@@ -349,10 +287,6 @@ FrpgPhysShapePhantomIns* init_FrpgPhysShapePhantomIns(bool is_sphere, StateTarge
 
 void free_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns* to, bool is_sphere, StateTarget target)
 {
-    if (to->_hkpSimpleShapePhantom != NULL && (uint64_t)(to->_hkpSimpleShapePhantom) != 0xff)
-    {
-        free_hkpSimpleShapePhantom(to->_hkpSimpleShapePhantom, target);
-    }
     if (is_sphere)
     {
         free_hkpSphereShape(to->_hkpSphereShape, target);
