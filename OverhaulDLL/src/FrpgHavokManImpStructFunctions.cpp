@@ -369,9 +369,8 @@ void RestoreHkpWorldSnapshot(const HkpWorldSnapshot* snap, hkpWorld* world)
     g_isRestoring = false;
 
     // NOTE: After restoring positions, the broadphase AABBs, overlap pairs,
-    // and simulation islands are stale. The next normal game step will rebuild
-    // these. but use stepDeltaTime(0) here to force an immediate rebuild.
-    hkpWorld_stepDeltaTime(world, 0.0f);
+    // and simulation islands are stale. The next normal game step will rebuild these.
+    // I attemped to use hkpWorld_stepDeltaTime(0) here to force an immediate rebuild but that causes crashing
 }
 
 /* ============================================================

@@ -1610,7 +1610,7 @@ void* Game::game_smallObject_malloc(uint64_t heap, size_t size, size_t alignment
     auto new_ptr = smallObject_internal_malloc(heap, size, alignment);
     if (new_ptr == NULL)
     {
-        FATALERROR("InGame_Malloc returned NULL");
+        FATALERROR("smallObject_internal_malloc returned NULL");
     }
     memset(new_ptr, 0, size);
     return new_ptr;
