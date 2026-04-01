@@ -395,13 +395,9 @@ public:
 
     static void* game_smallObject_malloc(uint64_t heap, size_t size, size_t alignment);
 
-    static void* thread_malloc(size_t size);
-
     static void game_free(void* p);
 
     static void game_free_alt(void* p, void* heapObjArg = NULL);
-
-    static void thread_free(void* p, size_t size);
 
     static bool Check_DLHeapManager_DLReadWriteLock_IsUnlocked(DWORD timeoutms);
 
