@@ -889,15 +889,21 @@ void copy_ChrAttachSys(ChrAttachSys* to, const ChrAttachSys* from, StateTarget t
 {
     if (to->SysSlots != NULL && from->SysSlots != NULL)
     {
-        switch (target)
+        AttachSysSlotBaseImpl* current_head = to->SysSlots;
+        while (current_head != NULL)
         {
-        case StateTarget::ToGame:
-            Game::game_free_alt(to->SysSlots);
-            break;
-        case StateTarget::ToLocal:
-        case StateTarget::Copy:
-            free(to->SysSlots);
-            break;
+            AttachSysSlotBaseImpl* next_head = current_head->next;
+            switch (target)
+            {
+            case StateTarget::ToGame:
+                Game::game_free_alt(current_head);
+                break;
+            case StateTarget::ToLocal:
+            case StateTarget::Copy:
+                free(current_head);
+                break;
+            }
+            current_head = next_head;
         }
         to->SysSlots = NULL;
     }
