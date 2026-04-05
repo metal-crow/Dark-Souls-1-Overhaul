@@ -7,107 +7,66 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include "SfxManStruct.h"
 
 typedef struct BulletMan BulletMan;
 typedef struct BulletIns BulletIns;
-typedef struct BulletMan_Field0x20 BulletMan_Field0x20;
-typedef struct BulletMan_Field0x40 BulletMan_Field0x40;
-typedef struct BulletMan_field0x78Elem BulletMan_field0x78Elem;
-typedef struct BulletIns_Field0x58 BulletIns_Field0x58;
-typedef struct BulletMan_Field0x20 BulletMan_Field0x20;
-typedef struct BulletParamInfo BulletParamInfo;
+typedef struct BulletIns_FollowupBullet BulletIns_FollowupBullet;
 typedef struct BulletIns_Field0x90_Field0x1a0 BulletIns_Field0x90_Field0x1a0;
+typedef struct BulletTargetingSystemOwner BulletTargetingSystemOwner;
+typedef struct TargetingSystemBase TargetingSystemBase;
 typedef struct BulletState BulletState;
 typedef struct BulletFlyState BulletFlyState;
-typedef struct TargetingSystemBase TargetingSystemBase;
-typedef struct BulletTargetingSystemOwner BulletTargetingSystemOwner;
-typedef struct BulletIns_FollowupBullet BulletIns_FollowupBullet;
+typedef struct BulletMan_Field0x20 BulletMan_Field0x20;
+typedef struct BulletMan_Field0x40 BulletMan_Field0x40;
 typedef struct ChrCam ChrCam;
-typedef struct ChrExFollowCam ChrExFollowCam;
+
+struct FXManager;
+struct FXEntry_Substruct;
 
 struct BulletIns_FollowupBullet
 {
     uint64_t vtable;
-    uint64_t FXManager; //const ptr
-    uint64_t FXEntry_Substruct_a; //const ptr to existing object
+    FXManager* FXManager;
+    FXEntry_Substruct* fxentry_a;
     BulletIns_FollowupBullet* next;
     BulletIns_FollowupBullet* prev;
-    uint64_t FXEntry_Substruct_b;  //const ptr to existing object
+    FXEntry_Substruct* fxentry_b;
 };
 static_assert(sizeof(BulletIns_FollowupBullet) == 0x30);
 
+struct BulletIns_Field0x90_Field0x1a0
+{
+    uint8_t data_0[0x160]; //contains entity IDs, attack data, position vectors, etc. All treatable as a data blob for rollback
+};
+static_assert(sizeof(BulletIns_Field0x90_Field0x1a0) == 0x160);
+
 struct BulletTargetingSystemOwner
 {
-    uint64_t padding_0[2];
-    uint8_t data_0[32];
+    uint8_t data_0[0x30]; //contains parent ptr, vtable, entityId, NpcThinkParam info. All raw pointers or data
 };
-static_assert(offsetof(BulletTargetingSystemOwner, data_0) == 0x10);
 static_assert(sizeof(BulletTargetingSystemOwner) == 0x30);
 
 struct TargetingSystemBase
 {
-    uint64_t padding_0;
-    uint64_t padding_1[2]; //the two owners here are already saved from BulletIns
-    uint64_t padding_2; //targeting isn't really needed
-    uint64_t padding_3; //unknown
-    uint8_t data_0[8+16];
-    uint64_t padding_4; //unknown
-    uint64_t data_1;
+    uint8_t data_0[0x50]; //contains vtable, owner ptr, targeting sub-struct, floats, flags
 };
-static_assert(offsetof(TargetingSystemBase, data_0) == 0x28);
-static_assert(offsetof(TargetingSystemBase, data_1) == 0x48);
 static_assert(sizeof(TargetingSystemBase) == 0x50);
-
-struct BulletParamInfo
-{
-    uint8_t data_0[0x10];
-};
-static_assert(sizeof(BulletParamInfo) == 0x10);
 
 struct BulletState
 {
-    uint64_t padding_0;
-    BulletParamInfo paramInfo;
-    uint64_t data_0;
+    uint8_t data_0[0x20]; //contains vtable, BulletParamInfo (bullet_id + BulletParam*), frametime, flags
 };
 static_assert(sizeof(BulletState) == 0x20);
 
 struct BulletFlyState
 {
-    BulletState state;
-    uint64_t data_0;
+    uint8_t data_0[0x28]; //BulletState base (0x20) + fly-specific fields
 };
 static_assert(sizeof(BulletFlyState) == 0x28);
 
-struct BulletIns_Field0x90_Field0x1a0
-{
-    uint8_t data_0[0x20];
-    uint64_t unknown1; //unknown
-    uint8_t data_1[0x18];
-    uint64_t unknown2; //unknown
-    uint8_t data_2[0x50];
-    uint64_t unknown3; //unknown
-    uint8_t data_3[0x20 + 0x18];
-    uint64_t unknown4; //unknown
-    uint8_t data_4[0x30 + 0x30 + 8];
-    void* unknown5; //unknown
-    uint8_t data_5[0x10];
-};
-static_assert(offsetof(BulletIns_Field0x90_Field0x1a0, data_1) == 0x28);
-static_assert(offsetof(BulletIns_Field0x90_Field0x1a0, unknown2) == 0x40);
-static_assert(offsetof(BulletIns_Field0x90_Field0x1a0, data_2) == 0x48);
-static_assert(offsetof(BulletIns_Field0x90_Field0x1a0, unknown3) == 0x90 + 8);
-static_assert(offsetof(BulletIns_Field0x90_Field0x1a0, data_3) == 0x90 + 0x10);
-static_assert(offsetof(BulletIns_Field0x90_Field0x1a0, unknown4) == 0xd8);
-static_assert(offsetof(BulletIns_Field0x90_Field0x1a0, data_4) == 0xe0);
-static_assert(offsetof(BulletIns_Field0x90_Field0x1a0, unknown5) == 0x148);
-static_assert(offsetof(BulletIns_Field0x90_Field0x1a0, data_5) == 0x150);
-static_assert(sizeof(BulletIns_Field0x90_Field0x1a0) == 0x160);
-
 struct BulletIns
 {
-    uint64_t padding_0;
+    uint64_t vtable;
     uint8_t data_0[0x50];
     BulletIns_FollowupBullet FollowupBullet;
     uint64_t data_1;
@@ -120,7 +79,7 @@ struct BulletIns
     uint64_t data_4;
     BulletFlyState bulletFlyState;
     BulletState bulletExplosionState;
-    void* padding_previous_bullet_in_use;
+    BulletIns* previous_bullet_in_use;
     uint64_t padding_1;
     uint64_t data_5;
 };
@@ -136,73 +95,72 @@ static_assert(offsetof(BulletIns, bulletState) == 0x2d8);
 static_assert(offsetof(BulletIns, data_4) == 0x2f8);
 static_assert(offsetof(BulletIns, bulletFlyState) == 0x300);
 static_assert(offsetof(BulletIns, bulletExplosionState) == 0x328);
-static_assert(offsetof(BulletIns, padding_previous_bullet_in_use) == 0x348);
+static_assert(offsetof(BulletIns, previous_bullet_in_use) == 0x348);
 static_assert(offsetof(BulletIns, data_5) == 0x358);
 static_assert(sizeof(BulletIns) == 0x360);
 
 struct BulletMan_Field0x20
 {
-    uint8_t data_0[0x198];
-    BulletParamInfo* bulletParamInfo;
-    BulletIns_Field0x90_Field0x1a0 field0x1a0;
-    uint64_t data_1[2]; //this includes a pointer to a saved entitu
-    uint64_t padding_1[2];
+    uint8_t data_0[0x194];
+    uint8_t data_1[4];
+    void* BulletParamInfo; //NS_FRPG__BulletParamInfo*, game-allocated. Treat as raw ptr for rollback
+    BulletIns_Field0x90_Field0x1a0 field0x1a0; //reuses same struct as BulletIns owner
+    uint8_t data_2[8];
+    BulletMan_Field0x20* next_in_use; //linked list pointer within field0x20 array
+    void* chrCam;
+    void* dbgNode;
 };
-static_assert(offsetof(BulletMan_Field0x20, bulletParamInfo) == 0x198);
+static_assert(offsetof(BulletMan_Field0x20, data_1) == 0x194);
+static_assert(offsetof(BulletMan_Field0x20, BulletParamInfo) == 0x198);
 static_assert(offsetof(BulletMan_Field0x20, field0x1a0) == 0x1a0);
-static_assert(offsetof(BulletMan_Field0x20, data_1) == 0x300);
+static_assert(offsetof(BulletMan_Field0x20, data_2) == 0x300);
+static_assert(offsetof(BulletMan_Field0x20, next_in_use) == 0x308);
+static_assert(offsetof(BulletMan_Field0x20, chrCam) == 0x310);
+static_assert(offsetof(BulletMan_Field0x20, dbgNode) == 0x318);
 static_assert(sizeof(BulletMan_Field0x20) == 0x320);
-
-struct BulletIns_Field0x58
-{
-    uint64_t padding_0;
-    uint64_t padding_1[5]; //unknown
-};
-static_assert(sizeof(BulletIns_Field0x58) == 0x30);
 
 struct BulletMan_Field0x40
 {
+    int32_t bulletOwnerEntityId;
+    uint32_t padding_0;
+    BulletIns_FollowupBullet arry[16];
     uint64_t data_0;
-    BulletIns_Field0x58 arry[16];
-    uint64_t data_1[2];
+    uint64_t data_1; //pointer to static data
 };
-static_assert(offsetof(BulletMan_Field0x40, data_1) == 0x308);
+static_assert(offsetof(BulletMan_Field0x40, arry) == 0x8);
+static_assert(offsetof(BulletMan_Field0x40, data_0) == 0x308);
+static_assert(offsetof(BulletMan_Field0x40, data_1) == 0x310);
 static_assert(sizeof(BulletMan_Field0x40) == 0x318);
 
-struct BulletMan_field0x78Elem
-{
-    uint8_t data_0[0x30];
-};
-static_assert(sizeof(BulletMan_field0x78Elem) == 0x30);
-
-struct ChrExFollowCam
-{
-    uint8_t padding_0[8];
-    uint8_t data_0[0x338];
-};
-static_assert(sizeof(ChrExFollowCam) == 0x340);
 
 struct ChrCam
 {
-    uint8_t padding_0[0x60];
-    ChrExFollowCam* chrExFollowCam;
-    uint8_t padding[0x68];
+    uint8_t data_0[0x60];
+    void* ChrExFollowCam; //0x340 bytes, game-allocated sub-camera
+    void* ChrAimCam; //0x1d0 bytes, game-allocated sub-camera
+    void* FallDieCam; //0xb0 bytes, game-allocated sub-camera
+    void* BallistaAimCam; //0xe0 bytes, game-allocated sub-camera
+    uint8_t data_1[0x50];
 };
-static_assert(offsetof(ChrCam, chrExFollowCam) == 0x60);
+static_assert(offsetof(ChrCam, ChrExFollowCam) == 0x60);
+static_assert(offsetof(ChrCam, ChrAimCam) == 0x68);
+static_assert(offsetof(ChrCam, FallDieCam) == 0x70);
+static_assert(offsetof(ChrCam, BallistaAimCam) == 0x78);
+static_assert(offsetof(ChrCam, data_1) == 0x80);
 static_assert(sizeof(ChrCam) == 0xd0);
 
 struct BulletMan
 {
     BulletIns* bulletins_arry; //length == 128
-    uint64_t data_0[3]; //includes pointers to offsets in above
-    BulletMan_Field0x20* field0x20; //length == 40
+    uint64_t data_0[3]; //includes pointers to offsets in above (end_of_bullets_in_use, start_of_unused_bullets, counts)
+    BulletMan_Field0x20* field0x20; //length == 64
     uint64_t data_1[3]; //includes pointers to offsets in above
     BulletMan_Field0x40* field0x40; //length == 4
     uint64_t data_2[3]; //includes pointers to offsets in above
     ChrCam* chrCam;
     uint64_t data_3;
     uint64_t padding_1;
-    BulletMan_field0x78Elem** field0x78; //variable length
+    void** field0x78; //should be fully created and destroyed during a frame, no inter-frame data
     uint64_t field0x78_next;
     uint64_t field0x78_end;
     uint64_t padding_2[3];
