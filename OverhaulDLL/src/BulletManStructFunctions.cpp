@@ -2,73 +2,6 @@
 #include "SfxManStructFunctions.h"
 #include "Rollback.h"
 
-typedef void* falloc(uint64_t, uint64_t, uint32_t);
-
-std::string print_BulletMan(BulletMan* to)
-{
-    std::string out = "BulletMan\n";
-    if (to == NULL)
-    {
-        return out;
-    }
-
-    for (size_t i = 0; i < 128; i++)
-    {
-        out += print_BulletIns(&to->bulletins_arry[i]);
-    }
-
-    out += "Data 0:";
-    for (size_t i = 0; i < sizeof(to->data_0)/sizeof(to->data_0[0]); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += print_BulletMan_Field0x20(to->field0x20);
-
-    out += "Data 1:";
-    for (size_t i = 0; i < sizeof(to->data_1) / sizeof(to->data_1[0]); i++)
-    {
-        out += std::to_string(to->data_1[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += print_BulletMan_Field0x40(to->field0x40);
-
-    out += "Data 2:";
-    for (size_t i = 0; i < sizeof(to->data_2) / sizeof(to->data_2[0]); i++)
-    {
-        out += std::to_string(to->data_2[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += print_ChrCam(to->chrCam);
-
-    out += "Data 3:" + std::to_string(to->data_3) + "\n";
-
-    if (to->field0x78 != NULL && to->field0x78_end != NULL)
-    {
-        size_t field0x78_len = (to->field0x78_end - (uint64_t)to->field0x78) / 8;
-        for (size_t i = 0; i < field0x78_len; i++)
-        {
-            out += print_BulletMan_field0x78Elem(to->field0x78[i]);
-        }
-    }
-
-    out += "Data 5:";
-    for (size_t i = 0; i < sizeof(to->data_5) / sizeof(to->data_5[0]); i++)
-    {
-        out += std::to_string(to->data_5[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    return out;
-}
-
 void copy_BulletMan(BulletMan* to, BulletMan* from, StateTarget target)
 {
     Game::SuspendThreads();
@@ -191,18 +124,6 @@ void free_BulletMan(BulletMan* to)
     free(to);
 }
 
-std::string print_ChrCam(ChrCam* to)
-{
-    std::string out = "ChrCam\n";
-    if (to == NULL)
-    {
-        return out;
-    }
-
-    out += print_ChrExFollowCam(to->chrExFollowCam);
-
-    return out;
-}
 
 void copy_ChrCam(ChrCam* to, ChrCam* from, StateTarget target)
 {
@@ -222,24 +143,6 @@ void free_ChrCam(ChrCam* to)
     free(to);
 }
 
-std::string print_ChrExFollowCam(ChrExFollowCam* to)
-{
-    std::string out = "ChrExFollowCam\n";
-    if (to == NULL)
-    {
-        return out;
-    }
-
-    out += "Data 0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    return out;
-}
 
 void copy_ChrExFollowCam(ChrExFollowCam* to, ChrExFollowCam* from, StateTarget target)
 {
@@ -257,60 +160,6 @@ void free_ChrExFollowCam(ChrExFollowCam* to)
     free(to);
 }
 
-std::string print_BulletIns(BulletIns* to)
-{
-    std::string out = "BulletIns\n";
-    if (to == NULL)
-    {
-        return out;
-    }
-
-    out += "Data 0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += print_BulletIns_FollowupBullet(&to->FollowupBullet);
-
-    out += "Data 1:" + std::to_string(to->data_1) + "\n";
-
-    out += print_BulletIns_Field0x90_Field0x1a0(&to->owner);
-
-    out += "Data 2:";
-    for (size_t i = 0; i < sizeof(to->data_2); i++)
-    {
-        out += std::to_string(to->data_2[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += print_BulletTargetingSystemOwner(&to->bulletTargetingSystemOwner);
-
-    out += print_TargetingSystemBase(&to->targetingSystemBase);
-
-    out += "Data 3:";
-    for (size_t i = 0; i < sizeof(to->data_3); i++)
-    {
-        out += std::to_string(to->data_3[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += print_BulletState(&to->bulletState);
-
-    out += "Data 4:" + std::to_string(to->data_4) + "\n";
-
-    out += print_BulletFlyState(&to->bulletFlyState);
-
-    out += print_BulletState(&to->bulletExplosionState);
-
-    out += "Data 5:" + std::to_string(to->data_5) + "\n";
-
-    return out;
-}
 
 void copy_BulletIns(BulletIns* to, BulletIns* from, StateTarget target)
 {
@@ -346,27 +195,6 @@ void free_BulletIns(BulletIns* to, bool freeself)
     }
 }
 
-static uint64_t* HeapPtr = (uint64_t*)(0x0141B67450 + 8);
-
-std::string print_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to)
-{
-    std::string out = "BulletIns_FollowupBullet\n";
-    if (to == NULL)
-    {
-        return out;
-    }
-
-    out += "FXManager:" + std::to_string(to->FXManager) + "\n";
-    out += "FXEntry_Substruct_a:" + std::to_string(to->FXEntry_Substruct_a) + "\n";
-    out += "FXEntry_Substruct_b:" + std::to_string(to->FXEntry_Substruct_b) + "\n";
-
-    if (to->next != NULL)
-    {
-        out += print_BulletIns_FollowupBullet(to->next);
-    }
-
-    return out;
-}
 
 //This only handles the data in the struct. The next/prev ptrs have to be handled by the caller
 //This is because otherwise we may allocate a new bullet struct for the next ptr, but the correct answer is to point to an already existing bullet struct
@@ -382,105 +210,14 @@ void copy_BulletIns_FollowupBullet_Data(BulletIns_FollowupBullet* to, BulletIns_
     return;
 }
 
-static void _copy_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, BulletIns_FollowupBullet* from, std::unordered_map<uint64_t, uint64_t>* processed_elems, StateTarget target)
-{
-    copy_BulletIns_FollowupBullet_Data(to, from, target);
-
-    //Check if this from node has already been saved. If not, make a new to node and save it. If it has, just refer to that existing to node.
-    if (!processed_elems->contains((uint64_t)from->next))
-    {
-        if (from->next == NULL)
-        {
-            if (to->next != NULL)
-            {
-                if (target == StateTarget::ToGame)
-                {
-                    FATALERROR(__FUNCTION__":free a in-game BulletIns_FollowupBullet %p %p", to, to->next);
-                }
-                else
-                {
-                    free_BulletIns_FollowupBullet(to->next, true, true);
-                }
-            }
-            to->next = NULL;
-            processed_elems->insert({ (uint64_t)from->next, (uint64_t)to->next });
-        }
-        else
-        {
-            if (to->next == NULL)
-            {
-                if (target == StateTarget::ToGame)
-                {
-                    FATALERROR(__FUNCTION__":Malloc a in-game BulletIns_FollowupBullet");
-                }
-                else
-                {
-                    to->next = (BulletIns_FollowupBullet*)malloc_(sizeof(BulletIns_FollowupBullet));
-                }
-            }
-            processed_elems->insert({ (uint64_t)from->next, (uint64_t)to->next });
-            _copy_BulletIns_FollowupBullet(to->next, from->next, processed_elems, target);
-        }
-    }
-    else
-    {
-        uint64_t processed_next = processed_elems->at((uint64_t)from->next);
-        to->next = (BulletIns_FollowupBullet*)processed_next;
-    }
-
-    if (!processed_elems->contains((uint64_t)from->prev))
-    {
-        if (from->prev == NULL)
-        {
-            if (to->prev != NULL)
-            {
-                if (target == StateTarget::ToGame)
-                {
-                    FATALERROR(__FUNCTION__":free a in-game BulletIns_FollowupBullet %p %p", to, to->prev);
-                }
-                else
-                {
-                    free_BulletIns_FollowupBullet(to->prev, true, true);
-                }
-            }
-            to->prev = NULL;
-            processed_elems->insert({ (uint64_t)from->prev, (uint64_t)to->prev });
-        }
-        else
-        {
-            if (to->prev == NULL)
-            {
-                if (target == StateTarget::ToGame)
-                {
-                    FATALERROR(__FUNCTION__":Malloc a in-game BulletIns_FollowupBullet");
-                }
-                else
-                {
-                    to->prev = (BulletIns_FollowupBullet*)malloc_(sizeof(BulletIns_FollowupBullet));
-                }
-            }
-            processed_elems->insert({ (uint64_t)from->prev, (uint64_t)to->prev });
-            _copy_BulletIns_FollowupBullet(to->prev, from->prev, processed_elems, target);
-        }
-    }
-    else
-    {
-        uint64_t processed_prev = processed_elems->at((uint64_t)from->prev);
-        to->prev = (BulletIns_FollowupBullet*)processed_prev;
-    }
-}
-
-//This handles copying a single BulletIns_FollowupBullet, where the next/prev pointers may go to an unseen object
 void copy_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, BulletIns_FollowupBullet* from, StateTarget target)
 {
-    //Need to keep track of what elements we have processed, since we are going to go through this graph in both directions and we don't know anything about it's layout
-    std::unordered_map<uint64_t, uint64_t>* processed_elems = new std::unordered_map<uint64_t, uint64_t>();
-    _copy_BulletIns_FollowupBullet(to, from, processed_elems, target);
-    delete processed_elems;
+    copy_BulletIns_FollowupBullet_Data(to, from, target);
+    //TODO unsure how to handle these
+    to->next = NULL;
+    to->prev = NULL;
 }
 
-//This handles copying a list of BulletIns_FollowupBullet elements
-//This uses copy_BulletIns_FollowupBullet_Data and handles setting the next/prev pointers, since they will be pointing to other elems in this list
 void copy_BulletIns_FollowupBullet_List(
     BulletIns_FollowupBullet** to_followup_bullet_list_ptr, int16_t* to_followup_bullet_list_len_ptr,
     BulletIns_FollowupBullet** from_followup_bullet_list_ptr, int16_t* from_followup_bullet_list_len_ptr,
@@ -508,7 +245,6 @@ void copy_BulletIns_FollowupBullet_List(
         size_t to_list_size = *to_followup_bullet_list_len_ptr;
         if (to_list_size != from_list_size)
         {
-            //allocate all the entities as a block
             if (target == StateTarget::ToGame)
             {
                 auto new_followup_bullet_list = (BulletIns_FollowupBullet*)Game::game_malloc(sizeof(BulletIns_FollowupBullet) * from_list_size, 0x10, *(uint64_t*)Game::internal_heap_3);
@@ -529,32 +265,11 @@ void copy_BulletIns_FollowupBullet_List(
             }
         }
 
-        //Copy the bullet entries
         for (size_t list_i = 0; list_i < *from_followup_bullet_list_len_ptr; list_i++)
         {
             BulletIns_FollowupBullet* to_bullet = &(*to_followup_bullet_list_ptr)[list_i];
             BulletIns_FollowupBullet* from_bullet = &(*from_followup_bullet_list_ptr)[list_i];
-
-            copy_BulletIns_FollowupBullet_Data(to_bullet, from_bullet, target);
-            //set up the next and prev ptrs.
-            if (from_bullet->next != NULL)
-            {
-                size_t from_next_offset = ((uint64_t)from_bullet->next) - ((uint64_t)(*from_followup_bullet_list_ptr));
-                to_bullet->next = (BulletIns_FollowupBullet*)(((uint64_t)(*to_followup_bullet_list_ptr)) + from_next_offset);
-            }
-            else
-            {
-                to_bullet->next = NULL;
-            }
-            if (from_bullet->prev != NULL)
-            {
-                size_t from_prev_offset = ((uint64_t)from_bullet->prev) - ((uint64_t)(*from_followup_bullet_list_ptr));
-                to_bullet->prev = (BulletIns_FollowupBullet*)(((uint64_t)(*to_followup_bullet_list_ptr)) + from_prev_offset);
-            }
-            else
-            {
-                to_bullet->prev = NULL;
-            }
+            copy_BulletIns_FollowupBullet(to_bullet, from_bullet, target);
         }
     }
     *to_followup_bullet_list_len_ptr = *from_followup_bullet_list_len_ptr;
@@ -574,64 +289,6 @@ void free_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, bool freeself, 
     }
 }
 
-std::string print_BulletIns_Field0x90_Field0x1a0(BulletIns_Field0x90_Field0x1a0* to)
-{
-    std::string out = "BulletIns_Field0x90_Field0x1a0\n";
-    if (to == NULL)
-    {
-        return out;
-    }
-
-    out += "Data 0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Data 1:";
-    for (size_t i = 0; i < sizeof(to->data_1); i++)
-    {
-        out += std::to_string(to->data_1[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Data 2:";
-    for (size_t i = 0; i < sizeof(to->data_2); i++)
-    {
-        out += std::to_string(to->data_2[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Data 3:";
-    for (size_t i = 0; i < sizeof(to->data_3); i++)
-    {
-        out += std::to_string(to->data_3[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Data 4:";
-    for (size_t i = 0; i < sizeof(to->data_4); i++)
-    {
-        out += std::to_string(to->data_4[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Data 5:";
-    for (size_t i = 0; i < sizeof(to->data_5); i++)
-    {
-        out += std::to_string(to->data_5[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    return out;
-}
 
 void copy_BulletIns_Field0x90_Field0x1a0(BulletIns_Field0x90_Field0x1a0* to, BulletIns_Field0x90_Field0x1a0* from, StateTarget target)
 {
@@ -643,50 +300,12 @@ void copy_BulletIns_Field0x90_Field0x1a0(BulletIns_Field0x90_Field0x1a0* to, Bul
     memcpy(to->data_5, from->data_5, sizeof(to->data_5));
 }
 
-std::string print_BulletTargetingSystemOwner(BulletTargetingSystemOwner* to)
-{
-    std::string out = "BulletTargetingSystemOwner\n";
-    if (to == NULL)
-    {
-        return out;
-    }
-
-    out += "Data 0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    return out;
-}
 
 void copy_BulletTargetingSystemOwner(BulletTargetingSystemOwner* to, BulletTargetingSystemOwner* from, StateTarget target)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 }
 
-std::string print_TargetingSystemBase(TargetingSystemBase* to)
-{
-    std::string out = "TargetingSystemBase\n";
-    if (to == NULL)
-    {
-        return out;
-    }
-
-    out += "Data 0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Data 1:" + std::to_string(to->data_1) + "\n";
-
-    return out;
-}
 
 void copy_TargetingSystemBase(TargetingSystemBase* to, TargetingSystemBase* from, StateTarget target)
 {
@@ -694,20 +313,6 @@ void copy_TargetingSystemBase(TargetingSystemBase* to, TargetingSystemBase* from
     to->data_1 = from->data_1;
 }
 
-std::string print_BulletState(BulletState* to)
-{
-    std::string out = "BulletState\n";
-    if (to == NULL)
-    {
-        return out;
-    }
-
-    out += print_BulletParamInfo(&to->paramInfo);
-
-    out += "Data 0:" + std::to_string(to->data_0) + "\n";
-
-    return out;
-}
 
 void copy_BulletState(BulletState* to, BulletState* from, StateTarget target)
 {
@@ -715,20 +320,6 @@ void copy_BulletState(BulletState* to, BulletState* from, StateTarget target)
     to->data_0 = from->data_0;
 }
 
-std::string print_BulletFlyState(BulletFlyState* to)
-{
-    std::string out = "BulletFlyState\n";
-    if (to == NULL)
-    {
-        return out;
-    }
-
-    out += print_BulletState(&to->state);
-
-    out += "Data 0:" + std::to_string(to->data_0) + "\n";
-
-    return out;
-}
 
 void copy_BulletFlyState(BulletFlyState* to, BulletFlyState* from, StateTarget target)
 {
@@ -736,60 +327,12 @@ void copy_BulletFlyState(BulletFlyState* to, BulletFlyState* from, StateTarget t
     to->data_0 = from->data_0;
 }
 
-std::string print_BulletParamInfo(BulletParamInfo* to)
-{
-    std::string out = "BulletParamInfo\n";
-    if (to == NULL)
-    {
-        return out;
-    }
-
-    out += "Data 0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    return out;
-}
 
 void copy_BulletParamInfo(BulletParamInfo* to, BulletParamInfo* from, StateTarget target)
 {
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
 }
 
-std::string print_BulletMan_Field0x20(BulletMan_Field0x20* to)
-{
-    std::string out = "BulletParamInfo\n";
-    if (to == NULL)
-    {
-        return out;
-    }
-
-    out += "Data 0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += print_BulletParamInfo(to->bulletParamInfo);
-
-    out += print_BulletIns_Field0x90_Field0x1a0(&to->field0x1a0);
-
-    out += "Data 1:";
-    for (size_t i = 0; i < sizeof(to->data_1)/sizeof(to->data_1[0]); i++)
-    {
-        out += std::to_string(to->data_1[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    return out;
-}
 
 void copy_BulletMan_Field0x20(BulletMan_Field0x20* to, BulletMan_Field0x20* from, StateTarget target)
 {
@@ -819,26 +362,6 @@ void free_BulletMan_Field0x20(BulletMan_Field0x20* to, bool freeself)
     }
 }
 
-std::string print_BulletMan_Field0x40(BulletMan_Field0x40* to)
-{
-    std::string out = "BulletParamInfo\n";
-    if (to == NULL)
-    {
-        return out;
-    }
-
-    out += "Data 0:" + std::to_string(to->data_0) + "\n";
-
-    out += "Data 1:";
-    for (size_t i = 0; i < sizeof(to->data_1)/sizeof(to->data_1[0]); i++)
-    {
-        out += std::to_string(to->data_1[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    return out;
-}
 
 void copy_BulletMan_Field0x40(BulletMan_Field0x40* to, BulletMan_Field0x40* from, StateTarget target)
 {
@@ -861,24 +384,6 @@ void free_BulletMan_Field0x40(BulletMan_Field0x40* to, bool freeself)
     }
 }
 
-std::string print_BulletMan_field0x78Elem(BulletMan_field0x78Elem* to)
-{
-    std::string out = "BulletParamInfo\n";
-    if (to == NULL)
-    {
-        return out;
-    }
-
-    out += "Data 0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    return out;
-}
 
 void copy_BulletMan_field0x78Elem(BulletMan_field0x78Elem* to, BulletMan_field0x78Elem* from, StateTarget target)
 {
