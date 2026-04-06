@@ -72,7 +72,7 @@ public:
     static FrpgHavokManImp* saved_havokman;
     static PlayerIns* saved_playerins;
     static BulletMan* saved_bulletman;
-    static FXManager* saved_sfxobjs;
+    static SfxMan* saved_sfxman;
     static DamageMan* saved_damageman;
     static ThrowMan* saved_throwman;
     static DmgHitRecordManImp* saved_DmgHitRecordMan;

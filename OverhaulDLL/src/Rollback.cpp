@@ -20,7 +20,7 @@
 FrpgHavokManImp* Rollback::saved_havokman = NULL;
 PlayerIns* Rollback::saved_playerins = NULL;
 BulletMan* Rollback::saved_bulletman = NULL;
-FXManager* Rollback::saved_sfxobjs = NULL;
+SfxMan* Rollback::saved_sfxman = NULL;
 DamageMan* Rollback::saved_damageman = NULL;
 ThrowMan* Rollback::saved_throwman = NULL;
 DmgHitRecordManImp* Rollback::saved_DmgHitRecordMan = NULL;
@@ -51,9 +51,9 @@ bool state_test(void* unused)
         auto player_o = Game::get_PlayerIns();
         PlayerIns* player = (PlayerIns*)player_o.value();
         copy_FrpgHavokManImp(Rollback::saved_havokman , *(FrpgHavokManImp**)Game::frpg_havok_man_imp, StateTarget::ToLocal);
+        copy_SfxMan(Rollback::saved_sfxman, *(SfxMan**)Game::sfx_man, StateTarget::ToLocal);
         copy_PlayerIns(Rollback::saved_playerins, player, StateTarget::ToLocal);
         copy_BulletMan(Rollback::saved_bulletman, *(BulletMan**)Game::bullet_man, StateTarget::ToLocal);
-        //copy_FXManager(Rollback::saved_sfxobjs, (*(SfxMan**)Game::sfx_man)->FrpgFxManagerBase->base.fXManager, StateTarget::ToLocal);
         copy_DamageMan(Rollback::saved_damageman, *(DamageMan**)Game::damage_man, Rollback::saved_havokman->physWorld->_hkpWorld, (*(FrpgHavokManImp**)Game::frpg_havok_man_imp)->physWorld->_hkpWorld, StateTarget::ToLocal);
         copy_ThrowMan(Rollback::saved_throwman, *(ThrowMan**)Game::throw_man, StateTarget::ToLocal);
         copy_DmgHitRecordManImp(Rollback::saved_DmgHitRecordMan, *(DmgHitRecordManImp**)Game::dmg_hit_record_man, StateTarget::ToLocal);
@@ -66,9 +66,9 @@ bool state_test(void* unused)
         auto player_o = Game::get_PlayerIns();
         PlayerIns* player = (PlayerIns*)player_o.value();
         copy_FrpgHavokManImp(*(FrpgHavokManImp**)Game::frpg_havok_man_imp, Rollback::saved_havokman, StateTarget::ToGame);
+        copy_SfxMan(*(SfxMan**)Game::sfx_man, Rollback::saved_sfxman, StateTarget::ToGame);
         copy_PlayerIns(player, Rollback::saved_playerins, StateTarget::ToGame);
         copy_BulletMan(*(BulletMan**)Game::bullet_man, Rollback::saved_bulletman, StateTarget::ToGame);
-        //copy_FXManager((*(SfxMan**)Game::sfx_man)->FrpgFxManagerBase->base.fXManager, Rollback::saved_sfxobjs, StateTarget::ToGame);
         copy_DamageMan(*(DamageMan**)Game::damage_man, Rollback::saved_damageman, (*(FrpgHavokManImp**)Game::frpg_havok_man_imp)->physWorld->_hkpWorld, Rollback::saved_havokman->physWorld->_hkpWorld, StateTarget::ToGame);
         copy_ThrowMan(*(ThrowMan**)Game::throw_man, Rollback::saved_throwman, StateTarget::ToGame);
         copy_DmgHitRecordManImp(*(DmgHitRecordManImp**)Game::dmg_hit_record_man, Rollback::saved_DmgHitRecordMan, StateTarget::ToGame);
@@ -671,7 +671,7 @@ void Rollback::start()
     Rollback::saved_havokman = init_FrpgHavokManImp();
     Rollback::saved_playerins = init_PlayerIns();
     Rollback::saved_bulletman = init_BulletMan();
-    Rollback::saved_sfxobjs = init_FXManager();
+    Rollback::saved_sfxman = init_SfxMan();
     Rollback::saved_damageman = init_DamageMan();
     Rollback::saved_throwman = init_ThrowMan();
     Rollback::saved_DmgHitRecordMan = init_DmgHitRecordManImp();
@@ -722,6 +722,9 @@ bool rollback_load_game_state_callback(unsigned char* buffer, int)
 
     //havok has to be copied first
     copy_FrpgHavokManImp(*(FrpgHavokManImp**)Game::frpg_havok_man_imp, state->havokman, StateTarget::ToGame);
+    //sfx must be restored before playerins/bulletman so that linked_followupBullet chain heads
+    //are cleared before any FollowupBullet data is modified or freed
+    copy_SfxMan(*(SfxMan**)Game::sfx_man, state->sfxman, StateTarget::ToGame);
     for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
     {
         auto player_o = Game::get_connected_player(i);
@@ -734,7 +737,6 @@ bool rollback_load_game_state_callback(unsigned char* buffer, int)
         copy_PlayerIns(player, state->playerins[i], StateTarget::ToGame);
     }
     copy_BulletMan(*(BulletMan**)Game::bullet_man, state->bulletman, StateTarget::ToGame);
-    //copy_SfxMan(*(SfxMan**)Game::sfx_man, state->sfxman, StateTarget::ToGame);
     copy_DamageMan(*(DamageMan**)Game::damage_man, state->damageman, (*(FrpgHavokManImp**)Game::frpg_havok_man_imp)->physWorld->_hkpWorld, state->havokman->physWorld->_hkpWorld, StateTarget::ToGame);
     copy_ThrowMan(*(ThrowMan**)Game::throw_man, state->throwman, StateTarget::ToGame);
     copy_DmgHitRecordManImp(*(DmgHitRecordManImp**)Game::dmg_hit_record_man, state->dmghitrecordman, StateTarget::ToGame);
@@ -783,8 +785,8 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
     }
     state->bulletman = init_BulletMan();
     copy_BulletMan(state->bulletman, *(BulletMan**)Game::bullet_man, StateTarget::ToLocal);
-    //state->sfxman = init_SfxMan();
-    //copy_SfxMan(state->sfxman, *(SfxMan**)Game::sfx_man, StateTarget::ToLocal);
+    state->sfxman = init_SfxMan();
+    copy_SfxMan(state->sfxman, *(SfxMan**)Game::sfx_man, StateTarget::ToLocal);
     state->damageman = init_DamageMan();
     copy_DamageMan(state->damageman, *(DamageMan**)Game::damage_man, state->havokman->physWorld->_hkpWorld, (*(FrpgHavokManImp**)Game::frpg_havok_man_imp)->physWorld->_hkpWorld, StateTarget::ToLocal);
     state->throwman = init_ThrowMan();
@@ -817,8 +819,8 @@ void rollback_copy_buffer(void* buffer_dst, void* buffer_src)
     }
     state_dst->bulletman = init_BulletMan();
     copy_BulletMan(state_dst->bulletman, state_src->bulletman, StateTarget::Copy);
-    //state_dst->sfxman = init_SfxMan();
-    //copy_SfxMan(state_dst->sfxman, state_src->sfxman, StateTarget::Copy);
+    state_dst->sfxman = init_SfxMan();
+    copy_SfxMan(state_dst->sfxman, state_src->sfxman, StateTarget::Copy);
     state_dst->damageman = init_DamageMan();
     copy_DamageMan(state_dst->damageman, state_src->damageman, state_dst->havokman->physWorld->_hkpWorld, state_src->havokman->physWorld->_hkpWorld, StateTarget::Copy);
     state_dst->throwman = init_ThrowMan();
@@ -838,8 +840,8 @@ void rollback_free_buffer(void* buffer)
     }
     free_BulletMan(state->bulletman);
     state->bulletman = NULL;
-    //free_SfxMan(state->sfxman);
-    //state->sfxman = NULL;
+    free_SfxMan(state->sfxman);
+    state->sfxman = NULL;
     free_DamageMan(state->damageman);
     state->damageman = NULL;
     free_ThrowMan(state->throwman);
@@ -907,8 +909,8 @@ bool rollback_log_game_state(char* filename, unsigned char* buffer, int)
         std::string player = print_PlayerIns(state->playerins[i]);
         fprintf(fp, "Player %d\n%s", i, player.c_str());
     }
-    std::string bulletman = print_BulletMan(state->bulletman);
-    fprintf(fp, "%s", bulletman.c_str());
+    //std::string bulletman = print_BulletMan(state->bulletman);
+    //fprintf(fp, "%s", bulletman.c_str());
     //std::string sfxman = print_SfxMan(state->sfxman);
     //fprintf(fp, "%s", sfxman.c_str());
     //std::string damage = print_DamageMan(state->damageman);
