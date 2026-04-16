@@ -204,8 +204,8 @@ DamageEntry* init_DamageEntry()
 
 void free_DamageEntry(DamageEntry* to, bool freeself)
 {
-    free_FrpgPhysShapePhantomIns(to->FrpgPhysShapePhantomIns_Sphere, true, StateTarget::ToLocal);
-    free_FrpgPhysShapePhantomIns(to->FrpgPhysShapePhantomIns_Capsule, false, StateTarget::ToLocal);
+    free_FrpgPhysShapePhantomIns(to->FrpgPhysShapePhantomIns_Sphere, true);
+    free_FrpgPhysShapePhantomIns(to->FrpgPhysShapePhantomIns_Capsule, false);
     to->hkpSphereShape1 = NULL;
     to->hkpCapsuleShape1 = NULL;
     free_DamageEntryField0x118(to->field0x118, StateTarget::ToLocal);
@@ -221,13 +221,10 @@ void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePha
     if (*to == NULL && *from != NULL)
     {
         FATALERROR("WARNING: I shouldn't have to init the FrpgPhysShapePhantomIns, it should be pre-init'ed either by me or the game");
-        //*to = init_FrpgPhysShapePhantomIns(is_sphere, target);
     }
     if (*to != NULL && *from == NULL)
     {
         FATALERROR("WARNING: I shouldn't have to free the FrpgPhysShapePhantomIns, it should always exist");
-        //free_FrpgPhysShapePhantomIns(*to, is_sphere, target);
-        //*to = NULL;
     }
     if (*to != NULL && *from != NULL)
     {
@@ -239,12 +236,12 @@ void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePha
         {
             FATALERROR("ToGame: SimpleShapePhantom ptr for %p is NULL", (*from));
         }
-        //the hkpSimpleShapePhantom has only been added to the hkpWorld if physWorld is non-null. If not we have to add it to our graveyard to prevent it's destruction
+        //the hkpSimpleShapePhantom has only been added to the hkpWorld if physWorld is non-null. If not we have to manually manage it
         if ((*from)->physWorld == NULL)
         {
-            AddPhantom_Manual((*from)->_hkpSimpleShapePhantom);
+            hk_ref((*from)->_hkpSimpleShapePhantom);
         }
-        //since the phantoms are never destroyed due to our graveyard mechanism, it's safe to just use the raw pointer. it should always be valid
+        //since the phantoms are never destroyed due to us keeping a ref to it, it's safe to just use the raw pointer. it should always be valid
         (*to)->_hkpSimpleShapePhantom = (*from)->_hkpSimpleShapePhantom;
 
         (*to)->self = (*to);
@@ -285,24 +282,22 @@ FrpgPhysShapePhantomIns* init_FrpgPhysShapePhantomIns(bool is_sphere, StateTarge
     return local;
 }
 
-void free_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns* to, bool is_sphere, StateTarget target)
+void free_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns* to, bool is_sphere)
 {
     if (is_sphere)
     {
-        free_hkpSphereShape(to->_hkpSphereShape, target);
+        free_hkpSphereShape(to->_hkpSphereShape, StateTarget::ToLocal);
     }
     else
     {
-        free_hkpCapsuleShape(to->_hkpCapsuleShape, target);
+        free_hkpCapsuleShape(to->_hkpCapsuleShape, StateTarget::ToLocal);
     }
-    if (target == StateTarget::ToGame)
+    if (to->physWorld == NULL)
     {
-        Game::game_free(to);
+        //now that we're freeing the rollback obj, deref the manually saved phantom
+        hk_deref(to->_hkpSimpleShapePhantom);
     }
-    else
-    {
-        free(to);
-    }
+    free(to);
 }
 
 void copy_DamageEntryField0x118(DamageEntryField0x118** to, DamageEntryField0x118** from, StateTarget target)

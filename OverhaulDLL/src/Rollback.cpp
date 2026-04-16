@@ -589,18 +589,6 @@ extern "C" {
     uint64_t simpleshapephantom_collisionDetails_iterate_return;
     void simpleshapephantom_collisionDetails_iterate_injection();
 
-    uint64_t hkpWorld_addEntity_return;
-    void hkpWorld_addEntity_injection();
-
-    uint64_t hkpWorld_removeEntities_return;
-    void hkpWorld_removeEntities_injection();
-
-    uint64_t hkpWorld_addPhantom_return;
-    void hkpWorld_addPhantom_injection();
-
-    uint64_t hkpWorld_removePhantom_return;
-    void hkpWorld_removePhantom_injection();
-
     uint64_t Destruct_SFXEntry_return;
     void Destruct_SFXEntry_injection();
 
@@ -642,19 +630,6 @@ void Rollback::start()
     write_address = (uint8_t*)(Rollback::call_EquipGameData_Reset_ItemBeingUsedFromInventory_offset + Game::ds1_base);
     uint8_t nop[5] = { 0x90, 0x90, 0x90, 0x90, 0x90 };
     sp::mem::patch_bytes(write_address, nop, 5);
-
-    //Havok world add/remove hooks — track entity/phantom lifetime for graveyard
-    write_address = (uint8_t*)(Rollback::hkpWorld_addEntity_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &hkpWorld_addEntity_return, 1, &hkpWorld_addEntity_injection);
-
-    write_address = (uint8_t*)(Rollback::hkpWorld_removeEntities_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &hkpWorld_removeEntities_return, 2, &hkpWorld_removeEntities_injection);
-
-    write_address = (uint8_t*)(Rollback::hkpWorld_addPhantom_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &hkpWorld_addPhantom_return, 2, &hkpWorld_addPhantom_injection);
-
-    write_address = (uint8_t*)(Rollback::hkpWorld_removePhantom_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &hkpWorld_removePhantom_return, 2, &hkpWorld_removePhantom_injection);
 
     //SFX graveyard: hook the raw dealloc paths so any object in the graveyard
     //is held alive (and the dealloc args remembered) until refcount drops to 0
@@ -864,12 +839,6 @@ void rollback_free_buffer(void* buffer)
     state->dmghitrecordman = NULL;
     free_FrpgHavokManImp(state->havokman);
     state->havokman = NULL;
-
-    // After releasing this snapshot's refs, sweep the graveyard —
-    // any entity/phantom whose only remaining ref was this snapshot
-    // can now be freed by Havok.
-    SweepGraveyard();
-    SweepSfxGraveyard();
 
     free(state);
 }

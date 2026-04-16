@@ -92,12 +92,6 @@ private:
     static const uint64_t call_EquipGameData_Reset_ItemBeingUsedFromInventory_offset = 0x3577c9;
     static const uint64_t simpleshapephantom_collisionDetails_iterate_offset = 0x9c763f;
 
-    // Havok world add/remove hooks for graveyard tracking
-    static const uint64_t hkpWorld_addEntity_offset = 0x9b0c40;
-    static const uint64_t hkpWorld_removeEntities_offset = 0x9b1600;
-    static const uint64_t hkpWorld_addPhantom_offset = 0x9b2160;
-    static const uint64_t hkpWorld_removePhantom_offset = 0x9b2760;
-
     // SFX graveyard: hook the dealloc functions for SFXEntries and FxBehaviorNodes
     static const uint64_t Destruct_SFXEntry_offset = 0xff9490;
     static const uint64_t Destruct_FxBehaviorNode_offset = 0xfdf530;

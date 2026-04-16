@@ -23,18 +23,6 @@ void RestoreHkpWorldSnapshot(const HkpWorldSnapshot* snap, hkpWorld* world);
 void CopyHkpWorldSnapshot(HkpWorldSnapshot* dst, const HkpWorldSnapshot* src);
 void FreeHkpWorldSnapshotRefs(HkpWorldSnapshot* snap);
 
-// Graveyard hooks
-extern "C" {
-    void OnEntityAdded(hkpWorld* world, hkpEntity* entity, uint32_t activationState);
-    void OnEntitiesRemoved(hkpWorld* world, hkpEntity** entities, int count);
-    void OnPhantomAdded(hkpWorld* world, void* phantom);
-    void OnPhantomRemoved(hkpWorld* world, void* phantom);
-}
-void AddPhantom_Manual(void* phantom);
-
-// Clear out all graveyard refs
-void SweepGraveyard();
-
 /* ---------------- for DamageMan entries ------------------ */
 void copy_hkpSphereShape(hkpSphereShape** to, hkpSphereShape* from, StateTarget target);
 hkpSphereShape* init_hkpSphereShape(StateTarget target);

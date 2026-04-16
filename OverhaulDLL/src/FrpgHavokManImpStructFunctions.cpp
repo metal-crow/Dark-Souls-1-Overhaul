@@ -2,101 +2,6 @@
 #include "GameData.h"
 #include <unordered_set>
 
-/* ============================================================
- * Graveyard: entities/phantoms removed from the world are
- * ref'd here so that the game does not destroy them and on rollback
- * their pointers can be added back trivially.  The hooks
- * on hkpWorld::addEntity / removeEntities / addPhantom /
- * removePhantom keep this up to date.
- * ============================================================ */
-static std::unordered_set<void*> g_entityGraveyard;
-static std::unordered_set<void*> g_phantomGraveyard;
-
-// Set true while RestoreHkpWorldSnapshot is running so the
-// hooks don't double-ref entities that we're adding/removing
-// as part of the restore.
-static bool g_isRestoring = false;
-
-/* ============================================================
- * Hook callbacks — called from ASM trampolines before the
- * original Havok function body executes.
- * ============================================================ */
-
-void OnEntityAdded(hkpWorld* /*world*/, hkpEntity* entity, uint32_t /*activationState*/)
-{
-    if (g_isRestoring) return;
-
-    auto it = g_entityGraveyard.find((void*)entity);
-    if (it != g_entityGraveyard.end())
-    {
-        // Entity is being re-added by the game; graveyard no longer
-        // needs to keep it alive.
-        hk_deref((void*)entity);
-        g_entityGraveyard.erase(it);
-    }
-}
-
-void OnEntitiesRemoved(hkpWorld* /*world*/, hkpEntity** entities, int count)
-{
-    if (g_isRestoring) return;
-
-    for (int i = 0; i < count; i++)
-    {
-        void* e = (void*)entities[i];
-        if (!e) continue;
-
-        // Keep the entity alive so rollback can restore it.
-        hk_ref(e);
-        g_entityGraveyard.insert(e);
-    }
-}
-
-void OnPhantomAdded(hkpWorld* /*world*/, void* phantom)
-{
-    if (g_isRestoring) return;
-
-    auto it = g_phantomGraveyard.find(phantom);
-    if (it != g_phantomGraveyard.end())
-    {
-        hk_deref(phantom);
-        g_phantomGraveyard.erase(it);
-    }
-}
-
-void OnPhantomRemoved(hkpWorld* /*world*/, void* phantom)
-{
-    if (g_isRestoring) return;
-
-    hk_ref(phantom);
-    g_phantomGraveyard.insert(phantom);
-}
-
-//Used with DamageMan to preserve phantoms currently untracked by hkpWorld
-void AddPhantom_Manual(void* phantom)
-{
-    hk_ref(phantom);
-    g_phantomGraveyard.insert(phantom);
-}
-
-/* Once rollback is finished we can clear out the remaining unused
- * objects in the graveyard. */
-void SweepGraveyard()
-{
-    for (void* e : g_entityGraveyard)
-    {
-        hk_deref(e);
-    }
-    g_entityGraveyard.clear();
-
-    for (void* p : g_phantomGraveyard)
-    {
-        hk_deref(p);
-    }
-    g_phantomGraveyard.clear();
-}
-
-/* ============================================================ */
-
 void copy_FrpgHavokManImp(FrpgHavokManImp* to, const FrpgHavokManImp* from, StateTarget target)
 {
     copy_FrpgPhysWorld(to->physWorld, from->physWorld, target);
@@ -259,7 +164,6 @@ void SaveHkpWorldSnapshot(HkpWorldSnapshot* snap, hkpWorld* world)
         s.ptr = e;
         memcpy(s.motionData, &e->m_motion, sizeof(hkpMotion));
         snap->entities.push_back(s);
-
         // Take a ref so Havok can't free this entity if it's removed before restore
         hk_ref((void*)e);
     }
@@ -290,8 +194,6 @@ void SaveHkpWorldSnapshot(HkpWorldSnapshot* snap, hkpWorld* world)
  * ============================================================ */
 void RestoreHkpWorldSnapshot(const HkpWorldSnapshot* snap, hkpWorld* world)
 {
-    g_isRestoring = true;
-
     // --- Build target sets for O(1) lookup when we remove entities ---
     std::unordered_set<hkpEntity*> targetEntities;
     for (auto& s : snap->entities)
@@ -319,11 +221,7 @@ void RestoreHkpWorldSnapshot(const HkpWorldSnapshot* snap, hkpWorld* world)
     {
         if (targetEntities.find(e) == targetEntities.end())
         {
-            // Ref before removal to prevent Havok from freeing it
-            // (other snapshots or graveyard may still reference this entity)
-            hk_ref((void*)e);
-            hk_removeEntities(world, &e, 1);
-            hk_deref((void*)e);
+            hk_removeEntities(world, &e, 1); //this derefs the entity
         }
     }
 
@@ -332,7 +230,7 @@ void RestoreHkpWorldSnapshot(const HkpWorldSnapshot* snap, hkpWorld* world)
     {
         if (currentEntitySet.find(s.ptr) == currentEntitySet.end())
         {
-            hk_addEntity(world, s.ptr, 1); // 1 = activate
+            hk_addEntity(world, s.ptr, 1); // 1 = activate. This refs the entity which we want since it's now in the world as well
         }
     }
 
@@ -341,9 +239,7 @@ void RestoreHkpWorldSnapshot(const HkpWorldSnapshot* snap, hkpWorld* world)
     {
         if (targetPhantoms.find(p) == targetPhantoms.end())
         {
-            hk_ref((void*)p);
-            hk_removePhantom(world, (void*)p);
-            hk_deref((void*)p);
+            hk_removePhantom(world, (void*)p); //this derefs the entity
         }
     }
 
@@ -352,7 +248,7 @@ void RestoreHkpWorldSnapshot(const HkpWorldSnapshot* snap, hkpWorld* world)
     {
         if (currentPhantomSet.find(s.ptr) == currentPhantomSet.end())
         {
-            hk_addPhantom(world, (void*)s.ptr);
+            hk_addPhantom(world, (void*)s.ptr); //This refs the entity
         }
     }
 
@@ -365,8 +261,6 @@ void RestoreHkpWorldSnapshot(const HkpWorldSnapshot* snap, hkpWorld* world)
     {
         memcpy(&s.ptr->m_motionState, s.motionStateData, sizeof(hkMotionState));
     }
-
-    g_isRestoring = false;
 
     // NOTE: After restoring positions, the broadphase AABBs, overlap pairs,
     // and simulation islands are stale. The next normal game step will rebuild these.
@@ -426,7 +320,7 @@ void FreeHkpWorldSnapshotRefs(HkpWorldSnapshot* snap)
 }
 
 /* ============================================================
- * Used for DamageMan entries.
+ * The following are used for DamageMan entries.
  * ============================================================ */
 void copy_hkpSphereShape(hkpSphereShape** to, hkpSphereShape* from, StateTarget target)
 {
