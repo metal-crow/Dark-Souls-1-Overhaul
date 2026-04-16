@@ -527,12 +527,12 @@ extern "C" {
 //manually set the fxentry_a ptr in the followupbullet
 //I can't figure out why it's sometimes not set (caused by my code somehow),
 //so i'm patching it this way to fix it.
-void followupBullet_loop_helper(uint64_t FXEntry_Substruct_2)
+void followupBullet_loop_helper(uint64_t FxBehaviorNode_body)
 {
-    uint64_t followupBullet = *(uint64_t*)(FXEntry_Substruct_2 + 0x20);
-    uint64_t FXEntry_Substruct = *(uint64_t*)(FXEntry_Substruct_2 + 0x8);
+    uint64_t followupBullet = *(uint64_t*)(FxBehaviorNode_body + 0x20);
+    uint64_t FxBehaviorNode = *(uint64_t*)(FxBehaviorNode_body + 0x8);
     uint64_t* fxentry_a = (uint64_t*)(followupBullet + 0x10);
-    *fxentry_a = FXEntry_Substruct;
+    *fxentry_a = FxBehaviorNode;
 }
 
 bool rollback_await_init(void* steamMsgs);
