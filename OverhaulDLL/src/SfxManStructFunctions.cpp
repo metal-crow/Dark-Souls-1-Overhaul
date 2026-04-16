@@ -11,7 +11,7 @@ static std::unordered_map<void*, uint32_t> g_sfxGraveyard;
 static std::unordered_map<void*, uint32_t> g_nodeGraveyard;
 
 
-void SfxEntryRef(void* SFXEntry)
+void SfxEntryRef(SFXEntry* SFXEntry)
 {
     auto search = g_sfxGraveyard.find(SFXEntry);
     if (search != g_sfxGraveyard.end())
@@ -24,7 +24,7 @@ void SfxEntryRef(void* SFXEntry)
     }
 }
 
-void SfxEntryDeref(void* SFXEntry)
+void SfxEntryDeref(SFXEntry* SFXEntry)
 {
     auto search = g_sfxGraveyard.find(SFXEntry);
     if (search != g_sfxGraveyard.end())
@@ -49,7 +49,7 @@ bool OnSfxEntryDestruct(void* SFXEntry)
     return refcount > 0;
 }
 
-void FxBehaviorNodeRef(void* FxBehaviorNode)
+void FxBehaviorNodeRef(FxBehaviorNode* FxBehaviorNode)
 {
     auto search = g_nodeGraveyard.find(FxBehaviorNode);
     if (search != g_nodeGraveyard.end())
@@ -62,7 +62,7 @@ void FxBehaviorNodeRef(void* FxBehaviorNode)
     }
 }
 
-void FxBehaviorNodeDeref(void* FxBehaviorNode)
+void FxBehaviorNodeDeref(FxBehaviorNode* FxBehaviorNode)
 {
     auto search = g_nodeGraveyard.find(FxBehaviorNode);
     if (search != g_nodeGraveyard.end())
@@ -150,13 +150,13 @@ void copy_FXManager(FXManager* to, FXManager* from, StateTarget target)
     switch (target)
     {
     case StateTarget::ToLocal:
-        Save_SFXEntryList(to->saved_entries, from);
+        Save_SFXEntryList(&to->saved_entries, from);
         break;
     case StateTarget::ToGame:
-        Restore_SFXEntryList(to, from->saved_entries);
+        Restore_SFXEntryList(to, &from->saved_entries);
         break;
     case StateTarget::Copy:
-        Copy_SFXEntryList(to->saved_entries, from->saved_entries);
+        Copy_SFXEntryList(&to->saved_entries, &from->saved_entries);
         break;
     }
     Game::ResumeThreads();
@@ -171,19 +171,13 @@ FXManager* init_FXManager()
 
 void free_FXManager(FXManager* to)
 {
-    for (auto e : to->saved_entries) {
-        SfxEntryDeref(e.game_addr);
-        for (auto n : e.nodes)
-        {
-            FxBehaviorNodeDeref(n);
-        }
-    }
+    Clear_SFXEntryList(&to->saved_entries);
     free(to);
 }
 
-void Save_SFXEntryList(std::vector<SavedSFXEntry> to, FXManager* from)
+void Save_SFXEntryList(std::vector<SavedSFXEntry>* to, FXManager* from)
 {
-    to.clear();
+    to->clear();
 
     SFXEntry* head = from->SFXEntryList;
     while (head != NULL)
@@ -201,19 +195,98 @@ void Save_SFXEntryList(std::vector<SavedSFXEntry> to, FXManager* from)
             node_head = node_head->next;
         }
 
-        to.push_back(e);
+        to->push_back(e);
         head = head->base.next;
     }
 }
 
-void Restore_SFXEntryList(FXManager* to, std::vector<SavedSFXEntry> from)
+void Restore_SFXEntryList(FXManager* to, std::vector<SavedSFXEntry>* from)
 {
+    //clear out everything, then insert.
+    //this may mean we remove and put back the same element but since those are still ref'd by the saved side it's safe
+    SFXEntry* head = to->SFXEntryList;
+    while (head != NULL)
+    {
+        SFXEntry* next = head->base.next;
+        FxBehaviorNode* node_head = head->base.behaviour_list;
+        while (node_head != NULL)
+        {
+            FxBehaviorNode* node_head_next = node_head->next;
+            FxBehaviorNodeDeref(node_head);
+            node_head = node_head_next;
+        }
+        head->base.behaviour_list = NULL;
+        head->base.behaviour_list_end = NULL;
+        SfxEntryDeref(head);
+        head = next;
+    }
+    to->SFXEntryList = NULL;
+    to->SFXEntryList_tail = NULL;
 
+    //insert elements. Do in reverse order so at the end the first element is put in the head
+    for (auto si = from->rbegin(); si != from->rend(); si++)
+    {
+        SavedSFXEntry s = *si;
+        SFXEntry* old_head = to->SFXEntryList;
+        //update the next pointer for this element
+        SFXEntry* new_head = s.game_addr;
+        new_head->base.next = old_head;
+        //update the data
+        copy_SFXEntry(new_head, &s.data, StateTarget::ToGame);
+        //insert into list
+        to->SFXEntryList = new_head;
+        //ref count now that it's in the game
+        SfxEntryRef(new_head);
+
+        for (auto ni = s.nodes.rbegin(); ni != s.nodes.rend(); ni++)
+        {
+            FxBehaviorNode* new_node_head = *ni;
+            FxBehaviorNode* old_node_head = new_head->base.behaviour_list;
+            //update next ptr
+            new_node_head->next = old_node_head;
+            //insert
+            new_head->base.behaviour_list = new_node_head;
+            //ref count
+            FxBehaviorNodeRef(new_node_head);
+        }
+        new_head->base.behaviour_list_end = s.nodes.back();
+    }
+    to->SFXEntryList_tail = from->back().game_addr;
 }
 
-void Copy_SFXEntryList(std::vector<SavedSFXEntry> to, std::vector<SavedSFXEntry> from)
+void Copy_SFXEntryList(std::vector<SavedSFXEntry>* to, std::vector<SavedSFXEntry>* from)
 {
+    // Clean the dst vectors
+    Clear_SFXEntryList(to);
 
+    // Deep copy the vectors, and Ref everything in the new copy
+    for (auto& s : *from)
+    {
+        SavedSFXEntry new_s;
+        new_s.game_addr = s.game_addr;
+        copy_SFXEntry(&new_s.data, &s.data, StateTarget::Copy);
+        SfxEntryRef(new_s.game_addr);
+        for (auto& n : s.nodes)
+        {
+            new_s.nodes.push_back(n);
+            FxBehaviorNodeRef(n);
+        }
+        to->push_back(new_s);
+    }
+}
+
+void Clear_SFXEntryList(std::vector<SavedSFXEntry>* to)
+{
+    for (auto e : *to)
+    {
+        SfxEntryDeref(e.game_addr);
+        for (auto n : e.nodes)
+        {
+            FxBehaviorNodeDeref(n);
+        }
+        e.nodes.clear();
+    }
+    to->clear();
 }
 
 void copy_SFXEntry(SFXEntry* to, SFXEntry* from, StateTarget target)

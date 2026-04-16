@@ -20,9 +20,10 @@ void copy_FXManager(FXManager* to, FXManager* from, StateTarget target);
 FXManager* init_FXManager();
 void free_FXManager(FXManager* to);
 
-void Save_SFXEntryList(std::vector<SavedSFXEntry> to, FXManager* from);
-void Restore_SFXEntryList(FXManager* to, std::vector<SavedSFXEntry> from);
-void Copy_SFXEntryList(std::vector<SavedSFXEntry> to, std::vector<SavedSFXEntry> from);
+void Save_SFXEntryList(std::vector<SavedSFXEntry>* to, FXManager* from);
+void Restore_SFXEntryList(FXManager* to, std::vector<SavedSFXEntry>* from);
+void Copy_SFXEntryList(std::vector<SavedSFXEntry>* to, std::vector<SavedSFXEntry> from);
+void Clear_SFXEntryList(std::vector<SavedSFXEntry>* to);
 
 //don't handle the behaviour_list in this, that's a seperate function
 void copy_SFXEntry(SFXEntry* to, SFXEntry* from, StateTarget target);
