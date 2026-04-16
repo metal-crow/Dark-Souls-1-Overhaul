@@ -358,6 +358,53 @@ jmp     hkpWorld_removePhantom_return
 hkpWorld_removePhantom_injection ENDP
 
 
+EXTERN Destruct_SFXEntry_return: qword
+extern OnSfxEntryDestruct: proc
+
+PUBLIC Destruct_SFXEntry_injection
+Destruct_SFXEntry_injection PROC
+FUNC_PROLOGUE_LITE
+; RCX = SFXEntry* (first param of Destruct_SFXEntry)
+call    OnSfxEntryDestruct
+FUNC_EPILOGUE_LITE_NORAX
+; AL = true if we should skip destruction
+test    al, al
+jnz     skip_destruct
+; Replay displaced instructions and continue into Destruct_SFXEntry body
+push    rdi
+sub     rsp, 30h
+mov     qword ptr [rsp+20h], -2
+jmp     Destruct_SFXEntry_return
+skip_destruct:
+; Destruct_SFXEntry returns param_1 in RAX
+mov     rax, rcx
+ret
+Destruct_SFXEntry_injection ENDP
+
+
+EXTERN Destruct_FxBehaviorNode_return: qword
+extern OnFxBehaviorNodeDealloc: proc
+
+PUBLIC Destruct_FxBehaviorNode_injection
+Destruct_FxBehaviorNode_injection PROC
+FUNC_PROLOGUE_LITE
+; RCX = Unused. Easier to not bother reordering
+; RDX = FxBehaviorNode* (second param of Destruct_SFXEntry)
+call    OnSfxEntryDestruct
+FUNC_EPILOGUE_LITE_NORAX
+; AL = true if we should skip destruction
+test    al, al
+jnz     skip_destruct
+MOV     qword ptr [RSP + 8], RBX
+MOV     qword ptr [RSP + 10h], RSI
+PUSH    RDI
+SUB     RSP,20h
+jmp     Destruct_FxBehaviorNode_return
+skip_destruct:
+ret
+Destruct_FxBehaviorNode_injection ENDP
+
+
 _TEXT    ENDS
 
 END

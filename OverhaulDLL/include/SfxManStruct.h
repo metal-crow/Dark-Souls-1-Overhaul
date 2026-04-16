@@ -7,111 +7,130 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <vector>
 
 typedef struct SfxMan SfxMan;
 typedef struct frpgFxManagerBase frpgFxManagerBase;
 typedef struct FXHGManagerBase FXHGManagerBase;
-typedef struct FXManager FXManager;
+typedef struct FXEntry FXEntry;
 typedef struct SFXEntry SFXEntry;
-typedef struct FXEntry_Substruct FXEntry_Substruct;
-typedef struct class_14152d360_field0xe0 class_14152d360_field0xe0;
-typedef struct class_14150b808_field0xf0 class_14150b808_field0xf0;
-typedef struct wstring wstring;
+typedef struct FXManager FXManager;
+typedef struct FxBehaviorNode FxBehaviorNode;
+typedef struct SavedSFXEntry SavedSFXEntry;
+typedef struct vectorFXEntry vectorFXEntry;
+typedef struct doublelinkedlistFxEntry doublelinkedlistFxEntry;
+typedef struct SFXEntry_field0xf0 SFXEntry_field0xf0;
 
-struct wstring
+struct FxBehaviorNode
 {
-    wchar_t* ptr;
-    wchar_t buf[8];
-    size_t chrLen;
-    size_t len;
+    uint8_t _0[0x90];
+    FxBehaviorNode* next;
+};
+static_assert(offsetof(FxBehaviorNode, next) == 0x90);
+
+struct doublelinkedlistFxEntry
+{
+    doublelinkedlistFxEntry* prev;
+    doublelinkedlistFxEntry* next;
+    FxBehaviorNode* data;
 };
 
-static_assert(sizeof(wstring) == 0x28);
-
-struct FXEntry_Substruct
+struct vectorFXEntry
 {
-    //substruct_1
-    uint8_t data_0[0x58];
-    uint64_t self_substruct2; //&self + 0xe0
-    uint8_t data_1[16];
-    void* unk1; //needed, otherwise game crashes
-    uint8_t data_2[16];
-    void* unk2; //can be nulled without error
-    FXEntry_Substruct* next; //this is p much always null, probably safe to ignore
-    FXEntry_Substruct* linked; //needed, otherwise the sfx freezes in place
-    void* unk5; //needed, otherwise game crashes
-    wstring str;
-    SFXEntry* parent;
-    uint64_t unk6; //can be nulled without error
-    //substruct_2
-    uint64_t vtable;
-    FXEntry_Substruct* self; //needed, otherwise game crashes.
-    uint64_t filecap1; //can treat as const ptr
-    uint64_t filecap2; //can treat as const ptr
-    void* linked_followupBullet; //can be nulled without error
-    uint8_t data_3[28+8];
+    uint64_t heap;
+    uint64_t* vec; //actually a {uint32, float}
+    uint64_t vec_cur;
+    uint64_t vec_end;
 };
 
-static_assert(offsetof(FXEntry_Substruct, self_substruct2) == 0x58);
-static_assert(offsetof(FXEntry_Substruct, data_1) == 0x60);
-static_assert(offsetof(FXEntry_Substruct, unk1) == 0x70);
-static_assert(offsetof(FXEntry_Substruct, data_2) == 0x78);
-static_assert(offsetof(FXEntry_Substruct, unk2) == 0x88);
-static_assert(offsetof(FXEntry_Substruct, next) == 0x90);
-static_assert(offsetof(FXEntry_Substruct, linked) == 0x98);
-static_assert(offsetof(FXEntry_Substruct, unk5) == 0xa0);
-static_assert(offsetof(FXEntry_Substruct, str) == 0xa8);
-static_assert(offsetof(FXEntry_Substruct, parent) == 0xd0);
-static_assert(offsetof(FXEntry_Substruct, unk6) == 0xd8);
-static_assert(offsetof(FXEntry_Substruct, self) == 0xe0+8);
-static_assert(offsetof(FXEntry_Substruct, data_3) == 0xe0+0x28);
-static_assert(sizeof(FXEntry_Substruct) == 0x130);
+// ---- FXEntry (base for SFXEntry) ----
+struct FXEntry
+{
+    uint8_t data_0[0x28];
+    void* fxParent; //this is static, rollback won't affect the FxManager pointer
+    vectorFXEntry* vec;
+    doublelinkedlistFxEntry* list; //the pointers here are static, not tied to this FXEntry lifetime
+    SFXEntry* next;
+    FxBehaviorNode* behaviour_list; //i have no idea what these pointers are about. graveyarding and treating as static for now
+    FxBehaviorNode* behaviour_list_end;
+    uint8_t data_1[8];
+};
+static_assert(sizeof(FXEntry) == 0x60);
+static_assert(offsetof(FXEntry, fxParent) == 0x28);
+static_assert(offsetof(FXEntry, vec) == 0x30);
+static_assert(offsetof(FXEntry, next) == 0x40);
+static_assert(offsetof(FXEntry, behaviour_list) == 0x48);
+static_assert(offsetof(FXEntry, behaviour_list_end) == 0x50);
 
+struct SFXEntry_field0xf0
+{
+    uint8_t* data;
+    size_t data_size;
+    uint64_t data_0;
+    uint8_t* secondary_data; //0x10 bytes
+};
+static_assert(sizeof(SFXEntry_field0xf0) == 0x20);
+
+// ---- SFXEntry (extends FXEntry) ----
+// Allocated from SmallObjHeap. Each represents an active SFX instance.
 struct SFXEntry
 {
-    //inline FXEntry here since this class is a linked list array and we can't handle inheritance in our basic copy functions
-        uint64_t vtable;
-        void* field0x8; //can be nulled without error
-        uint8_t data_0[24];
-        FXManager* parent;
-        uint64_t unk1; //always null
-        uint64_t unk2; //can be nulled without error
-        SFXEntry* next;
-        FXEntry_Substruct* field0x48_head;
-        FXEntry_Substruct* field0x48_tail;
-        uint64_t unk4; //always null
-    //end inline
-    uint8_t data_1[0x80];
-    class_14152d360_field0xe0* field0xe0;
-    uint64_t data_2;
-    class_14150b808_field0xf0* field0xf0;
-    uint64_t data_3;
+    FXEntry base;
+    uint8_t data_0[0x80];
+    uint8_t* field_0xe0;
+    uint64_t field_0xe0_size;
+    SFXEntry_field0xf0* field_0xf0;
+    uint8_t data_1[8];
 };
-static_assert(offsetof(SFXEntry, field0x8) == 0x8);
-static_assert(offsetof(SFXEntry, data_0) == 0x10);
-static_assert(offsetof(SFXEntry, unk1) == 0x30);
-static_assert(offsetof(SFXEntry, unk2) == 0x38);
-static_assert(offsetof(SFXEntry, next) == 0x40);
-static_assert(offsetof(SFXEntry, field0x48_head) == 0x48);
-static_assert(offsetof(SFXEntry, field0x48_tail) == 0x50);
-static_assert(offsetof(SFXEntry, unk4) == 0x58);
-static_assert(offsetof(SFXEntry, data_1) == 0x60);
-static_assert(offsetof(SFXEntry, field0xe0) == 0xe0);
-static_assert(offsetof(SFXEntry, data_2) == 0xe8);
-static_assert(offsetof(SFXEntry, field0xf0) == 0xf0);
 static_assert(sizeof(SFXEntry) == 0x100);
+static_assert(offsetof(SFXEntry, base) == 0);
+static_assert(offsetof(SFXEntry, field_0xe0) == 0xe0);
+static_assert(offsetof(SFXEntry, field_0xf0) == 0xf0);
 
+
+// ---- FXManager ----
+// Manages the SFXEntry linked list and multiple internal vectors.
+// Accessed via frpgFxManagerBase->base.fXManager.
 struct FXManager
 {
-    uint64_t padding_0[3];
-    SFXEntry* SFXEntryList;
-    SFXEntry* SFXEntryList_tail; //can ignore since it's unchanging after alloc. Need to check to ensure we don't go past it, since it represents the last "valid" entry.
-    uint8_t padding[88];
-    FXEntry_Substruct* unk;
+    uint8_t data_0[0x18];
+    SFXEntry* SFXEntryList; // the active SFXEntry linked list
+    SFXEntry* SFXEntryList_tail;
+    void* FxBehaviorNode_destructlist_head; //keep both of these null, the should only be set in the middle of a frame anyway
+    void* FxBehaviorNode_destructlist_tail;
+    uint8_t data_1[8];
+    uint8_t FXDrawEntityHandler_list[0x20]; //this list is static and it's contents (and the contents of it's element) don't change during runtime. Safe to memcpy
+    uint8_t FxBehaviorNode_staging_list[0x20]; //this list is cleared at the start of every frame and only holds pointers to stuff saved elsewhere. Safe to memcpy
+    void* FxBehaviorNode_destruction_queue; //this should be set to 1 (empty queue) since any substruct destruction is handled by us anyway
+    uint8_t data_2[0x118]; //this contains arrays which are constants during runtime (or are settings related and don't change during a game)
+    void* FrpgFxAdapterBase; //this is static and not important for rollback
+    uint64_t substructs_visable[4]; //unsure how important this is. Don't save for now
+    uint64_t loaded_assets[8]; //safe to not save
+    uint64_t unk;
+    // Local-only fields (not part of the game struct, only used in our local copies)
+    std::vector<SavedSFXEntry> saved_entries;
 };
+//static_assert(sizeof(FXManager) == 0x210);
 static_assert(offsetof(FXManager, SFXEntryList) == 0x18);
-static_assert(offsetof(FXManager, unk) == 0x80);
+static_assert(offsetof(FXManager, SFXEntryList_tail) == 0x20);
+static_assert(offsetof(FXManager, FxBehaviorNode_destructlist_head) == 0x28);
+static_assert(offsetof(FXManager, FXDrawEntityHandler_list) == 0x40);
+static_assert(offsetof(FXManager, FxBehaviorNode_staging_list) == 0x60);
+static_assert(offsetof(FXManager, FxBehaviorNode_destruction_queue) == 0x80);
+static_assert(offsetof(FXManager, FrpgFxAdapterBase) == 0x1a0);
+static_assert(offsetof(FXManager, loaded_assets) == 0x1c8);
 
+// ---- Saved SFXEntry for rollback ----
+// Pairs a game-memory address with a snapshot of the SFXEntry data and
+// snapshots of every node hanging off the entry.
+struct SavedSFXEntry
+{
+    SFXEntry* game_addr;
+    SFXEntry data;
+    std::vector<FxBehaviorNode*> nodes;
+};
+
+// ---- FXHGManagerBase ----
 struct FXHGManagerBase
 {
     uint64_t padding_0;
@@ -119,11 +138,15 @@ struct FXHGManagerBase
 };
 static_assert(offsetof(FXHGManagerBase, fXManager) == 8);
 
+
+// ---- frpgFxManagerBase ----
 struct frpgFxManagerBase
 {
     FXHGManagerBase base;
 };
 
+
+// ---- SfxMan ----
 struct SfxMan
 {
     uint8_t padding_0[16];

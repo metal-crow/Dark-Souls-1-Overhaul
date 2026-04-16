@@ -21,16 +21,16 @@ typedef struct BulletMan_Field0x40 BulletMan_Field0x40;
 typedef struct ChrCam ChrCam;
 
 struct FXManager;
-struct FXEntry_Substruct;
+struct FxBehaviorNode;
 
 struct BulletIns_FollowupBullet
 {
     uint64_t vtable;
     FXManager* FXManager;
-    FXEntry_Substruct* fxentry_a;
+    FxBehaviorNode* fxentry_a;
     BulletIns_FollowupBullet* next;
     BulletIns_FollowupBullet* prev;
-    FXEntry_Substruct* fxentry_b;
+    FxBehaviorNode* fxentry_b;
 };
 static_assert(sizeof(BulletIns_FollowupBullet) == 0x30);
 

@@ -600,6 +600,12 @@ extern "C" {
 
     uint64_t hkpWorld_removePhantom_return;
     void hkpWorld_removePhantom_injection();
+
+    uint64_t Destruct_SFXEntry_return;
+    void Destruct_SFXEntry_injection();
+
+    uint64_t Destruct_FxBehaviorNode_return;
+    void Destruct_FxBehaviorNode_injection();
 }
 
 void Rollback::start()
@@ -649,6 +655,14 @@ void Rollback::start()
 
     write_address = (uint8_t*)(Rollback::hkpWorld_removePhantom_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &hkpWorld_removePhantom_return, 2, &hkpWorld_removePhantom_injection);
+
+    //SFX graveyard: hook the raw dealloc paths so any object in the graveyard
+    //is held alive (and the dealloc args remembered) until refcount drops to 0
+    write_address = (uint8_t*)(Rollback::Destruct_SFXEntry_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &Destruct_SFXEntry_return, 1, &Destruct_SFXEntry_injection);
+
+    write_address = (uint8_t*)(Rollback::Destruct_FxBehaviorNode_offset + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &Destruct_FxBehaviorNode_return, 1, &Destruct_FxBehaviorNode_injection);
 
     //Disable all thread specific allocations. Replace it with global malloc/free
     //this is needed because otherwise we can't know what hkThreadMemory instance to allocate or free an object under
@@ -855,6 +869,7 @@ void rollback_free_buffer(void* buffer)
     // any entity/phantom whose only remaining ref was this snapshot
     // can now be freed by Havok.
     SweepGraveyard();
+    SweepSfxGraveyard();
 
     free(state);
 }

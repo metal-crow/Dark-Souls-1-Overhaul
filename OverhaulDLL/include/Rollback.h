@@ -98,6 +98,10 @@ private:
     static const uint64_t hkpWorld_addPhantom_offset = 0x9b2160;
     static const uint64_t hkpWorld_removePhantom_offset = 0x9b2760;
 
+    // SFX graveyard: hook the dealloc functions for SFXEntries and FxBehaviorNodes
+    static const uint64_t Destruct_SFXEntry_offset = 0xff9490;
+    static const uint64_t Destruct_FxBehaviorNode_offset = 0xfdf530;
+
     static const uint64_t PlayerIns_Is_NetworkedPlayer_offsets[];
     static const uint64_t PlayerIns_IsHostPlayerIns_offsets[];
 
