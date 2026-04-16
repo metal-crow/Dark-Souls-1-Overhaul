@@ -275,18 +275,25 @@ void RestoreHkpWorldSnapshot(const HkpWorldSnapshot* snap, hkpWorld* world)
  * ============================================================ */
 void CopyHkpWorldSnapshot(HkpWorldSnapshot* dst, const HkpWorldSnapshot* src)
 {
-    // Deep copy the vectors
-    dst->entities = src->entities;
-    dst->phantoms = src->phantoms;
+    // Clean the dst vectors
+    FreeHkpWorldSnapshotRefs(dst);
 
-    // Ref everything in the new copy
-    for (auto& s : dst->entities)
+    // Deep copy the vectors, and Ref everything in the new copy
+    for (auto& s : src->entities)
     {
+        SavedEntityState new_s;
+        new_s.ptr = s.ptr;
+        memcpy(&new_s.motionData, &s.motionData, sizeof(hkpMotion));
+        dst->entities.push_back(new_s);
         hk_ref((void*)s.ptr);
     }
 
-    for (auto& s : dst->phantoms)
+    for (auto& s : src->phantoms)
     {
+        SavedPhantomState new_s;
+        new_s.ptr = s.ptr;
+        memcpy(&new_s.motionStateData, &s.motionStateData, sizeof(hkMotionState));
+        dst->phantoms.push_back(new_s);
         hk_ref((void*)s.ptr);
     }
 }
