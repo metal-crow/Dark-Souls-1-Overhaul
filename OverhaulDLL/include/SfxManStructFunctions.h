@@ -22,7 +22,7 @@ void free_FXManager(FXManager* to);
 
 void Save_SFXEntryList(std::vector<SavedSFXEntry>* to, FXManager* from);
 void Restore_SFXEntryList(FXManager* to, std::vector<SavedSFXEntry>* from);
-void Copy_SFXEntryList(std::vector<SavedSFXEntry>* to, std::vector<SavedSFXEntry> from);
+void Copy_SFXEntryList(std::vector<SavedSFXEntry>* to, std::vector<SavedSFXEntry>* from);
 void Clear_SFXEntryList(std::vector<SavedSFXEntry>* to);
 
 //don't handle the behaviour_list in this, that's a seperate function
