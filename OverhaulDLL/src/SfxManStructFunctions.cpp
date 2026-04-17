@@ -70,7 +70,7 @@ void FxBehaviorNodeDeref(FxBehaviorNode* FxBehaviorNode)
         g_nodeGraveyard[FxBehaviorNode] -= 1;
         if (g_nodeGraveyard[FxBehaviorNode] == 0)
         {
-            Destruct_FxBehaviorNode(FxBehaviorNode, 1);
+            Destruct_FxBehaviorNode(NULL, FxBehaviorNode, FxBehaviorNode_GetSize_Type1(FxBehaviorNode), FxBehaviorNode_GetSize_Type2(FxBehaviorNode));
         }
     }
 }

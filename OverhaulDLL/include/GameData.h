@@ -699,4 +699,16 @@ static const hkpWorld_removePhantom_fn hk_removePhantom = (hkpWorld_removePhanto
 typedef void (*hkpWorld_stepDeltaTime_t)(hkpWorld* world, float dt);
 static const hkpWorld_stepDeltaTime_t hkpWorld_stepDeltaTime = (hkpWorld_stepDeltaTime_t)0x1409b6280;
 
+typedef void (*Destruct_SfxEntry_t)(void* sfx, uint64_t param_2);
+static const Destruct_SfxEntry_t Destruct_SfxEntry = (Destruct_SfxEntry_t)0x140ff9490;
+
+typedef void (*Destruct_FxBehaviorNode_t)(void* unused, void* FxBehaviorNode, bool param_3, bool param_4);
+static const Destruct_FxBehaviorNode_t Destruct_FxBehaviorNode = (Destruct_FxBehaviorNode_t)0x140fdf530;
+
+typedef bool (*FxBehaviorNode_GetSize_Type1_t)(void* FxBehaviorNode);
+static const FxBehaviorNode_GetSize_Type1_t FxBehaviorNode_GetSize_Type1 = (FxBehaviorNode_GetSize_Type1_t)0x140f07f80;
+
+typedef bool (*FxBehaviorNode_GetSize_Type2_t)(void* FxBehaviorNode);
+static const FxBehaviorNode_GetSize_Type2_t FxBehaviorNode_GetSize_Type2 = (FxBehaviorNode_GetSize_Type2_t)0x140f07fc0;
+
 #endif // _DS1_OVERHAUL_GAME_DATA_H_
