@@ -27,6 +27,15 @@ void Clear_SFXEntryList(std::vector<SavedSFXEntry>* to);
 
 //don't handle the behaviour_list in this, that's a seperate function
 void copy_SFXEntry(SFXEntry* to, SFXEntry* from, StateTarget target);
+void Free_SFXEntry(SFXEntry* to, bool freeself);
+
+void Save_SavedFxBehaviorNodeGraph(SavedFxBehaviorNode* to, FxBehaviorNode* from);
+void Restore_SavedFxBehaviorNodeGraph(FxBehaviorNode** to, SavedFxBehaviorNode* from);
+void Copy_SavedFxBehaviorNodeGraph(SavedFxBehaviorNode* to, SavedFxBehaviorNode* from);
+void Clear_SavedFxBehaviorNodeGraph(SavedFxBehaviorNode* to); //the caller should delete the to
+
+void copy_FxBehaviorNode(FxBehaviorNode* to, FxBehaviorNode* from, StateTarget target);
+void Free_FxBehaviorNode(FxBehaviorNode* to, bool freeself);
 
 // SFX graveyard: prevents SFXEntries and FxBehaviorNodes
 // internal allocations from being freed during the rollback window.

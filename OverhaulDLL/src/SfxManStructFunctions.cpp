@@ -175,6 +175,7 @@ void free_FXManager(FXManager* to)
     free(to);
 }
 
+
 void Save_SFXEntryList(std::vector<SavedSFXEntry>* to, FXManager* from)
 {
     to->clear();
@@ -182,20 +183,19 @@ void Save_SFXEntryList(std::vector<SavedSFXEntry>* to, FXManager* from)
     SFXEntry* head = from->SFXEntryList;
     while (head != NULL)
     {
-        SavedSFXEntry e;
-        e.game_addr = head;
+        SavedSFXEntry ss;
+        ss.game_addr = head;
         SfxEntryRef(head);
-        copy_SFXEntry(&e.data, head, StateTarget::ToLocal);
+        copy_SFXEntry(&ss.data, head, StateTarget::ToLocal);
 
         FxBehaviorNode* node_head = head->base.behaviour_list;
-        while (node_head != NULL)
+        if (node_head != NULL)
         {
-            e.nodes.push_back(node_head);
-            FxBehaviorNodeRef(node_head);
-            node_head = node_head->next;
+            ss.behaviour_list_head = new SavedFxBehaviorNode();
+            Save_SavedFxBehaviorNodeGraph(ss.behaviour_list_head, node_head);
         }
 
-        to->push_back(e);
+        to->push_back(ss);
         head = head->base.next;
     }
 }
@@ -208,15 +208,27 @@ void Restore_SFXEntryList(FXManager* to, std::vector<SavedSFXEntry>* from)
     while (head != NULL)
     {
         SFXEntry* next = head->base.next;
-        FxBehaviorNode* node_head = head->base.behaviour_list;
-        while (node_head != NULL)
+
+        std::vector<FxBehaviorNode*> graph_elems;
+        graph_elems.push_back(head->base.behaviour_list);
+        while (!graph_elems.empty())
         {
-            FxBehaviorNode* node_head_next = node_head->next;
-            FxBehaviorNodeDeref(node_head);
-            node_head = node_head_next;
+            FxBehaviorNode* node = graph_elems.back();
+            graph_elems.pop_back();
+
+            if (node->next_node != NULL)
+            {
+                graph_elems.push_back(node->next_node);
+            }
+            if (node->child_node != NULL)
+            {
+                graph_elems.push_back(node->child_node);
+            }
+            FxBehaviorNodeDeref(node);
         }
         head->base.behaviour_list = NULL;
         head->base.behaviour_list_end = NULL;
+
         SfxEntryDeref(head);
         head = next;
     }
@@ -236,20 +248,18 @@ void Restore_SFXEntryList(FXManager* to, std::vector<SavedSFXEntry>* from)
         //insert into list
         to->SFXEntryList = new_head;
         //ref count now that it's in the game
-        SfxEntryRef(new_head);
+        SfxEntryRef(s.game_addr);
 
-        for (auto ni = s.nodes.rbegin(); ni != s.nodes.rend(); ni++)
+        if (s.behaviour_list_head != NULL)
         {
-            FxBehaviorNode* new_node_head = *ni;
-            FxBehaviorNode* old_node_head = new_head->base.behaviour_list;
-            //update next ptr
-            new_node_head->next = old_node_head;
-            //insert
-            new_head->base.behaviour_list = new_node_head;
-            //ref count
-            FxBehaviorNodeRef(new_node_head);
+            Restore_SavedFxBehaviorNodeGraph(&new_head->base.behaviour_list, s.behaviour_list_head);
         }
-        new_head->base.behaviour_list_end = s.nodes.back();
+        FxBehaviorNode* last_node = new_head->base.behaviour_list;
+        while (last_node != NULL)
+        {
+            new_head->base.behaviour_list_end = last_node;
+            last_node = last_node->next_node;
+        }
     }
     to->SFXEntryList_tail = from->back().game_addr;
 }
@@ -266,10 +276,14 @@ void Copy_SFXEntryList(std::vector<SavedSFXEntry>* to, std::vector<SavedSFXEntry
         new_s.game_addr = s.game_addr;
         copy_SFXEntry(&new_s.data, &s.data, StateTarget::Copy);
         SfxEntryRef(new_s.game_addr);
-        for (auto& n : s.nodes)
+        if (s.behaviour_list_head != NULL)
         {
-            new_s.nodes.push_back(n);
-            FxBehaviorNodeRef(n);
+            new_s.behaviour_list_head = new SavedFxBehaviorNode();
+            Copy_SavedFxBehaviorNodeGraph(new_s.behaviour_list_head, s.behaviour_list_head);
+        }
+        else
+        {
+            new_s.behaviour_list_head = NULL;
         }
         to->push_back(new_s);
     }
@@ -280,14 +294,17 @@ void Clear_SFXEntryList(std::vector<SavedSFXEntry>* to)
     for (auto e : *to)
     {
         SfxEntryDeref(e.game_addr);
-        for (auto n : e.nodes)
+        Free_SFXEntry(&e.data, false);
+        if (e.behaviour_list_head != NULL)
         {
-            FxBehaviorNodeDeref(n);
+            Clear_SavedFxBehaviorNodeGraph(e.behaviour_list_head);
+            delete e.behaviour_list_head;
+            e.behaviour_list_head = NULL;
         }
-        e.nodes.clear();
     }
     to->clear();
 }
+
 
 void copy_SFXEntry(SFXEntry* to, SFXEntry* from, StateTarget target)
 {
@@ -303,4 +320,127 @@ void copy_SFXEntry(SFXEntry* to, SFXEntry* from, StateTarget target)
     //field_0xe0
     //field_0xf0
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+}
+
+void Free_SFXEntry(SFXEntry* to, bool freeself)
+{
+    if (freeself)
+    {
+        free(to);
+    }
+}
+
+
+void Save_SavedFxBehaviorNodeGraph(SavedFxBehaviorNode* to, FxBehaviorNode* from)
+{
+    to->game_addr = from;
+    copy_FxBehaviorNode(&to->data, from, StateTarget::ToLocal);
+    FxBehaviorNodeRef(from);
+
+    if (from->next_node != NULL)
+    {
+        to->next_node = new SavedFxBehaviorNode();
+        Save_SavedFxBehaviorNodeGraph(to->next_node, from->next_node);
+    }
+    if (from->child_node != NULL)
+    {
+        to->child_node = new SavedFxBehaviorNode();
+        Save_SavedFxBehaviorNodeGraph(to->child_node, from->child_node);
+    }
+}
+
+void Restore_SavedFxBehaviorNodeGraph(FxBehaviorNode** to, SavedFxBehaviorNode* from)
+{
+    *to = from->game_addr;
+    copy_FxBehaviorNode(*to, &from->data, StateTarget::ToGame);
+    FxBehaviorNodeRef(from->game_addr);
+
+    if (from->next_node != NULL)
+    {
+        Restore_SavedFxBehaviorNodeGraph(&(*to)->next_node, from->next_node);
+    }
+    else
+    {
+        (*to)->next_node = NULL;
+    }
+    if (from->child_node != NULL)
+    {
+        Restore_SavedFxBehaviorNodeGraph(&(*to)->child_node, from->child_node);
+    }
+    else
+    {
+        (*to)->child_node = NULL;
+    }
+}
+
+void Copy_SavedFxBehaviorNodeGraph(SavedFxBehaviorNode* to, SavedFxBehaviorNode* from)
+{
+    to->game_addr = from->game_addr;
+    copy_FxBehaviorNode(&to->data, &from->data, StateTarget::Copy);
+    FxBehaviorNodeRef(to->game_addr);
+
+    if (from->next_node != NULL)
+    {
+        to->next_node = new SavedFxBehaviorNode();
+        Copy_SavedFxBehaviorNodeGraph(to->next_node, from->next_node);
+    }
+    else
+    {
+        to->next_node = NULL;
+    }
+    if (from->child_node != NULL)
+    {
+        to->child_node = new SavedFxBehaviorNode();
+        Copy_SavedFxBehaviorNodeGraph(to->child_node, from->child_node);
+    }
+    else
+    {
+        to->child_node = NULL;
+    }
+}
+
+void Clear_SavedFxBehaviorNodeGraph(SavedFxBehaviorNode* to)
+{
+    FxBehaviorNodeDeref(to->game_addr);
+    Free_FxBehaviorNode(&to->data, false);
+    if (to->next_node != NULL)
+    {
+        Clear_SavedFxBehaviorNodeGraph(to->next_node);
+        delete to->next_node;
+        to->next_node = NULL;
+    }
+    if (to->child_node != NULL)
+    {
+        Clear_SavedFxBehaviorNodeGraph(to->child_node);
+        delete to->child_node;
+        to->child_node = NULL;
+    }
+}
+
+
+void copy_FxBehaviorNode(FxBehaviorNode* to, FxBehaviorNode* from, StateTarget target)
+{
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    to->unk_1 = from->unk_1;
+    //body !!!
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    //TODO dunno if i need to save any of these pointers i've commented out
+    //unk_2
+    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    to->parent_node = from->parent_node;
+    to->next_node = from->next_node;
+    to->child_node = from->child_node;
+    //unk_3;
+    //unk_4;
+    //_0 !!!
+    to->parent = from->parent;
+    to->destruction_queue_next = from->destruction_queue_next;
+}
+
+void Free_FxBehaviorNode(FxBehaviorNode* to, bool freeself)
+{
+    if (freeself)
+    {
+        free(to);
+    }
 }

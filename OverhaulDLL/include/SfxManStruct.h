@@ -17,16 +17,39 @@ typedef struct SFXEntry SFXEntry;
 typedef struct FXManager FXManager;
 typedef struct FxBehaviorNode FxBehaviorNode;
 typedef struct SavedSFXEntry SavedSFXEntry;
+typedef struct SavedFxBehaviorNode SavedFxBehaviorNode;
 typedef struct vectorFXEntry vectorFXEntry;
 typedef struct doublelinkedlistFxEntry doublelinkedlistFxEntry;
 typedef struct SFXEntry_field0xf0 SFXEntry_field0xf0;
 
 struct FxBehaviorNode
 {
-    uint8_t _0[0x90];
-    FxBehaviorNode* next;
+    uint8_t data_0[0x50];
+    void* unk_1; //some sort of static pointer
+    void* body; //TODO
+    uint8_t data_1[16];
+    void* unk_2; //TODO
+    uint8_t data_2[16];
+    FxBehaviorNode* parent_node;
+    FxBehaviorNode* next_node;
+    FxBehaviorNode* child_node;
+    void* unk_3; //TODO
+    void* unk_4; //TODO
+    uint8_t _0[24+4+4]; //TODO
+    SFXEntry* parent; //already saved, just a static pointer
+    void* destruction_queue_next;
 };
-static_assert(offsetof(FxBehaviorNode, next) == 0x90);
+static_assert(sizeof(FxBehaviorNode) == 0xe0);
+static_assert(offsetof(FxBehaviorNode, unk_1) == 0x50);
+static_assert(offsetof(FxBehaviorNode, body) == 0x58);
+static_assert(offsetof(FxBehaviorNode, unk_2) == 0x70);
+static_assert(offsetof(FxBehaviorNode, unk_2) == 0x70);
+static_assert(offsetof(FxBehaviorNode, parent_node) == 0x88);
+static_assert(offsetof(FxBehaviorNode, next_node) == 0x90);
+static_assert(offsetof(FxBehaviorNode, child_node) == 0x98);
+static_assert(offsetof(FxBehaviorNode, unk_3) == 0xa0);
+static_assert(offsetof(FxBehaviorNode, unk_4) == 0xa8);
+static_assert(offsetof(FxBehaviorNode, parent) == 0xd0);
 
 struct doublelinkedlistFxEntry
 {
@@ -51,7 +74,7 @@ struct FXEntry
     vectorFXEntry* vec;
     doublelinkedlistFxEntry* list; //the pointers here are static, not tied to this FXEntry lifetime
     SFXEntry* next;
-    FxBehaviorNode* behaviour_list; //i have no idea what these pointers are about. graveyarding and treating as static for now
+    FxBehaviorNode* behaviour_list;
     FxBehaviorNode* behaviour_list_end;
     uint8_t data_1[8];
 };
@@ -120,6 +143,16 @@ static_assert(offsetof(FXManager, FxBehaviorNode_destruction_queue) == 0x80);
 static_assert(offsetof(FXManager, FrpgFxAdapterBase) == 0x1a0);
 static_assert(offsetof(FXManager, loaded_assets) == 0x1c8);
 
+// ---- Saved FxBehaviorNode for rollback ----
+// Pairs a game-memory address with a snapshot of the FxBehaviorNode data
+struct SavedFxBehaviorNode
+{
+    FxBehaviorNode* game_addr;
+    FxBehaviorNode data;
+    SavedFxBehaviorNode* next_node;
+    SavedFxBehaviorNode* child_node;
+};
+
 // ---- Saved SFXEntry for rollback ----
 // Pairs a game-memory address with a snapshot of the SFXEntry data and
 // snapshots of every node hanging off the entry.
@@ -127,7 +160,7 @@ struct SavedSFXEntry
 {
     SFXEntry* game_addr;
     SFXEntry data;
-    std::vector<FxBehaviorNode*> nodes;
+    SavedFxBehaviorNode* behaviour_list_head;
 };
 
 // ---- FXHGManagerBase ----
