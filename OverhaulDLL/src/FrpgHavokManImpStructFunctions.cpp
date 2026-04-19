@@ -119,7 +119,7 @@ static void CollectWorldEntities(hkpWorld* world, std::vector<hkpEntity*>& out)
 
 /* ============================================================
  * Helper: collect all non-border phantoms from the world
- * We only save hkpSimpleShapePhantom types (broadPhaseHandle.m_type != 3)
+ * We only save hkpSimpleShapePhantom types
  * ============================================================ */
 static void CollectWorldPhantoms(hkpWorld* world, std::vector<hkpSimpleShapePhantom*>& out)
 {
@@ -133,9 +133,8 @@ static void CollectWorldPhantoms(hkpWorld* world, std::vector<hkpSimpleShapePhan
         // Skip broadphase border phantoms
         if (IsBorderPhantom(world, (void*)phantomPtr)) continue;
 
-        // Check the broadPhaseHandle type: type 3 = border/aabb infrastructure phantom
-        uint8_t bpType = phantomPtr->m_collidable.base.m_broadPhaseHandle.m_type;
-        if (bpType == 3) continue; // skip AABB/border phantoms
+        // Check the vtable (hkpSimpleShapePhantom::vftable)
+        if ((uint64_t)phantomPtr->vtable != 0x14145ccc8) continue;
 
         out.push_back((hkpSimpleShapePhantom*)phantomPtr);
     }
@@ -162,7 +161,7 @@ void SaveHkpWorldSnapshot(HkpWorldSnapshot* snap, hkpWorld* world)
     {
         SavedEntityState s;
         s.ptr = e;
-        memcpy(s.motionData, &e->m_motion, sizeof(hkpMotion));
+        memcpy(&s.motionData, &e->m_motion, sizeof(hkpMotion));
         snap->entities.push_back(s);
         // Take a ref so Havok can't free this entity if it's removed before restore
         hk_ref((void*)e);
@@ -177,7 +176,7 @@ void SaveHkpWorldSnapshot(HkpWorldSnapshot* snap, hkpWorld* world)
     {
         SavedPhantomState s;
         s.ptr = p;
-        memcpy(s.motionStateData, &p->m_motionState, sizeof(hkMotionState));
+        memcpy(&s.motionStateData, &p->m_motionState, sizeof(hkMotionState));
         snap->phantoms.push_back(s);
 
         hk_ref((void*)p);
@@ -255,11 +254,11 @@ void RestoreHkpWorldSnapshot(const HkpWorldSnapshot* snap, hkpWorld* world)
     // --- Restore motion states via memcpy ---
     for (auto& s : snap->entities)
     {
-        memcpy(&s.ptr->m_motion, s.motionData, sizeof(hkpMotion));
+        memcpy(&s.ptr->m_motion, &s.motionData, sizeof(hkpMotion));
     }
     for (auto& s : snap->phantoms)
     {
-        memcpy(&s.ptr->m_motionState, s.motionStateData, sizeof(hkMotionState));
+        memcpy(&s.ptr->m_motionState, &s.motionStateData, sizeof(hkMotionState));
     }
 
     // NOTE: After restoring positions, the broadphase AABBs, overlap pairs,
@@ -283,7 +282,7 @@ void CopyHkpWorldSnapshot(HkpWorldSnapshot* dst, const HkpWorldSnapshot* src)
     {
         SavedEntityState new_s;
         new_s.ptr = s.ptr;
-        memcpy(&new_s.motionData, &s.motionData, sizeof(hkpMotion));
+        memcpy(new_s.motionData, s.motionData, sizeof(hkpMotion));
         dst->entities.push_back(new_s);
         hk_ref((void*)s.ptr);
     }
@@ -292,7 +291,7 @@ void CopyHkpWorldSnapshot(HkpWorldSnapshot* dst, const HkpWorldSnapshot* src)
     {
         SavedPhantomState new_s;
         new_s.ptr = s.ptr;
-        memcpy(&new_s.motionStateData, &s.motionStateData, sizeof(hkMotionState));
+        memcpy(new_s.motionStateData, s.motionStateData, sizeof(hkMotionState));
         dst->phantoms.push_back(new_s);
         hk_ref((void*)s.ptr);
     }
