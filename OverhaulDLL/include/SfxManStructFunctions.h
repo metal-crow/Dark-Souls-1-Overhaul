@@ -29,6 +29,7 @@ void Clear_SFXEntryList(std::vector<SavedSFXEntry>* to);
 void copy_SFXEntry(SFXEntry* to, SFXEntry* from, StateTarget target);
 void Free_SFXEntry(SFXEntry* to, bool freeself);
 
+//these functions operate on the Node graph, but it's actually a tree with no duplicates, not strictly a graph
 void Save_SavedFxBehaviorNodeGraph(SavedFxBehaviorNode* to, FxBehaviorNode* from);
 void Restore_SavedFxBehaviorNodeGraph(FxBehaviorNode** to, SavedFxBehaviorNode* from);
 void Copy_SavedFxBehaviorNodeGraph(SavedFxBehaviorNode* to, SavedFxBehaviorNode* from);

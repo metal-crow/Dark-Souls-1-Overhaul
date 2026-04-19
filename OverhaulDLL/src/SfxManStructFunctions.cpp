@@ -210,7 +210,10 @@ void Restore_SFXEntryList(FXManager* to, std::vector<SavedSFXEntry>* from)
         SFXEntry* next = head->base.next;
 
         std::vector<FxBehaviorNode*> graph_elems;
-        graph_elems.push_back(head->base.behaviour_list);
+        if (head->base.behaviour_list != NULL)
+        {
+            graph_elems.push_back(head->base.behaviour_list);
+        }
         while (!graph_elems.empty())
         {
             FxBehaviorNode* node = graph_elems.back();
@@ -261,7 +264,10 @@ void Restore_SFXEntryList(FXManager* to, std::vector<SavedSFXEntry>* from)
             last_node = last_node->next_node;
         }
     }
-    to->SFXEntryList_tail = from->back().game_addr;
+    if (!from->empty())
+    {
+        to->SFXEntryList_tail = from->back().game_addr;
+    }
 }
 
 void Copy_SFXEntryList(std::vector<SavedSFXEntry>* to, std::vector<SavedSFXEntry>* from)
@@ -299,7 +305,6 @@ void Clear_SFXEntryList(std::vector<SavedSFXEntry>* to)
         {
             Clear_SavedFxBehaviorNodeGraph(e.behaviour_list_head);
             delete e.behaviour_list_head;
-            e.behaviour_list_head = NULL;
         }
     }
     to->clear();
@@ -423,6 +428,7 @@ void copy_FxBehaviorNode(FxBehaviorNode* to, FxBehaviorNode* from, StateTarget t
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     to->unk_1 = from->unk_1;
     //body !!!
+    to->body = from->body;
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
     //TODO dunno if i need to save any of these pointers i've commented out
     //unk_2
