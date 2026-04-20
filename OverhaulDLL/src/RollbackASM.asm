@@ -315,7 +315,7 @@ Destruct_FxBehaviorNode_injection PROC
 FUNC_PROLOGUE_LITE
 ; RCX = Unused. Easier to not bother reordering
 ; RDX = FxBehaviorNode* (second param of Destruct_SFXEntry)
-call    OnSfxEntryDestruct
+call    OnFxBehaviorNodeDealloc
 FUNC_EPILOGUE_LITE_NORAX
 ; AL = true if we should skip destruction
 test    al, al
