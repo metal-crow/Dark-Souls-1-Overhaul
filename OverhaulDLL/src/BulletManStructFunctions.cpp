@@ -13,8 +13,8 @@ void copy_BulletIns_FollowupBullet_Data(BulletIns_FollowupBullet* to, BulletIns_
 {
     to->vtable = from->vtable;
     to->FXManager = from->FXManager;
-    to->fxentry_a = from->fxentry_a;
-    to->fxentry_b = from->fxentry_b;
+    to->fxentry_a = NULL;// from->fxentry_a;
+    to->fxentry_b = NULL;// from->fxentry_b;
 }
 
 void copy_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, BulletIns_FollowupBullet* from, StateTarget target)
