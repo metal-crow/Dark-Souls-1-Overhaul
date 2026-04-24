@@ -244,14 +244,8 @@ void copy_AttachSysSlot(AttachSysSlotBaseImpl** to, AttachSysSlotBaseImpl* from,
         //need to free and realloc the slot since the type will probably differ and thus the struct size will differ
         if ((*to)->next != NULL)
         {
-            if (target == StateTarget::ToGame)
-            {
-                Game::game_free_alt((*to)->next);
-            }
-            else
-            {
-                free((*to)->next);
-            }
+            //free_AttachSysSlot frees the whole chain + any embedded dynamic arrays
+            free_AttachSysSlot((*to)->next, target);
             (*to)->next = NULL;
         }
         (*to)->next = init_AttachSysSlot((AttachSysSlotType)(from->next->slotType), target);
@@ -261,14 +255,7 @@ void copy_AttachSysSlot(AttachSysSlotBaseImpl** to, AttachSysSlotBaseImpl* from,
     {
         if ((*to)->next != NULL)
         {
-            if (target == StateTarget::ToGame)
-            {
-                Game::game_free_alt((*to)->next);
-            }
-            else
-            {
-                free((*to)->next);
-            }
+            free_AttachSysSlot((*to)->next, target);
             (*to)->next = NULL;
         }
     }
@@ -392,13 +379,100 @@ AttachSysSlotBaseImpl* init_AttachSysSlot(AttachSysSlotType type, StateTarget ta
     return local;
 }
 
-void free_AttachSysSlot(AttachSysSlotBaseImpl* to)
+//Frees any dynamic arrays embedded in an AttachSysSlot, dispatching on slotType.
+//Must be called before freeing the slot itself so embedded allocations don't leak.
+//target tells us whether the slot (and thus its embedded arrays) live in game memory or MSVC memory.
+void free_AttachSysSlot_Fields(AttachSysSlotBaseImpl* to, StateTarget target)
 {
+    if (to == NULL)
+    {
+        return;
+    }
+    switch (to->slotType)
+    {
+    case TypeChrMultiSfxSlot:
+    {
+        ChrMultiSfxSlot* slot = (ChrMultiSfxSlot*)to;
+        free_BulletIns_FollowupBullet_List(&slot->bullet_list, &slot->bullet_list_len, target);
+        break;
+    }
+    case TypeChrWepEnchantSlot:
+    {
+        ChrWepEnchantSlot* slot = (ChrWepEnchantSlot*)to;
+        free_BulletIns_FollowupBullet_List(&slot->followup_bullet_list, &slot->followup_bullet_list_len, target);
+        break;
+    }
+    case TypeChrStatueDeadSlot:
+    {
+        ChrStatueDeadSlot* slot = (ChrStatueDeadSlot*)to;
+        int16_t len = (int16_t)slot->followup_bullet_list_len;
+        free_BulletIns_FollowupBullet_List(&slot->followup_bullet_list, &len, target);
+        slot->followup_bullet_list_len = len;
+        break;
+    }
+    case TypeChrConditionSfxSeSlot:
+    {
+        ChrConditionSfxSeSlot* slot = (ChrConditionSfxSeSlot*)to;
+        free_BulletIns_FollowupBullet_List(&slot->followupbullet_list, &slot->followupbullet_list_len, target);
+        break;
+    }
+    case TypeChrBurnSlot:
+    {
+        ChrBurnSlot* slot = (ChrBurnSlot*)to;
+        if (slot->floatlist != NULL)
+        {
+            if (target == StateTarget::ToGame) { Game::game_free(slot->floatlist); }
+            else { free(slot->floatlist); }
+            slot->floatlist = NULL;
+        }
+        slot->floatlist_len = 0;
+        if (slot->list != NULL)
+        {
+            if (target == StateTarget::ToGame) { Game::game_free(slot->list); }
+            else { free(slot->list); }
+            slot->list = NULL;
+        }
+        slot->list_len = 0;
+        break;
+    }
+    case TypeChrGasmanSlot:
+    {
+        ChrGasmanSlot* slot = (ChrGasmanSlot*)to;
+        if (slot->list != NULL)
+        {
+            if (target == StateTarget::ToGame) { Game::game_free(slot->list); }
+            else { free(slot->list); }
+            slot->list = NULL;
+        }
+        slot->list_len = 0;
+        break;
+    }
+    default:
+        //slot types without dynamic allocations: nothing to free
+        break;
+    }
+}
+
+void free_AttachSysSlot(AttachSysSlotBaseImpl* to, StateTarget target)
+{
+    if (to == NULL)
+    {
+        return;
+    }
     if (to->next != NULL)
     {
-        free_AttachSysSlot(to->next);
+        free_AttachSysSlot(to->next, target);
+        to->next = NULL;
     }
-    free(to);
+    free_AttachSysSlot_Fields(to, target);
+    if (target == StateTarget::ToGame)
+    {
+        Game::game_free_alt(to);
+    }
+    else
+    {
+        free(to);
+    }
 }
 
 

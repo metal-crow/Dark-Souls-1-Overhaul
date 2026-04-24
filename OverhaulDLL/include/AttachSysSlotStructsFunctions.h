@@ -10,7 +10,8 @@
 std::string print_AttachSysSlot(AttachSysSlotBaseImpl* to);
 void copy_AttachSysSlot(AttachSysSlotBaseImpl** to, AttachSysSlotBaseImpl* from, StateTarget target);
 AttachSysSlotBaseImpl* init_AttachSysSlot(AttachSysSlotType type, StateTarget target);
-void free_AttachSysSlot(AttachSysSlotBaseImpl* to);
+void free_AttachSysSlot(AttachSysSlotBaseImpl* to, StateTarget target);
+void free_AttachSysSlot_Fields(AttachSysSlotBaseImpl* to, StateTarget target);
 
 std::string print_ChrShineTreasureSlot(ChrShineTreasureSlot* to);
 void copy_ChrShineTreasureSlot(ChrShineTreasureSlot* to, ChrShineTreasureSlot* from, StateTarget target);

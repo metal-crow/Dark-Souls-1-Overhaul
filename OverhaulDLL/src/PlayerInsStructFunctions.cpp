@@ -889,22 +889,8 @@ void copy_ChrAttachSys(ChrAttachSys* to, const ChrAttachSys* from, StateTarget t
 {
     if (to->SysSlots != NULL && from->SysSlots != NULL)
     {
-        AttachSysSlotBaseImpl* current_head = to->SysSlots;
-        while (current_head != NULL)
-        {
-            AttachSysSlotBaseImpl* next_head = current_head->next;
-            switch (target)
-            {
-            case StateTarget::ToGame:
-                Game::game_free_alt(current_head);
-                break;
-            case StateTarget::ToLocal:
-            case StateTarget::Copy:
-                free(current_head);
-                break;
-            }
-            current_head = next_head;
-        }
+        //free_AttachSysSlot recursively frees the whole chain AND any embedded dynamic arrays
+        free_AttachSysSlot(to->SysSlots, target);
         to->SysSlots = NULL;
     }
     if (to->SysSlots == NULL && from->SysSlots != NULL)
@@ -928,7 +914,9 @@ ChrAttachSys* init_ChrAttachSys()
 
 void free_ChrAttachSys(ChrAttachSys* to, bool freeself)
 {
-    free_AttachSysSlot(to->SysSlots);
+    //ChrAttachSys is always managed as part of our local rollback snapshots, so targets are always MSVC-heap
+    free_AttachSysSlot(to->SysSlots, StateTarget::ToLocal);
+    to->SysSlots = NULL;
 
     if (freeself)
     {

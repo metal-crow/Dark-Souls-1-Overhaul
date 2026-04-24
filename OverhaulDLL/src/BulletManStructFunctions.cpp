@@ -27,9 +27,62 @@ void copy_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, BulletIns_Follo
     to->prev = from->prev;
 }
 
+//Game's layout for BulletIns_FollowupBullet list allocations (verified via ghidra on
+//ChrMultiSfxSlot_Process_, ChrStatueDeadSlot_Process_, and Destruct_ChrConditionSfxSeSlot):
+//    raw = internal_heap_3->malloc(count * sizeof(BulletIns_FollowupBullet) + 0x10, 0x10)
+//    raw[0x0] = raw                    //self pointer used on free
+//    raw[0x8] = (uint64_t)count        //element count
+//    list    = (BulletIns_FollowupBullet*)(raw + 0x10)
+//    free    = Get_HeapAllocator_For_allocation(list)->free( *(void**)(((uint8_t*)list) - 0x10) )
+static const size_t BULLETIN_FOLLOWUPBULLET_LIST_HEADER_SIZE = 0x10;
+
+BulletIns_FollowupBullet* alloc_BulletIns_FollowupBullet_List(int16_t count, StateTarget target)
+{
+    if (count <= 0)
+    {
+        return NULL;
+    }
+    if (target == StateTarget::ToGame)
+    {
+        uint8_t* raw = (uint8_t*)Game::game_malloc(
+            sizeof(BulletIns_FollowupBullet) * (size_t)count + BULLETIN_FOLLOWUPBULLET_LIST_HEADER_SIZE,
+            0x10,
+            *(uint64_t*)Game::internal_heap_3);
+        *(void**)(raw + 0x0) = raw;
+        *(uint64_t*)(raw + 0x8) = (uint64_t)count;
+        return (BulletIns_FollowupBullet*)(raw + BULLETIN_FOLLOWUPBULLET_LIST_HEADER_SIZE);
+    }
+    return (BulletIns_FollowupBullet*)malloc_(sizeof(BulletIns_FollowupBullet) * (size_t)count);
+}
+
+void free_BulletIns_FollowupBullet_List(BulletIns_FollowupBullet** list, int16_t* len, StateTarget target)
+{
+    if (*list == NULL)
+    {
+        *len = 0;
+        return;
+    }
+    if (target == StateTarget::ToGame)
+    {
+        void* raw = *(void**)(((uint8_t*)(*list)) - BULLETIN_FOLLOWUPBULLET_LIST_HEADER_SIZE);
+        Game::game_free_alt(raw);
+    }
+    else
+    {
+        free(*list);
+    }
+    *list = NULL;
+    *len = 0;
+}
+
 void copy_BulletIns_FollowupBullet_List(BulletIns_FollowupBullet** to_list, int16_t* to_len, BulletIns_FollowupBullet** from_list, int16_t* from_len, StateTarget target)
 {
-    *to_list = (BulletIns_FollowupBullet*)realloc_(*to_list, sizeof(BulletIns_FollowupBullet) * (*from_len));
+    //Only resize when the count actually changes - this avoids thrashing the allocator
+    if (*to_len != *from_len)
+    {
+        free_BulletIns_FollowupBullet_List(to_list, to_len, target);
+        *to_list = alloc_BulletIns_FollowupBullet_List(*from_len, target);
+    }
     for (int16_t i = 0; i < *from_len; i++)
     {
         copy_BulletIns_FollowupBullet_Data(&(*to_list)[i], &(*from_list)[i], target);
