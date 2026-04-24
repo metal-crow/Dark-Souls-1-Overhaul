@@ -178,7 +178,6 @@ void SaveHkpWorldSnapshot(HkpWorldSnapshot* snap, hkpWorld* world)
         s.ptr = p;
         memcpy(&s.motionStateData, &p->m_motionState, sizeof(hkMotionState));
         snap->phantoms.push_back(s);
-
         hk_ref((void*)p);
     }
 }
@@ -229,7 +228,11 @@ void RestoreHkpWorldSnapshot(const HkpWorldSnapshot* snap, hkpWorld* world)
     {
         if (currentEntitySet.find(s.ptr) == currentEntitySet.end())
         {
-            hk_addEntity(world, s.ptr, 1); // 1 = activate. This refs the entity which we want since it's now in the world as well
+            //don't add if there's no associated shape
+            if (s.ptr->m_collidable.base.shape != NULL)
+            {
+                hk_addEntity(world, s.ptr, 1); // 1 = activate. This refs the entity which we want since it's now in the world as well
+            }
         }
     }
 
@@ -247,7 +250,10 @@ void RestoreHkpWorldSnapshot(const HkpWorldSnapshot* snap, hkpWorld* world)
     {
         if (currentPhantomSet.find(s.ptr) == currentPhantomSet.end())
         {
-            hk_addPhantom(world, (void*)s.ptr); //This refs the entity
+            if (s.ptr->base.m_collidable.base.shape != NULL)
+            {
+                hk_addPhantom(world, (void*)s.ptr); //This refs the entity
+            }
         }
     }
 
