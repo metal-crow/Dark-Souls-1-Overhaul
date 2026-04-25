@@ -855,7 +855,7 @@ void free_ChrIns(ChrIns* to, bool freeself)
 {
     //free_ChrIns_field0x18(to->field0x18);
     free_PlayerCtrl(to->playerCtrl);
-    //free_PadManipulator(to->padManipulator);
+    free_PadManipulator(to->padManipulator);
     free(to->player_handing_state);
     free_SpecialEffect(to->specialEffects);
     free_QwcSpEffectEquipCtrl(to->qwcSpEffectEquipCtrl);
@@ -2896,7 +2896,7 @@ ChrCtrl_AnimationQueueEntry* init_ChrCtrl_AnimationQueueEntry()
 
 void free_ChrCtrl_AnimationQueueEntry(ChrCtrl_AnimationQueueEntry* to, bool freeself)
 {
-    free(to->defaultAnimationControl);
+    free_hkaDefaultAnimationControl(to->defaultAnimationControl);
 
     if (freeself)
     {
