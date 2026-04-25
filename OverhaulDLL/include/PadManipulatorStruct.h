@@ -60,8 +60,8 @@ struct PadManipulatorPacked
     float Backstep_timer;
     uint32_t LockonTargetHandle;
     int32_t CurrentFrame_ActionInputs_ButtonId;
-    float y_movement_input;
-    float x_movement_input;
+    float y_movement_input[6];
+    float x_movement_input[6];
     uint32_t cur_movement_input_index_to_use;
 };
 

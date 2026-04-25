@@ -42,8 +42,8 @@ std::string print_PadManipulatorPacked(PadManipulatorPacked* to)
     out += std::to_string(to->LockonTargetHandle) + "\n";
     out += std::to_string(to->movement_related_flags) + "\n";
     out += std::to_string(to->not_getting_movement_input) + "\n";
-    out += std::to_string(to->y_movement_input) + "\n";
-    out += std::to_string(to->x_movement_input) + "\n";
+    //out += std::to_string(to->y_movement_input) + "\n";
+    //out += std::to_string(to->x_movement_input) + "\n";
     out += std::to_string(to->cur_movement_input_index_to_use) + "\n";
     return out;
 }
@@ -411,8 +411,8 @@ void PadManipulator_to_PadManipulatorPacked(PadManipulatorPacked* to, PadManipul
     to->movement_related_flags = from->movement_related_flags;
     to->not_getting_movement_input = from->not_getting_movement_input;
     to->TimeRollButtonHeld = from->TimeRollButtonHeld;
-    to->y_movement_input = from->y_movement_input[from->cur_movement_input_index_to_use];
-    to->x_movement_input = from->x_movement_input[from->cur_movement_input_index_to_use];
+    memcpy(to->y_movement_input, from->y_movement_input, sizeof(to->y_movement_input));
+    memcpy(to->x_movement_input, from->x_movement_input, sizeof(to->x_movement_input));
     to->cur_movement_input_index_to_use = from->cur_movement_input_index_to_use;
     to->Backstep_timer = from->Backstep_timer;
     to->EnableBackStep = from->EnableBackStep;
@@ -485,8 +485,8 @@ void PadManipulatorPacked_to_PadManipulator(PlayerIns* target, PadManipulatorPac
     to->movement_related_flags = from->movement_related_flags;
     to->not_getting_movement_input = from->not_getting_movement_input;
     to->TimeRollButtonHeld = from->TimeRollButtonHeld;
-    to->y_movement_input[from->cur_movement_input_index_to_use] = from->y_movement_input;
-    to->x_movement_input[from->cur_movement_input_index_to_use] = from->x_movement_input;
+    memcpy(to->y_movement_input, from->y_movement_input, sizeof(to->y_movement_input));
+    memcpy(to->x_movement_input, from->x_movement_input, sizeof(to->x_movement_input));
     to->cur_movement_input_index_to_use = from->cur_movement_input_index_to_use;
     //time_spend_forward_strafing
     //time_spend_back_strafing
