@@ -77,7 +77,7 @@ void free_BulletIns_FollowupBullet_List(BulletIns_FollowupBullet** list, int16_t
 
 void copy_BulletIns_FollowupBullet_List(BulletIns_FollowupBullet** to_list, int16_t* to_len, BulletIns_FollowupBullet** from_list, int16_t* from_len, StateTarget target)
 {
-    //Only resize when the count actually changes - this avoids thrashing the allocator
+    //must realloc on any size change because the header has a build in count
     if (*to_len != *from_len)
     {
         free_BulletIns_FollowupBullet_List(to_list, to_len, target);
