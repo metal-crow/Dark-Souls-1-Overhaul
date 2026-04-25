@@ -94,6 +94,7 @@ void free_DamageMan(DamageMan* to)
     {
         free_DamageEntry(&to->all_damage_entries_list_start[i], false);
     }
+    free(to->all_damage_entries_list_start);
 
     free(to);
 }
