@@ -130,6 +130,8 @@ void copy_BulletIns(BulletIns* to, BulletIns* from, StateTarget target)
 
     //targetingSystemBase contains vtable, owner ptr, targeting data - raw pointers are fine
     memcpy(&to->targetingSystemBase, &from->targetingSystemBase, sizeof(to->targetingSystemBase));
+    //TODO setting the BulletTargetingSystemOwner to null for now, we may have to save/restore it
+    *(uint64_t*)((uint64_t)(&to->targetingSystemBase) + 8) = NULL;
 
     memcpy(to->data_3, from->data_3, sizeof(to->data_3));
 
