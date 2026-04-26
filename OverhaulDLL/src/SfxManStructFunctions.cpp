@@ -7,8 +7,8 @@
  * ============================================================ */
 
 //these objects are not ref counted, so we must do so manually
-static std::unordered_map<void*, uint32_t> g_sfxGraveyard;
-static std::unordered_map<void*, uint32_t> g_nodeGraveyard;
+static std::unordered_map<void*, int32_t> g_sfxGraveyard;
+static std::unordered_map<void*, int32_t> g_nodeGraveyard;
 
 
 void SfxEntryRef(SFXEntry* SFXEntry)
@@ -45,8 +45,16 @@ bool OnSfxEntryDestruct(void* SFXEntry)
         //nothing keeping this alive, let it be destroyed
         return false;
     }
-    uint32_t refcount = search->second;
-    return refcount > 0;
+    //count a game-attempted destruction as a deref
+    int32_t refcount = search->second;
+    refcount -= 1;
+    g_sfxGraveyard[SFXEntry] = refcount;
+    if (refcount <= 0)
+    {
+        g_sfxGraveyard.erase(SFXEntry);
+        return false;
+    }
+    return true;
 }
 
 void FxBehaviorNodeRef(FxBehaviorNode* FxBehaviorNode)
@@ -83,8 +91,16 @@ bool OnFxBehaviorNodeDealloc(void* unused, void* FxBehaviorNode)
         //nothing keeping this alive, let it be destroyed
         return false;
     }
-    uint32_t refcount = search->second;
-    return refcount > 0;
+    //count a game-attempted destruction as a deref
+    int32_t refcount = search->second;
+    refcount -= 1;
+    g_nodeGraveyard[FxBehaviorNode] = refcount;
+    if (refcount <= 0)
+    {
+        g_nodeGraveyard.erase(FxBehaviorNode);
+        return false;
+    }
+    return true;
 }
 
 
