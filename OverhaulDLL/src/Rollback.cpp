@@ -594,6 +594,13 @@ extern "C" {
 
     uint64_t Destruct_FxBehaviorNode_return;
     void Destruct_FxBehaviorNode_injection();
+
+    uint64_t Destruct_DamageEntry1_return;
+    void Destruct_DamageEntry1_injection();
+    uint64_t Destruct_DamageEntry2_return;
+    void Destruct_DamageEntry2_injection();
+    uint64_t Destruct_DamageEntry3_return;
+    void Destruct_DamageEntry3_injection();
 }
 
 void Rollback::start()
@@ -637,6 +644,15 @@ void Rollback::start()
     //sp::mem::code::x64::inject_jmp_14b(write_address, &Destruct_SFXEntry_return, 1, &Destruct_SFXEntry_injection);
     //write_address = (uint8_t*)(Rollback::Destruct_FxBehaviorNode_offset + Game::ds1_base);
     //sp::mem::code::x64::inject_jmp_14b(write_address, &Destruct_FxBehaviorNode_return, 1, &Destruct_FxBehaviorNode_injection);
+
+    //DamageEntry Graveyard: hook all locatiosn the destructor+free is called for the dynamically alloc'd DamageEntries
+    //these injects will overwrite the destruct+free, and the called handled will perform them instead if needed
+    write_address = (uint8_t*)(Rollback::Destruct_DamageEntry_offset1 + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &Destruct_DamageEntry1_return, 3, &Destruct_DamageEntry1_injection);
+    write_address = (uint8_t*)(Rollback::Destruct_DamageEntry_offset2 + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &Destruct_DamageEntry2_return, 5, &Destruct_DamageEntry2_injection);
+    write_address = (uint8_t*)(Rollback::Destruct_DamageEntry_offset3 + Game::ds1_base);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &Destruct_DamageEntry3_return, 4, &Destruct_DamageEntry3_injection);
 
     //Disable all thread specific allocations. Replace it with global malloc/free
     //this is needed because otherwise we can't know what hkThreadMemory instance to allocate or free an object under

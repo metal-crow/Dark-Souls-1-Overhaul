@@ -2,64 +2,167 @@
 #include "PlayerInsStructFunctions.h"
 #include "FrpgHavokManImpStructFunctions.h"
 
-//the game preallocates the DamageMan active_damage_entries_list to be 128 elements long. Instead of dynamically trying to resize it, lets just never save above the 128 max
+/* ============================================================
+ * Dynamic object management
+ * ============================================================ */
+
+bool DamageEntry_isDynamicAlloc(DamageEntry* to)
+{
+    return to->id >= 0x800000; //the high byte is 0x80 when dynamically alloc'd
+}
+
+//these objects are not ref counted, so we must do so manually
+static std::unordered_map<void*, int32_t> g_DamageEntryGraveyard;
+
+void DamageEntry_ref(DamageEntry* DamageEntry)
+{
+    auto search = g_DamageEntryGraveyard.find(DamageEntry);
+    if (search != g_DamageEntryGraveyard.end())
+    {
+        g_DamageEntryGraveyard[DamageEntry] += 1;
+    }
+    else
+    {
+        g_DamageEntryGraveyard.insert({ DamageEntry, 1 });
+    }
+}
+
+void DamageEntry_deref(DamageEntry* DamageEntry)
+{
+    auto search = g_DamageEntryGraveyard.find(DamageEntry);
+    if (search != g_DamageEntryGraveyard.end())
+    {
+        g_DamageEntryGraveyard[DamageEntry] -= 1;
+        if (g_DamageEntryGraveyard[DamageEntry] == 0)
+        {
+            Destruct_DamageEntry(DamageEntry);
+            Game::game_free_alt(DamageEntry); //the destruct call doesn't free it
+            g_DamageEntryGraveyard.erase(DamageEntry);
+        }
+    }
+    else if (search == g_DamageEntryGraveyard.end())
+    {
+        Destruct_DamageEntry(DamageEntry);
+        Game::game_free_alt(DamageEntry);
+    }
+}
+
+//manually perform the destruct operations here, if needed
+void OnDamageEntryDestruct(void* DamageEntry)
+{
+    auto search = g_DamageEntryGraveyard.find(DamageEntry);
+    if (search == g_DamageEntryGraveyard.end())
+    {
+        //nothing keeping this alive, let it be destroyed
+        Destruct_DamageEntry(DamageEntry);
+        Game::game_free_alt(DamageEntry);
+        return;
+    }
+    //count a game-attempted destruction as a deref
+    int32_t refcount = search->second;
+    refcount -= 1;
+    g_DamageEntryGraveyard[DamageEntry] = refcount;
+    if (refcount <= 0)
+    {
+        g_DamageEntryGraveyard.erase(DamageEntry);
+        Destruct_DamageEntry(DamageEntry);
+        Game::game_free_alt(DamageEntry);
+        return;
+    }
+    return;
+}
+
+/* ============================================================ */
+
+//the game allocates the DamageMan active_damage_entries_list to be 128 elements long. Instead of having a dynamic local-side array, lets just prealloc enough to fit the 128 max
 static const size_t max_preallocated_DamageEntry = 128;
 
 void copy_DamageMan(DamageMan* to, DamageMan* from, const hkpWorld* to_world, const hkpWorld* from_world, StateTarget target)
 {
     Game::SuspendThreads();
 
-    uint64_t active_damage_entries_list_offset = (uint64_t)from->active_damage_entries_list - (uint64_t)from->all_damage_entries_list_start;
-    to->active_damage_entries_list = (DamageEntry*)((uint64_t)to->all_damage_entries_list_start + active_damage_entries_list_offset);
+    //go through the active_damage_entries_list and save it, along with the data of any dynamic entries. Any static ones are contained in the all_damage_entries_list
+    if (target == StateTarget::ToLocal)
+    {
+        free_SavedDamageEntryList(&to->saved_active_damage_entries);
+        DamageEntry* head = from->active_damage_entries_list;
+        while (head != NULL)
+        {
+            SavedDamageEntry e;
+            e.game_addr = head;
+            e.is_dynamic = false;
+            e.data = NULL;
+            if (DamageEntry_isDynamicAlloc(head))
+            {
+                DamageEntry_ref(head); //ref because the entry is stored game-side
+                DamageEntry_ref(head); //ref for the storage local-side
+                e.data = init_DamageEntry();
+                copy_DamageEntry(e.data, head, to_world, from_world, target);
+                e.is_dynamic = true;
+            }
+            to->saved_active_damage_entries.push_back(e);
+            head = head->next;
+        }
+    }
+    else if (target == StateTarget::ToGame)
+    {
+        //clear out the existing list first
+        //this is needed in case we need to destroy any dynamic entries in it
+        //this may also mean we remove and put back the same element but since those are still ref'd by the saved side it's safe
+        DamageEntry* oldhead = to->active_damage_entries_list;
+        while (oldhead != NULL)
+        {
+            DamageEntry* next = oldhead->next;
+            if (DamageEntry_isDynamicAlloc(oldhead))
+            {
+                DamageEntry_deref(oldhead);
+            }
+            oldhead = next;
+        }
 
-    uint64_t all_damage_entries_list_cur_offset = (uint64_t)from->all_damage_entries_list_cur - (uint64_t)from->all_damage_entries_list_start;
-    to->all_damage_entries_list_cur = (DamageEntry*)((uint64_t)to->all_damage_entries_list_start + all_damage_entries_list_cur_offset);
+        //push back the correct pointers into the active_damage_entries_list
+        to->active_damage_entries_list = NULL;
+        DamageEntry** head = &to->active_damage_entries_list;
+        for (auto e : from->saved_active_damage_entries)
+        {
+            *head = e.game_addr;
+            if (e.is_dynamic)
+            {
+                DamageEntry_ref(*head);
+                copy_DamageEntry(*head, e.data, to_world, from_world, target);
+            }
+            head = &((*head)->next);
+        }
+    }
+    else if (target == StateTarget::Copy)
+    {
+        free_SavedDamageEntryList(&to->saved_active_damage_entries);
+        for (auto e : from->saved_active_damage_entries)
+        {
+            SavedDamageEntry new_e;
+            new_e.game_addr = e.game_addr;
+            new_e.is_dynamic = e.is_dynamic;
+            new_e.data = NULL;
+            if (e.is_dynamic)
+            {
+                DamageEntry_ref(new_e.game_addr);
+                new_e.data = init_DamageEntry();
+                copy_DamageEntry(new_e.data, e.data, to_world, from_world, target);
+            }
+            to->saved_active_damage_entries.push_back(new_e);
+        }
 
+    }
+
+    to->all_damage_entries_list_cur = from->all_damage_entries_list_cur;
+
+    //go through the all_damage_entries_list. This is all static allocations
     for (size_t i = 0; i < max_preallocated_DamageEntry; i++)
     {
         DamageEntry* from_DamageEntry = &from->all_damage_entries_list_start[i];
         DamageEntry* to_DamageEntry = &to->all_damage_entries_list_start[i];
 
         copy_DamageEntry(to_DamageEntry, from_DamageEntry, to_world, from_world, target);
-
-        if (from_DamageEntry->next != NULL)
-        {
-            uint64_t from_DamageEntry_nextoffset = (uint64_t)from_DamageEntry->next - (uint64_t)from->all_damage_entries_list_start;
-            to_DamageEntry->next = (DamageEntry*)((uint64_t)to->all_damage_entries_list_start + from_DamageEntry_nextoffset);
-        }
-        else
-        {
-            to_DamageEntry->next = NULL;
-        }
-
-        //handle the followup ptrs, since they are also in this list
-        if (from_DamageEntry->followup_a != NULL)
-        {
-            uint64_t a_nextoffset = (uint64_t)from_DamageEntry->followup_a - (uint64_t)from->all_damage_entries_list_start;
-            to_DamageEntry->followup_a = (DamageEntry*)((uint64_t)to->all_damage_entries_list_start + a_nextoffset);
-        }
-        else
-        {
-            to_DamageEntry->followup_a = NULL;
-        }
-        if (from_DamageEntry->followup_b != NULL)
-        {
-            uint64_t a_nextoffset = (uint64_t)from_DamageEntry->followup_b - (uint64_t)from->all_damage_entries_list_start;
-            to_DamageEntry->followup_b = (DamageEntry*)((uint64_t)to->all_damage_entries_list_start + a_nextoffset);
-        }
-        else
-        {
-            to_DamageEntry->followup_b = NULL;
-        }
-        if (from_DamageEntry->followup_c != NULL)
-        {
-            uint64_t a_nextoffset = (uint64_t)from_DamageEntry->followup_c - (uint64_t)from->all_damage_entries_list_start;
-            to_DamageEntry->followup_c = (DamageEntry*)((uint64_t)to->all_damage_entries_list_start + a_nextoffset);
-        }
-        else
-        {
-            to_DamageEntry->followup_c = NULL;
-        }
     }
 
     to->data_0 = from->data_0;
@@ -68,7 +171,6 @@ void copy_DamageMan(DamageMan* to, DamageMan* from, const hkpWorld* to_world, co
     Game::ResumeThreads();
 }
 
-//Since the game has pre-init'd all of the DamageEntries already, we don't need to ever init for the game, we can copy in place. So this and all child init's are just for the mod memory
 DamageMan* init_DamageMan()
 {
     DamageMan* local_DamageMan = (DamageMan*)malloc_(sizeof(DamageMan));
@@ -90,6 +192,7 @@ DamageMan* init_DamageMan()
 
 void free_DamageMan(DamageMan* to)
 {
+    free_SavedDamageEntryList(&to->saved_active_damage_entries);
     for (size_t i = 0; i < max_preallocated_DamageEntry; i++)
     {
         free_DamageEntry(&to->all_damage_entries_list_start[i], false);
@@ -99,8 +202,25 @@ void free_DamageMan(DamageMan* to)
     free(to);
 }
 
+void free_SavedDamageEntryList(std::vector<SavedDamageEntry>* to)
+{
+    for (auto e : *to)
+    {
+        if (e.is_dynamic)
+        {
+            DamageEntry_deref(e.game_addr);
+            if (e.data)
+            {
+                free_DamageEntry(e.data, true);
+            }
+        }
+    }
+    to->clear();
+}
+
 void copy_DamageEntry(DamageEntry* to, DamageEntry* from, const hkpWorld* to_world, const hkpWorld* from_world, StateTarget target)
 {
+    to->id = from->id;
     to->data_0 = from->data_0;
     //these need to be run first
     if (from->FrpgPhysShapePhantomIns_Sphere == NULL || from->FrpgPhysShapePhantomIns_Capsule == NULL)
@@ -184,9 +304,11 @@ void copy_DamageEntry(DamageEntry* to, DamageEntry* from, const hkpWorld* to_wor
     memcpy(to->data_4, from->data_4, sizeof(to->data_4));
     to->DmgHitRecordManImp_field0x10Elem = from->DmgHitRecordManImp_field0x10Elem;
     to->physWorld = from->physWorld;
-    //ignore followup, that's handled by the caller
+    to->followup_a = from->followup_a;
+    to->followup_b = from->followup_b;
+    to->followup_c = from->followup_c;
     memcpy(to->data_6, from->data_6, sizeof(to->data_6));
-    //ignore next, that's handled by the caller
+    to->next = from->next;
     to->data_7 = from->data_7;
 }
 

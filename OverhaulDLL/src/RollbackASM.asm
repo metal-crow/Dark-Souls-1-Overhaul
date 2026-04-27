@@ -330,6 +330,40 @@ ret
 Destruct_FxBehaviorNode_injection ENDP
 
 
+EXTERN Destruct_DamageEntry1_return: qword
+extern OnDamageEntryDestruct: proc
+
+PUBLIC Destruct_DamageEntry1_injection
+Destruct_DamageEntry1_injection PROC
+FUNC_PROLOGUE
+; RCX = DamageEntry*
+call    OnDamageEntryDestruct
+FUNC_EPILOGUE
+jmp     Destruct_DamageEntry1_return
+Destruct_DamageEntry1_injection ENDP
+
+EXTERN Destruct_DamageEntry2_return: qword
+
+PUBLIC Destruct_DamageEntry2_injection
+Destruct_DamageEntry2_injection PROC
+FUNC_PROLOGUE
+; RCX = DamageEntry*
+call    OnDamageEntryDestruct
+FUNC_EPILOGUE
+jmp     Destruct_DamageEntry2_return
+Destruct_DamageEntry2_injection ENDP
+
+EXTERN Destruct_DamageEntry3_return: qword
+
+PUBLIC Destruct_DamageEntry3_injection
+Destruct_DamageEntry3_injection PROC
+FUNC_PROLOGUE
+; RCX = DamageEntry*
+call    OnDamageEntryDestruct
+FUNC_EPILOGUE
+jmp     Destruct_DamageEntry3_return
+Destruct_DamageEntry3_injection ENDP
+
 _TEXT    ENDS
 
 END

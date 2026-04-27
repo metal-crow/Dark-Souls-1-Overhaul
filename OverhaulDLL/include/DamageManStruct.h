@@ -10,6 +10,7 @@
 #include "FrpgHavokManImpStruct.h"
 
 typedef struct DamageMan DamageMan;
+typedef struct SavedDamageEntry SavedDamageEntry;
 typedef struct DamageEntry DamageEntry;
 typedef struct FrpgPhysShapePhantomIns FrpgPhysShapePhantomIns;
 typedef struct DamageEntryField0x118 DamageEntryField0x118;
@@ -44,7 +45,8 @@ static_assert(sizeof(DamageEntryField0x118) == 0x20);
 
 struct DamageEntry
 {
-    uint64_t data_0;
+    uint32_t id;
+    uint32_t data_0;
     void* PhysShapePhantomIns1; //this always points to 1 of the 2 FrpgPhysShapePhantomIns and can be treated as data
     FrpgPhysShapePhantomIns* FrpgPhysShapePhantomIns_Sphere;
     FrpgPhysShapePhantomIns* FrpgPhysShapePhantomIns_Capsule;
@@ -58,17 +60,18 @@ struct DamageEntry
     void* DmgHitRecordManImp_field0x10Elem; //ptr to an entry in DmgHitRecordManImp
     uint64_t padding_2;
     void* physWorld; //this is just a const ptr to FrpgHavokManImp->FrpgPhysWorld
-    //these point to other entries in the DamageMan list. So treat as offsets, not objs
+    //able to treat these as static, since we're preseving the address of even dynamic DamageEntrys
     DamageEntry* followup_a;
     DamageEntry* followup_b;
     DamageEntry* followup_c;
     void* dbgNode;
     uint8_t data_6[16];
+    //able to treat this as static, since we're preseving the address of even dynamic DamageEntrys
     DamageEntry* next;
     uint64_t data_7;
 };
 
-static_assert(offsetof(DamageEntry, data_0) == 0);
+static_assert(offsetof(DamageEntry, id) == 0);
 static_assert(offsetof(DamageEntry, PhysShapePhantomIns1) == 8);
 static_assert(offsetof(DamageEntry, FrpgPhysShapePhantomIns_Sphere) == 0x10);
 static_assert(offsetof(DamageEntry, FrpgPhysShapePhantomIns_Capsule) == 0x18);
@@ -85,6 +88,13 @@ static_assert(offsetof(DamageEntry, data_6) == 0x210);
 static_assert(offsetof(DamageEntry, data_7) == 0x228);
 static_assert(sizeof(DamageEntry) == 0x230);
 
+struct SavedDamageEntry
+{
+    DamageEntry* game_addr;
+    DamageEntry* data;
+    bool is_dynamic; //if this is false we can just use the game_addr raw, since it points to an entry in all_damage_entries_list_start we already handle
+};
+
 struct DamageMan
 {
     DamageEntry* active_damage_entries_list;
@@ -93,6 +103,8 @@ struct DamageMan
     uint64_t data_0;
     uint8_t padding_0[18];
     uint8_t data_1[6];
+    // Local-only fields (not part of the game struct, only used in our local copies)
+    std::vector<SavedDamageEntry> saved_active_damage_entries;
 };
 
 static_assert(offsetof(DamageMan, active_damage_entries_list) == 0);
@@ -100,6 +112,6 @@ static_assert(offsetof(DamageMan, all_damage_entries_list_cur) == 0x8);
 static_assert(offsetof(DamageMan, all_damage_entries_list_start) == 0x10);
 static_assert(offsetof(DamageMan, data_0) == 0x18);
 static_assert(offsetof(DamageMan, data_1) == 0x32);
-static_assert(sizeof(DamageMan) == 0x38);
+//static_assert(sizeof(DamageMan) == 0x38);
 
 #endif

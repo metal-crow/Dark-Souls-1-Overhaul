@@ -711,4 +711,7 @@ static const FxBehaviorNode_GetSize_Type1_t FxBehaviorNode_GetSize_Type1 = (FxBe
 typedef bool (*FxBehaviorNode_GetSize_Type2_t)(void* FxBehaviorNode);
 static const FxBehaviorNode_GetSize_Type2_t FxBehaviorNode_GetSize_Type2 = (FxBehaviorNode_GetSize_Type2_t)0x140f07fc0;
 
+typedef void (*Destruct_DamageEntry_t)(void* entry);
+static const Destruct_DamageEntry_t Destruct_DamageEntry = (Destruct_DamageEntry_t)0x1403c5490;
+
 #endif // _DS1_OVERHAUL_GAME_DATA_H_

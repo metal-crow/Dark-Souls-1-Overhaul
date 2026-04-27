@@ -6,9 +6,13 @@
 #include "DamageManStruct.h"
 #include "Rollback.h"
 
+extern "C" void OnDamageEntryDestruct(void* DamageEntry);
+
 void copy_DamageMan(DamageMan* to, DamageMan* from, const hkpWorld* to_world, const hkpWorld* from_world, StateTarget target);
 DamageMan* init_DamageMan();
 void free_DamageMan(DamageMan* to);
+
+void free_SavedDamageEntryList(std::vector<SavedDamageEntry>* to);
 
 void copy_DamageEntry(DamageEntry* to, DamageEntry* from, const hkpWorld* to_world, const hkpWorld* from_world, StateTarget target);
 DamageEntry* init_DamageEntry();

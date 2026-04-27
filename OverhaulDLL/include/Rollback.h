@@ -96,6 +96,11 @@ private:
     static const uint64_t Destruct_SFXEntry_offset = 0xff9490;
     static const uint64_t Destruct_FxBehaviorNode_offset = 0xfdf530;
 
+    // DamageEntry graveyard: hook the callers to intercept all destructs+frees
+    static const uint64_t Destruct_DamageEntry_offset1 = 0x3ca737;
+    static const uint64_t Destruct_DamageEntry_offset2 = 0x3c8d03;
+    static const uint64_t Destruct_DamageEntry_offset3 = 0x3c9015;
+
     static const uint64_t PlayerIns_Is_NetworkedPlayer_offsets[];
     static const uint64_t PlayerIns_IsHostPlayerIns_offsets[];
 
