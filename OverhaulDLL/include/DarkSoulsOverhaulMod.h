@@ -78,6 +78,7 @@ void inline ConsoleWrite(const char* str, ...)
     if (logfile != NULL)
     {
         fprintf(logfile, "[%lld] %s\n", time, dest);
+        fflush(logfile);
     }
 }
 
