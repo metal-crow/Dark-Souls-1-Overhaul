@@ -201,7 +201,8 @@ void Save_SFXEntryList(std::vector<SavedSFXEntry>* to, FXManager* from)
     {
         SavedSFXEntry ss;
         ss.game_addr = head;
-        SfxEntryRef(head);
+        SfxEntryRef(head); //ref for the game-side storage
+        SfxEntryRef(head); //ref for the local-side storage
         copy_SFXEntry(&ss.data, head, StateTarget::ToLocal);
 
         FxBehaviorNode* node_head = head->base.behaviour_list;
@@ -356,7 +357,8 @@ void Save_SavedFxBehaviorNodeGraph(SavedFxBehaviorNode* to, FxBehaviorNode* from
 {
     to->game_addr = from;
     copy_FxBehaviorNode(&to->data, from, StateTarget::ToLocal);
-    FxBehaviorNodeRef(from);
+    FxBehaviorNodeRef(from); //ref for game-side
+    FxBehaviorNodeRef(from); //ref for local-side
 
     if (from->next_node != NULL)
     {
