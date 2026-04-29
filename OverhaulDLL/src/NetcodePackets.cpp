@@ -41,8 +41,8 @@ const uint64_t Rollback::PlayerIns_Is_NetworkedPlayer_offsets[] = {
     //0x14036ede3,
     //0x140370266,
     //0x140370591,
-    //0x14037922a,
-    //0x1403792d9,
+    0x14037922a, //toggling weapon (path FUN_140378d00)
+    0x1403792d9, //toggling weapon (path FUN_140378d00)
     //0x140395a78,
     //0x140406776,
     //0x14040689e,
@@ -189,7 +189,7 @@ const uint64_t Rollback::PlayerIns_IsHostPlayerIns_offsets[] = {
     //0x14037057d,
     //0x140373dd6,
     //0x140373df2,
-    //0x140379219,
+    0x140379219, //toggling weapon (path FUN_140378d00)
     //0x140382584,
     //0x1403909d4,
     //0x140392f71,
