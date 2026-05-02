@@ -222,7 +222,7 @@ void copy_DamageEntry(DamageEntry* to, DamageEntry* from, const hkpWorld* to_wor
 {
     to->id = from->id;
     to->data_0 = from->data_0;
-    //these need to be run first
+
     if (from->FrpgPhysShapePhantomIns_Sphere == NULL || from->FrpgPhysShapePhantomIns_Capsule == NULL)
     {
         FATALERROR("FrpgPhysShapePhantomIns can be null??? from=%p sphere=%p cap=%p", from, from->FrpgPhysShapePhantomIns_Sphere, from->FrpgPhysShapePhantomIns_Capsule);
@@ -230,74 +230,12 @@ void copy_DamageEntry(DamageEntry* to, DamageEntry* from, const hkpWorld* to_wor
     copy_FrpgPhysShapePhantomIns(&to->FrpgPhysShapePhantomIns_Sphere, &from->FrpgPhysShapePhantomIns_Sphere, true, to_world, from_world, target);
     copy_FrpgPhysShapePhantomIns(&to->FrpgPhysShapePhantomIns_Capsule, &from->FrpgPhysShapePhantomIns_Capsule, false, to_world, from_world, target);
 
-    //these are handled by the above FrpgPhysShapePhantomIns
-    if (from->hkpSphereShape1 != from->FrpgPhysShapePhantomIns_Sphere->_hkpSphereShape)
-    {
-        FATALERROR("hkpSphereShape1 %p not pointing to FrpgPhysShapePhantomIns_Sphere->_hkpSphereShape %p",
-            from->hkpSphereShape1, from->FrpgPhysShapePhantomIns_Sphere->_hkpSphereShape);
-    }
-    to->hkpSphereShape1 = to->FrpgPhysShapePhantomIns_Sphere->_hkpSphereShape;
-    if (from->hkpCapsuleShape1 != from->FrpgPhysShapePhantomIns_Capsule->_hkpCapsuleShape)
-    {
-        FATALERROR("hkpCapsuleShape1 %p not pointing to FrpgPhysShapePhantomIns_Capsule->_hkpCapsuleShape %p",
-            from->hkpCapsuleShape1, from->FrpgPhysShapePhantomIns_Capsule->_hkpCapsuleShape);
-    }
-    to->hkpCapsuleShape1 = to->FrpgPhysShapePhantomIns_Capsule->_hkpCapsuleShape;
-
-    //these always points to either the sphere or the capsule
-    if (from->PhysShapePhantomIns1 == from->FrpgPhysShapePhantomIns_Sphere)
-    {
-        to->PhysShapePhantomIns1 = to->FrpgPhysShapePhantomIns_Sphere;
-    }
-    else if (from->PhysShapePhantomIns1 == from->FrpgPhysShapePhantomIns_Capsule)
-    {
-        to->PhysShapePhantomIns1 = to->FrpgPhysShapePhantomIns_Capsule;
-    }
-    else if (from->PhysShapePhantomIns1 == NULL)
-    {
-        to->PhysShapePhantomIns1 = NULL;
-    }
-    else
-    {
-        FATALERROR("PhysShapePhantomIns1 %p FrpgPhysShapePhantomIns_Sphere %p FrpgPhysShapePhantomIns_Capsule %p",
-            to->PhysShapePhantomIns1, to->FrpgPhysShapePhantomIns_Sphere, to->FrpgPhysShapePhantomIns_Capsule);
-    }
-
-    if (from->PhysShapePhantomIns1_altPtr_A == from->FrpgPhysShapePhantomIns_Sphere)
-    {
-        to->PhysShapePhantomIns1_altPtr_A = to->FrpgPhysShapePhantomIns_Sphere;
-    }
-    else if (from->PhysShapePhantomIns1_altPtr_A == from->FrpgPhysShapePhantomIns_Capsule)
-    {
-        to->PhysShapePhantomIns1_altPtr_A = to->FrpgPhysShapePhantomIns_Capsule;
-    }
-    else if (from->PhysShapePhantomIns1_altPtr_A == NULL)
-    {
-        to->PhysShapePhantomIns1_altPtr_A = NULL;
-    }
-    else
-    {
-        FATALERROR("PhysShapePhantomIns1_altPtr_A %p FrpgPhysShapePhantomIns_Sphere %p FrpgPhysShapePhantomIns_Capsule %p",
-            to->PhysShapePhantomIns1_altPtr_A, to->FrpgPhysShapePhantomIns_Sphere, to->FrpgPhysShapePhantomIns_Capsule);
-    }
-
-    if (from->PhysShapePhantomIns1_altPtr_B == from->FrpgPhysShapePhantomIns_Sphere)
-    {
-        to->PhysShapePhantomIns1_altPtr_B = to->FrpgPhysShapePhantomIns_Sphere;
-    }
-    else if (from->PhysShapePhantomIns1_altPtr_B == from->FrpgPhysShapePhantomIns_Capsule)
-    {
-        to->PhysShapePhantomIns1_altPtr_B = to->FrpgPhysShapePhantomIns_Capsule;
-    }
-    else if (from->PhysShapePhantomIns1_altPtr_B == NULL)
-    {
-        to->PhysShapePhantomIns1_altPtr_B = NULL;
-    }
-    else
-    {
-        FATALERROR("PhysShapePhantomIns1_altPtr_B %p FrpgPhysShapePhantomIns_Sphere %p FrpgPhysShapePhantomIns_Capsule %p",
-            to->PhysShapePhantomIns1_altPtr_B, to->FrpgPhysShapePhantomIns_Sphere, to->FrpgPhysShapePhantomIns_Capsule);
-    }
+    //these are all static pointers to the already handled shapes
+    to->PhysShapePhantomIns1 = from->PhysShapePhantomIns1;
+    to->hkpSphereShape1 = from->hkpSphereShape1;
+    to->hkpCapsuleShape1 = from->hkpCapsuleShape1;
+    to->PhysShapePhantomIns1_altPtr_A = from->PhysShapePhantomIns1_altPtr_A;
+    to->PhysShapePhantomIns1_altPtr_B = from->PhysShapePhantomIns1_altPtr_B;
 
     memcpy(to->data_2, from->data_2, sizeof(to->data_2));
     copy_DamageEntryField0x118(&to->field0x118, &from->field0x118, target);
@@ -316,8 +254,8 @@ DamageEntry* init_DamageEntry()
 {
     DamageEntry* local_DamageEntry = (DamageEntry*)malloc_(sizeof(DamageEntry));
 
-    local_DamageEntry->FrpgPhysShapePhantomIns_Sphere = init_FrpgPhysShapePhantomIns(true, StateTarget::ToLocal);
-    local_DamageEntry->FrpgPhysShapePhantomIns_Capsule = init_FrpgPhysShapePhantomIns(false, StateTarget::ToLocal);
+    local_DamageEntry->FrpgPhysShapePhantomIns_Sphere = init_FrpgPhysShapePhantomIns(true);
+    local_DamageEntry->FrpgPhysShapePhantomIns_Capsule = init_FrpgPhysShapePhantomIns(false);
     local_DamageEntry->hkpSphereShape1 = local_DamageEntry->FrpgPhysShapePhantomIns_Sphere->_hkpSphereShape;
     local_DamageEntry->hkpCapsuleShape1 = local_DamageEntry->FrpgPhysShapePhantomIns_Capsule->_hkpCapsuleShape;
     local_DamageEntry->field0x118 = init_DamageEntryField0x118(StateTarget::ToLocal);
@@ -327,8 +265,8 @@ DamageEntry* init_DamageEntry()
 
 void free_DamageEntry(DamageEntry* to, bool freeself)
 {
-    free_FrpgPhysShapePhantomIns(to->FrpgPhysShapePhantomIns_Sphere, true);
-    free_FrpgPhysShapePhantomIns(to->FrpgPhysShapePhantomIns_Capsule, false);
+    free_FrpgPhysShapePhantomIns(to->FrpgPhysShapePhantomIns_Sphere);
+    free_FrpgPhysShapePhantomIns(to->FrpgPhysShapePhantomIns_Capsule);
     to->hkpSphereShape1 = NULL;
     to->hkpCapsuleShape1 = NULL;
     free_DamageEntryField0x118(to->field0x118, StateTarget::ToLocal);
@@ -357,69 +295,29 @@ void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePha
 
         if ((*from)->_hkpSimpleShapePhantom == NULL)
         {
-            FATALERROR("ToGame: SimpleShapePhantom ptr for %p is NULL", (*from));
+            FATALERROR("SimpleShapePhantom ptr for %p is NULL", (*from));
         }
-        //the hkpSimpleShapePhantom has only been added to the hkpWorld if physWorld is non-null. If not we have to manually manage it
-        if ((*from)->physWorld == NULL)
-        {
-            hk_ref((*from)->_hkpSimpleShapePhantom);
-        }
-        //since the phantoms are never destroyed due to us keeping a ref to it, it's safe to just use the raw pointer. it should always be valid
+        //since the phantoms (and the associated shape) are never destroyed due to the FrpgHavok rollback code, it's safe to just use the raw pointer. it should always be valid
         (*to)->_hkpSimpleShapePhantom = (*from)->_hkpSimpleShapePhantom;
+        (*to)->_shape = (*from)->_shape;
 
         (*to)->self = (*to);
         (*to)->data_1 = (*from)->data_1;
-        if (is_sphere)
-        {
-            copy_hkpSphereShape(&(*to)->_hkpSphereShape, (*from)->_hkpSphereShape, target);
-        }
-        else
-        {
-            copy_hkpCapsuleShape(&(*to)->_hkpCapsuleShape, (*from)->_hkpCapsuleShape, target);
-        }
     }
 }
 
-FrpgPhysShapePhantomIns* init_FrpgPhysShapePhantomIns(bool is_sphere, StateTarget target)
+FrpgPhysShapePhantomIns* init_FrpgPhysShapePhantomIns(bool is_sphere)
 {
-    FrpgPhysShapePhantomIns* local;
-    if (target == StateTarget::ToGame)
-    {
-        local = (FrpgPhysShapePhantomIns*)Game::game_malloc(sizeof(FrpgPhysShapePhantomIns), 8, *(uint64_t*)Game::internal_heap_2);
-    }
-    else
-    {
-        local = (FrpgPhysShapePhantomIns*)malloc_(sizeof(FrpgPhysShapePhantomIns));
-    }
+    FrpgPhysShapePhantomIns* local = (FrpgPhysShapePhantomIns*)malloc_(sizeof(FrpgPhysShapePhantomIns));
 
     local->_hkpSimpleShapePhantom = NULL;
+    local->_shape = NULL;
 
-    if (is_sphere)
-    {
-        local->_hkpSphereShape = init_hkpSphereShape(target);
-    }
-    else
-    {
-        local->_hkpCapsuleShape = init_hkpCapsuleShape(target);
-    }
     return local;
 }
 
-void free_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns* to, bool is_sphere)
+void free_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns* to)
 {
-    if (is_sphere)
-    {
-        free_hkpSphereShape(to->_hkpSphereShape, StateTarget::ToLocal);
-    }
-    else
-    {
-        free_hkpCapsuleShape(to->_hkpCapsuleShape, StateTarget::ToLocal);
-    }
-    if (to->physWorld == NULL)
-    {
-        //now that we're freeing the rollback obj, deref the manually saved phantom
-        hk_deref(to->_hkpSimpleShapePhantom);
-    }
     free(to);
 }
 

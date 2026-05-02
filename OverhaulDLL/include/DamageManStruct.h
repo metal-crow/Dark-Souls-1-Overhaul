@@ -28,6 +28,7 @@ struct FrpgPhysShapePhantomIns
     {
         hkpCapsuleShape* _hkpCapsuleShape;
         hkpSphereShape* _hkpSphereShape;
+        void* _shape;
     };
 };
 static_assert(offsetof(FrpgPhysShapePhantomIns, damageEntry) == 0x10);

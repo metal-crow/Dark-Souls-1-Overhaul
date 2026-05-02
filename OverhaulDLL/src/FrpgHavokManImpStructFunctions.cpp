@@ -149,8 +149,7 @@ static void CollectWorldPhantoms(hkpWorld* world, std::vector<hkpSimpleShapePhan
  * ============================================================ */
 void SaveHkpWorldSnapshot(HkpWorldSnapshot* snap, hkpWorld* world)
 {
-    snap->entities.clear();
-    snap->phantoms.clear();
+    FreeHkpWorldSnapshotRefs(snap);
 
     // --- Entities ---
     std::vector<hkpEntity*> worldEntities;
@@ -159,12 +158,19 @@ void SaveHkpWorldSnapshot(HkpWorldSnapshot* snap, hkpWorld* world)
     snap->entities.reserve(worldEntities.size());
     for (hkpEntity* e : worldEntities)
     {
-        SavedEntityState s;
-        s.ptr = e;
-        memcpy(&s.motionData, &e->m_motion, sizeof(hkpMotion));
-        snap->entities.push_back(s);
-        // Take a ref so Havok can't free this entity if it's removed before restore
-        hk_ref((void*)e);
+        //don't add if there's no associated shape
+        if (e->m_collidable.base.shape != NULL)
+        {
+            SavedEntityState s;
+            s.ptr = e;
+            s.shapePtr = e->m_collidable.base.shape;
+            memcpy(&s.motionData, &e->m_motion, sizeof(hkpMotion));
+            copy_hkpShape(&s.shapeData, e->m_collidable.base.shape);
+            snap->entities.push_back(s);
+            // Take a ref so Havok can't free this entity if it's removed before restore
+            hk_ref((void*)e);
+            hk_ref(e->m_collidable.base.shape);
+        }
     }
 
     // --- Phantoms ---
@@ -174,11 +180,18 @@ void SaveHkpWorldSnapshot(HkpWorldSnapshot* snap, hkpWorld* world)
     snap->phantoms.reserve(worldPhantoms.size());
     for (hkpSimpleShapePhantom* p : worldPhantoms)
     {
-        SavedPhantomState s;
-        s.ptr = p;
-        memcpy(&s.motionStateData, &p->m_motionState, sizeof(hkMotionState));
-        snap->phantoms.push_back(s);
-        hk_ref((void*)p);
+        //don't add if there's no associated shape
+        if (p->base.m_collidable.base.shape != NULL)
+        {
+            SavedPhantomState s;
+            s.ptr = p;
+            s.shapePtr = p->base.m_collidable.base.shape;
+            memcpy(&s.motionStateData, &p->m_motionState, sizeof(hkMotionState));
+            copy_hkpShape(&s.shapeData, p->base.m_collidable.base.shape);
+            snap->phantoms.push_back(s);
+            hk_ref((void*)p);
+            hk_ref(p->base.m_collidable.base.shape);
+        }
     }
 }
 
@@ -219,7 +232,7 @@ void RestoreHkpWorldSnapshot(const HkpWorldSnapshot* snap, hkpWorld* world)
     {
         if (targetEntities.find(e) == targetEntities.end())
         {
-            hk_removeEntities(world, &e, 1); //this derefs the entity
+            hk_removeEntities(world, &e, 1); //this derefs the entity and it's shape
         }
     }
 
@@ -228,11 +241,7 @@ void RestoreHkpWorldSnapshot(const HkpWorldSnapshot* snap, hkpWorld* world)
     {
         if (currentEntitySet.find(s.ptr) == currentEntitySet.end())
         {
-            //don't add if there's no associated shape
-            if (s.ptr->m_collidable.base.shape != NULL)
-            {
-                hk_addEntity(world, s.ptr, 1); // 1 = activate. This refs the entity which we want since it's now in the world as well
-            }
+            hk_addEntity(world, s.ptr, 1); // 1 = activate. This refs the entity which we want since it's now in the world as well
         }
     }
 
@@ -241,7 +250,7 @@ void RestoreHkpWorldSnapshot(const HkpWorldSnapshot* snap, hkpWorld* world)
     {
         if (targetPhantoms.find(p) == targetPhantoms.end())
         {
-            hk_removePhantom(world, (void*)p); //this derefs the entity
+            hk_removePhantom(world, (void*)p); //this derefs the entity and it's shape
         }
     }
 
@@ -250,21 +259,40 @@ void RestoreHkpWorldSnapshot(const HkpWorldSnapshot* snap, hkpWorld* world)
     {
         if (currentPhantomSet.find(s.ptr) == currentPhantomSet.end())
         {
-            if (s.ptr->base.m_collidable.base.shape != NULL)
-            {
-                hk_addPhantom(world, (void*)s.ptr); //This refs the entity
-            }
+            hk_addPhantom(world, (void*)s.ptr); //This refs the entity
         }
     }
 
-    // --- Restore motion states via memcpy ---
+    // --- Restore shapes and motion states via memcpy ---
     for (auto& s : snap->entities)
     {
         memcpy(&s.ptr->m_motion, &s.motionData, sizeof(hkpMotion));
+        void* old_shape = s.ptr->m_collidable.base.shape;
+        if (old_shape != s.shapePtr)
+        {
+            if (old_shape != NULL)
+            {
+                hk_deref(old_shape);
+            }
+            s.ptr->m_collidable.base.shape = s.shapePtr;
+            hk_ref(s.shapePtr);
+        }
+        copy_hkpShape(s.shapePtr, (void*)(&s.shapeData));
     }
     for (auto& s : snap->phantoms)
     {
         memcpy(&s.ptr->m_motionState, &s.motionStateData, sizeof(hkMotionState));
+        void* old_shape = s.ptr->base.m_collidable.base.shape;
+        if (old_shape != s.shapePtr)
+        {
+            if (old_shape != NULL)
+            {
+                hk_deref(old_shape);
+            }
+            s.ptr->base.m_collidable.base.shape = s.shapePtr;
+            hk_ref(s.shapePtr);
+        }
+        copy_hkpShape(s.shapePtr, (void*)(&s.shapeData));
     }
 
     // NOTE: After restoring positions, the broadphase AABBs, overlap pairs,
@@ -288,18 +316,24 @@ void CopyHkpWorldSnapshot(HkpWorldSnapshot* dst, const HkpWorldSnapshot* src)
     {
         SavedEntityState new_s;
         new_s.ptr = s.ptr;
+        new_s.shapePtr = s.shapePtr;
         memcpy(new_s.motionData, s.motionData, sizeof(hkpMotion));
+        copy_hkpShape(&new_s.shapeData, (void*)(&s.shapeData));
         dst->entities.push_back(new_s);
         hk_ref((void*)s.ptr);
+        hk_ref(s.shapePtr);
     }
 
     for (auto& s : src->phantoms)
     {
         SavedPhantomState new_s;
         new_s.ptr = s.ptr;
+        new_s.shapePtr = s.shapePtr;
         memcpy(new_s.motionStateData, s.motionStateData, sizeof(hkMotionState));
+        copy_hkpShape(&new_s.shapeData, (void*)(&s.shapeData));
         dst->phantoms.push_back(new_s);
         hk_ref((void*)s.ptr);
+        hk_ref(s.shapePtr);
     }
 }
 
@@ -316,6 +350,7 @@ void FreeHkpWorldSnapshotRefs(HkpWorldSnapshot* snap)
     {
         if (s.ptr)
         {
+            hk_deref(s.shapePtr);
             hk_deref((void*)s.ptr);
         }
     }
@@ -325,20 +360,38 @@ void FreeHkpWorldSnapshotRefs(HkpWorldSnapshot* snap)
     {
         if (s.ptr)
         {
+            hk_deref(s.shapePtr);
             hk_deref((void*)s.ptr);
         }
     }
     snap->phantoms.clear();
 }
 
-/* ============================================================
- * The following are used for DamageMan entries.
- * ============================================================ */
-void copy_hkpSphereShape(hkpSphereShape** to, hkpSphereShape* from, StateTarget target)
+
+void copy_hkpShape(void* to, void* from)
 {
-    (*to)->vtable = (from)->vtable;
-    memcpy((*to)->data_0, (from)->data_0, sizeof((*to)->data_0));
-    memcpy((*to)->data_1, (from)->data_1, sizeof((*to)->data_1));
+    switch (*(uint64_t*)from)
+    {
+    //sphere
+    case 0x14141c200:
+        copy_hkpSphereShape((hkpSphereShape*)to, (hkpSphereShape*)from);
+        break;
+    //capsule
+    case 0x14141bf58:
+        copy_hkpCapsuleShape((hkpCapsuleShape*)to, (hkpCapsuleShape*)from);
+        break;
+    default:
+        FATALERROR("Unknown shape type: %llx %p", *(uint64_t*)from, from);
+        break;
+    }
+}
+
+
+void copy_hkpSphereShape(hkpSphereShape* to, hkpSphereShape* from)
+{
+    to->vtable = from->vtable;
+    memcpy((to)->data_0, (from)->data_0, sizeof((to)->data_0));
+    memcpy((to)->data_1, (from)->data_1, sizeof((to)->data_1));
     if ((from)->m_userData != 0)
     {
         FATALERROR("hkpSphereShape->m_userData is non-0, value %x", (from)->m_userData);
@@ -368,11 +421,11 @@ void free_hkpSphereShape(hkpSphereShape* to, StateTarget target)
 }
 
 
-void copy_hkpCapsuleShape(hkpCapsuleShape** to, hkpCapsuleShape* from, StateTarget target)
+void copy_hkpCapsuleShape(hkpCapsuleShape* to, hkpCapsuleShape* from)
 {
-    (*to)->vtable = (from)->vtable;
-    memcpy((*to)->data_0, (from)->data_0, sizeof((*to)->data_0));
-    memcpy((*to)->data_1, (from)->data_1, sizeof((*to)->data_1));
+    (to)->vtable = (from)->vtable;
+    memcpy((to)->data_0, (from)->data_0, sizeof((to)->data_0));
+    memcpy((to)->data_1, (from)->data_1, sizeof((to)->data_1));
     if ((from)->m_userData != 0)
     {
         FATALERROR("hkpCapsuleShape->m_userData is non-0, value %x", (from)->m_userData);

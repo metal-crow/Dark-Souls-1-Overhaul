@@ -23,12 +23,13 @@ void RestoreHkpWorldSnapshot(const HkpWorldSnapshot* snap, hkpWorld* world);
 void CopyHkpWorldSnapshot(HkpWorldSnapshot* dst, const HkpWorldSnapshot* src);
 void FreeHkpWorldSnapshotRefs(HkpWorldSnapshot* snap);
 
-/* ---------------- for DamageMan entries ------------------ */
-void copy_hkpSphereShape(hkpSphereShape** to, hkpSphereShape* from, StateTarget target);
+void copy_hkpShape(void* to, void* from);
+
+void copy_hkpSphereShape(hkpSphereShape* to, hkpSphereShape* from);
 hkpSphereShape* init_hkpSphereShape(StateTarget target);
 void free_hkpSphereShape(hkpSphereShape* to, StateTarget target);
 
-void copy_hkpCapsuleShape(hkpCapsuleShape** to, hkpCapsuleShape* from, StateTarget target);
+void copy_hkpCapsuleShape(hkpCapsuleShape* to, hkpCapsuleShape* from);
 hkpCapsuleShape* init_hkpCapsuleShape(StateTarget target);
 void free_hkpCapsuleShape(hkpCapsuleShape* to, StateTarget target);
 

@@ -19,8 +19,8 @@ DamageEntry* init_DamageEntry();
 void free_DamageEntry(DamageEntry* to, bool freeself);
 
 void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePhantomIns** from, bool is_sphere, const hkpWorld* to_world, const hkpWorld* from_world, StateTarget target);
-FrpgPhysShapePhantomIns* init_FrpgPhysShapePhantomIns(bool is_sphere, StateTarget target);
-void free_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns* to, bool is_sphere);
+FrpgPhysShapePhantomIns* init_FrpgPhysShapePhantomIns(bool is_sphere);
+void free_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns* to);
 
 void copy_DamageEntryField0x118(DamageEntryField0x118** to, DamageEntryField0x118** from, StateTarget target);
 DamageEntryField0x118* init_DamageEntryField0x118(StateTarget target);

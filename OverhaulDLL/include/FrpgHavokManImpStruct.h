@@ -379,29 +379,6 @@ static_assert(offsetof(hkpBroadPhaseBorder, listener_vtable1) == 0x10);
 static_assert(offsetof(hkpBroadPhaseBorder, phantom1) == 0x30);
 static_assert(offsetof(hkpBroadPhaseBorder, phantom6) == 0x58);
 
-/* ============================================================
- * Per-frame physics snapshot for rollback */
-struct SavedEntityState
-{
-    hkpEntity* ptr;
-    alignas(16) uint8_t motionData[sizeof(hkpMotion)]; // hkpMotion in hkpEntity
-};
-
-struct SavedPhantomState
-{
-    hkpSimpleShapePhantom* ptr;
-    alignas(16) uint8_t motionStateData[sizeof(hkMotionState)]; // hkMotionState in hkpSimpleShapePhantom
-};
-
-struct HkpWorldSnapshot
-{
-    std::vector<SavedEntityState> entities;
-    std::vector<SavedPhantomState> phantoms;
-};
-/* ============================================================ */
-
-/* ============================================================
- * Used with DamageMan */
 struct hkpCapsuleShape
 {
     uint64_t vtable;
@@ -421,5 +398,40 @@ struct hkpSphereShape
 };
 static_assert(sizeof(hkpSphereShape) == 0x38);
 static_assert(offsetof(hkpSphereShape, m_userData) == 0x18);
+
+/* ============================================================
+ * Per-frame physics snapshot for rollback
+ *  unsure if the shape ptr can get messed with during game operations. Testing seems to show yes so need to save it
+ */
+struct SavedEntityState
+{
+    hkpEntity* ptr;
+    void* shapePtr; 
+    alignas(16) uint8_t motionData[sizeof(hkpMotion)]; // hkpMotion in hkpEntity
+    union
+    {
+        hkpCapsuleShape capsuleData;
+        hkpSphereShape sphereData;
+    } shapeData;
+};
+
+struct SavedPhantomState
+{
+    hkpSimpleShapePhantom* ptr;
+    void* shapePtr;
+    alignas(16) uint8_t motionStateData[sizeof(hkMotionState)]; // hkMotionState in hkpSimpleShapePhantom
+    union
+    {
+        hkpCapsuleShape capsuleData;
+        hkpSphereShape sphereData;
+    } shapeData;
+};
+
+struct HkpWorldSnapshot
+{
+    std::vector<SavedEntityState> entities;
+    std::vector<SavedPhantomState> phantoms;
+};
+/* ============================================================ */
 
 #endif
