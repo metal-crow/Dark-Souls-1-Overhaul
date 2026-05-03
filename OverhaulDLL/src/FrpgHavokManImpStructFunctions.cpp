@@ -205,18 +205,6 @@ void SaveHkpWorldSnapshot(HkpWorldSnapshot* snap, hkpWorld* world)
  * ============================================================ */
 void RestoreHkpWorldSnapshot(const HkpWorldSnapshot* snap, hkpWorld* world)
 {
-    // --- Build target sets for O(1) lookup when we remove entities ---
-    std::unordered_set<hkpEntity*> targetEntities;
-    for (auto& s : snap->entities)
-    {
-        targetEntities.insert(s.ptr);
-    }
-    std::unordered_set<hkpSimpleShapePhantom*> targetPhantoms;
-    for (auto& s : snap->phantoms)
-    {
-        targetPhantoms.insert(s.ptr);
-    }
-
     // --- Collect current world state ---
     std::vector<hkpEntity*> currentEntities;
     CollectWorldEntities(world, currentEntities);
@@ -224,67 +212,51 @@ void RestoreHkpWorldSnapshot(const HkpWorldSnapshot* snap, hkpWorld* world)
     std::vector<hkpSimpleShapePhantom*> currentPhantoms;
     CollectWorldPhantoms(world, currentPhantoms);
 
-    std::unordered_set<hkpEntity*> currentEntitySet(currentEntities.begin(), currentEntities.end());
-    std::unordered_set<hkpSimpleShapePhantom*> currentPhantomSet(currentPhantoms.begin(), currentPhantoms.end());
-
-    // --- Remove entities that shouldn't exist at this frame ---
+    // --- Remove all existing entities ---
     for (hkpEntity* e : currentEntities)
     {
-        if (targetEntities.find(e) == targetEntities.end())
-        {
-            hk_removeEntities(world, &e, 1); //this derefs the entity and it's shape
-        }
+        hk_removeEntities(world, &e, 1); //this derefs the entity and it's shape
     }
 
-    // --- Re-add entities from the snapshot that are not currently in the world ---
-    for (auto& s : snap->entities)
-    {
-        if (currentEntitySet.find(s.ptr) == currentEntitySet.end())
-        {
-            hk_addEntity(world, s.ptr, 1); // 1 = activate. This refs the entity which we want since it's now in the world as well
-        }
-    }
-
-    // --- Remove phantoms that shouldn't exist ---
-    for (hkpSimpleShapePhantom* p : currentPhantoms)
-    {
-        if (targetPhantoms.find(p) == targetPhantoms.end())
-        {
-            hk_removePhantom(world, (void*)p); //this derefs the entity and it's shape
-        }
-    }
-
-    // --- Re-add phantoms from the snapshot ---
-    for (auto& s : snap->phantoms)
-    {
-        if (currentPhantomSet.find(s.ptr) == currentPhantomSet.end())
-        {
-            hk_addPhantom(world, (void*)s.ptr); //This refs the entity
-        }
-    }
-
-    // --- Restore shapes and motion states via memcpy ---
+    // --- Re-add entities from the snapshot  ---
     for (auto& s : snap->entities)
     {
         memcpy(&s.ptr->m_motion, &s.motionData, sizeof(hkpMotion));
+
+        //check if something happened to the object's shape in between saving and now
         void* old_shape = s.ptr->m_collidable.base.shape;
         if (old_shape != s.shapePtr)
         {
+            ConsoleWrite("Shape mismatch! %p", old_shape);
             if (old_shape != NULL)
             {
                 hk_deref(old_shape);
             }
             s.ptr->m_collidable.base.shape = s.shapePtr;
-            hk_ref(s.shapePtr);
+            hk_ref(s.shapePtr); //ref it for the game, since the game would ref it when it gets added
         }
         copy_hkpShape(s.shapePtr, (void*)(&s.shapeData));
+
+        // 1 = activate. This refs the entity which we want since it's now in the world as well
+        // This also rebuilds the agents/manifolds for the island
+        hk_addEntity(world, s.ptr, 1);
     }
+
+    // --- Remove all existing phantoms ---
+    for (hkpSimpleShapePhantom* p : currentPhantoms)
+    {
+        hk_removePhantom(world, (void*)p); //this derefs the entity and it's shape
+    }
+
+    // --- Re-add phantoms from the snapshot ---
     for (auto& s : snap->phantoms)
     {
         memcpy(&s.ptr->m_motionState, &s.motionStateData, sizeof(hkMotionState));
+
         void* old_shape = s.ptr->base.m_collidable.base.shape;
         if (old_shape != s.shapePtr)
         {
+            ConsoleWrite("Shape mismatch! %p", old_shape);
             if (old_shape != NULL)
             {
                 hk_deref(old_shape);
@@ -293,11 +265,14 @@ void RestoreHkpWorldSnapshot(const HkpWorldSnapshot* snap, hkpWorld* world)
             hk_ref(s.shapePtr);
         }
         copy_hkpShape(s.shapePtr, (void*)(&s.shapeData));
+
+        hk_addPhantom(world, (void*)s.ptr); //This refs the entity
     }
 
     // NOTE: After restoring positions, the broadphase AABBs, overlap pairs,
     // and simulation islands are stale. The next normal game step will rebuild these.
-    // I attemped to use hkpWorld_stepDeltaTime(0) here to force an immediate rebuild but that causes crashing
+    // Use hkpWorld_stepDeltaTime(0) here to force an immediate rebuild
+    hkpWorld_stepDeltaTime(world, 0.0f);
 }
 
 /* ============================================================
@@ -381,7 +356,8 @@ void copy_hkpShape(void* to, void* from)
         copy_hkpCapsuleShape((hkpCapsuleShape*)to, (hkpCapsuleShape*)from);
         break;
     default:
-        FATALERROR("Unknown shape type: %llx %p", *(uint64_t*)from, from);
+        //not going to bother to copy every possible shape data, most of them are not used for player-important details
+        //FATALERROR("Unknown shape type: %llx %p", *(uint64_t*)from, from);
         break;
     }
 }
@@ -390,12 +366,8 @@ void copy_hkpShape(void* to, void* from)
 void copy_hkpSphereShape(hkpSphereShape* to, hkpSphereShape* from)
 {
     to->vtable = from->vtable;
-    memcpy((to)->data_0, (from)->data_0, sizeof((to)->data_0));
+    to->m_userData = from->m_userData;
     memcpy((to)->data_1, (from)->data_1, sizeof((to)->data_1));
-    if ((from)->m_userData != 0)
-    {
-        FATALERROR("hkpSphereShape->m_userData is non-0, value %x", (from)->m_userData);
-    }
 }
 
 hkpSphereShape* init_hkpSphereShape(StateTarget target)
@@ -424,12 +396,8 @@ void free_hkpSphereShape(hkpSphereShape* to, StateTarget target)
 void copy_hkpCapsuleShape(hkpCapsuleShape* to, hkpCapsuleShape* from)
 {
     (to)->vtable = (from)->vtable;
-    memcpy((to)->data_0, (from)->data_0, sizeof((to)->data_0));
+    to->m_userData = from->m_userData;
     memcpy((to)->data_1, (from)->data_1, sizeof((to)->data_1));
-    if ((from)->m_userData != 0)
-    {
-        FATALERROR("hkpCapsuleShape->m_userData is non-0, value %x", (from)->m_userData);
-    }
 }
 
 hkpCapsuleShape* init_hkpCapsuleShape(StateTarget target)

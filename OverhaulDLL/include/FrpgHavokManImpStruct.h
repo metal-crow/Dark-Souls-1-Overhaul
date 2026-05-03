@@ -382,22 +382,24 @@ static_assert(offsetof(hkpBroadPhaseBorder, phantom6) == 0x58);
 struct hkpCapsuleShape
 {
     uint64_t vtable;
-    uint8_t data_0[0x10];
+    uint8_t _0[0x10];
     void* m_userData;
     uint8_t data_1[0x30];
 };
 static_assert(sizeof(hkpCapsuleShape) == 0x50);
 static_assert(offsetof(hkpCapsuleShape, m_userData) == 0x18);
+static_assert(offsetof(hkpCapsuleShape, data_1) == 0x20);
 
 struct hkpSphereShape
 {
     uint64_t vtable;
-    uint8_t data_0[0x10];
+    uint8_t _0[0x10];
     void* m_userData;
     uint8_t data_1[0x18];
 };
 static_assert(sizeof(hkpSphereShape) == 0x38);
 static_assert(offsetof(hkpSphereShape, m_userData) == 0x18);
+static_assert(offsetof(hkpSphereShape, data_1) == 0x20);
 
 /* ============================================================
  * Per-frame physics snapshot for rollback
