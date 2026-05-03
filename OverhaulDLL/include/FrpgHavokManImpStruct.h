@@ -73,7 +73,10 @@ struct hkpWorld
     uint32_t m_dirtySimulationIslands_cap;
     uint8_t _1[0x18];
     void* m_broadPhase; //DSR always uses a hkp3AxisSweep broadPhase
-    uint8_t _2[0xF8];
+    uint8_t _2a[0x58];
+    int m_criticalOperationsLockCount;
+    int m_criticalOperationsLockCountForPhantoms;
+    uint8_t _2b[0x98];
     hkpPhantom** m_phantoms;
     uint32_t m_phantoms_size;
     uint32_t m_phantoms_cap;
@@ -84,6 +87,7 @@ static_assert(offsetof(hkpWorld, m_activeSimulationIslands) == 0x40);
 static_assert(offsetof(hkpWorld, m_inactiveSimulationIslands) == 0x50);
 static_assert(offsetof(hkpWorld, m_dirtySimulationIslands) == 0x60);
 static_assert(offsetof(hkpWorld, m_broadPhase) == 0x88);
+static_assert(offsetof(hkpWorld, m_criticalOperationsLockCount) == 0xE8);
 static_assert(offsetof(hkpWorld, m_phantoms) == 0x188);
 static_assert(offsetof(hkpWorld, m_broadPhaseBorder) == 0x280);
 

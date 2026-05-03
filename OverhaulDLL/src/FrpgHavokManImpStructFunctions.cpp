@@ -86,15 +86,7 @@ static void CollectWorldEntities(hkpWorld* world, std::vector<hkpEntity*>& out)
 {
     out.clear();
 
-    // Fixed island (static/keyframed bodies)
-    if (world->m_fixedIsland)
-    {
-        hkpSimulationIsland* island = world->m_fixedIsland;
-        for (uint32_t j = 0; j < island->m_entities_size; j++)
-        {
-            out.push_back(island->m_entities[j]);
-        }
-    }
+    // Ignore fixed island. These are level chunks and can probably be ignored
 
     // Active simulation islands
     for (uint32_t i = 0; i < world->m_activeSimulationIslands_size; i++)
@@ -161,7 +153,7 @@ void SaveHkpWorldSnapshot(HkpWorldSnapshot* snap, hkpWorld* world)
         //don't add if there's no associated shape
         if (e->m_collidable.base.shape != NULL)
         {
-            SavedEntityState s;
+            SavedEntityState s = {};
             s.ptr = e;
             s.shapePtr = e->m_collidable.base.shape;
             memcpy(&s.motionData, &e->m_motion, sizeof(hkpMotion));
@@ -183,7 +175,7 @@ void SaveHkpWorldSnapshot(HkpWorldSnapshot* snap, hkpWorld* world)
         //don't add if there's no associated shape
         if (p->base.m_collidable.base.shape != NULL)
         {
-            SavedPhantomState s;
+            SavedPhantomState s = {};
             s.ptr = p;
             s.shapePtr = p->base.m_collidable.base.shape;
             memcpy(&s.motionStateData, &p->m_motionState, sizeof(hkMotionState));
@@ -205,6 +197,13 @@ void SaveHkpWorldSnapshot(HkpWorldSnapshot* snap, hkpWorld* world)
  * ============================================================ */
 void RestoreHkpWorldSnapshot(const HkpWorldSnapshot* snap, hkpWorld* world)
 {
+    if (world->m_criticalOperationsLockCount != 0 || world->m_criticalOperationsLockCountForPhantoms != 0)
+    {
+        FATALERROR("RestoreHkpWorldSnapshot: world is locked (entity=%d phantom=%d)",
+            world->m_criticalOperationsLockCount,
+            world->m_criticalOperationsLockCountForPhantoms);
+    }
+
     // --- Collect current world state ---
     std::vector<hkpEntity*> currentEntities;
     CollectWorldEntities(world, currentEntities);
@@ -213,10 +212,7 @@ void RestoreHkpWorldSnapshot(const HkpWorldSnapshot* snap, hkpWorld* world)
     CollectWorldPhantoms(world, currentPhantoms);
 
     // --- Remove all existing entities ---
-    for (hkpEntity* e : currentEntities)
-    {
-        hk_removeEntities(world, &e, 1); //this derefs the entity and it's shape
-    }
+    hk_removeEntities(world, currentEntities.data(), currentEntities.size()); //this derefs each entity and it's shape
 
     // --- Re-add entities from the snapshot  ---
     for (auto& s : snap->entities)
