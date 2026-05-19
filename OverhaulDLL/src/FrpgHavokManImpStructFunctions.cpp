@@ -86,7 +86,16 @@ static void CollectWorldEntities(hkpWorld* world, std::vector<hkpEntity*>& out)
 {
     out.clear();
 
-    // Ignore fixed island. These are level chunks and can probably be ignored
+    // Fixed island (static/keyframed bodies)
+    // Even though in theory we don't need to save these, it crashes without them
+    if (world->m_fixedIsland)
+    {
+        hkpSimulationIsland* island = world->m_fixedIsland;
+        for (uint32_t j = 0; j < island->m_entities_size; j++)
+        {
+            out.push_back(island->m_entities[j]);
+        }
+    }
 
     // Active simulation islands
     for (uint32_t i = 0; i < world->m_activeSimulationIslands_size; i++)
@@ -212,7 +221,7 @@ void RestoreHkpWorldSnapshot(const HkpWorldSnapshot* snap, hkpWorld* world)
     CollectWorldPhantoms(world, currentPhantoms);
 
     // --- Remove all existing entities ---
-    hk_removeEntities(world, currentEntities.data(), currentEntities.size()); //this derefs each entity and it's shape
+    hk_removeEntities(world, currentEntities.data(), (int)currentEntities.size()); //this derefs each entity and it's shape
 
     // --- Re-add entities from the snapshot  ---
     for (auto& s : snap->entities)
@@ -267,8 +276,8 @@ void RestoreHkpWorldSnapshot(const HkpWorldSnapshot* snap, hkpWorld* world)
 
     // NOTE: After restoring positions, the broadphase AABBs, overlap pairs,
     // and simulation islands are stale. The next normal game step will rebuild these.
-    // Use hkpWorld_stepDeltaTime(0) here to force an immediate rebuild
-    hkpWorld_stepDeltaTime(world, 0.0f);
+    // Use hkpWorld_stepDeltaTime(0) here to force an immediate rebuild, but this seems to cause some sort of corruption/crashing.
+    //hkpWorld_stepDeltaTime(world, 0.0f);
 }
 
 /* ============================================================
