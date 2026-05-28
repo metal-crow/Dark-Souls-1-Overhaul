@@ -16,7 +16,7 @@ https://www.nexusmods.com/darksoulsremastered/mods/466
 https://discord.gg/nABqj8G
 
 ### Installation
-This requires the [Microsoft Visual C++ Redistributable for Visual Studio 2015-2022 ](https://aka.ms/vs/17/release/vc_redist.x64.exe). You should already have it, but just in case.  
+This requires the [Microsoft Visual C++ Redistributable for Visual Studio 2017-2026](https://aka.ms/vc14/vc_redist.x64.exe). Windows users likely already have it, buf if you encounter issues/use Linux attempt to install this first.
   
 Unzip the contents of the zip into your DARK SOULS REMASTERED folder to install (so d3d11.dll should be in the same folder as the game exe). If a command window pops up on game start, the mod is installed.  
   
