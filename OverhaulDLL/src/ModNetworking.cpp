@@ -16,6 +16,33 @@
 //This is needed for the steam callbacks to work
 static ModNetworking modnet = ModNetworking();
 
+//=========Seamless Co-op compatability
+// 
+//Under SC there are TWO lobbies: "master" lobby and a real "game" lobby (created by the game's CreateLobby).
+// This mod supports SC compatability by using the master lobby as our persistant lobby,
+// and ignoring the game lobby.
+static std::atomic<uint64_t> seamlessGameLobby = 0;
+
+//Set when our Steam_CreateLobby hook passes through under SC; the next lobby the host enters is the game lobby.
+static std::atomic<bool> expecting_sc_game_lobby = false;
+
+bool is_seamless_coop_present()
+{
+    //ds1sc.dll is either loaded at startup or not at all, and never changes during the session, so cache it.
+    static bool present = GetModuleHandleA("ds1sc.dll") != nullptr;
+    return present;
+}
+
+//SC runs its matchmaking through its own Steam lobbies. Both players share an SC lobby, so we
+// adopt the master lobby as our persistant lobby.
+//Note that only the master lobby has the lobby_data == seamless
+static bool IsSeamlessCoopLobby(uint64_t lobby)
+{
+    const char* lobby_type = ModNetworking::SteamMatchmaking->GetLobbyData(lobby, "lobby_type");
+    return lobby_type != nullptr && strstr(lobby_type, "seamless") != nullptr;
+}
+
+
 extern "C" {
     uint64_t AcceptP2PSessionWithUser_injection_return;
     void AcceptP2PSessionWithUser_injection();
@@ -51,7 +78,7 @@ extern "C" {
 
     uint64_t Steam_CreateLobby_injection_return;
     void Steam_CreateLobby_injection();
-    void Steam_CreateLobby_injection_helper(void*);
+    bool Steam_CreateLobby_injection_helper(void*);
 }
 
 typedef void* gfGetSteamInterface(int iSteamUser, int iUnkInt, const char* pcVersion, const char* pcInterface);
@@ -137,6 +164,15 @@ void ModNetworking::CreatePersistentLobby()
 {
     //clear the list of breakin users since we've gone back to our home lobby
     ServerMonitor::clearBreakinList();
+
+    //Under SC, we can't have our own persistent lobby
+    if (is_seamless_coop_present())
+    {
+        //We've left the session, so forget any SC game lobby we were tracking
+        seamlessGameLobby = 0;
+        expecting_sc_game_lobby = false;
+        return;
+    }
     SteamAPICall_t lobby_created = ModNetworking::SteamMatchmaking->CreateLobby(ELobbyType::k_ELobbyTypePublic, 6);
     ModNetworking::LobbyCreatedCallResult.Set(lobby_created, &modnet, &ModNetworking::LobbyCreatedCallback);
 }
@@ -153,13 +189,28 @@ void ModNetworking::LobbyCreatedCallback(LobbyCreated_t* pCallback, bool bIOFail
     {
         FATALERROR("LobbyCreatedCallback failed");
     }
-    ConsoleWrite("Created Persistent Lobby");
+    ConsoleWrite("Created Persistent Lobby %llx", pCallback->m_ulSteamIDLobby);
     ModNetworking::selfPersisantLobby.store(pCallback->m_ulSteamIDLobby);
     UpdatePersistentLobbyData(Mod::get_mode());
 }
 
 const char* MOD_LOBBY_DATA_KEY = "DarkSoulsOverhaulModData";
 const char* MOD_LOBBY_USERAPPROVED_KEY = "DarkSoulsOverhaulModUserApproved";
+
+//If we're hosting through an SC lobby, write the lobby data to the master lobby instead of the persistent lobby.
+//Only writes when the value would actually change,
+// writing lobby data triggers another LobbyDataUpdate, so an unconditional write would loop forever.
+static void HostPublishModeOnSeamlessLobby(uint64_t lobby, ModMode mode)
+{
+    const char* desired = ModModes_To_String.at(mode);
+    const char* current = ModNetworking::SteamMatchmaking->GetLobbyData(lobby, MOD_LOBBY_DATA_KEY);
+    if (current == nullptr || strcmp(current, desired) != 0)
+    {
+        ModNetworking::SteamMatchmaking->SetLobbyData(lobby, MOD_LOBBY_DATA_KEY, desired);
+        ModNetworking::SteamMatchmaking->SetLobbyMemberData(lobby, MOD_LOBBY_DATA_KEY, desired);
+        ConsoleWrite("Set SC (%llx) lobby data = %hhx", lobby, mode);
+    }
+}
 
 //Set the persistant lobby data for what mode we are in
 void ModNetworking::UpdatePersistentLobbyData(ModMode mode)
@@ -184,15 +235,18 @@ void ModNetworking::start()
     //Inject code into when the game normally creates it's own lobby to instead use our persistant lobby
     //This ensures we don't have to worry about lobby data not being updated in time for other players
     //This injection makes it so that the function that normally creates a lobby instead sets the lobbyid to our persistant lobby, and returns true
+    //Note: Under SC this injection calls the real function instead
     write_address = (uint8_t*)(ModNetworking::Steam_CreateLobby_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &Steam_CreateLobby_injection_return, 0, &Steam_CreateLobby_injection);
 
-
     //Inject code into when the game leaves a lobby to re-create our persistant lobby
-    //We can only be in one lobby at a time, so we have to re-create it
     write_address = (uint8_t*)(ModNetworking::Steam_LeaveLobby_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &Steam_LeaveLobby_injection_return, 1, &Steam_LeaveLobby_injection);
 
+  bool sc_present = is_seamless_coop_present();
+  //Under SC we skip the mod's P2P translation hooks - they collide with SC's identical translation
+  if (!sc_present)
+  {
     /*
      * Supporting code for the connection handshake section
      * Inject into the AcceptP2PSessionWithUser callback to be sure we d/c users
@@ -231,6 +285,11 @@ void ModNetworking::start()
      */
     write_address = (uint8_t*)(ModNetworking::CloseP2PSessionWithUser_Replacement_injection_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &CloseP2PSessionWithUser_Replacement_injection_return, 9, &CloseP2PSessionWithUser_Replacement_injection);
+  }
+  else
+  {
+      ConsoleWrite("Seamless Co-op detected - skipping P2P translation hooks");
+  }
 
     /*
      * Prevent the type 34 steam network packet from ever informing the host that we don't see any guests
@@ -422,6 +481,12 @@ void ModNetworking::SteamNetworkingMessagesSessionRequestCallback(SteamNetworkin
 {
     CSteamID user = pCallback->m_identityRemote.GetSteamID();
 
+    //Under SC, SC owns the ISteamNetworkingMessages, so let SC manage this.
+    if (is_seamless_coop_present())
+    {
+        return;
+    }
+
     //Check if we want to d/c them
     uint64_t incoming_guest_to_not_accept = ModNetworking::incoming_guest_to_not_accept.load();
     if (incoming_guest_to_not_accept != 0 && user.ConvertToUint64() == incoming_guest_to_not_accept)
@@ -492,7 +557,7 @@ bool IsP2PPacketAvailable_Replacement_injection_helper(uint32 *pcubMsgSize, int 
     * There is no equivilent in the NetworkingMessages API, so just grab a message if one is present and save it
     * Grab this saved message and return it in the upcoming ReadP2PPacket call
     */
-    SteamNetworkingMessage_t* new_message = new SteamNetworkingMessage_t();
+    SteamNetworkingMessage_t* new_message = nullptr;
     int num_messages = ModNetworking::SteamNetMessages->ReceiveMessagesOnChannel(nChannel, &new_message, 1);
 
     if (num_messages == 1)
@@ -699,13 +764,25 @@ void Steam_LeaveLobby_injection_helper(uint64_t lobbyid)
 }
 
 //CreateLobby
-void Steam_CreateLobby_injection_helper(void* SteamSessionLight)
+//Returns true if the caller should pass through to the real Steam_CreateLobby
+bool Steam_CreateLobby_injection_helper(void* SteamSessionLight)
 {
-    //tell the game the lobby was created, and here's it's id
+    //Under Seamless Co-op we can't return our persistant lobby, SC needs the game's real CreateLobby to make a new lobby
+    //Unsure why SC breaks due to this, likely because it doesn't trigger a join session callback at the right time
+    if (is_seamless_coop_present())
+    {
+        //The real CreateLobby is about to make SC's game lobby and we'll enter it next.
+        //Flag it so LobbyEnterCallback knows to leave that lobby alone (keep our state on the master lobby).
+        expecting_sc_game_lobby = true;
+        return true;
+    }
+
+    //Normal play: substitute our persistent lobby for the game's session lobby
     LobbyCreated_t lobbyCreatedt;
     lobbyCreatedt.m_eResult = k_EResultOK;
     lobbyCreatedt.m_ulSteamIDLobby = ModNetworking::selfPersisantLobby.load();
     Steam_CreateLobby_APICallResult(SteamSessionLight, &lobbyCreatedt);
+    return false;
 }
 
 /*
@@ -729,8 +806,36 @@ void ModNetworking::LobbyEnterCallback(LobbyEnter_t* pCallback)
         return;
     }
 
+    //If this is the Seamless Coop game lobby: leave it alone. We don't use it at all.
+    //  Host: we just passed CreateLobby through, so the next lobby we enter is it (expecting_sc_game_lobby).
+    //  Guest: while we're already in an SC master lobby, any other lobby we join is SC's game lobby.
+    if (is_seamless_coop_present())
+    {
+        uint64_t lobby = pCallback->m_ulSteamIDLobby;
+        uint64_t cur = ModNetworking::currentLobby.load();
+        bool host_game_lobby = expecting_sc_game_lobby.load();
+        bool guest_game_lobby = IsSeamlessCoopLobby(cur) && lobby != cur && !IsSeamlessCoopLobby(lobby);
+        if (host_game_lobby || guest_game_lobby)
+        {
+            expecting_sc_game_lobby = false;
+            seamlessGameLobby = lobby;
+            return;
+        }
+    }
+
     CSteamID lobbyowner = ModNetworking::SteamMatchmaking->GetLobbyOwner(pCallback->m_ulSteamIDLobby);
     CSteamID selfsteamid = ModNetworking::SteamUser->GetSteamID();
+
+    //If this is the Seamless Coop master lobby: adopt it as the persistent lobby
+    //(At host create-time lobby_type likely isn't set yet, so this no-ops and we'll actually later publish via LobbyDataUpdateCallback)
+    if (is_seamless_coop_present() && IsSeamlessCoopLobby(pCallback->m_ulSteamIDLobby))
+    {
+        if (lobbyowner == selfsteamid)
+        {
+            HostPublishModeOnSeamlessLobby(pCallback->m_ulSteamIDLobby, Mod::get_mode());
+        }
+    }
+
     ModNetworking::currentLobby = pCallback->m_ulSteamIDLobby;
     ModNetworking::incoming_guest_to_not_accept = 0;
     ModNetworking::SteamAPIStatusKnown_Users.clear();
@@ -848,9 +953,24 @@ void ModNetworking::LobbyDataUpdateCallback(LobbyDataUpdate_t* pCallback)
         ConsoleWrite("Ignore PaintedWorlds prejoin lobby");
         return;
     }
+    //If this is a Seamless Coop game lobby, ignore it. The LobbyData is only in the master lobby
+    if (is_seamless_coop_present() && seamlessGameLobby.load() != 0 && pCallback->m_ulSteamIDLobby == seamlessGameLobby.load())
+    {
+        return;
+    }
 
     CSteamID lobbyowner = ModNetworking::SteamMatchmaking->GetLobbyOwner(pCallback->m_ulSteamIDLobby);
     CSteamID selfsteamid = ModNetworking::SteamUser->GetSteamID();
+
+    //If this is the Seamless Coop master lobby: adopt it as the persistent lobby
+    //(Since the lobby_data doesn't arive until later, here is where we likely detect this as the SC master lobby)
+    if (is_seamless_coop_present() && IsSeamlessCoopLobby(pCallback->m_ulSteamIDLobby))
+    {
+        if (lobbyowner == selfsteamid)
+        {
+            HostPublishModeOnSeamlessLobby(pCallback->m_ulSteamIDLobby, Mod::get_mode());
+        }
+    }
 
     // Guest: If we do get more data later, after we're connected, then the host is telling us that we need to change modes, or is triggering the approval of the new guest
     if (pCallback->m_ulSteamIDMember == pCallback->m_ulSteamIDLobby && lobbyowner != selfsteamid && ModNetworking::SteamAPIStatusKnown_Users.contains(lobbyowner.ConvertToUint64()))
@@ -963,6 +1083,11 @@ void ModNetworking::LobbyChatUpdateCallback(LobbyChatUpdate_t* pCallback)
     if (strlen(ModNetworking::SteamMatchmaking->GetLobbyData(pCallback->m_ulSteamIDLobby, "PaintedWorlds")) != 0)
     {
         ConsoleWrite("Ignore PaintedWorlds prejoin lobby");
+        return;
+    }
+    //If this is a Seamless Coop game lobby, ignore it. The LobbyData is only in the master lobby
+    if (is_seamless_coop_present() && seamlessGameLobby.load() != 0 && pCallback->m_ulSteamIDLobby == seamlessGameLobby.load())
+    {
         return;
     }
 

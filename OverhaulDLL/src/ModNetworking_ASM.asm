@@ -299,12 +299,21 @@ Steam_CreateLobby_injection PROC
 
 FUNC_PROLOGUE_LITE
 call    Steam_CreateLobby_injection_helper
-FUNC_EPILOGUE_LITE
+FUNC_EPILOGUE_LITE_NORAX
 
-;don't keep original code
-;just return true, since we are replacing this function all together
+test    al, al
+jnz     passthrough
+
+;normal: we replaced the function, return true to the game
 mov     al, 1
 ret
+
+passthrough:
+;Under seamless-coop: restore original code, then continue the real function.
+push    rdi
+sub     rsp, 30h
+cmp     qword ptr [rcx + 468h], 0
+jmp     Steam_CreateLobby_injection_return
 Steam_CreateLobby_injection ENDP
 
 _TEXT    ENDS

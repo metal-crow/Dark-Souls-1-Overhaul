@@ -116,9 +116,13 @@ void start() {
     write_address = Game::ds1_base + ApplyType33_packet_offset;
     sp::mem::code::x64::inject_jmp_14b((void*)write_address, &ApplyType33_packet_return, 0, &ApplyType33_packet_injection);
 
-    // Monitor all incoming packets so we can drop certain ones from invaders
-    write_address = getNetMessageAC_offset + Game::ds1_base;
-    sp::mem::code::x64::inject_jmp_14b((void*)write_address, &getNetMessageAC_return, 4, &getNetMessageAC_injection);
+    // Monitor all incoming packets so we can drop certain ones from invaders.
+    // Don't enable this in Seamless Co-op, since it drops vital SC packets
+    if (!is_seamless_coop_present())
+    {
+        write_address = getNetMessageAC_offset + Game::ds1_base;
+        sp::mem::code::x64::inject_jmp_14b((void*)write_address, &getNetMessageAC_return, 4, &getNetMessageAC_injection);
+    }
 
     // Disable the SendNotificationMessage packet, since any player can tell the server to send it to any other player
     //https://www.patreon.com/posts/info-blue-and-of-148777896

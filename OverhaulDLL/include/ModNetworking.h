@@ -79,4 +79,7 @@ private:
     static const uint64_t Steam_CreateLobby_offset = 0x10b7c40;
 };
 
+//True if Seamless Co-op (ds1sc.dll) is loaded. Used to back off mod features that conflict with SC.
+bool is_seamless_coop_present();
+
 #endif
