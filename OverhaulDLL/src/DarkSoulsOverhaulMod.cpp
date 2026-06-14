@@ -103,6 +103,8 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
 
     Game::init();
     AntiAntiCheat::start();
+    FixAnkles::start();
+
 #ifndef ANTIBAN_ONLY
     Game::injections_init(); //only do injections after we disable the built in code checking
 
@@ -161,7 +163,6 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     AnimationEdits::start();
     SpellDesync::start();
     PhantomUnshackle::start();
-    FixAnkles::start();
     ModNetworking::start();
     ServerMonitor::start();
     FileReloading::start();
