@@ -114,16 +114,40 @@ void copy_BulletIns_FollowupBullet_List(BulletIns_FollowupBullet** to_list, int1
 void copy_BulletIns(BulletIns* to, BulletIns* from, StateTarget target)
 {
     to->vtable = from->vtable;
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    to->bullet_number = from->bullet_number;
+    to->unk_9 = from->unk_9;
+    to->unk_a = from->unk_a;
+    memcpy(to->unk_c, from->unk_c, sizeof(to->unk_c));
+    memcpy(to->player_position, from->player_position, sizeof(to->player_position));
+    to->orbit_radius_X = from->orbit_radius_X;
+    to->orbit_radius_Y = from->orbit_radius_Y;
+    to->orbit_radius_Z = from->orbit_radius_Z;
+    to->orbit_radius_W = from->orbit_radius_W;
+    to->unk_30 = from->unk_30;
+    to->unk_34 = from->unk_34;
+    to->unk_38 = from->unk_38;
+    to->unk_3c = from->unk_3c;
+    to->unk_40 = from->unk_40;
+    to->unk_44 = from->unk_44;
+    to->unk_48 = from->unk_48;
+    to->unk_4c = from->unk_4c;
+    to->unk_50 = from->unk_50;
+    to->unk_54 = from->unk_54;
 
     copy_BulletIns_FollowupBullet(&to->FollowupBullet, &from->FollowupBullet, target);
 
-    to->data_1 = from->data_1;
+    to->bulletClassType = from->bulletClassType;
+    to->unk_8c = from->unk_8c;
 
     //owner contains entity IDs, attack data, position vectors - all safe to memcpy
     memcpy(&to->owner, &from->owner, sizeof(to->owner));
 
-    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    to->bullet_distance = from->bullet_distance;
+    to->bullet_life = from->bullet_life;
+    to->unk_1f8 = from->unk_1f8;
+    to->unk_1fc = from->unk_1fc;
+    to->unk_200 = from->unk_200;
+    to->unk_204 = from->unk_204;
 
     //bulletTargetingSystemOwner contains parent ptr, vtable, entityId, NpcThinkParam - raw pointers are fine
     memcpy(&to->bulletTargetingSystemOwner, &from->bulletTargetingSystemOwner, sizeof(to->bulletTargetingSystemOwner));
@@ -131,17 +155,27 @@ void copy_BulletIns(BulletIns* to, BulletIns* from, StateTarget target)
     //targetingSystemBase contains vtable, owner ptr, targeting data - raw pointers are fine
     memcpy(&to->targetingSystemBase, &from->targetingSystemBase, sizeof(to->targetingSystemBase));
     //TODO setting the BulletTargetingSystemOwner to null for now, we may have to save/restore it
-    *(uint64_t*)((uint64_t)(&to->targetingSystemBase) + 8) = NULL;
+    to->targetingSystemBase.owner_1 = NULL;
 
-    memcpy(to->data_3, from->data_3, sizeof(to->data_3));
+    to->unk_288 = from->unk_288;
+    to->unk_28c = from->unk_28c;
+    memcpy(to->target, from->target, sizeof(to->target));
+    memcpy(to->unk_2c1, from->unk_2c1, sizeof(to->unk_2c1));
+    to->unk_2c4 = from->unk_2c4;
+    to->unk_2c8 = from->unk_2c8;
+    to->unk_2cc = from->unk_2cc;
+    to->unk_2d0 = from->unk_2d0;
+    memcpy(to->unk_2d1, from->unk_2d1, sizeof(to->unk_2d1));
 
     memcpy(&to->bulletState, &from->bulletState, sizeof(to->bulletState));
-    to->data_4 = from->data_4;
+    to->unk_2f8 = from->unk_2f8;
+    to->unk_2fc = from->unk_2fc;
     memcpy(&to->bulletFlyState, &from->bulletFlyState, sizeof(to->bulletFlyState));
     memcpy(&to->bulletExplosionState, &from->bulletExplosionState, sizeof(to->bulletExplosionState));
 
     //previous_bullet_in_use is handled by copy_BulletMan after all elements are copied
-    to->data_5 = from->data_5;
+    to->unk_358 = from->unk_358;
+    to->unk_35c = from->unk_35c;
 }
 
 BulletIns* init_BulletIns()
@@ -162,14 +196,20 @@ void free_BulletIns(BulletIns* to, bool freeself)
 
 void copy_BulletMan_Field0x20(BulletMan_Field0x20* to, BulletMan_Field0x20* from, StateTarget target)
 {
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    to->unk_0 = from->unk_0;
+    memcpy(to->field0x4Elem, from->field0x4Elem, sizeof(to->field0x4Elem));
+    memcpy(to->unk_184, from->unk_184, sizeof(to->unk_184));
+    memcpy(to->unk_18c, from->unk_18c, sizeof(to->unk_18c));
+    to->unk_194 = from->unk_194;
+    to->unk_195 = from->unk_195;
+    memcpy(to->unk_196, from->unk_196, sizeof(to->unk_196));
 
     //BulletParamInfo is game-allocated and never freed. Since this object is linked to the lifetime of BulletMan itself, it's stable
     to->BulletParamInfo = from->BulletParamInfo;
 
     memcpy(&to->field0x1a0, &from->field0x1a0, sizeof(to->field0x1a0));
-    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    to->unk_300 = from->unk_300;
+    to->unk_304 = from->unk_304;
 
     //next_in_use is a linked list pointer within the field0x20 array - handled by copy_BulletMan
     //chrCam is a raw pointer to the game ChrCam
@@ -223,8 +263,9 @@ void copy_BulletMan_Field0x40(BulletMan_Field0x40* to, BulletMan_Field0x40* from
         }
     }
 
-    to->data_0 = from->data_0;
-    to->data_1 = from->data_1;
+    to->unk_308 = from->unk_308;
+    to->unk_30c = from->unk_30c;
+    to->unk_310 = from->unk_310;
 }
 
 BulletMan_Field0x40* init_BulletMan_Field0x40()
@@ -246,7 +287,7 @@ void free_BulletMan_Field0x40(BulletMan_Field0x40* to, bool freeself)
 void copy_ChrCam(ChrCam* to, ChrCam* from, StateTarget target)
 {
     //Copy the FrpgPersCam base data
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(to->FrpgPersCam_base, from->FrpgPersCam_base, sizeof(to->FrpgPersCam_base));
 
     //Deep copy sub-camera data. The sub-cameras are allocated once by the game and persist,
     //so for our local copy we have our own allocations. Copy the data at the pointers.
@@ -268,7 +309,22 @@ void copy_ChrCam(ChrCam* to, ChrCam* from, StateTarget target)
     }
 
     //Copy remaining ChrCam state (flags, floats, etc.)
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    to->unk_80 = from->unk_80;
+    memcpy(to->unk_81, from->unk_81, sizeof(to->unk_81));
+    to->unk_84 = from->unk_84;
+    to->unk_88 = from->unk_88;
+    to->unk_8c = from->unk_8c;
+    memcpy(to->unk_90, from->unk_90, sizeof(to->unk_90));
+    to->unk_9c = from->unk_9c;
+    to->unk_a0 = from->unk_a0;
+    to->unk_a1 = from->unk_a1;
+    to->unk_a2 = from->unk_a2;
+    to->UseBallistaAimCam = from->UseBallistaAimCam;
+    memcpy(to->unk_a4, from->unk_a4, sizeof(to->unk_a4));
+    to->unk_c0 = from->unk_c0;
+    memcpy(to->unk_c1, from->unk_c1, sizeof(to->unk_c1));
+    to->DbgNode = from->DbgNode;
+    memcpy(to->unk_c9, from->unk_c9, sizeof(to->unk_c9));
 }
 
 ChrCam* init_ChrCam()
@@ -328,7 +384,10 @@ void copy_BulletMan(BulletMan* to, BulletMan* from, StateTarget target)
         }
     }
 
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    to->end_of_bullets_in_use = from->end_of_bullets_in_use;
+    to->start_of_unused_bullets = from->start_of_unused_bullets;
+    to->bullet_count_1 = from->bullet_count_1;
+    to->bullet_count_2 = from->bullet_count_2;
 
     for (size_t i = 0; i < 64; i++)
     {
@@ -348,20 +407,31 @@ void copy_BulletMan(BulletMan* to, BulletMan* from, StateTarget target)
         }
     }
 
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    to->end_of_bullets_in_use_field0x20 = from->end_of_bullets_in_use_field0x20;
+    to->start_of_unused_bullets_field0x20 = from->start_of_unused_bullets_field0x20;
+    to->unk_38 = from->unk_38;
+    to->unk_3c = from->unk_3c;
 
     for (size_t i = 0; i < 4; i++)
     {
         copy_BulletMan_Field0x40(&to->field0x40[i], &from->field0x40[i], target);
     }
 
-    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    to->end_of_bullets_in_use_field0x40 = from->end_of_bullets_in_use_field0x40;
+    to->start_of_unused_bullets_field0x40 = from->start_of_unused_bullets_field0x40;
+    to->unk_58 = from->unk_58;
+    to->unk_5c = from->unk_5c;
 
     copy_ChrCam(to->chrCam, from->chrCam, target);
 
-    to->data_3 = from->data_3;
+    to->attach_system_disabled = from->attach_system_disabled;
+    memcpy(to->unk_69, from->unk_69, sizeof(to->unk_69));
 
-    memcpy(to->data_5, from->data_5, sizeof(to->data_5));
+    to->bullet_direction_drawing = from->bullet_direction_drawing;
+    memcpy(to->unk_a9, from->unk_a9, sizeof(to->unk_a9));
+    to->speed_attenuation_rate = from->speed_attenuation_rate;
+    to->last_addition_rate = from->last_addition_rate;
+    to->external_force = from->external_force;
 
     Game::ResumeThreads();
 }

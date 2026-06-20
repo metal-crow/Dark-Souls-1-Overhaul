@@ -41,9 +41,31 @@ void copy_ThrowMan(ThrowMan* to, ThrowMan* from, StateTarget target)
     }
     to->throw_request_queue_cur = &to->throw_request_queue_start[to_len];
 
-    to->data_0 = from->data_0;
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
-    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    to->unk_80 = from->unk_80;
+    to->unk_81 = from->unk_81;
+    memcpy(to->unk_82, from->unk_82, sizeof(to->unk_82));
+    to->timeoutVal = from->timeoutVal;
+    to->throwEscape_remainingTypeToDecayWeighting = from->throwEscape_remainingTypeToDecayWeighting;
+    to->throwEscape_IncreaseValueOfGoalWeighting = from->throwEscape_IncreaseValueOfGoalWeighting;
+    to->throwEscape_NowIncreaseWeighting = from->throwEscape_NowIncreaseWeighting;
+    to->throwEscape_goalWeightLossVals = from->throwEscape_goalWeightLossVals;
+    to->throwEscape_curWeightLossVals = from->throwEscape_curWeightLossVals;
+    to->attacking_chr = from->attacking_chr;
+    to->defending_chr = from->defending_chr;
+    to->allDrawing = from->allDrawing;
+    memcpy(to->unk_c1, from->unk_c1, sizeof(to->unk_c1));
+    to->unk_c4 = from->unk_c4;
+    to->animPlaySpeed = from->animPlaySpeed;
+    to->unk_cc = from->unk_cc;
+    memcpy(to->unk_cd, from->unk_cd, sizeof(to->unk_cd));
+    to->unk_d0 = from->unk_d0;
+    memcpy(to->unk_d4, from->unk_d4, sizeof(to->unk_d4));
+    memcpy(to->vec_e0, from->vec_e0, sizeof(to->vec_e0));
+    memcpy(to->vec_100, from->vec_100, sizeof(to->vec_100));
+    memcpy(to->unk_120, from->unk_120, sizeof(to->unk_120));
+    memcpy(to->unk_128, from->unk_128, sizeof(to->unk_128));
+    memcpy(to->unk_12a, from->unk_12a, sizeof(to->unk_12a));
+    to->unk_12c = from->unk_12c;
 }
 
 ThrowMan* init_ThrowMan()
@@ -76,7 +98,11 @@ void copy_ThrowRequestedEntry(ThrowRequestedEntry* to, ThrowRequestedEntry* from
 {
     to->attacker = from->attacker;
     to->defender = from->defender;
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    to->throwId = from->throwId;
+    to->throwTimeout = from->throwTimeout;
+    to->unk_18 = from->unk_18;
+    to->unk1 = from->unk1;
+    memcpy(to->unk_1a, from->unk_1a, sizeof(to->unk_1a));
 }
 
 ThrowRequestedEntry* init_ThrowRequestedEntry()

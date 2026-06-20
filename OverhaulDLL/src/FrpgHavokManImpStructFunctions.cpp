@@ -372,7 +372,10 @@ void copy_hkpSphereShape(hkpSphereShape* to, hkpSphereShape* from)
 {
     to->vtable = from->vtable;
     to->m_userData = from->m_userData;
-    memcpy((to)->data_1, (from)->data_1, sizeof((to)->data_1));
+    to->m_radius = from->m_radius;
+    to->unk_24 = from->unk_24;
+    memcpy(to->m_pad, from->m_pad, sizeof(to->m_pad));
+    to->unk_34 = from->unk_34;
 }
 
 hkpSphereShape* init_hkpSphereShape(StateTarget target)
@@ -402,7 +405,11 @@ void copy_hkpCapsuleShape(hkpCapsuleShape* to, hkpCapsuleShape* from)
 {
     (to)->vtable = (from)->vtable;
     to->m_userData = from->m_userData;
-    memcpy((to)->data_1, (from)->data_1, sizeof((to)->data_1));
+    to->m_radius = from->m_radius;
+    to->unk_24 = from->unk_24;
+    memcpy(to->unk_28, from->unk_28, sizeof(to->unk_28));
+    memcpy(to->vertexA, from->vertexA, sizeof(to->vertexA));
+    memcpy(to->vertexB, from->vertexB, sizeof(to->vertexB));
 }
 
 hkpCapsuleShape* init_hkpCapsuleShape(StateTarget target)

@@ -21,15 +21,8 @@ std::string print_PlayerIns(PlayerIns* to)
     }
     out += "\n";
 
-    out += "Unknown data 1:";
-    for (size_t i = 0; i < sizeof(to->data_1); i++)
-    {
-        out += std::to_string(to->data_1[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Unknown data 2:" + std::to_string(to->data_2) + "\n";
+    out += "TimeDelayForRollRecalc:" + std::to_string(to->TimeDelayForRollRecalc) + "\n";
+    out += "unk_7d4:" + std::to_string(to->unk_7d4) + "\n";
     out += print_RingEquipCtrl(to->ringequipctrl);
     out += print_WeaponEquipCtrl(to->weaponequipctrl);
     out += print_ProEquipCtrl(to->proequipctrl);
@@ -40,20 +33,11 @@ std::string print_PlayerIns(PlayerIns* to)
     out += print_ChrAsmModelRes(to->chrAsmModelRes);
     out += print_ChrAsmModel(to->chrAsmModel);
 
-    out += "Unknown data 3:";
-    for (size_t i = 0; i < sizeof(to->data_3)/4; i++)
-    {
-        out += std::to_string((float)to->data_3[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "bodySizes head/upper/lower/arm/leg: " + std::to_string(to->headSize) + " " + std::to_string(to->upperBodySize) +
+        " " + std::to_string(to->lowerBodySize) + " " + std::to_string(to->armSize) + " " + std::to_string(to->legSize) + "\n";
 
-    out += "Unknown data 4:";
-    for (size_t i = 0; i < sizeof(to->data_4); i++)
-    {
-        out += std::to_string(to->data_4[i]);
-        out += " ";
-    }
+    out += "equipSlotToEquipIndexMap: ";
+    for (int i = 0; i < 8; i++) out += std::to_string(to->equipSlotToEquipIndexMap[i]) + " ";
     out += "\n";
 
     out += "Unknown data 5:";
@@ -84,8 +68,8 @@ void copy_PlayerIns(PlayerIns* to, const PlayerIns* from, StateTarget target)
     copy_ChrIns(&to->chrins, &from->chrins, target);
     copy_PlayerGameData(to->playergamedata, from->playergamedata);
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
-    to->data_2 = from->data_2;
+    memcpy(&to->unk_7a8, &from->unk_7a8, 16);
+    memcpy(&to->unk_7d0, &from->unk_7d0, 8);
     copy_RingEquipCtrl(to->ringequipctrl, from->ringequipctrl, target);
     copy_WeaponEquipCtrl(to->weaponequipctrl, from->weaponequipctrl, target);
     copy_ProEquipCtrl(to->proequipctrl, from->proequipctrl, target);
@@ -97,8 +81,8 @@ void copy_PlayerIns(PlayerIns* to, const PlayerIns* from, StateTarget target)
     copy_ChrAsm(to->chrasm, from->chrasm);
     //copy_ChrAsmModelRes(to->chrAsmModelRes, from->chrAsmModelRes, target); //This is dynamically re-drawn every frame by the game
     copy_ChrAsmModel(to->chrAsmModel, from->chrAsmModel, target);
-    memcpy(to->data_3, from->data_3, sizeof(to->data_3));
-    memcpy(to->data_4, from->data_4, sizeof(to->data_4));
+    memcpy(&to->headSize, &from->headSize, 24);
+    memcpy(&to->unk_880, &from->unk_880, 0x50);
     memcpy(to->data_5, from->data_5, sizeof(to->data_5));
     memcpy(to->data_5a, from->data_5a, sizeof(to->data_5a));
     memcpy(to->data_6, from->data_6, sizeof(to->data_6));
@@ -145,15 +129,10 @@ std::string print_ChrAsm(ChrAsm* to)
     out += "l_hand_equipped_index:" + std::to_string(to->l_hand_equipped_index) + "\n";
     out += "r_hand_equipped_index:" + std::to_string(to->r_hand_equipped_index) + "\n";
 
-    out += "Unknown data_0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "arrow_equipped l/r:" + std::to_string(to->l_arrow_equipped_index) + "," + std::to_string(to->r_arrow_equipped_index) +
+        " bolt_equipped l/r:" + std::to_string(to->l_bolt_equipped_index) + "," + std::to_string(to->r_bolt_equipped_index) + "\n";
 
-    out += "Unknown equip_items:";
+    out += "equip_items:";
     for (size_t i = 0; i < sizeof(to->equip_items)/4; i++)
     {
         out += std::to_string(to->equip_items[i]);
@@ -161,13 +140,8 @@ std::string print_ChrAsm(ChrAsm* to)
     }
     out += "\n";
 
-    out += "Unknown data_1:";
-    for (size_t i = 0; i < sizeof(to->data_1); i++)
-    {
-        out += std::to_string(to->data_1[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "transformProtectorId:" + std::to_string(to->transformProtectorId) +
+        " transformProtectorId_HalfCamo:" + std::to_string(to->transformProtectorId_HalfCamo) + "\n";
 
     return out;
 }
@@ -177,9 +151,14 @@ void copy_ChrAsm(ChrAsm* to, const ChrAsm* from)
     to->equipped_weapon_style = from->equipped_weapon_style;
     to->l_hand_equipped_index = from->l_hand_equipped_index;
     to->r_hand_equipped_index = from->r_hand_equipped_index;
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    to->l_arrow_equipped_index = from->l_arrow_equipped_index;
+    to->r_arrow_equipped_index = from->r_arrow_equipped_index;
+    to->l_bolt_equipped_index = from->l_bolt_equipped_index;
+    to->r_bolt_equipped_index = from->r_bolt_equipped_index;
     memcpy(to->equip_items, from->equip_items, sizeof(to->equip_items));
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    to->transformProtectorId = from->transformProtectorId;
+    to->transformProtectorId_HalfCamo = from->transformProtectorId_HalfCamo;
+    to->unk_7c = from->unk_7c;
 }
 
 ChrAsm* init_ChrAsm()
@@ -196,13 +175,7 @@ void free_ChrAsm(ChrAsm* to)
 std::string print_ChrAsmModelRes(ChrAsmModelRes* to)
 {
     std::string out = "ChrAsmModelRes\n";
-    out += "Unknown data 0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "magic_state:" + std::to_string(to->magic_state) + "\n";
 
     for (size_t i = 0; i < 14; i++)
     {
@@ -214,7 +187,7 @@ std::string print_ChrAsmModelRes(ChrAsmModelRes* to)
 
 void copy_ChrAsmModelRes(ChrAsmModelRes* to, const ChrAsmModelRes* from, StateTarget target)
 {
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(&to->magic_state, &from->magic_state, 0x28);
     for (size_t i = 0; i < 14; i++)
     {
         copy_ChrAsmModelRes_Elem(&to->arry[i], &from->arry[i], target);
@@ -247,24 +220,17 @@ void free_ChrAsmModelRes(ChrAsmModelRes* to)
 std::string print_ChrAsmModelRes_Elem(ChrAsmModelRes_Elem* to)
 {
     std::string out = "ChrAsmModelRes_Elem\n";
-    out += "Unknown data_0:" + std::to_string(to->data_0) + "\n";
-
-    out += "Unknown data 1:";
-    for (size_t i = 0; i < sizeof(to->data_1); i++)
-    {
-        out += std::to_string(to->data_1[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "curModelId:" + std::to_string(to->curModelId) + " newModelId:" + std::to_string(to->newModelId) + "\n";
 
     return out;
 }
 
 void copy_ChrAsmModelRes_Elem(ChrAsmModelRes_Elem* to, const ChrAsmModelRes_Elem* from, StateTarget target)
 {
-    to->data_0 = from->data_0;
+    to->curModelId = from->curModelId;
+    to->newModelId = from->newModelId;
     to->PartsbndFileCap2 = NULL; //this should always be null since it's just tmp storage for 1 frame
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    memcpy(&to->unk_18, &from->unk_18, 0x38);
 }
 
 ChrAsmModelRes_Elem* init_ChrAsmModelRes_Elem()
@@ -284,69 +250,27 @@ void free_ChrAsmModelRes_Elem(ChrAsmModelRes_Elem* to, bool freeself)
 std::string print_ChrAsmModel(ChrAsmModel* to)
 {
     std::string out = "ChrAsmModel\n";
-    out += "Unknown data_0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
+    out += "unk_10:" + std::to_string(to->unk_10) + "\n";
+    out += "data_3a:" + std::to_string(to->data_3a) + "\n";
+    out += "phantomColor:" + std::to_string(to->phantomColor) + "\n";
+    out += "hairColor: ";
+    for (int i = 0; i < 4; i++) out += std::to_string(to->hairColor[i]) + " ";
     out += "\n";
-
-    out += "Unknown data_1:";
-    for (size_t i = 0; i < sizeof(to->data_1); i++)
-    {
-        out += std::to_string(to->data_1[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Unknown data_2:";
-    for (size_t i = 0; i < sizeof(to->data_2); i++)
-    {
-        out += std::to_string(to->data_2[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Unknown data_3:";
-    for (size_t i = 0; i < sizeof(to->data_3); i++)
-    {
-        out += std::to_string(to->data_3[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Unknown data_4:";
-    for (size_t i = 0; i < sizeof(to->data_4); i++)
-    {
-        out += std::to_string(to->data_4[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Unknown data_5:";
-    for (size_t i = 0; i < sizeof(to->data_5)/8; i++)
-    {
-        out += std::to_string(to->data_5[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Unknown data_6:" + std::to_string(to->data_6) + "\n";
 
     return out;
 }
 
 void copy_ChrAsmModel(ChrAsmModel* to, const ChrAsmModel* from, StateTarget target)
 {
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
-    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    memcpy(&to->unk_8, &from->unk_8, 0x10);
+    memcpy(to->fieldE0, from->fieldE0, sizeof(to->fieldE0));
+    memcpy(&to->unk_68, &from->unk_68, 0x18);
     to->data_3a = from->data_3a;
-    memcpy(to->data_3, from->data_3, sizeof(to->data_3));
-    memcpy(to->data_4, from->data_4, sizeof(to->data_4));
-    memcpy(to->data_5, from->data_5, sizeof(to->data_5));
-    to->data_6 = from->data_6;
+    memcpy(&to->unk_a0, &from->unk_a0, 0x28);
+    memcpy(&to->hairColor, &from->hairColor, 0x80);
+    memcpy(to->filecap_array, from->filecap_array, sizeof(to->filecap_array));
+    to->unk_1c8 = from->unk_1c8;
+    memcpy(to->unk_1c9, from->unk_1c9, sizeof(to->unk_1c9));
 }
 
 ChrAsmModel* init_ChrAsmModel()
@@ -535,20 +459,24 @@ std::string print_PlayerGameData_ChrProperties(PlayerGameData_ChrProperties* to)
 {
     std::string out = "PlayerGameData_ChrProperties\n";
 
-    out += "Unknown data 0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "defPhysicalTotal:" + std::to_string(to->defPhysicalTotal) + " defMagicTotal:" + std::to_string(to->defMagicTotal) + "\n";
+    out += "attackLeftWep1:" + std::to_string(to->attackLeftWep1) + " attackRightWep1:" + std::to_string(to->attackRightWep1) +
+        " attackLeftWep2:" + std::to_string(to->attackLeftWep2) + " attackRightWep2:" + std::to_string(to->attackRightWep2) + "\n";
+    out += "MaxEquipLoad:" + std::to_string(to->MaxEquipLoad) + "\n";
+    out += "defCutTotal:" + std::to_string(to->defCutTotal) + " defBluntTotal:" + std::to_string(to->defBluntTotal) +
+        " defStabTotal:" + std::to_string(to->defStabTotal) + " defFireTotal:" + std::to_string(to->defFireTotal) +
+        " defThunderboltTotal:" + std::to_string(to->defThunderboltTotal) + "\n";
+    out += "resistPoisonTotal:" + std::to_string(to->resistPoisonTotal) + " resistPlagueTotal:" + std::to_string(to->resistPlagueTotal) +
+        " resistBleedingTotal:" + std::to_string(to->resistBleedingTotal) + " resistCurseTotal:" + std::to_string(to->resistCurseTotal) +
+        " defSAToughnessTotal:" + std::to_string(to->defSAToughnessTotal) + "\n";
+    out += "ItemDiscoveryRate:" + std::to_string(to->ItemDiscoveryRate) + "\n";
 
     return out;
 }
 
 void copy_PlayerGameData_ChrProperties(PlayerGameData_ChrProperties* to, const PlayerGameData_ChrProperties* from)
 {
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(to, from, sizeof(PlayerGameData_ChrProperties));
 }
 
 std::string print_EquipGameData(EquipGameData* to)
@@ -661,20 +589,24 @@ std::string print_PlayerGameData_AttributeInfo(PlayerGameData_AttributeInfo* to)
 {
     std::string out = "PlayerGameData_AttributeInfo\n";
 
-    out += "Unknown data 0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "Hp:" + std::to_string(to->Hp) + " MaxHp:" + std::to_string(to->MaxHp) + "\n";
+    out += "Mp:" + std::to_string(to->Mp) + " MaxMp:" + std::to_string(to->MaxMp) + "\n";
+    out += "Sp:" + std::to_string(to->Sp) + " MaxSp:" + std::to_string(to->MaxSp) + "\n";
+    out += "Vitality:" + std::to_string(to->Vitality) + " Attunement:" + std::to_string(to->Attunement) +
+        " Endurance:" + std::to_string(to->Endurance) + " Strength:" + std::to_string(to->Strength) +
+        " Dexterity:" + std::to_string(to->Dexterity) + " Intellect:" + std::to_string(to->Intellect) +
+        " Force:" + std::to_string(to->Force) + " Luck:" + std::to_string(to->Luck) + "\n";
+    out += "Humanity:" + std::to_string(to->Humanity) + " SoulLevel:" + std::to_string(to->SoulLevel) +
+        " soul_count:" + std::to_string(to->soul_count) + "\n";
+    out += "PoisonResist:" + std::to_string(to->PoisonResist) + " BleedResist:" + std::to_string(to->BleedResist) +
+        " ToxicResist:" + std::to_string(to->ToxicResist) + " CurseResist:" + std::to_string(to->CurseResist) + "\n";
 
     return out;
 }
 
 void copy_PlayerGameData_AttributeInfo(PlayerGameData_AttributeInfo* to, const PlayerGameData_AttributeInfo* from)
 {
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(to, from, sizeof(PlayerGameData_AttributeInfo));
 }
 
 std::string print_ChrIns(ChrIns* to)
@@ -682,14 +614,6 @@ std::string print_ChrIns(ChrIns* to)
     std::string out = "ChrIns\n";
     out += print_PlayerCtrl(to->playerCtrl);
     out += "CharaInitParamID:" + std::to_string(to->CharaInitParamID) + "\n";
-
-    out += "Unknown data 5:";
-    for (size_t i = 0; i < sizeof(to->data_5); i++)
-    {
-        out += std::to_string(to->data_5[i]);
-        out += " ";
-    }
-    out += "\n";
 
     out += "lowerThrowAnim:" + std::to_string(to->lowerThrowAnim.animationId) + "," + std::to_string(to->lowerThrowAnim.stateIndex) + "\n";
     out += "upperThrowAnim:" + std::to_string(to->upperThrowAnim.animationId) + "," + std::to_string(to->upperThrowAnim.stateIndex) + "\n";
@@ -712,27 +636,16 @@ std::string print_ChrIns(ChrIns* to)
     out += print_SpecialEffect(to->specialEffects);
     out += print_QwcSpEffectEquipCtrl(to->qwcSpEffectEquipCtrl);
 
-    out += "Unknown data 0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "entityId:" + std::to_string(to->entityId) + "\n";
 
     out += print_ChrIns_field0x2c8(to->field0x2c8);
 
-    out += "Unknown data 0a:";
-    for (size_t i = 0; i < sizeof(to->data_0a); i++)
-    {
-        out += std::to_string(to->data_0a[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "onlineAreaId:" + std::to_string(to->onlineAreaId) + " areaId:" + std::to_string(to->areaId) +
+        " hitMtrlId:" + std::to_string(to->hitMtrlId) + " defenseMaterialId:" + std::to_string(to->defenseMaterialId) + "\n";
 
     out += print_HitIns(to->hitins_1);
     out += print_HitIns(to->hitins_2);
-    out += "data_0b:" + std::to_string(to->data_0b) + "\n";
+    out += "unk_380:" + std::to_string(to->unk_380) + "\n";
     out += print_ChrAttachSys(&to->chrattachsys);
     out += "curHp:" + std::to_string(to->curHp) + "\n";
     out += "maxHp:" + std::to_string(to->maxHp) + "\n";
@@ -749,37 +662,12 @@ std::string print_ChrIns(ChrIns* to)
     out += "resistCurseTotal:" + std::to_string(to->resistCurseTotal) + "\n";
     out += print_EntityThrowAnimationStatus(to->throw_animation_info);
 
-    out += "Unknown data 1:";
-    for (size_t i = 0; i < sizeof(to->data_1); i++)
-    {
-        out += std::to_string(to->data_1[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Unknown data 2:";
-    for (size_t i = 0; i < sizeof(to->data_2); i++)
-    {
-        out += std::to_string(to->data_2[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Unknown data 3:";
-    for (size_t i = 0; i < sizeof(to->data_3)/8; i++)
-    {
-        out += std::to_string(to->data_3[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Unknown data 4:";
-    for (size_t i = 0; i < sizeof(to->data_4); i++)
-    {
-        out += std::to_string(to->data_4[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "frame_delta_amount:" + std::to_string(to->frame_delta_amount) +
+        " frame_delta_amount2:" + std::to_string(to->frame_delta_amount2) + "\n";
+    out += "frame_time_delta:" + std::to_string(to->frame_time_delta) +
+        " timestamp_when_joined_session:" + std::to_string(to->timestamp_when_joined_session) +
+        " MenuLockout:" + std::to_string(to->MenuLockout) + "\n";
+    out += "chrReset_flag:" + std::to_string(to->chrReset_flag) + "\n";
 
     return out;
 }
@@ -790,7 +678,7 @@ void copy_ChrIns(ChrIns* to, const ChrIns* from, StateTarget target)
     copy_PlayerCtrl(to->playerCtrl, from->playerCtrl, target);
     copy_PadManipulator(to->padManipulator, from->padManipulator);
     to->CharaInitParamID = from->CharaInitParamID;
-    memcpy(to->data_5, from->data_5, sizeof(to->data_5));
+    memcpy(&to->unk_16c, &from->unk_16c, 0x10);
     to->lowerThrowAnim = from->lowerThrowAnim;
     to->upperThrowAnim = from->upperThrowAnim;
     memcpy(to->player_handing_state, from->player_handing_state, sizeof(uint32_t)*3);
@@ -803,12 +691,12 @@ void copy_ChrIns(ChrIns* to, const ChrIns* from, StateTarget target)
     to->curUsedItem = from->curUsedItem;
     copy_SpecialEffect(to->specialEffects, from->specialEffects, target);
     copy_QwcSpEffectEquipCtrl(to->qwcSpEffectEquipCtrl, from->qwcSpEffectEquipCtrl);
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(&to->unk_288, &from->unk_288, 0x48);
     copy_ChrIns_field0x2c8(to->field0x2c8, from->field0x2c8);
-    memcpy(to->data_0a, from->data_0a, sizeof(to->data_0a));
+    memcpy(&to->unk_2d8, &from->unk_2d8, 0x98);
     copy_HitIns(to->hitins_1, from->hitins_1);
     copy_HitIns(to->hitins_2, from->hitins_2);
-    to->data_0b = from->data_0b;
+    memcpy(&to->unk_380, &from->unk_380, 8);
     copy_ChrAttachSys(&to->chrattachsys, &from->chrattachsys, target);
     to->curHp = from->curHp;
     to->maxHp = from->maxHp;
@@ -824,10 +712,10 @@ void copy_ChrIns(ChrIns* to, const ChrIns* from, StateTarget target)
     to->resistBleedingTotal = from->resistBleedingTotal;
     to->resistCurseTotal = from->resistCurseTotal;
     copy_EntityThrowAnimationStatus(to->throw_animation_info, from->throw_animation_info, target);
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
-    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
-    memcpy(to->data_3, from->data_3, sizeof(to->data_3));
-    memcpy(to->data_4, from->data_4, sizeof(to->data_4));
+    memcpy(&to->unk_450, &from->unk_450, 0x18);
+    memcpy(&to->unk_470, &from->unk_470, 0x50);
+    memcpy(&to->unk_4d8, &from->unk_4d8, 0x18);
+    memcpy(&to->unk_518, &from->unk_518, 0x58);
 }
 
 ChrIns* init_ChrIns()
@@ -876,7 +764,8 @@ std::string print_ChrAttachSys(ChrAttachSys* to)
     std::string out = "ChrAttachSys\n";
     if (to->SysSlots != NULL)
     {
-        out += print_AttachSysSlot(to->SysSlots);
+        //print_AttachSysSlot was removed; just record presence for now
+        out += "SysSlots: set\n";
     }
     else
     {
@@ -927,20 +816,15 @@ void free_ChrAttachSys(ChrAttachSys* to, bool freeself)
 std::string print_ChrIns_field0x18(ChrIns_field0x18* to)
 {
     std::string out = "ChrIns_field0x18\n";
-    out += "Unknown data 0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "throw_animId:" + std::to_string(to->throw_animId) + " animId:" + std::to_string(to->animId) +
+        " IsEnableAnimLoop:" + std::to_string(to->IsEnableAnimLoop) + "\n";
 
     return out;
 }
 
 void copy_ChrIns_field0x18(ChrIns_field0x18* to, const ChrIns_field0x18* from)
 {
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(to, from, sizeof(ChrIns_field0x18));
 }
 
 ChrIns_field0x18* init_ChrIns_field0x18()
@@ -958,35 +842,21 @@ std::string print_ChrIns_field0x2c8(ChrIns_field0x2c8* to)
 {
     std::string out = "ChrIns_field0x2c8\n";
 
-    out += "Unknown data 0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "data_1:" + std::to_string(to->data_1) + "\n";
-
-    out += "Unknown data 2:";
-    for (size_t i = 0; i < sizeof(to->data_2); i++)
-    {
-        out += std::to_string(to->data_2[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "data_3:" + std::to_string(to->data_3) + "\n";
+    out += "unk_10:" + std::to_string(to->unk_10) + " unk_14:" + std::to_string(to->unk_14) + "\n";
+    out += "unk_28:" + std::to_string(to->unk_28) + "\n";
+    out += "unk_40:" + std::to_string(to->unk_40) + "\n";
+    out += "unk_50:" + std::to_string(to->unk_50) + "\n";
 
     return out;
 }
 
 void copy_ChrIns_field0x2c8(ChrIns_field0x2c8* to, const ChrIns_field0x2c8* from)
 {
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-    to->data_1 = from->data_1;
-    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
-    to->data_3 = from->data_3;
+    memcpy(&to->unk_8, &from->unk_8, 0x18);
+    to->unk_28 = from->unk_28;
+    to->unk_2c = from->unk_2c;
+    memcpy(&to->unk_38, &from->unk_38, 0x10);
+    to->unk_50 = from->unk_50;
 }
 
 ChrIns_field0x2c8* init_ChrIns_field0x2c8()
@@ -1004,13 +874,17 @@ std::string print_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to)
 {
     std::string out = "EntityThrowAnimationStatus\n";
 
-    out += "Unknown data 0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
+    out += "throwState:" + std::to_string(to->throwState) + " ThrowEscHp:" + std::to_string(to->ThrowEscHp) +
+        " ThrowPairHandle:" + std::to_string(to->ThrowPairHandle) + "\n";
+    out += "Desire_Weight_of_ResistanceAnim:" + std::to_string(to->Desire_Weight_of_ResistanceAnim) +
+        " Current_Weight_of_ResistanceAnim:" + std::to_string(to->Current_Weight_of_ResistanceAnim) + "\n";
+    out += "starting_position_self: ";
+    for (int i = 0; i < 4; i++) out += std::to_string(to->starting_position_self[i]) + " ";
     out += "\n";
+    out += "starting_position_other: ";
+    for (int i = 0; i < 4; i++) out += std::to_string(to->starting_position_other[i]) + " ";
+    out += "\n";
+    out += "throwMask:" + std::to_string(to->throwMask) + "\n";
 
     if (to->throwSelfEsc != NULL)
     {
@@ -1021,14 +895,6 @@ std::string print_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to)
         out += "throwSelfEsc: NULL\n";
     }
 
-    out += "Unknown data 1:";
-    for (size_t i = 0; i < sizeof(to->data_1); i++)
-    {
-        out += std::to_string(to->data_1[i]);
-        out += " ";
-    }
-    out += "\n";
-
     return out;
 }
 
@@ -1036,7 +902,7 @@ void copy_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to, const Entit
 {
     to->playerins_parent = from->playerins_parent;
     to->throw_paramdef = from->throw_paramdef;
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(&to->unk_18, &from->unk_18, 0x40);
 
     if (to->throwSelfEsc == NULL && from->throwSelfEsc != NULL)
     {
@@ -1069,7 +935,7 @@ void copy_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to, const Entit
         copy_ThrowSelfEsc(to->throwSelfEsc, from->throwSelfEsc);
     }
 
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    memcpy(&to->unk_60, &from->unk_60, 0x50);
 }
 
 EntityThrowAnimationStatus* init_EntityThrowAnimationStatus()
@@ -1092,20 +958,17 @@ std::string print_ThrowSelfEsc(ThrowSelfEsc* to)
 {
     std::string out = "ThrowSelfEsc\n";
 
-    out += "Unknown data 0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "m_cycleTime:" + std::to_string(to->m_cycleTime) + " m_cycleRemainTime:" + std::to_string(to->m_cycleRemainTime) + "\n";
+    out += "m_cycleInputCounterMax:" + std::to_string(to->m_cycleInputCounterMax) + " self_esc_dmg:" + std::to_string(to->self_esc_dmg) + "\n";
+    out += "m_thresholdStickMaxDist:" + std::to_string(to->m_thresholdStickMaxDist) + " m_thresholdStickMinDist:" + std::to_string(to->m_thresholdStickMinDist) + "\n";
+    out += "m_currentDeclineRemainTime:" + std::to_string(to->m_currentDeclineRemainTime) + "\n";
 
     return out;
 }
 
 void copy_ThrowSelfEsc(ThrowSelfEsc* to, const ThrowSelfEsc* from)
 {
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(&to->m_cycleTime, &from->m_cycleTime, 0x18);
 }
 
 ThrowSelfEsc* init_ThrowSelfEsc()
@@ -1130,13 +993,8 @@ std::string print_QwcSpEffectEquipCtrl(QwcSpEffectEquipCtrl* to)
     }
     out += "\n";
 
-    out += "Unknown data 0:";
-    for (size_t i = 0; i < sizeof(to->data_0)/4; i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "unk_24:" + std::to_string(to->unk_24) + " unk_28:" + std::to_string(to->unk_28) +
+        " unk_2c:" + std::to_string(to->unk_2c) + "\n";
 
     return out;
 }
@@ -1153,7 +1011,9 @@ void copy_QwcSpEffectEquipCtrl(QwcSpEffectEquipCtrl* to, const QwcSpEffectEquipC
     {
         to->arry[i] = from->arry[i];
     }
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    to->unk_24 = from->unk_24;
+    to->unk_28 = from->unk_28;
+    to->unk_2c = from->unk_2c;
 }
 
 QwcSpEffectEquipCtrl* init_QwcSpEffectEquipCtrl()
@@ -1179,29 +1039,9 @@ std::string print_SpecialEffect(SpecialEffect* to)
 
     out += print_SpecialEffect_Info(to->specialEffect_Info);
 
-    out += "Unknown data 0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Unknown data 1:";
-    for (size_t i = 0; i < sizeof(to->data_1); i++)
-    {
-        out += std::to_string(to->data_1[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Unknown data 2:";
-    for (size_t i = 0; i < sizeof(to->data_2); i++)
-    {
-        out += std::to_string(to->data_2[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "speffectIsBeingRun:" + std::to_string(to->speffectIsBeingRun) + " unk_14:" + std::to_string(to->unk_14) + "\n";
+    out += "flags:" + std::to_string(to->flags) + "\n";
+    out += "debugActivateSpEffect:" + std::to_string(to->debugActivateSpEffect) + "\n";
 
     return out;
 }
@@ -1209,9 +1049,13 @@ std::string print_SpecialEffect(SpecialEffect* to)
 void copy_SpecialEffect(SpecialEffect* to, const SpecialEffect* from, StateTarget target)
 {
     copy_SpecialEffect_Info(to->specialEffect_Info, from->specialEffect_Info, target);
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
-    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    to->speffectIsBeingRun = from->speffectIsBeingRun;
+    memcpy(to->unk_11, from->unk_11, sizeof(to->unk_11));
+    to->unk_14 = from->unk_14;
+    to->flags = from->flags;
+    to->unk_24 = from->unk_24;
+    to->debugActivateSpEffect = from->debugActivateSpEffect;
+    to->unk_34 = from->unk_34;
 }
 
 SpecialEffect* init_SpecialEffect()
@@ -1356,32 +1200,12 @@ std::string print_PlayerCtrl(PlayerCtrl* to)
 
     out += print_ChrCtrl(&to->chrCtrl);
 
-    out += "Unknown data 0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
-
     out += print_TurnAnim(to->turnAnim);
     out += print_ArrowTurnAnim(to->arrowTurnAnim);
 
-    out += "Unknown data 1:";
-    for (size_t i = 0; i < sizeof(to->data_1); i++)
-    {
-        out += std::to_string(to->data_1[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Unknown data 2:";
-    for (size_t i = 0; i < sizeof(to->data_2); i++)
-    {
-        out += std::to_string(to->data_2[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "movement_related_flags:" + std::to_string(to->movement_related_flags) +
+        " recordCtrl_fileNum:" + std::to_string(to->recordCtrl_fileNum) +
+        " feetIK:" + std::to_string(to->feetIK) + "\n";
 
     return out;
 }
@@ -1389,11 +1213,11 @@ std::string print_PlayerCtrl(PlayerCtrl* to)
 void copy_PlayerCtrl(PlayerCtrl* to, const PlayerCtrl* from, StateTarget target)
 {
     copy_ChrCtrl(&to->chrCtrl, &from->chrCtrl, target);
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(&to->unk_300, &from->unk_300, 8);
     copy_TurnAnim(to->turnAnim, from->turnAnim);
     copy_ArrowTurnAnim(to->arrowTurnAnim, from->arrowTurnAnim);
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
-    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    memcpy(&to->unk_330, &from->unk_330, 8);
+    memcpy(&to->movement_related_flags, &from->movement_related_flags, 24);
 }
 
 PlayerCtrl* init_PlayerCtrl()
@@ -1426,14 +1250,6 @@ std::string print_ArrowTurnAnim(ArrowTurnAnim* to)
     out += print_SpinJoint(to->joint_spine_2);
     out += print_SpinJoint(to->joint_spine1_2);
 
-    out += "Unknown data 0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
-
     return out;
 }
 
@@ -1442,7 +1258,7 @@ void copy_ArrowTurnAnim(ArrowTurnAnim* to, const ArrowTurnAnim* from)
     copy_TurnAnim(&to->turnAnim, &from->turnAnim);
     copy_SpinJoint(to->joint_spine_2, from->joint_spine_2);
     copy_SpinJoint(to->joint_spine1_2, from->joint_spine1_2);
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(&to->unk_1b8, &from->unk_1b8, 8);
 }
 
 ArrowTurnAnim* init_ArrowTurnAnim()
@@ -1471,38 +1287,19 @@ std::string print_SpinJoint(SpinJoint* to)
 {
     std::string out = "SpinJoint\n";
 
-    out += "Unknown data 0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Unknown data_1:";
-    for (size_t i = 0; i < sizeof(to->data_1); i++)
-    {
-        out += std::to_string(to->data_1[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Unknown data_2:";
-    for (size_t i = 0; i < sizeof(to->data_2); i++)
-    {
-        out += std::to_string(to->data_2[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "spin_bone_index:" + std::to_string(to->spin_bone_index) +
+        " axis_bone_index:" + std::to_string(to->axis_bone_index) +
+        " gain:" + std::to_string(to->gain) +
+        " disableUpdate:" + std::to_string(to->disableUpdate) + "\n";
 
     return out;
 }
 
 void copy_SpinJoint(SpinJoint* to, const SpinJoint* from)
 {
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
-    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    to->unk_8 = from->unk_8;
+    memcpy(&to->spin_bone_index, &from->spin_bone_index, 96);
+    memcpy(&to->disableUpdate, &from->disableUpdate, 8);
 }
 
 SpinJoint* init_SpinJoint()
@@ -1520,21 +1317,8 @@ std::string print_TurnAnim(TurnAnim* to)
 {
     std::string out = "TurnAnim\n";
 
-    out += "Unknown data 0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Unknown data_1:";
-    for (size_t i = 0; i < sizeof(to->data_1); i++)
-    {
-        out += std::to_string(to->data_1[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "turnL/R:" + std::to_string(to->turnL) + "," + std::to_string(to->turnR) +
+        " rotation_speed:" + std::to_string(to->rotation_speed) + "\n";
 
     out += print_SpinJoint(to->joint_UpperRoot);
     out += print_SpinJoint(to->joint_LowerRoot);
@@ -1542,36 +1326,23 @@ std::string print_TurnAnim(TurnAnim* to)
     out += print_SpinJoint(to->joint_spine_1);
     out += print_SpinJoint(to->joint_master);
 
-    out += "Unknown data_2:";
-    for (size_t i = 0; i < sizeof(to->data_2); i++)
-    {
-        out += std::to_string(to->data_2[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Unknown data_3:";
-    for (size_t i = 0; i < sizeof(to->data_3); i++)
-    {
-        out += std::to_string(to->data_3[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "playerRotation:" + std::to_string(to->playerRotation) +
+        " master_rotation_gain:" + std::to_string(to->master_rotation_gain) + "\n";
 
     return out;
 }
 
 void copy_TurnAnim(TurnAnim* to, const TurnAnim* from)
 {
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    to->unk_8 = from->unk_8;
+    memcpy(&to->turnL, &from->turnL, 0x28);
     copy_SpinJoint(to->joint_UpperRoot, from->joint_UpperRoot);
     copy_SpinJoint(to->joint_LowerRoot, from->joint_LowerRoot);
     copy_SpinJoint(to->joint_spine1_1, from->joint_spine1_1);
     copy_SpinJoint(to->joint_spine_1, from->joint_spine_1);
     copy_SpinJoint(to->joint_master, from->joint_master);
-    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
-    memcpy(to->data_3, from->data_3, sizeof(to->data_3));
+    memcpy(&to->unk_70, &from->unk_70, 0x120);
+    to->unk_198 = from->unk_198;
 }
 
 TurnAnim* init_TurnAnim()
@@ -1603,70 +1374,37 @@ void free_TurnAnim(TurnAnim* to, bool freeself)
 
 std::string print_ChrCtrl(ChrCtrl* to)
 {
-    std::string out = "TurnAnim\n";
-
-    out += "Unknown data 0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
+    std::string out = "ChrCtrl\n";
 
     out += print_ChrCtrl_AnimationQueue(to->animationQueue);
     out += print_AnimationMediator(to->animationMediator);
     out += print_HavokChara(to->havokChara);
     out += print_ActionCtrl(to->actionctrl);
 
-    out += "Unknown data_1:";
-    for (size_t i = 0; i < sizeof(to->data_1); i++)
-    {
-        out += std::to_string(to->data_1[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Unknown data_2:";
-    for (size_t i = 0; i < sizeof(to->data_2); i++)
-    {
-        out += std::to_string(to->data_2[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "enable:" + std::to_string(to->enable) + " CompletelyNoMove:" + std::to_string(to->CompletelyNoMove) +
+        " WarpActivate:" + std::to_string(to->WarpActivate) + "\n";
 
     out += print_WalkAnim_Twist(to->walkAnim_Twist);
 
-    out += "Unknown data_3:";
-    for (size_t i = 0; i < sizeof(to->data_3); i++)
-    {
-        out += std::to_string(to->data_3[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Unknown data_4:";
-    for (size_t i = 0; i < sizeof(to->data_4); i++)
-    {
-        out += std::to_string(to->data_4[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "movement_enabled:" + std::to_string(to->movement_enabled) + " MoveType:" + std::to_string(to->MoveType) + "\n";
+    out += "knockback_speed:" + std::to_string(to->knockback_speed) + " knockback_time:" + std::to_string(to->knockback_time) +
+        " dmgLv_max:" + std::to_string(to->dmgLv_max) + " guardLv_max:" + std::to_string(to->guardLv_max) + "\n";
 
     return out;
 }
 
 void copy_ChrCtrl(ChrCtrl* to, const ChrCtrl* from, StateTarget target)
 {
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    to->unk_8 = from->unk_8;
     copy_ChrCtrl_AnimationQueue(to->animationQueue, from->animationQueue, target);
     copy_AnimationMediator(to->animationMediator, from->animationMediator);
     copy_HavokChara(to->havokChara, from->havokChara, target);
     copy_ActionCtrl(to->actionctrl, from->actionctrl, target);
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
-    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    to->unk_80 = from->unk_80;
+    memcpy(&to->unk_90, &from->unk_90, 0x118);
     copy_WalkAnim_Twist(to->walkAnim_Twist, from->walkAnim_Twist, target);
-    memcpy(to->data_3, from->data_3, sizeof(to->data_3));
-    memcpy(to->data_4, from->data_4, sizeof(to->data_4));
+    memcpy(&to->movement_enabled, &from->movement_enabled, 0xe0);
+    memcpy(&to->MapHitDisableDebugging, &from->MapHitDisableDebugging, 0x60);
 }
 
 ChrCtrl* init_ChrCtrl()
@@ -1700,66 +1438,35 @@ std::string print_WalkAnim_Twist(WalkAnim_Twist* to)
 {
     std::string out = "WalkAnim_Twist\n";
 
-    out += "Unknown data_0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Unknown data_1:";
-    for (size_t i = 0; i < sizeof(to->data_1); i++)
-    {
-        out += std::to_string(to->data_1[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Unknown data_2:";
-    for (size_t i = 0; i < sizeof(to->data_2); i++)
-    {
-        out += std::to_string(to->data_2[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "walkF/B/L/R:" + std::to_string(to->walkF) + "," + std::to_string(to->walkB) + "," +
+        std::to_string(to->walkL) + "," + std::to_string(to->walkR) + "\n";
+    out += "dashF/B/L/R:" + std::to_string(to->dashF) + "," + std::to_string(to->dashB) + "," +
+        std::to_string(to->dashL) + "," + std::to_string(to->dashR) + "\n";
+    out += "stayAnimId:" + std::to_string(to->stayAnimId) + " superDashAnimId:" + std::to_string(to->superDashAnimId) + "\n";
 
     out += print_SpinJoint(to->Upper_Root_Joint);
     out += print_SpinJoint(to->master_joint);
     out += print_SpinJoint(to->neck_joint);
 
-    out += "Unknown data_3:";
-    for (size_t i = 0; i < sizeof(to->data_3); i++)
-    {
-        out += std::to_string(to->data_3[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "turn_gain:" + std::to_string(to->turn_gain) + " dash_threshold:" + std::to_string(to->dash_threshold) +
+        " max_equip_load:" + std::to_string(to->max_equip_load) + "\n";
 
     out += print_WalkAnim_Twist_Field0x228Elem(&to->walkAnim_Twist_Field0x228Elem);
-
-    out += "Unknown data_4:";
-    for (size_t i = 0; i < sizeof(to->data_4); i++)
-    {
-        out += std::to_string(to->data_4[i]);
-        out += " ";
-    }
-    out += "\n";
 
     return out;
 }
 
 void copy_WalkAnim_Twist(WalkAnim_Twist* to, const WalkAnim_Twist* from, StateTarget target)
 {
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
-    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    to->unk_8 = from->unk_8;
+    memcpy(&to->walkF, &from->walkF, 0x1b8);
+    memcpy(&to->unk_1d8, &from->unk_1d8, 16);
     copy_SpinJoint(to->Upper_Root_Joint, from->Upper_Root_Joint);
     copy_SpinJoint(to->master_joint, from->master_joint);
     copy_SpinJoint(to->neck_joint, from->neck_joint);
-    memcpy(to->data_3, from->data_3, sizeof(to->data_3));
+    memcpy(&to->turn_lower_body, &from->turn_lower_body, 0x28);
     copy_WalkAnim_Twist_Field0x228Elem(&to->walkAnim_Twist_Field0x228Elem, &from->walkAnim_Twist_Field0x228Elem, target);
-    memcpy(to->data_4, from->data_4, sizeof(to->data_4));
+    memcpy(&to->unk_258, &from->unk_258, 0x48);
 }
 
 WalkAnim_Twist* init_WalkAnim_Twist()
@@ -1886,63 +1593,44 @@ std::string print_WalkAnim_Twist_Field0x228Elem_field0x10elem(WalkAnim_Twist_Fie
 {
     std::string out = "WalkAnim_Twist_Field0x228Elem_field0x10elem\n";
 
-    out += "Unknown data_0:";
-    for (size_t i = 0; i < sizeof(to->data_0)/4; i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "unk_0:" + std::to_string(to->unk_0) + " unk_4:" + std::to_string(to->unk_4) +
+        " unk_8:" + std::to_string(to->unk_8) + " unk_c:" + std::to_string(to->unk_c) + "\n";
 
     return out;
 }
 
 void copy_WalkAnim_Twist_Field0x228Elem_field0x10elem(WalkAnim_Twist_Field0x228Elem_field0x10elem* to, const WalkAnim_Twist_Field0x228Elem_field0x10elem* from)
 {
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    to->unk_0 = from->unk_0;
+    to->unk_4 = from->unk_4;
+    to->unk_8 = from->unk_8;
+    to->unk_c = from->unk_c;
 }
 
 std::string print_ActionCtrl(ActionCtrl* to)
 {
     std::string out = "ActionCtrl\n";
 
-    out += "Unknown data_0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
-
     out += print_ActionCtrl_0x30Substruct(&to->passive_state);
     out += print_ActionCtrl_0x30Substruct(&to->active_state);
 
-    out += "Unknown data_1:";
-    for (size_t i = 0; i < sizeof(to->data_1); i++)
-    {
-        out += std::to_string(to->data_1[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Unknown data_2:";
-    for (size_t i = 0; i < sizeof(to->data_2); i++)
-    {
-        out += std::to_string(to->data_2[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "ezStatePassiveState:" + std::to_string(to->ezStatePassiveState) +
+        " ezStateActiveState:" + std::to_string(to->ezStateActiveState) + "\n";
+    out += "recievedDamageType:" + std::to_string(to->recievedDamageType) +
+        " dmgLv_cur:" + std::to_string(to->dmgLv_cur) + " guardLv_cur:" + std::to_string(to->guardLv_cur) + "\n";
+    out += "actionType:" + std::to_string(to->actionType) + " actionNumber:" + std::to_string(to->actionNumber) +
+        " ezState:" + std::to_string(to->ezState) + "\n";
 
     return out;
 }
 
 void copy_ActionCtrl(ActionCtrl* to, const ActionCtrl* from, StateTarget target)
 {
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    to->unk_8 = from->unk_8;
     copy_ActionCtrl_0x30Substruct(&to->passive_state, &from->passive_state, target);
     copy_ActionCtrl_0x30Substruct(&to->active_state, &from->active_state, target);
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
-    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    memcpy(&to->ezStatePassiveState, &from->ezStatePassiveState, 0x4d0);
+    memcpy(&to->unk_548, &from->unk_548, 0x18);
 }
 
 ActionCtrl* init_ActionCtrl()
@@ -1969,13 +1657,8 @@ std::string print_ActionCtrl_0x30Substruct(ActionCtrl_0x30Substruct* to)
 
     out += print_EzState_detail_EzStateMachineImpl(to->EzStateMachineImpl);
 
-    out += "Unknown data_0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "actionIsValid:" + std::to_string(to->actionIsValid) + " animType:" + std::to_string(to->animType) +
+        " count:" + std::to_string(to->count) + "\n";
 
     return out;
 }
@@ -1983,7 +1666,7 @@ std::string print_ActionCtrl_0x30Substruct(ActionCtrl_0x30Substruct* to)
 void copy_ActionCtrl_0x30Substruct(ActionCtrl_0x30Substruct* to, const ActionCtrl_0x30Substruct* from, StateTarget target)
 {
     copy_EzState_detail_EzStateMachineImpl(to->EzStateMachineImpl, from->EzStateMachineImpl, target);
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(&to->actionIsValid, &from->actionIsValid, 0x18);
 }
 
 std::string print_EzState_detail_EzStateMachineImpl(EzState_detail_EzStateMachineImpl* to)
@@ -2124,61 +1807,40 @@ void free_EzStateRegisterSet(EzStateRegisterSet* to, bool freeself)
 
 std::string print_HavokChara(HavokChara* to)
 {
-    std::string out = "EzState_detail_EzStateMachineImpl\n";
+    std::string out = "HavokChara\n";
 
-    out += "Unknown data_0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
+    out += "current_coords: ";
+    for (int i = 0; i < 4; i++) out += std::to_string(to->current_coords[i]) + " ";
     out += "\n";
-
-    out += "print_hkpCharacterProxy";// (to->char_proxy);
-
-    out += "Unknown data_1:";
-    for (size_t i = 0; i < sizeof(to->data_1); i++)
-    {
-        out += std::to_string(to->data_1[i]);
-        out += " ";
-    }
+    out += "isLanded:" + std::to_string(to->isLanded) + " is_sliding:" + std::to_string(to->is_sliding) + "\n";
+    out += "movement_delta: ";
+    for (int i = 0; i < 4; i++) out += std::to_string(to->movement_delta[i]) + " ";
     out += "\n";
-
-    out += "Unknown data_2:";
-    for (size_t i = 0; i < sizeof(to->data_2); i++)
-    {
-        out += std::to_string(to->data_2[i]);
-        out += " ";
-    }
+    out += "fall_height:" + std::to_string(to->fall_height) +
+        " attach_height:" + std::to_string(to->attach_height) +
+        " attach_height_no_slope_material:" + std::to_string(to->attach_height_no_slope_material) + "\n";
+    out += "last_ground_coords: ";
+    for (int i = 0; i < 4; i++) out += std::to_string(to->last_ground_coords[i]) + " ";
     out += "\n";
-
-    out += "Unknown data_3:";
-    for (size_t i = 0; i < sizeof(to->data_3); i++)
-    {
-        out += std::to_string(to->data_3[i]);
-        out += " ";
-    }
+    out += "slopeInfo: ";
+    for (int i = 0; i < 4; i++) out += std::to_string(to->slopeInfo[i]) + " ";
     out += "\n";
-
-    out += "Unknown data_4:";
-    for (size_t i = 0; i < sizeof(to->data_4); i++)
-    {
-        out += std::to_string(to->data_4[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "hitMtrlType:" + std::to_string(to->hitMtrlType) + "\n";
+    out += "unable_to_fall:" + std::to_string(to->unable_to_fall) +
+        " no_integrate:" + std::to_string(to->no_integrate) + "\n";
 
     return out;
 }
 
 void copy_HavokChara(HavokChara* to, const HavokChara* from, StateTarget target)
 {
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(&to->RotAngleUnkWep, &from->RotAngleUnkWep, 0x38);
     copy_hkpCharacterProxy(to->char_proxy, from->char_proxy, target);
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
-    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
-    memcpy(to->data_3, from->data_3, sizeof(to->data_3));
-    memcpy(to->data_4, from->data_4, sizeof(to->data_4));
+    //should we copy capsule_shape_1/2 and physShapePhantomIns_1/2?
+    memcpy(&to->unk_60, &from->unk_60, 0x98);
+    memcpy(&to->unk_100, &from->unk_100, 0xe8);
+    memcpy(&to->unk_1f0, &from->unk_1f0, 0x58);
+    memcpy(&to->unk_258, &from->unk_258, 0x38);
 }
 
 HavokChara* init_HavokChara()
@@ -2201,14 +1863,15 @@ void free_HavokChara(HavokChara* to)
 //CharacterProxy is not in hkpWorld, it's handled by game code. So we can save/restore it from the Chr
 void copy_hkpCharacterProxy(hkpCharacterProxy* to, const hkpCharacterProxy* from, StateTarget target)
 {
-    to->data_0 = from->data_0;
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    to->unk_8 = from->unk_8;
+    to->unk_c = from->unk_c;
+    memcpy(&to->m_velocity, &from->m_velocity, 0x20);
 
     //since the phantoms are never destroyed due to our graveyard mechanism, it's safe to just use the raw pointer. it should always be valid
     to->HkpSimpleShapePhantom = from->HkpSimpleShapePhantom;
 
-    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
-    memcpy(to->data_3, from->data_3, sizeof(to->data_3));
+    memcpy(&to->m_dynamicFriction, &from->m_dynamicFriction, 0x40);
+    memcpy(&to->m_maxSlopeCosine, &from->m_maxSlopeCosine, 24);
 }
 
 hkpCharacterProxy* init_hkpCharacterProxy(StateTarget target)
@@ -2238,20 +1901,10 @@ std::string print_HitIns(HitIns* to)
 
     std::string out = "HitIns\n";
 
-    out += "data_0: " + std::to_string(to->data_0) + "\n";
-
-    out += "Unknown data_1:";
-    for (size_t i = 0; i < sizeof(to->data_1); i++)
-    {
-        out += std::to_string(to->data_1[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "data_2: " + std::to_string(to->data_2) + "\n";
-    out += "data_3: " + std::to_string(to->data_3) + "\n";
-    out += "data_4: " + std::to_string(to->data_4) + "\n";
-    out += "data_5: " + std::to_string(to->data_5) + "\n";
+    out += "areaId:" + std::to_string(to->areaId) + "\n";
+    out += "BackReadState:" + std::to_string(to->BackReadState) +
+        " TargetBackreadState:" + std::to_string(to->TargetBackreadState) + "\n";
+    out += "IsDispHitRigid:" + std::to_string(to->IsDispHitRigid) + "\n";
 
     return out;
 }
@@ -2262,12 +1915,21 @@ void copy_HitIns(HitIns* to, const HitIns* from)
     {
         return;
     }
-    to->data_0 = from->data_0;
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
-    to->data_2 = from->data_2;
-    to->data_3 = from->data_3;
-    to->data_4 = from->data_4;
-    to->data_5 = from->data_5;
+    to->unk_8 = from->unk_8;
+    to->unk_c = from->unk_c;
+    memcpy(&to->unk_18, &from->unk_18, 0x48);
+    to->unk_70 = from->unk_70;
+    to->unk_72 = from->unk_72;
+    to->unk_74 = from->unk_74;
+    to->unk_98 = from->unk_98;
+    to->unk_9a = from->unk_9a;
+    to->unk_9c = from->unk_9c;
+    to->unk_b0 = from->unk_b0;
+    to->BackReadState = from->BackReadState;
+    to->TargetBackreadState = from->TargetBackreadState;
+    memcpy(to->unk_b3, from->unk_b3, sizeof(to->unk_b3));
+    to->IsDispHitRigid = from->IsDispHitRigid;
+    memcpy(to->unk_c1, from->unk_c1, sizeof(to->unk_c1));
 }
 
 HitIns* init_HitIns()
@@ -2292,13 +1954,7 @@ std::string print_AnimationMediator(AnimationMediator* to)
     }
     out += print_AnimationQueue(to->animationQueue);
 
-    out += "Unknown data_0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "unk_1468[0]:" + std::to_string(to->unk_1468[0]) + "\n";
 
     return out;
 }
@@ -2310,7 +1966,7 @@ void copy_AnimationMediator(AnimationMediator* to, const AnimationMediator* from
         copy_AnimationMediatorStateEntry(&to->states_list[i], &from->states_list[i]);
     }
     copy_AnimationQueue(to->animationQueue, from->animationQueue);
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(&to->unk_1468, &from->unk_1468, 0x28);
 }
 
 AnimationMediator* init_AnimationMediator()
@@ -2343,28 +1999,16 @@ std::string print_AnimationMediatorStateEntry(AnimationMediatorStateEntry* to)
 {
     std::string out = "AnimationMediatorStateEntry\n";
 
-    out += "Unknown data_0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Unknown data_1:";
-    for (size_t i = 0; i < sizeof(to->data_1); i++)
-    {
-        out += std::to_string(to->data_1[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "animationId:" + std::to_string(to->animationId) +
+        " blend slots:" + std::to_string(to->animationId_blend_slot0) + "," + std::to_string(to->animationId_blend_slot1) + "," + std::to_string(to->animationId_blend_slot2) +
+        " blend_ratio:" + std::to_string(to->blend_ratio) + " stateIndex2:" + std::to_string(to->stateIndex2) + "\n";
 
     return out;
 }
 
 void copy_AnimationMediatorStateEntry(AnimationMediatorStateEntry* to, const AnimationMediatorStateEntry* from)
 {
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(&to->animationId, &from->animationId, 0x90);
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
 }
 
@@ -2387,7 +2031,7 @@ std::string print_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to)
     std::string out = "ChrCtrl_AnimationQueue\n";
 
     out += "array_length: " + std::to_string(to->array_length) + "\n";
-    out += "data_0: " + std::to_string(to->data_0) + "\n";
+    out += "unk_4: " + std::to_string(to->unk_4) + "\n";
 
     for (size_t i = 0; i < to->array_length; i++)
     {
@@ -2397,39 +2041,21 @@ std::string print_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to)
     out += print_hkaAnimatedSkeleton(to->HkaAnimatedSkeleton);
     out += print_ChrCtrl_AnimationQueue_field0x20(to->field0x20);
 
-    out += "Unknown data_1:";
-    for (size_t i = 0; i < sizeof(to->data_1); i++)
-    {
-        out += std::to_string(to->data_1[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "genderSpecificAnimationOffset:" + std::to_string(to->genderSpecificAnimationOffset) +
+        " unk_64:" + std::to_string(to->unk_64) + " unk_68:" + std::to_string(to->unk_68) +
+        " addToAnimId:" + std::to_string(to->addToAnimId) + "\n";
 
-    out += "Unknown data_2:";
-    for (size_t i = 0; i < sizeof(to->data_2); i++)
-    {
-        out += std::to_string(to->data_2[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "unk_70:" + std::to_string(to->unk_70) + " unk_74:" + std::to_string(to->unk_74) +
+        " unk_78:" + std::to_string(to->unk_78) + " unk_7c:" + std::to_string(to->unk_7c) + "\n";
 
-    out += "data_3: " + std::to_string(to->data_3) + "\n";
+    out += "unk_88: " + std::to_string(to->unk_88) + "\n";
 
-    out += "Unknown data_4:";
-    for (size_t i = 0; i < sizeof(to->data_4); i++)
-    {
-        out += std::to_string(to->data_4[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "unk_a8:" + std::to_string(to->unk_a8) + " unk_ac:" + std::to_string(to->unk_ac) +
+        " unk_ad:" + std::to_string(to->unk_ad) + " unk_c0:" + std::to_string(to->unk_c0) +
+        " unk_c1:" + std::to_string(to->unk_c1) + "\n";
 
-    out += "Unknown data_5:";
-    for (size_t i = 0; i < sizeof(to->data_5); i++)
-    {
-        out += std::to_string(to->data_5[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "unk_d8:" + std::to_string(to->unk_d8) + " unk_dc:" + std::to_string(to->unk_dc) +
+        " unk_e0:" + std::to_string(to->unk_e0) + "\n";
 
     return out;
 }
@@ -2442,7 +2068,7 @@ void copy_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to, const ChrCtrl_Anima
         FATALERROR("Got %d number of ChrCtrl_AnimationQueueEntry entries for ChrCtrl_AnimationQueue->arry. Only support a max of 32.", from->array_length);
     }
     to->array_length = from->array_length;
-    to->data_0 = from->data_0;
+    to->unk_4 = from->unk_4;
     for (size_t i = 0; i < from->array_length; i++)
     {
         copy_ChrCtrl_AnimationQueueEntry(&to->arry[i], &from->arry[i], target);
@@ -2451,11 +2077,11 @@ void copy_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to, const ChrCtrl_Anima
     copy_ChrCtrl_AnimationQueue_field0x10(to->field0x10, from->field0x10);
     copy_hkaAnimatedSkeleton(to->HkaAnimatedSkeleton, from->HkaAnimatedSkeleton);
     copy_ChrCtrl_AnimationQueue_field0x20(to->field0x20, from->field0x20, target);
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
-    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
-    to->data_3 = from->data_3;
-    memcpy(to->data_4, from->data_4, sizeof(to->data_4));
-    memcpy(to->data_5, from->data_5, sizeof(to->data_5));
+    memcpy(&to->genderSpecificAnimationOffset, &from->genderSpecificAnimationOffset, 0x10);
+    memcpy(&to->unk_70, &from->unk_70, 0x10);
+    to->unk_88 = from->unk_88;
+    memcpy(&to->unk_a8, &from->unk_a8, 0x20);
+    memcpy(&to->unk_d8, &from->unk_d8, 0x18);
 }
 
 ChrCtrl_AnimationQueue* init_ChrCtrl_AnimationQueue()
@@ -2503,13 +2129,7 @@ std::string print_ChrCtrl_AnimationQueue_field0x20(ChrCtrl_AnimationQueue_field0
     }
     out += "\n";
 
-    out += "Unknown data_0:";
-    for (size_t i = 0; i < sizeof(to->data_0)/4; i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "field0x8_len:" + std::to_string(to->field0x8_len) + " field0x8_len2:" + std::to_string(to->field0x8_len2) + "\n";
 
     out += "Unknown field0x18:";
     for (size_t i = 0; i < (0x30 * 64) / 4; i++)
@@ -2519,13 +2139,7 @@ std::string print_ChrCtrl_AnimationQueue_field0x20(ChrCtrl_AnimationQueue_field0
     }
     out += "\n";
 
-    out += "Unknown data_1:";
-    for (size_t i = 0; i < sizeof(to->data_1) / 4; i++)
-    {
-        out += std::to_string(to->data_1[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "field0x18_len:" + std::to_string(to->field0x18_len) + " field0x18_len2:" + std::to_string(to->field0x18_len2) + "\n";
 
     out += "Unknown field0x28:";
     for (size_t i = 0; i < 64; i++)
@@ -2535,21 +2149,10 @@ std::string print_ChrCtrl_AnimationQueue_field0x20(ChrCtrl_AnimationQueue_field0
     }
     out += "\n";
 
-    out += "Unknown data_2:";
-    for (size_t i = 0; i < sizeof(to->data_2) / 4; i++)
-    {
-        out += std::to_string(to->data_2[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "field0x28_len:" + std::to_string(to->field0x28_len) + " field0x28_len2:" + std::to_string(to->field0x28_len2) +
+        " unk_38:" + std::to_string(to->unk_38) + "\n";
 
-    out += "Unknown data_3:";
-    for (size_t i = 0; i < sizeof(to->data_3) / 4; i++)
-    {
-        out += std::to_string(to->data_3[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "unk_48:" + std::to_string(to->unk_48) + " unk_4c:" + std::to_string(to->unk_4c) + "\n";
 
     return out;
 }
@@ -2565,12 +2168,12 @@ void copy_ChrCtrl_AnimationQueue_field0x20(ChrCtrl_AnimationQueue_field0x20* to,
         }
     }
     memcpy(to->field0x8, from->field0x8, 0x30 * 64);
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(&to->field0x8_len, &from->field0x8_len, 8);
     memcpy(to->field0x18, from->field0x18, 0x30 * 64);
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    memcpy(&to->field0x18_len, &from->field0x18_len, 8);
     memcpy(to->field0x28, from->field0x28, 4 * 64);
-    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
-    memcpy(to->data_3, from->data_3, sizeof(to->data_3));
+    memcpy(&to->field0x28_len, &from->field0x28_len, 0x10);
+    memcpy(&to->unk_48, &from->unk_48, 8);
 }
 
 ChrCtrl_AnimationQueue_field0x20* init_ChrCtrl_AnimationQueue_field0x20()
@@ -2598,21 +2201,20 @@ std::string print_hkaAnimatedSkeleton(hkaAnimatedSkeleton* to)
 {
     std::string out = "hkaAnimatedSkeleton\n";
 
-    out += "Unknown data_0:" + std::to_string(to->data_0) + "\n";
-    out += "Unknown animCtrl_list_len:" + std::to_string(to->animCtrl_list_len) + "\n";
+    out += "animCtrl_list_len:" + std::to_string(to->animCtrl_list_len) + "\n";
     for (uint32_t i = 0; i < to->animCtrl_list_len; i++)
     {
         out += print_hkaDefaultAnimationControl(to->animCtrl_list[i]);
     }
-    out += "Unknown data_1:" + std::to_string(to->data_1) + "\n";
-    out += "Unknown data_2:" + std::to_string(to->data_2) + "\n";
+    out += "data_1:" + std::to_string(to->data_1) + "\n";
 
     return out;
 }
 
 void copy_hkaAnimatedSkeleton(hkaAnimatedSkeleton* to, const hkaAnimatedSkeleton* from)
 {
-    to->data_0 = from->data_0;
+    to->unk_8 = from->unk_8;
+    to->unk_c = from->unk_c;
     if (from->animCtrl_list_len > 32)
     {
         FATALERROR("Got %d number of hkaAnimatedSkeleton entries for hkaAnimatedSkeleton->animCtrl_list. Only support a max of 32.", from->animCtrl_list_len);
@@ -2623,7 +2225,8 @@ void copy_hkaAnimatedSkeleton(hkaAnimatedSkeleton* to, const hkaAnimatedSkeleton
         copy_hkaDefaultAnimationControl(to->animCtrl_list[i], from->animCtrl_list[i]);
     }
     to->data_1 = from->data_1;
-    to->data_2 = from->data_2;
+    to->unk_38 = from->unk_38;
+    to->unk_3c = from->unk_3c;
 }
 
 hkaAnimatedSkeleton* init_hkaAnimatedSkeleton()
@@ -2656,13 +2259,8 @@ std::string print_hkaDefaultAnimationControl(hkaDefaultAnimationControl* to)
 
     out += print_hkaAnimationControl(&to->HkaAnimationControl);
 
-    out += "Unknown data_0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "weight:" + std::to_string(to->weight) + " speed:" + std::to_string(to->speed) +
+        " repetitions:" + std::to_string(to->repetitions) + " frameTickAnimTime:" + std::to_string(to->frameTickAnimTime) + "\n";
 
     return out;
 }
@@ -2670,7 +2268,7 @@ std::string print_hkaDefaultAnimationControl(hkaDefaultAnimationControl* to)
 void copy_hkaDefaultAnimationControl(hkaDefaultAnimationControl* to, const hkaDefaultAnimationControl* from)
 {
     copy_hkaAnimationControl(&to->HkaAnimationControl, &from->HkaAnimationControl);
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(&to->weight, &from->weight, 0x50);
 }
 
 hkaDefaultAnimationControl* init_hkaDefaultAnimationControl()
@@ -2695,13 +2293,7 @@ std::string print_hkaAnimationControl(hkaAnimationControl* to)
 {
     std::string out = "hkaAnimationControl\n";
 
-    out += "Unknown data_0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "curTimeInAnimation:" + std::to_string(to->curTimeInAnimation) + " weight:" + std::to_string(to->weight) + "\n";
 
     out += "Unknown field0x18:";
     for (size_t i = 0; i < to->field0x18_len; i++)
@@ -2721,20 +2313,18 @@ std::string print_hkaAnimationControl(hkaAnimationControl* to)
 
     out += "HkaAnimationBinding:" + std::to_string(to->HkaAnimationBinding) + "\n";
 
-    out += "Unknown data_1:";
-    for (size_t i = 0; i < sizeof(to->data_1)/4; i++)
-    {
-        out += std::to_string(to->data_1[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "unk_48:" + std::to_string(to->unk_48) + " unk_4c:" + std::to_string(to->unk_4c) +
+        " unk_50:" + std::to_string(to->unk_50) + "\n";
 
     return out;
 }
 
 void copy_hkaAnimationControl(hkaAnimationControl* to, const hkaAnimationControl* from)
 {
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    to->unk_8 = from->unk_8;
+    to->unk_c = from->unk_c;
+    to->curTimeInAnimation = from->curTimeInAnimation;
+    to->weight = from->weight;
 
     if (from->field0x18_cap > 64)
     {
@@ -2754,7 +2344,9 @@ void copy_hkaAnimationControl(hkaAnimationControl* to, const hkaAnimationControl
 
     to->HkaAnimationBinding = from->HkaAnimationBinding;
 
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    to->unk_48 = from->unk_48;
+    to->unk_4c = from->unk_4c;
+    to->unk_50 = from->unk_50;
 }
 
 hkaAnimationControl* init_hkaAnimationControl()
@@ -2785,15 +2377,12 @@ std::string print_ChrCtrl_AnimationQueue_field0x10(ChrCtrl_AnimationQueue_field0
     out += "array1_len:" + std::to_string(to->array1_len) + "\n";
     out += "array2_len:" + std::to_string(to->array2_len) + "\n";
 
-    out += "Unknown arry2:";
+    out += "arry2:";
     for (size_t i = 0; i < to->array2_len; i++)
     {
-        for (size_t j = 0; j < sizeof(ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem); j++)
-        {
-            out += std::to_string(to->arry2[i].data_0[j]);
-            out += " ";
-        }
-        out += ";";
+        out += "rescap_anibnd:" + std::to_string(to->arry2[i].rescap_anibnd) +
+            " unk_8:" + std::to_string(to->arry2[i].unk_8) +
+            " count:" + std::to_string(to->arry2[i].count) + ";";
     }
     out += "\n";
 
@@ -2855,34 +2444,29 @@ std::string print_ChrCtrl_AnimationQueueEntry(ChrCtrl_AnimationQueueEntry* to)
 {
     std::string out = "ChrCtrl_AnimationQueueEntry\n";
 
-    out += "Unknown data_0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "unk_0:" + std::to_string(to->unk_0) + " unk_2:" + std::to_string(to->unk_2) + "\n";
 
     out += print_hkaDefaultAnimationControl(to->defaultAnimationControl);
     out += "HvkAnim_AnimInfoArrayElem:" + std::to_string(to->HvkAnim_AnimInfoArrayElem) + "\n";
 
-    out += "Unknown data_1:";
-    for (size_t i = 0; i < sizeof(to->data_1); i++)
-    {
-        out += std::to_string(to->data_1[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "unk_28:" + std::to_string(to->unk_28) + " unk_2c:" + std::to_string(to->unk_2c) +
+        " unk_30:" + std::to_string(to->unk_30) + " unk_3c:" + std::to_string(to->unk_3c) +
+        " unk_40:" + std::to_string(to->unk_40) + " unk_44:" + std::to_string(to->unk_44) +
+        " unk_4c:" + std::to_string(to->unk_4c) + " lastFrameTime:" + std::to_string(to->lastFrameTime) +
+        " unk_58:" + std::to_string(to->unk_58) + " unk_5c:" + std::to_string(to->unk_5c) +
+        " unk_60:" + std::to_string(to->unk_60) + " unk_64:" + std::to_string(to->unk_64) +
+        " unk_68:" + std::to_string(to->unk_68) + " unk_6c:" + std::to_string(to->unk_6c) +
+        " unk_70:" + std::to_string(to->unk_70) + "\n";
 
     return out;
 }
 
 void copy_ChrCtrl_AnimationQueueEntry(ChrCtrl_AnimationQueueEntry* to, const ChrCtrl_AnimationQueueEntry* from, StateTarget target)
 {
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(&to->unk_0, &from->unk_0, 8);
     copy_hkaDefaultAnimationControl(to->defaultAnimationControl, from->defaultAnimationControl);
     to->HvkAnim_AnimInfoArrayElem = from->HvkAnim_AnimInfoArrayElem;
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    memcpy(&to->unk_28, &from->unk_28, 0x50);
 }
 
 ChrCtrl_AnimationQueueEntry* init_ChrCtrl_AnimationQueueEntry()
@@ -2950,31 +2534,26 @@ std::string print_AnimationQueue_Entry(AnimationQueue_Entry* to)
 {
     std::string out = "AnimationQueue_Entry\n";
 
-    out += "Unknown data_0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "unk_0:" + std::to_string(to->unk_0) + " unk_2:" + std::to_string(to->unk_2) + "\n";
 
-    out += "Unknown data_1:";
-    for (size_t i = 0; i < sizeof(to->data_1); i++)
+    out += "field0x10:";
+    for (size_t i = 0; i < 8; i++)
     {
-        out += std::to_string(to->data_1[i]);
-        out += " ";
+        out += "upcoming_animId:" + std::to_string(to->field0x10[i].upcoming_animId) +
+            " unk_4:" + std::to_string(to->field0x10[i].unk_4) +
+            " unk_8:" + std::to_string(to->field0x10[i].unk_8) +
+            " unk_c:" + std::to_string(to->field0x10[i].unk_c) +
+            " unk_10:" + std::to_string(to->field0x10[i].unk_10) +
+            " unk_14:" + std::to_string(to->field0x10[i].unk_14) +
+            " unk_18:" + std::to_string(to->field0x10[i].unk_18) +
+            " unk_1c:" + std::to_string(to->field0x10[i].unk_1c) + ";";
     }
     out += "\n";
 
     out += print_AnimationQueue_Entry_sub1(&to->sub1);
 
-    out += "Unknown data_2:";
-    for (size_t i = 0; i < sizeof(to->data_2)/8; i++)
-    {
-        out += std::to_string(to->data_2[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "unk_140:" + std::to_string(to->unk_140) + " unk_142:" + std::to_string(to->unk_142) +
+        " unk_144:" + std::to_string(to->unk_144) + "\n";
 
     size_t len = ((uint64_t)to->chained_animations_array_end - (uint64_t)to->chained_animations_array_start) / 8;
     out += "arry len:" + std::to_string(len) + "\n";
@@ -2986,23 +2565,19 @@ std::string print_AnimationQueue_Entry(AnimationQueue_Entry* to)
     }
     out += "\n";
 
-    out += "Unknown data_3:";
-    for (size_t i = 0; i < sizeof(to->data_3); i++)
-    {
-        out += std::to_string(to->data_3[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "unk_168:" + std::to_string(to->unk_168) + " unk_16c:" + std::to_string(to->unk_16c) +
+        " unk_170:" + std::to_string(to->unk_170) + " unk_174:" + std::to_string(to->unk_174) +
+        " unk_178:" + std::to_string(to->unk_178) + "\n";
 
     return out;
 }
 
 void copy_AnimationQueue_Entry(AnimationQueue_Entry* to, const AnimationQueue_Entry* from)
 {
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    memcpy(&to->unk_0, &from->unk_0, 8);
+    memcpy(to->field0x10, from->field0x10, sizeof(to->field0x10));
     copy_AnimationQueue_Entry_sub1(&to->sub1, &from->sub1);
-    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    memcpy(&to->unk_140, &from->unk_140, 8);
 
     size_t i = 0;
     size_t from_len = ((uint64_t)from->chained_animations_array_end - (uint64_t)from->chained_animations_array_start) / 8;
@@ -3017,7 +2592,7 @@ void copy_AnimationQueue_Entry(AnimationQueue_Entry* to, const AnimationQueue_En
     }
     to->chained_animations_array_end = &to->chained_animations_array_start[i];
 
-    memcpy(to->data_3, from->data_3, sizeof(to->data_3));
+    memcpy(&to->unk_168, &from->unk_168, 0x18);
 }
 
 AnimationQueue_Entry* init_AnimationQueue_Entry()
@@ -3125,18 +2700,14 @@ std::string print_AnimationQueue_Entry_sub1_field0x10(AnimationQueue_Entry_sub1_
 {
     std::string out = "AnimationQueue_Entry\n";
 
-    out += "Unknown data_0:";
-    for (size_t i = 0; i < sizeof(to->data_0)/8; i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
+    out += "parent_AnimationQueue_Entry_field0x10:" + std::to_string(to->parent_AnimationQueue_Entry_field0x10) +
+        " unk_8:" + std::to_string(to->unk_8) + "\n";
 
     return out;
 }
 
 void copy_AnimationQueue_Entry_sub1_field0x10(AnimationQueue_Entry_sub1_field0x10* to, const AnimationQueue_Entry_sub1_field0x10* from)
 {
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    to->parent_AnimationQueue_Entry_field0x10 = from->parent_AnimationQueue_Entry_field0x10;
+    to->unk_8 = from->unk_8;
 }

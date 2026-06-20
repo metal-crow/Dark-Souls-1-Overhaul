@@ -2,7 +2,12 @@
 
 void copy_EzStateManagerImpl_field0x20(EzStateManagerImpl_field0x20* to, EzStateManagerImpl_field0x20* from, StateTarget target)
 {
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    //per-frame scratch space (not needed for rollback)
+    //current/heap are pointers copied raw - harmless here since this is scratch.
+    memcpy(to->queries, from->queries, sizeof(to->queries));
+    memcpy(to->registers, from->registers, sizeof(to->registers));
+    to->current = from->current;
+    to->heap = from->heap;
 }
 
 EzStateManagerImpl_field0x20* init_EzStateManagerImpl_field0x20()

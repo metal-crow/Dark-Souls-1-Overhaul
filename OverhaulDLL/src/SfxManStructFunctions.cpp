@@ -153,14 +153,24 @@ void copy_FXManager(FXManager* to, FXManager* from, StateTarget target)
 {
     Game::SuspendThreads();
 
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    to->vtable = from->vtable;
+    to->parent = from->parent;
+    to->heap = from->heap;
     to->FxBehaviorNode_destructlist_head = NULL;
     to->FxBehaviorNode_destructlist_tail = NULL;
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    to->unk_38 = from->unk_38;
+    to->unk_3c = from->unk_3c;
     memcpy(to->FXDrawEntityHandler_list, from->FXDrawEntityHandler_list, sizeof(to->FXDrawEntityHandler_list));
     memcpy(to->FxBehaviorNode_staging_list, from->FxBehaviorNode_staging_list, sizeof(to->FxBehaviorNode_staging_list));
     to->FxBehaviorNode_destruction_queue = (void*)1;
-    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    memcpy(to->unk_88, from->unk_88, sizeof(to->unk_88));
+    memcpy(to->unk_98, from->unk_98, sizeof(to->unk_98));
+    memcpy(to->unk_a0, from->unk_a0, sizeof(to->unk_a0));
+    to->unk_b0 = from->unk_b0;
+    memcpy(to->unk_b1, from->unk_b1, sizeof(to->unk_b1));
+    memcpy(to->FXSettingOptions, from->FXSettingOptions, sizeof(to->FXSettingOptions));
+    memcpy(to->unk_17c, from->unk_17c, sizeof(to->unk_17c));
+    memcpy(to->FXSettingScales, from->FXSettingScales, sizeof(to->FXSettingScales));
     to->FrpgFxAdapterBase = from->FrpgFxAdapterBase;
 
     switch (target)
@@ -330,7 +340,13 @@ void Clear_SFXEntryList(std::vector<SavedSFXEntry>* to)
 
 void copy_SFXEntry(SFXEntry* to, SFXEntry* from, StateTarget target)
 {
-    memcpy(to->base.data_0, from->base.data_0, sizeof(to->base.data_0));
+    to->base.vtable = from->base.vtable;
+    to->base.unk_8 = from->base.unk_8;
+    to->base.unk_10 = from->base.unk_10;
+    to->base.sfxId = from->base.sfxId;
+    to->base.unk_18 = from->base.unk_18;
+    to->base.unk_1c = from->base.unk_1c;
+    to->base.unk_20 = from->base.unk_20;
     to->base.fxParent = from->base.fxParent;
     //TODO dunno if i need to save any of these pointers i've commented out
     //vec
@@ -338,10 +354,20 @@ void copy_SFXEntry(SFXEntry* to, SFXEntry* from, StateTarget target)
     to->base.next = from->base.next; //safe to copy since we are graveyarding the pointers
     //ignore behaviour_list in this function
     memcpy(to->base.data_1, from->base.data_1, sizeof(to->base.data_1));
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    to->unk_60 = from->unk_60;
+    to->unk_68 = from->unk_68;
+    to->unk_6c = from->unk_6c;
+    to->unk_70 = from->unk_70;
+    to->unk_74 = from->unk_74;
+    to->unk_78 = from->unk_78;
+    to->unk_7c = from->unk_7c;
+    memcpy(to->field0x80, from->field0x80, sizeof(to->field0x80));
+    memcpy(to->field0xb0, from->field0xb0, sizeof(to->field0xb0));
     //field_0xe0
     //field_0xf0
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    to->unk_f8 = from->unk_f8;
+    to->unk_fc = from->unk_fc;
+    memcpy(to->unk_fd, from->unk_fd, sizeof(to->unk_fd));
 }
 
 void Free_SFXEntry(SFXEntry* to, bool freeself)
@@ -443,14 +469,23 @@ void Clear_SavedFxBehaviorNodeGraph(SavedFxBehaviorNode* to)
 
 void copy_FxBehaviorNode(FxBehaviorNode* to, FxBehaviorNode* from, StateTarget target)
 {
-    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    memcpy(to->unk_0, from->unk_0, sizeof(to->unk_0));
+    memcpy(to->unk_20, from->unk_20, sizeof(to->unk_20));
     to->unk_1 = from->unk_1;
     //body !!!
     to->body = from->body;
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    to->flags1 = from->flags1;
+    to->flags2 = from->flags2;
+    to->unk_68 = from->unk_68;
     //TODO dunno if i need to save any of these pointers i've commented out
     //unk_2
-    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    to->unk_78 = from->unk_78;
+    to->unk_7c = from->unk_7c;
+    to->parent_node_updated = from->parent_node_updated;
+    memcpy(to->unk_81, from->unk_81, sizeof(to->unk_81));
+    to->unk_84 = from->unk_84;
+    to->unk_85 = from->unk_85;
+    memcpy(to->unk_86, from->unk_86, sizeof(to->unk_86));
     to->parent_node = from->parent_node;
     to->next_node = from->next_node;
     to->child_node = from->child_node;

@@ -74,12 +74,16 @@ void free_DmgHitRecordManImp(DmgHitRecordManImp* to)
 
 void copy_DmgHitRecordManImp_field0x10Elem(DmgHitRecordManImp_field0x10Elem* to, DmgHitRecordManImp_field0x10Elem* from, StateTarget target)
 {
-    to->data_0 = from->data_0;
-    to->data_1 = from->data_1;
+    to->unk_8 = from->unk_8;
+    to->unk_c = from->unk_c;
+    to->unk_18 = from->unk_18;
+    to->unk_1c = from->unk_1c;
 }
 
 void copy_DmgHitRecordManImp_field0x28Elem(DmgHitRecordManImp_field0x28Elem* to, DmgHitRecordManImp_field0x28Elem* from, StateTarget target)
 {
-    to->data_0 = from->data_0;
-    to->data_1 = from->data_1;
+    to->targetHandle = from->targetHandle;
+    to->unk_4 = from->unk_4;
+    to->unk_10 = from->unk_10;
+    to->unk_14 = from->unk_14;
 }

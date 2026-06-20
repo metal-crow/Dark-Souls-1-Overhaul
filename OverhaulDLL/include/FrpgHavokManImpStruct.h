@@ -2,9 +2,6 @@
 #ifndef FRPGHAVOKMAN_STRUCT_H
 #define FRPGHAVOKMAN_STRUCT_H
 
-//NOTE: Anything marked "data_x" is a bunch of non-pointer data that can be saved/loaded without really knowing what it is.
-// See the ghidra repo for more specific info about what is in that blob, if it's even known
-
 #include <stddef.h>
 #include <stdint.h>
 #include <vector>
@@ -93,41 +90,58 @@ static_assert(offsetof(hkpWorld, m_broadPhaseBorder) == 0x280);
 
 struct hkpSimulationIsland
 {
-    void* vtable;
-    uint8_t data_0[0x18];
-    hkpWorld* m_world;
-    uint32_t m_numConstraints;
-    uint16_t m_storageIndex;
-    uint16_t m_dirtyListIndex;
-    uint8_t data_1[0x10];
-    float m_timeSinceLastHighFrequencyCheck;
-    float m_timeSinceLastLowFrequencyCheck;
-    void** m_actions; //this seems to always be empty, keep as null
-    uint32_t m_actions_size;
-    uint32_t m_actions_cap;
-    uint64_t data_2;
-    hkpEntity** m_entities;
-    uint32_t m_entities_size;
-    uint32_t m_entities_cap;
-    hkpEntity* m_entities_inline; //just set to null i think, and clear the cap flags
-    uint64_t data_3;
-    hkpAgentNnSector** m_sectorsmidphase;
-    uint32_t m_sectorsmidphase_size;
-    uint32_t m_sectorsmidphase_cap;
-    hkpAgentNnSector* m_sectorsmidphase_inline; //just set to null i think, and clear the cap flags
-    uint64_t data_4;
-    hkpAgentNnSector** m_sectorsnarrowphase;
-    uint32_t m_sectorsnarrowphase_size;
-    uint32_t m_sectorsnarrowphase_cap;
-    hkpAgentNnSector* m_sectorsnarrowphase_inline; //just set to null i think, and clear the cap flags
+    void* vtable;                          // 0x0 (hkReferencedObject::hkBaseObject)
+    uint16_t m_memSizeAndFlags;            // 0x8
+    uint16_t m_referenceCount;             // 0xa
+    uint32_t unk_c;                        // 0xc (padding)
+    uint32_t m_constraintInfo[4];          // 0x10
+    hkpWorld* m_world;                     // 0x20
+    uint32_t m_numConstraints;             // 0x28
+    uint16_t m_storageIndex;               // 0x2c
+    uint16_t m_dirtyListIndex;             // 0x2e
+    uint8_t m_splitCheckFrameCounter;      // 0x30
+    uint8_t flags1;                        // 0x31
+    uint8_t flags2;                        // 0x32
+    uint8_t unk_33;                        // 0x33 (gap)
+    uint32_t unk_34;                       // 0x34
+    uint8_t unk_38[4];                     // 0x38 (gap)
+    uint16_t unk_3c;                       // 0x3c
+    uint8_t unk_3e[2];                     // 0x3e (gap)
+    float m_timeSinceLastHighFrequencyCheck;  // 0x40
+    float m_timeSinceLastLowFrequencyCheck;   // 0x44
+    void** m_actions; //this seems to always be empty, keep as null (0x48)
+    uint32_t m_actions_size;               // 0x50
+    uint32_t m_actions_cap;                // 0x54
+    float m_timeOfDeactivation;            // 0x58
+    uint32_t unk_5c;                       // 0x5c (gap)
+    hkpEntity** m_entities;                // 0x60
+    uint32_t m_entities_size;              // 0x68
+    uint32_t m_entities_cap;               // 0x6c
+    hkpEntity* m_entities_inline; //just set to null i think, and clear the cap flags (0x70)
+    uint16_t m_midphase_bytesUsedInLastSector;  // 0x78
+    uint8_t m_midphase_nnTrackType;        // 0x7a
+    uint8_t unk_7b[5];                     // 0x7b (gap)
+    hkpAgentNnSector** m_sectorsmidphase;  // 0x80 (hkpAgentNnTrack::m_sectors)
+    uint32_t m_sectorsmidphase_size;       // 0x88
+    uint32_t m_sectorsmidphase_cap;        // 0x8c
+    hkpAgentNnSector* m_sectorsmidphase_inline; //just set to null i think, and clear the cap flags (0x90)
+    uint16_t m_narrowphase_bytesUsedInLastSector;  // 0x98
+    uint8_t m_narrowphase_nnTrackType;     // 0x9a
+    uint8_t unk_9b[5];                     // 0x9b (gap)
+    hkpAgentNnSector** m_sectorsnarrowphase;  // 0xa0 (hkpAgentNnTrack::m_sectors)
+    uint32_t m_sectorsnarrowphase_size;    // 0xa8
+    uint32_t m_sectorsnarrowphase_cap;     // 0xac
+    hkpAgentNnSector* m_sectorsnarrowphase_inline; //just set to null i think, and clear the cap flags (0xb0)
 };
+static_assert(offsetof(hkpSimulationIsland, m_constraintInfo) == 0x10);
 static_assert(offsetof(hkpSimulationIsland, m_world) == 0x20);
 static_assert(offsetof(hkpSimulationIsland, m_storageIndex) == 0x2c);
-static_assert(offsetof(hkpSimulationIsland, data_1) == 0x30);
+static_assert(offsetof(hkpSimulationIsland, m_splitCheckFrameCounter) == 0x30);
 static_assert(offsetof(hkpSimulationIsland, m_timeSinceLastHighFrequencyCheck) == 0x40);
 static_assert(offsetof(hkpSimulationIsland, m_actions) == 0x48);
-static_assert(offsetof(hkpSimulationIsland, data_2) == 0x58);
+static_assert(offsetof(hkpSimulationIsland, m_timeOfDeactivation) == 0x58);
 static_assert(offsetof(hkpSimulationIsland, m_entities) == 0x60);
+static_assert(offsetof(hkpSimulationIsland, m_midphase_bytesUsedInLastSector) == 0x78);
 static_assert(offsetof(hkpSimulationIsland, m_sectorsmidphase) == 0x80);
 static_assert(offsetof(hkpSimulationIsland, m_sectorsnarrowphase) == 0xa0);
 static_assert(sizeof(hkpSimulationIsland) == 0xb8);
@@ -244,119 +258,159 @@ static_assert(sizeof(hkMotionState) == 0xb0);
 
 struct hkpPhantom
 {
-    void* vtable;
-    uint64_t data_0;
-    void* hkpWorldPtr; //static pointer to the havok world
+    void* vtable;                // 0x0 (hkReferencedObject::hkBaseObject)
+    uint16_t m_memSizeAndFlags;  // 0x8
+    uint16_t m_referenceCount;   // 0xa
+    uint32_t unk_c;              // 0xc (padding)
+    void* hkpWorldPtr; //static pointer to the havok world (0x10)
     //this is actually a FrpgPhysShapePhantomIns**, but we are saving these already as part of DamageMan, so treat as raw ptrs.
     // This is only used when we write to the game, and the target isn't realloc'd when we write to the game so it's stable.
-    void** m_userData;
-    hkpLinkedCollidable m_collidable;
+    void** m_userData;           // 0x18
+    hkpLinkedCollidable m_collidable;  // 0x20
 };
-static_assert(offsetof(hkpPhantom, data_0) == 0x8);
+static_assert(offsetof(hkpPhantom, m_memSizeAndFlags) == 0x8);
 static_assert(offsetof(hkpPhantom, hkpWorldPtr) == 0x10);
 static_assert(offsetof(hkpPhantom, m_userData) == 0x18);
 static_assert(offsetof(hkpPhantom, m_collidable) == 0x20);
 
 struct hkpSimpleShapePhantom
 {
-    hkpPhantom base;
-    uint8_t data_1[16];
-    void* unk_0;
-    hkpProperty* m_properties;
-    uint32_t m_properties_len;
-    uint32_t m_properties_cap;
-    void** m_overlapListeners;
-    uint32_t m_overlapListeners_len;
-    uint32_t m_overlapListeners_cap;
-    void** m_phantomListeners;
-    uint32_t m_phantomListeners_len;
-    uint32_t m_phantomListeners_cap;
-    uint64_t padding_0;
-    hkMotionState m_motionState;
-    hkpCollidable** m_collisionDetails;
-    uint32_t m_collisionDetails_len;
-    uint32_t m_collisionDetails_cap;
-    uint8_t data_2[16];
+    hkpPhantom base;           // 0x0
+    uint32_t unk_a0;           // 0xa0 (ghidra: undefined4)
+    uint8_t unk_a4[4];         // 0xa4 (gap)
+    uint16_t unk_a8;           // 0xa8 (ghidra: undefined2)
+    uint8_t unk_aa[6];         // 0xaa (gap)
+    void* unk_0;               // 0xb0 (ghidra: hkpWorldObject::m_name)
+    hkpProperty* m_properties; // 0xb8
+    uint32_t m_properties_len; // 0xc0
+    uint32_t m_properties_cap; // 0xc4
+    void** m_overlapListeners; // 0xc8
+    uint32_t m_overlapListeners_len;  // 0xd0
+    uint32_t m_overlapListeners_cap;  // 0xd4
+    void** m_phantomListeners; // 0xd8
+    uint32_t m_phantomListeners_len;  // 0xe0
+    uint32_t m_phantomListeners_cap;  // 0xe4
+    uint64_t padding_0;        // 0xe8
+    hkMotionState m_motionState;  // 0xf0
+    hkpCollidable** m_collisionDetails;  // 0x1a0
+    uint32_t m_collisionDetails_len;  // 0x1a8
+    uint32_t m_collisionDetails_cap;  // 0x1ac
+    uint8_t m_orderDirty;      // 0x1b0 (ghidra: bool)
+    uint8_t unk_1b1[15];       // 0x1b1 (gap)
 };
-static_assert(offsetof(hkpSimpleShapePhantom, data_1) == 0xa0);
+static_assert(offsetof(hkpSimpleShapePhantom, unk_a0) == 0xa0);
 static_assert(offsetof(hkpSimpleShapePhantom, unk_0) == 0xb0);
 static_assert(offsetof(hkpSimpleShapePhantom, m_properties) == 0xb8);
 static_assert(offsetof(hkpSimpleShapePhantom, m_phantomListeners) == 0xd8);
 static_assert(offsetof(hkpSimpleShapePhantom, m_motionState) == 0xf0);
 static_assert(offsetof(hkpSimpleShapePhantom, m_collisionDetails) == 0x1a0);
-static_assert(offsetof(hkpSimpleShapePhantom, data_2) == 0x1b0);
+static_assert(offsetof(hkpSimpleShapePhantom, m_orderDirty) == 0x1b0);
 static_assert(sizeof(hkpSimpleShapePhantom) == 0x1c0);
 
 struct hkpMotion
 {
-    uint64_t vtable;
-    uint8_t data_0[0x120];
-    hkpMotion* m_savedMotion; //hkpSphereMotion/hkpBoxMotion, but the data itself is just hkpMotion
-    uint8_t data_1[0x10];
+    uint64_t vtable;                          // 0x0 (ghidra: hkReferencedObject::hkBaseObject)
+    uint16_t m_memSizeAndFlags;               // 0x8
+    uint16_t m_referenceCount;                // 0xa
+    uint32_t unk_c;                           // 0xc (padding)
+    uint8_t m_type;                           // 0x10
+    uint8_t m_deactivationIntegrateCounter;   // 0x11
+    uint16_t m_deactivationNumInactiveFrames[2]; // 0x12
+    uint8_t unk_16[10];                       // 0x16 (gap)
+    hkMotionState m_motionState;              // 0x20 (the actual transform/swept transform)
+    float m_inertiaAndMassInv[4];             // 0xd0 (ghidra: Vector4)
+    float m_linearVelocity[4];                // 0xe0 (ghidra: Vector4)
+    float m_angularVelocity[4];               // 0xf0 (ghidra: Vector4)
+    float m_deactivationRefPosition[8];       // 0x100 (ghidra: Vector4[2])
+    uint32_t m_deactivationRefOrientation[2]; // 0x120
+    hkpMotion* m_savedMotion; //hkpSphereMotion/hkpBoxMotion, but the data itself is just hkpMotion (0x128)
+    uint16_t m_savedQualityTypeIndex;         // 0x130
+    uint16_t m_gravityFactor;                 // 0x132
+    uint8_t unk_134[12];                      // 0x134 (gap)
 };
 static_assert(sizeof(hkpMotion) == 0x140);
-static_assert(offsetof(hkpMotion, data_0) == 0x8);
+static_assert(offsetof(hkpMotion, m_memSizeAndFlags) == 0x8);
+static_assert(offsetof(hkpMotion, m_motionState) == 0x20);
+static_assert(offsetof(hkpMotion, m_linearVelocity) == 0xe0);
 static_assert(offsetof(hkpMotion, m_savedMotion) == 0x128);
-static_assert(offsetof(hkpMotion, data_1) == 0x130);
+static_assert(offsetof(hkpMotion, m_savedQualityTypeIndex) == 0x130);
 
 struct hkpEntity
 {
-    uint64_t vtable;
-    uint64_t data_0;
-    hkpWorld* _hkpWorld;
-    void* m_userData; //FrpgPhysSysIns_Entity*, points to the entry in FrpgPhysSysIns's arrays
-    hkpLinkedCollidable m_collidable;
-    uint8_t data_1[16];
-    void* m_name;
-    hkpProperty* m_properties; //always null
-    uint32_t m_properties_len;
-    uint32_t m_properties_cap;
-    uint8_t m_material[0x10];
-    void* m_limitContactImpulseUtilAndFlag; //always null
-    uint64_t data_2;
-    void* m_breakableBody; //always null
-    uint8_t data_3[8];
-    hkConstraintInternal* m_constraintsMaster;
-    uint16_t m_constraintsMaster_size;
-    uint16_t m_constraintsMaster_cap;
-    uint32_t data_4;
-    hkpConstraintInstance** m_constraintsSlave;
-    uint32_t m_constraintsSlave_size;
-    uint32_t m_constraintsSlave_cap;
-    uint8_t* m_constraintRuntime;
-    uint32_t m_constraintRuntime_size;
-    uint32_t m_constraintRuntime_cap;
-    hkpSimulationIsland* m_simulationIsland;
-    uint8_t data_5[8];
-    void* spuCollisionCallback_m_util; //always null
-    uint16_t spuCollisionCallback_m_capacity;
-    uint8_t data_6[14];
-    hkpMotion m_motion;
-    void** m_contactListeners; //always null
-    uint16_t m_contactListeners_size;
-    uint16_t m_contactListeners_cap;
-    uint32_t data_8;
-    void** m_actions; //always null
-    uint16_t m_actions_size;
-    uint16_t m_actions_cap;
-    uint32_t data_9;
-    void* m_localFrame;
-    void* m_extendedListeners;
+    uint64_t vtable;           // 0x0 (hkReferencedObject::hkBaseObject)
+    uint16_t m_memSizeAndFlags;  // 0x8
+    uint16_t m_referenceCount;   // 0xa
+    uint32_t unk_c;             // 0xc (padding)
+    hkpWorld* _hkpWorld;       // 0x10
+    void* m_userData; //FrpgPhysSysIns_Entity*, points to the entry in FrpgPhysSysIns's arrays (0x18)
+    hkpLinkedCollidable m_collidable;  // 0x20
+    uint32_t unk_a0;           // 0xa0 (ghidra: undefined4)
+    uint8_t unk_a4[4];         // 0xa4 (gap)
+    uint16_t unk_a8;           // 0xa8 (ghidra: undefined2)
+    uint8_t unk_aa[6];         // 0xaa (gap)
+    void* m_name;              // 0xb0
+    hkpProperty* m_properties; //always null (0xb8)
+    uint32_t m_properties_len; // 0xc0
+    uint32_t m_properties_cap; // 0xc4
+    uint8_t m_material[0x10];  // 0xc8 (ghidra: hkpMaterial(12) + 4 gap)
+    void* m_limitContactImpulseUtilAndFlag; //always null (0xd8)
+    float m_damageMultiplier;  // 0xe0
+    uint32_t unk_e4;           // 0xe4 (gap)
+    void* m_breakableBody; //always null (0xe8)
+    uint32_t m_solverData;     // 0xf0
+    uint16_t m_storageIndex;   // 0xf4
+    uint16_t m_contactPointCallbackDelay;  // 0xf6
+    hkConstraintInternal* m_constraintsMaster;  // 0xf8
+    uint16_t m_constraintsMaster_size;  // 0x100
+    uint16_t m_constraintsMaster_cap;   // 0x102
+    uint32_t unk_104;          // 0x104 (former data_4; gap)
+    hkpConstraintInstance** m_constraintsSlave;  // 0x108
+    uint32_t m_constraintsSlave_size;   // 0x110
+    uint32_t m_constraintsSlave_cap;    // 0x114
+    uint8_t* m_constraintRuntime;       // 0x118
+    uint32_t m_constraintRuntime_size;  // 0x120
+    uint32_t m_constraintRuntime_cap;   // 0x124
+    hkpSimulationIsland* m_simulationIsland;  // 0x128
+    uint8_t m_autoRemoveLevel;          // 0x130
+    uint8_t m_numShapeKeysInContactPointProperties;  // 0x131
+    uint8_t m_responseModifierFlags;    // 0x132
+    uint8_t unk_133;                    // 0x133 (gap)
+    uint32_t m_uid;                     // 0x134
+    void* spuCollisionCallback_m_util; //always null (0x138)
+    uint16_t spuCollisionCallback_m_capacity;  // 0x140
+    uint8_t spuCollisionCallback_m_eventFilter;  // 0x142
+    uint8_t spuCollisionCallback_m_userFilter;   // 0x143
+    uint8_t unk_144[12];                // 0x144 (gap)
+    hkpMotion m_motion;                 // 0x150
+    void** m_contactListeners; //always null (0x290)
+    uint16_t m_contactListeners_size;   // 0x298
+    uint16_t m_contactListeners_cap;    // 0x29a
+    uint32_t unk_29c;          // 0x29c (former data_8; gap)
+    void** m_actions; //always null (0x2a0)
+    uint16_t m_actions_size;            // 0x2a8
+    uint16_t m_actions_cap;             // 0x2aa
+    uint32_t unk_2ac;          // 0x2ac (former data_9; gap)
+    void* m_localFrame;        // 0x2b0
+    void* m_extendedListeners; // 0x2b8
 };
 static_assert(sizeof(hkpEntity) == 0x2c0);
-static_assert(offsetof(hkpEntity, data_0) == 0x8);
+static_assert(offsetof(hkpEntity, m_memSizeAndFlags) == 0x8);
 static_assert(offsetof(hkpEntity, _hkpWorld) == 0x10);
 static_assert(offsetof(hkpEntity, m_userData) == 0x18);
 static_assert(offsetof(hkpEntity, m_collidable) == 0x20);
-static_assert(offsetof(hkpEntity, data_1) == 0xa0);
+static_assert(offsetof(hkpEntity, unk_a0) == 0xa0);
 static_assert(offsetof(hkpEntity, m_name) == 0xb0);
 static_assert(offsetof(hkpEntity, m_properties) == 0xb8);
 static_assert(offsetof(hkpEntity, m_limitContactImpulseUtilAndFlag) == 0xd8);
+static_assert(offsetof(hkpEntity, m_damageMultiplier) == 0xe0);
 static_assert(offsetof(hkpEntity, m_breakableBody) == 0xe8);
+static_assert(offsetof(hkpEntity, m_solverData) == 0xf0);
 static_assert(offsetof(hkpEntity, m_constraintsMaster) == 0xf8);
 static_assert(offsetof(hkpEntity, m_constraintsSlave) == 0x108);
 static_assert(offsetof(hkpEntity, m_constraintRuntime) == 0x118);
 static_assert(offsetof(hkpEntity, m_simulationIsland) == 0x128);
+static_assert(offsetof(hkpEntity, m_autoRemoveLevel) == 0x130);
+static_assert(offsetof(hkpEntity, m_uid) == 0x134);
 static_assert(offsetof(hkpEntity, spuCollisionCallback_m_util) == 0x138);
 static_assert(offsetof(hkpEntity, m_motion) == 0x150);
 static_assert(offsetof(hkpEntity, m_contactListeners) == 0x290);
@@ -385,25 +439,34 @@ static_assert(offsetof(hkpBroadPhaseBorder, phantom6) == 0x58);
 
 struct hkpCapsuleShape
 {
-    uint64_t vtable;
-    uint8_t _0[0x10];
-    void* m_userData;
-    uint8_t data_1[0x30];
+    uint64_t vtable;       // 0x0
+    uint8_t _0[0x10];      // 0x8
+    void* m_userData;      // 0x18
+    float m_radius;        // 0x20 (ghidra: hkpConvexShape::m_radius)
+    uint32_t unk_24;       // 0x24 (padding)
+    uint8_t unk_28[8];     // 0x28 (gap before the vertices)
+    float vertexA[4];      // 0x30 (ghidra: Vector4)
+    float vertexB[4];      // 0x40 (ghidra: Vector4)
 };
 static_assert(sizeof(hkpCapsuleShape) == 0x50);
 static_assert(offsetof(hkpCapsuleShape, m_userData) == 0x18);
-static_assert(offsetof(hkpCapsuleShape, data_1) == 0x20);
+static_assert(offsetof(hkpCapsuleShape, m_radius) == 0x20);
+static_assert(offsetof(hkpCapsuleShape, vertexA) == 0x30);
 
 struct hkpSphereShape
 {
-    uint64_t vtable;
-    uint8_t _0[0x10];
-    void* m_userData;
-    uint8_t data_1[0x18];
+    uint64_t vtable;       // 0x0
+    uint8_t _0[0x10];      // 0x8
+    void* m_userData;      // 0x18
+    float m_radius;        // 0x20 (ghidra: hkpConvexShape::m_radius)
+    uint32_t unk_24;       // 0x24 (padding)
+    uint32_t m_pad[3];     // 0x28 (ghidra: uint32_t[3])
+    uint32_t unk_34;       // 0x34 (padding)
 };
 static_assert(sizeof(hkpSphereShape) == 0x38);
 static_assert(offsetof(hkpSphereShape, m_userData) == 0x18);
-static_assert(offsetof(hkpSphereShape, data_1) == 0x20);
+static_assert(offsetof(hkpSphereShape, m_radius) == 0x20);
+static_assert(offsetof(hkpSphereShape, m_pad) == 0x28);
 
 /* ============================================================
  * Per-frame physics snapshot for rollback

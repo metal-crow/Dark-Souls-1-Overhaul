@@ -18,6 +18,8 @@ void copy_DamageEntry(DamageEntry* to, DamageEntry* from, const hkpWorld* to_wor
 DamageEntry* init_DamageEntry();
 void free_DamageEntry(DamageEntry* to, bool freeself);
 
+void copy_FrpgPhysIns(FrpgPhysIns* to, FrpgPhysIns* from, StateTarget target);
+void copy_FrpgPhysPhantomIns(FrpgPhysPhantomIns* to, FrpgPhysPhantomIns* from, StateTarget target);
 void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePhantomIns** from, bool is_sphere, const hkpWorld* to_world, const hkpWorld* from_world, StateTarget target);
 FrpgPhysShapePhantomIns* init_FrpgPhysShapePhantomIns(bool is_sphere);
 void free_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns* to);

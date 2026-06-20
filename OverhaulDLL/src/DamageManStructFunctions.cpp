@@ -165,8 +165,11 @@ void copy_DamageMan(DamageMan* to, DamageMan* from, const hkpWorld* to_world, co
         copy_DamageEntry(to_DamageEntry, from_DamageEntry, to_world, from_world, target);
     }
 
-    to->data_0 = from->data_0;
-    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+    to->unk_18 = from->unk_18;
+    to->put_out_sparks = from->put_out_sparks;
+    to->damage_from_weapon = from->damage_from_weapon;
+    to->damage_to_occur = from->damage_to_occur;
+    memcpy(to->unk_34, from->unk_34, sizeof(to->unk_34));
 
     Game::ResumeThreads();
 }
@@ -221,7 +224,7 @@ void free_SavedDamageEntryList(std::vector<SavedDamageEntry>* to)
 void copy_DamageEntry(DamageEntry* to, DamageEntry* from, const hkpWorld* to_world, const hkpWorld* from_world, StateTarget target)
 {
     to->id = from->id;
-    to->data_0 = from->data_0;
+    to->unk_4 = from->unk_4;
 
     if (from->FrpgPhysShapePhantomIns_Sphere == NULL || from->FrpgPhysShapePhantomIns_Capsule == NULL)
     {
@@ -237,17 +240,54 @@ void copy_DamageEntry(DamageEntry* to, DamageEntry* from, const hkpWorld* to_wor
     to->PhysShapePhantomIns1_altPtr_A = from->PhysShapePhantomIns1_altPtr_A;
     to->PhysShapePhantomIns1_altPtr_B = from->PhysShapePhantomIns1_altPtr_B;
 
-    memcpy(to->data_2, from->data_2, sizeof(to->data_2));
+    to->attackerHandle = from->attackerHandle;
+    memcpy(to->attackInfo, from->attackInfo, sizeof(to->attackInfo));
+    to->unk_114 = from->unk_114;
     copy_DamageEntryField0x118(&to->field0x118, &from->field0x118, target);
-    memcpy(to->data_4, from->data_4, sizeof(to->data_4));
+    to->life = from->life;
+    to->unk_124 = from->unk_124;
+    memcpy(to->unk_128, from->unk_128, sizeof(to->unk_128));
+    memcpy(to->field0x130, from->field0x130, sizeof(to->field0x130));
+    to->unk_170 = from->unk_170;
+    to->unk_174 = from->unk_174;
+    to->unk_178 = from->unk_178;
+    to->unk_17c = from->unk_17c;
+    to->unk_180 = from->unk_180;
+    to->unk_184 = from->unk_184;
+    to->unk_188 = from->unk_188;
+    to->unk_18c = from->unk_18c;
+    to->unk_190 = from->unk_190;
+    to->unk_194 = from->unk_194;
+    to->unk_196 = from->unk_196;
+    to->unk_198 = from->unk_198;
+    to->unk_19c = from->unk_19c;
+    to->unk_1a0 = from->unk_1a0;
+    to->unk_1a4 = from->unk_1a4;
+    to->unk_1a8 = from->unk_1a8;
+    to->unk_1ac = from->unk_1ac;
+    to->unk_1b0 = from->unk_1b0;
+    to->isSweetSpot = from->isSweetSpot;
+    to->isWeakSpot = from->isWeakSpot;
+    to->unk_1b6 = from->unk_1b6;
+    to->unk_1b8 = from->unk_1b8;
+    to->physical_magnification = from->physical_magnification;
+    to->magic_magnification = from->magic_magnification;
+    to->fire_magnification = from->fire_magnification;
+    to->lightning_magnification = from->lightning_magnification;
+    to->stamina_dmg_magnification = from->stamina_dmg_magnification;
+    to->knockback_percent = from->knockback_percent;
+    to->unk_1d4 = from->unk_1d4;
     to->DmgHitRecordManImp_field0x10Elem = from->DmgHitRecordManImp_field0x10Elem;
     to->physWorld = from->physWorld;
     to->followup_a = from->followup_a;
     to->followup_b = from->followup_b;
     to->followup_c = from->followup_c;
-    memcpy(to->data_6, from->data_6, sizeof(to->data_6));
+    to->num_hits = from->num_hits;
+    to->unk_214 = from->unk_214;
+    memcpy(to->unk_218, from->unk_218, sizeof(to->unk_218));
     to->next = from->next;
-    to->data_7 = from->data_7;
+    to->unk_228 = from->unk_228;
+    to->unk_22c = from->unk_22c;
 }
 
 DamageEntry* init_DamageEntry()
@@ -277,6 +317,29 @@ void free_DamageEntry(DamageEntry* to, bool freeself)
     }
 }
 
+void copy_FrpgPhysIns(FrpgPhysIns* to, FrpgPhysIns* from, StateTarget target)
+{
+    to->vtable = from->vtable;
+    to->data_0 = from->data_0;
+    to->damageEntry = from->damageEntry;
+    to->physWorld = from->physWorld;
+}
+
+void copy_FrpgPhysPhantomIns(FrpgPhysPhantomIns* to, FrpgPhysPhantomIns* from, StateTarget target)
+{
+    copy_FrpgPhysIns(&to->base, &from->base, target);
+
+    if (from->_hkpSimpleShapePhantom == NULL)
+    {
+        FATALERROR("SimpleShapePhantom ptr for %p is NULL", from);
+    }
+    //since the phantoms (and the associated shape) are never destroyed due to the FrpgHavok rollback code, it's safe to just use the raw pointer. it should always be valid
+    to->_hkpSimpleShapePhantom = from->_hkpSimpleShapePhantom;
+
+    to->self = to;
+    to->data_1 = from->data_1;
+}
+
 void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePhantomIns** from, bool is_sphere, const hkpWorld* to_world, const hkpWorld* from_world, StateTarget target)
 {
     if (*to == NULL && *from != NULL)
@@ -289,20 +352,9 @@ void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePha
     }
     if (*to != NULL && *from != NULL)
     {
-        (*to)->data_0 = (*from)->data_0;
-        (*to)->damageEntry = (*from)->damageEntry;
-        (*to)->physWorld = (*from)->physWorld;
-
-        if ((*from)->_hkpSimpleShapePhantom == NULL)
-        {
-            FATALERROR("SimpleShapePhantom ptr for %p is NULL", (*from));
-        }
-        //since the phantoms (and the associated shape) are never destroyed due to the FrpgHavok rollback code, it's safe to just use the raw pointer. it should always be valid
-        (*to)->_hkpSimpleShapePhantom = (*from)->_hkpSimpleShapePhantom;
+        copy_FrpgPhysPhantomIns(&(*to)->base, &(*from)->base, target);
+        //the capsule/sphere shape is never destroyed, so the raw pointer is safe
         (*to)->_shape = (*from)->_shape;
-
-        (*to)->self = (*to);
-        (*to)->data_1 = (*from)->data_1;
     }
 }
 
@@ -310,7 +362,7 @@ FrpgPhysShapePhantomIns* init_FrpgPhysShapePhantomIns(bool is_sphere)
 {
     FrpgPhysShapePhantomIns* local = (FrpgPhysShapePhantomIns*)malloc_(sizeof(FrpgPhysShapePhantomIns));
 
-    local->_hkpSimpleShapePhantom = NULL;
+    local->base._hkpSimpleShapePhantom = NULL;
     local->_shape = NULL;
 
     return local;
@@ -334,7 +386,9 @@ void copy_DamageEntryField0x118(DamageEntryField0x118** to, DamageEntryField0x11
     }
     if (*to != NULL && *from != NULL)
     {
-        memcpy((*to)->data_0, (*from)->data_0, sizeof((*to)->data_0));
+        memcpy((*to)->unk_0, (*from)->unk_0, sizeof((*to)->unk_0));
+        (*to)->PlayerHandle = (*from)->PlayerHandle;
+        memcpy((*to)->unk_14, (*from)->unk_14, sizeof((*to)->unk_14));
     }
 }
 
