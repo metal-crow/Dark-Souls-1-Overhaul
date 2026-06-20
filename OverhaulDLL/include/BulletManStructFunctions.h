@@ -7,9 +7,14 @@
 #include "BulletManStruct.h"
 #include "Rollback.h"
 
+class StateVisitor;
+
 void copy_BulletMan(BulletMan* to, BulletMan* from, StateTarget target);
 BulletMan* init_BulletMan();
 void free_BulletMan(BulletMan* to);
+void serialize_BulletMan(StateVisitor& v, BulletMan* m);
+std::string print_BulletMan(BulletMan* m);
+uint64_t hash_BulletMan(BulletMan* m);
 
 void copy_BulletIns(BulletIns* to, BulletIns* from, StateTarget target);
 BulletIns* init_BulletIns();

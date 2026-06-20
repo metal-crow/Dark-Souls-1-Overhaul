@@ -7,11 +7,16 @@
 #include "FrpgHavokManImpStruct.h"
 #include "Rollback.h"
 
+class StateVisitor;
+
 /* ---------------- hkpWorld ------------------ */
 
 void copy_FrpgHavokManImp(FrpgHavokManImp* to, const FrpgHavokManImp* from, StateTarget target);
 FrpgHavokManImp* init_FrpgHavokManImp();
 void free_FrpgHavokManImp(FrpgHavokManImp* to);
+void serialize_FrpgHavokManImp(StateVisitor& v, FrpgHavokManImp* h);
+std::string print_FrpgHavokManImp(FrpgHavokManImp* h);
+uint64_t hash_FrpgHavokManImp(FrpgHavokManImp* h);
 
 void copy_FrpgPhysWorld(FrpgPhysWorld* to, const FrpgPhysWorld* from, StateTarget target);
 FrpgPhysWorld* init_FrpgPhysWorld();

@@ -1,5 +1,6 @@
 #include "FrpgHavokManImpStructFunctions.h"
 #include "GameData.h"
+#include "StateSerializer.h"
 #include <unordered_set>
 
 void copy_FrpgHavokManImp(FrpgHavokManImp* to, const FrpgHavokManImp* from, StateTarget target)
@@ -432,4 +433,159 @@ void free_hkpCapsuleShape(hkpCapsuleShape* to, StateTarget target)
     {
         free(to);
     }
+}
+
+// ---- serializer (mirrors the HkpWorldSnapshot that copy_FrpgPhysWorld saves) -
+//
+// The rollback state for havok is the HkpWorldSnapshot: per-entity hkpMotion and
+// per-phantom hkMotionState (memcpy'd), plus a copy of each body's shape.
+// Notes on what is/isn't hashed:
+//  - vtables are fixed code addresses (the collect code compares vtable to a
+//    hardcoded constant), so they are identical across instances; skipped as they
+//    carry no per-frame state.
+//  - entity/shape pointers are heap addresses (non-deterministic across
+//    instances) -> ptr_flag only.
+//  - gap/padding bytes are kept as blobs to mirror copy's whole-struct memcpy; if
+//    a havok divergence localizes to one of these, downgrade/drop it.
+//  - CAVEAT: entities/phantoms are serialized in snapshot (world-traversal) order.
+//    If that order ever differs across instances without a physics difference,
+//    sort by a stable id (e.g. hkpEntity::m_uid via s.ptr) before hashing.
+
+static void serialize_hkMotionState(StateVisitor& v, const hkMotionState* m)
+{
+    v.begin("hkMotionState");
+    for (int i = 0; i < 4; i++) v.field("transform_rotation0", m->m_transform_rotation0[i]);
+    for (int i = 0; i < 4; i++) v.field("transform_rotation1", m->m_transform_rotation1[i]);
+    for (int i = 0; i < 4; i++) v.field("transform_rotation2", m->m_transform_rotation2[i]);
+    for (int i = 0; i < 4; i++) v.field("transform_translation", m->m_transform_translation[i]);
+    for (int i = 0; i < 4; i++) v.field("swept_centerOfMass0", m->m_sweptTransform_centerOfMass0[i]);
+    for (int i = 0; i < 4; i++) v.field("swept_centerOfMass1", m->m_sweptTransform_centerOfMass1[i]);
+    for (int i = 0; i < 4; i++) v.field("swept_rotation0", m->m_sweptTransform_rotation0[i]);
+    for (int i = 0; i < 4; i++) v.field("swept_rotation1", m->m_sweptTransform_rotation1[i]);
+    for (int i = 0; i < 4; i++) v.field("swept_centerOfMassLocal", m->m_sweptTransform_centerOfMassLocal[i]);
+    for (int i = 0; i < 4; i++) v.field("m_deltaAngle", m->m_deltaAngle[i]);
+    v.field("m_objectRadius", m->m_objectRadius);
+    v.field("m_linearDamping", m->m_linearDamping);
+    v.field("m_angularDamping", m->m_angularDamping);
+    v.field("m_timeFactor", m->m_timeFactor);
+    v.field("m_maxLinearVelocity", m->m_maxLinearVelocity);
+    v.field("m_maxAngularVelocity", m->m_maxAngularVelocity);
+    v.field("m_deactivationClass", m->m_deactivationClass);
+    v.blob("padding", m->padding, sizeof(m->padding));
+    v.end();
+}
+
+static void serialize_hkpMotion(StateVisitor& v, const hkpMotion* m)
+{
+    v.begin("hkpMotion");
+    // vtable skipped (fixed code addr). memSizeAndFlags/referenceCount are frozen
+    // at save time; kept for now (drop if they prove noisy cross-instance).
+    v.field("m_memSizeAndFlags", m->m_memSizeAndFlags);
+    v.field("m_referenceCount", m->m_referenceCount);
+    v.blob("unk_c", &m->unk_c, sizeof(m->unk_c));
+    v.field("m_type", m->m_type);
+    v.field("m_deactivationIntegrateCounter", m->m_deactivationIntegrateCounter);
+    for (int i = 0; i < 2; i++) v.field("m_deactivationNumInactiveFrames", m->m_deactivationNumInactiveFrames[i]);
+    v.blob("unk_16", m->unk_16, sizeof(m->unk_16));
+    serialize_hkMotionState(v, &m->m_motionState);
+    for (int i = 0; i < 4; i++) v.field("m_inertiaAndMassInv", m->m_inertiaAndMassInv[i]);
+    for (int i = 0; i < 4; i++) v.field("m_linearVelocity", m->m_linearVelocity[i]);
+    for (int i = 0; i < 4; i++) v.field("m_angularVelocity", m->m_angularVelocity[i]);
+    for (int i = 0; i < 8; i++) v.field("m_deactivationRefPosition", m->m_deactivationRefPosition[i]);
+    for (int i = 0; i < 2; i++) v.field("m_deactivationRefOrientation", m->m_deactivationRefOrientation[i]);
+    v.ptr_flag("m_savedMotion", m->m_savedMotion);   // heap ptr
+    v.field("m_savedQualityTypeIndex", m->m_savedQualityTypeIndex);
+    v.field("m_gravityFactor", m->m_gravityFactor);
+    v.blob("unk_134", m->unk_134, sizeof(m->unk_134));
+    v.end();
+}
+
+static void serialize_hkpSphereShape(StateVisitor& v, const hkpSphereShape* s)
+{
+    v.begin("hkpSphereShape");
+    v.ptr_flag("m_userData", s->m_userData);
+    v.field("m_radius", s->m_radius);
+    v.field("unk_24", s->unk_24);
+    for (int i = 0; i < 3; i++) v.field("m_pad", s->m_pad[i]);
+    v.field("unk_34", s->unk_34);
+    v.end();
+}
+
+static void serialize_hkpCapsuleShape(StateVisitor& v, const hkpCapsuleShape* s)
+{
+    v.begin("hkpCapsuleShape");
+    v.ptr_flag("m_userData", s->m_userData);
+    v.field("m_radius", s->m_radius);
+    v.field("unk_24", s->unk_24);
+    v.blob("unk_28", s->unk_28, sizeof(s->unk_28));
+    for (int i = 0; i < 4; i++) v.field("vertexA", s->vertexA[i]);
+    for (int i = 0; i < 4; i++) v.field("vertexB", s->vertexB[i]);
+    v.end();
+}
+
+// shapeData is a union discriminated by the vtable stored at its start (same as
+// copy_hkpShape). Unknown shapes are left zero by copy, so the tag reads 0.
+static void serialize_hkpShapeData(StateVisitor& v, const void* shapeData)
+{
+    uint64_t tag = *(const uint64_t*)shapeData;
+    v.field("shape_vtable_tag", tag);   // fixed code addr; identifies the shape kind
+    switch (tag)
+    {
+    case 0x14141c200: serialize_hkpSphereShape(v, (const hkpSphereShape*)shapeData); break;
+    case 0x14141bf58: serialize_hkpCapsuleShape(v, (const hkpCapsuleShape*)shapeData); break;
+    default: break;   // copy_hkpShape doesn't copy other shapes; nothing to hash
+    }
+}
+
+static void serialize_SavedEntityState(StateVisitor& v, const SavedEntityState* s)
+{
+    v.begin("SavedEntityState");
+    v.ptr_flag("ptr", s->ptr);
+    v.ptr_flag("shapePtr", s->shapePtr);
+    serialize_hkpMotion(v, (const hkpMotion*)s->motionData);
+    serialize_hkpShapeData(v, &s->shapeData);
+    v.end();
+}
+
+static void serialize_SavedPhantomState(StateVisitor& v, const SavedPhantomState* s)
+{
+    v.begin("SavedPhantomState");
+    v.ptr_flag("ptr", s->ptr);
+    v.ptr_flag("shapePtr", s->shapePtr);
+    serialize_hkMotionState(v, (const hkMotionState*)s->motionStateData);
+    serialize_hkpShapeData(v, &s->shapeData);
+    v.end();
+}
+
+void serialize_FrpgHavokManImp(StateVisitor& v, FrpgHavokManImp* h)
+{
+    v.begin("FrpgHavokManImp");
+    HkpWorldSnapshot* snap = h->physWorld->snapshot;
+
+    v.count("entities", snap->entities.size());
+    for (SavedEntityState& s : snap->entities)
+    {
+        serialize_SavedEntityState(v, &s);
+    }
+
+    v.count("phantoms", snap->phantoms.size());
+    for (SavedPhantomState& s : snap->phantoms)
+    {
+        serialize_SavedPhantomState(v, &s);
+    }
+    v.end();
+}
+
+std::string print_FrpgHavokManImp(FrpgHavokManImp* h)
+{
+    StateVisitor v(StateVisitor::Mode::Print);
+    serialize_FrpgHavokManImp(v, h);
+    return v.text();
+}
+
+uint64_t hash_FrpgHavokManImp(FrpgHavokManImp* h)
+{
+    StateVisitor v(StateVisitor::Mode::Hash);
+    serialize_FrpgHavokManImp(v, h);
+    return v.digest();
 }

@@ -1,4 +1,5 @@
 #include "ThrowManStructFunctions.h"
+#include "StateSerializer.h"
 
 static const size_t ThrowRequestQueueCapacity = 5;
 
@@ -114,4 +115,77 @@ ThrowRequestedEntry* init_ThrowRequestedEntry()
 void free_ThrowRequestedEntry(ThrowRequestedEntry* to)
 {
     free(to);
+}
+
+// ---- serializer (mirrors copy_ThrowMan; drives both print_ and hash_) -------
+
+void serialize_ThrowRequestedEntry(StateVisitor& v, ThrowRequestedEntry* e)
+{
+    v.begin("ThrowRequestedEntry");
+    // attacker/defender point into a PlayerIns' throw_animation_info; the raw
+    // pointer varies across instances, so record only null/non-null. Upgrade to
+    // a stable entity id if throw state ever shows persistent cross-instance drift.
+    v.ptr_flag("attacker", e->attacker);
+    v.ptr_flag("defender", e->defender);
+    v.field("throwId", e->throwId);
+    v.field("throwTimeout", e->throwTimeout);
+    v.field("unk_18", e->unk_18);
+    v.field("unk1", e->unk1);
+    v.blob("unk_1a", e->unk_1a, sizeof(e->unk_1a));
+    v.end();
+}
+
+void serialize_ThrowMan(StateVisitor& v, ThrowMan* t)
+{
+    v.begin("ThrowMan");
+
+    // dynamic throw-request queue: length = cur - start (mirrors copy_ThrowMan)
+    size_t len = (size_t)(t->throw_request_queue_cur - t->throw_request_queue_start);
+    v.count("throw_request_queue", len);
+    for (size_t i = 0; i < len; i++)
+    {
+        serialize_ThrowRequestedEntry(v, t->throw_request_queue_start[i]);
+    }
+
+    v.field("unk_80", t->unk_80);
+    v.field("unk_81", t->unk_81);
+    v.blob("unk_82", t->unk_82, sizeof(t->unk_82));
+    v.field("timeoutVal", t->timeoutVal);
+    v.field("throwEscape_remainingTypeToDecayWeighting", t->throwEscape_remainingTypeToDecayWeighting);
+    v.field("throwEscape_IncreaseValueOfGoalWeighting", t->throwEscape_IncreaseValueOfGoalWeighting);
+    v.field("throwEscape_NowIncreaseWeighting", t->throwEscape_NowIncreaseWeighting);
+    v.field("throwEscape_goalWeightLossVals", t->throwEscape_goalWeightLossVals);
+    v.field("throwEscape_curWeightLossVals", t->throwEscape_curWeightLossVals);
+    v.field("attacking_chr", t->attacking_chr);
+    v.field("defending_chr", t->defending_chr);
+    v.field("allDrawing", t->allDrawing);
+    v.blob("unk_c1", t->unk_c1, sizeof(t->unk_c1));
+    v.field("unk_c4", t->unk_c4);
+    v.field("animPlaySpeed", t->animPlaySpeed);
+    v.field("unk_cc", t->unk_cc);
+    v.blob("unk_cd", t->unk_cd, sizeof(t->unk_cd));
+    v.field("unk_d0", t->unk_d0);
+    v.blob("unk_d4", t->unk_d4, sizeof(t->unk_d4));
+    for (int i = 0; i < 8; i++) v.field("vec_e0", t->vec_e0[i]);
+    for (int i = 0; i < 8; i++) v.field("vec_100", t->vec_100[i]);
+    for (int i = 0; i < 2; i++) v.field("unk_120", t->unk_120[i]);
+    v.blob("unk_128", t->unk_128, sizeof(t->unk_128));
+    v.blob("unk_12a", t->unk_12a, sizeof(t->unk_12a));
+    v.field("unk_12c", t->unk_12c);
+
+    v.end();
+}
+
+std::string print_ThrowMan(ThrowMan* t)
+{
+    StateVisitor v(StateVisitor::Mode::Print);
+    serialize_ThrowMan(v, t);
+    return v.text();
+}
+
+uint64_t hash_ThrowMan(ThrowMan* t)
+{
+    StateVisitor v(StateVisitor::Mode::Hash);
+    serialize_ThrowMan(v, t);
+    return v.digest();
 }

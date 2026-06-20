@@ -3,14 +3,20 @@
 #define DAMAGEMANSTRUCTFUNCTIONS_H
 
 #include <stdint.h>
+#include <string>
 #include "DamageManStruct.h"
 #include "Rollback.h"
+
+class StateVisitor;
 
 extern "C" void OnDamageEntryDestruct(void* DamageEntry);
 
 void copy_DamageMan(DamageMan* to, DamageMan* from, const hkpWorld* to_world, const hkpWorld* from_world, StateTarget target);
 DamageMan* init_DamageMan();
 void free_DamageMan(DamageMan* to);
+void serialize_DamageMan(StateVisitor& v, DamageMan* d);
+std::string print_DamageMan(DamageMan* d);
+uint64_t hash_DamageMan(DamageMan* d);
 
 void free_SavedDamageEntryList(std::vector<SavedDamageEntry>* to);
 

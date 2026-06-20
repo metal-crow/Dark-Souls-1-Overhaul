@@ -1,6 +1,7 @@
 #include "DamageManStructFunctions.h"
 #include "PlayerInsStructFunctions.h"
 #include "FrpgHavokManImpStructFunctions.h"
+#include "StateSerializer.h"
 
 /* ============================================================
  * Dynamic object management
@@ -416,4 +417,178 @@ void free_DamageEntryField0x118(DamageEntryField0x118* to, StateTarget target)
     {
         free(to);
     }
+}
+
+// ---- serializer (mirrors copy_DamageMan / copy_DamageEntry) ------------------
+//
+// Pointer handling: in the snapshot, the DamageEntry link/followup pointers and
+// the shape/phantom pointers hold GAME addresses (copy_DamageEntry copies the raw
+// game value), which are non-deterministic across instances and cannot be indexed
+// against the snapshot's own pool -> ptr_flag (null/non-null). The per-entry data
+// (id, attackInfo, life, magnifications, etc.) carries the signal. vtables/data_x
+// "non-pointer" words are at fixed addresses / are plain data -> hashed directly.
+
+static void serialize_FrpgPhysIns(StateVisitor& v, const FrpgPhysIns* p)
+{
+    v.begin("FrpgPhysIns");
+    v.field("vtable", p->vtable);          // fixed code addr (deterministic)
+    v.field("data_0", p->data_0);          // non-pointer data
+    v.ptr_flag("damageEntry", (void*)p->damageEntry);
+    v.ptr_flag("physWorld", p->physWorld);
+    v.end();
+}
+
+static void serialize_FrpgPhysPhantomIns(StateVisitor& v, const FrpgPhysPhantomIns* p)
+{
+    v.begin("FrpgPhysPhantomIns");
+    serialize_FrpgPhysIns(v, &p->base);
+    v.ptr_flag("_hkpSimpleShapePhantom", p->_hkpSimpleShapePhantom);
+    v.ptr_flag("self", p->self);
+    v.field("data_1", p->data_1);
+    v.end();
+}
+
+static void serialize_FrpgPhysShapePhantomIns(StateVisitor& v, const FrpgPhysShapePhantomIns* p)
+{
+    v.begin("FrpgPhysShapePhantomIns");
+    serialize_FrpgPhysPhantomIns(v, &p->base);
+    v.ptr_flag("_shape", p->_shape);
+    v.end();
+}
+
+static void serialize_DamageEntryField0x118(StateVisitor& v, const DamageEntryField0x118* f)
+{
+    v.begin("DamageEntryField0x118");
+    for (int i = 0; i < 4; i++) v.field("unk_0", f->unk_0[i]);
+    v.field("PlayerHandle", f->PlayerHandle);
+    v.blob("unk_14", f->unk_14, sizeof(f->unk_14));
+    v.end();
+}
+
+static void serialize_DamageEntry(StateVisitor& v, const DamageEntry* e)
+{
+    v.begin("DamageEntry");
+    v.field("id", e->id);
+    v.field("unk_4", e->unk_4);
+    serialize_FrpgPhysShapePhantomIns(v, e->FrpgPhysShapePhantomIns_Sphere);
+    serialize_FrpgPhysShapePhantomIns(v, e->FrpgPhysShapePhantomIns_Capsule);
+    v.ptr_flag("PhysShapePhantomIns1", e->PhysShapePhantomIns1);
+    v.ptr_flag("hkpSphereShape1", e->hkpSphereShape1);
+    v.ptr_flag("hkpCapsuleShape1", e->hkpCapsuleShape1);
+    v.ptr_flag("PhysShapePhantomIns1_altPtr_A", e->PhysShapePhantomIns1_altPtr_A);
+    v.ptr_flag("PhysShapePhantomIns1_altPtr_B", e->PhysShapePhantomIns1_altPtr_B);
+    v.field("attackerHandle", e->attackerHandle);
+    v.blob("attackInfo", e->attackInfo, sizeof(e->attackInfo));
+    v.field("unk_114", e->unk_114);
+    if (e->field0x118)
+    {
+        v.field("field0x118_present", true);
+        serialize_DamageEntryField0x118(v, e->field0x118);
+    }
+    else
+    {
+        v.field("field0x118_present", false);
+    }
+    v.field("life", e->life);
+    v.field("unk_124", e->unk_124);
+    v.blob("unk_128", e->unk_128, sizeof(e->unk_128));
+    v.blob("field0x130", e->field0x130, sizeof(e->field0x130));
+    v.field("unk_170", e->unk_170);
+    v.field("unk_174", e->unk_174);
+    v.field("unk_178", e->unk_178);
+    v.field("unk_17c", e->unk_17c);
+    v.field("unk_180", e->unk_180);
+    v.field("unk_184", e->unk_184);
+    v.field("unk_188", e->unk_188);
+    v.field("unk_18c", e->unk_18c);
+    v.field("unk_190", e->unk_190);
+    v.field("unk_194", e->unk_194);
+    v.field("unk_196", e->unk_196);
+    v.field("unk_198", e->unk_198);
+    v.field("unk_19c", e->unk_19c);
+    v.field("unk_1a0", e->unk_1a0);
+    v.field("unk_1a4", e->unk_1a4);
+    v.field("unk_1a8", e->unk_1a8);
+    v.field("unk_1ac", e->unk_1ac);
+    v.field("unk_1b0", e->unk_1b0);
+    v.field("isSweetSpot", e->isSweetSpot);
+    v.field("isWeakSpot", e->isWeakSpot);
+    v.field("unk_1b6", e->unk_1b6);
+    v.field("unk_1b8", e->unk_1b8);
+    v.field("physical_magnification", e->physical_magnification);
+    v.field("magic_magnification", e->magic_magnification);
+    v.field("fire_magnification", e->fire_magnification);
+    v.field("lightning_magnification", e->lightning_magnification);
+    v.field("stamina_dmg_magnification", e->stamina_dmg_magnification);
+    v.field("knockback_percent", e->knockback_percent);
+    v.field("unk_1d4", e->unk_1d4);
+    v.ptr_flag("DmgHitRecordManImp_field0x10Elem", e->DmgHitRecordManImp_field0x10Elem);
+    v.ptr_flag("physWorld", e->physWorld);
+    v.ptr_flag("followup_a", e->followup_a);
+    v.ptr_flag("followup_b", e->followup_b);
+    v.ptr_flag("followup_c", e->followup_c);
+    v.field("num_hits", e->num_hits);
+    v.field("unk_214", e->unk_214);
+    v.blob("unk_218", e->unk_218, sizeof(e->unk_218));
+    v.ptr_flag("next", e->next);
+    v.field("unk_228", e->unk_228);
+    v.field("unk_22c", e->unk_22c);
+    v.end();
+}
+
+static void serialize_SavedDamageEntry(StateVisitor& v, const SavedDamageEntry* e)
+{
+    v.begin("SavedDamageEntry");
+    v.ptr_flag("game_addr", e->game_addr);   // game pool/heap address
+    v.field("is_dynamic", e->is_dynamic);
+    if (e->is_dynamic && e->data)
+    {
+        serialize_DamageEntry(v, e->data);
+    }
+    v.end();
+}
+
+void serialize_DamageMan(StateVisitor& v, DamageMan* d)
+{
+    v.begin("DamageMan");
+
+    // active list as captured at save time (the linked list walked via ->next)
+    v.count("saved_active_damage_entries", d->saved_active_damage_entries.size());
+    for (SavedDamageEntry& e : d->saved_active_damage_entries)
+    {
+        serialize_SavedDamageEntry(v, &e);
+    }
+
+    // all_damage_entries_list_cur is a GAME pool address in the snapshot; can't be
+    // indexed against the snapshot's own pool -> null/non-null only. A real cursor
+    // divergence also shows up as differing pool contents below.
+    v.ptr_flag("all_damage_entries_list_cur", d->all_damage_entries_list_cur);
+
+    v.count("all_damage_entries_list", max_preallocated_DamageEntry);
+    for (size_t i = 0; i < max_preallocated_DamageEntry; i++)
+    {
+        serialize_DamageEntry(v, &d->all_damage_entries_list_start[i]);
+    }
+
+    v.field("unk_18", d->unk_18);
+    v.field("put_out_sparks", d->put_out_sparks);
+    v.field("damage_from_weapon", d->damage_from_weapon);
+    v.field("damage_to_occur", d->damage_to_occur);
+    v.blob("unk_34", d->unk_34, sizeof(d->unk_34));
+
+    v.end();
+}
+
+std::string print_DamageMan(DamageMan* d)
+{
+    StateVisitor v(StateVisitor::Mode::Print);
+    serialize_DamageMan(v, d);
+    return v.text();
+}
+
+uint64_t hash_DamageMan(DamageMan* d)
+{
+    StateVisitor v(StateVisitor::Mode::Hash);
+    serialize_DamageMan(v, d);
+    return v.digest();
 }

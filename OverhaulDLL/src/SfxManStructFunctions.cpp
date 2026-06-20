@@ -1,5 +1,6 @@
 #include "GameData.h"
 #include "SfxManStructFunctions.h"
+#include "StateSerializer.h"
 #include <unordered_map>
 
 /* ============================================================
@@ -502,4 +503,133 @@ void Free_FxBehaviorNode(FxBehaviorNode* to, bool freeself)
     {
         free(to);
     }
+}
+
+// ---- serializer (mirrors copy_SfxMan / Save_SFXEntryList) --------------------
+//
+// Currently NOT wired into the rollback digest (SfxMan is disabled in the active
+// state -- state->sfxman is NULL). Provided so it's ready when SfxMan is restored;
+// re-enable the sfx lines in StateHash.h::digest_of and the copy_SfxMan calls in
+// Rollback.cpp together. Mirrors the saved-entry/node-graph snapshot that
+// copy_FXManager builds. Heap/resource pointers -> ptr_flag.
+
+static void serialize_FxBehaviorNode(StateVisitor& v, const FxBehaviorNode* n)
+{
+    v.begin("FxBehaviorNode");
+    v.blob("unk_0", n->unk_0, sizeof(n->unk_0));
+    v.blob("unk_20", n->unk_20, sizeof(n->unk_20));
+    v.ptr_flag("unk_1", n->unk_1);
+    v.ptr_flag("body", n->body);
+    v.field("flags1", n->flags1);
+    v.field("flags2", n->flags2);
+    v.field("unk_68", n->unk_68);
+    v.field("unk_78", n->unk_78);
+    v.field("unk_7c", n->unk_7c);
+    v.field("parent_node_updated", n->parent_node_updated);
+    v.blob("unk_81", n->unk_81, sizeof(n->unk_81));
+    v.field("unk_84", n->unk_84);
+    v.field("unk_85", n->unk_85);
+    v.blob("unk_86", n->unk_86, sizeof(n->unk_86));
+    v.ptr_flag("parent_node", n->parent_node);
+    v.ptr_flag("next_node", n->next_node);
+    v.ptr_flag("child_node", n->child_node);
+    v.ptr_flag("parent", n->parent);
+    v.ptr_flag("destruction_queue_next", n->destruction_queue_next);
+    v.end();
+}
+
+static void serialize_SavedFxBehaviorNodeGraph(StateVisitor& v, const SavedFxBehaviorNode* g)
+{
+    if (g == NULL) { v.field("node_present", false); return; }
+    v.field("node_present", true);
+    v.begin("SavedFxBehaviorNode");
+    v.ptr_flag("game_addr", g->game_addr);
+    serialize_FxBehaviorNode(v, &g->data);
+    serialize_SavedFxBehaviorNodeGraph(v, g->next_node);
+    serialize_SavedFxBehaviorNodeGraph(v, g->child_node);
+    v.end();
+}
+
+static void serialize_SFXEntry(StateVisitor& v, const SFXEntry* e)
+{
+    v.begin("SFXEntry");
+    // FXEntry base (mirrors copy_SFXEntry: vec/list/behaviour_list skipped)
+    v.ptr_flag("base.vtable", e->base.vtable);
+    v.field("base.unk_8", e->base.unk_8);
+    v.field("base.unk_10", e->base.unk_10);
+    v.field("base.sfxId", e->base.sfxId);
+    v.field("base.unk_18", e->base.unk_18);
+    v.field("base.unk_1c", e->base.unk_1c);
+    v.field("base.unk_20", e->base.unk_20);
+    v.ptr_flag("base.fxParent", e->base.fxParent);
+    v.ptr_flag("base.next", e->base.next);
+    v.blob("base.data_1", e->base.data_1, sizeof(e->base.data_1));
+    v.field("unk_60", e->unk_60);
+    v.field("unk_68", e->unk_68);
+    v.field("unk_6c", e->unk_6c);
+    v.field("unk_70", e->unk_70);
+    v.field("unk_74", e->unk_74);
+    v.field("unk_78", e->unk_78);
+    v.field("unk_7c", e->unk_7c);
+    v.blob("field0x80", e->field0x80, sizeof(e->field0x80));
+    v.blob("field0xb0", e->field0xb0, sizeof(e->field0xb0));
+    v.field("unk_f8", e->unk_f8);
+    v.field("unk_fc", e->unk_fc);
+    v.blob("unk_fd", e->unk_fd, sizeof(e->unk_fd));
+    v.end();
+}
+
+static void serialize_FXManager(StateVisitor& v, const FXManager* m)
+{
+    v.begin("FXManager");
+    v.ptr_flag("vtable", m->vtable);
+    v.ptr_flag("parent", m->parent);
+    v.ptr_flag("heap", (void*)m->heap);
+    // destructlist head/tail + destruction_queue are forced to constants by copy
+    v.field("unk_38", m->unk_38);
+    v.field("unk_3c", m->unk_3c);
+    v.blob("FXDrawEntityHandler_list", m->FXDrawEntityHandler_list, sizeof(m->FXDrawEntityHandler_list));
+    // staging_list holds transient pointers (cleared each frame); blob mirrors copy
+    v.blob("FxBehaviorNode_staging_list", m->FxBehaviorNode_staging_list, sizeof(m->FxBehaviorNode_staging_list));
+    v.blob("unk_88", m->unk_88, sizeof(m->unk_88));
+    v.blob("unk_98", m->unk_98, sizeof(m->unk_98));
+    for (int i = 0; i < 4; i++) v.field("unk_a0", m->unk_a0[i]);
+    v.field("unk_b0", m->unk_b0);
+    v.blob("unk_b1", m->unk_b1, sizeof(m->unk_b1));
+    v.blob("FXSettingOptions", m->FXSettingOptions, sizeof(m->FXSettingOptions));
+    v.blob("unk_17c", m->unk_17c, sizeof(m->unk_17c));
+    v.blob("FXSettingScales", m->FXSettingScales, sizeof(m->FXSettingScales));
+    v.ptr_flag("FrpgFxAdapterBase", m->FrpgFxAdapterBase);
+
+    v.count("saved_entries", m->saved_entries.size());
+    for (const SavedSFXEntry& s : m->saved_entries)
+    {
+        v.begin("SavedSFXEntry");
+        v.ptr_flag("game_addr", s.game_addr);
+        serialize_SFXEntry(v, &s.data);
+        serialize_SavedFxBehaviorNodeGraph(v, s.behaviour_list_head);
+        v.end();
+    }
+    v.end();
+}
+
+void serialize_SfxMan(StateVisitor& v, SfxMan* s)
+{
+    v.begin("SfxMan");
+    serialize_FXManager(v, s->FrpgFxManagerBase->base.fXManager);
+    v.end();
+}
+
+std::string print_SfxMan(SfxMan* s)
+{
+    StateVisitor v(StateVisitor::Mode::Print);
+    serialize_SfxMan(v, s);
+    return v.text();
+}
+
+uint64_t hash_SfxMan(SfxMan* s)
+{
+    StateVisitor v(StateVisitor::Mode::Hash);
+    serialize_SfxMan(v, s);
+    return v.digest();
 }

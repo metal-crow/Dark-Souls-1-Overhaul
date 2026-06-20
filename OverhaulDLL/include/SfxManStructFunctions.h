@@ -8,9 +8,14 @@
 #include "SfxManStruct.h"
 #include "Rollback.h"
 
+class StateVisitor;
+
 void copy_SfxMan(SfxMan* to, SfxMan* from, StateTarget target);
 SfxMan* init_SfxMan();
 void free_SfxMan(SfxMan* to);
+void serialize_SfxMan(StateVisitor& v, SfxMan* s);
+std::string print_SfxMan(SfxMan* s);
+uint64_t hash_SfxMan(SfxMan* s);
 
 void copy_frpgFxManagerBase(frpgFxManagerBase* to, frpgFxManagerBase* from, StateTarget target);
 frpgFxManagerBase* init_frpgFxManagerBase();

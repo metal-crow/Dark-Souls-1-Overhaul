@@ -2,64 +2,10 @@
 #include "Rollback.h"
 #include "AttachSysSlotStructsFunctions.h"
 #include "PadManipulatorStructFunctions.h"
+#include "StateSerializer.h"
 
 typedef void* falloc(uint64_t, uint64_t, uint32_t);
 
-std::string print_PlayerIns(PlayerIns* to)
-{
-    Game::SuspendThreads();
-
-    std::string out = "PlayerIns\n";
-    out += print_ChrIns(&to->chrins);
-    out += print_PlayerGameData(to->playergamedata);
-
-    out += "Unknown data 0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "TimeDelayForRollRecalc:" + std::to_string(to->TimeDelayForRollRecalc) + "\n";
-    out += "unk_7d4:" + std::to_string(to->unk_7d4) + "\n";
-    out += print_RingEquipCtrl(to->ringequipctrl);
-    out += print_WeaponEquipCtrl(to->weaponequipctrl);
-    out += print_ProEquipCtrl(to->proequipctrl);
-    out += "curSelectedMagicId:" + std::to_string(to->curSelectedMagicId) + "\n";
-    out += "curUsedItem:" + std::to_string(to->curUsedItem.amountUsed) + "," + std::to_string(to->curUsedItem.itemId) + "\n";
-    out += "override_equipped_magicId:" + std::to_string(to->override_equipped_magicId) + "\n";
-    out += print_ChrAsm(to->chrasm);
-    out += print_ChrAsmModelRes(to->chrAsmModelRes);
-    out += print_ChrAsmModel(to->chrAsmModel);
-
-    out += "bodySizes head/upper/lower/arm/leg: " + std::to_string(to->headSize) + " " + std::to_string(to->upperBodySize) +
-        " " + std::to_string(to->lowerBodySize) + " " + std::to_string(to->armSize) + " " + std::to_string(to->legSize) + "\n";
-
-    out += "equipSlotToEquipIndexMap: ";
-    for (int i = 0; i < 8; i++) out += std::to_string(to->equipSlotToEquipIndexMap[i]) + " ";
-    out += "\n";
-
-    out += "Unknown data 5:";
-    for (size_t i = 0; i < sizeof(to->data_5); i++)
-    {
-        out += std::to_string(to->data_5[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Unknown data 6:";
-    for (size_t i = 0; i < sizeof(to->data_6); i++)
-    {
-        out += std::to_string(to->data_6[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    Game::ResumeThreads();
-
-    return out;
-}
 
 void copy_PlayerIns(PlayerIns* to, const PlayerIns* from, StateTarget target)
 {
@@ -122,29 +68,6 @@ void free_PlayerIns(PlayerIns* to)
     free(to);
 }
 
-std::string print_ChrAsm(ChrAsm* to)
-{
-    std::string out = "ChrAsm\n";
-    out += "equipped_weapon_style:" + std::to_string(to->equipped_weapon_style) + "\n";
-    out += "l_hand_equipped_index:" + std::to_string(to->l_hand_equipped_index) + "\n";
-    out += "r_hand_equipped_index:" + std::to_string(to->r_hand_equipped_index) + "\n";
-
-    out += "arrow_equipped l/r:" + std::to_string(to->l_arrow_equipped_index) + "," + std::to_string(to->r_arrow_equipped_index) +
-        " bolt_equipped l/r:" + std::to_string(to->l_bolt_equipped_index) + "," + std::to_string(to->r_bolt_equipped_index) + "\n";
-
-    out += "equip_items:";
-    for (size_t i = 0; i < sizeof(to->equip_items)/4; i++)
-    {
-        out += std::to_string(to->equip_items[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "transformProtectorId:" + std::to_string(to->transformProtectorId) +
-        " transformProtectorId_HalfCamo:" + std::to_string(to->transformProtectorId_HalfCamo) + "\n";
-
-    return out;
-}
 
 void copy_ChrAsm(ChrAsm* to, const ChrAsm* from)
 {
@@ -172,18 +95,6 @@ void free_ChrAsm(ChrAsm* to)
     free(to);
 }
 
-std::string print_ChrAsmModelRes(ChrAsmModelRes* to)
-{
-    std::string out = "ChrAsmModelRes\n";
-    out += "magic_state:" + std::to_string(to->magic_state) + "\n";
-
-    for (size_t i = 0; i < 14; i++)
-    {
-        out += print_ChrAsmModelRes_Elem(&to->arry[i]);
-    }
-
-    return out;
-}
 
 void copy_ChrAsmModelRes(ChrAsmModelRes* to, const ChrAsmModelRes* from, StateTarget target)
 {
@@ -217,13 +128,6 @@ void free_ChrAsmModelRes(ChrAsmModelRes* to)
     free(to);
 }
 
-std::string print_ChrAsmModelRes_Elem(ChrAsmModelRes_Elem* to)
-{
-    std::string out = "ChrAsmModelRes_Elem\n";
-    out += "curModelId:" + std::to_string(to->curModelId) + " newModelId:" + std::to_string(to->newModelId) + "\n";
-
-    return out;
-}
 
 void copy_ChrAsmModelRes_Elem(ChrAsmModelRes_Elem* to, const ChrAsmModelRes_Elem* from, StateTarget target)
 {
@@ -247,18 +151,6 @@ void free_ChrAsmModelRes_Elem(ChrAsmModelRes_Elem* to, bool freeself)
     }
 }
 
-std::string print_ChrAsmModel(ChrAsmModel* to)
-{
-    std::string out = "ChrAsmModel\n";
-    out += "unk_10:" + std::to_string(to->unk_10) + "\n";
-    out += "data_3a:" + std::to_string(to->data_3a) + "\n";
-    out += "phantomColor:" + std::to_string(to->phantomColor) + "\n";
-    out += "hairColor: ";
-    for (int i = 0; i < 4; i++) out += std::to_string(to->hairColor[i]) + " ";
-    out += "\n";
-
-    return out;
-}
 
 void copy_ChrAsmModel(ChrAsmModel* to, const ChrAsmModel* from, StateTarget target)
 {
@@ -284,19 +176,6 @@ void free_ChrAsmModel(ChrAsmModel* to)
     free(to);
 }
 
-std::string print_ProEquipCtrl(ProEquipCtrl* to)
-{
-    std::string out = "ProEquipCtrl\n";
-    out += print_SpecialEffect(to->spEffectList);
-    out += "equipped_armors_ids:" +
-        std::to_string(to->equipped_armors_ids[0]) + "," +
-        std::to_string(to->equipped_armors_ids[1]) + "," +
-        std::to_string(to->equipped_armors_ids[2]) + "," +
-        std::to_string(to->equipped_armors_ids[3]) + "," +
-        std::to_string(to->equipped_armors_ids[4]) + "\n";
-
-    return out;
-}
 
 void copy_ProEquipCtrl(ProEquipCtrl* to, const ProEquipCtrl* from, StateTarget target)
 {
@@ -333,16 +212,6 @@ void free_ProEquipCtrl(ProEquipCtrl* to)
     free(to);
 }
 
-std::string print_WeaponEquipCtrl(WeaponEquipCtrl* to)
-{
-    std::string out = "WeaponEquipCtrl\n";
-    out += print_SpecialEffect(to->spEffectList);
-    out += "equipped_weapons_ids:" +
-        std::to_string(to->equipped_weapons_ids[0]) + "," +
-        std::to_string(to->equipped_weapons_ids[1]) + "\n";
-
-    return out;
-}
 
 void copy_WeaponEquipCtrl(WeaponEquipCtrl* to, const WeaponEquipCtrl* from, StateTarget target)
 {
@@ -376,16 +245,6 @@ void free_WeaponEquipCtrl(WeaponEquipCtrl* to)
     free(to);
 }
 
-std::string print_RingEquipCtrl(RingEquipCtrl* to)
-{
-    std::string out = "RingEquipCtrl\n";
-    out += print_SpecialEffect(to->spEffectList);
-    out += "equipped_rings_ids:" +
-        std::to_string(to->equipped_rings_ids[0]) + "," +
-        std::to_string(to->equipped_rings_ids[1]) + "\n";
-
-    return out;
-}
 
 void copy_RingEquipCtrl(RingEquipCtrl* to, const RingEquipCtrl* from, StateTarget target)
 {
@@ -419,16 +278,6 @@ void free_RingEquipCtrl(RingEquipCtrl* to)
     free(to);
 }
 
-std::string print_PlayerGameData(PlayerGameData* to)
-{
-    std::string out = "PlayerGameData\n";
-
-    out += print_PlayerGameData_AttributeInfo(&to->attribs);
-    out += print_EquipGameData(&to->equipGameData);
-    out += print_PlayerGameData_ChrProperties(&to->ChrProperties);
-
-    return out;
-}
 
 void copy_PlayerGameData(PlayerGameData* to, const PlayerGameData* from)
 {
@@ -455,48 +304,12 @@ void free_PlayerGameData(PlayerGameData* to)
     free(to);
 }
 
-std::string print_PlayerGameData_ChrProperties(PlayerGameData_ChrProperties* to)
-{
-    std::string out = "PlayerGameData_ChrProperties\n";
-
-    out += "defPhysicalTotal:" + std::to_string(to->defPhysicalTotal) + " defMagicTotal:" + std::to_string(to->defMagicTotal) + "\n";
-    out += "attackLeftWep1:" + std::to_string(to->attackLeftWep1) + " attackRightWep1:" + std::to_string(to->attackRightWep1) +
-        " attackLeftWep2:" + std::to_string(to->attackLeftWep2) + " attackRightWep2:" + std::to_string(to->attackRightWep2) + "\n";
-    out += "MaxEquipLoad:" + std::to_string(to->MaxEquipLoad) + "\n";
-    out += "defCutTotal:" + std::to_string(to->defCutTotal) + " defBluntTotal:" + std::to_string(to->defBluntTotal) +
-        " defStabTotal:" + std::to_string(to->defStabTotal) + " defFireTotal:" + std::to_string(to->defFireTotal) +
-        " defThunderboltTotal:" + std::to_string(to->defThunderboltTotal) + "\n";
-    out += "resistPoisonTotal:" + std::to_string(to->resistPoisonTotal) + " resistPlagueTotal:" + std::to_string(to->resistPlagueTotal) +
-        " resistBleedingTotal:" + std::to_string(to->resistBleedingTotal) + " resistCurseTotal:" + std::to_string(to->resistCurseTotal) +
-        " defSAToughnessTotal:" + std::to_string(to->defSAToughnessTotal) + "\n";
-    out += "ItemDiscoveryRate:" + std::to_string(to->ItemDiscoveryRate) + "\n";
-
-    return out;
-}
 
 void copy_PlayerGameData_ChrProperties(PlayerGameData_ChrProperties* to, const PlayerGameData_ChrProperties* from)
 {
     memcpy(to, from, sizeof(PlayerGameData_ChrProperties));
 }
 
-std::string print_EquipGameData(EquipGameData* to)
-{
-    std::string out = "EquipGameData\n";
-
-    out += "equippedItemIndexes:";
-    for (size_t i = 0; i < sizeof(to->EquipItemToInventoryIndexMap)/4; i++)
-    {
-        out += std::to_string(to->EquipItemToInventoryIndexMap[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += print_ChrAsm(&to->chrasm);
-    out += print_EquipMagicData(to->equipMagicData);
-    out += print_EquipItemData(&to->equippedItemsInQuickbar);
-
-    return out;
-}
 
 void copy_EquipGameData(EquipGameData* to, const EquipGameData* from)
 {
@@ -528,22 +341,6 @@ void free_EquipGameData(EquipGameData* to, bool freeself)
     }
 }
 
-std::string print_EquipItemData(EquipItemData* to)
-{
-    std::string out = "EquipItemData\n";
-
-    out += "quickbar:";
-    for (size_t i = 0; i < sizeof(to->quickbar) / 4; i++)
-    {
-        out += std::to_string(to->quickbar[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "selectedQuickbarItem:" + std::to_string(to->selectedQuickbarItem) + "\n";
-
-    return out;
-}
 
 void copy_EquipItemData(EquipItemData* to, const EquipItemData* from)
 {
@@ -551,22 +348,6 @@ void copy_EquipItemData(EquipItemData* to, const EquipItemData* from)
     to->selectedQuickbarItem = from->selectedQuickbarItem;
 }
 
-std::string print_EquipMagicData(EquipMagicData* to)
-{
-    std::string out = "EquipMagicData\n";
-
-    out += "equippedMagicList:";
-    for (size_t i = 0; i < sizeof(to->equippedMagicList) / 8; i++)
-    {
-        out += std::to_string(to->equippedMagicList[i].magic_id);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "curSelectedMagicSlot:" + std::to_string(to->curSelectedMagicSlot) + "\n";
-
-    return out;
-}
 
 void copy_EquipMagicData(EquipMagicData* to, const EquipMagicData* from)
 {
@@ -585,92 +366,12 @@ void free_EquipMagicData(EquipMagicData* to)
     free(to);
 }
 
-std::string print_PlayerGameData_AttributeInfo(PlayerGameData_AttributeInfo* to)
-{
-    std::string out = "PlayerGameData_AttributeInfo\n";
-
-    out += "Hp:" + std::to_string(to->Hp) + " MaxHp:" + std::to_string(to->MaxHp) + "\n";
-    out += "Mp:" + std::to_string(to->Mp) + " MaxMp:" + std::to_string(to->MaxMp) + "\n";
-    out += "Sp:" + std::to_string(to->Sp) + " MaxSp:" + std::to_string(to->MaxSp) + "\n";
-    out += "Vitality:" + std::to_string(to->Vitality) + " Attunement:" + std::to_string(to->Attunement) +
-        " Endurance:" + std::to_string(to->Endurance) + " Strength:" + std::to_string(to->Strength) +
-        " Dexterity:" + std::to_string(to->Dexterity) + " Intellect:" + std::to_string(to->Intellect) +
-        " Force:" + std::to_string(to->Force) + " Luck:" + std::to_string(to->Luck) + "\n";
-    out += "Humanity:" + std::to_string(to->Humanity) + " SoulLevel:" + std::to_string(to->SoulLevel) +
-        " soul_count:" + std::to_string(to->soul_count) + "\n";
-    out += "PoisonResist:" + std::to_string(to->PoisonResist) + " BleedResist:" + std::to_string(to->BleedResist) +
-        " ToxicResist:" + std::to_string(to->ToxicResist) + " CurseResist:" + std::to_string(to->CurseResist) + "\n";
-
-    return out;
-}
 
 void copy_PlayerGameData_AttributeInfo(PlayerGameData_AttributeInfo* to, const PlayerGameData_AttributeInfo* from)
 {
     memcpy(to, from, sizeof(PlayerGameData_AttributeInfo));
 }
 
-std::string print_ChrIns(ChrIns* to)
-{
-    std::string out = "ChrIns\n";
-    out += print_PlayerCtrl(to->playerCtrl);
-    out += "CharaInitParamID:" + std::to_string(to->CharaInitParamID) + "\n";
-
-    out += "lowerThrowAnim:" + std::to_string(to->lowerThrowAnim.animationId) + "," + std::to_string(to->lowerThrowAnim.stateIndex) + "\n";
-    out += "upperThrowAnim:" + std::to_string(to->upperThrowAnim.animationId) + "," + std::to_string(to->upperThrowAnim.stateIndex) + "\n";
-
-    out += "player_handing_state:";
-    for (size_t i = 0; i < 3; i++)
-    {
-        out += std::to_string(to->player_handing_state[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "curToughness:" + std::to_string(to->curToughness) + "\n";
-    out += "maxToughness:" + std::to_string(to->maxToughness) + "\n";
-    out += "toughnessUnk1:" + std::to_string(to->toughnessUnk1) + "\n";
-    out += "toughnessRefillTimer:" + std::to_string(to->toughnessRefillTimer) + "\n";
-    out += "toughnessUnk2:" + std::to_string(to->toughnessUnk2) + "\n";
-    out += "curSelectedMagicId:" + std::to_string(to->curSelectedMagicId) + "\n";
-    out += "curUsedItem:" + std::to_string(to->curUsedItem.amountUsed) + "," + std::to_string(to->curUsedItem.itemId) + "\n";
-    out += print_SpecialEffect(to->specialEffects);
-    out += print_QwcSpEffectEquipCtrl(to->qwcSpEffectEquipCtrl);
-
-    out += "entityId:" + std::to_string(to->entityId) + "\n";
-
-    out += print_ChrIns_field0x2c8(to->field0x2c8);
-
-    out += "onlineAreaId:" + std::to_string(to->onlineAreaId) + " areaId:" + std::to_string(to->areaId) +
-        " hitMtrlId:" + std::to_string(to->hitMtrlId) + " defenseMaterialId:" + std::to_string(to->defenseMaterialId) + "\n";
-
-    out += print_HitIns(to->hitins_1);
-    out += print_HitIns(to->hitins_2);
-    out += "unk_380:" + std::to_string(to->unk_380) + "\n";
-    out += print_ChrAttachSys(&to->chrattachsys);
-    out += "curHp:" + std::to_string(to->curHp) + "\n";
-    out += "maxHp:" + std::to_string(to->maxHp) + "\n";
-    out += "curSp:" + std::to_string(to->curSp) + "\n";
-    out += "maxSp:" + std::to_string(to->maxSp) + "\n";
-    out += "damage_taken_scalar:" + std::to_string(to->damage_taken_scalar) + "\n";
-    out += "PoisonResist:" + std::to_string(to->PoisonResist) + "\n";
-    out += "ToxicResist:" + std::to_string(to->ToxicResist) + "\n";
-    out += "BleedResist:" + std::to_string(to->BleedResist) + "\n";
-    out += "CurseResist:" + std::to_string(to->CurseResist) + "\n";
-    out += "resistPoisonTotal:" + std::to_string(to->resistPoisonTotal) + "\n";
-    out += "resistPlagueTotal:" + std::to_string(to->resistPlagueTotal) + "\n";
-    out += "resistBleedingTotal:" + std::to_string(to->resistBleedingTotal) + "\n";
-    out += "resistCurseTotal:" + std::to_string(to->resistCurseTotal) + "\n";
-    out += print_EntityThrowAnimationStatus(to->throw_animation_info);
-
-    out += "frame_delta_amount:" + std::to_string(to->frame_delta_amount) +
-        " frame_delta_amount2:" + std::to_string(to->frame_delta_amount2) + "\n";
-    out += "frame_time_delta:" + std::to_string(to->frame_time_delta) +
-        " timestamp_when_joined_session:" + std::to_string(to->timestamp_when_joined_session) +
-        " MenuLockout:" + std::to_string(to->MenuLockout) + "\n";
-    out += "chrReset_flag:" + std::to_string(to->chrReset_flag) + "\n";
-
-    return out;
-}
 
 void copy_ChrIns(ChrIns* to, const ChrIns* from, StateTarget target)
 {
@@ -759,20 +460,6 @@ void free_ChrIns(ChrIns* to, bool freeself)
     }
 }
 
-std::string print_ChrAttachSys(ChrAttachSys* to)
-{
-    std::string out = "ChrAttachSys\n";
-    if (to->SysSlots != NULL)
-    {
-        //print_AttachSysSlot was removed; just record presence for now
-        out += "SysSlots: set\n";
-    }
-    else
-    {
-        out += "SysSlots: NULL\n";
-    }
-    return out;
-}
 
 void copy_ChrAttachSys(ChrAttachSys* to, const ChrAttachSys* from, StateTarget target)
 {
@@ -813,15 +500,6 @@ void free_ChrAttachSys(ChrAttachSys* to, bool freeself)
     }
 }
 
-std::string print_ChrIns_field0x18(ChrIns_field0x18* to)
-{
-    std::string out = "ChrIns_field0x18\n";
-    out += "throw_animId:" + std::to_string(to->throw_animId) + " animId:" + std::to_string(to->animId) +
-        " IsEnableAnimLoop:" + std::to_string(to->IsEnableAnimLoop) + "\n";
-
-    return out;
-}
-
 void copy_ChrIns_field0x18(ChrIns_field0x18* to, const ChrIns_field0x18* from)
 {
     memcpy(to, from, sizeof(ChrIns_field0x18));
@@ -838,17 +516,6 @@ void free_ChrIns_field0x18(ChrIns_field0x18* to)
     free(to);
 }
 
-std::string print_ChrIns_field0x2c8(ChrIns_field0x2c8* to)
-{
-    std::string out = "ChrIns_field0x2c8\n";
-
-    out += "unk_10:" + std::to_string(to->unk_10) + " unk_14:" + std::to_string(to->unk_14) + "\n";
-    out += "unk_28:" + std::to_string(to->unk_28) + "\n";
-    out += "unk_40:" + std::to_string(to->unk_40) + "\n";
-    out += "unk_50:" + std::to_string(to->unk_50) + "\n";
-
-    return out;
-}
 
 void copy_ChrIns_field0x2c8(ChrIns_field0x2c8* to, const ChrIns_field0x2c8* from)
 {
@@ -870,33 +537,6 @@ void free_ChrIns_field0x2c8(ChrIns_field0x2c8* to)
     free(to);
 }
 
-std::string print_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to)
-{
-    std::string out = "EntityThrowAnimationStatus\n";
-
-    out += "throwState:" + std::to_string(to->throwState) + " ThrowEscHp:" + std::to_string(to->ThrowEscHp) +
-        " ThrowPairHandle:" + std::to_string(to->ThrowPairHandle) + "\n";
-    out += "Desire_Weight_of_ResistanceAnim:" + std::to_string(to->Desire_Weight_of_ResistanceAnim) +
-        " Current_Weight_of_ResistanceAnim:" + std::to_string(to->Current_Weight_of_ResistanceAnim) + "\n";
-    out += "starting_position_self: ";
-    for (int i = 0; i < 4; i++) out += std::to_string(to->starting_position_self[i]) + " ";
-    out += "\n";
-    out += "starting_position_other: ";
-    for (int i = 0; i < 4; i++) out += std::to_string(to->starting_position_other[i]) + " ";
-    out += "\n";
-    out += "throwMask:" + std::to_string(to->throwMask) + "\n";
-
-    if (to->throwSelfEsc != NULL)
-    {
-        out += print_ThrowSelfEsc(to->throwSelfEsc);
-    }
-    else
-    {
-        out += "throwSelfEsc: NULL\n";
-    }
-
-    return out;
-}
 
 void copy_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to, const EntityThrowAnimationStatus* from, StateTarget target)
 {
@@ -954,17 +594,6 @@ void free_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to)
     free(to);
 }
 
-std::string print_ThrowSelfEsc(ThrowSelfEsc* to)
-{
-    std::string out = "ThrowSelfEsc\n";
-
-    out += "m_cycleTime:" + std::to_string(to->m_cycleTime) + " m_cycleRemainTime:" + std::to_string(to->m_cycleRemainTime) + "\n";
-    out += "m_cycleInputCounterMax:" + std::to_string(to->m_cycleInputCounterMax) + " self_esc_dmg:" + std::to_string(to->self_esc_dmg) + "\n";
-    out += "m_thresholdStickMaxDist:" + std::to_string(to->m_thresholdStickMaxDist) + " m_thresholdStickMinDist:" + std::to_string(to->m_thresholdStickMinDist) + "\n";
-    out += "m_currentDeclineRemainTime:" + std::to_string(to->m_currentDeclineRemainTime) + "\n";
-
-    return out;
-}
 
 void copy_ThrowSelfEsc(ThrowSelfEsc* to, const ThrowSelfEsc* from)
 {
@@ -982,22 +611,6 @@ void free_ThrowSelfEsc(ThrowSelfEsc* to)
     free(to);
 }
 
-std::string print_QwcSpEffectEquipCtrl(QwcSpEffectEquipCtrl* to)
-{
-    std::string out = "QwcSpEffectEquipCtrl\n";
-
-    out += "Array: ";
-    for (size_t i = 0; i < to->arry_len; i++)
-    {
-        out += std::to_string(to->arry[i]) + " ";
-    }
-    out += "\n";
-
-    out += "unk_24:" + std::to_string(to->unk_24) + " unk_28:" + std::to_string(to->unk_28) +
-        " unk_2c:" + std::to_string(to->unk_2c) + "\n";
-
-    return out;
-}
 
 void copy_QwcSpEffectEquipCtrl(QwcSpEffectEquipCtrl* to, const QwcSpEffectEquipCtrl* from)
 {
@@ -1033,18 +646,6 @@ void free_QwcSpEffectEquipCtrl(QwcSpEffectEquipCtrl* to)
     free(to);
 }
 
-std::string print_SpecialEffect(SpecialEffect* to)
-{
-    std::string out = "SpecialEffect\n";
-
-    out += print_SpecialEffect_Info(to->specialEffect_Info);
-
-    out += "speffectIsBeingRun:" + std::to_string(to->speffectIsBeingRun) + " unk_14:" + std::to_string(to->unk_14) + "\n";
-    out += "flags:" + std::to_string(to->flags) + "\n";
-    out += "debugActivateSpEffect:" + std::to_string(to->debugActivateSpEffect) + "\n";
-
-    return out;
-}
 
 void copy_SpecialEffect(SpecialEffect* to, const SpecialEffect* from, StateTarget target)
 {
@@ -1076,41 +677,7 @@ void free_SpecialEffect(SpecialEffect* to)
 
 static const size_t max_preallocated_SpecialEffect_Info = 64;
 
-std::string print_SpecialEffect_Info(SpecialEffect_Info* to)
-{
-    std::string out = "SpecialEffect_Info\n";
 
-    out += "Life: " + std::to_string(to->data_0_struct.life) + "\n";
-    out += "intervalLength: " + std::to_string(to->data_0_struct.intervalLength) + "\n";
-    out += "intervalCountdownTimer: " + std::to_string(to->data_0_struct.intervalCountdownTimer) + "\n";
-    out += "unk0: " + std::to_string(to->data_0_struct.unk0) + "\n";
-    out += "unk1: " + std::to_string(to->data_0_struct.unk1) + "\n";
-    out += "unk2: " + std::to_string(to->data_0_struct.unk2) + "\n";
-    out += "unk3: " + std::to_string(to->data_0_struct.unk3) + "\n";
-    out += "unk4: " + std::to_string(to->data_0_struct.unk4) + "\n";
-    out += "unk5: " + std::to_string(to->data_0_struct.unk5) + "\n";
-    out += "unk6: " + std::to_string(to->data_0_struct.unk6) + "\n";
-    out += "unk7: " + std::to_string(to->data_0_struct.unk7) + "\n";
-    out += "unk8: " + std::to_string(to->data_0_struct.unk8) + "\n";
-    out += "unk9: " + std::to_string(to->data_0_struct.unk9) + "\n";
-    out += "unk10: " + std::to_string(to->data_0_struct.unk10) + "\n";
-    out += "target: " + std::to_string(to->data_0_struct.target) + "\n";
-    out += "attacker: " + std::to_string(to->data_0_struct.attacker) + "\n";
-    out += "unk11: " + std::to_string(to->data_0_struct.unk11) + "\n";
-    out += "isDead: " + std::to_string(to->data_0_struct.isDead) + "\n";
-    out += "unk12: " + std::to_string(to->data_0_struct.unk12) + "\n";
-    out += "unk13: " + std::to_string(to->data_0_struct.unk13) + "\n";
-    out += "unk14: " + std::to_string(to->data_0_struct.unk14) + "\n";
-    out += "speffect_id: " + std::to_string(to->data_0_struct.speffect_id) + "\n";
-    out += "unk15: " + std::to_string(to->data_0_struct.unk15) + "\n";
-
-    if (to->next != NULL)
-    {
-        out += print_SpecialEffect_Info(to->next);
-    }
-
-    return out;
-}
 
 void copy_SpecialEffect_Info(SpecialEffect_Info* to, const SpecialEffect_Info* from, StateTarget target)
 {
@@ -1194,21 +761,6 @@ void free_SpecialEffect_Info(SpecialEffect_Info* to)
     free(to);
 }
 
-std::string print_PlayerCtrl(PlayerCtrl* to)
-{
-    std::string out = "PlayerCtrl\n";
-
-    out += print_ChrCtrl(&to->chrCtrl);
-
-    out += print_TurnAnim(to->turnAnim);
-    out += print_ArrowTurnAnim(to->arrowTurnAnim);
-
-    out += "movement_related_flags:" + std::to_string(to->movement_related_flags) +
-        " recordCtrl_fileNum:" + std::to_string(to->recordCtrl_fileNum) +
-        " feetIK:" + std::to_string(to->feetIK) + "\n";
-
-    return out;
-}
 
 void copy_PlayerCtrl(PlayerCtrl* to, const PlayerCtrl* from, StateTarget target)
 {
@@ -1242,16 +794,6 @@ void free_PlayerCtrl(PlayerCtrl* to)
     free(to);
 }
 
-std::string print_ArrowTurnAnim(ArrowTurnAnim* to)
-{
-    std::string out = "ArrowTurnAnim\n";
-
-    out += print_TurnAnim(&to->turnAnim);
-    out += print_SpinJoint(to->joint_spine_2);
-    out += print_SpinJoint(to->joint_spine1_2);
-
-    return out;
-}
 
 void copy_ArrowTurnAnim(ArrowTurnAnim* to, const ArrowTurnAnim* from)
 {
@@ -1283,17 +825,6 @@ void free_ArrowTurnAnim(ArrowTurnAnim* to)
     free(to);
 }
 
-std::string print_SpinJoint(SpinJoint* to)
-{
-    std::string out = "SpinJoint\n";
-
-    out += "spin_bone_index:" + std::to_string(to->spin_bone_index) +
-        " axis_bone_index:" + std::to_string(to->axis_bone_index) +
-        " gain:" + std::to_string(to->gain) +
-        " disableUpdate:" + std::to_string(to->disableUpdate) + "\n";
-
-    return out;
-}
 
 void copy_SpinJoint(SpinJoint* to, const SpinJoint* from)
 {
@@ -1313,24 +844,6 @@ void free_SpinJoint(SpinJoint* to)
     free(to);
 }
 
-std::string print_TurnAnim(TurnAnim* to)
-{
-    std::string out = "TurnAnim\n";
-
-    out += "turnL/R:" + std::to_string(to->turnL) + "," + std::to_string(to->turnR) +
-        " rotation_speed:" + std::to_string(to->rotation_speed) + "\n";
-
-    out += print_SpinJoint(to->joint_UpperRoot);
-    out += print_SpinJoint(to->joint_LowerRoot);
-    out += print_SpinJoint(to->joint_spine1_1);
-    out += print_SpinJoint(to->joint_spine_1);
-    out += print_SpinJoint(to->joint_master);
-
-    out += "playerRotation:" + std::to_string(to->playerRotation) +
-        " master_rotation_gain:" + std::to_string(to->master_rotation_gain) + "\n";
-
-    return out;
-}
 
 void copy_TurnAnim(TurnAnim* to, const TurnAnim* from)
 {
@@ -1372,26 +885,6 @@ void free_TurnAnim(TurnAnim* to, bool freeself)
     }
 }
 
-std::string print_ChrCtrl(ChrCtrl* to)
-{
-    std::string out = "ChrCtrl\n";
-
-    out += print_ChrCtrl_AnimationQueue(to->animationQueue);
-    out += print_AnimationMediator(to->animationMediator);
-    out += print_HavokChara(to->havokChara);
-    out += print_ActionCtrl(to->actionctrl);
-
-    out += "enable:" + std::to_string(to->enable) + " CompletelyNoMove:" + std::to_string(to->CompletelyNoMove) +
-        " WarpActivate:" + std::to_string(to->WarpActivate) + "\n";
-
-    out += print_WalkAnim_Twist(to->walkAnim_Twist);
-
-    out += "movement_enabled:" + std::to_string(to->movement_enabled) + " MoveType:" + std::to_string(to->MoveType) + "\n";
-    out += "knockback_speed:" + std::to_string(to->knockback_speed) + " knockback_time:" + std::to_string(to->knockback_time) +
-        " dmgLv_max:" + std::to_string(to->dmgLv_max) + " guardLv_max:" + std::to_string(to->guardLv_max) + "\n";
-
-    return out;
-}
 
 void copy_ChrCtrl(ChrCtrl* to, const ChrCtrl* from, StateTarget target)
 {
@@ -1434,27 +927,6 @@ void free_ChrCtrl(ChrCtrl* to, bool freeself)
     }
 }
 
-std::string print_WalkAnim_Twist(WalkAnim_Twist* to)
-{
-    std::string out = "WalkAnim_Twist\n";
-
-    out += "walkF/B/L/R:" + std::to_string(to->walkF) + "," + std::to_string(to->walkB) + "," +
-        std::to_string(to->walkL) + "," + std::to_string(to->walkR) + "\n";
-    out += "dashF/B/L/R:" + std::to_string(to->dashF) + "," + std::to_string(to->dashB) + "," +
-        std::to_string(to->dashL) + "," + std::to_string(to->dashR) + "\n";
-    out += "stayAnimId:" + std::to_string(to->stayAnimId) + " superDashAnimId:" + std::to_string(to->superDashAnimId) + "\n";
-
-    out += print_SpinJoint(to->Upper_Root_Joint);
-    out += print_SpinJoint(to->master_joint);
-    out += print_SpinJoint(to->neck_joint);
-
-    out += "turn_gain:" + std::to_string(to->turn_gain) + " dash_threshold:" + std::to_string(to->dash_threshold) +
-        " max_equip_load:" + std::to_string(to->max_equip_load) + "\n";
-
-    out += print_WalkAnim_Twist_Field0x228Elem(&to->walkAnim_Twist_Field0x228Elem);
-
-    return out;
-}
 
 void copy_WalkAnim_Twist(WalkAnim_Twist* to, const WalkAnim_Twist* from, StateTarget target)
 {
@@ -1493,20 +965,6 @@ void free_WalkAnim_Twist(WalkAnim_Twist* to)
     free(to);
 }
 
-std::string print_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* to)
-{
-    std::string out = "WalkAnim_Twist_Field0x228Elem\n";
-
-    for (size_t i = 0; i < to->field0x10_len; i++)
-    {
-        if (to->field0x10[i] != NULL)
-        {
-            out += print_WalkAnim_Twist_Field0x228Elem_field0x10elem(to->field0x10[i]);
-        }
-    }
-
-    return out;
-}
 
 void copy_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* to, const WalkAnim_Twist_Field0x228Elem* from, StateTarget target)
 {
@@ -1589,15 +1047,6 @@ void free_WalkAnim_Twist_Field0x228Elem(WalkAnim_Twist_Field0x228Elem* to, bool 
     }
 }
 
-std::string print_WalkAnim_Twist_Field0x228Elem_field0x10elem(WalkAnim_Twist_Field0x228Elem_field0x10elem* to)
-{
-    std::string out = "WalkAnim_Twist_Field0x228Elem_field0x10elem\n";
-
-    out += "unk_0:" + std::to_string(to->unk_0) + " unk_4:" + std::to_string(to->unk_4) +
-        " unk_8:" + std::to_string(to->unk_8) + " unk_c:" + std::to_string(to->unk_c) + "\n";
-
-    return out;
-}
 
 void copy_WalkAnim_Twist_Field0x228Elem_field0x10elem(WalkAnim_Twist_Field0x228Elem_field0x10elem* to, const WalkAnim_Twist_Field0x228Elem_field0x10elem* from)
 {
@@ -1607,22 +1056,6 @@ void copy_WalkAnim_Twist_Field0x228Elem_field0x10elem(WalkAnim_Twist_Field0x228E
     to->unk_c = from->unk_c;
 }
 
-std::string print_ActionCtrl(ActionCtrl* to)
-{
-    std::string out = "ActionCtrl\n";
-
-    out += print_ActionCtrl_0x30Substruct(&to->passive_state);
-    out += print_ActionCtrl_0x30Substruct(&to->active_state);
-
-    out += "ezStatePassiveState:" + std::to_string(to->ezStatePassiveState) +
-        " ezStateActiveState:" + std::to_string(to->ezStateActiveState) + "\n";
-    out += "recievedDamageType:" + std::to_string(to->recievedDamageType) +
-        " dmgLv_cur:" + std::to_string(to->dmgLv_cur) + " guardLv_cur:" + std::to_string(to->guardLv_cur) + "\n";
-    out += "actionType:" + std::to_string(to->actionType) + " actionNumber:" + std::to_string(to->actionNumber) +
-        " ezState:" + std::to_string(to->ezState) + "\n";
-
-    return out;
-}
 
 void copy_ActionCtrl(ActionCtrl* to, const ActionCtrl* from, StateTarget target)
 {
@@ -1651,17 +1084,6 @@ void free_ActionCtrl(ActionCtrl* to)
     free(to);
 }
 
-std::string print_ActionCtrl_0x30Substruct(ActionCtrl_0x30Substruct* to)
-{
-    std::string out = "ActionCtrl_0x30Substruct\n";
-
-    out += print_EzState_detail_EzStateMachineImpl(to->EzStateMachineImpl);
-
-    out += "actionIsValid:" + std::to_string(to->actionIsValid) + " animType:" + std::to_string(to->animType) +
-        " count:" + std::to_string(to->count) + "\n";
-
-    return out;
-}
 
 void copy_ActionCtrl_0x30Substruct(ActionCtrl_0x30Substruct* to, const ActionCtrl_0x30Substruct* from, StateTarget target)
 {
@@ -1669,39 +1091,6 @@ void copy_ActionCtrl_0x30Substruct(ActionCtrl_0x30Substruct* to, const ActionCtr
     memcpy(&to->actionIsValid, &from->actionIsValid, 0x18);
 }
 
-std::string print_EzState_detail_EzStateMachineImpl(EzState_detail_EzStateMachineImpl* to)
-{
-    std::string out = "EzState_detail_EzStateMachineImpl\n";
-
-    out += "Unknown data_0:";
-    for (size_t i = 0; i < sizeof(to->data_0); i++)
-    {
-        out += std::to_string(to->data_0[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += print_EzStateRegisterSet(&to->EzStateRegisterSet1);
-    out += print_EzStateRegisterSet(&to->EzStateRegisterSet2);
-
-    out += "Unknown data_1:";
-    for (size_t i = 0; i < sizeof(to->data_1); i++)
-    {
-        out += std::to_string(to->data_1[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Unknown data_2:";
-    for (size_t i = 0; i < sizeof(to->data_2); i++)
-    {
-        out += std::to_string(to->data_2[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    return out;
-}
 
 void copy_EzState_detail_EzStateMachineImpl(EzState_detail_EzStateMachineImpl* to, const EzState_detail_EzStateMachineImpl* from, StateTarget target)
 {
@@ -1747,22 +1136,6 @@ void free_EzState_detail_EzStateMachineImpl(EzState_detail_EzStateMachineImpl* t
     free(to);
 }
 
-std::string print_EzStateRegisterSet(EzStateRegisterSet* to)
-{
-    std::string out = "EzStateRegisterSet\n";
-
-    for (size_t i = 0; i < 8; i++)
-    {
-        for (size_t j = 0; j < sizeof(to->arry[i].data_0); j++)
-        {
-            out += std::to_string(to->arry[i].data_0[j]) + " ";
-        }
-        out += ";";
-    }
-    out += "\n";
-
-    return out;
-}
 
 void copy_EzStateRegisterSet(EzStateRegisterSet* to, const EzStateRegisterSet* from, StateTarget target)
 {
@@ -1805,32 +1178,6 @@ void free_EzStateRegisterSet(EzStateRegisterSet* to, bool freeself)
     }
 }
 
-std::string print_HavokChara(HavokChara* to)
-{
-    std::string out = "HavokChara\n";
-
-    out += "current_coords: ";
-    for (int i = 0; i < 4; i++) out += std::to_string(to->current_coords[i]) + " ";
-    out += "\n";
-    out += "isLanded:" + std::to_string(to->isLanded) + " is_sliding:" + std::to_string(to->is_sliding) + "\n";
-    out += "movement_delta: ";
-    for (int i = 0; i < 4; i++) out += std::to_string(to->movement_delta[i]) + " ";
-    out += "\n";
-    out += "fall_height:" + std::to_string(to->fall_height) +
-        " attach_height:" + std::to_string(to->attach_height) +
-        " attach_height_no_slope_material:" + std::to_string(to->attach_height_no_slope_material) + "\n";
-    out += "last_ground_coords: ";
-    for (int i = 0; i < 4; i++) out += std::to_string(to->last_ground_coords[i]) + " ";
-    out += "\n";
-    out += "slopeInfo: ";
-    for (int i = 0; i < 4; i++) out += std::to_string(to->slopeInfo[i]) + " ";
-    out += "\n";
-    out += "hitMtrlType:" + std::to_string(to->hitMtrlType) + "\n";
-    out += "unable_to_fall:" + std::to_string(to->unable_to_fall) +
-        " no_integrate:" + std::to_string(to->no_integrate) + "\n";
-
-    return out;
-}
 
 void copy_HavokChara(HavokChara* to, const HavokChara* from, StateTarget target)
 {
@@ -1892,22 +1239,6 @@ void free_hkpCharacterProxy(hkpCharacterProxy* to)
     free(to);
 }
 
-std::string print_HitIns(HitIns* to)
-{
-    if (to == NULL)
-    {
-        return "HitIns: NULL\n";
-    }
-
-    std::string out = "HitIns\n";
-
-    out += "areaId:" + std::to_string(to->areaId) + "\n";
-    out += "BackReadState:" + std::to_string(to->BackReadState) +
-        " TargetBackreadState:" + std::to_string(to->TargetBackreadState) + "\n";
-    out += "IsDispHitRigid:" + std::to_string(to->IsDispHitRigid) + "\n";
-
-    return out;
-}
 
 void copy_HitIns(HitIns* to, const HitIns* from)
 {
@@ -1944,20 +1275,6 @@ void free_HitIns(HitIns* to)
     free(to);
 }
 
-std::string print_AnimationMediator(AnimationMediator* to)
-{
-    std::string out = "hkpSimpleShapePhantom_field0x30\n";
-
-    for (int i = 0; i < 31; i++)
-    {
-        out += print_AnimationMediatorStateEntry(&to->states_list[i]);
-    }
-    out += print_AnimationQueue(to->animationQueue);
-
-    out += "unk_1468[0]:" + std::to_string(to->unk_1468[0]) + "\n";
-
-    return out;
-}
 
 void copy_AnimationMediator(AnimationMediator* to, const AnimationMediator* from)
 {
@@ -1995,16 +1312,6 @@ void free_AnimationMediator(AnimationMediator* to)
     free(to);
 }
 
-std::string print_AnimationMediatorStateEntry(AnimationMediatorStateEntry* to)
-{
-    std::string out = "AnimationMediatorStateEntry\n";
-
-    out += "animationId:" + std::to_string(to->animationId) +
-        " blend slots:" + std::to_string(to->animationId_blend_slot0) + "," + std::to_string(to->animationId_blend_slot1) + "," + std::to_string(to->animationId_blend_slot2) +
-        " blend_ratio:" + std::to_string(to->blend_ratio) + " stateIndex2:" + std::to_string(to->stateIndex2) + "\n";
-
-    return out;
-}
 
 void copy_AnimationMediatorStateEntry(AnimationMediatorStateEntry* to, const AnimationMediatorStateEntry* from)
 {
@@ -2026,39 +1333,6 @@ void free_AnimationMediatorStateEntry(AnimationMediatorStateEntry* to, bool free
     }
 }
 
-std::string print_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to)
-{
-    std::string out = "ChrCtrl_AnimationQueue\n";
-
-    out += "array_length: " + std::to_string(to->array_length) + "\n";
-    out += "unk_4: " + std::to_string(to->unk_4) + "\n";
-
-    for (size_t i = 0; i < to->array_length; i++)
-    {
-        out += print_ChrCtrl_AnimationQueueEntry(&to->arry[i]);
-    }
-    out += print_ChrCtrl_AnimationQueue_field0x10(to->field0x10);
-    out += print_hkaAnimatedSkeleton(to->HkaAnimatedSkeleton);
-    out += print_ChrCtrl_AnimationQueue_field0x20(to->field0x20);
-
-    out += "genderSpecificAnimationOffset:" + std::to_string(to->genderSpecificAnimationOffset) +
-        " unk_64:" + std::to_string(to->unk_64) + " unk_68:" + std::to_string(to->unk_68) +
-        " addToAnimId:" + std::to_string(to->addToAnimId) + "\n";
-
-    out += "unk_70:" + std::to_string(to->unk_70) + " unk_74:" + std::to_string(to->unk_74) +
-        " unk_78:" + std::to_string(to->unk_78) + " unk_7c:" + std::to_string(to->unk_7c) + "\n";
-
-    out += "unk_88: " + std::to_string(to->unk_88) + "\n";
-
-    out += "unk_a8:" + std::to_string(to->unk_a8) + " unk_ac:" + std::to_string(to->unk_ac) +
-        " unk_ad:" + std::to_string(to->unk_ad) + " unk_c0:" + std::to_string(to->unk_c0) +
-        " unk_c1:" + std::to_string(to->unk_c1) + "\n";
-
-    out += "unk_d8:" + std::to_string(to->unk_d8) + " unk_dc:" + std::to_string(to->unk_dc) +
-        " unk_e0:" + std::to_string(to->unk_e0) + "\n";
-
-    return out;
-}
 
 void copy_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to, const ChrCtrl_AnimationQueue* from, StateTarget target)
 {
@@ -2117,45 +1391,6 @@ void free_ChrCtrl_AnimationQueue(ChrCtrl_AnimationQueue* to)
     free(to);
 }
 
-std::string print_ChrCtrl_AnimationQueue_field0x20(ChrCtrl_AnimationQueue_field0x20* to)
-{
-    std::string out = "ChrCtrl_AnimationQueue_field0x20\n";
-
-    out += "Unknown field0x8:";
-    for (size_t i = 0; i < (0x30 * 64) / 4; i++)
-    {
-        out += std::to_string( (int)( (((float*)to->field0x8)[i]) * 100) / 100.0f);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "field0x8_len:" + std::to_string(to->field0x8_len) + " field0x8_len2:" + std::to_string(to->field0x8_len2) + "\n";
-
-    out += "Unknown field0x18:";
-    for (size_t i = 0; i < (0x30 * 64) / 4; i++)
-    {
-        out += std::to_string( (int)( (((float*)to->field0x18)[i]) * 100) / 100.0f);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "field0x18_len:" + std::to_string(to->field0x18_len) + " field0x18_len2:" + std::to_string(to->field0x18_len2) + "\n";
-
-    out += "Unknown field0x28:";
-    for (size_t i = 0; i < 64; i++)
-    {
-        out += std::to_string(to->field0x28[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "field0x28_len:" + std::to_string(to->field0x28_len) + " field0x28_len2:" + std::to_string(to->field0x28_len2) +
-        " unk_38:" + std::to_string(to->unk_38) + "\n";
-
-    out += "unk_48:" + std::to_string(to->unk_48) + " unk_4c:" + std::to_string(to->unk_4c) + "\n";
-
-    return out;
-}
 
 void copy_ChrCtrl_AnimationQueue_field0x20(ChrCtrl_AnimationQueue_field0x20* to, const ChrCtrl_AnimationQueue_field0x20* from, StateTarget target)
 {
@@ -2195,20 +1430,6 @@ void free_ChrCtrl_AnimationQueue_field0x20(ChrCtrl_AnimationQueue_field0x20* to)
     free(to->field0x28);
 
     free(to);
-}
-
-std::string print_hkaAnimatedSkeleton(hkaAnimatedSkeleton* to)
-{
-    std::string out = "hkaAnimatedSkeleton\n";
-
-    out += "animCtrl_list_len:" + std::to_string(to->animCtrl_list_len) + "\n";
-    for (uint32_t i = 0; i < to->animCtrl_list_len; i++)
-    {
-        out += print_hkaDefaultAnimationControl(to->animCtrl_list[i]);
-    }
-    out += "data_1:" + std::to_string(to->data_1) + "\n";
-
-    return out;
 }
 
 void copy_hkaAnimatedSkeleton(hkaAnimatedSkeleton* to, const hkaAnimatedSkeleton* from)
@@ -2253,18 +1474,6 @@ void free_hkaAnimatedSkeleton(hkaAnimatedSkeleton* to)
     free(to);
 }
 
-std::string print_hkaDefaultAnimationControl(hkaDefaultAnimationControl* to)
-{
-    std::string out = "hkaDefaultAnimationControl\n";
-
-    out += print_hkaAnimationControl(&to->HkaAnimationControl);
-
-    out += "weight:" + std::to_string(to->weight) + " speed:" + std::to_string(to->speed) +
-        " repetitions:" + std::to_string(to->repetitions) + " frameTickAnimTime:" + std::to_string(to->frameTickAnimTime) + "\n";
-
-    return out;
-}
-
 void copy_hkaDefaultAnimationControl(hkaDefaultAnimationControl* to, const hkaDefaultAnimationControl* from)
 {
     copy_hkaAnimationControl(&to->HkaAnimationControl, &from->HkaAnimationControl);
@@ -2287,36 +1496,6 @@ void free_hkaDefaultAnimationControl(hkaDefaultAnimationControl* to)
     free_hkaAnimationControl(&to->HkaAnimationControl, false);
 
     free(to);
-}
-
-std::string print_hkaAnimationControl(hkaAnimationControl* to)
-{
-    std::string out = "hkaAnimationControl\n";
-
-    out += "curTimeInAnimation:" + std::to_string(to->curTimeInAnimation) + " weight:" + std::to_string(to->weight) + "\n";
-
-    out += "Unknown field0x18:";
-    for (size_t i = 0; i < to->field0x18_len; i++)
-    {
-        out += std::to_string(to->field0x18[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "Unknown field0x28:";
-    for (size_t i = 0; i < to->field0x28_len; i++)
-    {
-        out += std::to_string(to->field0x28[i]);
-        out += " ";
-    }
-    out += "\n";
-
-    out += "HkaAnimationBinding:" + std::to_string(to->HkaAnimationBinding) + "\n";
-
-    out += "unk_48:" + std::to_string(to->unk_48) + " unk_4c:" + std::to_string(to->unk_4c) +
-        " unk_50:" + std::to_string(to->unk_50) + "\n";
-
-    return out;
 }
 
 void copy_hkaAnimationControl(hkaAnimationControl* to, const hkaAnimationControl* from)
@@ -2370,24 +1549,6 @@ void free_hkaAnimationControl(hkaAnimationControl* to, bool freeself)
     }
 }
 
-std::string print_ChrCtrl_AnimationQueue_field0x10(ChrCtrl_AnimationQueue_field0x10* to)
-{
-    std::string out = "ChrCtrl_AnimationQueue_field0x10\n";
-
-    out += "array1_len:" + std::to_string(to->array1_len) + "\n";
-    out += "array2_len:" + std::to_string(to->array2_len) + "\n";
-
-    out += "arry2:";
-    for (size_t i = 0; i < to->array2_len; i++)
-    {
-        out += "rescap_anibnd:" + std::to_string(to->arry2[i].rescap_anibnd) +
-            " unk_8:" + std::to_string(to->arry2[i].unk_8) +
-            " count:" + std::to_string(to->arry2[i].count) + ";";
-    }
-    out += "\n";
-
-    return out;
-}
 
 void copy_ChrCtrl_AnimationQueue_field0x10(ChrCtrl_AnimationQueue_field0x10* to, const ChrCtrl_AnimationQueue_field0x10* from)
 {
@@ -2440,26 +1601,6 @@ void free_ChrCtrl_AnimationQueue_field0x10(ChrCtrl_AnimationQueue_field0x10* to)
     free(to);
 }
 
-std::string print_ChrCtrl_AnimationQueueEntry(ChrCtrl_AnimationQueueEntry* to)
-{
-    std::string out = "ChrCtrl_AnimationQueueEntry\n";
-
-    out += "unk_0:" + std::to_string(to->unk_0) + " unk_2:" + std::to_string(to->unk_2) + "\n";
-
-    out += print_hkaDefaultAnimationControl(to->defaultAnimationControl);
-    out += "HvkAnim_AnimInfoArrayElem:" + std::to_string(to->HvkAnim_AnimInfoArrayElem) + "\n";
-
-    out += "unk_28:" + std::to_string(to->unk_28) + " unk_2c:" + std::to_string(to->unk_2c) +
-        " unk_30:" + std::to_string(to->unk_30) + " unk_3c:" + std::to_string(to->unk_3c) +
-        " unk_40:" + std::to_string(to->unk_40) + " unk_44:" + std::to_string(to->unk_44) +
-        " unk_4c:" + std::to_string(to->unk_4c) + " lastFrameTime:" + std::to_string(to->lastFrameTime) +
-        " unk_58:" + std::to_string(to->unk_58) + " unk_5c:" + std::to_string(to->unk_5c) +
-        " unk_60:" + std::to_string(to->unk_60) + " unk_64:" + std::to_string(to->unk_64) +
-        " unk_68:" + std::to_string(to->unk_68) + " unk_6c:" + std::to_string(to->unk_6c) +
-        " unk_70:" + std::to_string(to->unk_70) + "\n";
-
-    return out;
-}
 
 void copy_ChrCtrl_AnimationQueueEntry(ChrCtrl_AnimationQueueEntry* to, const ChrCtrl_AnimationQueueEntry* from, StateTarget target)
 {
@@ -2488,17 +1629,6 @@ void free_ChrCtrl_AnimationQueueEntry(ChrCtrl_AnimationQueueEntry* to, bool free
     }
 }
 
-std::string print_AnimationQueue(AnimationQueue* to)
-{
-    std::string out = "AnimationQueue\n";
-
-    for (int i = 0; i < 6; i++)
-    {
-        out += print_AnimationQueue_Entry(to->AnimationQueue_Entries[i]);
-    }
-
-    return out;
-}
 
 void copy_AnimationQueue(AnimationQueue* to, const AnimationQueue* from)
 {
@@ -2530,47 +1660,6 @@ void free_AnimationQueue(AnimationQueue* to)
     free(to);
 }
 
-std::string print_AnimationQueue_Entry(AnimationQueue_Entry* to)
-{
-    std::string out = "AnimationQueue_Entry\n";
-
-    out += "unk_0:" + std::to_string(to->unk_0) + " unk_2:" + std::to_string(to->unk_2) + "\n";
-
-    out += "field0x10:";
-    for (size_t i = 0; i < 8; i++)
-    {
-        out += "upcoming_animId:" + std::to_string(to->field0x10[i].upcoming_animId) +
-            " unk_4:" + std::to_string(to->field0x10[i].unk_4) +
-            " unk_8:" + std::to_string(to->field0x10[i].unk_8) +
-            " unk_c:" + std::to_string(to->field0x10[i].unk_c) +
-            " unk_10:" + std::to_string(to->field0x10[i].unk_10) +
-            " unk_14:" + std::to_string(to->field0x10[i].unk_14) +
-            " unk_18:" + std::to_string(to->field0x10[i].unk_18) +
-            " unk_1c:" + std::to_string(to->field0x10[i].unk_1c) + ";";
-    }
-    out += "\n";
-
-    out += print_AnimationQueue_Entry_sub1(&to->sub1);
-
-    out += "unk_140:" + std::to_string(to->unk_140) + " unk_142:" + std::to_string(to->unk_142) +
-        " unk_144:" + std::to_string(to->unk_144) + "\n";
-
-    size_t len = ((uint64_t)to->chained_animations_array_end - (uint64_t)to->chained_animations_array_start) / 8;
-    out += "arry len:" + std::to_string(len) + "\n";
-
-    out += "chained_animations_array: ";
-    for (size_t i = 0; i < len; i++)
-    {
-        out += std::to_string(to->chained_animations_array_start[i]) + " ";
-    }
-    out += "\n";
-
-    out += "unk_168:" + std::to_string(to->unk_168) + " unk_16c:" + std::to_string(to->unk_16c) +
-        " unk_170:" + std::to_string(to->unk_170) + " unk_174:" + std::to_string(to->unk_174) +
-        " unk_178:" + std::to_string(to->unk_178) + "\n";
-
-    return out;
-}
 
 void copy_AnimationQueue_Entry(AnimationQueue_Entry* to, const AnimationQueue_Entry* from)
 {
@@ -2617,24 +1706,6 @@ void free_AnimationQueue_Entry(AnimationQueue_Entry* to)
     free(to);
 }
 
-std::string print_AnimationQueue_Entry_sub1(AnimationQueue_Entry_sub1* to)
-{
-    std::string out = "AnimationQueue_Entry_sub1\n";
-
-    out += "field0x10_cap: " + std::to_string(to->field0x10_cap) + "\n";
-    out += "unk: " + std::to_string(to->unk) + "\n";
-    out += "field0x10_len: " + std::to_string(to->field0x10_len) + "\n";
-
-    for (size_t i = 0; i < to->field0x10_len; i++)
-    {
-        if (to->field0x10[i] != NULL)
-        {
-            out += print_AnimationQueue_Entry_sub1_field0x10(to->field0x10[i]);
-        }
-    }
-
-    return out;
-}
 
 void copy_AnimationQueue_Entry_sub1(AnimationQueue_Entry_sub1* to, const AnimationQueue_Entry_sub1* from)
 {
@@ -2696,18 +1767,754 @@ void free_AnimationQueue_Entry_sub1(AnimationQueue_Entry_sub1* to, bool freeself
     }
 }
 
-std::string print_AnimationQueue_Entry_sub1_field0x10(AnimationQueue_Entry_sub1_field0x10* to)
-{
-    std::string out = "AnimationQueue_Entry\n";
-
-    out += "parent_AnimationQueue_Entry_field0x10:" + std::to_string(to->parent_AnimationQueue_Entry_field0x10) +
-        " unk_8:" + std::to_string(to->unk_8) + "\n";
-
-    return out;
-}
 
 void copy_AnimationQueue_Entry_sub1_field0x10(AnimationQueue_Entry_sub1_field0x10* to, const AnimationQueue_Entry_sub1_field0x10* from)
 {
     to->parent_AnimationQueue_Entry_field0x10 = from->parent_AnimationQueue_Entry_field0x10;
     to->unk_8 = from->unk_8;
+}
+
+// ---- forward declarations (tree has no cycles; fwd-decl avoids ordering) -----
+static void serialize_ChrAsm(StateVisitor&, const ChrAsm*);
+static void serialize_ChrAsmModel(StateVisitor&, const ChrAsmModel*);
+static void serialize_ProEquipCtrl(StateVisitor&, const ProEquipCtrl*);
+static void serialize_WeaponEquipCtrl(StateVisitor&, const WeaponEquipCtrl*);
+static void serialize_RingEquipCtrl(StateVisitor&, const RingEquipCtrl*);
+static void serialize_PlayerGameData(StateVisitor&, const PlayerGameData*);
+static void serialize_EquipGameData(StateVisitor&, const EquipGameData*);
+static void serialize_EquipItemData(StateVisitor&, const EquipItemData*);
+static void serialize_EquipMagicData(StateVisitor&, const EquipMagicData*);
+static void serialize_ChrIns(StateVisitor&, const ChrIns*);
+static void serialize_ChrAttachSys(StateVisitor&, const ChrAttachSys*);
+static void serialize_ChrIns_field0x2c8(StateVisitor&, const ChrIns_field0x2c8*);
+static void serialize_EntityThrowAnimationStatus(StateVisitor&, const EntityThrowAnimationStatus*);
+static void serialize_ThrowSelfEsc(StateVisitor&, const ThrowSelfEsc*);
+static void serialize_QwcSpEffectEquipCtrl(StateVisitor&, const QwcSpEffectEquipCtrl*);
+static void serialize_SpecialEffect(StateVisitor&, const SpecialEffect*);
+static void serialize_SpecialEffect_Info(StateVisitor&, const SpecialEffect_Info*);
+static void serialize_PlayerCtrl(StateVisitor&, const PlayerCtrl*);
+static void serialize_ArrowTurnAnim(StateVisitor&, const ArrowTurnAnim*);
+static void serialize_SpinJoint(StateVisitor&, const SpinJoint*);
+static void serialize_TurnAnim(StateVisitor&, const TurnAnim*);
+static void serialize_ChrCtrl(StateVisitor&, const ChrCtrl*);
+static void serialize_WalkAnim_Twist(StateVisitor&, const WalkAnim_Twist*);
+static void serialize_WalkAnim_Twist_Field0x228Elem(StateVisitor&, const WalkAnim_Twist_Field0x228Elem*);
+static void serialize_WalkAnim_Twist_Field0x228Elem_field0x10elem(StateVisitor&, const WalkAnim_Twist_Field0x228Elem_field0x10elem*);
+static void serialize_ActionCtrl(StateVisitor&, const ActionCtrl*);
+static void serialize_ActionCtrl_0x30Substruct(StateVisitor&, const ActionCtrl_0x30Substruct*);
+static void serialize_EzState_detail_EzStateMachineImpl(StateVisitor&, const EzState_detail_EzStateMachineImpl*);
+static void serialize_EzStateRegisterSet(StateVisitor&, const EzStateRegisterSet*);
+static void serialize_HavokChara(StateVisitor&, const HavokChara*);
+static void serialize_hkpCharacterProxy(StateVisitor&, const hkpCharacterProxy*);
+static void serialize_HitIns(StateVisitor&, const HitIns*);
+static void serialize_AnimationMediator(StateVisitor&, const AnimationMediator*);
+static void serialize_AnimationMediatorStateEntry(StateVisitor&, const AnimationMediatorStateEntry*);
+static void serialize_ChrCtrl_AnimationQueue(StateVisitor&, const ChrCtrl_AnimationQueue*);
+static void serialize_ChrCtrl_AnimationQueue_field0x20(StateVisitor&, const ChrCtrl_AnimationQueue_field0x20*);
+static void serialize_hkaAnimatedSkeleton(StateVisitor&, const hkaAnimatedSkeleton*);
+static void serialize_hkaDefaultAnimationControl(StateVisitor&, const hkaDefaultAnimationControl*);
+static void serialize_hkaAnimationControl(StateVisitor&, const hkaAnimationControl*);
+static void serialize_ChrCtrl_AnimationQueue_field0x10(StateVisitor&, const ChrCtrl_AnimationQueue_field0x10*);
+static void serialize_ChrCtrl_AnimationQueueEntry(StateVisitor&, const ChrCtrl_AnimationQueueEntry*);
+static void serialize_AnimationQueue(StateVisitor&, const AnimationQueue*);
+static void serialize_AnimationQueue_Entry(StateVisitor&, const AnimationQueue_Entry*);
+static void serialize_AnimationQueue_Entry_sub1(StateVisitor&, const AnimationQueue_Entry_sub1*);
+static void serialize_AnimationQueue_Entry_sub1_field0x10(StateVisitor&, const AnimationQueue_Entry_sub1_field0x10*);
+
+// ---- leaf / small structs ---------------------------------------------------
+
+static void serialize_ChrAsm(StateVisitor& v, const ChrAsm* a)
+{
+    v.begin("ChrAsm");
+    v.field("equipped_weapon_style", a->equipped_weapon_style);
+    v.field("l_hand_equipped_index", a->l_hand_equipped_index);
+    v.field("r_hand_equipped_index", a->r_hand_equipped_index);
+    v.field("l_arrow_equipped_index", a->l_arrow_equipped_index);
+    v.field("r_arrow_equipped_index", a->r_arrow_equipped_index);
+    v.field("l_bolt_equipped_index", a->l_bolt_equipped_index);
+    v.field("r_bolt_equipped_index", a->r_bolt_equipped_index);
+    v.blob("equip_items", a->equip_items, sizeof(a->equip_items));
+    v.field("transformProtectorId", a->transformProtectorId);
+    v.field("transformProtectorId_HalfCamo", a->transformProtectorId_HalfCamo);
+    v.field("unk_7c", a->unk_7c);
+    v.end();
+}
+
+static void serialize_ChrAsmModel(StateVisitor& v, const ChrAsmModel* m)
+{
+    v.begin("ChrAsmModel");
+    v.blob("unk_8", &m->unk_8, 0x10);
+    v.blob("fieldE0", m->fieldE0, sizeof(m->fieldE0));
+    v.blob("unk_68", &m->unk_68, 0x18);
+    v.field("data_3a", m->data_3a);
+    v.blob("unk_a0", &m->unk_a0, 0x28);
+    v.blob("hairColor", &m->hairColor, 0x80);
+    v.blob("filecap_array", m->filecap_array, sizeof(m->filecap_array));
+    v.field("unk_1c8", m->unk_1c8);
+    v.blob("unk_1c9", m->unk_1c9, sizeof(m->unk_1c9));
+    v.end();
+}
+
+static void serialize_ProEquipCtrl(StateVisitor& v, const ProEquipCtrl* p)
+{
+    v.begin("ProEquipCtrl");
+    serialize_SpecialEffect(v, p->spEffectList);
+    v.field("array_len", p->array_len);
+    for (int i = 0; i < 5; i++) v.field("equipped_armors_ids", p->equipped_armors_ids[i]);
+    v.end();
+}
+
+static void serialize_WeaponEquipCtrl(StateVisitor& v, const WeaponEquipCtrl* p)
+{
+    v.begin("WeaponEquipCtrl");
+    serialize_SpecialEffect(v, p->spEffectList);
+    v.field("array_len", p->array_len);
+    for (int i = 0; i < 2; i++) v.field("equipped_weapons_ids", p->equipped_weapons_ids[i]);
+    v.end();
+}
+
+static void serialize_RingEquipCtrl(StateVisitor& v, const RingEquipCtrl* p)
+{
+    v.begin("RingEquipCtrl");
+    serialize_SpecialEffect(v, p->spEffectList);
+    v.field("array_len", p->array_len);
+    for (int i = 0; i < 2; i++) v.field("equipped_rings_ids", p->equipped_rings_ids[i]);
+    v.end();
+}
+
+static void serialize_EquipItemData(StateVisitor& v, const EquipItemData* e)
+{
+    v.begin("EquipItemData");
+    v.blob("quickbar", e->quickbar, sizeof(e->quickbar));
+    v.field("selectedQuickbarItem", e->selectedQuickbarItem);
+    v.end();
+}
+
+static void serialize_EquipMagicData(StateVisitor& v, const EquipMagicData* e)
+{
+    v.begin("EquipMagicData");
+    v.blob("equippedMagicList", e->equippedMagicList, sizeof(e->equippedMagicList));
+    v.field("curSelectedMagicSlot", e->curSelectedMagicSlot);
+    v.end();
+}
+
+static void serialize_EquipGameData(StateVisitor& v, const EquipGameData* e)
+{
+    v.begin("EquipGameData");
+    v.blob("EquipItemToInventoryIndexMap", e->EquipItemToInventoryIndexMap, sizeof(e->EquipItemToInventoryIndexMap));
+    v.blob("EquipItemToInventoryIndexMap_index_updated", e->EquipItemToInventoryIndexMap_index_updated, sizeof(e->EquipItemToInventoryIndexMap_index_updated));
+    serialize_ChrAsm(v, &e->chrasm);
+    serialize_EquipMagicData(v, e->equipMagicData);
+    serialize_EquipItemData(v, &e->equippedItemsInQuickbar);
+    v.field("amountOfItemUsedFromInventory", e->amountOfItemUsedFromInventory);
+    v.field("itemInventoryIdCurrentlyBeingUsedFromInventory", e->itemInventoryIdCurrentlyBeingUsedFromInventory);
+    v.end();
+}
+
+// copy_PlayerGameData_AttributeInfo / _ChrProperties memcpy the whole struct, so
+// these blob it for full, bit-exact coverage (their dedicated prints delegate here).
+static void serialize_PlayerGameData_AttributeInfo(StateVisitor& v, const PlayerGameData_AttributeInfo* a)
+{
+    v.begin("PlayerGameData_AttributeInfo");
+    v.blob("AttributeInfo", a, sizeof(*a));
+    v.end();
+}
+
+static void serialize_PlayerGameData_ChrProperties(StateVisitor& v, const PlayerGameData_ChrProperties* c)
+{
+    v.begin("PlayerGameData_ChrProperties");
+    v.blob("ChrProperties", c, sizeof(*c));
+    v.end();
+}
+
+// These are NOT part of the rollback snapshot (copy_PlayerIns skips chrAsmModelRes;
+// copy_ChrIns skips field0x18). Provided only so their existing debug print_X can
+// delegate to a serializer; not called from serialize_PlayerIns.
+static void serialize_ChrAsmModelRes_Elem(StateVisitor& v, const ChrAsmModelRes_Elem* e)
+{
+    v.begin("ChrAsmModelRes_Elem");
+    v.field("curModelId", e->curModelId);
+    v.field("newModelId", e->newModelId);
+    v.end();
+}
+
+static void serialize_ChrAsmModelRes(StateVisitor& v, const ChrAsmModelRes* m)
+{
+    v.begin("ChrAsmModelRes");
+    v.field("magic_state", m->magic_state);
+    for (int i = 0; i < 14; i++) serialize_ChrAsmModelRes_Elem(v, &m->arry[i]);
+    v.end();
+}
+
+static void serialize_ChrIns_field0x18(StateVisitor& v, const ChrIns_field0x18* f)
+{
+    v.begin("ChrIns_field0x18");
+    v.field("throw_animId", f->throw_animId);
+    v.field("animId", f->animId);
+    v.field("IsEnableAnimLoop", f->IsEnableAnimLoop);
+    v.end();
+}
+
+static void serialize_PlayerGameData(StateVisitor& v, const PlayerGameData* p)
+{
+    v.begin("PlayerGameData");
+    serialize_PlayerGameData_AttributeInfo(v, &p->attribs);
+    serialize_EquipGameData(v, &p->equipGameData);
+    serialize_PlayerGameData_ChrProperties(v, &p->ChrProperties);
+    v.end();
+}
+
+static void serialize_ThrowSelfEsc(StateVisitor& v, const ThrowSelfEsc* t)
+{
+    v.begin("ThrowSelfEsc");
+    v.blob("m_cycleTime", &t->m_cycleTime, 0x18);   // copy memcpy's 0x18 from m_cycleTime
+    v.end();
+}
+
+static void serialize_EntityThrowAnimationStatus(StateVisitor& v, const EntityThrowAnimationStatus* e)
+{
+    v.begin("EntityThrowAnimationStatus");
+    v.ptr_flag("playerins_parent", (void*)e->playerins_parent);   // heap parent ptr
+    v.ptr_flag("throw_paramdef", (void*)e->throw_paramdef);       // loaded-param ptr
+    v.blob("unk_18", &e->unk_18, 0x40);
+    if (e->throwSelfEsc)
+    {
+        v.field("throwSelfEsc_present", true);
+        serialize_ThrowSelfEsc(v, e->throwSelfEsc);
+    }
+    else
+    {
+        v.field("throwSelfEsc_present", false);
+    }
+    v.blob("unk_60", &e->unk_60, 0x50);
+    v.end();
+}
+
+static void serialize_QwcSpEffectEquipCtrl(StateVisitor& v, const QwcSpEffectEquipCtrl* q)
+{
+    v.begin("QwcSpEffectEquipCtrl");
+    v.count("arry", q->arry_len);
+    for (size_t i = 0; i < q->arry_len; i++) v.field("arry", q->arry[i]);
+    v.field("unk_24", q->unk_24);
+    v.field("unk_28", q->unk_28);
+    v.field("unk_2c", q->unk_2c);
+    v.end();
+}
+
+static void serialize_SpecialEffect_Info(StateVisitor& v, const SpecialEffect_Info* s)
+{
+    // linked list; walk via ->next (capped) mirroring copy_SpecialEffect_Info
+    v.begin("SpecialEffect_Info");
+    size_t n = 0;
+    const SpecialEffect_Info* cur = s;
+    while (cur && n < max_preallocated_SpecialEffect_Info)
+    {
+        v.blob("data_0", cur->data_0, sizeof(cur->data_0));
+        v.ptr_flag("paramRowBytes", (void*)cur->paramRowBytes);   // loaded-param ptr
+        cur = cur->next;
+        n++;
+    }
+    v.count("nodes", n);
+    v.end();
+}
+
+static void serialize_SpecialEffect(StateVisitor& v, const SpecialEffect* s)
+{
+    v.begin("SpecialEffect");
+    serialize_SpecialEffect_Info(v, s->specialEffect_Info);
+    v.field("speffectIsBeingRun", s->speffectIsBeingRun);
+    v.blob("unk_11", s->unk_11, sizeof(s->unk_11));
+    v.field("unk_14", s->unk_14);
+    v.field("flags", s->flags);
+    v.field("unk_24", s->unk_24);
+    v.field("debugActivateSpEffect", s->debugActivateSpEffect);
+    v.field("unk_34", s->unk_34);
+    v.end();
+}
+
+static void serialize_ChrAttachSys(StateVisitor& v, const ChrAttachSys* c)
+{
+    // Shallow per the harness design: presence + slot type only. Full AttachSysSlot
+    // expansion is deferred (see rollback-test-harness memo). copy_ChrAttachSys
+    // rebuilds the whole slot chain; if attach state ever desyncs, add a
+    // serialize_AttachSysSlot in the AttachSysSlot module and recurse here.
+    v.begin("ChrAttachSys");
+    if (c->SysSlots)
+    {
+        v.field("SysSlots_present", true);
+        v.field("slotType", c->SysSlots->slotType);
+    }
+    else
+    {
+        v.field("SysSlots_present", false);
+    }
+    v.end();
+}
+
+static void serialize_ChrIns_field0x2c8(StateVisitor& v, const ChrIns_field0x2c8* f)
+{
+    v.begin("ChrIns_field0x2c8");
+    v.blob("unk_8", &f->unk_8, 0x18);
+    v.field("unk_28", f->unk_28);
+    v.field("unk_2c", f->unk_2c);
+    v.blob("unk_38", &f->unk_38, 0x10);
+    v.field("unk_50", f->unk_50);
+    v.end();
+}
+
+static void serialize_HitIns(StateVisitor& v, const HitIns* h)
+{
+    if (h == NULL) { v.field("HitIns_null", true); return; }
+    v.begin("HitIns");
+    v.field("unk_8", h->unk_8);
+    v.field("unk_c", h->unk_c);
+    v.blob("unk_18", &h->unk_18, 0x48);
+    v.field("unk_70", h->unk_70);
+    v.field("unk_72", h->unk_72);
+    v.field("unk_74", h->unk_74);
+    v.field("unk_98", h->unk_98);
+    v.field("unk_9a", h->unk_9a);
+    v.field("unk_9c", h->unk_9c);
+    v.field("unk_b0", h->unk_b0);
+    v.field("BackReadState", h->BackReadState);
+    v.field("TargetBackreadState", h->TargetBackreadState);
+    v.blob("unk_b3", h->unk_b3, sizeof(h->unk_b3));
+    v.field("IsDispHitRigid", h->IsDispHitRigid);
+    v.blob("unk_c1", h->unk_c1, sizeof(h->unk_c1));
+    v.end();
+}
+
+static void serialize_SpinJoint(StateVisitor& v, const SpinJoint* s)
+{
+    v.begin("SpinJoint");
+    v.field("unk_8", s->unk_8);
+    v.blob("spin_bone_index", &s->spin_bone_index, 96);
+    v.blob("disableUpdate", &s->disableUpdate, 8);
+    v.end();
+}
+
+static void serialize_TurnAnim(StateVisitor& v, const TurnAnim* t)
+{
+    v.begin("TurnAnim");
+    v.field("unk_8", t->unk_8);
+    v.blob("turnL", &t->turnL, 0x28);
+    serialize_SpinJoint(v, t->joint_UpperRoot);
+    serialize_SpinJoint(v, t->joint_LowerRoot);
+    serialize_SpinJoint(v, t->joint_spine1_1);
+    serialize_SpinJoint(v, t->joint_spine_1);
+    serialize_SpinJoint(v, t->joint_master);
+    v.blob("unk_70", &t->unk_70, 0x120);
+    v.field("unk_198", t->unk_198);
+    v.end();
+}
+
+static void serialize_ArrowTurnAnim(StateVisitor& v, const ArrowTurnAnim* a)
+{
+    v.begin("ArrowTurnAnim");
+    serialize_TurnAnim(v, &a->turnAnim);
+    serialize_SpinJoint(v, a->joint_spine_2);
+    serialize_SpinJoint(v, a->joint_spine1_2);
+    v.blob("unk_1b8", &a->unk_1b8, 8);
+    v.end();
+}
+
+static void serialize_hkpCharacterProxy(StateVisitor& v, const hkpCharacterProxy* h)
+{
+    v.begin("hkpCharacterProxy");
+    v.field("unk_8", h->unk_8);
+    v.field("unk_c", h->unk_c);
+    v.blob("m_velocity", &h->m_velocity, 0x20);
+    v.ptr_flag("HkpSimpleShapePhantom", h->HkpSimpleShapePhantom);   // heap phantom ptr
+    v.blob("m_dynamicFriction", &h->m_dynamicFriction, 0x40);
+    v.blob("m_maxSlopeCosine", &h->m_maxSlopeCosine, 24);
+    v.end();
+}
+
+static void serialize_HavokChara(StateVisitor& v, const HavokChara* h)
+{
+    v.begin("HavokChara");
+    v.blob("RotAngleUnkWep", &h->RotAngleUnkWep, 0x38);
+    serialize_hkpCharacterProxy(v, h->char_proxy);
+    v.blob("unk_60", &h->unk_60, 0x98);
+    v.blob("unk_100", &h->unk_100, 0xe8);
+    v.blob("unk_1f0", &h->unk_1f0, 0x58);
+    v.blob("unk_258", &h->unk_258, 0x38);
+    v.end();
+}
+
+// ---- EzState / ActionCtrl ---------------------------------------------------
+
+static void serialize_EzStateRegisterSet(StateVisitor& v, const EzStateRegisterSet* e)
+{
+    v.begin("EzStateRegisterSet");
+    for (size_t i = 0; i < 8; i++)
+    {
+        v.blob("register", e->arry[i].data_0, sizeof(EzStateRegister));
+    }
+    v.end();
+}
+
+static void serialize_EzState_detail_EzStateMachineImpl(StateVisitor& v, const EzState_detail_EzStateMachineImpl* e)
+{
+    v.begin("EzStateMachineImpl");
+    v.blob("data_0", e->data_0, sizeof(e->data_0));
+    serialize_EzStateRegisterSet(v, &e->EzStateRegisterSet1);
+    serialize_EzStateRegisterSet(v, &e->EzStateRegisterSet2);
+    v.blob("data_1", e->data_1, sizeof(e->data_1));
+    v.blob("data_2", e->data_2, sizeof(e->data_2));
+    v.end();
+}
+
+static void serialize_ActionCtrl_0x30Substruct(StateVisitor& v, const ActionCtrl_0x30Substruct* a)
+{
+    v.begin("ActionCtrl_0x30Substruct");
+    serialize_EzState_detail_EzStateMachineImpl(v, a->EzStateMachineImpl);
+    v.blob("actionIsValid", &a->actionIsValid, 0x18);
+    v.end();
+}
+
+static void serialize_ActionCtrl(StateVisitor& v, const ActionCtrl* a)
+{
+    v.begin("ActionCtrl");
+    v.field("unk_8", a->unk_8);
+    serialize_ActionCtrl_0x30Substruct(v, &a->passive_state);
+    serialize_ActionCtrl_0x30Substruct(v, &a->active_state);
+    v.blob("ezStatePassiveState_region", &a->ezStatePassiveState, 0x4d0);
+    v.blob("unk_548", &a->unk_548, 0x18);
+    v.end();
+}
+
+// ---- animation chain --------------------------------------------------------
+
+static void serialize_hkaAnimationControl(StateVisitor& v, const hkaAnimationControl* h)
+{
+    v.begin("hkaAnimationControl");
+    v.field("unk_8", h->unk_8);
+    v.field("unk_c", h->unk_c);
+    v.field("curTimeInAnimation", h->curTimeInAnimation);
+    v.field("weight", h->weight);
+    v.field("field0x18_len", h->field0x18_len);
+    v.field("field0x18_cap", h->field0x18_cap);
+    v.blob("field0x18", h->field0x18, h->field0x18_len);   // copy memcpy's _len bytes
+    v.field("field0x28_len", h->field0x28_len);
+    v.field("field0x28_cap", h->field0x28_cap);
+    v.blob("field0x28", h->field0x28, h->field0x28_len);
+    v.ptr_flag("HkaAnimationBinding", (void*)h->HkaAnimationBinding);   // loaded anim resource
+    v.field("unk_48", h->unk_48);
+    v.field("unk_4c", h->unk_4c);
+    v.field("unk_50", h->unk_50);
+    v.end();
+}
+
+static void serialize_hkaDefaultAnimationControl(StateVisitor& v, const hkaDefaultAnimationControl* h)
+{
+    v.begin("hkaDefaultAnimationControl");
+    serialize_hkaAnimationControl(v, &h->HkaAnimationControl);
+    v.blob("weight_region", &h->weight, 0x50);
+    v.end();
+}
+
+static void serialize_hkaAnimatedSkeleton(StateVisitor& v, const hkaAnimatedSkeleton* h)
+{
+    v.begin("hkaAnimatedSkeleton");
+    v.field("unk_8", h->unk_8);
+    v.field("unk_c", h->unk_c);
+    v.count("animCtrl_list", h->animCtrl_list_len);
+    for (uint32_t i = 0; i < h->animCtrl_list_len; i++)
+    {
+        serialize_hkaDefaultAnimationControl(v, h->animCtrl_list[i]);
+    }
+    v.field("data_1", h->data_1);
+    v.field("unk_38", h->unk_38);
+    v.field("unk_3c", h->unk_3c);
+    v.end();
+}
+
+static void serialize_ChrCtrl_AnimationQueue_field0x20(StateVisitor& v, const ChrCtrl_AnimationQueue_field0x20* f)
+{
+    v.begin("ChrCtrl_AnimationQueue_field0x20");
+    v.blob("field0x8", f->field0x8, 0x30 * 64);
+    v.blob("field0x8_lens", &f->field0x8_len, 8);
+    v.blob("field0x18", f->field0x18, 0x30 * 64);
+    v.blob("field0x18_lens", &f->field0x18_len, 8);
+    v.blob("field0x28", f->field0x28, 4 * 64);
+    v.blob("field0x28_lens", &f->field0x28_len, 0x10);
+    v.blob("unk_48", &f->unk_48, 8);
+    v.end();
+}
+
+static void serialize_ChrCtrl_AnimationQueue_field0x10(StateVisitor& v, const ChrCtrl_AnimationQueue_field0x10* f)
+{
+    v.begin("ChrCtrl_AnimationQueue_field0x10");
+    v.field("array1_len", f->array1_len);
+    v.field("array2_len", f->array2_len);
+    v.blob("arry2", f->arry2, sizeof(ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem) * f->array2_len);
+    for (size_t i = 0; i < f->array1_len; i++)
+    {
+        v.ptr_index("arry1", f->arry1[i], f->arry2, sizeof(ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem));
+    }
+    v.end();
+}
+
+static void serialize_ChrCtrl_AnimationQueueEntry(StateVisitor& v, const ChrCtrl_AnimationQueueEntry* e)
+{
+    v.begin("ChrCtrl_AnimationQueueEntry");
+    v.blob("unk_0", &e->unk_0, 8);
+    serialize_hkaDefaultAnimationControl(v, e->defaultAnimationControl);
+    v.ptr_flag("HvkAnim_AnimInfoArrayElem", (void*)e->HvkAnim_AnimInfoArrayElem);   // loaded animbnd
+    v.blob("unk_28", &e->unk_28, 0x50);
+    v.end();
+}
+
+static void serialize_ChrCtrl_AnimationQueue(StateVisitor& v, const ChrCtrl_AnimationQueue* q)
+{
+    v.begin("ChrCtrl_AnimationQueue");
+    v.field("array_length", q->array_length);
+    v.field("unk_4", q->unk_4);
+    v.count("arry", q->array_length);
+    for (size_t i = 0; i < q->array_length; i++)
+    {
+        serialize_ChrCtrl_AnimationQueueEntry(v, &q->arry[i]);
+    }
+    serialize_ChrCtrl_AnimationQueue_field0x10(v, q->field0x10);
+    serialize_hkaAnimatedSkeleton(v, q->HkaAnimatedSkeleton);
+    serialize_ChrCtrl_AnimationQueue_field0x20(v, q->field0x20);
+    v.blob("genderSpecificAnimationOffset_region", &q->genderSpecificAnimationOffset, 0x10);
+    v.blob("unk_70_region", &q->unk_70, 0x10);
+    v.field("unk_88", q->unk_88);
+    v.blob("unk_a8", &q->unk_a8, 0x20);
+    v.blob("unk_d8", &q->unk_d8, 0x18);
+    v.end();
+}
+
+static void serialize_AnimationMediatorStateEntry(StateVisitor& v, const AnimationMediatorStateEntry* e)
+{
+    v.begin("AnimationMediatorStateEntry");
+    v.blob("animationId_region", &e->animationId, 0x90);
+    v.blob("data_1", e->data_1, sizeof(e->data_1));
+    v.end();
+}
+
+static void serialize_AnimationQueue_Entry_sub1_field0x10(StateVisitor& v, const AnimationQueue_Entry_sub1_field0x10* f)
+{
+    v.begin("sub1_field0x10");
+    v.field("parent_AnimationQueue_Entry_field0x10", f->parent_AnimationQueue_Entry_field0x10);
+    v.field("unk_8", f->unk_8);
+    v.end();
+}
+
+static void serialize_AnimationQueue_Entry_sub1(StateVisitor& v, const AnimationQueue_Entry_sub1* s)
+{
+    v.begin("AnimationQueue_Entry_sub1");
+    v.field("field0x10_cap", s->field0x10_cap);
+    v.field("unk", s->unk);
+    v.field("field0x10_len", s->field0x10_len);
+    for (size_t i = 0; i < s->field0x10_len; i++)
+    {
+        if (s->field0x10[i] != NULL)
+        {
+            serialize_AnimationQueue_Entry_sub1_field0x10(v, s->field0x10[i]);
+        }
+    }
+    v.end();
+}
+
+static void serialize_AnimationQueue_Entry(StateVisitor& v, const AnimationQueue_Entry* e)
+{
+    v.begin("AnimationQueue_Entry");
+    v.blob("unk_0", &e->unk_0, 8);
+    v.blob("field0x10", e->field0x10, sizeof(e->field0x10));
+    serialize_AnimationQueue_Entry_sub1(v, &e->sub1);
+    v.blob("unk_140", &e->unk_140, 8);
+    size_t len = ((uint64_t)e->chained_animations_array_end - (uint64_t)e->chained_animations_array_start) / 8;
+    v.count("chained_animations_array", len);
+    for (size_t i = 0; i < len; i++) v.field("chained", e->chained_animations_array_start[i]);
+    v.blob("unk_168", &e->unk_168, 0x18);
+    v.end();
+}
+
+static void serialize_AnimationQueue(StateVisitor& v, const AnimationQueue* q)
+{
+    v.begin("AnimationQueue");
+    for (int i = 0; i < 6; i++) serialize_AnimationQueue_Entry(v, q->AnimationQueue_Entries[i]);
+    v.end();
+}
+
+static void serialize_AnimationMediator(StateVisitor& v, const AnimationMediator* m)
+{
+    v.begin("AnimationMediator");
+    for (int i = 0; i < 31; i++) serialize_AnimationMediatorStateEntry(v, &m->states_list[i]);
+    serialize_AnimationQueue(v, m->animationQueue);
+    v.blob("unk_1468", &m->unk_1468, 0x28);
+    v.end();
+}
+
+// ---- WalkAnim_Twist ---------------------------------------------------------
+
+static void serialize_WalkAnim_Twist_Field0x228Elem_field0x10elem(StateVisitor& v, const WalkAnim_Twist_Field0x228Elem_field0x10elem* e)
+{
+    v.begin("Field0x228Elem_field0x10elem");
+    v.field("unk_0", e->unk_0);
+    v.field("unk_4", e->unk_4);
+    v.field("unk_8", e->unk_8);
+    v.field("unk_c", e->unk_c);
+    v.end();
+}
+
+static void serialize_WalkAnim_Twist_Field0x228Elem(StateVisitor& v, const WalkAnim_Twist_Field0x228Elem* f)
+{
+    v.begin("WalkAnim_Twist_Field0x228Elem");
+    v.field("field0x10_cap", f->field0x10_cap);
+    v.field("unk", f->unk);
+    v.field("field0x10_len", f->field0x10_len);
+    for (size_t i = 0; i < f->field0x10_cap; i++)
+    {
+        if (f->field0x10[i] != NULL)
+        {
+            v.field("slot_present", true);
+            serialize_WalkAnim_Twist_Field0x228Elem_field0x10elem(v, f->field0x10[i]);
+        }
+        else
+        {
+            v.field("slot_present", false);
+        }
+    }
+    v.end();
+}
+
+static void serialize_WalkAnim_Twist(StateVisitor& v, const WalkAnim_Twist* w)
+{
+    v.begin("WalkAnim_Twist");
+    v.field("unk_8", w->unk_8);
+    v.blob("walkF_region", &w->walkF, 0x1b8);
+    v.blob("unk_1d8", &w->unk_1d8, 16);
+    serialize_SpinJoint(v, w->Upper_Root_Joint);
+    serialize_SpinJoint(v, w->master_joint);
+    serialize_SpinJoint(v, w->neck_joint);
+    v.blob("turn_lower_body_region", &w->turn_lower_body, 0x28);
+    serialize_WalkAnim_Twist_Field0x228Elem(v, &w->walkAnim_Twist_Field0x228Elem);
+    v.blob("unk_258", &w->unk_258, 0x48);
+    v.end();
+}
+
+// ---- ChrCtrl / PlayerCtrl ---------------------------------------------------
+
+static void serialize_ChrCtrl(StateVisitor& v, const ChrCtrl* c)
+{
+    v.begin("ChrCtrl");
+    v.field("unk_8", c->unk_8);
+    serialize_ChrCtrl_AnimationQueue(v, c->animationQueue);
+    serialize_AnimationMediator(v, c->animationMediator);
+    serialize_HavokChara(v, c->havokChara);
+    serialize_ActionCtrl(v, c->actionctrl);
+    v.field("unk_80", c->unk_80);
+    v.blob("unk_90", &c->unk_90, 0x118);
+    serialize_WalkAnim_Twist(v, c->walkAnim_Twist);
+    v.blob("movement_enabled_region", &c->movement_enabled, 0xe0);
+    v.blob("MapHitDisableDebugging_region", &c->MapHitDisableDebugging, 0x60);
+    v.end();
+}
+
+static void serialize_PlayerCtrl(StateVisitor& v, const PlayerCtrl* p)
+{
+    v.begin("PlayerCtrl");
+    serialize_ChrCtrl(v, &p->chrCtrl);
+    v.blob("unk_300", &p->unk_300, 8);
+    serialize_TurnAnim(v, p->turnAnim);
+    serialize_ArrowTurnAnim(v, p->arrowTurnAnim);
+    v.blob("unk_330", &p->unk_330, 8);
+    v.blob("movement_related_flags_region", &p->movement_related_flags, 24);
+    v.end();
+}
+
+// ---- ChrIns -----------------------------------------------------------------
+
+static void serialize_ChrIns(StateVisitor& v, const ChrIns* c)
+{
+    v.begin("ChrIns");
+    serialize_PlayerCtrl(v, c->playerCtrl);
+    serialize_PadManipulator(v, c->padManipulator);
+    v.field("CharaInitParamID", c->CharaInitParamID);
+    v.blob("unk_16c", &c->unk_16c, 0x10);
+    v.blob("lowerThrowAnim", &c->lowerThrowAnim, sizeof(c->lowerThrowAnim));
+    v.blob("upperThrowAnim", &c->upperThrowAnim, sizeof(c->upperThrowAnim));
+    v.blob("player_handing_state", c->player_handing_state, sizeof(uint32_t) * 3);
+    v.field("curToughness", c->curToughness);
+    v.field("maxToughness", c->maxToughness);
+    v.field("toughnessUnk1", c->toughnessUnk1);
+    v.field("toughnessRefillTimer", c->toughnessRefillTimer);
+    v.field("toughnessUnk2", c->toughnessUnk2);
+    v.field("curSelectedMagicId", c->curSelectedMagicId);
+    v.blob("curUsedItem", &c->curUsedItem, sizeof(c->curUsedItem));
+    serialize_SpecialEffect(v, c->specialEffects);
+    serialize_QwcSpEffectEquipCtrl(v, c->qwcSpEffectEquipCtrl);
+    v.blob("unk_288", &c->unk_288, 0x48);
+    serialize_ChrIns_field0x2c8(v, c->field0x2c8);
+    v.blob("unk_2d8", &c->unk_2d8, 0x98);
+    serialize_HitIns(v, c->hitins_1);
+    serialize_HitIns(v, c->hitins_2);
+    v.blob("unk_380", &c->unk_380, 8);
+    serialize_ChrAttachSys(v, &c->chrattachsys);
+    v.field("curHp", c->curHp);
+    v.field("maxHp", c->maxHp);
+    v.field("curSp", c->curSp);
+    v.field("maxSp", c->maxSp);
+    v.field("damage_taken_scalar", c->damage_taken_scalar);
+    v.field("PoisonResist", c->PoisonResist);
+    v.field("ToxicResist", c->ToxicResist);
+    v.field("BleedResist", c->BleedResist);
+    v.field("CurseResist", c->CurseResist);
+    v.field("resistPoisonTotal", c->resistPoisonTotal);
+    v.field("resistPlagueTotal", c->resistPlagueTotal);
+    v.field("resistBleedingTotal", c->resistBleedingTotal);
+    v.field("resistCurseTotal", c->resistCurseTotal);
+    serialize_EntityThrowAnimationStatus(v, c->throw_animation_info);
+    v.blob("unk_450", &c->unk_450, 0x18);
+    v.blob("unk_470", &c->unk_470, 0x50);
+    v.blob("unk_4d8", &c->unk_4d8, 0x18);
+    v.blob("unk_518", &c->unk_518, 0x58);
+    v.end();
+}
+
+// ---- top level --------------------------------------------------------------
+
+void serialize_PlayerIns(StateVisitor& v, const PlayerIns* p)
+{
+    v.begin("PlayerIns");
+    serialize_ChrIns(v, &p->chrins);
+    serialize_PlayerGameData(v, p->playergamedata);
+    v.blob("data_0", p->data_0, sizeof(p->data_0));
+    v.blob("unk_7a8", &p->unk_7a8, 16);
+    v.blob("unk_7d0", &p->unk_7d0, 8);
+    serialize_RingEquipCtrl(v, p->ringequipctrl);
+    serialize_WeaponEquipCtrl(v, p->weaponequipctrl);
+    serialize_ProEquipCtrl(v, p->proequipctrl);
+    v.field("curSelectedMagicId", p->curSelectedMagicId);
+    v.blob("curUsedItem", &p->curUsedItem, sizeof(p->curUsedItem));
+    v.field("override_itemId", p->override_itemId);
+    v.field("override_equipped_magicId", p->override_equipped_magicId);
+    v.field("using_override", p->using_override);
+    serialize_ChrAsm(v, p->chrasm);
+    // chrAsmModelRes intentionally skipped (copy_PlayerIns skips it; redrawn each frame)
+    serialize_ChrAsmModel(v, p->chrAsmModel);
+    v.blob("headSize_region", &p->headSize, 24);
+    v.blob("unk_880", &p->unk_880, 0x50);
+    v.blob("data_5", p->data_5, sizeof(p->data_5));
+    v.blob("data_5a", p->data_5a, sizeof(p->data_5a));
+    v.blob("data_6", p->data_6, sizeof(p->data_6));
+    v.end();
+}
+
+uint64_t hash_PlayerIns(PlayerIns* p)
+{
+    StateVisitor v(StateVisitor::Mode::Hash);
+    serialize_PlayerIns(v, p);
+    return v.digest();
+}
+
+std::string print_PlayerIns(PlayerIns* to)
+{
+    StateVisitor v(StateVisitor::Mode::Print);
+    serialize_PlayerIns(v, to);
+    return v.text();
 }
