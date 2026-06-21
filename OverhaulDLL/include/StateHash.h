@@ -113,7 +113,7 @@ namespace RollbackHash
                 break;   // std::map is ordered ascending; nothing later is confirmed
             }
             const StateDigest& d = it->second;
-            fprintf(logfile, "STATEHASH frame=%d player=%016llx bullet=%016llx damage=%016llx havok=%016llx throw=%016llx dmghit=%016llx comb=%016llx",
+            fprintf(logfile, "STATEHASH frame=%d player=%016llx bullet=%016llx damage=%016llx havok=%016llx throw=%016llx dmghit=%016llx comb=%016llx\n",
                 it->first,
                 (unsigned long long)d.player,
                 (unsigned long long)d.bullet,
