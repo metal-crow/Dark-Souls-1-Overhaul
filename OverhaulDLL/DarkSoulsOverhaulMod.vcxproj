@@ -113,6 +113,8 @@
     <ClInclude Include="include\SfxManStruct.h" />
     <ClInclude Include="include\SfxManStructFunctions.h" />
     <ClInclude Include="include\SpellDesyncFixes.h" />
+    <ClInclude Include="include\StateHash.h" />
+    <ClInclude Include="include\StateSerializer.h" />
     <ClInclude Include="include\ThrowManStruct.h" />
     <ClInclude Include="include\ThrowManStructFunctions.h" />
     <ClInclude Include="include\UIFeatures.h" />

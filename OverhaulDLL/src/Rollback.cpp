@@ -16,6 +16,7 @@
 #include "ThrowManStructFunctions.h"
 #include "DmgHitRecordManImpStructFunctions.h"
 #include "FrpgHavokManImpStructFunctions.h"
+#include "StateHash.h"
 
 FrpgHavokManImp* Rollback::saved_havokman = NULL;
 PlayerIns* Rollback::saved_playerins = NULL;
@@ -495,6 +496,14 @@ void dsr_frame_finished_helper()
             //this is where the game state is actually saved (and also loaded if we are in SyncTest)
             ggpo_advance_frame(Rollback::ggpo);
 
+            //Emit STATEHASH log lines for any frames that are now confirmed
+            int framecount_unused = 0;
+            int last_confirmed_frame = 0;
+            if (GGPO_SUCCEEDED(ggpo_get_frame_info(Rollback::ggpo, &framecount_unused, &last_confirmed_frame)))
+            {
+                RollbackHash::emit_confirmed(last_confirmed_frame);
+            }
+
             if (Rollback::rollbackVisual)
             {
                 float* visability = (float*)((uint64_t)Game::get_PlayerIns().value() + 0x328);
@@ -758,16 +767,13 @@ bool rollback_load_game_state_callback(unsigned char* buffer, int)
  * Save the current state to a buffer and return it to GGPO via the
  * buffer and len parameters.
  */
-bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int)
+bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int frame)
 {
     RollbackState* state = (RollbackState*)malloc(sizeof(RollbackState));
     if (state == NULL)
     {
         FATALERROR("Unable to get allocate state for rollback_save_game_state_callback");
     }
-
-    //The checksum is only used when we run the GGPO synctest, disable otherwise
-    size_t our_checksum = 0;
 
     //havok has to be copied first
     state->havokman = init_FrpgHavokManImp();
@@ -783,9 +789,6 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
 
         state->playerins[i] = init_PlayerIns();
         copy_PlayerIns(state->playerins[i], player, StateTarget::ToLocal);
-#if defined(GGPO_SYNCTEST) && 0
-        our_checksum ^= std::hash<std::string>{}(print_PlayerIns(player));
-#endif
     }
     state->bulletman = init_BulletMan();
     copy_BulletMan(state->bulletman, *(BulletMan**)Game::bullet_man, StateTarget::ToLocal);
@@ -797,13 +800,16 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
     copy_ThrowMan(state->throwman, *(ThrowMan**)Game::throw_man, StateTarget::ToLocal);
     state->dmghitrecordman = init_DmgHitRecordManImp();
     copy_DmgHitRecordManImp(state->dmghitrecordman, *(DmgHitRecordManImp**)Game::dmg_hit_record_man, StateTarget::ToLocal);
-#if defined(GGPO_SYNCTEST) && 0
-    our_checksum ^= std::hash<std::string>{}(print_BulletMan(*(BulletMan**)Game::bullet_man));
-#endif
+
+    //Record the per-subsystem state digest for the determinism oracle, keyed by the
+    //GGPO frame being saved. It is emitted later as a STATEHASH log line once the
+    //frame is confirmed. combined() also serves as the GGPO synctest checksum
+    //(covers single-process save/restore determinism with the same hash).
+    RollbackHash::StateDigest digest = RollbackHash::record(frame, state);
 
     *buffer = (unsigned char*)state;
     *len = sizeof(RollbackState);
-    *checksum = (int)our_checksum;
+    *checksum = (int)RollbackHash::combined(digest);
 
     return true;
 }
