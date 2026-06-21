@@ -27,6 +27,8 @@ ThrowMan* Rollback::saved_throwman = NULL;
 DmgHitRecordManImp* Rollback::saved_DmgHitRecordMan = NULL;
 PadManipulatorPacked** Rollback::saved_PadManipulator = NULL;
 
+FILE* hash_logfile = NULL;
+
 GGPOSession* Rollback::ggpo = NULL;
 GGPOPlayerHandle Rollback::ggpoHandles[GGPO_MAX_PLAYERS] = {};
 bool Rollback::ggpoStarted = false;

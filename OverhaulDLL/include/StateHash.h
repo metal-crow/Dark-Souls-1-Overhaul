@@ -14,6 +14,10 @@
 #include "FrpgHavokManImpStructFunctions.h"
 #include "ThrowManStructFunctions.h"
 #include "DmgHitRecordManImpStructFunctions.h"
+
+static const char* hash_logfilename = "dsoverhaul_statehash_logging.txt";
+extern FILE* hash_logfile;
+
 // SfxMan is currently disabled in the active rollback state (state->sfxman is
 // NULL -- the copy_SfxMan calls are commented out in Rollback.cpp), so it is not
 // hashed here. Re-enable the two SfxMan lines below once it is restored.
@@ -113,7 +117,11 @@ namespace RollbackHash
                 break;   // std::map is ordered ascending; nothing later is confirmed
             }
             const StateDigest& d = it->second;
-            fprintf(logfile, "STATEHASH frame=%d player=%016llx bullet=%016llx damage=%016llx havok=%016llx throw=%016llx dmghit=%016llx comb=%016llx\n",
+            if (hash_logfile == NULL)
+            {
+                hash_logfile = _fsopen(logfilename, "w", _SH_DENYWR);
+            }
+            fprintf(hash_logfile, "STATEHASH frame=%d player=%016llx bullet=%016llx damage=%016llx havok=%016llx throw=%016llx dmghit=%016llx comb=%016llx\n",
                 it->first,
                 (unsigned long long)d.player,
                 (unsigned long long)d.bullet,
