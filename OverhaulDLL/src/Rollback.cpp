@@ -17,6 +17,7 @@
 #include "DmgHitRecordManImpStructFunctions.h"
 #include "FrpgHavokManImpStructFunctions.h"
 #include "StateHash.h"
+#include "RollbackReplay.h"
 
 FrpgHavokManImp* Rollback::saved_havokman = NULL;
 PlayerIns* Rollback::saved_playerins = NULL;
@@ -401,6 +402,13 @@ bool rollback_game_frame_start_helper(void* unused)
             //Now that we've saved the padManip data, restore the frame info
             player->chrins.padManipulator->chrManipulator.PrevFrame_ActionInputs = PrevFrame_ActionInputs_Save;
             player->chrins.padManipulator->chrManipulator.CurrentFrame_ActionInputs = CurFrame_ActionInputs_Save;
+
+            //Scripted input: record or replay the local input
+            //this is keyed by the GGPO framecount
+            //In Replay mode this overwrites localInput with the recorded input
+            int rr_framecount = 0, rr_last_confirmed = 0;
+            ggpo_get_frame_info(Rollback::ggpo, &rr_framecount, &rr_last_confirmed);
+            RollbackReplay::on_local_input(rr_framecount, &localInput);
 
             //notify ggpo of the local player's inputs
             GGPOErrorCode result = ggpo_add_local_input(Rollback::ggpo, Rollback::ggpoHandles[0], &localInput, sizeof(RollbackInput));
@@ -933,6 +941,7 @@ void Rollback::rollback_end_session()
 {
     if (Rollback::ggpoStarted)
     {
+        RollbackReplay::end_session();
         Rollback::ggpoStarted = false;
         Rollback::ggpoReady = GGPOREADY::NotReady;
         GGPOErrorCode result = ggpo_close_session(Rollback::ggpo);
@@ -1036,6 +1045,8 @@ bool rollback_await_init(void* steamMsgs)
 
     ConsoleWrite("GGPO started");
     Rollback::ggpoStarted = true;
+
+    RollbackReplay::init_session();
 
     return false;
 }

@@ -108,6 +108,7 @@
     <ClInclude Include="include\PlayerInsStructFunctions.h" />
     <ClInclude Include="include\PlayerVisualsValidationFix.h" />
     <ClInclude Include="include\Rollback.h" />
+    <ClInclude Include="include\RollbackReplay.h" />
     <ClInclude Include="include\PlayerInsStruct.h" />
     <ClInclude Include="include\ServerMonitor.h" />
     <ClInclude Include="include\SfxManStruct.h" />

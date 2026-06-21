@@ -11,6 +11,7 @@
 #include "sp/memory/injection/asm/x64.h"
 #include "ModNetworking.h"
 #include "Rollback.h"
+#include "RollbackReplay.h"
 
 namespace Input {
 
@@ -280,6 +281,14 @@ void handle_input(XINPUT_GAMEPAD* xold, XINPUT_GAMEPAD* xcurrent, DIJOYSTATE2* d
         if (Button::pressed(kbold, kbcurrent, DIK_F7))
         {
             Rollback::networkToggle = true;
+        }
+        if (Button::pressed(kbold, kbcurrent, DIK_F12))
+        {
+            //Arm input recording for the test harness. Takes effect at the next
+            //GGPO session start (when RollbackReplay::init_session runs), and only
+            //if no rollback_replay.bin is present (replay wins over record).
+            RollbackReplay::record_armed = !RollbackReplay::record_armed;
+            ConsoleWrite("Rollback input record armed=%d (applies at next session start)", RollbackReplay::record_armed);
         }
     }
 }
