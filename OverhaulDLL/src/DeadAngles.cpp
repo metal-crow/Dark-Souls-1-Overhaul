@@ -30,9 +30,14 @@ uint64_t main_dead_angle_helper(uint64_t attacker, uint64_t target)
         return 1;
     }
 
-    //disable when in offline/PvE
-    auto session_action_result = Game::get_SessionManagerImp_session_action_result();
-    if (session_action_result.has_value() && session_action_result.value() == NoSession)
+    //disable when the attack is PvE
+    auto attacker_is_player = Game::entity_is_player((void*)attacker);
+    auto target_is_player = Game::entity_is_player((void*)target);
+    if (!attacker_is_player.has_value() || !target_is_player.has_value())
+    {
+        return 1;
+    }
+    if (!attacker_is_player.value() || !target_is_player.value())
     {
         return 1;
     }

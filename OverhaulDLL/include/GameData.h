@@ -323,6 +323,8 @@ public:
 
 	static std::optional<float> get_entity_rotation(void * entity_ptr);
 
+	static std::optional<bool> entity_is_player(void * entity_ptr);
+
 	static std::optional<uint8_t> get_area_number();
 
     static std::optional<uint8_t> get_world_number();

@@ -968,6 +968,14 @@ std::optional<float> Game::get_entity_rotation(void* entity_ptr) {
     }
 }
 
+//Check if the given entity is a PlayerIns
+std::optional<bool> Game::entity_is_player(void* entity_ptr) {
+    if (entity_ptr == NULL) {
+        return std::nullopt;
+    }
+    return *(uint64_t*)entity_ptr == 0x1413251f0;
+}
+
 std::optional<uint8_t> Game::get_area_number() {
     if (area_num_cache) {
         return *area_num_cache;
