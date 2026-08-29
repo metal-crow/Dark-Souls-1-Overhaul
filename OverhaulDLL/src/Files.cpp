@@ -9,6 +9,7 @@
 
 
 int Files::save_file_index = 0;
+int Files::save_file_backup_count = 30;
 bool Files::save_file_index_pending_set_next = false;
 bool Files::save_file_index_pending_set_prev = false;
 bool Files::save_file_index_make_new = false;
@@ -548,7 +549,13 @@ void Files::check_custom_game_config_file_path()
 
 void Files::backup_save_file()
 {
-    const int maxFolders = 30;
+    const int maxFolders = Files::save_file_backup_count;
+    if (maxFolders <= 0)
+    {
+        ConsoleWrite("Save file backups are disabled.");
+        return;
+    }
+
     std::filesystem::path parent_dir = std::filesystem::path(Files::save_file).parent_path();
     std::filesystem::path backup_dir = parent_dir / "backup";
     // Create parent backup folder if it doesn't exist

@@ -93,6 +93,12 @@ void Mod::get_init_preferences()
 
     Mod::use_steam_names = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_USE_STEAM_NAMES_, (int)Mod::use_steam_names, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
 
+    Files::save_file_backup_count = (int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_SAVE_BACKUP_COUNT_, Files::save_file_backup_count, _DS1_OVERHAUL_SETTINGS_FILE_);
+    if (Files::save_file_backup_count < 0)
+    {
+        Files::save_file_backup_count = 0;
+    }
+
     Mod::fix_hp_bar_size = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_FIX_HP_BAR_SIZE_, (int)Mod::fix_hp_bar_size, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);
 
     Mod::stop_durability_damage = ((int)GetPrivateProfileInt(_DS1_OVERHAUL_PREFS_SECTION_, _DS1_OVERHAUL_PREF_STOP_DURABILITY_DAMAGE_, (int)Mod::stop_durability_damage, _DS1_OVERHAUL_SETTINGS_FILE_) != 0);

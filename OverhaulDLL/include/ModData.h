@@ -20,6 +20,7 @@
 #define _DS1_OVERHAUL_PREF_CUSTOM_GAME_ARCHIVE_ "CustomArchiveFiles"
 #define _DS1_OVERHAUL_PREF_CUSTOM_SAVE_FILE_ "CustomSaveFile"
 #define _DS1_OVERHAUL_PREF_CUSTOM_GAME_CFG_FILE_ "CustomGameConfigFile"
+#define _DS1_OVERHAUL_PREF_SAVE_BACKUP_COUNT_ "SaveFileBackupCount"
 // General settings:
 #define _DS1_OVERHAUL_PREF_DISABLE_LOW_FPS_DISCONNECT_ "DisableLowFpsDisconnect"
 #define _DS1_OVERHAUL_PREF_USE_STEAM_NAMES_ "UseSteamNames"

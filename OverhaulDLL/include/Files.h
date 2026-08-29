@@ -35,6 +35,9 @@ public:
     // Index of the save file currently being read/written by the game
     static int save_file_index;
 
+    // Number of save file backups to keep (0 disables backups)
+    static int save_file_backup_count;
+
     // Pending save file index changes
     static bool save_file_index_pending_set_next;
     static bool save_file_index_pending_set_prev;
