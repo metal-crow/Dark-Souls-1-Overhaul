@@ -31,6 +31,7 @@
 #include "Rollback.h"
 #include "PlayerVisualsValidationFix.h"
 #include "ServerMonitor.h"
+#include "dearxan.h"
 
 HMODULE d3d11_module;
 FILE* logfile = NULL;
@@ -100,6 +101,14 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
 {
     ConsoleWrite("%s\n\n",DS1_OVERHAUL_TXT_INTRO);
     d3d11_module = h_module;
+
+    // This hooks the game's entry point and does the work from there, so the callback below runs after return
+    dearxan::neuter_arxan([](const dearxan::DearxanResult& result) {
+        if (result.status() == dearxan::DearxanStatus::DearxanSuccess)
+            ConsoleWrite("Arxan neutered (anti-tamper %s)", result.is_arxan_detected() ? "detected" : "not detected");
+        else
+            ConsoleWrite("FAILED to neuter Arxan: %s", result.error_msg().c_str());
+    });
 
     Game::init();
     AntiAntiCheat::start();
