@@ -32,6 +32,7 @@
 #include "PlayerVisualsValidationFix.h"
 #include "ServerMonitor.h"
 #include "dearxan.h"
+#include "SandboxieCompat.h"
 
 HMODULE d3d11_module;
 FILE* logfile = NULL;
@@ -109,6 +110,11 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
         else
             ConsoleWrite("FAILED to neuter Arxan: %s", result.error_msg().c_str());
     });
+
+    // Reconcile Sandboxie's entry point hook with Seamless Co-op's arxan-disabler (see SandboxieCompat.cpp).
+    // Deliberately after dearxan: under Sandboxie dearxan has already looked at the hooked entry point and
+    // backed off, so restoring the original bytes here doesn't change what it does.
+    SandboxieCompat::start();
 
     Game::init();
     AntiAntiCheat::start();

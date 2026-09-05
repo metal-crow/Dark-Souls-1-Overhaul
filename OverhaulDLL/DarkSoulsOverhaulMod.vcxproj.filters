@@ -90,6 +90,9 @@
     <ClCompile Include="src\FixAnkles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\SandboxieCompat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\CrashHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -186,6 +189,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\FixAnkles.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SandboxieCompat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\CrashHandler.h">
