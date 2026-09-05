@@ -4,3 +4,4 @@ OverhaulDLL_PtDE/
 /OverhaulDLL/Testing.cpp
 /OverhaulDLL/testing.h
 /OverhaulDLL/DebugAsan
+/dev_scripts/rollback_harness/__pycache__
