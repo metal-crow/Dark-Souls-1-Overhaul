@@ -211,8 +211,7 @@ same deterministic script to classify.
 ```
 python launch_harness.py --launch                --control-port 42800   # A (native)
 python launch_harness.py --launch --sandbox DSR2 --control-port 42810   # B (Sandboxie)
-python harness_client.py --port 42800 rollback on ; python harness_client.py --port 42810 rollback on
-# connect the two through Seamless Co-op (password matchmaking) -> GGPO starts
+# The two enable rollback via the launch_harness, then auto-connect through Seamless Co-op (password matchmaking) -> GGPO starts
 python harness_client.py --port 42800 script load scenario_A.txt
 python harness_client.py --port 42810 script load scenario_B.txt
 python rollback_compare.py --live 42800,42810 --frames 3600 --dump-on-desync --json > result.json

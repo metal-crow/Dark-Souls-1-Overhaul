@@ -35,7 +35,7 @@ Load detection (the stop condition) -- a single lightness threshold:
     loading screen) and declare LOADED once mean luma stays at/above --light-thresh
     for --confirm-samples checks in a row. Brightness is tested *before* each tap,
     so reaching gameplay stops us before 'e' can fire in-game interactions.
-    Once LOADED, we wait 5s for the character to settle and tap 'r' once.
+    Once LOADED, we wait 5s for the character to settle, then tap F6 and 'r'.
 
 --light-thresh is mean luma 0..255 and depends on resolution / UI scale / HDR, so
 it needs a one-time calibration: set it above the brightest menu and below the
@@ -96,7 +96,7 @@ KEYEVENTF_SCANCODE = 0x0008
 # DirectInput (DIK_*) scancodes == hardware scancodes for the keys we care about.
 KEY_SCANCODES = {
     "e": 0x12, "enter": 0x1C, "return": 0x1C, "space": 0x39,
-    "f": 0x21, "q": 0x10, "r": 0x13, "esc": 0x01,
+    "f": 0x21, "q": 0x10, "r": 0x13, "esc": 0x01, "f6": 0x40,
 }
 
 # Seconds to wait after the lightness check says LOADED before tapping 'r':
@@ -460,7 +460,7 @@ class Result:
 
 
 def advance_to_ingame(hwnd, scancode=0x12, press_interval=0.7, poll_interval=0.2,
-                      timeout=180.0, light_thresh=60.0, confirm_samples=4,
+                      timeout=180.0, light_thresh=60.0, confirm_samples=10,
                       max_pixel_samples=4000, debug=False, save_dir=None, log=print):
     """Tap the confirm key through the menus until the screen is bright == in-game.
 
@@ -476,7 +476,8 @@ def advance_to_ingame(hwnd, scancode=0x12, press_interval=0.7, poll_interval=0.2
     in-game scene.
 
     Once LOADED is confirmed we wait POST_LOAD_DELAY seconds for the character to
-    finish settling in, then tap 'r' once. Returns Result.LOADED / TIMEOUT.
+    finish settling in, then tap F6 and 'r' once each. Returns
+    Result.LOADED / TIMEOUT.
     """
     deadline = time.time() + timeout
     bright_run = 0
@@ -519,8 +520,10 @@ def advance_to_ingame(hwnd, scancode=0x12, press_interval=0.7, poll_interval=0.2
                     f"{confirm_samples} checks, {presses} presses)")
                 time.sleep(POST_LOAD_DELAY)
                 set_foreground(hwnd)
+                tap_scancode(KEY_SCANCODES["f6"])
+                time.sleep(press_interval)
                 tap_scancode(KEY_SCANCODES["r"])
-                log("menu_nav: pressed 'r'")
+                log("menu_nav: pressed F6 then 'r'")
                 return Result.LOADED
             time.sleep(poll_interval)  # confirming in-game -- do NOT tap
             continue
@@ -724,8 +727,8 @@ def main(argv=None):
     ap.add_argument("--light-thresh", type=float, default=60.0,
                     help="mean luma 0..255 at/above which the screen is in-game, "
                          "not a dark menu/loading screen (default 60; calibrate)")
-    ap.add_argument("--confirm-samples", type=int, default=4,
-                    help="consecutive bright samples to declare LOADED (default 4)")
+    ap.add_argument("--confirm-samples", type=int, default=10,
+                    help="consecutive bright samples to declare LOADED (default 10)")
     ap.add_argument("--poll-interval", type=float, default=0.2,
                     help="capture interval while confirming the in-game screen (default 0.2)")
 
