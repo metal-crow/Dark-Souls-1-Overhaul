@@ -4,8 +4,10 @@
 
 #include <cstdint>
 #include <cstdio>
+#include <deque>
 #include <map>
 #include <string>
+#include <utility>
 
 #include "Rollback.h"
 #include "PlayerInsStructFunctions.h"
@@ -95,6 +97,122 @@ namespace RollbackHash
         return m;
     }
 
+    // ---- confirmed-digest history, served by the control plane's "hashes" command ----
+    // The live verifier (rollback_verify.py) polls "hashes since=<frame>" on both
+    // instances and aligns by frame, so it needs no log file access (the sandboxed
+    // instance's files are inside Sandboxie). ~2.3 minutes at 60 fps; a poller
+    // that falls further behind than that sees "gap":true and knows to restart.
+    inline const size_t HISTORY_MAX = 8192;
+    inline std::deque<std::pair<int, StateDigest>>& _history()
+    {
+        static std::deque<std::pair<int, StateDigest>> h;
+        return h;
+    }
+    inline int last_confirmed_emitted = -1;   // newest frame in _history(), -1 if none
+
+    inline std::string _hex(uint64_t v)
+    {
+        char b[24];
+        snprintf(b, sizeof(b), "%016llx", (unsigned long long)v);
+        return b;
+    }
+
+    inline std::string _digest_json(int frame, const StateDigest& d)
+    {
+        std::string s = "{\"f\":" + std::to_string(frame);
+        s += ",\"player\":\"" + _hex(d.player) + "\"";
+        s += ",\"bullet\":\"" + _hex(d.bullet) + "\"";
+        s += ",\"damage\":\"" + _hex(d.damage) + "\"";
+        s += ",\"havok\":\"" + _hex(d.havok) + "\"";
+        s += ",\"throw\":\"" + _hex(d.throwman) + "\"";
+        s += ",\"dmghit\":\"" + _hex(d.dmghit) + "\"";
+        s += ",\"comb\":\"" + _hex(combined(d)) + "\"}";
+        return s;
+    }
+
+    // Confirmed digests with frame > since_frame, oldest first, at most max_count.
+    // "gap" is true when history no longer reaches back to since_frame+1.
+    inline std::string hashes_json(int since_frame, int max_count)
+    {
+        std::deque<std::pair<int, StateDigest>>& h = _history();
+        int oldest = h.empty() ? -1 : h.front().first;
+        int newest = h.empty() ? -1 : h.back().first;
+        std::string s = "{\"frames\":[";
+        int n = 0;
+        for (const auto& e : h)
+        {
+            if (e.first <= since_frame) continue;
+            if (n >= max_count) break;
+            if (n) s += ",";
+            s += _digest_json(e.first, e.second);
+            n++;
+        }
+        s += "],\"count\":" + std::to_string(n);
+        s += ",\"oldest\":" + std::to_string(oldest);
+        s += ",\"newest\":" + std::to_string(newest);
+        bool gap = (since_frame >= 0 && oldest > since_frame + 1);
+        s += ",\"gap\":" + std::string(gap ? "true" : "false") + "}";
+        return s;
+    }
+
+    // ---- Tier-1 localizer: full canonical text dump of one saved frame ----
+    // The control plane arms dump_request_frame ("dump_at <frame>"); record()
+    // captures that frame's text each time GGPO saves it (a rollback re-save
+    // overwrites with the corrected state) until emit_confirmed sees it confirmed.
+    // "dump_get" then returns the text, so both instances can be dumped at the
+    // SAME GGPO frame and diffed field by field. Also written to
+    // statedump_harness_<frame>.txt next to the exe.
+    inline int         dump_request_frame = -1;
+    inline int         dump_frame = -1;       // frame the stored dump is for, -1 = none
+    inline bool        dump_confirmed = false;
+    inline std::string dump_text_store;
+    inline std::string dump_file;
+
+    inline std::string dump_text_of(RollbackState* s)
+    {
+        std::string t;
+        for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
+        {
+            t += "=== Player ";
+            t += std::to_string(i);
+            t += " ===\n";
+            t += print_PlayerIns(s->playerins[i]);
+        }
+        t += "=== BulletMan ===\n";        t += print_BulletMan(s->bulletman);
+        t += "=== DamageMan ===\n";        t += print_DamageMan(s->damageman);
+        t += "=== FrpgHavokManImp ===\n";  t += print_FrpgHavokManImp(s->havokman);
+        t += "=== ThrowMan ===\n";         t += print_ThrowMan(s->throwman);
+        t += "=== DmgHitRecordManImp ===\n"; t += print_DmgHitRecordManImp(s->dmghitrecordman);
+        return t;
+    }
+
+    inline void _write_text_file(const char* name, const std::string& t)
+    {
+        FILE* fp = nullptr;
+        fopen_s(&fp, name, "w");
+        if (!fp) return;
+        fwrite(t.data(), 1, t.size(), fp);
+        fclose(fp);
+    }
+
+    // Dump a saved state to statedump_<tag>_<frame>.txt next to the game exe.
+    inline void dump_state(int frame, RollbackState* s, const char* tag)
+    {
+        char name[128];
+        snprintf(name, sizeof(name), "statedump_%s_%d.txt", tag, frame);
+        _write_text_file(name, dump_text_of(s));
+    }
+
+    inline std::string dump_status_fields()
+    {
+        std::string s = "\"dump_requested\":" + std::to_string(dump_request_frame);
+        s += ",\"dump_frame\":" + std::to_string(dump_frame);
+        s += ",\"dump_confirmed\":" + std::string(dump_confirmed ? "true" : "false");
+        s += ",\"dump_size\":" + std::to_string(dump_text_store.size());
+        s += ",\"dump_file\":\"" + dump_file + "\"";
+        return s;
+    }
+
     // Called from rollback_save_game_state_callback with the frame GGPO is
     // saving. Returns the digest so the caller can reuse it (e.g. as the synctest
     // checksum) without hashing the whole state twice.
@@ -102,6 +220,18 @@ namespace RollbackHash
     {
         StateDigest d = digest_of(s);
         _store()[frame] = d;
+
+        if (frame == dump_request_frame)
+        {
+            dump_text_store = dump_text_of(s);
+            dump_frame = frame;
+            dump_confirmed = false;
+            char name[128];
+            snprintf(name, sizeof(name), "statedump_harness_%d.txt", frame);
+            _write_text_file(name, dump_text_store);
+            dump_file = name;
+            ConsoleWrite("StateHash: captured state dump for frame %d (%u bytes)", frame, (unsigned)dump_text_store.size());
+        }
         return d;
     }
 
@@ -119,50 +249,52 @@ namespace RollbackHash
             const StateDigest& d = it->second;
             if (hash_logfile == NULL)
             {
-                hash_logfile = _fsopen(logfilename, "w", _SH_DENYWR);
+                // NB: its own file. The main log is already open deny-write, so
+                // opening *that* name here fails and leaves a NULL stream.
+                hash_logfile = _fsopen(hash_logfilename, "w", _SH_DENYWR);
             }
-            fprintf(hash_logfile, "STATEHASH frame=%d player=%016llx bullet=%016llx damage=%016llx havok=%016llx throw=%016llx dmghit=%016llx comb=%016llx\n",
-                it->first,
-                (unsigned long long)d.player,
-                (unsigned long long)d.bullet,
-                (unsigned long long)d.damage,
-                (unsigned long long)d.havok,
-                (unsigned long long)d.throwman,
-                (unsigned long long)d.dmghit,
-                (unsigned long long)combined(d));
+            if (hash_logfile != NULL)
+            {
+                fprintf(hash_logfile, "STATEHASH frame=%d player=%016llx bullet=%016llx damage=%016llx havok=%016llx throw=%016llx dmghit=%016llx comb=%016llx\n",
+                    it->first,
+                    (unsigned long long)d.player,
+                    (unsigned long long)d.bullet,
+                    (unsigned long long)d.damage,
+                    (unsigned long long)d.havok,
+                    (unsigned long long)d.throwman,
+                    (unsigned long long)d.dmghit,
+                    (unsigned long long)combined(d));
+                fflush(hash_logfile);
+            }
+
+            std::deque<std::pair<int, StateDigest>>& h = _history();
+            h.emplace_back(it->first, d);
+            if (h.size() > HISTORY_MAX) h.pop_front();
+            last_confirmed_emitted = it->first;
+
             it = m.erase(it);
+        }
+
+        if (dump_frame >= 0 && !dump_confirmed && dump_frame <= last_confirmed_frame)
+        {
+            dump_confirmed = true;                 // no more re-saves of that frame: the text is final
+            if (dump_request_frame == dump_frame) dump_request_frame = -1;
+            ConsoleWrite("StateHash: state dump for frame %d is confirmed", dump_frame);
         }
     }
 
-    // Tier-1 localizer: dump the full canonical text of a saved state to
-    // statedump_<tag>_<frame>.txt next to the game exe. Drive this from the
-    // harness on the offending frame (re-run the deterministic scenario with
-    // dumping enabled) and diff the host vs guest file.
-    inline void dump_state(int frame, RollbackState* s, const char* tag)
+    // Session boundary: GGPO frames restart at 0, so the per-frame stores must not
+    // carry stale entries across sessions.
+    inline void reset_session()
     {
-        char name[128];
-        snprintf(name, sizeof(name), "statedump_%s_%d.txt", tag, frame);
-        FILE* fp = nullptr;
-        fopen_s(&fp, name, "w");
-        if (!fp)
-        {
-            return;
-        }
-        std::string t;
-        for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
-        {
-            t += "=== Player ";
-            t += std::to_string(i);
-            t += " ===\n";
-            t += print_PlayerIns(s->playerins[i]);
-        }
-        t += "=== BulletMan ===\n";        t += print_BulletMan(s->bulletman);
-        t += "=== DamageMan ===\n";        t += print_DamageMan(s->damageman);
-        t += "=== FrpgHavokManImp ===\n";  t += print_FrpgHavokManImp(s->havokman);
-        t += "=== ThrowMan ===\n";         t += print_ThrowMan(s->throwman);
-        t += "=== DmgHitRecordManImp ===\n"; t += print_DmgHitRecordManImp(s->dmghitrecordman);
-        fwrite(t.data(), 1, t.size(), fp);
-        fclose(fp);
+        _store().clear();
+        _history().clear();
+        last_confirmed_emitted = -1;
+        dump_request_frame = -1;
+        dump_frame = -1;
+        dump_confirmed = false;
+        dump_text_store.clear();
+        dump_file.clear();
     }
 }
 

@@ -36,6 +36,13 @@
       end_session                   Rollback::rollback_end_session()
       log <text>                    write "HARNESS: <text>" into the mod log (marker for alignment)
       subscribe                     turn this connection into a log stream
+      hashes [since] [max]          confirmed per-frame state digests (StateHash.h ring) with frame > since,
+                                    oldest first; "gap":true if the ring no longer reaches since+1
+      dump_at <frame>|+<n>          capture the full canonical state text when GGPO saves that frame
+                                    (absolute, or n frames past the current one); re-saves overwrite until confirmed
+      dump_status                   dump_requested / dump_frame / dump_confirmed / dump_size / dump_file
+      dump_get                      the captured text (+ dump_status fields); large (hundreds of KB)
+      probe                         per connected player: hp, max_hp, x, y, z, rot -- a cheap "what is happening" view
       help                          list commands
 */
 
@@ -53,6 +60,7 @@
 #include "Rollback.h"
 #include "RollbackReplay.h"
 #include "RollbackScript.h"
+#include "StateHash.h"
 
 #include <algorithm>
 #include <atomic>
@@ -382,13 +390,91 @@ namespace
             return ok_json();
         }
 
+        // ---- determinism oracle (StateHash.h) ----
+        if (cmd == "hashes")
+        {
+            int since = -1;
+            int maxn = 2000;
+            if (a.size() > 1) since = atoi(a[1].c_str());
+            if (a.size() > 2) maxn = atoi(a[2].c_str());
+            if (maxn <= 0 || maxn > (int)RollbackHash::HISTORY_MAX) maxn = (int)RollbackHash::HISTORY_MAX;
+            int frame, confirmed;
+            frame_info(&frame, &confirmed);
+            return ok_json("\"frame\":" + std::to_string(frame) + ",\"confirmed_frame\":" + std::to_string(confirmed)
+                           + ",\"ggpo_started\":" + b2s(Rollback::ggpoStarted)
+                           + ",\"hashes\":" + RollbackHash::hashes_json(since, maxn));
+        }
+
+        if (cmd == "dump_at")
+        {
+            if (sub.empty()) return err_json("usage: dump_at <frame> | dump_at +<frames ahead>");
+            int frame, confirmed;
+            frame_info(&frame, &confirmed);
+            int target;
+            if (sub[0] == '+')
+            {
+                if (frame < 0) return err_json("no GGPO session running; use an absolute frame");
+                target = frame + atoi(sub.c_str() + 1);
+            }
+            else
+            {
+                target = atoi(sub.c_str());
+            }
+            if (target < 0) return err_json("bad frame '" + sub + "'");
+            RollbackHash::dump_request_frame = target;
+            ConsoleWrite("HARNESS: state dump requested for frame %d (current %d)", target, frame);
+            return ok_json("\"dump_requested\":" + std::to_string(target) + ",\"frame\":" + std::to_string(frame));
+        }
+
+        if (cmd == "dump_status") return ok_json(RollbackHash::dump_status_fields());
+
+        if (cmd == "dump_get")
+        {
+            if (RollbackHash::dump_frame < 0) return err_json("no state dump captured yet (use dump_at)");
+            return ok_json(RollbackHash::dump_status_fields() + ",\"text\":" + q(RollbackHash::dump_text_store));
+        }
+
+        if (cmd == "probe")
+        {
+            int frame, confirmed;
+            frame_info(&frame, &confirmed);
+            std::string s = "\"frame\":" + std::to_string(frame) + ",\"confirmed_frame\":" + std::to_string(confirmed) + ",\"players\":[";
+            int n = 0;
+            if (Game::playerchar_is_loaded())
+            {
+                for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
+                {
+                    auto p = Game::get_connected_player(i);
+                    if (!p.has_value() || p.value() == 0) continue;
+                    PlayerIns* pi = (PlayerIns*)p.value();
+                    if (n) s += ",";
+                    s += "{\"slot\":" + std::to_string(i);
+                    s += ",\"hp\":" + std::to_string(pi->chrins.curHp) + ",\"max_hp\":" + std::to_string(pi->chrins.maxHp);
+                    HavokChara* hc = (pi->chrins.playerCtrl != NULL) ? pi->chrins.playerCtrl->chrCtrl.havokChara : NULL;
+                    if (hc != NULL)
+                    {
+                        s += ",\"x\":" + RollbackScript::json_number(hc->current_coords[0]);
+                        s += ",\"y\":" + RollbackScript::json_number(hc->current_coords[1]);
+                        s += ",\"z\":" + RollbackScript::json_number(hc->current_coords[2]);
+                        // the rotation the mod treats as authoritative (PadManipulatorPacked_to_PadManipulator writes it here)
+                        s += ",\"rot\":" + RollbackScript::json_number(*(float*)((uint8_t*)hc + 4));
+                    }
+                    s += "}";
+                    n++;
+                }
+            }
+            s += "]";
+            return ok_json(s);
+        }
+
         if (cmd == "help")
         {
             return ok_json("\"commands\":[\"ping\",\"status\",\"frame\",\"input\",\"rollback on|off|toggle\",\"network on|off\","
                            "\"record arm|disarm\",\"record file <path>\",\"replay file <path>\",\"replay off\","
                            "\"script load <path>\",\"script add <directive>\",\"script clear\",\"script neutral on|off\","
                            "\"script name <text>\",\"script status\",\"hotkey gsave|gload|isave|iload\",\"end_session\","
-                           "\"log <text>\",\"subscribe\",\"help\"]");
+                           "\"log <text>\",\"subscribe\",\"hashes [since] [max]\",\"dump_at <frame>|+<n>\",\"dump_status\","
+                           "\"dump_get\",\"probe\",\"help\"]");
         }
 
         return err_json("unknown command '" + cmd + "' (try help)");

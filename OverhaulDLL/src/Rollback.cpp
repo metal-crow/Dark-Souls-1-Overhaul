@@ -1053,6 +1053,7 @@ bool rollback_await_init(void* steamMsgs)
 
     RollbackReplay::init_session();
     RollbackScript::init_session();
+    RollbackHash::reset_session();
 
     return false;
 }
