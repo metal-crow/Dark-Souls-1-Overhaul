@@ -56,6 +56,11 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam);
 static const char* logfilename = "dsoverhaul_logging.txt";
 extern FILE* logfile;
 
+// Optional observer for every ConsoleWrite line (time in ms, formatted text).
+// Installed by the test-harness control plane to stream the log over TCP; NULL
+// otherwise. Must not call ConsoleWrite. May be called from any thread.
+extern void (*ConsoleWrite_tap)(uint64_t time_ms, const char* line);
+
 void inline ConsoleWrite(const char* str, ...)
 {
     if (logfile == NULL)
@@ -79,6 +84,11 @@ void inline ConsoleWrite(const char* str, ...)
     {
         fprintf(logfile, "[%lld] %s\n", time, dest);
         fflush(logfile);
+    }
+
+    if (ConsoleWrite_tap != NULL)
+    {
+        ConsoleWrite_tap(time, dest);
     }
 }
 

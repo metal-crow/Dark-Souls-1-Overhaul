@@ -36,6 +36,7 @@
 
 HMODULE d3d11_module;
 FILE* logfile = NULL;
+void (*ConsoleWrite_tap)(uint64_t time_ms, const char* line) = NULL;
 
 //VERY BASIC update check
 void Update_Check()
