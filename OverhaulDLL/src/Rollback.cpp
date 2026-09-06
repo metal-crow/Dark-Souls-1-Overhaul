@@ -18,6 +18,7 @@
 #include "FrpgHavokManImpStructFunctions.h"
 #include "StateHash.h"
 #include "RollbackReplay.h"
+#include "RollbackScript.h"
 
 FrpgHavokManImp* Rollback::saved_havokman = NULL;
 PlayerIns* Rollback::saved_playerins = NULL;
@@ -403,12 +404,15 @@ bool rollback_game_frame_start_helper(void* unused)
             player->chrins.padManipulator->chrManipulator.PrevFrame_ActionInputs = PrevFrame_ActionInputs_Save;
             player->chrins.padManipulator->chrManipulator.CurrentFrame_ActionInputs = CurFrame_ActionInputs_Save;
 
-            //Scripted input: record or replay the local input
-            //this is keyed by the GGPO framecount
-            //In Replay mode this overwrites localInput with the recorded input
+            //Test-harness input pipeline, keyed by the GGPO framecount (the same index STATEHASH uses):
+            //  replay (base) -> script (overlay) -> record (captures the final input)
+            //so a scripted session's recording replays faithfully, and a script can patch a replayed recording.
             int rr_framecount = 0, rr_last_confirmed = 0;
             ggpo_get_frame_info(Rollback::ggpo, &rr_framecount, &rr_last_confirmed);
-            RollbackReplay::on_local_input(rr_framecount, &localInput);
+            RollbackReplay::apply_replay(rr_framecount, &localInput);
+            RollbackScript::apply(rr_framecount, &localInput);
+            RollbackReplay::capture_record(rr_framecount, &localInput);
+            RollbackScript::observe(rr_framecount, &localInput);
 
             //notify ggpo of the local player's inputs
             GGPOErrorCode result = ggpo_add_local_input(Rollback::ggpo, Rollback::ggpoHandles[0], &localInput, sizeof(RollbackInput));
@@ -942,6 +946,7 @@ void Rollback::rollback_end_session()
     if (Rollback::ggpoStarted)
     {
         RollbackReplay::end_session();
+        RollbackScript::end_session();
         Rollback::ggpoStarted = false;
         Rollback::ggpoReady = GGPOREADY::NotReady;
         GGPOErrorCode result = ggpo_close_session(Rollback::ggpo);
@@ -1047,6 +1052,7 @@ bool rollback_await_init(void* steamMsgs)
     Rollback::ggpoStarted = true;
 
     RollbackReplay::init_session();
+    RollbackScript::init_session();
 
     return false;
 }

@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <cstring>
 #include <map>
+#include <string>
 
 #include "Rollback.h"               // RollbackInput
 #include "DarkSoulsOverhaulMod.h"   // ConsoleWrite
@@ -41,8 +42,11 @@ namespace RollbackReplay
 {
     enum class Mode { Off, Record, Replay };
 
-    inline const char* REPLAY_FILE   = "rollback_replay.bin";
-    inline const char* RECORD_FILE   = "rollback_recording.bin";
+    // File names are settable (HarnessControl "replay file"/"record file") so the
+    // orchestrator can point each instance at its own recording without renaming.
+    // Read at init_session; changing them mid-session has no effect until the next.
+    inline std::string replay_file   = "rollback_replay.bin";
+    inline std::string record_file   = "rollback_recording.bin";
     inline const char* RECORD_MARKER = "rollback_record.on";
 
     // 8-byte magic + the input size this file was written with, so a replay
@@ -83,6 +87,9 @@ namespace RollbackReplay
         record_fp = nullptr;
         _replay_store().clear();
         _exhausted_logged = false;
+
+        const char* REPLAY_FILE = replay_file.c_str();
+        const char* RECORD_FILE = record_file.c_str();
 
         FILE* rf = nullptr;
         fopen_s(&rf, REPLAY_FILE, "rb");
@@ -144,44 +151,52 @@ namespace RollbackReplay
         ConsoleWrite("RollbackReplay: OFF (no '%s', record not armed)", REPLAY_FILE);
     }
 
-    // Called once per frame at the ggpo_add_local_input seam with the GGPO
-    // framecount this input is for. In Replay mode it overwrites *io with the
-    // recorded input; in Record mode it captures *io. Off mode is a no-op.
+    // Replay half of the seam: in Replay mode overwrite *io with the recorded
+    // input for this GGPO frame. No-op otherwise. Runs BEFORE RollbackScript so
+    // a script can patch a replayed recording.
+    inline void apply_replay(int frame, RollbackInput* io)
+    {
+        if (mode != Mode::Replay) return;
+        std::map<int, RollbackInput>& m = _replay_store();
+        auto it = m.find(frame);
+        if (it != m.end())
+        {
+            *io = it->second;
+        }
+        else if (!_exhausted_logged)
+        {
+            // Past the end of (or a gap in) the recording: leave the live
+            // input in place and note where the deterministic window ended.
+            ConsoleWrite("RollbackReplay: no recorded input for frame %d (replay exhausted / gap); live input from here", frame);
+            _exhausted_logged = true;
+        }
+    }
+
+    // Record half of the seam: in Record mode append *io for this frame. Runs
+    // AFTER RollbackScript so the recording holds what was actually sent to GGPO.
+    inline void capture_record(int frame, RollbackInput* io)
+    {
+        if (mode != Mode::Record || !record_fp) return;
+        int32_t f = frame;
+        fwrite(&f, 1, sizeof(f), record_fp);
+        fwrite(io, 1, sizeof(*io), record_fp);
+        fflush(record_fp);          // write-through so a crash keeps the recording
+    }
+
+    // Convenience for callers that don't interpose anything between the halves.
     inline void on_local_input(int frame, RollbackInput* io)
+    {
+        apply_replay(frame, io);
+        capture_record(frame, io);
+    }
+
+    inline const char* mode_name()
     {
         switch (mode)
         {
-        case Mode::Record:
-            if (record_fp)
-            {
-                int32_t f = frame;
-                fwrite(&f, 1, sizeof(f), record_fp);
-                fwrite(io, 1, sizeof(*io), record_fp);
-                fflush(record_fp);          // write-through so a crash keeps the recording
-            }
-            break;
-
-        case Mode::Replay:
-        {
-            std::map<int, RollbackInput>& m = _replay_store();
-            auto it = m.find(frame);
-            if (it != m.end())
-            {
-                *io = it->second;
-            }
-            else if (!_exhausted_logged)
-            {
-                // Past the end of (or a gap in) the recording: leave the live
-                // input in place and note where the deterministic window ended.
-                ConsoleWrite("RollbackReplay: no recorded input for frame %d (replay exhausted / gap); live input from here", frame);
-                _exhausted_logged = true;
-            }
-            break;
-        }
-
-        case Mode::Off:
-        default:
-            break;
+        case Mode::Record: return "Record";
+        case Mode::Replay: return "Replay";
+        default:           return "Off";
         }
     }
 
