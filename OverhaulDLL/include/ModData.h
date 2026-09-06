@@ -15,6 +15,9 @@
 #define _DS1_OVERHAUL_SETTINGS_FILE_ ".\\d3d11_mod.ini"
 #define _DS1_OVERHAUL_PREFS_SECTION_ "Dark Souls Overhaul Settings"
 #define _DS1_OVERHAUL_KEYBINDS_SECTION_ "Dark Souls Overhaul Keybinds"
+#define _DS1_OVERHAUL_TESTING_SECTION_ "Dark Souls Overhaul Testing"
+// Test harness (see HarnessControl.h). 0/absent = disabled. Env var DSR_HARNESS_PORT overrides.
+#define _DS1_OVERHAUL_TESTING_CONTROL_PORT_ "HarnessControlPort"
 // Startup preferences:
 #define _DS1_OVERHAUL_PREF_LEGACY_MODE_ "LegacyMode"
 #define _DS1_OVERHAUL_PREF_CUSTOM_GAME_ARCHIVE_ "CustomArchiveFiles"

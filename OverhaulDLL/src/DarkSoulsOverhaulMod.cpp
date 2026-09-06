@@ -33,6 +33,7 @@
 #include "ServerMonitor.h"
 #include "dearxan.h"
 #include "SandboxieCompat.h"
+#include "HarnessControl.h"
 
 HMODULE d3d11_module;
 FILE* logfile = NULL;
@@ -187,6 +188,8 @@ DWORD WINAPI on_process_attach_async(LPVOID lpParam)
     //Rollback::start();
     Game::disable_low_fps_disconnect(true);
     PlayerVisualsValidationFix::start();
+    // Test-harness control plane. Inert unless DSR_HARNESS_PORT / HarnessControlPort is set.
+    HarnessControl::start();
 
     ConsoleWrite("All initial loading finished!");
 

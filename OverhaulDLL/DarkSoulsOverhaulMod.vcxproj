@@ -52,6 +52,7 @@
     <ClCompile Include="src\Files.cpp" />
     <ClCompile Include="src\FixAnkles.cpp" />
     <ClCompile Include="src\SandboxieCompat.cpp" />
+    <ClCompile Include="src\HarnessControl.cpp" />
     <ClCompile Include="src\FrpgHavokManImpStructFunctions.cpp" />
     <ClCompile Include="src\GameData.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -99,6 +100,7 @@
     <ClInclude Include="include\EquipmentUnlock.h" />
     <ClInclude Include="include\FixAnkles.h" />
     <ClInclude Include="include\SandboxieCompat.h" />
+    <ClInclude Include="include\HarnessControl.h" />
     <ClInclude Include="include\FrpgHavokManImpStruct.h" />
     <ClInclude Include="include\FrpgHavokManImpStructFunctions.h" />
     <ClInclude Include="include\InvisibleBackstabAttackFix.h" />
