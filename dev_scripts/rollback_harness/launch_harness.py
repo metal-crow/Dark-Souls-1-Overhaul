@@ -588,12 +588,22 @@ def game_windows(title):
     return cands
 
 
-def launch_instance(launcher, sandbox=None, sandboxie_start=None, log=print):
-    """Start the SC launcher natively, or inside a Sandboxie box via Start.exe."""
+def launch_instance(launcher, sandbox=None, sandboxie_start=None, log=print, env_extra=None):
+    """Start the SC launcher natively, or inside a Sandboxie box via Start.exe.
+
+    `env_extra` is merged into the child's environment. The launcher and the
+    game inherit it (CreateProcess default), which is how DSR_HARNESS_PORT
+    reaches the DLL's control plane. Under Sandboxie the environment goes
+    through Start.exe; if it turns out not to survive that hop, the DLL's
+    fallback is the ini key HarnessControlPort plus port fall-forward, and the
+    orchestrator can still find the instance with `harness_client.py discover
+    --pid` using the pid logged below."""
     launcher = os.path.abspath(launcher)
     if not os.path.isfile(launcher):
         raise FileNotFoundError(f"launcher not found: {launcher}")
     workdir = os.path.dirname(launcher)
+    env = os.environ.copy()
+    env.update(env_extra or {})
     if sandbox:
         start = find_sandboxie_start(sandboxie_start)
         if not start:
@@ -604,7 +614,15 @@ def launch_instance(launcher, sandbox=None, sandboxie_start=None, log=print):
     else:
         cmd = [launcher]
         log(f"menu_nav: launching {launcher}")
-    subprocess.Popen(cmd, cwd=workdir, close_fds=True)
+    if env_extra:
+        log("menu_nav: env " + " ".join(f"{k}={v}" for k, v in env_extra.items()))
+    subprocess.Popen(cmd, cwd=workdir, close_fds=True, env=env)
+
+
+def window_pid(hwnd):
+    pid = wintypes.DWORD(0)
+    user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
+    return pid.value
 
 
 def wait_for_new_window(title, exclude, timeout, poll=1.0):
@@ -620,11 +638,18 @@ def wait_for_new_window(title, exclude, timeout, poll=1.0):
 
 
 def launch_and_navigate(launcher, sandbox, sandboxie_start, window_title,
-                        launch_timeout, nav_kwargs, log=print):
-    """Launch one instance (native or Sandboxie), wait for its window, navigate."""
+                        launch_timeout, nav_kwargs, log=print, control_port=None):
+    """Launch one instance (native or Sandboxie), wait for its window, navigate.
+
+    With `control_port`, the DLL's test-harness control plane is enabled on that
+    port (env DSR_HARNESS_PORT; the DLL falls forward up to +9 if it is taken).
+    Emits one machine-readable line `INSTANCE hwnd=... pid=... control_port=...`
+    once the window is up so an orchestrator can pair the process with its port
+    (harness_client.py discover --pid PID)."""
     before = game_windows(window_title)  # already-open windows (e.g. the other instance)
+    env_extra = {"DSR_HARNESS_PORT": str(control_port)} if control_port else None
     try:
-        launch_instance(launcher, sandbox, sandboxie_start, log=log)
+        launch_instance(launcher, sandbox, sandboxie_start, log=log, env_extra=env_extra)
     except (FileNotFoundError, OSError) as e:
         log(f"menu_nav: launch failed: {e}")
         return Result.ERROR
@@ -635,9 +660,11 @@ def launch_and_navigate(launcher, sandbox, sandboxie_start, window_title,
         log("menu_nav: launch TIMEOUT -- game window never appeared (launcher "
             "needs a click? Steam not running in this box? wrong --sandbox?)")
         return Result.TIMEOUT
-    log(f"menu_nav: game window appeared (hwnd={hwnd:#x}, "
+    log(f"menu_nav: game window appeared (hwnd={hwnd:#x}, pid={window_pid(hwnd)}, "
         f"title={_window_title(hwnd)!r}, class={_window_class(hwnd)}); "
         f"navigating menus")
+    log(f"INSTANCE hwnd={hwnd:#x} pid={window_pid(hwnd)} "
+        f"control_port={control_port if control_port else 0} sandbox={sandbox or ''}")
     return advance_to_ingame(hwnd, log=log, **nav_kwargs)
 
 
@@ -676,6 +703,10 @@ def main(argv=None):
                         help="seconds to wait for the game window to appear (default 120)")
     launch.add_argument("--window-title", default=DEFAULT_GAME_TITLE,
                         help="game window title substring (default 'DARK SOULS')")
+    launch.add_argument("--control-port", type=int, metavar="PORT",
+                        help="enable the DLL's test-harness control plane on this "
+                             "localhost port (sets DSR_HARNESS_PORT for the game; "
+                             "see harness_client.py). Use different ports for A and B.")
 
     attach = ap.add_argument_group("attach (when not launching)")
     attach.add_argument("--pid", type=int, help="target game process id")
@@ -727,7 +758,7 @@ def main(argv=None):
     if args.launch:
         res = launch_and_navigate(
             args.launcher, args.sandbox, args.sandboxie_start, args.window_title,
-            args.launch_timeout, nav_kwargs, log=emit)
+            args.launch_timeout, nav_kwargs, log=emit, control_port=args.control_port)
     else:
         hwnd = find_window(pid=args.pid, title=args.title, match_index=args.match_index)
         if not hwnd:
