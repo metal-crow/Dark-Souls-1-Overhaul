@@ -14,9 +14,12 @@ class StateVisitor;
 void copy_FrpgHavokManImp(FrpgHavokManImp* to, const FrpgHavokManImp* from, StateTarget target);
 FrpgHavokManImp* init_FrpgHavokManImp();
 void free_FrpgHavokManImp(FrpgHavokManImp* to);
-void serialize_FrpgHavokManImp(StateVisitor& v, FrpgHavokManImp* h);
-std::string print_FrpgHavokManImp(FrpgHavokManImp* h);
-uint64_t hash_FrpgHavokManImp(FrpgHavokManImp* h);
+// The havok digest covers only the CHARACTER bodies (each player's character
+// proxy phantom), not the whole physics world
+void serialize_FrpgHavokManImp(StateVisitor& v, FrpgHavokManImp* h,
+                               PlayerIns* const* players, uint32_t nplayers);
+std::string print_FrpgHavokManImp(FrpgHavokManImp* h, PlayerIns* const* players, uint32_t nplayers);
+uint64_t hash_FrpgHavokManImp(FrpgHavokManImp* h, PlayerIns* const* players, uint32_t nplayers);
 
 void copy_FrpgPhysWorld(FrpgPhysWorld* to, const FrpgPhysWorld* from, StateTarget target);
 FrpgPhysWorld* init_FrpgPhysWorld();

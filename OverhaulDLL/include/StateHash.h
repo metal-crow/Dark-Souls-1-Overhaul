@@ -74,7 +74,7 @@ namespace RollbackHash
         d.player   = pl;
         d.bullet   = hash_BulletMan(s->bulletman);
         d.damage   = hash_DamageMan(s->damageman);
-        d.havok    = hash_FrpgHavokManImp(s->havokman);
+        d.havok    = hash_FrpgHavokManImp(s->havokman, s->playerins, Rollback::ggpoCurrentPlayerCount);
         d.throwman = hash_ThrowMan(s->throwman);
         d.dmghit   = hash_DmgHitRecordManImp(s->dmghitrecordman);
         // d.sfx   = hash_SfxMan(s->sfxman);
@@ -180,7 +180,7 @@ namespace RollbackHash
         }
         t += "=== BulletMan ===\n";        t += print_BulletMan(s->bulletman);
         t += "=== DamageMan ===\n";        t += print_DamageMan(s->damageman);
-        t += "=== FrpgHavokManImp ===\n";  t += print_FrpgHavokManImp(s->havokman);
+        t += "=== FrpgHavokManImp ===\n";  t += print_FrpgHavokManImp(s->havokman, s->playerins, Rollback::ggpoCurrentPlayerCount);
         t += "=== ThrowMan ===\n";         t += print_ThrowMan(s->throwman);
         t += "=== DmgHitRecordManImp ===\n"; t += print_DmgHitRecordManImp(s->dmghitrecordman);
         return t;

@@ -557,35 +557,65 @@ static void serialize_SavedPhantomState(StateVisitor& v, const SavedPhantomState
     v.end();
 }
 
-void serialize_FrpgHavokManImp(StateVisitor& v, FrpgHavokManImp* h)
+// The character's physics body is the hkpSimpleShapePhantom its proxy drives.
+static void* character_phantom(const PlayerIns* p)
+{
+    if (!p) return NULL;
+    const PlayerCtrl* pc = p->chrins.playerCtrl;
+    if (!pc) return NULL;
+    const HavokChara* hc = pc->chrCtrl.havokChara;
+    if (!hc) return NULL;
+    const hkpCharacterProxy* cp = hc->char_proxy;
+    if (!cp) return NULL;
+    return cp->HkpSimpleShapePhantom;
+}
+
+// scope the hash to only the bodies that carry character state.
+// The snapshot saves and restores the ENTIRE world, but the world is not meant to be bit-identical across instances.
+// So we hash each player's character body only
+void serialize_FrpgHavokManImp(StateVisitor& v, FrpgHavokManImp* h,
+                               PlayerIns* const* players, uint32_t nplayers)
 {
     v.begin("FrpgHavokManImp");
     HkpWorldSnapshot* snap = h->physWorld->snapshot;
 
-    v.count("entities", snap->entities.size());
-    for (SavedEntityState& s : snap->entities)
+    v.count("char_bodies", nplayers);
+    for (uint32_t i = 0; i < nplayers; i++)
     {
-        serialize_SavedEntityState(v, &s);
+        void* want = character_phantom(players ? players[i] : NULL);
+        v.begin("char_body");
+        v.ptr_flag("proxy_phantom", want);
+
+        const SavedPhantomState* found = NULL;
+        if (want)
+        {
+            for (const SavedPhantomState& s : snap->phantoms)
+            {
+                if ((void*)s.ptr == want) { found = &s; break; }
+            }
+        }
+        v.field("in_snapshot", found != NULL);
+        if (found)
+        {
+            serialize_hkMotionState(v, (const hkMotionState*)found->motionStateData);
+            serialize_hkpShapeData(v, &found->shapeData);
+        }
+        v.end();
     }
 
-    v.count("phantoms", snap->phantoms.size());
-    for (SavedPhantomState& s : snap->phantoms)
-    {
-        serialize_SavedPhantomState(v, &s);
-    }
     v.end();
 }
 
-std::string print_FrpgHavokManImp(FrpgHavokManImp* h)
+std::string print_FrpgHavokManImp(FrpgHavokManImp* h, PlayerIns* const* players, uint32_t nplayers)
 {
     StateVisitor v(StateVisitor::Mode::Print);
-    serialize_FrpgHavokManImp(v, h);
+    serialize_FrpgHavokManImp(v, h, players, nplayers);
     return v.text();
 }
 
-uint64_t hash_FrpgHavokManImp(FrpgHavokManImp* h)
+uint64_t hash_FrpgHavokManImp(FrpgHavokManImp* h, PlayerIns* const* players, uint32_t nplayers)
 {
     StateVisitor v(StateVisitor::Mode::Hash);
-    serialize_FrpgHavokManImp(v, h);
+    serialize_FrpgHavokManImp(v, h, players, nplayers);
     return v.digest();
 }
