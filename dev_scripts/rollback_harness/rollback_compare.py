@@ -56,6 +56,7 @@ harness_client.py from this directory.
 """
 
 import argparse
+import collections
 import difflib
 import json
 import os
@@ -414,6 +415,74 @@ def _clients(port_a, port_b, host):
     return HarnessClient(port_a, host).connect(), HarnessClient(port_b, host).connect()
 
 
+# Wholesale difflib on two ~140k-line state dumps that differ in a third of their
+# lines took ~3 minutes of CPU on the first real in-game run (2026-09-07) and
+# dominated the whole comparison. Two cheap wins below: strip the identical
+# prefix/suffix (a desync is normally localised, so this usually removes nearly
+# everything), and if what remains is still enormous, skip the line diff and emit
+# a field-grouped summary -- which is what you end up reading anyway.
+
+DIFF_LINE_BUDGET = 20000     # max lines of divergence handed to difflib
+
+
+def _diff_field_name(line):
+    m = re.match(r"\s*([A-Za-z_][A-Za-z0-9_]*)\s*[:=]", line)
+    return m.group(1) if m else line.strip()[:40]
+
+
+def _diff_summary(mid_a, mid_b, header):
+    """Alignment-independent summary: which field names differ, and how often."""
+    out = list(header)
+    out.append("@@ divergence too large for a line diff (%d vs %d lines); "
+               "field-grouped summary instead @@" % (len(mid_a), len(mid_b)))
+    ca, cb = collections.Counter(mid_a), collections.Counter(mid_b)
+    only_a, only_b = ca - cb, cb - ca
+    fa, fb = collections.Counter(), collections.Counter()
+    for ln, k in only_a.items():
+        fa[_diff_field_name(ln)] += k
+    for ln, k in only_b.items():
+        fb[_diff_field_name(ln)] += k
+    names = sorted(set(fa) | set(fb), key=lambda n: -(fa[n] + fb[n]))
+    out.append("  %-44s %8s %8s" % ("field", "A-only", "B-only"))
+    for n in names[:40]:
+        out.append("  %-44s %8d %8d" % (n[:44], fa[n], fb[n]))
+    out.append("@@ first differing lines (positional) @@")
+    shown = 0
+    for i in range(min(len(mid_a), len(mid_b))):
+        if mid_a[i] != mid_b[i]:
+            out.append("-" + mid_a[i][:160])
+            out.append("+" + mid_b[i][:160])
+            shown += 1
+            if shown >= 20:
+                break
+    return out, sum(only_a.values()) + sum(only_b.values())
+
+
+def diff_dumps(ta, tb, pa, pb):
+    """Return (diff_lines, changed_count) for two state dump texts."""
+    a, b = ta.splitlines(), tb.splitlines()
+    n_a, n_b = len(a), len(b)
+
+    lo = 0
+    while lo < n_a and lo < n_b and a[lo] == b[lo]:
+        lo += 1
+    hi = 0
+    while hi < (n_a - lo) and hi < (n_b - lo) and a[n_a - 1 - hi] == b[n_b - 1 - hi]:
+        hi += 1
+    mid_a, mid_b = a[lo:n_a - hi], b[lo:n_b - hi]
+
+    header = ["--- %s" % pa, "+++ %s" % pb,
+              "@@ identical prefix %d lines, identical suffix %d lines @@" % (lo, hi)]
+    if not mid_a and not mid_b:
+        return header + ["(dumps are identical)"], 0
+    if max(len(mid_a), len(mid_b)) <= DIFF_LINE_BUDGET:
+        body = list(difflib.unified_diff(mid_a, mid_b, fromfile=pa, tofile=pb,
+                                         lineterm="", n=2))
+        changed = sum(1 for l in body if l[:1] in "+-" and not l.startswith(("+++", "---")))
+        return header[2:] + body, changed
+    return _diff_summary(mid_a, mid_b, header)
+
+
 def dump_both(a, b, label_a, label_b, ahead, out_dir, log):
     """Capture both instances' full state text at the same future GGPO frame and diff it.
 
@@ -436,12 +505,12 @@ def dump_both(a, b, label_a, label_b, ahead, out_dir, log):
         pb = os.path.join(out_dir, f"statedump_{label_b}_{target}.txt")
         ta = a.dump_get(save_to=pa)["text"]
         tb = b.dump_get(save_to=pb)["text"]
-        diff = list(difflib.unified_diff(ta.splitlines(), tb.splitlines(),
-                                         fromfile=pa, tofile=pb, lineterm="", n=2))
+        t0 = time.time()
+        diff, changed = diff_dumps(ta, tb, pa, pb)
+        log(f"  diffed {len(ta.splitlines())}/{len(tb.splitlines())} dump lines in {time.time() - t0:.1f}s")
         pd = os.path.join(out_dir, f"statedump_diff_{target}.txt")
         with open(pd, "w", newline="\n") as fh:
             fh.write("\n".join(diff) + ("\n" if diff else ""))
-        changed = sum(1 for l in diff if l[:1] in "+-" and not l.startswith(("+++", "---")))
         return {"frame": target, "files": [pa, pb], "diff_file": pd,
                 "diff_lines": changed, "preview": diff[:60]}
     except Exception as e:  # network, timeout, protocol -- report, don't crash the verdict
