@@ -62,7 +62,9 @@ No third-party dependencies (Windows only; Python 3.8+, stdlib + ctypes).
 
 import argparse
 import ctypes
+import json
 import os
+import socket
 import struct
 import subprocess
 import sys
@@ -459,9 +461,54 @@ class Result:
     ERROR = "ERROR"
 
 
+def _finish_ingame(hwnd, press_interval, log):
+    """Settle, then tap F6 (rollback on) and 'r' (the co-op item) once each."""
+    time.sleep(POST_LOAD_DELAY)
+    set_foreground(hwnd)
+    tap_scancode(KEY_SCANCODES["f6"])
+    time.sleep(press_interval)
+    tap_scancode(KEY_SCANCODES["r"])
+    log("menu_nav: pressed F6 then 'r'")
+    return Result.LOADED
+
+
+def control_char_loaded(port, host="127.0.0.1", timeout=1.0):
+    """Ask the DLL's control plane whether the character is loaded.
+
+    This is strictly more reliable than the luma heuristic, which needs a
+    per-setup threshold and silently fails when a spawn happens to be dark --
+    seen 2026-09-07, where the character was fully loaded (control plane said
+    char_loaded=true) but mean luma stayed under --light-thresh, so the navigator
+    kept tapping until it timed out. The control plane only exists once the DLL is
+    up and only when --control-port was passed, so this is an *additional* stop
+    condition, never a required one: None means "couldn't ask, fall back to luma".
+    """
+    try:
+        s = socket.create_connection((host, port), timeout=timeout)
+    except OSError:
+        return None
+    try:
+        s.sendall(b"status\n")
+        buf = b""
+        while b"\n" not in buf:
+            chunk = s.recv(65536)
+            if not chunk:
+                return None
+            buf += chunk
+        reply = json.loads(buf.split(b"\n", 1)[0].decode("utf-8", "replace"))
+    except (OSError, ValueError):
+        return None
+    finally:
+        s.close()
+    if not reply.get("ok"):
+        return None
+    return bool(reply.get("char_loaded"))
+
+
 def advance_to_ingame(hwnd, scancode=0x12, press_interval=0.7, poll_interval=0.2,
                       timeout=180.0, light_thresh=60.0, confirm_samples=10,
-                      max_pixel_samples=4000, debug=False, save_dir=None, log=print):
+                      max_pixel_samples=4000, debug=False, save_dir=None, log=print,
+                      control_port=None):
     """Tap the confirm key through the menus until the screen is bright == in-game.
 
     On this setup the menus and the loading screen are dark while the in-game scene
@@ -487,6 +534,13 @@ def advance_to_ingame(hwnd, scancode=0x12, press_interval=0.7, poll_interval=0.2
     luma = None
 
     while time.time() < deadline:
+        # Authoritative stop condition when the control plane is available.
+        if control_port:
+            loaded = control_char_loaded(control_port)
+            if loaded:
+                log(f"menu_nav: LOADED (control plane char_loaded, {presses} presses)")
+                return _finish_ingame(hwnd, press_interval, log)
+
         set_foreground(hwnd)
         if not _is_foreground(hwnd):
             # SendInput goes to whatever *is* focused, so tapping now would type
@@ -518,13 +572,7 @@ def advance_to_ingame(hwnd, scancode=0x12, press_interval=0.7, poll_interval=0.2
             if bright_run >= confirm_samples:
                 log(f"menu_nav: LOADED (luma={luma:.1f} >= {light_thresh:.0f} for "
                     f"{confirm_samples} checks, {presses} presses)")
-                time.sleep(POST_LOAD_DELAY)
-                set_foreground(hwnd)
-                tap_scancode(KEY_SCANCODES["f6"])
-                time.sleep(press_interval)
-                tap_scancode(KEY_SCANCODES["r"])
-                log("menu_nav: pressed F6 then 'r'")
-                return Result.LOADED
+                return _finish_ingame(hwnd, press_interval, log)
             time.sleep(poll_interval)  # confirming in-game -- do NOT tap
             continue
 
@@ -668,7 +716,7 @@ def launch_and_navigate(launcher, sandbox, sandboxie_start, window_title,
         f"navigating menus")
     log(f"INSTANCE hwnd={hwnd:#x} pid={window_pid(hwnd)} "
         f"control_port={control_port if control_port else 0} sandbox={sandbox or ''}")
-    return advance_to_ingame(hwnd, log=log, **nav_kwargs)
+    return advance_to_ingame(hwnd, log=log, control_port=control_port, **nav_kwargs)
 
 
 # ---------------------------------------------------------------------------
@@ -769,7 +817,7 @@ def main(argv=None):
             sys.stderr.write(f"error: no visible top-level window for {which}. "
                              f"Is the game launched and windowed?\n")
             return 2
-        res = advance_to_ingame(hwnd, log=emit, **nav_kwargs)
+        res = advance_to_ingame(hwnd, log=emit, control_port=args.control_port, **nav_kwargs)
 
     return {Result.LOADED: 0, Result.TIMEOUT: 1}.get(res, 2)
 
