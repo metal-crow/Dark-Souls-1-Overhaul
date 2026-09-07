@@ -50,9 +50,10 @@ struct ThrowMan
     float unk_c4;              // 0xc4
     float animPlaySpeed;       // 0xc8
     uint8_t unk_cc;            // 0xcc
-    uint8_t unk_cd[3];         // 0xcd (alignment)
+    uint8_t field_0xcd;        // 0xcd
+    uint8_t pad_ce[2];         // 0xce (alignment)
     uint32_t unk_d0;           // 0xd0
-    uint8_t unk_d4[12];        // 0xd4 (undefined in ghidra)
+    uint8_t pad_d4[12];        // 0xd4 (alignment)
     float vec_e0[8];           // 0xe0 (ghidra: Vector4[2])
     float vec_100[8];          // 0x100 (ghidra: Vector4[2])
     uint32_t unk_120[2];       // 0x120
@@ -64,6 +65,10 @@ static_assert(offsetof(ThrowMan, throw_request_queue_start) == 0x28);
 static_assert(offsetof(ThrowMan, unk_80) == 0x80);
 static_assert(offsetof(ThrowMan, timeoutVal) == 0x98);
 static_assert(offsetof(ThrowMan, attacking_chr) == 0xb8);
+static_assert(offsetof(ThrowMan, field_0xcd) == 0xcd);
+static_assert(offsetof(ThrowMan, pad_ce) == 0xce);
+static_assert(offsetof(ThrowMan, unk_d0) == 0xd0);
+static_assert(offsetof(ThrowMan, pad_d4) == 0xd4);
 static_assert(offsetof(ThrowMan, vec_e0) == 0xe0);
 static_assert(offsetof(ThrowMan, unk_12c) == 0x12c);
 static_assert(sizeof(ThrowMan) == 0x130);

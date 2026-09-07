@@ -101,10 +101,10 @@ static void serialize_DmgHitRecordManImp_field0x10Elem(StateVisitor& v, DmgHitRe
     v.begin("field0x10Elem");
     v.ptr_index("attached", e->attached, base0x28, sizeof(DmgHitRecordManImp_field0x28Elem));
     v.field("unk_8", e->unk_8);
-    v.field("unk_c", e->unk_c);
+    v.padding("unk_c", &e->unk_c, sizeof(e->unk_c));     // alignment before next @0x10
     v.ptr_index("next", e->next, base0x10, sizeof(DmgHitRecordManImp_field0x10Elem));
     v.field("unk_18", e->unk_18);
-    v.field("unk_1c", e->unk_1c);
+    v.padding("unk_1c", &e->unk_1c, sizeof(e->unk_1c));  // trailing alignment to 0x20
     v.end();
 }
 
@@ -116,7 +116,7 @@ static void serialize_DmgHitRecordManImp_field0x28Elem(StateVisitor& v, DmgHitRe
     v.field("unk_4", e->unk_4);
     v.ptr_index("next", e->next, base0x28, sizeof(DmgHitRecordManImp_field0x28Elem));
     v.field("unk_10", e->unk_10);
-    v.field("unk_14", e->unk_14);
+    v.padding("unk_14", &e->unk_14, sizeof(e->unk_14));  // trailing alignment to 0x18
     v.end();
 }
 

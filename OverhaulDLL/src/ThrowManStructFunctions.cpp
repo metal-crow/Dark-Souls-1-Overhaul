@@ -58,9 +58,10 @@ void copy_ThrowMan(ThrowMan* to, ThrowMan* from, StateTarget target)
     to->unk_c4 = from->unk_c4;
     to->animPlaySpeed = from->animPlaySpeed;
     to->unk_cc = from->unk_cc;
-    memcpy(to->unk_cd, from->unk_cd, sizeof(to->unk_cd));
+    to->field_0xcd = from->field_0xcd;
+    memcpy(to->pad_ce, from->pad_ce, sizeof(to->pad_ce));
     to->unk_d0 = from->unk_d0;
-    memcpy(to->unk_d4, from->unk_d4, sizeof(to->unk_d4));
+    memcpy(to->pad_d4, from->pad_d4, sizeof(to->pad_d4));
     memcpy(to->vec_e0, from->vec_e0, sizeof(to->vec_e0));
     memcpy(to->vec_100, from->vec_100, sizeof(to->vec_100));
     memcpy(to->unk_120, from->unk_120, sizeof(to->unk_120));
@@ -131,7 +132,7 @@ void serialize_ThrowRequestedEntry(StateVisitor& v, ThrowRequestedEntry* e)
     v.field("throwTimeout", e->throwTimeout);
     v.field("unk_18", e->unk_18);
     v.field("unk1", e->unk1);
-    v.blob("unk_1a", e->unk_1a, sizeof(e->unk_1a));
+    v.padding("unk_1a", e->unk_1a, sizeof(e->unk_1a));   // trailing alignment to 0x20
     v.end();
 }
 
@@ -149,7 +150,7 @@ void serialize_ThrowMan(StateVisitor& v, ThrowMan* t)
 
     v.field("unk_80", t->unk_80);
     v.field("unk_81", t->unk_81);
-    v.blob("unk_82", t->unk_82, sizeof(t->unk_82));
+    v.padding("unk_82", t->unk_82, sizeof(t->unk_82));   // alignment gap
     v.field("timeoutVal", t->timeoutVal);
     v.field("throwEscape_remainingTypeToDecayWeighting", t->throwEscape_remainingTypeToDecayWeighting);
     v.field("throwEscape_IncreaseValueOfGoalWeighting", t->throwEscape_IncreaseValueOfGoalWeighting);
@@ -159,18 +160,19 @@ void serialize_ThrowMan(StateVisitor& v, ThrowMan* t)
     v.field("attacking_chr", t->attacking_chr);
     v.field("defending_chr", t->defending_chr);
     v.field("allDrawing", t->allDrawing);
-    v.blob("unk_c1", t->unk_c1, sizeof(t->unk_c1));
+    v.padding("unk_c1", t->unk_c1, sizeof(t->unk_c1));   // alignment gap
     v.field("unk_c4", t->unk_c4);
     v.field("animPlaySpeed", t->animPlaySpeed);
     v.field("unk_cc", t->unk_cc);
-    v.blob("unk_cd", t->unk_cd, sizeof(t->unk_cd));
+    v.field("field_0xcd", t->field_0xcd);
+    v.padding("pad_ce", t->pad_ce, sizeof(t->pad_ce));
     v.field("unk_d0", t->unk_d0);
-    v.blob("unk_d4", t->unk_d4, sizeof(t->unk_d4));
+    v.padding("pad_d4", t->pad_d4, sizeof(t->pad_d4));
     for (int i = 0; i < 8; i++) v.field("vec_e0", t->vec_e0[i]);
     for (int i = 0; i < 8; i++) v.field("vec_100", t->vec_100[i]);
     for (int i = 0; i < 2; i++) v.field("unk_120", t->unk_120[i]);
     v.blob("unk_128", t->unk_128, sizeof(t->unk_128));
-    v.blob("unk_12a", t->unk_12a, sizeof(t->unk_12a));
+    v.padding("unk_12a", t->unk_12a, sizeof(t->unk_12a));   // alignment gap
     v.field("unk_12c", t->unk_12c);
 
     v.end();

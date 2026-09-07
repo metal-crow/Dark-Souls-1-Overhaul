@@ -29,7 +29,21 @@
  * hashed directly, or they produce a false desync every frame. Use ptr_index()
  * when the pointer indexes a known array (fully canonical) or ptr_flag() when
  * it does not (records only null/non-null).
+ *
+ * Padding rule: alignment gaps and trailing padding are never written by the
+ * game, so they hold whatever the allocator handed out -- per-process heap
+ * garbage. Hashing them produces a false desync on frame 0 of every run, on
+ * every subsystem that has them (this is exactly what the 2026-09-07 in-game
+ * run hit). Use padding() for those bytes: copy_X still memcpys them, we just
+ * refuse to *compare* them.
  */
+
+// Set to 1 to fold padding bytes back into the digest. Useful to double-check a
+// field marked padding that you suspect is actually live state -- a field that
+// is genuinely live will still agree across instances when they are in sync.
+#ifndef STATEHASH_HASH_PADDING
+#define STATEHASH_HASH_PADDING 0
+#endif
 class StateVisitor
 {
 public:
@@ -62,6 +76,25 @@ public:
             char tmp[4];
             for (size_t i = 0; i < len; i++) { snprintf(tmp, sizeof(tmp), "%02x", b[i]); _out += tmp; }
             _out += "\n";
+        }
+    }
+
+    // Alignment gap / trailing padding. The length is folded (so a layout change
+    // is still caught) but the CONTENTS are not: they are uninitialised bytes
+    // and can never match across two processes. Printed without a value so the
+    // Tier-1 dump diff stays quiet about them too.
+    void padding(const char* n, const void* p, size_t len)
+    {
+        tag('_'); fold(&len, sizeof(len));
+#if STATEHASH_HASH_PADDING
+        fold(p, len);
+#else
+        (void)p;
+#endif
+        if (mode == Mode::Print)
+        {
+            line_begin(n);
+            _out += "<pad "; _out += std::to_string(len); _out += "B>\n";
         }
     }
 

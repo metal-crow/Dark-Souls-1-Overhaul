@@ -5,3 +5,4 @@ OverhaulDLL_PtDE/
 /OverhaulDLL/testing.h
 /OverhaulDLL/DebugAsan
 /dev_scripts/rollback_harness/__pycache__
+/dev_scripts/rollback_harness/runs

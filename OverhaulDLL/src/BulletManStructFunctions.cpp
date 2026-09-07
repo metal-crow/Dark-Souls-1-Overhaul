@@ -395,7 +395,7 @@ static void serialize_BulletIns_Field0x90_Field0x1a0(StateVisitor& v, const Bull
     v.field("unk_10", o->unk_10);
     v.field("unk_14", o->unk_14);
     v.field("goodsId", o->goodsId);
-    v.field("unk_1c", o->unk_1c);
+    v.padding("unk_1c", &o->unk_1c, sizeof(o->unk_1c));            // alignment before AttackData @0x20
     v.blob("AttackData", o->AttackData, sizeof(o->AttackData));
     v.blob("unk_88", o->unk_88, sizeof(o->unk_88));
     v.blob("target0x90", o->target0x90, sizeof(o->target0x90));
@@ -422,7 +422,7 @@ static void serialize_BulletTargetingSystemOwner(StateVisitor& v, const BulletTa
     v.field("vtable", o->vtable);
     v.ptr_flag("parent", o->parent);
     v.field("ownerEntityId", o->ownerEntityId);
-    v.field("unk_14", o->unk_14);
+    v.padding("unk_14", &o->unk_14, sizeof(o->unk_14));            // alignment before the 8-aligned param @0x18
     v.blob("autoSearchNPCThinkParam", o->autoSearchNPCThinkParam, sizeof(o->autoSearchNPCThinkParam));
     v.end();
 }
@@ -436,12 +436,12 @@ static void serialize_TargetingSystemBase(StateVisitor& v, const TargetingSystem
     v.field("unk_30", t->unk_30);
     v.field("unk_34", t->unk_34);
     v.field("unk_35", t->unk_35);
-    v.blob("unk_36", t->unk_36, sizeof(t->unk_36));
+    v.padding("unk_36", t->unk_36, sizeof(t->unk_36));             // alignment before unk_38
     v.field("unk_38", t->unk_38);
-    v.field("unk_3c", t->unk_3c);
+    v.padding("unk_3c", &t->unk_3c, sizeof(t->unk_3c));            // alignment before unk_40 (8-aligned)
     v.field("unk_40", t->unk_40);
     v.field("unk_48", t->unk_48);
-    v.blob("unk_4a", t->unk_4a, sizeof(t->unk_4a));
+    v.padding("unk_4a", t->unk_4a, sizeof(t->unk_4a));             // trailing alignment
     v.end();
 }
 
@@ -464,7 +464,7 @@ static void serialize_BulletFlyState(StateVisitor& v, const BulletFlyState* s)
     v.begin("BulletFlyState");
     serialize_BulletState(v, &s->base);
     v.field("unk_20", s->unk_20);
-    v.blob("unk_22", s->unk_22, sizeof(s->unk_22));
+    v.padding("unk_22", s->unk_22, sizeof(s->unk_22));             // trailing alignment
     v.end();
 }
 
@@ -538,7 +538,7 @@ static void serialize_BulletMan_Field0x20(StateVisitor& v, const BulletMan_Field
     v.blob("unk_18c", f->unk_18c, sizeof(f->unk_18c));
     v.field("unk_194", f->unk_194);
     v.field("unk_195", f->unk_195);
-    v.blob("unk_196", f->unk_196, sizeof(f->unk_196));
+    v.padding("unk_196", f->unk_196, sizeof(f->unk_196));          // alignment before BulletParamInfo ptr
     v.ptr_flag("BulletParamInfo", f->BulletParamInfo);
     serialize_BulletIns_Field0x90_Field0x1a0(v, &f->field0x1a0);
     v.field("unk_300", f->unk_300);
