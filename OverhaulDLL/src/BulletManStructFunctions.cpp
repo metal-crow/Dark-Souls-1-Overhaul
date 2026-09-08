@@ -553,7 +553,7 @@ static void serialize_BulletMan_Field0x40(StateVisitor& v, const BulletMan_Field
 {
     v.begin("BulletMan_Field0x40");
     v.field("bulletOwnerEntityId", f->bulletOwnerEntityId);
-    v.field("padding_0", f->padding_0);
+    v.padding("padding_0", &f->padding_0, sizeof(f->padding_0));
     v.count("arry", 16);
     for (size_t i = 0; i < 16; i++)
     {
@@ -564,8 +564,8 @@ static void serialize_BulletMan_Field0x40(StateVisitor& v, const BulletMan_Field
         v.end();
     }
     v.field("unk_308", f->unk_308);
-    v.field("unk_30c", f->unk_30c);
-    v.field("unk_310", f->unk_310);   // ptr to static data (fixed addr) -> deterministic
+    v.padding("unk_30c", &f->unk_30c, sizeof(f->unk_30c)); // gap
+    v.ptr_flag("unk_310", (const void*)f->unk_310); // alloc'd-once static location
     v.end();
 }
 
@@ -601,23 +601,42 @@ void serialize_BulletMan(StateVisitor& v, BulletMan* m)
 {
     v.begin("BulletMan");
 
-    v.count("bulletins_arry", 128);
-    for (size_t i = 0; i < 128; i++)
+    // only the pool entries actually IN USE are hashed.
+    // ignore free slots since they will have garbage data
+    size_t n_bullets = 0;
+    for (const BulletIns* b = m->end_of_bullets_in_use; b != NULL; b = b->previous_bullet_in_use)
     {
-        serialize_BulletIns(v, &m->bulletins_arry[i]);
-        v.ptr_index("previous_bullet_in_use", m->bulletins_arry[i].previous_bullet_in_use,
-                    m->bulletins_arry, sizeof(BulletIns));
+        if (++n_bullets >= 128) break;
+    }
+    v.count("bullets_in_use", n_bullets);
+    {
+        size_t i = 0;
+        for (const BulletIns* b = m->end_of_bullets_in_use; b != NULL && i < n_bullets;
+             b = b->previous_bullet_in_use, i++)
+        {
+            v.ptr_index("slot", b, m->bulletins_arry, sizeof(BulletIns));
+            serialize_BulletIns(v, b);
+        }
     }
     v.ptr_flag("end_of_bullets_in_use", m->end_of_bullets_in_use);
     v.ptr_flag("start_of_unused_bullets", m->start_of_unused_bullets);
     v.field("bullet_count_1", m->bullet_count_1);
     v.field("bullet_count_2", m->bullet_count_2);
 
-    v.count("field0x20", 64);
-    for (size_t i = 0; i < 64; i++)
+    size_t n_f20 = 0;
+    for (const BulletMan_Field0x20* f = m->end_of_bullets_in_use_field0x20; f != NULL; f = f->next_in_use)
     {
-        serialize_BulletMan_Field0x20(v, &m->field0x20[i]);
-        v.ptr_index("next_in_use", m->field0x20[i].next_in_use, m->field0x20, sizeof(BulletMan_Field0x20));
+        if (++n_f20 >= 64) break;
+    }
+    v.count("field0x20_in_use", n_f20);
+    {
+        size_t i = 0;
+        for (const BulletMan_Field0x20* f = m->end_of_bullets_in_use_field0x20; f != NULL && i < n_f20;
+             f = f->next_in_use, i++)
+        {
+            v.ptr_index("slot", f, m->field0x20, sizeof(BulletMan_Field0x20));
+            serialize_BulletMan_Field0x20(v, f);
+        }
     }
     v.ptr_flag("end_of_bullets_in_use_field0x20", m->end_of_bullets_in_use_field0x20);
     v.ptr_flag("start_of_unused_bullets_field0x20", m->start_of_unused_bullets_field0x20);
@@ -634,12 +653,14 @@ void serialize_BulletMan(StateVisitor& v, BulletMan* m)
     v.field("unk_58", m->unk_58);
     v.field("unk_5c", m->unk_5c);
 
-    serialize_ChrCam(v, m->chrCam);
+    // ChrCam is NOT hashed. it is saved/restored, but the two instances are two different players
+    // looking in different directions
+    v.ptr_flag("chrCam", m->chrCam);
 
     v.field("attach_system_disabled", m->attach_system_disabled);
-    v.blob("unk_69", m->unk_69, sizeof(m->unk_69));
+    v.padding("unk_69", m->unk_69, sizeof(m->unk_69));             // gap
     v.field("bullet_direction_drawing", m->bullet_direction_drawing);
-    v.blob("unk_a9", m->unk_a9, sizeof(m->unk_a9));
+    v.padding("unk_a9", m->unk_a9, sizeof(m->unk_a9));             // gap
     v.field("speed_attenuation_rate", m->speed_attenuation_rate);
     v.field("last_addition_rate", m->last_addition_rate);
     v.field("external_force", m->external_force);
