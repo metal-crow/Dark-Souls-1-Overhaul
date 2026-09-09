@@ -803,6 +803,10 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
 
         state->playerins[i] = init_PlayerIns();
         copy_PlayerIns(state->playerins[i], player, StateTarget::ToLocal);
+        // Capture the network-stable identity of this slot for the oracle.
+        state->player_steam_ids[i] =
+            (player->steamPlayerData != NULL && player->steamPlayerData->steamOnlineIDData != NULL)
+                ? player->steamPlayerData->steamOnlineIDData->steam_id : 0;
     }
     state->bulletman = init_BulletMan();
     copy_BulletMan(state->bulletman, *(BulletMan**)Game::bullet_man, StateTarget::ToLocal);
@@ -840,6 +844,7 @@ void rollback_copy_buffer(void* buffer_dst, void* buffer_src)
     {
         state_dst->playerins[i] = init_PlayerIns();
         copy_PlayerIns(state_dst->playerins[i], state_src->playerins[i], StateTarget::Copy);
+        state_dst->player_steam_ids[i] = state_src->player_steam_ids[i];
     }
     state_dst->bulletman = init_BulletMan();
     copy_BulletMan(state_dst->bulletman, state_src->bulletman, StateTarget::Copy);

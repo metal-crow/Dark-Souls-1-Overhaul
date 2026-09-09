@@ -62,19 +62,46 @@ namespace RollbackHash
         return h;
     }
 
+    // Canonical player order for hashing.
+    // Order this so that the resulting array is deterministic regardless of viewpoint (ordered by steam id)
+    inline void canonical_player_order(const RollbackState* s, uint32_t n, uint32_t* order)
+    {
+        for (uint32_t i = 0; i < n; i++) order[i] = i;
+        for (uint32_t i = 1; i < n; i++)   // insertion sort; n <= GGPO_MAX_PLAYERS
+        {
+            uint32_t k = order[i];
+            uint64_t key = s->player_steam_ids[k];
+            int j = (int)i - 1;
+            while (j >= 0 && s->player_steam_ids[order[j]] > key)
+            {
+                order[j + 1] = order[j];
+                j--;
+            }
+            order[j + 1] = k;
+        }
+    }
+
     inline StateDigest digest_of(RollbackState* s)
     {
         StateDigest d;
 
+        const uint32_t n = Rollback::ggpoCurrentPlayerCount;
+        uint32_t order[GGPO_MAX_PLAYERS];
+        canonical_player_order(s, n, order);
+
+        // Hash the players in canonical (steam-id) order
+        PlayerIns* ordered[GGPO_MAX_PLAYERS] = {};
         uint64_t pl = 1469598103934665603ULL;
-        for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
+        for (uint32_t i = 0; i < n; i++)
         {
-            pl = _fold(pl, hash_PlayerIns(s->playerins[i]));
+            ordered[i] = s->playerins[order[i]];
+            pl = _fold(pl, s->player_steam_ids[order[i]]);
+            pl = _fold(pl, hash_PlayerIns(ordered[i]));
         }
         d.player   = pl;
         d.bullet   = hash_BulletMan(s->bulletman);
         d.damage   = hash_DamageMan(s->damageman);
-        d.havok    = hash_FrpgHavokManImp(s->havokman, s->playerins, Rollback::ggpoCurrentPlayerCount);
+        d.havok    = hash_FrpgHavokManImp(s->havokman, ordered, n);
         d.throwman = hash_ThrowMan(s->throwman);
         d.dmghit   = hash_DmgHitRecordManImp(s->dmghitrecordman);
         // d.sfx   = hash_SfxMan(s->sfxman);
@@ -171,16 +198,29 @@ namespace RollbackHash
     inline std::string dump_text_of(RollbackState* s)
     {
         std::string t;
-        for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
+        const uint32_t n = Rollback::ggpoCurrentPlayerCount;
+        uint32_t order[GGPO_MAX_PLAYERS];
+        canonical_player_order(s, n, order);
+        PlayerIns* ordered[GGPO_MAX_PLAYERS] = {};
+        for (uint32_t i = 0; i < n; i++)
         {
+            ordered[i] = s->playerins[order[i]];
+            // The steam id goes in the header so a dump says WHICH character each
+            // block is; the game slot alone does not, and differs per instance.
+            char idbuf[32];
+            snprintf(idbuf, sizeof(idbuf), "%llx", (unsigned long long)s->player_steam_ids[order[i]]);
             t += "=== Player ";
             t += std::to_string(i);
-            t += " ===\n";
-            t += print_PlayerIns(s->playerins[i]);
+            t += " (steam_id ";
+            t += idbuf;
+            t += ", game slot ";
+            t += std::to_string(order[i]);
+            t += ") ===\n";
+            t += print_PlayerIns(ordered[i]);
         }
         t += "=== BulletMan ===\n";        t += print_BulletMan(s->bulletman);
         t += "=== DamageMan ===\n";        t += print_DamageMan(s->damageman);
-        t += "=== FrpgHavokManImp ===\n";  t += print_FrpgHavokManImp(s->havokman, s->playerins, Rollback::ggpoCurrentPlayerCount);
+        t += "=== FrpgHavokManImp ===\n";  t += print_FrpgHavokManImp(s->havokman, ordered, n);
         t += "=== ThrowMan ===\n";         t += print_ThrowMan(s->throwman);
         t += "=== DmgHitRecordManImp ===\n"; t += print_DmgHitRecordManImp(s->dmghitrecordman);
         return t;

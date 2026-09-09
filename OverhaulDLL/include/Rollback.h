@@ -145,6 +145,10 @@ void UnpackRollbackInput(RollbackInput* in, PlayerIns* player);
 struct RollbackState
 {
     PlayerIns* playerins[GGPO_MAX_PLAYERS];
+    // Steam id of the player in the matching playerins[] slot
+    // this gives us network-stable key to canonicalise the hash order
+    // Not part of the simulation.
+    uint64_t player_steam_ids[GGPO_MAX_PLAYERS];
     BulletMan* bulletman;
     SfxMan* sfxman;
     DamageMan* damageman;
