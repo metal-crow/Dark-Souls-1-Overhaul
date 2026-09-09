@@ -93,6 +93,15 @@ void copy_DamageMan(DamageMan* to, DamageMan* from, const hkpWorld* to_world, co
             e.game_addr = head;
             e.is_dynamic = false;
             e.data = NULL;
+            //canonical identity of this entry: its slot in the game's pool
+            e.pool_index = -1;
+            {
+                ptrdiff_t idx = head - from->all_damage_entries_list_start;
+                if (idx >= 0 && idx < (ptrdiff_t)max_preallocated_DamageEntry)
+                {
+                    e.pool_index = (int32_t)idx;
+                }
+            }
             if (DamageEntry_isDynamicAlloc(head))
             {
                 DamageEntry_ref(head); //ref because the entry is stored game-side
@@ -144,6 +153,7 @@ void copy_DamageMan(DamageMan* to, DamageMan* from, const hkpWorld* to_world, co
             new_e.game_addr = e.game_addr;
             new_e.is_dynamic = e.is_dynamic;
             new_e.data = NULL;
+            new_e.pool_index = e.pool_index;
             if (e.is_dynamic)
             {
                 DamageEntry_ref(new_e.game_addr);
@@ -536,14 +546,23 @@ static void serialize_DamageEntry(StateVisitor& v, const DamageEntry* e)
     v.end();
 }
 
-static void serialize_SavedDamageEntry(StateVisitor& v, const SavedDamageEntry* e)
+// An active damage entry, identified by its POOL SLOT rather than its address.
+// `pool` is the snapshot's own copy of all_damage_entries_list_start, so a static
+// entry's contents are hashed here, from the slot it actually occupies.
+static void serialize_SavedDamageEntry(StateVisitor& v, const SavedDamageEntry* e,
+                                       const DamageEntry* pool)
 {
     v.begin("SavedDamageEntry");
-    v.ptr_flag("game_addr", e->game_addr);   // game pool/heap address
+    v.field("pool_index", e->pool_index);   // use this instead, since game_addr is a raw address
     v.field("is_dynamic", e->is_dynamic);
     if (e->is_dynamic && e->data)
     {
         serialize_DamageEntry(v, e->data);
+    }
+    else if (pool != NULL && e->pool_index >= 0 &&
+             e->pool_index < (int32_t)max_preallocated_DamageEntry)
+    {
+        serialize_DamageEntry(v, &pool[e->pool_index]);
     }
     v.end();
 }
@@ -552,11 +571,11 @@ void serialize_DamageMan(StateVisitor& v, DamageMan* d)
 {
     v.begin("DamageMan");
 
-    // active list as captured at save time (the linked list walked via ->next)
+    // only the ACTIVE damage entries are hashed, and identified by pool slot.
     v.count("saved_active_damage_entries", d->saved_active_damage_entries.size());
     for (SavedDamageEntry& e : d->saved_active_damage_entries)
     {
-        serialize_SavedDamageEntry(v, &e);
+        serialize_SavedDamageEntry(v, &e, d->all_damage_entries_list_start);
     }
 
     // all_damage_entries_list_cur is a GAME pool address in the snapshot; can't be
@@ -564,11 +583,8 @@ void serialize_DamageMan(StateVisitor& v, DamageMan* d)
     // divergence also shows up as differing pool contents below.
     v.ptr_flag("all_damage_entries_list_cur", d->all_damage_entries_list_cur);
 
-    v.count("all_damage_entries_list", max_preallocated_DamageEntry);
-    for (size_t i = 0; i < max_preallocated_DamageEntry; i++)
-    {
-        serialize_DamageEntry(v, &d->all_damage_entries_list_start[i]);
-    }
+    // The pool itself is NOT walked: an entry that is not in the active list is a
+    // free slot holding uninitialised memory.
 
     v.field("unk_18", d->unk_18);
     v.field("put_out_sparks", d->put_out_sparks);

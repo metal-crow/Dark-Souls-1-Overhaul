@@ -155,6 +155,8 @@ struct SavedDamageEntry
     DamageEntry* game_addr;
     DamageEntry* data;
     bool is_dynamic; //if this is false we can just use the game_addr raw, since it points to an entry in all_damage_entries_list_start we already handle
+    //identifier for this DamageEntry that can be used for serialization
+    int32_t pool_index;
 };
 
 struct DamageMan
