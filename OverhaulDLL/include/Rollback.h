@@ -140,7 +140,7 @@ struct RollbackInput
 #pragma pack(pop)
 
 void PackRollbackInput(RollbackInput* out, PlayerIns* player);
-void UnpackRollbackInput(RollbackInput* in, PlayerIns* player);
+void UnpackRollbackInput(RollbackInput* in, PlayerIns* player, uint32_t playerIndex);
 
 struct RollbackState
 {

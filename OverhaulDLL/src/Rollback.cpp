@@ -157,18 +157,40 @@ bool ggpo_toggle(void* unused)
 
 
 extern "C" {
-    int32_t ItemIdOverride = -1;
     uint64_t get_item_currently_being_used_return;
     void get_item_currently_being_used_injection();
     uint8_t get_item_currently_being_used_injection_helper(EquipGameData*, ItemUsed*);
 }
 
-//Return 1 if we have an override itemid we want to use
+//The item each player is using, indexed the same way as Game::get_connected_player. -1 = no override.
+static int32_t ItemIdOverride[GGPO_MAX_PLAYERS] = { -1, -1, -1, -1, -1, -1 };
+static_assert(GGPO_MAX_PLAYERS == 6, "ItemIdOverride initialiser must cover every player slot");
+
 uint8_t get_item_currently_being_used_injection_helper(EquipGameData* equip, ItemUsed* out)
 {
-    if (Rollback::rollbackEnabled && ItemIdOverride != -1)
+    if (!Rollback::rollbackEnabled)
     {
-        out->itemId = ItemIdOverride;
+        return 0;
+    }
+
+    for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
+    {
+        auto player_o = Game::get_connected_player(i);
+        if (!player_o.has_value() || player_o.value() == NULL)
+        {
+            continue;
+        }
+        PlayerIns* player = (PlayerIns*)player_o.value();
+        if (player->playergamedata == NULL || &player->playergamedata->equipGameData != equip)
+        {
+            continue;
+        }
+
+        if (ItemIdOverride[i] == -1)
+        {
+            return 0;
+        }
+        out->itemId = ItemIdOverride[i];
         out->amountUsed = 1;
         return 1;
     }
@@ -215,7 +237,7 @@ void PackRollbackInput(RollbackInput* out, PlayerIns* player)
     }
 }
 
-void UnpackRollbackInput(RollbackInput* in, PlayerIns* player)
+void UnpackRollbackInput(RollbackInput* in, PlayerIns* player, uint32_t playerIndex)
 {
     EquipInventoryDataItem* itemlist = player->playergamedata->equipGameData.equippedInventory.itemlist2;
     uint32_t itemlistlen = player->playergamedata->equipGameData.equippedInventory.itemList2_len;
@@ -263,12 +285,12 @@ void UnpackRollbackInput(RollbackInput* in, PlayerIns* player)
     //this won't work for the remote user (no inventory), so we have manually inject our item id
     if (in->curUsingInventoryItemId != -1)
     {
-        ItemIdOverride = in->curUsingInventoryItemId;
+        ItemIdOverride[playerIndex] = in->curUsingInventoryItemId;
     }
     //fall back to the quickbar if we don't have an inventory item
     else
     {
-        ItemIdOverride = in->curSelectedQuickbarItemId;
+        ItemIdOverride[playerIndex] = in->curSelectedQuickbarItemId;
     }
 
     PadManipulatorPacked_to_PadManipulator(player, &in->padmanipulator);
@@ -334,7 +356,7 @@ void rollback_sync_inputs()
         //We handle that by just not loading it at all, so the PadManipulator stays unchanged from the rollback frame it was saved from
         if (inputs[i].const1 == 1)
         {
-            UnpackRollbackInput(&inputs[i], player);
+            UnpackRollbackInput(&inputs[i], player, i);
         }
         else
         {
