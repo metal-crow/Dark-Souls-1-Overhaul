@@ -73,7 +73,10 @@ struct hkpWorld
     uint8_t _2a[0x58];
     int m_criticalOperationsLockCount;
     int m_criticalOperationsLockCountForPhantoms;
-    uint8_t _2b[0x98];
+    uint8_t _2b[0x8C];
+    uint32_t m_lastEntityUid;
+    uint32_t m_lastIslandUid;
+    uint32_t m_lastConstraintUid;
     hkpPhantom** m_phantoms;
     uint32_t m_phantoms_size;
     uint32_t m_phantoms_cap;
@@ -85,6 +88,9 @@ static_assert(offsetof(hkpWorld, m_inactiveSimulationIslands) == 0x50);
 static_assert(offsetof(hkpWorld, m_dirtySimulationIslands) == 0x60);
 static_assert(offsetof(hkpWorld, m_broadPhase) == 0x88);
 static_assert(offsetof(hkpWorld, m_criticalOperationsLockCount) == 0xE8);
+static_assert(offsetof(hkpWorld, m_lastEntityUid) == 0x17C);
+static_assert(offsetof(hkpWorld, m_lastIslandUid) == 0x180);
+static_assert(offsetof(hkpWorld, m_lastConstraintUid) == 0x184);
 static_assert(offsetof(hkpWorld, m_phantoms) == 0x188);
 static_assert(offsetof(hkpWorld, m_broadPhaseBorder) == 0x280);
 
@@ -475,7 +481,8 @@ static_assert(offsetof(hkpSphereShape, m_pad) == 0x28);
 struct SavedEntityState
 {
     hkpEntity* ptr;
-    void* shapePtr; 
+    void* shapePtr;
+    uint32_t uid;
     alignas(16) uint8_t motionData[sizeof(hkpMotion)]; // hkpMotion in hkpEntity
     union
     {

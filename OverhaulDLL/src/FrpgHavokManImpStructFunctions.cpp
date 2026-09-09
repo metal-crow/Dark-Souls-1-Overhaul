@@ -166,6 +166,7 @@ void SaveHkpWorldSnapshot(HkpWorldSnapshot* snap, hkpWorld* world)
             SavedEntityState s = {};
             s.ptr = e;
             s.shapePtr = e->m_collidable.base.shape;
+            s.uid = e->m_uid;
             memcpy(&s.motionData, &e->m_motion, sizeof(hkpMotion));
             copy_hkpShape(&s.shapeData, e->m_collidable.base.shape);
             snap->entities.push_back(s);
@@ -197,6 +198,24 @@ void SaveHkpWorldSnapshot(HkpWorldSnapshot* snap, hkpWorld* world)
     }
 }
 
+//Restore the shape of a saved entity/phantom, re-homing it if the game swapped the shape out
+//while the snapshot was held. Shared by the entity and phantom paths.
+static void RestoreSavedShape(void** live_shape_slot, void* saved_shape, const void* saved_shape_data)
+{
+    void* old_shape = *live_shape_slot;
+    if (old_shape != saved_shape)
+    {
+        ConsoleWrite("Shape mismatch! %p", old_shape);
+        if (old_shape != NULL)
+        {
+            hk_deref(old_shape);
+        }
+        *live_shape_slot = saved_shape;
+        hk_ref(saved_shape); //ref it for the game, since the game would ref it when it gets added
+    }
+    copy_hkpShape(saved_shape, (void*)saved_shape_data);
+}
+
 /* ============================================================
  * RestoreHkpWorldSnapshot
  *
@@ -214,6 +233,12 @@ void RestoreHkpWorldSnapshot(const HkpWorldSnapshot* snap, hkpWorld* world)
             world->m_criticalOperationsLockCountForPhantoms);
     }
 
+    //the add/remove calls below bump these; put them back once we're done so a rollback
+    //doesn't leave the world's uid allocation ahead of where the saved frame left it
+    const uint32_t saved_lastEntityUid = world->m_lastEntityUid;
+    const uint32_t saved_lastIslandUid = world->m_lastIslandUid;
+    const uint32_t saved_lastConstraintUid = world->m_lastConstraintUid;
+
     // --- Collect current world state ---
     std::vector<hkpEntity*> currentEntities;
     CollectWorldEntities(world, currentEntities);
@@ -222,58 +247,75 @@ void RestoreHkpWorldSnapshot(const HkpWorldSnapshot* snap, hkpWorld* world)
     CollectWorldPhantoms(world, currentPhantoms);
 
     // --- Remove all existing entities ---
-    hk_removeEntities(world, currentEntities.data(), (int)currentEntities.size()); //this derefs each entity and it's shape
+    //Unlike the phantoms below, entities still go through a full remove/re-add: hkpWorld_addEntity
+    //is what recomputes the collidable AABB from the restored motion and re-inserts it into the
+    //broadphase. Doing that in place needs an AABB-refresh path we don't have yet.
+    hk_removeEntities(world, currentEntities.data(), (int)currentEntities.size()); //this derefs each entity (not its shape)
 
     // --- Re-add entities from the snapshot  ---
     for (auto& s : snap->entities)
     {
+        //must happen before hk_addEntity: the AABB it computes is derived from this transform
         memcpy(&s.ptr->m_motion, &s.motionData, sizeof(hkpMotion));
 
         //check if something happened to the object's shape in between saving and now
-        void* old_shape = s.ptr->m_collidable.base.shape;
-        if (old_shape != s.shapePtr)
-        {
-            ConsoleWrite("Shape mismatch! %p", old_shape);
-            if (old_shape != NULL)
-            {
-                hk_deref(old_shape);
-            }
-            s.ptr->m_collidable.base.shape = s.shapePtr;
-            hk_ref(s.shapePtr); //ref it for the game, since the game would ref it when it gets added
-        }
-        copy_hkpShape(s.shapePtr, (void*)(&s.shapeData));
+        RestoreSavedShape(&s.ptr->m_collidable.base.shape, s.shapePtr, &s.shapeData);
 
         // 1 = activate. This refs the entity which we want since it's now in the world as well
         // This also rebuilds the agents/manifolds for the island
         hk_addEntity(world, s.ptr, 1);
+
+        //hkpWorld_addEntity overwrites these after reading the transform: it stamps a new uid and
+        //clears the deactivation counters (so every restore would wake every body and lose how long
+        //it had been asleep). Put the saved values back.
+        const hkpMotion* saved_motion = (const hkpMotion*)&s.motionData;
+        s.ptr->m_motion.m_deactivationIntegrateCounter = saved_motion->m_deactivationIntegrateCounter;
+        s.ptr->m_motion.m_deactivationNumInactiveFrames[0] = saved_motion->m_deactivationNumInactiveFrames[0];
+        s.ptr->m_motion.m_deactivationNumInactiveFrames[1] = saved_motion->m_deactivationNumInactiveFrames[1];
+        s.ptr->m_uid = s.uid;
     }
 
-    // --- Remove all existing phantoms ---
+    // --- Phantoms: only touch the ones whose world membership actually changed ---
+    std::unordered_set<const void*> snapshotPhantoms;
+    snapshotPhantoms.reserve(snap->phantoms.size());
+    for (auto& s : snap->phantoms)
+    {
+        snapshotPhantoms.insert((const void*)s.ptr);
+    }
+
+    //in the world now but not in the snapshot -> created after the saved frame, so remove it
     for (hkpSimpleShapePhantom* p : currentPhantoms)
     {
-        hk_removePhantom(world, (void*)p); //this derefs the entity and it's shape
+        if (snapshotPhantoms.find((const void*)p) == snapshotPhantoms.end())
+        {
+            hk_removePhantom(world, (void*)p); //this derefs the phantom (not its shape)
+        }
     }
 
-    // --- Re-add phantoms from the snapshot ---
+    std::unordered_set<const void*> livePhantoms;
+    livePhantoms.reserve(currentPhantoms.size());
+    for (hkpSimpleShapePhantom* p : currentPhantoms)
+    {
+        livePhantoms.insert((const void*)p);
+    }
+
     for (auto& s : snap->phantoms)
     {
         memcpy(&s.ptr->m_motionState, &s.motionStateData, sizeof(hkMotionState));
 
-        void* old_shape = s.ptr->base.m_collidable.base.shape;
-        if (old_shape != s.shapePtr)
-        {
-            ConsoleWrite("Shape mismatch! %p", old_shape);
-            if (old_shape != NULL)
-            {
-                hk_deref(old_shape);
-            }
-            s.ptr->base.m_collidable.base.shape = s.shapePtr;
-            hk_ref(s.shapePtr);
-        }
-        copy_hkpShape(s.shapePtr, (void*)(&s.shapeData));
+        RestoreSavedShape(&s.ptr->base.m_collidable.base.shape, s.shapePtr, &s.shapeData);
 
-        hk_addPhantom(world, (void*)s.ptr); //This refs the entity
+        //in the snapshot but gone from the world -> destroyed after the saved frame. Our snapshot ref
+        //is what kept it alive, so it can be put back.
+        if (livePhantoms.find((const void*)s.ptr) == livePhantoms.end())
+        {
+            hk_addPhantom(world, (void*)s.ptr); //This refs the phantom
+        }
     }
+
+    world->m_lastEntityUid = saved_lastEntityUid;
+    world->m_lastIslandUid = saved_lastIslandUid;
+    world->m_lastConstraintUid = saved_lastConstraintUid;
 
     // NOTE: After restoring positions, the broadphase AABBs, overlap pairs,
     // and simulation islands are stale. The next normal game step will rebuild these.
@@ -298,6 +340,7 @@ void CopyHkpWorldSnapshot(HkpWorldSnapshot* dst, const HkpWorldSnapshot* src)
         SavedEntityState new_s;
         new_s.ptr = s.ptr;
         new_s.shapePtr = s.shapePtr;
+        new_s.uid = s.uid;
         memcpy(new_s.motionData, s.motionData, sizeof(hkpMotion));
         copy_hkpShape(&new_s.shapeData, (void*)(&s.shapeData));
         dst->entities.push_back(new_s);
