@@ -24,6 +24,7 @@ typedef struct AnimationMediatorStateEntry AnimationMediatorStateEntry;
 typedef struct AnimationMediator AnimationMediator;
 typedef struct HitIns HitIns;
 typedef struct HavokChara HavokChara;
+typedef struct hkpRootCdPoint hkpRootCdPoint;
 typedef struct hkpCharacterProxy hkpCharacterProxy;
 typedef struct EzState_detail_EzStateMachineImpl EzState_detail_EzStateMachineImpl;
 typedef struct EzStateRegister EzStateRegister;
@@ -570,15 +571,37 @@ static_assert(offsetof(HavokChara, padding_2) == 0x248);
 static_assert(offsetof(HavokChara, unk_258) == 0x258);
 static_assert(sizeof(HavokChara) == 0x290);
 
+//One contact in hkpCharacterProxy::m_manifold. Standard Havok hkpRootCdPoint layout:
+//an hkContactPoint (position + separating normal) plus the two collidables that produced it.
+struct hkpRootCdPoint
+{
+    float m_position[4];          // 0x0
+    float m_separatingNormal[4];  // 0x10
+    void* m_rootCollidableA;      // 0x20 (hkpCdBody*; a live game pointer, never hashed)
+    uint64_t m_shapeKeyA;         // 0x28
+    void* m_rootCollidableB;      // 0x30 (hkpCdBody*)
+    uint64_t m_shapeKeyB;         // 0x38
+};
+static_assert(offsetof(hkpRootCdPoint, m_separatingNormal) == 0x10);
+static_assert(offsetof(hkpRootCdPoint, m_rootCollidableA) == 0x20);
+static_assert(offsetof(hkpRootCdPoint, m_rootCollidableB) == 0x30);
+static_assert(sizeof(hkpRootCdPoint) == 0x40);
+
+//low 30 bits of an hkArray capacity word; the top 2 are DONT_DEALLOCATE / LOCKED
+static const uint32_t HKARRAY_CAPACITY_MASK = 0x3FFFFFFF;
+
 struct hkpCharacterProxy
 {
     uint64_t padding_0;    // 0x0 (vtable1)
     uint32_t unk_8;        // 0x8
     uint32_t unk_c;        // 0xc (gap)
     uint64_t padding_1[2]; // 0x10 (vtable2, vtable3)
-    void* field0x20; //ghidra: m_manifold. Ignore this, seems to not be important.
-    uint32_t field0x20_len;
-    uint32_t field0x20_cap;
+    //The proxy's contact set. hkpCharacterProxy::integrate resolves the character's movement
+    //against this
+    hkpRootCdPoint* m_manifold;   // 0x20
+    int32_t m_manifold_len;       // 0x28
+    //hkArray packs flags into the top bits of the capacity; the real capacity is the low 30.
+    uint32_t m_manifold_cap;      // 0x2c
     void** field0x30; //ghidra: m_bodies. Ignore this, seems to not be important.
     uint32_t field0x30_len;
     uint32_t field0x30_cap;
@@ -615,7 +638,9 @@ struct hkpCharacterProxy
 };
 
 static_assert(offsetof(hkpCharacterProxy, unk_8) == 0x8);
-static_assert(offsetof(hkpCharacterProxy, field0x20) == 0x20);
+static_assert(offsetof(hkpCharacterProxy, m_manifold) == 0x20);
+static_assert(offsetof(hkpCharacterProxy, m_manifold_len) == 0x28);
+static_assert(offsetof(hkpCharacterProxy, m_manifold_cap) == 0x2c);
 static_assert(offsetof(hkpCharacterProxy, field0x30) == 0x30);
 static_assert(offsetof(hkpCharacterProxy, field0x40) == 0x40);
 static_assert(offsetof(hkpCharacterProxy, field0x50) == 0x50);

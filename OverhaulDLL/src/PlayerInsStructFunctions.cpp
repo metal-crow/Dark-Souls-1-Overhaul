@@ -1207,11 +1207,54 @@ void free_HavokChara(HavokChara* to)
     free(to);
 }
 
+//m_manifold is an hkArray owned by Havok on the game side and by us on a snapshot. Copying it means
+//moving the CONTENTS, never the pointer: the game reallocates and frees its own buffer.
+//
+//On the way back into the game we can only write into the buffer Havok already has -- growing an
+//hkArray needs Havok's allocator, and handing it storage of ours would mean fighting its ownership
+//flags. In practice this is not a limitation: the manifold holds a handful of contacts and hkArray
+//capacity only ever grows, so the live capacity is >= the saved length except in the first frames
+//after a character spawns. If it ever is not, say so rather than silently restoring a truncated
+//contact set, which would be a desync that looks like a physics bug.
+static void copy_hkpCharacterProxy_manifold(hkpCharacterProxy* to, const hkpCharacterProxy* from, StateTarget target)
+{
+    const int32_t n = from->m_manifold_len;
+
+    if (target == StateTarget::ToGame)
+    {
+        const uint32_t live_cap = to->m_manifold_cap & HKARRAY_CAPACITY_MASK;
+        if (n > 0 && (to->m_manifold == NULL || live_cap < (uint32_t)n))
+        {
+            ConsoleWrite("copy_hkpCharacterProxy: cannot restore %d manifold contacts, live capacity is %u", n, live_cap);
+            return;
+        }
+        if (n > 0)
+        {
+            memcpy(to->m_manifold, from->m_manifold, (size_t)n * sizeof(hkpRootCdPoint));
+        }
+        to->m_manifold_len = n;
+        return;
+    }
+
+    //ToLocal / Copy: `to` is one of our snapshots, so we own its buffer outright.
+    if ((uint32_t)n > to->m_manifold_cap)
+    {
+        to->m_manifold = (hkpRootCdPoint*)realloc_(to->m_manifold, (size_t)n * sizeof(hkpRootCdPoint));
+        to->m_manifold_cap = (uint32_t)n;
+    }
+    if (n > 0)
+    {
+        memcpy(to->m_manifold, from->m_manifold, (size_t)n * sizeof(hkpRootCdPoint));
+    }
+    to->m_manifold_len = n;
+}
+
 //CharacterProxy is not in hkpWorld, it's handled by game code. So we can save/restore it from the Chr
 void copy_hkpCharacterProxy(hkpCharacterProxy* to, const hkpCharacterProxy* from, StateTarget target)
 {
     to->unk_8 = from->unk_8;
     to->unk_c = from->unk_c;
+    copy_hkpCharacterProxy_manifold(to, from, target);
     memcpy(&to->m_velocity, &from->m_velocity, 0x20);
 
     //since the phantoms are never destroyed due to our graveyard mechanism, it's safe to just use the raw pointer. it should always be valid
@@ -1236,6 +1279,7 @@ hkpCharacterProxy* init_hkpCharacterProxy(StateTarget target)
 
 void free_hkpCharacterProxy(hkpCharacterProxy* to)
 {
+    free(to->m_manifold);
     free(to);
 }
 
@@ -2123,6 +2167,21 @@ static void serialize_hkpCharacterProxy(StateVisitor& v, const hkpCharacterProxy
     v.begin("hkpCharacterProxy");
     v.field("unk_8", h->unk_8);
     v.field("unk_c", h->unk_c);
+    //The contact set the proxy integrates against. Hash the geometry and the shape keys; the two
+    //hkpCdBody pointers are live game addresses, so only their null/non-null-ness is comparable.
+    v.count("m_manifold", (size_t)(h->m_manifold_len > 0 ? h->m_manifold_len : 0));
+    for (int32_t i = 0; i < h->m_manifold_len && h->m_manifold != NULL; i++)
+    {
+        const hkpRootCdPoint* p = &h->m_manifold[i];
+        v.begin("contact");
+        v.blob("m_position", p->m_position, sizeof(p->m_position));
+        v.blob("m_separatingNormal", p->m_separatingNormal, sizeof(p->m_separatingNormal));
+        v.ptr_flag("m_rootCollidableA", p->m_rootCollidableA);
+        v.field("m_shapeKeyA", p->m_shapeKeyA);
+        v.ptr_flag("m_rootCollidableB", p->m_rootCollidableB);
+        v.field("m_shapeKeyB", p->m_shapeKeyB);
+        v.end();
+    }
     v.blob("m_velocity", &h->m_velocity, 0x20);
     v.ptr_flag("HkpSimpleShapePhantom", h->HkpSimpleShapePhantom);   // heap phantom ptr
     v.blob("m_dynamicFriction", &h->m_dynamicFriction, 0x40);
