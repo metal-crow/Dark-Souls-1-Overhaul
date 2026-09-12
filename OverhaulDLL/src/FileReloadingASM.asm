@@ -146,7 +146,11 @@ FUNC_EPILOGUE
 ;original code
 mov     rax, [rsi]
 mov     rcx, rsi
-call    qword ptr [rax+150h]
+;This is PlayerIns_ComputeChanges' Is_WorldChrManImp_HostPlayerIns gate on the magic/item
+;block. We manully redirect to the +170Ah trampoline (see Rollback::NetcodeFix) the same way the
+;PlayerIns_IsHostPlayerIns_offsets sites are, because a rollback-driven phantom is neither
+;host nor NPC and would otherwise skip the block entirely -- so using an item does nothing.
+call    qword ptr [rax+170Ah]
 movaps  xmm7, xmmword ptr [rsp+0D0h]
 
 FUNC_PROLOGUE

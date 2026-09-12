@@ -60,6 +60,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugAsan|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\PadManipulatorStructFunctions.cpp" />
+    <ClCompile Include="src\VirtualPad.cpp" />
     <ClCompile Include="src\InvisibleBackstabAttackFix.cpp" />
     <ClCompile Include="src\MainLoop.cpp" />
     <ClCompile Include="src\Menu\SavedCharacters.cpp" />
@@ -109,6 +110,7 @@
     <ClInclude Include="include\NetcodePackets.h" />
     <ClInclude Include="include\PadManipulatorStruct.h" />
     <ClInclude Include="include\PadManipulatorStructFunctions.h" />
+    <ClInclude Include="include\VirtualPad.h" />
     <ClInclude Include="include\PlayerInsStructFunctions.h" />
     <ClInclude Include="include\PlayerVisualsValidationFix.h" />
     <ClInclude Include="include\Rollback.h" />

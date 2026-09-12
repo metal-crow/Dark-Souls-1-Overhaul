@@ -19,6 +19,7 @@
 #include "StateHash.h"
 #include "RollbackReplay.h"
 #include "RollbackScript.h"
+#include "VirtualPad.h"
 
 FrpgHavokManImp* Rollback::saved_havokman = NULL;
 PlayerIns* Rollback::saved_playerins = NULL;
@@ -27,7 +28,6 @@ SfxMan* Rollback::saved_sfxman = NULL;
 DamageMan* Rollback::saved_damageman = NULL;
 ThrowMan* Rollback::saved_throwman = NULL;
 DmgHitRecordManImp* Rollback::saved_DmgHitRecordMan = NULL;
-PadManipulatorPacked** Rollback::saved_PadManipulator = NULL;
 
 FILE* hash_logfile = NULL;
 
@@ -86,48 +86,10 @@ bool state_test(void* unused)
     return true;
 }
 
-bool Rollback::isave = false;
-bool Rollback::iload = false;
-static uint32_t inputSaveFrameI = 0;
-static const size_t INPUT_ROLLBACK_LENGTH = 5 * 60; //5 seconds
-bool input_test(void* unused)
-{
-    if (Rollback::isave)
-    {
-        auto player_o = Game::get_PlayerIns();
-        PlayerIns* player = (PlayerIns*)player_o.value();
-        PadManipulator_to_PadManipulatorPacked(Rollback::saved_PadManipulator[inputSaveFrameI], player->chrins.padManipulator);
-
-        inputSaveFrameI++;
-        if (inputSaveFrameI >= INPUT_ROLLBACK_LENGTH)
-        {
-            ConsoleWrite("Input save finish");
-            Rollback::isave = false;
-            inputSaveFrameI = 0;
-        }
-    }
-
-    if (Rollback::iload)
-    {
-        Game::set_ReadInputs_allowed(false);
-
-        auto player_o = Game::get_PlayerIns();
-        PlayerIns* player = (PlayerIns*)player_o.value();
-        PadManipulatorPacked_to_PadManipulator(player, Rollback::saved_PadManipulator[inputSaveFrameI]);
-
-        inputSaveFrameI++;
-        if (inputSaveFrameI >= INPUT_ROLLBACK_LENGTH)
-        {
-            Game::set_ReadInputs_allowed(true);
-            ConsoleWrite("Input restore finish");
-            Rollback::iload = false;
-            inputSaveFrameI = 0;
-        }
-    }
-
-    return true;
-}
-
+bool Rollback::inRollbackResim = false;
+#if ROLLBACK_INPUT_TESTING
+RollbackInput Rollback::lastAppliedInput[GGPO_MAX_PLAYERS] = {};
+InputDiag Rollback::inputDiag[GGPO_MAX_PLAYERS] = {};
 bool Rollback::networkToggle = false;
 bool Rollback::networkTest = false;
 bool network_toggle(void* unused)
@@ -141,6 +103,32 @@ bool network_toggle(void* unused)
     }
     return true;
 }
+
+//Test-only: sample the pad outside a session so the harness can read it back. During a
+//session PackRollbackInput does the capture.
+bool virtualpad_capture_tick(void* unused)
+{
+#if VIRTUALPAD_SELFTEST
+    //The self-test installs a replay for a whole frame; UnpackRollbackInput installs one per
+    //player inside that frame. Nesting them would have the inner end_replay restore the
+    //originals mid-frame, so they are mutually exclusive.
+    if (VirtualPad::selftest_frames_remaining > 0 && !Rollback::ggpoStarted)
+    {
+        //captures internally, then installs the stubs for the rest of the frame
+        VirtualPad::selftest_frame_start();
+        return true;
+    }
+#endif
+    //While a session is running PackRollbackInput does the capture; this tick would only be a
+    //redundant second read of the same device state.
+    if (!VirtualPad::replaying() && !Rollback::ggpoStarted)
+    {
+        VirtualPadState s{};
+        VirtualPad::capture(&s);
+    }
+    return true;
+}
+#endif
 
 bool Rollback::rollbackToggle = false;
 bool Rollback::rollbackEnabled = false;
@@ -164,11 +152,14 @@ extern "C" {
 
 //The item each player is using, indexed the same way as Game::get_connected_player. -1 = no override.
 static int32_t ItemIdOverride[GGPO_MAX_PLAYERS] = { -1, -1, -1, -1, -1, -1 };
+#if ROLLBACK_INPUT_TESTING
+int32_t Rollback::item_override_for(uint32_t i) { return i < GGPO_MAX_PLAYERS ? ItemIdOverride[i] : -1; }
+#endif
 static_assert(GGPO_MAX_PLAYERS == 6, "ItemIdOverride initialiser must cover every player slot");
 
 uint8_t get_item_currently_being_used_injection_helper(EquipGameData* equip, ItemUsed* out)
 {
-    if (!Rollback::rollbackEnabled)
+    if (!Rollback::rollbackEnabled && !Rollback::networkTest)
     {
         return 0;
     }
@@ -202,7 +193,20 @@ void PackRollbackInput(RollbackInput* out, PlayerIns* player)
     EquipInventoryDataItem* itemlist = player->playergamedata->equipGameData.equippedInventory.itemlist2;
     uint32_t itemlistlen = player->playergamedata->equipGameData.equippedInventory.itemList2_len;
 
-    PadManipulator_to_PadManipulatorPacked(&out->padmanipulator, player->chrins.padManipulator);
+    //Read the game pad inputs.
+    VirtualPad::capture(&out->vpad.pad);
+
+    out->vpad.camera_x_rotation = player->chrins.padManipulator->chrManipulator.camera_x_rotation;
+    out->vpad.camera_y_rotation = player->chrins.padManipulator->chrManipulator.camera_y_rotation;
+    out->vpad.LockonTargetHandle = player->chrins.padManipulator->chrManipulator.LockonTargetHandle;
+
+    //Read before our own Step_PadManipulator consumes it. Pack runs at MainUpdate entry, so
+    //this is the request the menus left last frame
+    out->vpad.menu_item_use_request = MenuMan_Get_Index(MENUMAN_INDEX_UNKNOWN109);
+
+    //Outputs of the local menu step, not the game pad
+    out->vpad.left_hand_slot_selected = player->chrins.padManipulator->chrManipulator.left_hand_slot_selected;
+    out->vpad.right_hand_slot_selected = player->chrins.padManipulator->chrManipulator.right_hand_slot_selected;
     //need to tell if GGPO has actually returned us a real input, or padding
     //TODO improve this
     out->const1 = 1;
@@ -237,8 +241,71 @@ void PackRollbackInput(RollbackInput* out, PlayerIns* player)
     }
 }
 
+//Drive one player's PadManipulator by re-running the Step_PadManipulator with the
+//sender's pad substituted at the accessor layer.
+//Step_PadManipulator runs exactly once per player per frame, since we only enable set_ReadInputs_allowed here.
+static void apply_virtualpad_input(RollbackInput* in, PlayerIns* player, uint32_t playerIndex)
+{
+    //Suppress Step_PadManipulator's global side effects for anyone but the local player on a
+    //live frame. For a REMOTE player they would consult and mutate this machine's menus, which
+    //are not theirs; on a RE-SIMULATED frame they would fire a second time for a frame that
+    //already ran. The local player on a live frame is the one case where consulting our own
+    //menus is exactly right, so leave it alone there.
+    const bool suppress_globals = (playerIndex != 0) || Rollback::inRollbackResim;
+    ChrManipulator* cm = &player->chrins.padManipulator->chrManipulator;
+
+    //Give the player their own camera before the step. This mirrors exactly what
+    //Apply_ChrCam_To_PlayerInsPadManipulator @140235400 writes for the viewing player,
+    //including the two fields it always zeroes.
+    cm->camera_x_rotation = in->vpad.camera_x_rotation;
+    cm->camera_y_rotation = in->vpad.camera_y_rotation;
+    cm->field27_0x58 = 0.0f;
+    cm->field28_0x5c = 0;
+
+    //Step_PadManipulator reads MenuMan slot 109 -- the in-game menus' "use this item" request
+    //-- and consumes it by writing 109 and 99. Both are global, so for a remote player it would
+    //read OUR menus and mutate them, and on a re-simulated frame it would consume them twice.
+    //So substitute the SENDER's request for the duration of the step and put both slots back
+    //afterwards.
+    const uint32_t saved_109 = MenuMan_Get_Index(MENUMAN_INDEX_UNKNOWN109);
+    const uint32_t saved_99 = MenuMan_Get_Index(MENUMAN_INDEX_UNKNOWN99);
+#if ROLLBACK_INPUT_TESTING
+    if (playerIndex < GGPO_MAX_PLAYERS && in->vpad.menu_item_use_request != 0) Rollback::inputDiag[playerIndex].menu109++;
+#endif
+    if (suppress_globals)
+    {
+        MenuMan_Set_IndexLookup(MENUMAN_INDEX_UNKNOWN109, (int32_t)in->vpad.menu_item_use_request);
+    }
+
+    VirtualPad::begin_replay(&in->vpad.pad);
+    //Allow Step_PadManipulator to run
+    Game::set_ReadInputs_allowed(true);
+    Step_PadManipulator(player->chrins.padManipulator, FRAMETIME, player->chrins.playerCtrl);
+    Game::set_ReadInputs_allowed(false);
+    VirtualPad::end_replay();
+
+    if (suppress_globals)
+    {
+        MenuMan_Set_IndexLookup(MENUMAN_INDEX_UNKNOWN109, (int32_t)saved_109);
+        MenuMan_Set_IndexLookup(MENUMAN_INDEX_UNKNOWN99, (int32_t)saved_99);
+    }
+
+    cm->LockonTargetHandle = in->vpad.LockonTargetHandle;
+
+    //Weapon-slot selection, for players whose in-game menu step did not run
+    if (suppress_globals)
+    {
+        cm->left_hand_slot_selected = in->vpad.left_hand_slot_selected;
+        cm->right_hand_slot_selected = in->vpad.right_hand_slot_selected;
+    }
+}
+
 void UnpackRollbackInput(RollbackInput* in, PlayerIns* player, uint32_t playerIndex)
 {
+#if ROLLBACK_INPUT_TESTING
+    //kept purely so the harness can show what each player was actually handed (see "inputdiag")
+    if (playerIndex < GGPO_MAX_PLAYERS) Rollback::lastAppliedInput[playerIndex] = *in;
+#endif
     EquipInventoryDataItem* itemlist = player->playergamedata->equipGameData.equippedInventory.itemlist2;
     uint32_t itemlistlen = player->playergamedata->equipGameData.equippedInventory.itemList2_len;
 
@@ -246,6 +313,8 @@ void UnpackRollbackInput(RollbackInput* in, PlayerIns* player, uint32_t playerIn
     //This only updates the chrasm equip items, since the game will dynamically update the chr elsewhere based on this
     for (uint32_t equip_index = 0; equip_index < InventorySlots::END; equip_index++)
     {
+        const uint32_t prev_equip_item = player->playergamedata->equipGameData.chrasm.equip_items[equip_index];
+
         //set the chr's equipped items
         //setting this here causes the game to update the other values dynamically (and correctly) when we later run PlayerIns_ComputeChanges
         player->playergamedata->equipGameData.chrasm.equip_items[equip_index] = in->equipment_array[equip_index];
@@ -260,7 +329,7 @@ void UnpackRollbackInput(RollbackInput* in, PlayerIns* player, uint32_t playerIn
             if ((equip_index == player->playergamedata->equipGameData.chrasm.l_hand_equipped_index * 0x2) ||
                 (equip_index == player->playergamedata->equipGameData.chrasm.r_hand_equipped_index * 0x2 + 0x1))
             {
-                if (player->playergamedata->equipGameData.chrasm.equip_items[equip_index] != in->equipment_array[equip_index])
+                if (prev_equip_item != in->equipment_array[equip_index])
                 {
                     player->playergamedata->equipGameData.chrasm.equipped_weapon_style = 0x1;
                 }
@@ -293,7 +362,7 @@ void UnpackRollbackInput(RollbackInput* in, PlayerIns* player, uint32_t playerIn
         ItemIdOverride[playerIndex] = in->curSelectedQuickbarItemId;
     }
 
-    PadManipulatorPacked_to_PadManipulator(player, &in->padmanipulator);
+    apply_virtualpad_input(in, player, playerIndex);
 
     uint32_t playerHandle = *(uint32_t*)(((uint64_t)player) + 8);
     if (playerHandle > Game::PC_Handle && playerHandle < Game::PC_Handle + 10)
@@ -329,6 +398,54 @@ void UnpackRollbackInput(RollbackInput* in, PlayerIns* player, uint32_t playerIn
         //update the itemInventoryIdCurrentlyBeingUsedFromInventory. For the local player, we need this so the rollback doesn't clear it next frame and prevent us from continuing to read it
         player->playergamedata->equipGameData.itemInventoryIdCurrentlyBeingUsedFromInventory = Game::locate_inventory_index_for_itemid(itemlist, itemlistlen, in->curUsingInventoryItemId);
     }
+#if ROLLBACK_INPUT_TESTING
+    //Sticky record of what this player was actually handed, so the harness can be read
+    //after the fact instead of having to catch the exact frame a button was down.
+    if (playerIndex < GGPO_MAX_PLAYERS)
+    {
+        InputDiag& d = Rollback::inputDiag[playerIndex];
+        d.frames++;
+        d.buttons_or |= in->vpad.pad.buttons;
+        if (ItemIdOverride[playerIndex] != -1) d.item_override_last = ItemIdOverride[playerIndex];
+        if (player->chrins.padManipulator != NULL)
+        {
+            ChrManipulator* dcm = &player->chrins.padManipulator->chrManipulator;
+            if (dcm->CurrentFrame_ActionInputs.use_ButtonPressed) d.use_seen = 1;
+            if (dcm->change_2handing_state > d.twohand_seen) d.twohand_seen = dcm->change_2handing_state;
+            //post-step, so this is what the step actually produced rather than what arrived
+            d.left_slot_or |= dcm->left_hand_slot_selected;
+            d.right_slot_or |= dcm->right_hand_slot_selected;
+            if (dcm->CurrentFrame_ActionInputs.r1_weapon_attack_input_1) d.attack_seen = 1;
+        }
+        if (player->playergamedata != NULL)
+        {
+            ChrAsm& dca = player->playergamedata->equipGameData.chrasm;
+            if (dca.l_hand_equipped_index < 32) d.l_index_mask |= (1u << dca.l_hand_equipped_index);
+            if (dca.r_hand_equipped_index < 32) d.r_index_mask |= (1u << dca.r_hand_equipped_index);
+            if (dca.equipped_weapon_style < 32) d.style_mask |= (1u << dca.equipped_weapon_style);
+        }
+        //The gate Step_PadManipulator puts in front of its whole action-input region.
+        if (player->chrins.playerCtrl != NULL)
+        {
+            ChrCtrl& cc = player->chrins.playerCtrl->chrCtrl;
+            d.enable_or |= cc.enable;
+            if (cc.actionctrl != NULL)
+            {
+                const uint8_t* ac = (const uint8_t*)cc.actionctrl;
+                const bool recv_state = (ac[0x1de] & 0x2) != 0;   // bitfield@0x1dc, RecieveStateInput
+                const bool use_override = ac[0x1ae] != 0;         // ItemBeingUsedOverride
+                if (recv_state) d.recv_state++;
+                if (use_override) d.item_use_override++;
+                if ((cc.enable & 4) != 0 && !recv_state && !use_override) d.gate_skip++;
+            }
+        }
+        //Step_PadManipulator wraps ONLY its magic and use assignments in bit 4 of this byte
+        //(140397412: TEST byte ptr [RAX + 0x2a6], 0x10 / JNZ past them); the attack
+        //assignments sit above it, which is exactly the split we are seeing.
+        if ((player->chrins.unk_2a6 & 0x10) != 0) d.bow_precision++;
+        d.chr_2a6_or |= player->chrins.unk_2a6;
+    }
+#endif
 }
 
 void rollback_sync_inputs()
@@ -365,6 +482,115 @@ void rollback_sync_inputs()
     }
 }
 
+/*
+ * Input loopback test -- no GGPO, no rollback, no state save/restore.
+ *
+ * One instance is the SENDER: it reads its own pad, packs a RollbackInput exactly as the
+ * rollback path would, ships it to the peer over Steam channel 1, and also applies it to
+ * itself so the sender's character responds normally.
+ *
+ * The other is the RECEIVER: it applies whatever arrives to the SENDER's character (the
+ * remote PlayerIns), through the same UnpackRollbackInput the rollback path uses.
+ *
+ * So if the receiver's view of the sender's character matches what the sender is doing, then
+ * capture -> pack -> wire -> unpack -> Step_PadManipulator is correct. That is the half of
+ * rollback worth isolating from prediction and state save/restore.
+ *
+ * Roles are explicit (`network role send|recv`) rather than inferred: this used to key off
+ * having an Old Witch's Ring equipped, which is not something a test should depend on.
+ */
+
+#if ROLLBACK_INPUT_TESTING
+NetworkTestRole Rollback::networkTestRole = NetworkTestRole::Send;
+uint32_t Rollback::networkTestSent = 0;
+uint32_t Rollback::networkTestRecv = 0;
+uint32_t Rollback::networkTestMissed = 0;
+static void networkTest_tick()
+{
+    auto player_o = Game::get_PlayerIns();
+    if (!player_o.has_value() || player_o.value() == NULL) return;
+    PlayerIns* player = (PlayerIns*)player_o.value();
+
+    auto guest_o = Game::get_connected_player(1);
+    if (!guest_o.has_value() || guest_o.value() == NULL) return;
+    PlayerIns* guest = (PlayerIns*)guest_o.value();
+
+    if (Rollback::networkTestRole == NetworkTestRole::Send)
+    {
+        //Refresh the device. Both input paths need this: the legacy one so
+        //Step_PadManipulator has fresh pad state, the VirtualPad one because it is what
+        //updates the VirtualMultiDevice that VirtualPad::capture reads.
+
+        Game::set_ReadInputs_allowed(true);
+        Step_PadMan(FRAMETIME);
+        Game::set_ReadInputs_allowed(false);
+
+        //menu/equipment resolution -- treated as input on both paths
+        Game::set_StepInGameMenu_allowed(true);
+        uint64_t ingamestep = (uint64_t)Game::get_InGameStep();
+        uint64_t taskitem = *(uint64_t*)(ingamestep + 0x5ae0);
+        uint64_t ingamemenustep = *(uint64_t*)(taskitem + 0x20);
+        Step_InGameMenus((void*)ingamemenustep, FRAMETIME, (void*)taskitem);
+        Game::set_StepInGameMenu_allowed(false);
+
+        RollbackInput localInput{};
+        PackRollbackInput(&localInput, player);
+
+
+        SteamNetworkingIdentity target{};
+        target.SetSteamID(guest->steamPlayerData->steamOnlineIDData->steam_id);
+        ModNetworking::SteamNetMessages->SendMessageToUser(target, &localInput, sizeof(localInput),
+            k_nSteamNetworkingSend_UnreliableNoNagle, 1);
+        Rollback::networkTestSent++;
+
+        //drive our own character from the very same input, so what the sender sees is produced
+        //by the same pack/unpack pipeline the receiver runs -- otherwise a mismatch could be
+        //blamed on either side
+        UnpackRollbackInput(&localInput, player, 0);
+        RollbackScript::observe(0, &localInput);
+    }
+    else
+    {
+        //receiver: never read the local pad, so the peer is the only thing moving anything
+        Game::set_ReadInputs_allowed(false);
+        Game::set_StepInGameMenu_allowed(false);
+
+        SteamNetworkingMessage_t* new_message = NULL;
+        int num_messages = 0;
+        int i = 0;
+        do
+        {
+            num_messages = ModNetworking::SteamNetMessages->ReceiveMessagesOnChannel(1, &new_message, 1);
+            i++;
+        } while (num_messages < 1 && i < 5);
+
+        if (num_messages == 1)
+        {
+            if (new_message->GetSize() == sizeof(RollbackInput))
+            {
+                RollbackInput* remoteInput = (RollbackInput*)new_message->GetData();
+                //index 1: this input belongs to the SENDER, who is our remote player
+                UnpackRollbackInput(remoteInput, guest, 1);
+                Rollback::networkTestRecv++;
+                RollbackScript::observe(0, remoteInput);
+            }
+            else
+            {
+                //There is one input layout now, so a size mismatch means the two instances are running
+                //different builds of the DLL.
+                ConsoleWrite("networkTest: input size %d, expected %d -- the two instances are running different DLL builds",
+                    new_message->GetSize(), (int)sizeof(RollbackInput));
+            }
+            new_message->Release();
+        }
+        else
+        {
+            Rollback::networkTestMissed++;
+        }
+    }
+}
+#endif
+
 bool rollback_game_frame_start_helper(void* unused)
 {
     if (Rollback::rollbackEnabled && Rollback::ggpoStarted)
@@ -386,23 +612,14 @@ bool rollback_game_frame_start_helper(void* unused)
             }
             PlayerIns* player = (PlayerIns*)player_o.value();
 
-            //Before we do anything, save the padManipulator PrevFrame_ActionInputs.
-            // This is state that the last GGPO input gave us and we will need to restore it after we get the current input to preserve continuity correctness between frames
-            // Otherwise, for example, if we press roll then this following code will put that in the current frame, and later we will copy the current frame to previous and overwrite only the current
-            ChrManipulator_ActionInputted PrevFrame_ActionInputs_Save = player->chrins.padManipulator->chrManipulator.PrevFrame_ActionInputs;
-            ChrManipulator_ActionInputted CurFrame_ActionInputs_Save = player->chrins.padManipulator->chrManipulator.CurrentFrame_ActionInputs;
 
-            //Manually call the PadMan and PadManipulator functions to read the inputs
+            //Manually call the PadMan function here
             //ONLY allow it to be called here, so we don't have it called normally by the game and overwrite our custom inputs
             Game::set_ReadInputs_allowed(true);
             //This function is called as part of MainUpdate, and needs to be called first before Step_PadManipulator.
-            //It reads the controller directly and normalizes it post-keybinds. All stored in the PadMan global
+            //It reads the controller directly and normalizes it post-keybinds.
+            //This refreshes the VirtualMultiDevice that VirtualPad::capture reads.
             Step_PadMan(FRAMETIME);
-            //This function is called as part of the Step_TaskMan list, so we need to directly call it here and block TaskMan from calling it.
-            //It reads the normalized controller, post processes inputs based on game state (camera, weapons, etc), and sets a standardized struct
-            //This reads from the PadMan global and puts it's results in the player PadManipulator and player PlayerCtrl structs
-            //These 2 structs are what we actually use for rollback input. PadMan itself is overly complex and too raw.
-            Step_PadManipulator(player->chrins.padManipulator, FRAMETIME, player->chrins.playerCtrl);
             Game::set_ReadInputs_allowed(false);
 
             //We need to process the menu actions here and resolve equipment state, since they are effectivly "input"
@@ -418,13 +635,9 @@ bool rollback_game_frame_start_helper(void* unused)
             Game::set_StepInGameMenu_allowed(false);
 
             //read the local inputs the above calls have resolved to
-            //TODO********! probably wanna get stuff from playerctrl in here also
             RollbackInput localInput{};
             PackRollbackInput(&localInput, player);
 
-            //Now that we've saved the padManip data, restore the frame info
-            player->chrins.padManipulator->chrManipulator.PrevFrame_ActionInputs = PrevFrame_ActionInputs_Save;
-            player->chrins.padManipulator->chrManipulator.CurrentFrame_ActionInputs = CurFrame_ActionInputs_Save;
 
             //Test-harness input pipeline, keyed by the GGPO framecount (the same index STATEHASH uses):
             //  replay (base) -> script (overlay) -> record (captures the final input)
@@ -447,69 +660,12 @@ bool rollback_game_frame_start_helper(void* unused)
         }
     }
 
+#if ROLLBACK_INPUT_TESTING
     if (Rollback::networkTest)
     {
-        auto player_o = Game::get_PlayerIns();
-        if (player_o.has_value() && player_o.value() != NULL)
-        {
-            PlayerIns* player = (PlayerIns*)player_o.value();
-
-            auto guest_o = Game::get_connected_player(1);
-            if (guest_o.has_value() && guest_o.value() != NULL)
-            {
-                PlayerIns* guest = (PlayerIns*)guest_o.value();
-
-                //only allow 1 player to be the controller, otherwise we can get a feedback loop
-                //first ring slot == old witch's ring
-                if (player->chrasm->equip_items[0xD] == 137)
-                {
-                    Game::set_ReadInputs_allowed(true);
-                    Step_PadMan(FRAMETIME);
-                    Step_PadManipulator(player->chrins.padManipulator, FRAMETIME, player->chrins.playerCtrl);
-                    Game::set_ReadInputs_allowed(false);
-                    Game::set_StepInGameMenu_allowed(true);
-                    uint64_t ingamestep = (uint64_t)Game::get_InGameStep();
-                    uint64_t taskitem = *(uint64_t*)(ingamestep + 0x5ae0);
-                    uint64_t ingamemenustep = *(uint64_t*)(taskitem + 0x20);
-                    Step_InGameMenus((void*)ingamemenustep, FRAMETIME, (void*)taskitem);
-                    Game::set_StepInGameMenu_allowed(false);
-
-                    //send out our input
-                    RollbackInput localInput{};
-                    PackRollbackInput(&localInput, player);
-                    SteamNetworkingIdentity target{};
-                    target.SetSteamID(guest->steamPlayerData->steamOnlineIDData->steam_id);
-                    ModNetworking::SteamNetMessages->SendMessageToUser(target, &localInput, sizeof(localInput), k_nSteamNetworkingSend_UnreliableNoNagle, 1);
-                }
-                else
-                {
-                    Game::set_ReadInputs_allowed(false);
-                    Game::set_StepInGameMenu_allowed(false);
-                }
-
-                //read in and set the other player input. Do this in lockstep
-                SteamNetworkingMessage_t* new_message;
-                int num_messages = 0;
-                int i = 0;
-                do
-                {
-                    num_messages = ModNetworking::SteamNetMessages->ReceiveMessagesOnChannel(1, &new_message, 1);
-                    i++;
-                } while (num_messages < 1 && i < 5);
-                if (num_messages == 1)
-                {
-                    RollbackInput* remoteInput = (RollbackInput*)new_message->GetData();
-                    PadManipulatorPacked_to_PadManipulator(guest, &remoteInput->padmanipulator);
-                    PadManipulatorPacked_to_PadManipulator(player, &remoteInput->padmanipulator);
-                    new_message->Release();
-                }
-                else
-                {
-                    //ConsoleWrite("Missed input");
-                }
-            }
-        }
+        networkTest_tick();
     }
+#endif
 
     return true;
 }
@@ -524,6 +680,11 @@ static int ggpo_eventcode_timesync_frames_ahead = 0;
 
 void dsr_frame_finished_helper()
 {
+#if VIRTUALPAD_SELFTEST
+    //outside the session checks below: the self-test runs with or without a session
+    VirtualPad::selftest_frame_end();
+#endif
+
     if (Rollback::rollbackEnabled && Rollback::ggpoStarted)
     {
         //only start telling ggpo we're running once the players are synced
@@ -724,16 +885,13 @@ void Rollback::start()
     Rollback::saved_damageman = init_DamageMan();
     Rollback::saved_throwman = init_ThrowMan();
     Rollback::saved_DmgHitRecordMan = init_DmgHitRecordManImp();
-    Rollback::saved_PadManipulator = (PadManipulatorPacked**)malloc_(sizeof(PadManipulatorPacked*) * INPUT_ROLLBACK_LENGTH);
-    for (size_t i = 0; i < INPUT_ROLLBACK_LENGTH; i++)
-    {
-        Rollback::saved_PadManipulator[i] = (PadManipulatorPacked*)malloc(sizeof(PadManipulatorPacked));
-    }
-    //Testing save/restore with a hotkey
-    MainLoop::setup_mainloop_callback(state_test, NULL, "state_test");
-    MainLoop::setup_mainloop_callback(input_test, NULL, "input_test");
     MainLoop::setup_mainloop_callback(ggpo_toggle, NULL, "ggpo_toggle");
+#if ROLLBACK_INPUT_TESTING
     MainLoop::setup_mainloop_callback(network_toggle, NULL, "network_toggle");
+#endif
+#if ROLLBACK_INPUT_TESTING
+    MainLoop::setup_mainloop_callback(virtualpad_capture_tick, NULL, "virtualpad_capture_tick");
+#endif
 
 #ifdef GGPO_SYNCTEST
     //used for GGPO SyncTest
@@ -752,10 +910,14 @@ bool rollback_begin_game_callback(const char*)
 */
 bool rollback_advance_frame_callback(int)
 {
+    //Marks everything in this callback as a RE-simulation of a frame that already ran, so the
+    //input path can skip side effects that must only happen once per real frame.
+    Rollback::inRollbackResim = true;
     rollback_sync_inputs();
 
     //step next frame
     Game::Step_GameSimulation();
+    Rollback::inRollbackResim = false;
     ggpo_advance_frame(Rollback::ggpo);
 
     //ConsoleWrite("rollback_advance_frame_callback finished");

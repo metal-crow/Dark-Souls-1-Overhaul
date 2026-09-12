@@ -16,6 +16,7 @@
 #include "DmgHitRecordManImpStruct.h"
 #include "FrpgHavokManImpStruct.h"
 
+#include "VirtualPad.h"
 #include "ggponet.h"
 
 enum class GGPOREADY
@@ -24,6 +25,15 @@ enum class GGPOREADY
     ReadyAwaitingFrameHead,
     Ready
 };
+
+#if ROLLBACK_INPUT_TESTING
+//Which end of the no-GGPO input loopback this instance is (see networkTest_tick).
+enum class NetworkTestRole
+{
+    Send,   // read the local pad, ship it to the peer, and drive our own character with it
+    Recv    // apply whatever arrives to the SENDER's character; never read the local pad
+};
+#endif
 
 enum class StateTarget
 {
@@ -61,14 +71,29 @@ public:
 #ifdef GGPO_SYNCTEST
     static const bool rollbackVisual = false; //a visual indicator of rollback for testing
 #else
-    static const bool rollbackVisual = true; //a visual indicator of rollback for testing
+    static const bool rollbackVisual = false; // true; //a visual indicator of rollback for testing
 #endif
     static bool gsave;
     static bool gload;
-    static bool isave;
-    static bool iload;
+    //true only inside rollback_advance_frame_callback: this frame already ran once, so
+    //anything that must happen once per REAL frame has to be skipped.
+    static bool inRollbackResim;
+#if ROLLBACK_INPUT_TESTING
     static bool networkToggle;
     static bool networkTest;
+    static NetworkTestRole networkTestRole;
+    static uint32_t networkTestSent;
+    static uint32_t networkTestRecv;
+    static uint32_t networkTestMissed;
+    //last input handed to each player by UnpackRollbackInput, for "inputdiag"
+    static struct RollbackInput lastAppliedInput[GGPO_MAX_PLAYERS];
+    static struct InputDiag inputDiag[GGPO_MAX_PLAYERS];
+    static int32_t item_override_for(uint32_t playerIndex);
+#else
+    //the item override and the P2P hooks gate on this; with the loopback compiled out it is
+    //always false, so those tests fold away
+    static constexpr bool networkTest = false;
+#endif
     static FrpgHavokManImp* saved_havokman;
     static PlayerIns* saved_playerins;
     static BulletMan* saved_bulletman;
@@ -76,7 +101,6 @@ public:
     static DamageMan* saved_damageman;
     static ThrowMan* saved_throwman;
     static DmgHitRecordManImp* saved_DmgHitRecordMan;
-    static PadManipulatorPacked** saved_PadManipulator;
 
 private:
     static const uint64_t sendNetMessage_offset = 0x50b6b0;
@@ -115,6 +139,47 @@ private:
 };
 
 
+#if ROLLBACK_INPUT_TESTING
+//Sticky per-player view of what the input path delivered, accumulated by
+//UnpackRollbackInput and cleared by "inputdiag reset". An instantaneous read cannot see a
+//button: the game runs at 60 Hz and the control plane is polled by hand, so the odds of
+//catching the frame you pressed on are poor -- and the "(on click)" ids are true for one
+//frame only. Same reason VirtualPad has a latch.
+struct InputDiag
+{
+    uint32_t frames;
+    uint32_t buttons_or;        // OR of every pad button mask seen
+    uint32_t use_seen;          // CurrentFrame_ActionInputs.use_ButtonPressed was ever set
+    uint32_t twohand_seen;      // highest change_2handing_state seen (0 = never toggled)
+    uint32_t left_slot_or;
+    uint32_t right_slot_or;
+    int32_t  item_override_last = -1; // last override that was not -1; -1 == never overridden
+    uint32_t l_index_mask;      // bit per l_hand_equipped_index value observed
+    uint32_t r_index_mask;      // bit per r_hand_equipped_index value observed
+    uint32_t style_mask;        // bit per equipped_weapon_style observed (1=OneHand,2=THL,3=THR)
+    //Step_PadManipulator gates its whole action-input region (attacks AND the use button)
+    //on ChrCtrl.enable & 4 together with ActionCtrl: when (enable & 4) is set and both
+    //RecieveStateInput and ItemBeingUsedOverride are clear, it skips the assignments
+    //entirely. These say whether that is what is eating the remote player's inputs.
+    uint32_t enable_or;         // OR of ChrCtrl.enable
+    uint32_t gate_skip;         // frames the action-input region would be skipped
+    uint32_t recv_state;        // frames with ActionCtrl.bitfield.RecieveStateInput set
+    uint32_t item_use_override; // frames with ActionCtrl.ItemBeingUsedOverride set
+    uint32_t attack_seen;       // r1_weapon_attack_input_1 ever set (a gated input that is not 'use')
+    //The two terms of Step_PadManipulator's Use_ButtonPressed = X || MenuMan109 || vtable_0x350
+    //that we can observe from outside it, measured per player around the replayed step.
+    uint32_t x_read;            // frames the pad accessor returned 0x5A pressed during replay
+    uint32_t menu109;           // frames MenuMan slot 109 was non-zero going into the step
+    //ChrIns inBowPrecisionShoot guards ONLY the magic and use assignments in
+    //Step_PadManipulator -- the attack assignments sit above it -- which is exactly the split
+    //we see. It is bit 4 of the byte at ChrIns+0x2a6, NOT the whole byte and not bit 0:
+    //140397412 is TEST byte ptr [RAX + 0x2a6], 0x10 / JNZ past the block.
+    //between what does and does not replicate.
+    uint32_t bow_precision;     // frames (chrins[0x2a6] & 0x10) was set
+    uint32_t chr_2a6_or;        // OR of that whole byte, to show which bits are actually live
+};
+#endif
+
 typedef struct RollbackInput RollbackInput;
 typedef struct RollbackState RollbackState;
 
@@ -128,7 +193,22 @@ struct RollbackInput
     unsigned int bTargetLocked : 1;
     unsigned int bTargetLocked_Alt : 1;
 
-    PadManipulatorPacked padmanipulator;
+    struct
+    {
+        //The pad as read at the VirtualMultiDevice accessor layer
+        VirtualPadState pad;
+        //Required since stick input is camera-relative: Compute_PadManipulator uses it
+        float camera_x_rotation;
+        float camera_y_rotation;
+        //Which entity the sender is locked on to
+        uint32_t LockonTargetHandle;
+        //Which weapon slot is selected in each hand
+        uint32_t left_hand_slot_selected;
+        uint32_t right_hand_slot_selected;
+        //The in-game menus' "use this item" request.
+        //using an item from the inventory screen goes through MenuMan(109) and involves no button press at all
+        uint32_t menu_item_use_request;
+    } vpad;
     uint8_t curSelectedMagicSlot; //this could be simulated, but let's not
     uint32_t curUsingInventoryItemId; //we can't simulate the inventory menus
     uint32_t curSelectedQuickbarItemId;

@@ -143,7 +143,7 @@ const uint64_t Rollback::PlayerIns_IsHostPlayerIns_offsets[] = {
     //0x140356d51,
     0x140356ec7, //needed to compute roll type
     //0x140357077,
-    //0x140357263,
+    //0x140357263, //this is already patched inline as part of the FileReloading ASM
     //0x1403575bd,
     //0x14035772e,
     //0x1403577e9,

@@ -266,22 +266,16 @@ void handle_input(XINPUT_GAMEPAD* xold, XINPUT_GAMEPAD* xcurrent, DIJOYSTATE2* d
         {
             Rollback::gload = true;
         }
-        if (Button::pressed(kbold, kbcurrent, DIK_F10))
-        {
-            Rollback::isave = true;
-        }
-        if (Button::pressed(kbold, kbcurrent, DIK_F11))
-        {
-            Rollback::iload = true;
-        }
         if (Button::pressed(kbold, kbcurrent, DIK_F6))
         {
             Rollback::rollbackToggle = true;
         }
+#if ROLLBACK_INPUT_TESTING
         if (Button::pressed(kbold, kbcurrent, DIK_F7))
         {
             Rollback::networkToggle = true;
         }
+#endif
         if (Button::pressed(kbold, kbcurrent, DIK_F12))
         {
             //Arm input recording for the test harness. Takes effect at the next

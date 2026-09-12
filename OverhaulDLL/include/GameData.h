@@ -644,6 +644,18 @@ static sub_1404363c0_FUNC* sub_1404363c0 = (sub_1404363c0_FUNC*)0x1404363c0;
 typedef bool Step_MenuMan_And_MouseMan_FUNC(float frametime);
 static Step_MenuMan_And_MouseMan_FUNC* Step_MenuMan_And_MouseMan = (Step_MenuMan_And_MouseMan_FUNC*)0x14071ab90;
 
+//MenuMan's index table (MenuMan->_x30[index]). Step_PadManipulator reads slot 109 for the
+//item-use path and writes 109/99, which is global state -- see the save/restore in
+//UnpackRollbackInput's VirtualPad path.
+static const uint32_t MENUMAN_INDEX_UNKNOWN109 = 109;
+static const uint32_t MENUMAN_INDEX_UNKNOWN99 = 99;
+
+typedef uint32_t MenuMan_Get_Index_FUNC(uint32_t index);
+static MenuMan_Get_Index_FUNC* MenuMan_Get_Index = (MenuMan_Get_Index_FUNC*)0x14071abd0;
+
+typedef void MenuMan_Set_IndexLookup_FUNC(uint32_t index, int32_t value);
+static MenuMan_Set_IndexLookup_FUNC* MenuMan_Set_IndexLookup = (MenuMan_Set_IndexLookup_FUNC*)0x14071abf0;
+
 typedef bool Step_InGameMenus_FUNC(void* InGameMenuStep, float frametime, void* TaskItem);
 static Step_InGameMenus_FUNC* Step_InGameMenus = (Step_InGameMenus_FUNC*)0x140288d10;
 
