@@ -557,7 +557,9 @@ static void serialize_DamageEntry(StateVisitor& v, const DamageEntry* e)
     v.field("num_hits", e->num_hits);
     v.field("unk_214", e->unk_214);
     v.blob("unk_218", e->unk_218, sizeof(e->unk_218));
-    v.ptr_flag("next", e->next);
+    // the active list's link. Its order is already the order of saved_active_damage_entries, and whether it is set
+    // also depends on world-owned entries after this one, which are not compared
+    v.excluded("next", sizeof(e->next));
     v.field("unk_228", e->unk_228);
     v.field("unk_22c", e->unk_22c);
     v.end();
@@ -599,8 +601,8 @@ void serialize_DamageMan(StateVisitor& v, DamageMan* d)
     {
         if (e.player_owned)
         {
-        serialize_SavedDamageEntry(v, &e, d->all_damage_entries_list_start);
-    }
+            serialize_SavedDamageEntry(v, &e, d->all_damage_entries_list_start);
+        }
     }
     v.note("world_owned_entries_not_compared", std::to_string(d->saved_active_damage_entries.size() - player_owned));
 
