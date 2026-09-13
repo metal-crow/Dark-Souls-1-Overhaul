@@ -78,6 +78,21 @@ void OnDamageEntryDestruct(void* DamageEntry)
 //the game allocates the DamageMan active_damage_entries_list to be 128 elements long. Instead of having a dynamic local-side array, lets just prealloc enough to fit the 128 max
 static const size_t max_preallocated_DamageEntry = 128;
 
+//Map objects and hazards put entries in the DamageMan too, which we should ignore
+//TODO need to verify that this works with spells and bullets
+static bool DamageEntry_is_player_owned(const DamageEntry* entry)
+{
+    for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
+    {
+        auto player_o = Game::get_connected_player(i);
+        if (player_o.has_value() && player_o.value() != 0 && entry->attackerHandle == *(uint32_t*)(player_o.value() + 0x8))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 void copy_DamageMan(DamageMan* to, DamageMan* from, const hkpWorld* to_world, const hkpWorld* from_world, StateTarget target)
 {
     Game::SuspendThreads();
@@ -102,6 +117,7 @@ void copy_DamageMan(DamageMan* to, DamageMan* from, const hkpWorld* to_world, co
                     e.pool_index = (int32_t)idx;
                 }
             }
+            e.player_owned = DamageEntry_is_player_owned(head);
             if (DamageEntry_isDynamicAlloc(head))
             {
                 DamageEntry_ref(head); //ref because the entry is stored game-side
@@ -154,6 +170,7 @@ void copy_DamageMan(DamageMan* to, DamageMan* from, const hkpWorld* to_world, co
             new_e.is_dynamic = e.is_dynamic;
             new_e.data = NULL;
             new_e.pool_index = e.pool_index;
+            new_e.player_owned = e.player_owned;
             if (e.is_dynamic)
             {
                 DamageEntry_ref(new_e.game_addr);
@@ -571,12 +588,21 @@ void serialize_DamageMan(StateVisitor& v, DamageMan* d)
 {
     v.begin("DamageMan");
 
-    // only the ACTIVE damage entries are hashed, and identified by pool slot.
-    v.count("saved_active_damage_entries", d->saved_active_damage_entries.size());
+    // only the ACTIVE, player-owned damage entries are hashed, and identified by pool slot.
+    size_t player_owned = 0;
+    for (const SavedDamageEntry& e : d->saved_active_damage_entries)
+    {
+        if (e.player_owned) player_owned++;
+    }
+    v.count("saved_active_damage_entries", player_owned);
     for (SavedDamageEntry& e : d->saved_active_damage_entries)
     {
+        if (e.player_owned)
+        {
         serialize_SavedDamageEntry(v, &e, d->all_damage_entries_list_start);
     }
+    }
+    v.note("world_owned_entries_not_compared", std::to_string(d->saved_active_damage_entries.size() - player_owned));
 
     // all_damage_entries_list_cur is a GAME pool address in the snapshot; can't be
     // indexed against the snapshot's own pool -> null/non-null only. A real cursor
