@@ -187,8 +187,6 @@ typedef struct RollbackState RollbackState;
 
 struct RollbackInput
 {
-    uint8_t const1;
-
     //this is only used for the local player, the remote player only needs LockonTargetHandle
     unsigned int bTargetLocked : 1;
     unsigned int bTargetLocked_Alt : 1;

@@ -207,9 +207,6 @@ void PackRollbackInput(RollbackInput* out, PlayerIns* player)
     //Outputs of the local menu step, not the game pad
     out->vpad.left_hand_slot_selected = player->chrins.padManipulator->chrManipulator.left_hand_slot_selected;
     out->vpad.right_hand_slot_selected = player->chrins.padManipulator->chrManipulator.right_hand_slot_selected;
-    //need to tell if GGPO has actually returned us a real input, or padding
-    //TODO improve this
-    out->const1 = 1;
 
     void* PadDevice = PadMan_GetPadDevice(0);
     //need to manually replicate the lockon code the game normally does
@@ -448,10 +445,28 @@ void UnpackRollbackInput(RollbackInput* in, PlayerIns* player, uint32_t playerIn
 #endif
 }
 
+//When GGPO has no input for a frame it predicts by repeating the newest input it has received from that player.
+//It only returns zeroed bytes when there is nothing to repeat: before that player's first input has arrived, and
+//for every frame after they disconnect.
+//A real input is never all zero (curUsingInventoryItemId alone is -1 or an item id),
+// and unpacking one would write item id 0 into every equipment slot.
+static bool rollback_input_is_empty(const RollbackInput* in)
+{
+    const uint8_t* bytes = (const uint8_t*)in;
+    for (size_t i = 0; i < sizeof(RollbackInput); i++)
+    {
+        if (bytes[i] != 0)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 void rollback_sync_inputs()
 {
     RollbackInput inputs[GGPO_MAX_PLAYERS];
-    int disconnect_flags; //TODO
+    int disconnect_flags = 0;
 
     //get the inputs for this frame
     GGPOErrorCode res = ggpo_synchronize_input(Rollback::ggpo, inputs, sizeof(RollbackInput) * GGPO_MAX_PLAYERS, &disconnect_flags);
@@ -463,22 +478,24 @@ void rollback_sync_inputs()
     //load the input states into the game to be used this frame
     for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
     {
+        //Skip the inputs GGPO had nothing to fill with, so the PadManipulator stays as it was on the frame being simulated from.
+        if ((disconnect_flags & (1 << i)) != 0)
+        {
+            continue;
+        }
+        if (rollback_input_is_empty(&inputs[i]))
+        {
+            ConsoleWrite("sync_input returned an empty input for player %u, ignoring", i);
+            continue;
+        }
+
         auto player_o = Game::get_connected_player(i);
         if (!player_o.has_value() || player_o.value() == NULL)
         {
             FATALERROR("Unable to get playerins in rollback_load_game_state_callback");
         }
         PlayerIns* player = (PlayerIns*)player_o.value();
-        //When ggpo doesn't have the input during it's prediction stage, it just defaults to a controller with nothing pressed (no change from last input)
-        //We handle that by just not loading it at all, so the PadManipulator stays unchanged from the rollback frame it was saved from
-        if (inputs[i].const1 == 1)
-        {
-            UnpackRollbackInput(&inputs[i], player, i);
-        }
-        else
-        {
-            ConsoleWrite("sync_input returned an empty input, ignoring");
-        }
+        UnpackRollbackInput(&inputs[i], player, i);
     }
 }
 
