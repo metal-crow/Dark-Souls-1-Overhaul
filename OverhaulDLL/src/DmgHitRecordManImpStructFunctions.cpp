@@ -33,7 +33,7 @@ void copy_DmgHitRecordManImp(DmgHitRecordManImp* to, DmgHitRecordManImp* from, S
         }
     }
 
-    uint64_t offset0x28 = ((uint64_t)from->field0x28_array_start) - ((uint64_t)from->field0x28_array);
+    uint64_t offset0x28 = ((uint64_t)from->field0x28_array) - ((uint64_t)from->field0x28_array_start);
     to->field0x28_array = (DmgHitRecordManImp_field0x28Elem*)(((uint64_t)to->field0x28_array_start) + offset0x28);
     for (size_t i = 0; i < max_preallocated_DmgHitRecordManImp_field0x28Elem; i++)
     {
