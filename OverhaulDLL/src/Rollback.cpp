@@ -21,14 +21,6 @@
 #include "RollbackScript.h"
 #include "VirtualPad.h"
 
-FrpgHavokManImp* Rollback::saved_havokman = NULL;
-PlayerIns* Rollback::saved_playerins = NULL;
-BulletMan* Rollback::saved_bulletman = NULL;
-SfxMan* Rollback::saved_sfxman = NULL;
-DamageMan* Rollback::saved_damageman = NULL;
-ThrowMan* Rollback::saved_throwman = NULL;
-DmgHitRecordManImp* Rollback::saved_DmgHitRecordMan = NULL;
-
 FILE* hash_logfile = NULL;
 
 GGPOSession* Rollback::ggpo = NULL;
@@ -46,45 +38,6 @@ GGPOSessionCallbacks Rollback::ggpoCallbacks = {
     .advance_frame = rollback_advance_frame_callback,
     .on_event = rollback_on_event_callback,
 };
-
-bool Rollback::gsave = false;
-bool Rollback::gload = false;
-bool state_test(void* unused)
-{
-    if (Rollback::gsave)
-    {
-        auto player_o = Game::get_PlayerIns();
-        PlayerIns* player = (PlayerIns*)player_o.value();
-        copy_FrpgHavokManImp(Rollback::saved_havokman , *(FrpgHavokManImp**)Game::frpg_havok_man_imp, StateTarget::ToLocal);
-        copy_SfxMan(Rollback::saved_sfxman, *(SfxMan**)Game::sfx_man, StateTarget::ToLocal);
-        copy_PlayerIns(Rollback::saved_playerins, player, StateTarget::ToLocal);
-        copy_BulletMan(Rollback::saved_bulletman, *(BulletMan**)Game::bullet_man, StateTarget::ToLocal);
-        copy_DamageMan(Rollback::saved_damageman, *(DamageMan**)Game::damage_man, Rollback::saved_havokman->physWorld->_hkpWorld, (*(FrpgHavokManImp**)Game::frpg_havok_man_imp)->physWorld->_hkpWorld, StateTarget::ToLocal);
-        copy_ThrowMan(Rollback::saved_throwman, *(ThrowMan**)Game::throw_man, StateTarget::ToLocal);
-        copy_DmgHitRecordManImp(Rollback::saved_DmgHitRecordMan, *(DmgHitRecordManImp**)Game::dmg_hit_record_man, StateTarget::ToLocal);
-        ConsoleWrite("Rollback saved");
-        Rollback::gsave = false;
-    }
-
-    if (Rollback::gload)
-    {
-        auto player_o = Game::get_PlayerIns();
-        PlayerIns* player = (PlayerIns*)player_o.value();
-        copy_FrpgHavokManImp(*(FrpgHavokManImp**)Game::frpg_havok_man_imp, Rollback::saved_havokman, StateTarget::ToGame);
-        copy_SfxMan(*(SfxMan**)Game::sfx_man, Rollback::saved_sfxman, StateTarget::ToGame);
-        copy_PlayerIns(player, Rollback::saved_playerins, StateTarget::ToGame);
-        copy_BulletMan(*(BulletMan**)Game::bullet_man, Rollback::saved_bulletman, StateTarget::ToGame);
-        copy_DamageMan(*(DamageMan**)Game::damage_man, Rollback::saved_damageman, (*(FrpgHavokManImp**)Game::frpg_havok_man_imp)->physWorld->_hkpWorld, Rollback::saved_havokman->physWorld->_hkpWorld, StateTarget::ToGame);
-        copy_ThrowMan(*(ThrowMan**)Game::throw_man, Rollback::saved_throwman, StateTarget::ToGame);
-        copy_DmgHitRecordManImp(*(DmgHitRecordManImp**)Game::dmg_hit_record_man, Rollback::saved_DmgHitRecordMan, StateTarget::ToGame);
-
-        Game::Step_GameSimulation();
-        ConsoleWrite("Rollback loaded");
-        Rollback::gload = false;
-    }
-
-    return true;
-}
 
 bool Rollback::inRollbackResim = false;
 #if ROLLBACK_INPUT_TESTING
@@ -894,14 +847,6 @@ void Rollback::start()
     write_address = (uint8_t*)(Game::ds1_base + Rollback::simpleshapephantom_collisionDetails_iterate_offset);
     sp::mem::code::x64::inject_jmp_14b(write_address, &simpleshapephantom_collisionDetails_iterate_return, 1, &simpleshapephantom_collisionDetails_iterate_injection);
 
-    //Testing rollback related stuff
-    Rollback::saved_havokman = init_FrpgHavokManImp();
-    Rollback::saved_playerins = init_PlayerIns();
-    Rollback::saved_bulletman = init_BulletMan();
-    Rollback::saved_sfxman = init_SfxMan();
-    Rollback::saved_damageman = init_DamageMan();
-    Rollback::saved_throwman = init_ThrowMan();
-    Rollback::saved_DmgHitRecordMan = init_DmgHitRecordManImp();
     MainLoop::setup_mainloop_callback(ggpo_toggle, NULL, "ggpo_toggle");
 #if ROLLBACK_INPUT_TESTING
     MainLoop::setup_mainloop_callback(network_toggle, NULL, "network_toggle");

@@ -258,14 +258,6 @@ void handle_input(XINPUT_GAMEPAD* xold, XINPUT_GAMEPAD* xcurrent, DIJOYSTATE2* d
             }
         }
 
-        if (Button::pressed(kbold, kbcurrent, DIK_F8))
-        {
-            Rollback::gsave = true;
-        }
-        if (Button::pressed(kbold, kbcurrent, DIK_F9))
-        {
-            Rollback::gload = true;
-        }
         if (Button::pressed(kbold, kbcurrent, DIK_F6))
         {
             Rollback::rollbackToggle = true;

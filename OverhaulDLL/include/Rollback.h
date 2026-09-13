@@ -73,8 +73,6 @@ public:
 #else
     static const bool rollbackVisual = false; // true; //a visual indicator of rollback for testing
 #endif
-    static bool gsave;
-    static bool gload;
     //true only inside rollback_advance_frame_callback: this frame already ran once, so
     //anything that must happen once per REAL frame has to be skipped.
     static bool inRollbackResim;
@@ -94,13 +92,6 @@ public:
     //always false, so those tests fold away
     static constexpr bool networkTest = false;
 #endif
-    static FrpgHavokManImp* saved_havokman;
-    static PlayerIns* saved_playerins;
-    static BulletMan* saved_bulletman;
-    static SfxMan* saved_sfxman;
-    static DamageMan* saved_damageman;
-    static ThrowMan* saved_throwman;
-    static DmgHitRecordManImp* saved_DmgHitRecordMan;
 
 private:
     static const uint64_t sendNetMessage_offset = 0x50b6b0;
