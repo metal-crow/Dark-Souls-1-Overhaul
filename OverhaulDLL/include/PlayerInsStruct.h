@@ -578,9 +578,11 @@ struct hkpRootCdPoint
     float m_position[4];          // 0x0
     float m_separatingNormal[4];  // 0x10
     void* m_rootCollidableA;      // 0x20 (hkpCdBody*; a live game pointer, never hashed)
-    uint64_t m_shapeKeyA;         // 0x28
+    uint32_t m_shapeKeyA;         // 0x28 (hkpShapeKey is 32 bits)
+    uint32_t m_shapeKeyA_pad;     // 0x2c: alignment
     void* m_rootCollidableB;      // 0x30 (hkpCdBody*)
-    uint64_t m_shapeKeyB;         // 0x38
+    uint32_t m_shapeKeyB;         // 0x38
+    uint32_t m_shapeKeyB_pad;     // 0x3c: alignment
 };
 static_assert(offsetof(hkpRootCdPoint, m_separatingNormal) == 0x10);
 static_assert(offsetof(hkpRootCdPoint, m_rootCollidableA) == 0x20);
@@ -1054,6 +1056,24 @@ static_assert(offsetof(ArrowTurnAnim, joint_spine1_2) == 0x1b0);
 static_assert(offsetof(ArrowTurnAnim, unk_1b8) == 0x1b8);
 static_assert(sizeof(ArrowTurnAnim) == 0x1c0);
 
+static const size_t FootIK_size = 0x1a0;                 // DLKRD_HeapAllocator_malloc(0x1a0) in PlayerCtrl_Init_FootIk @140381780
+static const size_t FootPlacementIkSolver_size = 0x120;  // hkThreadMemory_BlockAlloc(0x120) in FUN_1402a0200
+
+//One leg's foot placement IK (PlayerFootIK_Parent in ghidra). Copied as raw bytes: its pointers (owner, solver, animation
+//queue, raycast interface) are set once per character, and the rest is state PlayerCtrl_Func_27 carries from frame to frame.
+struct FootIK
+{
+    void* player;                   // 0x0 (PlayerCtrl*)
+    void* footPlacementIkSolver;    // 0x8 (hkaFootPlacementIkSolver*): the frame-to-frame smoothing lives in here
+    uint8_t unk_10[FootIK_size - 0x10];
+    // Local-only (not part of the game struct, only used in our local copies)
+    bool saved_present;
+    uint8_t saved_solver[FootPlacementIkSolver_size];
+};
+
+static_assert(offsetof(FootIK, footPlacementIkSolver) == 0x8);
+static_assert(offsetof(FootIK, saved_present) == FootIK_size);
+
 struct PlayerCtrl
 {
     ChrCtrl chrCtrl;           // 0x0
@@ -1061,7 +1081,9 @@ struct PlayerCtrl
     uint32_t unk_304;          // 0x304
     TurnAnim* turnAnim;        // 0x308
     ArrowTurnAnim* arrowTurnAnim; // 0x310
-    uint8_t padding_0[24];     // 0x318 (ghidra: footIK ptrs; not copied)
+    FootIK* footIK_right;      // 0x318
+    FootIK* footIK_left;       // 0x320
+    uint8_t padding_0[8];      // 0x328 (ghidra: FrpgFootIkRaycastInterface ptr; only holds per-frame raycast inputs, not copied)
     float unk_330;             // 0x330
     uint16_t unk_334;          // 0x334
     uint16_t unk_336;          // 0x336
@@ -1079,7 +1101,8 @@ struct PlayerCtrl
 static_assert(offsetof(PlayerCtrl, unk_300) == 0x300);
 static_assert(offsetof(PlayerCtrl, turnAnim) == 0x308);
 static_assert(offsetof(PlayerCtrl, arrowTurnAnim) == 0x310);
-static_assert(offsetof(PlayerCtrl, padding_0) == 0x318);
+static_assert(offsetof(PlayerCtrl, footIK_right) == 0x318);
+static_assert(offsetof(PlayerCtrl, footIK_left) == 0x320);
 static_assert(offsetof(PlayerCtrl, unk_330) == 0x330);
 static_assert(offsetof(PlayerCtrl, padding_1) == 0x338);
 static_assert(offsetof(PlayerCtrl, movement_related_flags) == 0x358);
@@ -1310,7 +1333,11 @@ struct ChrIns
     ChrIns_AnimationMediatorStateInfo upperThrowAnim;
     uint8_t padding_4a[12];
     uint32_t* player_handing_state;
-    uint8_t padding_4b[176];
+    uint8_t padding_4b[0x28];
+    void* chrIns_1c0;          // 0x1c8 (ghidra: ChrIns_1c0*)
+    uint8_t padding_4c[0x10];
+    float unk_1e0;             // 0x1e0: written by the simulation almost every frame (synctest unrestored-write detector)
+    uint8_t padding_4d[176 - 0x44];
     float curToughness;
     float maxToughness;
     float toughnessUnk1;
@@ -1318,7 +1345,7 @@ struct ChrIns
     uint32_t toughnessUnk2;
     int32_t curSelectedMagicId;
     ItemUsed curUsedItem;
-    uint32_t itemid;
+    int32_t current_attack_type; // 0x270 (ghidra)
     uint32_t override_equipped_magicId;
     SpecialEffect* specialEffects;
     QwcSpEffectEquipCtrl* qwcSpEffectEquipCtrl;
@@ -1375,7 +1402,7 @@ struct ChrIns
     uint32_t curSp;
     uint32_t maxSp;
     float damage_taken_scalar;
-    uint8_t padding_9[20];
+    uint8_t unk_404[20];       // 0x404 (ghidra: const_float0, then copies of max hp/mp/sp)
     uint32_t PoisonResist;
     uint32_t ToxicResist;
     uint32_t BleedResist;
@@ -1384,7 +1411,7 @@ struct ChrIns
     uint32_t resistPlagueTotal;
     uint32_t resistBleedingTotal;
     uint32_t resistCurseTotal;
-    uint8_t padding_10[0x10];
+    float unk_438[4];          // 0x438: one per status type after the resist totals; changes every frame (synctest unrestored-write detector)
     EntityThrowAnimationStatus* throw_animation_info;
     float unk_450;             // 0x450
     uint32_t unk_454;          // 0x454 (gap)
@@ -1443,7 +1470,12 @@ static_assert(offsetof(ChrIns, unk_16c) == 0x164 + 8);
 static_assert(offsetof(ChrIns, lowerThrowAnim) == 0x174+8);
 static_assert(offsetof(ChrIns, upperThrowAnim) == 0x17c+8);
 static_assert(offsetof(ChrIns, player_handing_state) == 0x190+8);
+static_assert(offsetof(ChrIns, chrIns_1c0) == 0x1c0+8);
+static_assert(offsetof(ChrIns, unk_1e0) == 0x1d8+8);
 static_assert(offsetof(ChrIns, curToughness) == 0x248 + 8);
+static_assert(offsetof(ChrIns, current_attack_type) == 0x268+8);
+static_assert(offsetof(ChrIns, unk_404) == 0x3fc+8);
+static_assert(offsetof(ChrIns, unk_438) == 0x430+8);
 static_assert(offsetof(ChrIns, maxToughness) == 0x24C + 8);
 static_assert(offsetof(ChrIns, curSelectedMagicId) == 0x25c+8);
 static_assert(offsetof(ChrIns, curUsedItem) == 0x260+8);
@@ -1941,7 +1973,9 @@ struct PlayerIns
     uint32_t override_itemId;
     uint32_t override_equipped_magicId;
     uint32_t using_override;
-    uint8_t padding_3[0x20];
+    uint8_t padding_3[0x14];
+    float unk_834;             // 0x834: a timer the simulation advances every frame (synctest unrestored-write detector)
+    uint8_t padding_3b[8];
     ChrAsm* chrasm;
     ChrAsmModelRes* chrAsmModelRes;
     ChrAsmModel* chrAsmModel;
@@ -1984,6 +2018,7 @@ static_assert(offsetof(PlayerIns, curSelectedMagicId) == 0x808);
 static_assert(offsetof(PlayerIns, curUsedItem) == 0x80c);
 static_assert(offsetof(PlayerIns, override_itemId) == 0x814);
 static_assert(offsetof(PlayerIns, override_equipped_magicId) == 0x818);
+static_assert(offsetof(PlayerIns, unk_834) == 0x834);
 static_assert(offsetof(PlayerIns, chrasm) == 0x840);
 static_assert(offsetof(PlayerIns, chrAsmModelRes) == 0x848);
 static_assert(offsetof(PlayerIns, chrAsmModel) == 0x850);

@@ -44,13 +44,13 @@ void copy_RingEquipCtrl(RingEquipCtrl* to, const RingEquipCtrl* from, StateTarge
 RingEquipCtrl* init_RingEquipCtrl();
 void free_RingEquipCtrl(RingEquipCtrl* to);
 
-void copy_PlayerGameData(PlayerGameData* to, const PlayerGameData* from);
+void copy_PlayerGameData(PlayerGameData* to, const PlayerGameData* from, StateTarget target);
 PlayerGameData* init_PlayerGameData();
 void free_PlayerGameData(PlayerGameData* to);
 
 void copy_PlayerGameData_ChrProperties(PlayerGameData_ChrProperties* to, const PlayerGameData_ChrProperties* from);
 
-void copy_EquipGameData(EquipGameData* to, const EquipGameData* from);
+void copy_EquipGameData(EquipGameData* to, const EquipGameData* from, StateTarget target);
 EquipGameData* init_EquipGameData();
 void free_EquipGameData(EquipGameData* to, bool freeself);
 

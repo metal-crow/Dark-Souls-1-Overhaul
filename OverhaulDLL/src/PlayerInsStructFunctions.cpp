@@ -12,7 +12,7 @@ void copy_PlayerIns(PlayerIns* to, const PlayerIns* from, StateTarget target)
     Game::SuspendThreads();
 
     copy_ChrIns(&to->chrins, &from->chrins, target);
-    copy_PlayerGameData(to->playergamedata, from->playergamedata);
+    copy_PlayerGameData(to->playergamedata, from->playergamedata, target);
     memcpy(to->data_0, from->data_0, sizeof(to->data_0));
     memcpy(&to->unk_7a8, &from->unk_7a8, 16);
     memcpy(&to->unk_7d0, &from->unk_7d0, 8);
@@ -24,6 +24,7 @@ void copy_PlayerIns(PlayerIns* to, const PlayerIns* from, StateTarget target)
     to->override_itemId = from->override_itemId;
     to->override_equipped_magicId = from->override_equipped_magicId;
     to->using_override = from->using_override;
+    to->unk_834 = from->unk_834;
     copy_ChrAsm(to->chrasm, from->chrasm);
     //copy_ChrAsmModelRes(to->chrAsmModelRes, from->chrAsmModelRes, target); //This is dynamically re-drawn every frame by the game
     copy_ChrAsmModel(to->chrAsmModel, from->chrAsmModel, target);
@@ -279,10 +280,10 @@ void free_RingEquipCtrl(RingEquipCtrl* to)
 }
 
 
-void copy_PlayerGameData(PlayerGameData* to, const PlayerGameData* from)
+void copy_PlayerGameData(PlayerGameData* to, const PlayerGameData* from, StateTarget target)
 {
     copy_PlayerGameData_AttributeInfo(&to->attribs, &from->attribs);
-    copy_EquipGameData(&to->equipGameData, &from->equipGameData);
+    copy_EquipGameData(&to->equipGameData, &from->equipGameData, target);
     copy_PlayerGameData_ChrProperties(&to->ChrProperties, &from->ChrProperties);
 }
 
@@ -311,11 +312,39 @@ void copy_PlayerGameData_ChrProperties(PlayerGameData_ChrProperties* to, const P
 }
 
 
-void copy_EquipGameData(EquipGameData* to, const EquipGameData* from)
+//The inventory's item list. Using an item rewrites its entry (Estus's item id counts its charges down), so it has to roll back.
+//A local copy owns its list in equippedInventory.itemlist2, sized by itemList2_len; game-side only the entries and counts are written.
+static void copy_EquipInventoryData(EquipInventoryData* to, const EquipInventoryData* from, StateTarget target)
+{
+    if (from->itemlist2 == NULL || from->itemList2_len == 0)
+    {
+        return;
+    }
+    if (target == StateTarget::ToGame)
+    {
+        //the game sizes this list once, so a different length means it is not the list we saved
+        if (to->itemlist2 == NULL || to->itemList2_len != from->itemList2_len)
+        {
+            return;
+        }
+    }
+    else if (to->itemlist2 == NULL || to->itemList2_len != from->itemList2_len)
+    {
+        free(to->itemlist2);
+        to->itemlist2 = (EquipInventoryDataItem*)malloc_(sizeof(EquipInventoryDataItem) * from->itemList2_len);
+        to->itemList2_len = from->itemList2_len;
+    }
+    memcpy(to->itemlist2, from->itemlist2, sizeof(EquipInventoryDataItem) * from->itemList2_len);
+    to->itemCount = from->itemCount;
+    to->keyCount = from->keyCount;
+}
+
+void copy_EquipGameData(EquipGameData* to, const EquipGameData* from, StateTarget target)
 {
     memcpy(to->EquipItemToInventoryIndexMap, from->EquipItemToInventoryIndexMap, sizeof(to->EquipItemToInventoryIndexMap)); //Part of input
     memcpy(to->EquipItemToInventoryIndexMap_index_updated, from->EquipItemToInventoryIndexMap_index_updated, sizeof(to->EquipItemToInventoryIndexMap_index_updated)); //Part of input
     copy_ChrAsm(&to->chrasm, &from->chrasm);
+    copy_EquipInventoryData(&to->equippedInventory, &from->equippedInventory, target);
     copy_EquipMagicData(to->equipMagicData, from->equipMagicData);
     copy_EquipItemData(&to->equippedItemsInQuickbar, &from->equippedItemsInQuickbar);
     to->amountOfItemUsedFromInventory = from->amountOfItemUsedFromInventory;
@@ -334,6 +363,8 @@ EquipGameData* init_EquipGameData()
 void free_EquipGameData(EquipGameData* to, bool freeself)
 {
     free_EquipMagicData(to->equipMagicData);
+    free(to->equippedInventory.itemlist2);
+    to->equippedInventory.itemlist2 = NULL;
 
     if (freeself)
     {
@@ -390,6 +421,8 @@ void copy_ChrIns(ChrIns* to, const ChrIns* from, StateTarget target)
     to->toughnessUnk2 = from->toughnessUnk2;
     to->curSelectedMagicId = from->curSelectedMagicId;
     to->curUsedItem = from->curUsedItem;
+    to->current_attack_type = from->current_attack_type;
+    to->unk_1e0 = from->unk_1e0;
     copy_SpecialEffect(to->specialEffects, from->specialEffects, target);
     copy_QwcSpEffectEquipCtrl(to->qwcSpEffectEquipCtrl, from->qwcSpEffectEquipCtrl);
     memcpy(&to->unk_288, &from->unk_288, 0x48);
@@ -404,6 +437,7 @@ void copy_ChrIns(ChrIns* to, const ChrIns* from, StateTarget target)
     to->curSp = from->curSp;
     to->maxSp = from->maxSp;
     to->damage_taken_scalar = from->damage_taken_scalar;
+    memcpy(to->unk_404, from->unk_404, sizeof(to->unk_404));
     to->PoisonResist = from->PoisonResist;
     to->ToxicResist = from->ToxicResist;
     to->BleedResist = from->BleedResist;
@@ -412,6 +446,7 @@ void copy_ChrIns(ChrIns* to, const ChrIns* from, StateTarget target)
     to->resistPlagueTotal = from->resistPlagueTotal;
     to->resistBleedingTotal = from->resistBleedingTotal;
     to->resistCurseTotal = from->resistCurseTotal;
+    memcpy(to->unk_438, from->unk_438, sizeof(to->unk_438));
     copy_EntityThrowAnimationStatus(to->throw_animation_info, from->throw_animation_info, target);
     memcpy(&to->unk_450, &from->unk_450, 0x18);
     memcpy(&to->unk_470, &from->unk_470, 0x50);
@@ -762,12 +797,54 @@ void free_SpecialEffect_Info(SpecialEffect_Info* to)
 }
 
 
+//The solver's hkReferencedObject header (vtable, size and refcount) is not state
+static const size_t FootPlacementIkSolver_header = 0x10;
+
+//Game-side FootIKs only exist for player characters, so either side may be missing
+static void copy_FootIK(FootIK* to, const FootIK* from, StateTarget target)
+{
+    switch (target)
+    {
+    case StateTarget::ToLocal:
+        to->saved_present = from != NULL;
+        if (from == NULL)
+        {
+            return;
+        }
+        memcpy(to, from, FootIK_size);
+        if (from->footPlacementIkSolver != NULL)
+        {
+            memcpy(to->saved_solver, from->footPlacementIkSolver, FootPlacementIkSolver_size);
+        }
+        break;
+    case StateTarget::ToGame:
+        //a character builds its FootIKs and their solvers once, so a different solver means this snapshot is not of this FootIK
+        if (to == NULL || !from->saved_present || to->footPlacementIkSolver != from->footPlacementIkSolver)
+        {
+            return;
+        }
+        memcpy(to, from, FootIK_size);
+        if (to->footPlacementIkSolver != NULL)
+        {
+            memcpy((uint8_t*)to->footPlacementIkSolver + FootPlacementIkSolver_header,
+                   from->saved_solver + FootPlacementIkSolver_header,
+                   FootPlacementIkSolver_size - FootPlacementIkSolver_header);
+        }
+        break;
+    case StateTarget::Copy:
+        memcpy(to, from, sizeof(FootIK));
+        break;
+    }
+}
+
 void copy_PlayerCtrl(PlayerCtrl* to, const PlayerCtrl* from, StateTarget target)
 {
     copy_ChrCtrl(&to->chrCtrl, &from->chrCtrl, target);
     memcpy(&to->unk_300, &from->unk_300, 8);
     copy_TurnAnim(to->turnAnim, from->turnAnim);
     copy_ArrowTurnAnim(to->arrowTurnAnim, from->arrowTurnAnim);
+    copy_FootIK(to->footIK_right, from->footIK_right, target);
+    copy_FootIK(to->footIK_left, from->footIK_left, target);
     memcpy(&to->unk_330, &from->unk_330, 8);
     memcpy(&to->movement_related_flags, &from->movement_related_flags, 24);
 }
@@ -781,6 +858,8 @@ PlayerCtrl* init_PlayerCtrl()
     free(pChrCtrl);
     local_PlayerCtrl->turnAnim = init_TurnAnim();
     local_PlayerCtrl->arrowTurnAnim = init_ArrowTurnAnim();
+    local_PlayerCtrl->footIK_right = (FootIK*)malloc_(sizeof(FootIK));
+    local_PlayerCtrl->footIK_left = (FootIK*)malloc_(sizeof(FootIK));
 
     return local_PlayerCtrl;
 }
@@ -790,6 +869,8 @@ void free_PlayerCtrl(PlayerCtrl* to)
     free_ChrCtrl(&to->chrCtrl, false);
     free_TurnAnim(to->turnAnim, true);
     free_ArrowTurnAnim(to->arrowTurnAnim);
+    free(to->footIK_right);
+    free(to->footIK_left);
 
     free(to);
 }
@@ -2076,22 +2157,67 @@ static void serialize_SpecialEffect(StateVisitor& v, const SpecialEffect* s)
     v.end();
 }
 
+// Slots that only drive SFX, sound or light. SfxMan is not rolled back, and live frames create these where a
+// re-simulated frame does not (synctest 2026-09-13: FootEffect, SingleSfx, SingleTraceSfx and MagicGoodsUseSfx slots
+// appeared only in live frames), so they are not compared.
+static bool attach_slot_is_cosmetic(uint32_t type)
+{
+    switch (type)
+    {
+    case TypeChrShineTreasureSlot:
+    case TypeChrSingleSeSlot:
+    case TypeChrSingleSfxSlot:
+    case TypeChrMultiSfxSlot:
+    case TypeChrGrassSlot:
+    case TypeChrFootEffectSlot:
+    case TypeChrRigidOffsetSfxSlot:
+    case TypeChrSingleOneshotSfxSlot:
+    case TypeChrSingleTraceSfxSlot:
+    case TypeChrMagicGoodsUseSfxSlot:
+    case TypeChrPointLightSlot:
+    case TypeChrConditionSfxSeSlot:
+    case TypeChrFollowSfxSlot:
+        return true;
+    default:
+        return false;
+    }
+}
+
 static void serialize_ChrAttachSys(StateVisitor& v, const ChrAttachSys* c)
 {
-    // Shallow per the harness design: presence + slot type only. Full AttachSysSlot
-    // expansion is deferred (see rollback-test-harness memo). copy_ChrAttachSys
-    // rebuilds the whole slot chain; if attach state ever desyncs, add a
-    // serialize_AttachSysSlot in the AttachSysSlot module and recurse here.
+    // Still shallow: which slot types are in the chain, not their contents. Sorted, because the game rotates the chain
+    // every frame, and cosmetic slots left out (attach_slot_is_cosmetic).
     v.begin("ChrAttachSys");
-    if (c->SysSlots)
+    uint32_t types[64];
+    size_t count = 0;
+    size_t cosmetic = 0;
+    size_t walked = 0;
+    for (const AttachSysSlotBaseImpl* s = c->SysSlots; s != NULL && walked < 256; s = s->next, walked++)
     {
-        v.field("SysSlots_present", true);
-        v.field("slotType", c->SysSlots->slotType);
+        if (attach_slot_is_cosmetic(s->slotType))
+        {
+            cosmetic++;
+        }
+        else if (count < sizeof(types) / sizeof(types[0]))
+        {
+            types[count++] = s->slotType;
+        }
     }
-    else
+    for (size_t i = 1; i < count; i++)
     {
-        v.field("SysSlots_present", false);
+        for (size_t j = i; j > 0 && types[j - 1] > types[j]; j--)
+        {
+            uint32_t t = types[j];
+            types[j] = types[j - 1];
+            types[j - 1] = t;
+        }
     }
+    v.count("slots", count);
+    for (size_t i = 0; i < count; i++)
+    {
+        v.field("slotType", types[i]);
+    }
+    v.note("cosmetic_slots_not_compared", std::to_string(cosmetic));
     v.end();
 }
 
@@ -2178,8 +2304,10 @@ static void serialize_hkpCharacterProxy(StateVisitor& v, const hkpCharacterProxy
         v.blob("m_separatingNormal", p->m_separatingNormal, sizeof(p->m_separatingNormal));
         v.ptr_flag("m_rootCollidableA", p->m_rootCollidableA);
         v.field("m_shapeKeyA", p->m_shapeKeyA);
+        v.padding("m_shapeKeyA_pad", &p->m_shapeKeyA_pad, sizeof(p->m_shapeKeyA_pad));
         v.ptr_flag("m_rootCollidableB", p->m_rootCollidableB);
         v.field("m_shapeKeyB", p->m_shapeKeyB);
+        v.padding("m_shapeKeyB_pad", &p->m_shapeKeyB_pad, sizeof(p->m_shapeKeyB_pad));
         v.end();
     }
     v.blob("m_velocity", &h->m_velocity, 0x20);
@@ -2461,7 +2589,10 @@ static void serialize_WalkAnim_Twist(StateVisitor& v, const WalkAnim_Twist* w)
 static void serialize_ChrCtrl(StateVisitor& v, const ChrCtrl* c)
 {
     v.begin("ChrCtrl");
-    v.field("unk_8", c->unk_8);
+    //Measured as a heap address, not a value: 0x1bb541ff0 on one instance against
+    //0x14d1b7d90 on the other in the same frame-0 dump. Comparing it is a guaranteed
+    //difference every run -- exactly the false-desync class the pointer rule exists for.
+    v.ptr_flag("unk_8", (const void*)c->unk_8);
     serialize_ChrCtrl_AnimationQueue(v, c->animationQueue);
     serialize_AnimationMediator(v, c->animationMediator);
     serialize_HavokChara(v, c->havokChara);
@@ -2474,6 +2605,23 @@ static void serialize_ChrCtrl(StateVisitor& v, const ChrCtrl* c)
     v.end();
 }
 
+static void serialize_FootIK(StateVisitor& v, const char* name, const FootIK* f)
+{
+    v.begin(name);
+    v.field("present", f->saved_present);
+    if (f->saved_present)
+    {
+        // skips the pointers: owner/solver/animation queue/raycast (0x0-0x28), the Setup's skeleton (0x50) and the raycast interface (0x148)
+        const uint8_t* b = (const uint8_t*)f;
+        v.blob("state_28", b + 0x28, 0x50 - 0x28);
+        v.blob("state_58", b + 0x58, 0x148 - 0x58);
+        v.blob("state_150", b + 0x150, FootIK_size - 0x150);
+        // the solver after its header and its Setup's skeleton pointer
+        v.blob("solver_state", f->saved_solver + 0x18, FootPlacementIkSolver_size - 0x18);
+    }
+    v.end();
+}
+
 static void serialize_PlayerCtrl(StateVisitor& v, const PlayerCtrl* p)
 {
     v.begin("PlayerCtrl");
@@ -2481,6 +2629,8 @@ static void serialize_PlayerCtrl(StateVisitor& v, const PlayerCtrl* p)
     v.blob("unk_300", &p->unk_300, 8);
     serialize_TurnAnim(v, p->turnAnim);
     serialize_ArrowTurnAnim(v, p->arrowTurnAnim);
+    serialize_FootIK(v, "footIK_right", p->footIK_right);
+    serialize_FootIK(v, "footIK_left", p->footIK_left);
     v.blob("unk_330", &p->unk_330, 8);
     v.blob("movement_related_flags_region", &p->movement_related_flags, 24);
     v.end();
@@ -2505,6 +2655,8 @@ static void serialize_ChrIns(StateVisitor& v, const ChrIns* c)
     v.field("toughnessUnk2", c->toughnessUnk2);
     v.field("curSelectedMagicId", c->curSelectedMagicId);
     v.blob("curUsedItem", &c->curUsedItem, sizeof(c->curUsedItem));
+    v.field("current_attack_type", c->current_attack_type);
+    v.field("unk_1e0", c->unk_1e0);
     serialize_SpecialEffect(v, c->specialEffects);
     serialize_QwcSpEffectEquipCtrl(v, c->qwcSpEffectEquipCtrl);
     v.blob("unk_288", &c->unk_288, 0x48);
@@ -2519,6 +2671,7 @@ static void serialize_ChrIns(StateVisitor& v, const ChrIns* c)
     v.field("curSp", c->curSp);
     v.field("maxSp", c->maxSp);
     v.field("damage_taken_scalar", c->damage_taken_scalar);
+    v.blob("unk_404", c->unk_404, sizeof(c->unk_404));
     v.field("PoisonResist", c->PoisonResist);
     v.field("ToxicResist", c->ToxicResist);
     v.field("BleedResist", c->BleedResist);
@@ -2527,6 +2680,7 @@ static void serialize_ChrIns(StateVisitor& v, const ChrIns* c)
     v.field("resistPlagueTotal", c->resistPlagueTotal);
     v.field("resistBleedingTotal", c->resistBleedingTotal);
     v.field("resistCurseTotal", c->resistCurseTotal);
+    v.blob("unk_438", c->unk_438, sizeof(c->unk_438));
     serialize_EntityThrowAnimationStatus(v, c->throw_animation_info);
     v.blob("unk_450", &c->unk_450, 0x18);
     v.blob("unk_470", &c->unk_470, 0x50);
@@ -2553,6 +2707,7 @@ void serialize_PlayerIns(StateVisitor& v, const PlayerIns* p)
     v.field("override_itemId", p->override_itemId);
     v.field("override_equipped_magicId", p->override_equipped_magicId);
     v.field("using_override", p->using_override);
+    v.field("unk_834", p->unk_834);
     serialize_ChrAsm(v, p->chrasm);
     // chrAsmModelRes intentionally skipped (copy_PlayerIns skips it; redrawn each frame)
     serialize_ChrAsmModel(v, p->chrAsmModel);
