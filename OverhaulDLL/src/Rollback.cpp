@@ -141,6 +141,16 @@ uint8_t get_item_currently_being_used_injection_helper(EquipGameData* equip, Ite
     return 0;
 }
 
+//The item id at an inventory index. -1 when the index is -1 (nothing selected, e.g. once the last item in a quickbar slot is used up) or out of range.
+static int32_t inventory_item_id_at(const EquipInventoryDataItem* itemlist, uint32_t itemlistlen, int32_t index)
+{
+    if (index < 0 || (uint32_t)index >= itemlistlen)
+    {
+        return -1;
+    }
+    return itemlist[index].item_id;
+}
+
 void PackRollbackInput(RollbackInput* out, PlayerIns* player)
 {
     EquipInventoryDataItem* itemlist = player->playergamedata->equipGameData.equippedInventory.itemlist2;
@@ -174,16 +184,12 @@ void PackRollbackInput(RollbackInput* out, PlayerIns* player)
     out->bTargetLocked_Alt = *bTargetLocked_Alt;
 
     //this is used both for what item we are using, and for saving the quickbar selected index
-    out->curSelectedQuickbarItemId = itemlist[player->playergamedata->equipGameData.equippedItemsInQuickbar.selectedQuickbarItem].item_id;
+    out->curSelectedQuickbarItemId = inventory_item_id_at(itemlist, itemlistlen, (int32_t)player->playergamedata->equipGameData.equippedItemsInQuickbar.selectedQuickbarItem);
 
     out->curSelectedMagicSlot = player->playergamedata->equipGameData.equipMagicData->curSelectedMagicSlot;
 
     //this doesn't actually control the item being used, but just what item will be used when the use button is pressed
-    out->curUsingInventoryItemId = -1;
-    if (player->playergamedata->equipGameData.itemInventoryIdCurrentlyBeingUsedFromInventory != -1)
-    {
-        out->curUsingInventoryItemId = itemlist[player->playergamedata->equipGameData.itemInventoryIdCurrentlyBeingUsedFromInventory].item_id;
-    }
+    out->curUsingInventoryItemId = inventory_item_id_at(itemlist, itemlistlen, (int32_t)player->playergamedata->equipGameData.itemInventoryIdCurrentlyBeingUsedFromInventory);
 
     for (size_t i = 0; i < InventorySlots::END; i++)
     {
