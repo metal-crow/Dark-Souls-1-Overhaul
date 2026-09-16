@@ -9,24 +9,22 @@
 
 class StateVisitor;
 
-extern "C" void OnDamageEntryDestruct(void* DamageEntry);
-
-void copy_DamageMan(DamageMan* to, DamageMan* from, const hkpWorld* to_world, const hkpWorld* from_world, StateTarget target);
+void copy_DamageMan(DamageMan* to, DamageMan* from, StateTarget target);
+// if DamageMan_PopHead_DamageEntry heap-allocated the entry because the pool was empty
+bool DamageEntry_isDynamicAlloc(const DamageEntry* entry);
 DamageMan* init_DamageMan();
 void free_DamageMan(DamageMan* to);
 void serialize_DamageMan(StateVisitor& v, DamageMan* d);
 std::string print_DamageMan(DamageMan* d);
 uint64_t hash_DamageMan(DamageMan* d);
 
-void free_SavedDamageEntryList(std::vector<SavedDamageEntry>* to);
-
-void copy_DamageEntry(DamageEntry* to, DamageEntry* from, const hkpWorld* to_world, const hkpWorld* from_world, StateTarget target);
+void copy_DamageEntry(DamageEntry* to, DamageEntry* from, StateTarget target);
 DamageEntry* init_DamageEntry();
 void free_DamageEntry(DamageEntry* to, bool freeself);
 
 void copy_FrpgPhysIns(FrpgPhysIns* to, FrpgPhysIns* from, StateTarget target);
 void copy_FrpgPhysPhantomIns(FrpgPhysPhantomIns* to, FrpgPhysPhantomIns* from, StateTarget target);
-void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePhantomIns** from, bool is_sphere, const hkpWorld* to_world, const hkpWorld* from_world, StateTarget target);
+void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePhantomIns** from, StateTarget target);
 FrpgPhysShapePhantomIns* init_FrpgPhysShapePhantomIns(bool is_sphere);
 void free_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns* to);
 

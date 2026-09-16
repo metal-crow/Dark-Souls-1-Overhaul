@@ -2,81 +2,21 @@
 #include "PlayerInsStructFunctions.h"
 #include "FrpgHavokManImpStructFunctions.h"
 #include "StateSerializer.h"
+#include <memory>
+#include <new>
+#include <unordered_map>
 
-/* ============================================================
- * Dynamic object management
- * ============================================================ */
-
-bool DamageEntry_isDynamicAlloc(DamageEntry* to)
-{
-    return to->id >= 0x800000; //the high byte is 0x80 when dynamically alloc'd
-}
-
-//these objects are not ref counted, so we must do so manually
-static std::unordered_map<void*, int32_t> g_DamageEntryGraveyard;
-
-void DamageEntry_ref(DamageEntry* DamageEntry)
-{
-    auto search = g_DamageEntryGraveyard.find(DamageEntry);
-    if (search != g_DamageEntryGraveyard.end())
-    {
-        g_DamageEntryGraveyard[DamageEntry] += 1;
-    }
-    else
-    {
-        g_DamageEntryGraveyard.insert({ DamageEntry, 1 });
-    }
-}
-
-void DamageEntry_deref(DamageEntry* DamageEntry)
-{
-    auto search = g_DamageEntryGraveyard.find(DamageEntry);
-    if (search != g_DamageEntryGraveyard.end())
-    {
-        g_DamageEntryGraveyard[DamageEntry] -= 1;
-        if (g_DamageEntryGraveyard[DamageEntry] == 0)
-        {
-            Destruct_DamageEntry(DamageEntry);
-            Game::game_free_alt(DamageEntry); //the destruct call doesn't free it
-            g_DamageEntryGraveyard.erase(DamageEntry);
-        }
-    }
-    else if (search == g_DamageEntryGraveyard.end())
-    {
-        Destruct_DamageEntry(DamageEntry);
-        Game::game_free_alt(DamageEntry);
-    }
-}
-
-//manually perform the destruct operations here, if needed
-void OnDamageEntryDestruct(void* DamageEntry)
-{
-    auto search = g_DamageEntryGraveyard.find(DamageEntry);
-    if (search == g_DamageEntryGraveyard.end())
-    {
-        //nothing keeping this alive, let it be destroyed
-        Destruct_DamageEntry(DamageEntry);
-        Game::game_free_alt(DamageEntry);
-        return;
-    }
-    //count a game-attempted destruction as a deref
-    int32_t refcount = search->second;
-    refcount -= 1;
-    g_DamageEntryGraveyard[DamageEntry] = refcount;
-    if (refcount <= 0)
-    {
-        g_DamageEntryGraveyard.erase(DamageEntry);
-        Destruct_DamageEntry(DamageEntry);
-        Game::game_free_alt(DamageEntry);
-        return;
-    }
-    return;
-}
-
-/* ============================================================ */
-
-//the game allocates the DamageMan active_damage_entries_list to be 128 elements long. Instead of having a dynamic local-side array, lets just prealloc enough to fit the 128 max
+//the game allocates the DamageMan all_damage_entries_list to be 128 elements long, and so does every local copy
 static const size_t max_preallocated_DamageEntry = 128;
+
+//Init_DamageEntry puts the pool slot in the id's high word, or 0x80 for an entry DamageMan_PopHead_DamageEntry heap-allocated because
+//the pool was empty. DamageMan_PushHead_DamageEntry reads it back the same way.
+static const int32_t DamageEntry_heap_slot = 0x80;
+
+bool DamageEntry_isDynamicAlloc(const DamageEntry* entry)
+{
+    return (entry->id >> 16) == (uint32_t)DamageEntry_heap_slot;
+}
 
 //Map objects and hazards put entries in the DamageMan too, which we should ignore
 //TODO need to verify that this works with spells and bullets
@@ -85,7 +25,7 @@ static bool DamageEntry_is_player_owned(const DamageEntry* entry)
     for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
     {
         auto player_o = Game::get_connected_player(i);
-        if (player_o.has_value() && player_o.value() != 0 && entry->attackerHandle == *(uint32_t*)(player_o.value() + 0x8))
+        if (player_o.has_value() && player_o.value() != 0 && entry->attackerHandle == (uint32_t)((PlayerIns*)player_o.value())->chrins.handle)
         {
             return true;
         }
@@ -93,93 +33,245 @@ static bool DamageEntry_is_player_owned(const DamageEntry* entry)
     return false;
 }
 
-void copy_DamageMan(DamageMan* to, DamageMan* from, const hkpWorld* to_world, const hkpWorld* from_world, StateTarget target)
+/* ============================================================
+ * Heap-allocated entries
+ *
+ * A heap entry is saved whole. A load restores it into the live heap entry with the same id, or into a new one built the way
+ * DamageMan_PopHead_DamageEntry builds one. Live heap entries the saved frame did not have are torn down the way Step_DamageMan
+ * retires an entry. A rebuilt entry has its own phantoms and shapes at new addresses, so pointers to them and links to the entry
+ * are remapped after the copy.
+ * ============================================================ */
+
+static void free_DamageMan_saved_heap_entries(DamageMan* d)
+{
+    for (SavedHeapDamageEntry& h : d->saved_heap_entries)
+    {
+        free_DamageEntry(h.entry, true);
+    }
+    d->saved_heap_entries.clear();
+}
+
+//ToLocal
+static void copy_SavedHeapDamageEntry(SavedHeapDamageEntry* to, DamageEntry* from)
+{
+    to->entry = init_DamageEntry();
+    copy_DamageEntry(to->entry, from, StateTarget::ToLocal);
+    to->game_address = (uint64_t)from;
+    to->game_sphere = (uint64_t)from->FrpgPhysShapePhantomIns_Sphere;
+    to->game_capsule = (uint64_t)from->FrpgPhysShapePhantomIns_Capsule;
+    copy_hkpShape(&to->shapes[0], from->FrpgPhysShapePhantomIns_Sphere->_hkpShape);
+    copy_hkpShape(&to->shapes[1], from->FrpgPhysShapePhantomIns_Capsule->_hkpShape);
+}
+
+//Copy
+static void copy_SavedHeapDamageEntry(SavedHeapDamageEntry* to, const SavedHeapDamageEntry* from)
+{
+    *to = *from;
+    to->entry = init_DamageEntry();
+    copy_DamageEntry(to->entry, from->entry, StateTarget::Copy);
+}
+
+//ToGame, into the live entry init_heap_DamageEntries picked. copy_DamageEntry writes the saved entry's game addresses, so point them at the
+//phantoms and shapes of the entry it was restored into, and restore those shapes.
+static void copy_SavedHeapDamageEntry(DamageEntry* to, const SavedHeapDamageEntry* from)
+{
+    copy_DamageEntry(to, from->entry, StateTarget::ToGame);
+
+    FrpgPhysShapePhantomIns* sphere = to->FrpgPhysShapePhantomIns_Sphere;
+    FrpgPhysShapePhantomIns* capsule = to->FrpgPhysShapePhantomIns_Capsule;
+    auto own_phantom = [&](void* p) -> void*
+    {
+        if (p == NULL)
+        {
+            return NULL;
+        }
+        if ((uint64_t)p == from->game_sphere)
+        {
+            return sphere;
+        }
+        if ((uint64_t)p != from->game_capsule)
+        {
+            FATALERROR("copy_DamageMan: heap DamageEntry id=%x refers to phantom %p, which is not one of its own", to->id, p);
+        }
+        return capsule;
+    };
+    to->PhysShapePhantomIns1 = own_phantom(to->PhysShapePhantomIns1);
+    to->PhysShapePhantomIns1_altPtr_A = own_phantom(to->PhysShapePhantomIns1_altPtr_A);
+    to->PhysShapePhantomIns1_altPtr_B = own_phantom(to->PhysShapePhantomIns1_altPtr_B);
+    to->hkpSphereShape1 = sphere->_shape;
+    to->hkpCapsuleShape1 = capsule->_shape;
+    //the phantoms' owner (Construct_FrpgPhysShapePhantomIns), which copy_FrpgPhysIns just set to the saved entry's address
+    sphere->base.base.owner = to;
+    capsule->base.base.owner = to;
+    copy_hkpShape(sphere->_hkpShape, &from->shapes[0]);
+    copy_hkpShape(capsule->_hkpShape, &from->shapes[1]);
+}
+
+//Step_DamageMan retires an entry with Clear_DamageEntry, DamageEntry_DestructDbgNode and DamageMan_PushHead_DamageEntry, which destructs
+//and frees a heap entry. Its phantoms are taken out of the world first. Its DmgHitRecordManImp references are dropped rather than
+//released: the load restores DmgHitRecordManImp after DamageMan, counts included.
+static void free_heap_DamageEntry(DamageMan* damageman, DamageEntry* entry)
+{
+    free_DamageEntry_phantoms(entry);
+    entry->PhysShapePhantomIns1 = NULL;
+    entry->PhysShapePhantomIns1_altPtr_A = NULL;
+    entry->PhysShapePhantomIns1_altPtr_B = NULL;
+    entry->DmgHitRecordManImp_field0x10Elem = NULL;
+    entry->DmgHitRecordManImp_field0x10Elem_b = NULL;
+    entry->DmgHitRecordManImp_field0x10Elem_c = NULL;
+    if (entry->field0x118 != NULL)
+    {
+        free_DamageEntryField0x118(entry->field0x118, StateTarget::ToGame);
+        entry->field0x118 = NULL;
+    }
+    DamageEntry_DestructDbgNode(entry);
+    entry->next = NULL;
+    DamageMan_PushHead_DamageEntry(damageman, entry);
+}
+
+//Allocated from the heap DamageMan_PopHead_DamageEntry uses. Its phantoms are not in the world.
+static DamageEntry* init_heap_DamageEntry()
+{
+    DamageEntry* entry = (DamageEntry*)Game::game_malloc(sizeof(DamageEntry), 0x10, *(uint64_t*)Game::internal_heap_3);
+    Init_DamageEntry(entry, DamageEntry_heap_slot);
+    entry->next = NULL;
+    return entry;
+}
+
+//The live entry each saved heap entry is restored into: the live heap entry with its id, or a new one. Live heap entries left over are
+//torn down.
+static std::vector<DamageEntry*> init_heap_DamageEntries(DamageMan* game, const DamageMan* saved)
+{
+    std::vector<DamageEntry*> live;
+    for (DamageEntry* e = game->active_damage_entries_list; e != NULL; e = e->next)
+    {
+        if (DamageEntry_isDynamicAlloc(e))
+        {
+            live.push_back(e);
+        }
+    }
+
+    std::vector<DamageEntry*> targets(saved->saved_heap_entries.size(), NULL);
+    for (size_t i = 0; i < targets.size(); i++)
+    {
+        for (DamageEntry*& e : live)
+        {
+            if (e != NULL && e->id == saved->saved_heap_entries[i].entry->id)
+            {
+                targets[i] = e;
+                e = NULL;
+                break;
+            }
+        }
+    }
+    for (DamageEntry* e : live)
+    {
+        if (e != NULL)
+        {
+            free_heap_DamageEntry(game, e);
+        }
+    }
+    for (DamageEntry*& t : targets)
+    {
+        if (t == NULL)
+        {
+            t = init_heap_DamageEntry();
+        }
+    }
+    return targets;
+}
+
+//Followup links that name a heap entry now restored at another address. Pool entries keep theirs.
+static void copy_heap_DamageEntry_links(DamageMan* to, const DamageMan* from, const std::vector<DamageEntry*>& targets)
+{
+    std::unordered_map<uint64_t, DamageEntry*> moved;
+    for (size_t i = 0; i < targets.size(); i++)
+    {
+        moved[from->saved_heap_entries[i].game_address] = targets[i];
+    }
+    if (moved.empty())
+    {
+        return;
+    }
+    auto remap = [&moved](DamageEntry* e)
+    {
+        for (DamageEntry** link : { &e->followup_a, &e->followup_b, &e->followup_c })
+        {
+            if (*link == NULL)
+            {
+                continue;
+            }
+            auto it = moved.find((uint64_t)*link);
+            if (it != moved.end())
+            {
+                *link = it->second;
+            }
+        }
+    };
+    for (size_t i = 0; i < max_preallocated_DamageEntry; i++)
+    {
+        remap(&to->all_damage_entries_list_start[i]);
+    }
+    for (DamageEntry* t : targets)
+    {
+        remap(t);
+    }
+}
+
+/* ============================================================ */
+
+void copy_DamageMan(DamageMan* to, DamageMan* from, StateTarget target)
 {
     Game::SuspendThreads();
 
-    //go through the active_damage_entries_list and save it, along with the data of any dynamic entries. Any static ones are contained in the all_damage_entries_list
+    //ToGame: the live entry each saved heap entry is restored into
+    std::vector<DamageEntry*> heap_targets;
+
     if (target == StateTarget::ToLocal)
     {
-        free_SavedDamageEntryList(&to->saved_active_damage_entries);
-        DamageEntry* head = from->active_damage_entries_list;
-        while (head != NULL)
+        to->saved_active_damage_entries.clear();
+        free_DamageMan_saved_heap_entries(to);
+        for (DamageEntry* head = from->active_damage_entries_list; head != NULL; head = head->next)
         {
             SavedDamageEntry e;
-            e.game_addr = head;
-            e.is_dynamic = false;
-            e.data = NULL;
-            //canonical identity of this entry: its slot in the game's pool
             e.pool_index = -1;
-            {
-                ptrdiff_t idx = head - from->all_damage_entries_list_start;
-                if (idx >= 0 && idx < (ptrdiff_t)max_preallocated_DamageEntry)
-                {
-                    e.pool_index = (int32_t)idx;
-                }
-            }
+            e.heap_index = -1;
+            memset(e.shapes, 0, sizeof(e.shapes));
             e.player_owned = DamageEntry_is_player_owned(head);
+            const ptrdiff_t idx = head - from->all_damage_entries_list_start;
             if (DamageEntry_isDynamicAlloc(head))
             {
-                DamageEntry_ref(head); //ref because the entry is stored game-side
-                DamageEntry_ref(head); //ref for the storage local-side
-                e.data = init_DamageEntry();
-                copy_DamageEntry(e.data, head, to_world, from_world, target);
-                e.is_dynamic = true;
+                to->saved_heap_entries.emplace_back();
+                copy_SavedHeapDamageEntry(&to->saved_heap_entries.back(), head);
+                e.heap_index = (int32_t)to->saved_heap_entries.size() - 1;
+            }
+            else if (idx >= 0 && idx < (ptrdiff_t)max_preallocated_DamageEntry)
+            {
+                e.pool_index = (int32_t)idx;
+                //the phantoms and shapes belong to the entry, so its shapes are saved with it
+                copy_hkpShape(&e.shapes[0], head->FrpgPhysShapePhantomIns_Sphere->_hkpShape);
+                copy_hkpShape(&e.shapes[1], head->FrpgPhysShapePhantomIns_Capsule->_hkpShape);
+            }
+            else
+            {
+                FATALERROR("copy_DamageMan: active DamageEntry %p id=%x is neither a pool slot nor a heap entry", head, head->id);
             }
             to->saved_active_damage_entries.push_back(e);
-            head = head->next;
         }
     }
     else if (target == StateTarget::ToGame)
     {
-        //clear out the existing list first
-        //this is needed in case we need to destroy any dynamic entries in it
-        //this may also mean we remove and put back the same element but since those are still ref'd by the saved side it's safe
-        DamageEntry* oldhead = to->active_damage_entries_list;
-        while (oldhead != NULL)
-        {
-            DamageEntry* next = oldhead->next;
-            if (DamageEntry_isDynamicAlloc(oldhead))
-            {
-                DamageEntry_deref(oldhead);
-            }
-            oldhead = next;
-        }
-
-        //push back the correct pointers into the active_damage_entries_list
-        to->active_damage_entries_list = NULL;
-        DamageEntry** head = &to->active_damage_entries_list;
-        for (auto e : from->saved_active_damage_entries)
-        {
-            *head = e.game_addr;
-            if (e.is_dynamic)
-            {
-                DamageEntry_ref(*head);
-                copy_DamageEntry(*head, e.data, to_world, from_world, target);
-            }
-            head = &((*head)->next);
-        }
+        heap_targets = init_heap_DamageEntries(to, from);
     }
     else if (target == StateTarget::Copy)
     {
-        free_SavedDamageEntryList(&to->saved_active_damage_entries);
-        for (auto e : from->saved_active_damage_entries)
+        to->saved_active_damage_entries = from->saved_active_damage_entries;
+        free_DamageMan_saved_heap_entries(to);
+        to->saved_heap_entries.resize(from->saved_heap_entries.size());
+        for (size_t i = 0; i < from->saved_heap_entries.size(); i++)
         {
-            SavedDamageEntry new_e;
-            new_e.game_addr = e.game_addr;
-            new_e.is_dynamic = e.is_dynamic;
-            new_e.data = NULL;
-            new_e.pool_index = e.pool_index;
-            new_e.player_owned = e.player_owned;
-            if (e.is_dynamic)
-            {
-                DamageEntry_ref(new_e.game_addr);
-                new_e.data = init_DamageEntry();
-                copy_DamageEntry(new_e.data, e.data, to_world, from_world, target);
-            }
-            to->saved_active_damage_entries.push_back(new_e);
+            copy_SavedHeapDamageEntry(&to->saved_heap_entries[i], &from->saved_heap_entries[i]);
         }
-
     }
 
     to->all_damage_entries_list_cur = from->all_damage_entries_list_cur;
@@ -190,7 +282,38 @@ void copy_DamageMan(DamageMan* to, DamageMan* from, const hkpWorld* to_world, co
         DamageEntry* from_DamageEntry = &from->all_damage_entries_list_start[i];
         DamageEntry* to_DamageEntry = &to->all_damage_entries_list_start[i];
 
-        copy_DamageEntry(to_DamageEntry, from_DamageEntry, to_world, from_world, target);
+        copy_DamageEntry(to_DamageEntry, from_DamageEntry, target);
+    }
+
+    if (target == StateTarget::ToGame)
+    {
+        for (size_t i = 0; i < heap_targets.size(); i++)
+        {
+            copy_SavedHeapDamageEntry(heap_targets[i], &from->saved_heap_entries[i]);
+        }
+        copy_heap_DamageEntry_links(to, from, heap_targets);
+
+        //a pool entry keeps its phantoms and shapes, so only their contents are restored (a heap entry's came with it)
+        for (const SavedDamageEntry& e : from->saved_active_damage_entries)
+        {
+            if (e.pool_index < 0)
+            {
+                continue;
+            }
+            DamageEntry* entry = &to->all_damage_entries_list_start[e.pool_index];
+            copy_hkpShape(entry->FrpgPhysShapePhantomIns_Sphere->_hkpShape, &e.shapes[0]);
+            copy_hkpShape(entry->FrpgPhysShapePhantomIns_Capsule->_hkpShape, &e.shapes[1]);
+        }
+
+        //relink the active list in its saved order
+        DamageEntry** link = &to->active_damage_entries_list;
+        for (const SavedDamageEntry& e : from->saved_active_damage_entries)
+        {
+            DamageEntry* entry = e.pool_index >= 0 ? &to->all_damage_entries_list_start[e.pool_index] : heap_targets[e.heap_index];
+            *link = entry;
+            link = &entry->next;
+        }
+        *link = NULL;
     }
 
     to->unk_18 = from->unk_18;
@@ -205,6 +328,9 @@ void copy_DamageMan(DamageMan* to, DamageMan* from, const hkpWorld* to_world, co
 DamageMan* init_DamageMan()
 {
     DamageMan* local_DamageMan = (DamageMan*)malloc_(sizeof(DamageMan));
+    //malloc_ hands back raw memory, so the local-only containers are constructed in place
+    new (&local_DamageMan->saved_active_damage_entries) std::vector<SavedDamageEntry>();
+    new (&local_DamageMan->saved_heap_entries) std::vector<SavedHeapDamageEntry>();
 
     local_DamageMan->active_damage_entries_list = NULL;
     local_DamageMan->all_damage_entries_list_cur = NULL;
@@ -223,7 +349,10 @@ DamageMan* init_DamageMan()
 
 void free_DamageMan(DamageMan* to)
 {
-    free_SavedDamageEntryList(&to->saved_active_damage_entries);
+    free_DamageMan_saved_heap_entries(to);
+    //the struct is malloc'd, so its containers are destroyed by hand
+    std::destroy_at(&to->saved_active_damage_entries);
+    std::destroy_at(&to->saved_heap_entries);
     for (size_t i = 0; i < max_preallocated_DamageEntry; i++)
     {
         free_DamageEntry(&to->all_damage_entries_list_start[i], false);
@@ -233,23 +362,7 @@ void free_DamageMan(DamageMan* to)
     free(to);
 }
 
-void free_SavedDamageEntryList(std::vector<SavedDamageEntry>* to)
-{
-    for (auto e : *to)
-    {
-        if (e.is_dynamic)
-        {
-            DamageEntry_deref(e.game_addr);
-            if (e.data)
-            {
-                free_DamageEntry(e.data, true);
-            }
-        }
-    }
-    to->clear();
-}
-
-void copy_DamageEntry(DamageEntry* to, DamageEntry* from, const hkpWorld* to_world, const hkpWorld* from_world, StateTarget target)
+void copy_DamageEntry(DamageEntry* to, DamageEntry* from, StateTarget target)
 {
     to->id = from->id;
     to->unk_4 = from->unk_4;
@@ -258,10 +371,10 @@ void copy_DamageEntry(DamageEntry* to, DamageEntry* from, const hkpWorld* to_wor
     {
         FATALERROR("FrpgPhysShapePhantomIns can be null??? from=%p sphere=%p cap=%p", from, from->FrpgPhysShapePhantomIns_Sphere, from->FrpgPhysShapePhantomIns_Capsule);
     }
-    copy_FrpgPhysShapePhantomIns(&to->FrpgPhysShapePhantomIns_Sphere, &from->FrpgPhysShapePhantomIns_Sphere, true, to_world, from_world, target);
-    copy_FrpgPhysShapePhantomIns(&to->FrpgPhysShapePhantomIns_Capsule, &from->FrpgPhysShapePhantomIns_Capsule, false, to_world, from_world, target);
+    copy_FrpgPhysShapePhantomIns(&to->FrpgPhysShapePhantomIns_Sphere, &from->FrpgPhysShapePhantomIns_Sphere, target);
+    copy_FrpgPhysShapePhantomIns(&to->FrpgPhysShapePhantomIns_Capsule, &from->FrpgPhysShapePhantomIns_Capsule, target);
 
-    //these are all static pointers to the already handled shapes
+    //these all point at the entry's own phantoms and shapes (copy_DamageMan remaps them for a rebuilt heap entry)
     to->PhysShapePhantomIns1 = from->PhysShapePhantomIns1;
     to->hkpSphereShape1 = from->hkpSphereShape1;
     to->hkpCapsuleShape1 = from->hkpCapsuleShape1;
@@ -306,7 +419,8 @@ void copy_DamageEntry(DamageEntry* to, DamageEntry* from, const hkpWorld* to_wor
     to->knockback_percent = from->knockback_percent;
     to->unk_1d4 = from->unk_1d4;
     to->DmgHitRecordManImp_field0x10Elem = from->DmgHitRecordManImp_field0x10Elem;
-    to->physWorld = from->physWorld;
+    to->DmgHitRecordManImp_field0x10Elem_b = from->DmgHitRecordManImp_field0x10Elem_b;
+    to->DmgHitRecordManImp_field0x10Elem_c = from->DmgHitRecordManImp_field0x10Elem_c;
     to->followup_a = from->followup_a;
     to->followup_b = from->followup_b;
     to->followup_c = from->followup_c;
@@ -348,8 +462,10 @@ void free_DamageEntry(DamageEntry* to, bool freeself)
 void copy_FrpgPhysIns(FrpgPhysIns* to, FrpgPhysIns* from, StateTarget target)
 {
     to->vtable = from->vtable;
-    to->data_0 = from->data_0;
-    to->damageEntry = from->damageEntry;
+    to->type = from->type;
+    to->unk_a = from->unk_a;
+    to->unk_c = from->unk_c;
+    to->owner = from->owner;
     to->physWorld = from->physWorld;
 }
 
@@ -361,14 +477,18 @@ void copy_FrpgPhysPhantomIns(FrpgPhysPhantomIns* to, FrpgPhysPhantomIns* from, S
     {
         FATALERROR("SimpleShapePhantom ptr for %p is NULL", from);
     }
-    //since the phantoms (and the associated shape) are never destroyed due to the FrpgHavok rollback code, it's safe to just use the raw pointer. it should always be valid
-    to->_hkpSimpleShapePhantom = from->_hkpSimpleShapePhantom;
+    //A phantom is created with its DamageEntry and lives as long as the entry, so a load leaves the live pointer alone.
+    //The snapshot keeps it only for the serializer's null check.
+    if (target != StateTarget::ToGame)
+    {
+        to->_hkpSimpleShapePhantom = from->_hkpSimpleShapePhantom;
+    }
 
     to->self = to;
     to->data_1 = from->data_1;
 }
 
-void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePhantomIns** from, bool is_sphere, const hkpWorld* to_world, const hkpWorld* from_world, StateTarget target)
+void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePhantomIns** from, StateTarget target)
 {
     if (*to == NULL && *from != NULL)
     {
@@ -381,8 +501,11 @@ void copy_FrpgPhysShapePhantomIns(FrpgPhysShapePhantomIns** to, FrpgPhysShapePha
     if (*to != NULL && *from != NULL)
     {
         copy_FrpgPhysPhantomIns(&(*to)->base, &(*from)->base, target);
-        //the capsule/sphere shape is never destroyed, so the raw pointer is safe
-        (*to)->_shape = (*from)->_shape;
+        //likewise the shape; its radius and vertices are restored by copy_FrpgHavokManImp, or for a heap entry by copy_DamageMan
+        if (target != StateTarget::ToGame)
+        {
+            (*to)->_shape = (*from)->_shape;
+        }
     }
 }
 
@@ -459,8 +582,10 @@ static void serialize_FrpgPhysIns(StateVisitor& v, const FrpgPhysIns* p)
 {
     v.begin("FrpgPhysIns");
     v.field("vtable", p->vtable);          // fixed code addr (deterministic)
-    v.field("data_0", p->data_0);          // non-pointer data
-    v.ptr_flag("damageEntry", (void*)p->damageEntry);
+    v.field("type", p->type);
+    v.field("unk_a", p->unk_a);
+    v.field("unk_c", p->unk_c);
+    v.ptr_flag("owner", p->owner);
     v.ptr_flag("physWorld", p->physWorld);
     v.end();
 }
@@ -550,7 +675,8 @@ static void serialize_DamageEntry(StateVisitor& v, const DamageEntry* e)
     v.field("knockback_percent", e->knockback_percent);
     v.field("unk_1d4", e->unk_1d4);
     v.ptr_flag("DmgHitRecordManImp_field0x10Elem", e->DmgHitRecordManImp_field0x10Elem);
-    v.ptr_flag("physWorld", e->physWorld);
+    v.ptr_flag("DmgHitRecordManImp_field0x10Elem_b", e->DmgHitRecordManImp_field0x10Elem_b);
+    v.ptr_flag("DmgHitRecordManImp_field0x10Elem_c", e->DmgHitRecordManImp_field0x10Elem_c);
     v.ptr_flag("followup_a", e->followup_a);
     v.ptr_flag("followup_b", e->followup_b);
     v.ptr_flag("followup_c", e->followup_c);
@@ -565,24 +691,24 @@ static void serialize_DamageEntry(StateVisitor& v, const DamageEntry* e)
     v.end();
 }
 
-// An active damage entry, identified by its POOL SLOT rather than its address.
-// `pool` is the snapshot's own copy of all_damage_entries_list_start, so a static
-// entry's contents are hashed here, from the slot it actually occupies.
-static void serialize_SavedDamageEntry(StateVisitor& v, const SavedDamageEntry* e,
-                                       const DamageEntry* pool)
+// An active damage entry, identified by its pool slot, or as a heap entry. A pool entry's contents are hashed from the snapshot's own
+// copy of all_damage_entries_list_start, from the slot it occupies; a heap entry's from its saved copy.
+static void serialize_SavedDamageEntry(StateVisitor& v, const SavedDamageEntry* e, const DamageMan* d)
 {
     v.begin("SavedDamageEntry");
-    v.field("pool_index", e->pool_index);   // use this instead, since game_addr is a raw address
-    v.field("is_dynamic", e->is_dynamic);
-    if (e->is_dynamic && e->data)
+    v.field("pool_index", e->pool_index);
+    const SavedHavokShape* shapes = e->shapes;
+    if (e->pool_index >= 0 && e->pool_index < (int32_t)max_preallocated_DamageEntry && d->all_damage_entries_list_start != NULL)
     {
-        serialize_DamageEntry(v, e->data);
+        serialize_DamageEntry(v, &d->all_damage_entries_list_start[e->pool_index]);
     }
-    else if (pool != NULL && e->pool_index >= 0 &&
-             e->pool_index < (int32_t)max_preallocated_DamageEntry)
+    else if (e->heap_index >= 0 && (size_t)e->heap_index < d->saved_heap_entries.size())
     {
-        serialize_DamageEntry(v, &pool[e->pool_index]);
+        serialize_DamageEntry(v, d->saved_heap_entries[e->heap_index].entry);
+        shapes = d->saved_heap_entries[e->heap_index].shapes;
     }
+    serialize_SavedHavokShape(v, "sphere_shape", &shapes[0]);
+    serialize_SavedHavokShape(v, "capsule_shape", &shapes[1]);
     v.end();
 }
 
@@ -590,18 +716,18 @@ void serialize_DamageMan(StateVisitor& v, DamageMan* d)
 {
     v.begin("DamageMan");
 
-    // only the ACTIVE, player-owned damage entries are hashed, and identified by pool slot.
+    // only the ACTIVE, player-owned damage entries are hashed
     size_t player_owned = 0;
     for (const SavedDamageEntry& e : d->saved_active_damage_entries)
     {
         if (e.player_owned) player_owned++;
     }
     v.count("saved_active_damage_entries", player_owned);
-    for (SavedDamageEntry& e : d->saved_active_damage_entries)
+    for (const SavedDamageEntry& e : d->saved_active_damage_entries)
     {
         if (e.player_owned)
         {
-            serialize_SavedDamageEntry(v, &e, d->all_damage_entries_list_start);
+            serialize_SavedDamageEntry(v, &e, d);
         }
     }
     v.note("world_owned_entries_not_compared", std::to_string(d->saved_active_damage_entries.size() - player_owned));

@@ -267,7 +267,7 @@ void copy_BulletMan_Field0x40(BulletMan_Field0x40* to, BulletMan_Field0x40* from
 
     to->unk_308 = from->unk_308;
     to->unk_30c = from->unk_30c;
-    to->unk_310 = from->unk_310;
+    to->next_in_use = from->next_in_use;
 }
 
 BulletMan_Field0x40* init_BulletMan_Field0x40()
@@ -565,7 +565,7 @@ static void serialize_BulletMan_Field0x40(StateVisitor& v, const BulletMan_Field
     }
     v.field("unk_308", f->unk_308);
     v.padding("unk_30c", &f->unk_30c, sizeof(f->unk_30c)); // gap
-    v.ptr_flag("unk_310", (const void*)f->unk_310); // alloc'd-once static location
+    v.ptr_flag("next_in_use", f->next_in_use);
     v.end();
 }
 
@@ -684,9 +684,55 @@ uint64_t hash_BulletMan(BulletMan* m)
 
 // ---- BulletMan ----
 
+//Init_BulletMan allocates each pool (128 BulletIns, 64 Field0x20, 4 Field0x40) as one array whose elements start on its free list.
+//BulletMan_AddBullet heap-allocates a BulletIns when the free list is empty. copy_BulletMan copies the arrays only, so a list that
+//reaches outside its array stops the save rather than losing the entry.
+template <typename T>
+static void check_BulletMan_pool_list(const T* head, T* T::* link, const T* pool, size_t count, const char* what)
+{
+    size_t n = 0;
+    for (const T* e = head; e != NULL; e = e->*link)
+    {
+        if (e < pool || e >= pool + count)
+        {
+            FATALERROR("copy_BulletMan: %s %p is not in its %zu-element pool; heap-allocated bullets cannot be rolled back", what, e, count);
+        }
+        if (++n > count)
+        {
+            FATALERROR("copy_BulletMan: %s list is longer than its %zu-element pool", what, count);
+        }
+    }
+}
+
+//A list link as the same element of the other copy's pool, so a local copy's lists stay inside its own arrays
+template <typename T>
+static T* copy_BulletMan_link(T* ptr, const T* from_pool, T* to_pool, size_t count, const char* what)
+{
+    if (ptr == NULL)
+    {
+        return NULL;
+    }
+    const uint64_t offset = (uint64_t)ptr - (uint64_t)from_pool;
+    if (offset >= count * sizeof(T) || offset % sizeof(T) != 0)
+    {
+        FATALERROR("copy_BulletMan: %s %p is not an element of its %zu-element pool", what, ptr, count);
+    }
+    return (T*)((uint64_t)to_pool + offset);
+}
+
 void copy_BulletMan(BulletMan* to, BulletMan* from, StateTarget target)
 {
     Game::SuspendThreads();
+
+    if (target == StateTarget::ToLocal)
+    {
+        check_BulletMan_pool_list(from->end_of_bullets_in_use, &BulletIns::previous_bullet_in_use, from->bulletins_arry, 128, "BulletIns in use");
+        check_BulletMan_pool_list(from->start_of_unused_bullets, &BulletIns::previous_bullet_in_use, from->bulletins_arry, 128, "unused BulletIns");
+        check_BulletMan_pool_list(from->end_of_bullets_in_use_field0x20, &BulletMan_Field0x20::next_in_use, from->field0x20, 64, "Field0x20 in use");
+        check_BulletMan_pool_list(from->start_of_unused_bullets_field0x20, &BulletMan_Field0x20::next_in_use, from->field0x20, 64, "unused Field0x20");
+        check_BulletMan_pool_list(from->end_of_bullets_in_use_field0x40, &BulletMan_Field0x40::next_in_use, from->field0x40, 4, "Field0x40 in use");
+        check_BulletMan_pool_list(from->start_of_unused_bullets_field0x40, &BulletMan_Field0x40::next_in_use, from->field0x40, 4, "unused Field0x40");
+    }
 
     for (size_t i = 0; i < 128; i++)
     {
@@ -706,8 +752,8 @@ void copy_BulletMan(BulletMan* to, BulletMan* from, StateTarget target)
         }
     }
 
-    to->end_of_bullets_in_use = from->end_of_bullets_in_use;
-    to->start_of_unused_bullets = from->start_of_unused_bullets;
+    to->end_of_bullets_in_use = copy_BulletMan_link(from->end_of_bullets_in_use, from->bulletins_arry, to->bulletins_arry, 128, "BulletIns in use");
+    to->start_of_unused_bullets = copy_BulletMan_link(from->start_of_unused_bullets, from->bulletins_arry, to->bulletins_arry, 128, "unused BulletIns");
     to->bullet_count_1 = from->bullet_count_1;
     to->bullet_count_2 = from->bullet_count_2;
 
@@ -729,8 +775,8 @@ void copy_BulletMan(BulletMan* to, BulletMan* from, StateTarget target)
         }
     }
 
-    to->end_of_bullets_in_use_field0x20 = from->end_of_bullets_in_use_field0x20;
-    to->start_of_unused_bullets_field0x20 = from->start_of_unused_bullets_field0x20;
+    to->end_of_bullets_in_use_field0x20 = copy_BulletMan_link(from->end_of_bullets_in_use_field0x20, from->field0x20, to->field0x20, 64, "Field0x20 in use");
+    to->start_of_unused_bullets_field0x20 = copy_BulletMan_link(from->start_of_unused_bullets_field0x20, from->field0x20, to->field0x20, 64, "unused Field0x20");
     to->unk_38 = from->unk_38;
     to->unk_3c = from->unk_3c;
 
@@ -739,8 +785,12 @@ void copy_BulletMan(BulletMan* to, BulletMan* from, StateTarget target)
         copy_BulletMan_Field0x40(&to->field0x40[i], &from->field0x40[i], target);
     }
 
-    to->end_of_bullets_in_use_field0x40 = from->end_of_bullets_in_use_field0x40;
-    to->start_of_unused_bullets_field0x40 = from->start_of_unused_bullets_field0x40;
+    for (size_t i = 0; i < 4; i++)
+    {
+        to->field0x40[i].next_in_use = copy_BulletMan_link(from->field0x40[i].next_in_use, from->field0x40, to->field0x40, 4, "Field0x40 next");
+    }
+    to->end_of_bullets_in_use_field0x40 = copy_BulletMan_link(from->end_of_bullets_in_use_field0x40, from->field0x40, to->field0x40, 4, "Field0x40 in use");
+    to->start_of_unused_bullets_field0x40 = copy_BulletMan_link(from->start_of_unused_bullets_field0x40, from->field0x40, to->field0x40, 4, "unused Field0x40");
     to->unk_58 = from->unk_58;
     to->unk_5c = from->unk_5c;
 

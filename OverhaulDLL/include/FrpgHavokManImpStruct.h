@@ -29,9 +29,15 @@ typedef struct hkConstraintInternal hkConstraintInternal;
 typedef struct hkpConstraintInstance hkpConstraintInstance;
 typedef struct hkpBroadPhaseBorder hkpBroadPhaseBorder;
 typedef struct hkpTypedBroadPhaseHandle hkpTypedBroadPhaseHandle;
-typedef struct SavedEntityState SavedEntityState;
-typedef struct SavedPhantomState SavedPhantomState;
-typedef struct HkpWorldSnapshot HkpWorldSnapshot;
+typedef struct SavedHavokShape SavedHavokShape;
+typedef struct SavedHavokPhantom SavedHavokPhantom;
+typedef struct HavokRollbackState HavokRollbackState;
+typedef struct hkpSimulation hkpSimulation;
+typedef struct hkpSimulationClock hkpSimulationClock;
+typedef struct hkpWorldDynamicsStepInfo hkpWorldDynamicsStepInfo;
+typedef struct hkpProcessCollisionInput hkpProcessCollisionInput;
+typedef struct hkpShape hkpShape;
+typedef struct hkpShapeVtable hkpShapeVtable;
 
 
 struct FrpgHavokManImp
@@ -48,15 +54,70 @@ struct FrpgPhysWorld
     void* vtable;
     hkpWorld* _hkpWorld;
     uint64_t heap;
-    // Local-only fields (not part of the game struct, only used in our snapshot copies)
-    HkpWorldSnapshot* snapshot;
+    // Local-only fields (not part of the game struct, only used in our local copies)
+    HavokRollbackState* rollbackState;
 };
 static_assert(offsetof(FrpgPhysWorld, _hkpWorld) == 0x8);
+
+// hkpSimulation's step clock, m_currentTime (+0x24) through m_previousStepResult. Every integrate stamps the swept transforms of the
+// bodies it steps with this clock, and float rounding depends on its value, so a re-simulated frame only reproduces the live one when
+// the clock is rolled back together with the bodies.
+struct hkpSimulationClock
+{
+    float m_currentTime;
+    float m_currentPsiTime;
+    float m_physicsDeltaTime;
+    float m_simulateUntilTime;
+    float m_frameMarkerPsiSnap;
+    uint32_t m_previousStepResult;
+};
+static_assert(sizeof(hkpSimulationClock) == 0x18);
+
+struct hkpSimulation
+{
+    uint8_t _0[0x24];
+    hkpSimulationClock m_clock;    // 0x24
+};
+static_assert(offsetof(hkpSimulation, m_clock) == 0x24);
+
+// hkStepInfo and hkpSolverInfo: step times and the solver deactivation counters (+0x14d..+0x14f) that every body's deactivation counter
+// is read against. No pointers
+struct hkpWorldDynamicsStepInfo
+{
+    uint8_t data_0[0x160];
+};
+
+struct hkpProcessCollisionInput
+{
+    uint8_t _0[0x10];
+    float m_tolerance;             // 0x10 (Set_Player_NextStep_Coords @1409c7230)
+};
+static_assert(offsetof(hkpProcessCollisionInput, m_tolerance) == 0x10);
+
+typedef void hkpShape_getAabb_FUNC(const hkpShape* shape, const hkMotionState* localToWorld, float tolerance, float* aabbOut);
+
+struct hkpShapeVtable
+{
+    void* _0[4];
+    hkpShape_getAabb_FUNC* getAabb;  // 0x20
+};
+static_assert(offsetof(hkpShapeVtable, getAabb) == 0x20);
+
+// The header every shape starts with; its vtable identifies the kind (hkpSphereShape, hkpCapsuleShape, ...)
+struct hkpShape
+{
+    hkpShapeVtable* vtable;        // 0x0
+    uint8_t _0[0x10];              // 0x8
+    void* m_userData;              // 0x18
+};
+static_assert(offsetof(hkpShape, m_userData) == 0x18);
 
 struct hkpWorld
 {
     void* vtable;
-    uint8_t _0[0x28];
+    uint8_t _0a[0x8];
+    hkpSimulation* m_simulation;   // 0x10
+    uint8_t _0b[0x18];
     hkpSimulationIsland* m_fixedIsland;
     void* m_fixedRigidBody;
     hkpSimulationIsland** m_activeSimulationIslands;
@@ -70,7 +131,9 @@ struct hkpWorld
     uint32_t m_dirtySimulationIslands_cap;
     uint8_t _1[0x18];
     void* m_broadPhase; //DSR always uses a hkp3AxisSweep broadPhase
-    uint8_t _2a[0x58];
+    uint8_t _2a0[0x28];
+    hkpProcessCollisionInput* m_collisionInput;  // 0xb8
+    uint8_t _2a1[0x28];
     int m_criticalOperationsLockCount;
     int m_criticalOperationsLockCountForPhantoms;
     uint8_t _2b[0x8C];
@@ -82,7 +145,11 @@ struct hkpWorld
     uint32_t m_phantoms_cap;
     uint8_t _3[0xE8];
     hkpBroadPhaseBorder* m_broadPhaseBorder;
+    uint8_t _4[0x18];
+    hkpWorldDynamicsStepInfo m_dynamicsStepInfo;  // 0x2a0
 };
+static_assert(offsetof(hkpWorld, m_simulation) == 0x10);
+static_assert(offsetof(hkpWorld, m_fixedIsland) == 0x30);
 static_assert(offsetof(hkpWorld, m_activeSimulationIslands) == 0x40);
 static_assert(offsetof(hkpWorld, m_inactiveSimulationIslands) == 0x50);
 static_assert(offsetof(hkpWorld, m_dirtySimulationIslands) == 0x60);
@@ -92,7 +159,9 @@ static_assert(offsetof(hkpWorld, m_lastEntityUid) == 0x17C);
 static_assert(offsetof(hkpWorld, m_lastIslandUid) == 0x180);
 static_assert(offsetof(hkpWorld, m_lastConstraintUid) == 0x184);
 static_assert(offsetof(hkpWorld, m_phantoms) == 0x188);
+static_assert(offsetof(hkpWorld, m_collisionInput) == 0xb8);
 static_assert(offsetof(hkpWorld, m_broadPhaseBorder) == 0x280);
+static_assert(offsetof(hkpWorld, m_dynamicsStepInfo) == 0x2a0);
 
 struct hkpSimulationIsland
 {
@@ -475,38 +544,36 @@ static_assert(offsetof(hkpSphereShape, m_radius) == 0x20);
 static_assert(offsetof(hkpSphereShape, m_pad) == 0x28);
 
 /* ============================================================
- * Per-frame physics snapshot for rollback
- *  unsure if the shape ptr can get messed with during game operations. Testing seems to show yes so need to save it
+ * Havok values saved by owner
+ *
+ * Nothing here points at a Havok object. The owners hold these: a character's phantoms in HavokChara, its ragdoll bodies in
+ * FrpgRagdollIns, a damage entry's shapes in its DamageMan record. Only the world's own state lives in HavokRollbackState, and
+ * copy_FrpgHavokManImp does the world-side work (broadphase, phantom add/remove, updateEntityBP) after the owners are restored.
+ * Objects no player owns (NPCs, map collision, props) are never touched.
  */
-struct SavedEntityState
+static const uint32_t HAVOK_ROLLBACK_DAMAGE_POOL_SIZE = 128;
+
+// The parts of a sphere or capsule shape the game rewrites. vtable 0 means the shape was neither and nothing was saved.
+struct SavedHavokShape
 {
-    hkpEntity* ptr;
-    void* shapePtr;
-    uint32_t uid;
-    alignas(16) uint8_t motionData[sizeof(hkpMotion)]; // hkpMotion in hkpEntity
-    union
-    {
-        hkpCapsuleShape capsuleData;
-        hkpSphereShape sphereData;
-    } shapeData;
+    uint64_t vtable;
+    float radius;
+    float vertexA[4];
+    float vertexB[4];
 };
 
-struct SavedPhantomState
+struct SavedHavokPhantom
 {
-    hkpSimpleShapePhantom* ptr;
-    void* shapePtr;
-    alignas(16) uint8_t motionStateData[sizeof(hkMotionState)]; // hkMotionState in hkpSimpleShapePhantom
-    union
-    {
-        hkpCapsuleShape capsuleData;
-        hkpSphereShape sphereData;
-    } shapeData;
+    bool valid;
+    hkMotionState motionState;   // hkpSimpleShapePhantom::m_motionState
+    SavedHavokShape shape;
 };
 
-struct HkpWorldSnapshot
+//The world's own state. Everything else havok holds for the players is saved by its owner.
+struct HavokRollbackState
 {
-    std::vector<SavedEntityState> entities;
-    std::vector<SavedPhantomState> phantoms;
+    hkpSimulationClock simulation_clock;
+    hkpWorldDynamicsStepInfo dynamics_step_info;
 };
 /* ============================================================ */
 

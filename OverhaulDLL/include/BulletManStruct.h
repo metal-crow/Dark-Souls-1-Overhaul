@@ -223,11 +223,11 @@ struct BulletMan_Field0x40
     //former data_0 (0x308)
     uint32_t unk_308;                       // 0x308
     uint32_t unk_30c;                       // 0x30c (gap)
-    uint64_t unk_310;                       // 0x310 (pointer to static data; raw)
+    BulletMan_Field0x40* next_in_use;       // 0x310 - linked list pointer within the field0x40 array (Init_BulletMan)
 };
 static_assert(offsetof(BulletMan_Field0x40, arry) == 0x8);
 static_assert(offsetof(BulletMan_Field0x40, unk_308) == 0x308);
-static_assert(offsetof(BulletMan_Field0x40, unk_310) == 0x310);
+static_assert(offsetof(BulletMan_Field0x40, next_in_use) == 0x310);
 static_assert(sizeof(BulletMan_Field0x40) == 0x318);
 
 

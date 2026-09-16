@@ -20,13 +20,28 @@ typedef struct DamageEntryField0x118 DamageEntryField0x118;
 struct FrpgPhysIns
 {
     uint64_t vtable;          // 0x0
-    uint64_t data_0;          // 0x8 (ghidra: undefined2 + ushort + alignment)
-    uint64_t damageEntry;     // 0x10 (ghidra: hitEntry, HitIns*) - points to an existing DamageEntry, treat as const
-    FrpgPhysWorld* physWorld; // 0x18 - const ptr to FrpgHavokManImp->FrpgPhysWorld
+    int16_t type;             // 0x8 (ghidra: undefined2) - 2 for a character's ragdoll and phantoms, 3 for a damage entry phantom
+    uint16_t unk_a;           // 0xa (ghidra: ushort)
+    uint32_t unk_c;           // 0xc (alignment)
+    void* owner;              // 0x10 (ghidra: hitEntry, HitIns*) - a damage phantom's DamageEntry, a character body's ChrIns
+    FrpgPhysWorld* physWorld; // 0x18 - FrpgHavokManImp->FrpgPhysWorld while the object is in the world
 };
-static_assert(offsetof(FrpgPhysIns, damageEntry) == 0x10);
+static_assert(offsetof(FrpgPhysIns, type) == 0x8);
+static_assert(offsetof(FrpgPhysIns, owner) == 0x10);
 static_assert(offsetof(FrpgPhysIns, physWorld) == 0x18);
 static_assert(sizeof(FrpgPhysIns) == 0x20);
+
+//What a physics object's hkpWorldObject::m_userData points at: an element of its FrpgPhysIns's element arrays (Init_RagDollIns)
+struct FrpgPhysInsElement
+{
+    FrpgPhysIns* physIns;     // 0x0
+    int16_t index;            // 0x8 - the body's index in its FrpgPhysIns; for a hit part, the part (FUN_1402a9d60)
+    uint16_t flags;           // 0xa - (flags >> 2) & 7 is 1 for a hit part (FUN_1402a9e00)
+    uint32_t unk_c;           // 0xc
+};
+static_assert(offsetof(FrpgPhysInsElement, index) == 0x8);
+static_assert(offsetof(FrpgPhysInsElement, flags) == 0xa);
+static_assert(sizeof(FrpgPhysInsElement) == 0x10);
 
 struct FrpgPhysPhantomIns
 {
@@ -46,6 +61,7 @@ struct FrpgPhysShapePhantomIns
     {
         hkpCapsuleShape* _hkpCapsuleShape;
         hkpSphereShape* _hkpSphereShape;
+        hkpShape* _hkpShape;
         void* _shape;
     };                        // 0x38 (ghidra: hkpCapsuleOrSphereShape)
 };
@@ -111,10 +127,12 @@ struct DamageEntry
     float stamina_dmg_magnification; // 0x1cc
     float knockback_percent;       // 0x1d0
     uint32_t unk_1d4;              // 0x1d4
-    void* DmgHitRecordManImp_field0x10Elem; //ptr to an entry in DmgHitRecordManImp (0x1d8)
-    uint64_t padding_2;            // 0x1e0 (ghidra: pointer; not copied)
-    void* physWorld; //this is just a const ptr to FrpgHavokManImp->FrpgPhysWorld (0x1e8)
-    //able to treat these as static, since we're preseving the address of even dynamic DamageEntrys
+    //Three refcounted DmgHitRecordManImp_field0x10Elem references. Destruct_DamageEntry releases all three the same way (FUN_1403c48f0).
+    //They point into DmgHitRecordManImp's fixed arrays, which keep their address, so they are copied as they are.
+    void* DmgHitRecordManImp_field0x10Elem; // 0x1d8
+    void* DmgHitRecordManImp_field0x10Elem_b; // 0x1e0
+    void* DmgHitRecordManImp_field0x10Elem_c; // 0x1e8 (ghidra: physWorld)
+    //Links to other entries. A pool entry keeps its address; copy_DamageMan remaps links to a heap entry it rebuilt elsewhere
     DamageEntry* followup_a;        // 0x1f0
     DamageEntry* followup_b;        // 0x1f8
     DamageEntry* followup_c;        // 0x200
@@ -122,7 +140,7 @@ struct DamageEntry
     uint32_t num_hits;              // 0x210
     uint32_t unk_214;               // 0x214
     uint8_t unk_218[8];             // 0x218 (gap)
-    //able to treat this as static, since we're preseving the address of even dynamic DamageEntrys
+    //the active or free list. copy_DamageMan relinks the active list itself
     DamageEntry* next;              // 0x220
     uint32_t unk_228;               // 0x228
     uint32_t unk_22c;               // 0x22c
@@ -143,7 +161,9 @@ static_assert(offsetof(DamageEntry, field0x130) == 0x130);
 static_assert(offsetof(DamageEntry, isSweetSpot) == 0x1b4);
 static_assert(offsetof(DamageEntry, knockback_percent) == 0x1d0);
 static_assert(offsetof(DamageEntry, DmgHitRecordManImp_field0x10Elem) == 0x1d8);
-static_assert(offsetof(DamageEntry, physWorld) == 0x1e8);
+static_assert(offsetof(DamageEntry, DmgHitRecordManImp_field0x10Elem_b) == 0x1e0);
+static_assert(offsetof(DamageEntry, DmgHitRecordManImp_field0x10Elem_c) == 0x1e8);
+static_assert(offsetof(DamageEntry, followup_a) == 0x1f0);
 static_assert(offsetof(DamageEntry, dbgNode) == 0x208);
 static_assert(offsetof(DamageEntry, num_hits) == 0x210);
 static_assert(offsetof(DamageEntry, next) == 0x220);
@@ -152,13 +172,26 @@ static_assert(sizeof(DamageEntry) == 0x230);
 
 struct SavedDamageEntry
 {
-    DamageEntry* game_addr;
-    DamageEntry* data;
-    bool is_dynamic; //if this is false we can just use the game_addr raw, since it points to an entry in all_damage_entries_list_start we already handle
-    //identifier for this DamageEntry that can be used for serialization
+    //the entry's slot in all_damage_entries_list, or -1 for a heap entry
     int32_t pool_index;
+    //a heap entry's index in DamageMan::saved_heap_entries, otherwise -1
+    int32_t heap_index;
     //its attacker is one of the connected players. Only these are compared: rollback covers the players, not the world
     bool player_owned;
+    //the entry's sphere and capsule contents. The phantoms and shapes belong to the entry, so they are saved with it
+    SavedHavokShape shapes[2];   //0 sphere, 1 capsule
+};
+
+//An entry DamageMan_PopHead_DamageEntry heap-allocated (id 0x80xxxx) because every pool slot was taken. It is saved whole. A load
+//restores it into the live heap entry with the same id, or into a new one built the way PopHead builds it, which comes with its own
+//phantoms and shapes. `entry`'s pointers still hold the game addresses it had when saved; the game_* fields say what they were.
+struct SavedHeapDamageEntry
+{
+    DamageEntry* entry;            //by-value copy, allocated by init_DamageEntry
+    uint64_t game_address;
+    uint64_t game_sphere;          //its FrpgPhysShapePhantomIns_Sphere / _Capsule
+    uint64_t game_capsule;
+    SavedHavokShape shapes[2];     //the sphere's and capsule's radius and vertices
 };
 
 struct DamageMan
@@ -173,7 +206,8 @@ struct DamageMan
     uint8_t damage_to_occur;    // 0x33
     uint8_t unk_34[4];          // 0x34 (gap)
     // Local-only fields (not part of the game struct, only used in our local copies)
-    std::vector<SavedDamageEntry> saved_active_damage_entries;
+    std::vector<SavedDamageEntry> saved_active_damage_entries;   //the active list, in order
+    std::vector<SavedHeapDamageEntry> saved_heap_entries;
 };
 
 static_assert(offsetof(DamageMan, active_damage_entries_list) == 0);

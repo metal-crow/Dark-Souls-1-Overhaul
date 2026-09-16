@@ -24,6 +24,9 @@ typedef struct AnimationMediatorStateEntry AnimationMediatorStateEntry;
 typedef struct AnimationMediator AnimationMediator;
 typedef struct HitIns HitIns;
 typedef struct HavokChara HavokChara;
+typedef struct hkaSkeleton hkaSkeleton;
+typedef struct hkaRagdollInstance hkaRagdollInstance;
+typedef struct FrpgRagdollIns FrpgRagdollIns;
 typedef struct hkpRootCdPoint hkpRootCdPoint;
 typedef struct hkpCharacterProxy hkpCharacterProxy;
 typedef struct EzState_detail_EzStateMachineImpl EzState_detail_EzStateMachineImpl;
@@ -553,6 +556,9 @@ struct HavokChara
     uint8_t draw_havokskel_normal;    // 0x284 (ghidra: bool)
     uint8_t unk_285[3];               // 0x285 (gap)
     uint64_t unk_288;                 // 0x288
+    // Local-only fields (not part of the game struct, only used in our local copies)
+    SavedHavokPhantom saved_phantom_1;   // physShapePhantomIns_1's phantom: its motion state and capsule
+    SavedHavokPhantom saved_phantom_2;
 };
 
 static_assert(offsetof(HavokChara, current_coords) == 0x10);
@@ -569,7 +575,111 @@ static_assert(offsetof(HavokChara, padding_hitIns) == 0x1e8);
 static_assert(offsetof(HavokChara, unk_1f0) == 0x1f0);
 static_assert(offsetof(HavokChara, padding_2) == 0x248);
 static_assert(offsetof(HavokChara, unk_258) == 0x258);
-static_assert(sizeof(HavokChara) == 0x290);
+static_assert(offsetof(HavokChara, saved_phantom_1) == 0x290);
+
+//The ragdoll's skeleton. Only its bone count is read (FUN_1402b4d90 loops over it).
+struct hkaSkeleton
+{
+    uint8_t padding_0[0x28];   // 0x0 (hkReferencedObject + name)
+    void* m_bones;             // 0x28
+    uint32_t m_bones_len;      // 0x30
+    uint32_t m_bones_cap;      // 0x34
+};
+static_assert(offsetof(hkaSkeleton, m_bones_len) == 0x30);
+
+//A character's ragdoll instance: the rigid bodies, the constraints between them, and the map from skeleton bone to body.
+//Only the fields Init_RagDollIns @1402b3150 and FUN_1402b4d90 use are known.
+struct hkaRagdollInstance
+{
+    uint8_t padding_0[0x10];            // 0x0 (hkReferencedObject)
+    hkpEntity** m_rigidBodies;          // 0x10
+    uint32_t m_rigidBodies_len;         // 0x18
+    uint32_t m_rigidBodies_cap;         // 0x1c
+    void** m_constraints;               // 0x20
+    uint32_t m_constraints_len;         // 0x28
+    uint32_t m_constraints_cap;         // 0x2c
+    int32_t* m_boneToRigidBodyMap;      // 0x30 - one entry per skeleton bone, negative when the bone drives no body
+    uint32_t m_boneToRigidBodyMap_len;  // 0x38
+    uint32_t m_boneToRigidBodyMap_cap;  // 0x3c
+    hkaSkeleton* m_skeleton;            // 0x40
+};
+static_assert(offsetof(hkaRagdollInstance, m_rigidBodies) == 0x10);
+static_assert(offsetof(hkaRagdollInstance, m_constraints) == 0x20);
+static_assert(offsetof(hkaRagdollInstance, m_boneToRigidBodyMap) == 0x30);
+static_assert(offsetof(hkaRagdollInstance, m_skeleton) == 0x40);
+
+//A character's ragdoll. Its bodies are the hurtboxes a damage cast hits while the character is alive: each carries a body-part index
+//(FUN_1403c6850 -> FUN_1402a9d60), and FUN_1402b4d90 maps the character's animation into `pose` and keyframes the bodies to it.
+//FUN_1402b4320 runs the state machine that decides whether a frame updates the bodies at all, so `mode`, the update accumulator and
+//the blend timers are as much rollback state as the body motions themselves.
+static const uint32_t FRPGRAGDOLL_MAX_BODIES = 32;
+static const uint32_t FRPGRAGDOLL_MAX_BONES = 64;
+
+struct FrpgRagdollIns
+{
+    FrpgPhysIns base;                   // 0x0 (type 2, owner ChrIns)
+    uint8_t padding_0[0x18];            // 0x20 (physics data and skeleton mapper pointers; not copied)
+    hkaRagdollInstance* ragdollInstance;  // 0x38
+    FrpgPhysInsElement* body_elements;    // 0x40 (one per body, what their hkpEntity::m_userData points at; not copied)
+    FrpgPhysInsElement* constraint_elements;  // 0x48 (not copied)
+    uint64_t padding_1;                 // 0x50 (not copied)
+    ChrCtrl_AnimationQueue_field0x20* pose;  // 0x58 - the hkaPose the animation is mapped into before keyframing
+    void* controller;                   // 0x60 (hkaRagdollRigidBodyController; not copied)
+    uint32_t unk_68;                    // 0x68
+    uint32_t unk_6c;                    // 0x6c
+    uint64_t unk_70;                    // 0x70
+    uint8_t* body_flags;                // 0x78 - one byte per body (the pointer is not copied, the bytes are)
+    int32_t mode;                       // 0x80 - 0 animation, 1 motor, 2 physical, 4 animation-completed physical
+    int32_t target_mode;                // 0x84 - mode is blended towards this
+    float unk_88;                       // 0x88
+    float update_interval;              // 0x8c - seconds between full updates
+    float update_accumulator;           // 0x90 - time since the last full update
+    uint32_t unk_94;                    // 0x94
+    uint8_t unk_98[8];                  // 0x98 (flags at 0x9b, 0x9c and 0x9d)
+    uint8_t unk_a0[16];                 // 0xa0
+    float blend_time_left;              // 0xb0 (counted down in FUN_1402b4320)
+    float unk_b4;                       // 0xb4
+    float unk_b8;                       // 0xb8
+    float unk_bc;                       // 0xbc
+    uint32_t unk_c0;                    // 0xc0
+    uint32_t unk_c4;                    // 0xc4
+    uint64_t padding_2;                 // 0xc8 (not copied)
+    void* HkxPwvResCap;                 // 0xd0 (not copied)
+    uint32_t unk_d8;                    // 0xd8
+    uint32_t unk_dc;                    // 0xdc
+    uint8_t padding_3[0x20];            // 0xe0 (four pointers built by Init_RagDollIns; not copied)
+    void* unk_100_array;                // 0x100 (hkArray storage; not copied)
+    uint32_t unk_100_array_len;         // 0x108
+    uint32_t unk_100_array_cap;         // 0x10c
+    float target_position[4];           // 0x110 (set from the HavokChara position each update, FUN_140379e10)
+    uint8_t unk_120[16];                // 0x120 (flags at 0x120, 0x121 and 0x123)
+    uint8_t unk_130[64];                // 0x130 (the character transform copied in each update)
+    void* padding_4;                    // 0x170 (not copied)
+    uint8_t* bone_flags;                // 0x178 - one byte per skeleton bone (the pointer is not copied, the bytes are)
+    uint32_t unk_180;                   // 0x180
+    uint32_t unk_184;                   // 0x184
+    void* dbgNode;                      // 0x188 (not copied)
+    float* padding_5;                   // 0x190 (not copied)
+    void* padding_6;                    // 0x198 (not copied)
+    uint8_t unk_1a0[16];                // 0x1a0 (debug draw flags)
+    // Local-only fields (not part of the game struct, only used in our local copies)
+    hkpMotion* saved_body_motions;      // one per ragdollInstance body, in index order
+    uint32_t saved_body_count;
+    uint32_t saved_bone_count;
+};
+static_assert(offsetof(FrpgRagdollIns, ragdollInstance) == 0x38);
+static_assert(offsetof(FrpgRagdollIns, pose) == 0x58);
+static_assert(offsetof(FrpgRagdollIns, body_flags) == 0x78);
+static_assert(offsetof(FrpgRagdollIns, mode) == 0x80);
+static_assert(offsetof(FrpgRagdollIns, update_interval) == 0x8c);
+static_assert(offsetof(FrpgRagdollIns, blend_time_left) == 0xb0);
+static_assert(offsetof(FrpgRagdollIns, HkxPwvResCap) == 0xd0);
+static_assert(offsetof(FrpgRagdollIns, unk_100_array) == 0x100);
+static_assert(offsetof(FrpgRagdollIns, target_position) == 0x110);
+static_assert(offsetof(FrpgRagdollIns, unk_130) == 0x130);
+static_assert(offsetof(FrpgRagdollIns, bone_flags) == 0x178);
+static_assert(offsetof(FrpgRagdollIns, dbgNode) == 0x188);
+static_assert(offsetof(FrpgRagdollIns, saved_body_motions) == 0x1b0);
 
 //One contact in hkpCharacterProxy::m_manifold. Standard Havok hkpRootCdPoint layout:
 //an hkContactPoint (position + separating normal) plus the two collidables that produced it.
@@ -904,7 +1014,8 @@ struct ChrCtrl
     ChrCtrl_AnimationQueue* animationQueue;  // 0x18
     AnimationMediator* animationMediator;    // 0x20
     HavokChara* havokChara;    // 0x28
-    uint8_t padding_2[24];     // 0x30 (ghidra: RagDoll/hkxPwv/aniSkl ptrs; not copied)
+    FrpgRagdollIns* ragdollIns;  // 0x30
+    uint8_t padding_2[16];     // 0x38 (ghidra: hkxPwv/aniSkl ptrs; not copied)
     ActionCtrl* actionctrl;    // 0x48
     uint8_t padding_3[0x30];   // 0x50 (ghidra: chrTaeAnimEvent ptr + name string; not copied)
     uint64_t unk_80;           // 0x80 (former data_1)
@@ -950,6 +1061,8 @@ struct ChrCtrl
 static_assert(offsetof(ChrCtrl, animationQueue) == 0x18);
 static_assert(offsetof(ChrCtrl, animationMediator) == 0x20);
 static_assert(offsetof(ChrCtrl, havokChara) == 0x28);
+static_assert(offsetof(ChrCtrl, ragdollIns) == 0x30);
+static_assert(offsetof(ChrCtrl, actionctrl) == 0x48);
 static_assert(offsetof(ChrCtrl, unk_80) == 0x80);
 static_assert(offsetof(ChrCtrl, unk_90) == 0x90);
 static_assert(offsetof(ChrCtrl, movementActionDeltas) == 0x140);
@@ -1314,7 +1427,9 @@ static_assert(sizeof(ChrIns_field0x18) == 0x80);
 
 struct ChrIns
 {
-    uint8_t padding_0[8 + 0x18];
+    uint8_t padding_0[8];
+    int32_t handle;    // 0x8 (ghidra: PlayerHandle)
+    uint8_t padding_0b[0x14];
     uint64_t field0x18;
     uint8_t padding_0a[0x38];
     void* chrModel;

@@ -44,19 +44,22 @@ static_assert(sizeof(DmgHitRecordManImp_field0x10Elem) == 0x20);
 struct DmgHitRecordManImp
 {
     uint64_t vtable;
-    DmgHitRecordManImp_field0x10Elem* field0x10_array; //offset from array start
-    DmgHitRecordManImp_field0x10Elem* field0x10_array_start;
-    uint64_t padding_0;
-    DmgHitRecordManImp_field0x28Elem* field0x28_array; //offset from array start
-    DmgHitRecordManImp_field0x28Elem* field0x28_array_start;
-    uint32_t field0x10_array_len;
-    uint32_t data_0;
+    DmgHitRecordManImp_field0x10Elem* field0x10_array; //head of the free list, a record in field0x10_array_start
+    DmgHitRecordManImp_field0x10Elem* field0x10_array_start; //96 records
+    DmgHitRecordManImp_field0x10Elem* timed_list; //records with a lifetime, counted down each frame by FUN_1403c4da0 (0x18)
+    DmgHitRecordManImp_field0x28Elem* field0x28_array; //head of the free list, a record in field0x28_array_start
+    DmgHitRecordManImp_field0x28Elem* field0x28_array_start; //96 records
+    uint32_t field0x10_array_len; //pool records in use
+    uint32_t field0x10_heap_count; //records heap-allocated because the pool was empty (DmgHitRecordManImp_Retrieve_Free_0x10Slot)
     uint32_t field0x28_array_len;
-    uint32_t data_1;
+    uint32_t field0x28_heap_count; //likewise (DmgHitRecordManImp_Retrieve_Free_0x28Slot)
 };
 static_assert(offsetof(DmgHitRecordManImp, vtable) == 0);
 static_assert(offsetof(DmgHitRecordManImp, field0x10_array) == 0x8);
 static_assert(offsetof(DmgHitRecordManImp, field0x10_array_start) == 0x10);
+static_assert(offsetof(DmgHitRecordManImp, timed_list) == 0x18);
+static_assert(offsetof(DmgHitRecordManImp, field0x10_heap_count) == 0x34);
+static_assert(offsetof(DmgHitRecordManImp, field0x28_heap_count) == 0x3c);
 static_assert(offsetof(DmgHitRecordManImp, field0x28_array) == 0x20);
 static_assert(offsetof(DmgHitRecordManImp, field0x28_array_start) == 0x28);
 static_assert(offsetof(DmgHitRecordManImp, field0x10_array_len) == 0x30);

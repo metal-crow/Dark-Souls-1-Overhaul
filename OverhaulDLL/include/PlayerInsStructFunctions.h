@@ -170,6 +170,11 @@ void copy_ChrCtrl_AnimationQueue_field0x20(ChrCtrl_AnimationQueue_field0x20* to,
 ChrCtrl_AnimationQueue_field0x20* init_ChrCtrl_AnimationQueue_field0x20();
 void free_ChrCtrl_AnimationQueue_field0x20(ChrCtrl_AnimationQueue_field0x20* to);
 
+//A character's ragdoll: its update state, its mapped pose and the motions of the bodies a damage cast hits
+void copy_FrpgRagdollIns(FrpgRagdollIns* to, FrpgRagdollIns* from, StateTarget target);
+FrpgRagdollIns* init_FrpgRagdollIns();
+void free_FrpgRagdollIns(FrpgRagdollIns* to);
+
 void copy_hkaAnimatedSkeleton(hkaAnimatedSkeleton* to, const hkaAnimatedSkeleton* from);
 hkaAnimatedSkeleton* init_hkaAnimatedSkeleton();
 void free_hkaAnimatedSkeleton(hkaAnimatedSkeleton* to);

@@ -569,6 +569,18 @@ static Step_Bullet_FUNC* Step_Bullet = (Step_Bullet_FUNC*)0x140429940;
 typedef void Step_DamageMan_FUNC(void* damageman, float frame_time);
 static Step_DamageMan_FUNC* Step_DamageMan = (Step_DamageMan_FUNC*)0x1403c8dd0;
 
+//Builds an entry's shapes and phantoms and sets its id to pool_slot << 16. DamageMan_PopHead_DamageEntry passes 0x80 for a heap entry
+typedef void Init_DamageEntry_FUNC(void* damageEntry, int32_t pool_slot);
+static Init_DamageEntry_FUNC* Init_DamageEntry = (Init_DamageEntry_FUNC*)0x1403c5250;
+
+//Returns a pool entry to the free list, or destructs and frees a heap entry. Returns the entry's next
+typedef void* DamageMan_PushHead_DamageEntry_FUNC(void* damageman, void* damageEntry);
+static DamageMan_PushHead_DamageEntry_FUNC* DamageMan_PushHead_DamageEntry = (DamageMan_PushHead_DamageEntry_FUNC*)0x1403ca6e0;
+
+//Destructs the entry's debug menu node, if it has one
+typedef void DamageEntry_DestructDbgNode_FUNC(void* damageEntry);
+static DamageEntry_DestructDbgNode_FUNC* DamageEntry_DestructDbgNode = (DamageEntry_DestructDbgNode_FUNC*)0x1403c7ed0;
+
 typedef void Step_Havok_FUNC(void* FrpgHavokManImp, float frame_time);
 static Step_Havok_FUNC* Step_Havok = (Step_Havok_FUNC*)0x142f9d251;
 
@@ -712,6 +724,24 @@ static const hkpWorld_removePhantom_fn hk_removePhantom = (hkpWorld_removePhanto
 
 typedef void (*hkpWorld_stepDeltaTime_t)(hkpWorld* world, float dt);
 static const hkpWorld_stepDeltaTime_t hkpWorld_stepDeltaTime = (hkpWorld_stepDeltaTime_t)0x1409b6280;
+
+typedef void (*hkpWorld_addPhantomBatch_fn)(hkpWorld* world, hkpSimpleShapePhantom** phantoms, uint32_t numPhantoms);
+static const hkpWorld_addPhantomBatch_fn hk_addPhantomBatch = (hkpWorld_addPhantomBatch_fn)0x1409b2290;
+
+typedef void (*hkpWorld_removePhantomBatch_fn)(hkpWorld* world, hkpSimpleShapePhantom** phantoms, uint32_t numPhantoms);
+static const hkpWorld_removePhantomBatch_fn hk_removePhantomBatch = (hkpWorld_removePhantomBatch_fn)0x1409b28a0;
+
+// hkpRigidBody::setMotionType(newState, preferredActivationState), as FrpgPhysIns calls it (FUN_1402a9670)
+typedef void (*hkpRigidBody_setMotionType_fn)(hkpEntity* body, uint32_t newState, uint32_t preferredActivationState);
+static const hkpRigidBody_setMotionType_fn hk_setMotionType = (hkpRigidBody_setMotionType_fn)0x1409c6610;
+
+//hkpWorldOperationUtil::updateEntityBP: recomputes the entity's AABB if it was invalidated, then updates its broadphase pairs
+typedef void (*hkpWorldOperationUtil_updateEntityBP_fn)(hkpWorld* world, hkpEntity* entity);
+static const hkpWorldOperationUtil_updateEntityBP_fn hk_updateEntityBP = (hkpWorldOperationUtil_updateEntityBP_fn)0x1409d55c0;
+
+//hkpPhantom::updateBroadPhase: moves the phantom's broadphase entry to the given hkAabb (16-aligned min, max) and updates its pairs
+typedef void (*hkpPhantom_updateBroadPhase_fn)(hkpPhantom* phantom, const float* aabb);
+static const hkpPhantom_updateBroadPhase_fn hk_updatePhantomBroadPhase = (hkpPhantom_updateBroadPhase_fn)0x1409cc630;
 
 typedef void (*Destruct_SfxEntry_t)(void* sfx, uint64_t param_2);
 static const Destruct_SfxEntry_t Destruct_SfxEntry = (Destruct_SfxEntry_t)0x140ff9490;

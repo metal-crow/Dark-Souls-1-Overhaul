@@ -111,11 +111,6 @@ private:
     static const uint64_t Destruct_SFXEntry_offset = 0xff9490;
     static const uint64_t Destruct_FxBehaviorNode_offset = 0xfdf530;
 
-    // DamageEntry graveyard: hook the callers to intercept all destructs+frees
-    static const uint64_t Destruct_DamageEntry_offset1 = 0x3ca737;
-    static const uint64_t Destruct_DamageEntry_offset2 = 0x3c8d03;
-    static const uint64_t Destruct_DamageEntry_offset3 = 0x3c9015;
-
     static const uint64_t PlayerIns_Is_NetworkedPlayer_offsets[];
     static const uint64_t PlayerIns_IsHostPlayerIns_offsets[];
 
@@ -260,5 +255,11 @@ void rollback_copy_buffer(void* buffer_dst, void* buffer_src);
 void rollback_free_buffer(void* buffer);
 bool rollback_on_event_callback(GGPOEvent* info);
 bool rollback_log_game_state(char* filename, unsigned char* buffer, int);
+
+#ifdef GGPO_SYNCTEST
+//Unrestored-write detector (Rollback.cpp): player bytes a live frame wrote that loading the previous frame did not put back
+std::string synctest_unrestored_json(size_t top);
+void synctest_unrestored_reset();
+#endif
 
 #endif

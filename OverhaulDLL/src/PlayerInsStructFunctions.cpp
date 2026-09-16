@@ -1,4 +1,6 @@
 #include "PlayerInsStructFunctions.h"
+#include "FrpgHavokManImpStructFunctions.h"
+#include "DamageManStructFunctions.h"
 #include "Rollback.h"
 #include "AttachSysSlotStructsFunctions.h"
 #include "PadManipulatorStructFunctions.h"
@@ -967,12 +969,145 @@ void free_TurnAnim(TurnAnim* to, bool freeself)
 }
 
 
+
+/* ---------------- FrpgRagdollIns ------------------ */
+
+//The hkaPose the character's animation is mapped into before the bodies are keyframed to it. Its arrays are as long as the ragdoll
+//skeleton, so only that many entries are copied; a local copy's arrays are fixed size and the rest of them is never read.
+static void copy_FrpgRagdollIns_pose(ChrCtrl_AnimationQueue_field0x20* to, const ChrCtrl_AnimationQueue_field0x20* from)
+{
+    if (from->field0x8_len > FRPGRAGDOLL_MAX_BONES || from->field0x18_len > FRPGRAGDOLL_MAX_BONES ||
+        from->field0x28_len > FRPGRAGDOLL_MAX_BONES)
+    {
+        FATALERROR("copy_FrpgRagdollIns: the ragdoll pose holds %u local and %u model transforms, only %u are supported",
+            from->field0x8_len, from->field0x18_len, FRPGRAGDOLL_MAX_BONES);
+    }
+    memcpy(to->field0x8, from->field0x8, (size_t)from->field0x8_len * 0x30);
+    to->field0x8_len = from->field0x8_len;
+    memcpy(to->field0x18, from->field0x18, (size_t)from->field0x18_len * 0x30);
+    to->field0x18_len = from->field0x18_len;
+    memcpy(to->field0x28, from->field0x28, (size_t)from->field0x28_len * sizeof(uint32_t));
+    to->field0x28_len = from->field0x28_len;
+    to->unk_38 = from->unk_38;
+    to->unk_48 = from->unk_48;
+    to->unk_4c = from->unk_4c;
+}
+
+void copy_FrpgRagdollIns(FrpgRagdollIns* to, FrpgRagdollIns* from, StateTarget target)
+{
+    //the game object owns the ragdoll instance; a local copy has none, and holds the bodies' motions by value instead
+    hkaRagdollInstance* instance = target == StateTarget::ToGame ? to->ragdollInstance : from->ragdollInstance;
+    uint32_t bodies = from->saved_body_count;
+    uint32_t bones = from->saved_bone_count;
+    if (target != StateTarget::Copy)
+    {
+        if (instance == NULL || instance->m_skeleton == NULL)
+        {
+            FATALERROR("copy_FrpgRagdollIns: the ragdoll has no instance");
+        }
+        bodies = instance->m_rigidBodies_len;
+        bones = instance->m_skeleton->m_bones_len;
+        if (bodies > FRPGRAGDOLL_MAX_BODIES || bones > FRPGRAGDOLL_MAX_BONES)
+        {
+            FATALERROR("copy_FrpgRagdollIns: the ragdoll has %u bodies and %u bones, only %u and %u are supported",
+                bodies, bones, FRPGRAGDOLL_MAX_BODIES, FRPGRAGDOLL_MAX_BONES);
+        }
+        if (target == StateTarget::ToGame && (bodies != from->saved_body_count || bones != from->saved_bone_count))
+        {
+            FATALERROR("copy_FrpgRagdollIns: the ragdoll had %u bodies and %u bones when it was saved, it has %u and %u now",
+                from->saved_body_count, from->saved_bone_count, bodies, bones);
+        }
+    }
+    if (from->unk_100_array_len != 0)
+    {
+        FATALERROR("copy_FrpgRagdollIns: the ragdoll's 0x100 array holds %u entries, which rollback does not restore",
+            from->unk_100_array_len);
+    }
+
+    copy_FrpgPhysIns(&to->base, &from->base, target);
+    to->unk_68 = from->unk_68;
+    to->unk_6c = from->unk_6c;
+    to->unk_70 = from->unk_70;
+    to->mode = from->mode;
+    to->target_mode = from->target_mode;
+    to->unk_88 = from->unk_88;
+    to->update_interval = from->update_interval;
+    to->update_accumulator = from->update_accumulator;
+    to->unk_94 = from->unk_94;
+    memcpy(to->unk_98, from->unk_98, sizeof(to->unk_98));
+    memcpy(to->unk_a0, from->unk_a0, sizeof(to->unk_a0));
+    to->blend_time_left = from->blend_time_left;
+    to->unk_b4 = from->unk_b4;
+    to->unk_b8 = from->unk_b8;
+    to->unk_bc = from->unk_bc;
+    to->unk_c0 = from->unk_c0;
+    to->unk_c4 = from->unk_c4;
+    to->unk_d8 = from->unk_d8;
+    to->unk_dc = from->unk_dc;
+    memcpy(to->target_position, from->target_position, sizeof(to->target_position));
+    memcpy(to->unk_120, from->unk_120, sizeof(to->unk_120));
+    memcpy(to->unk_130, from->unk_130, sizeof(to->unk_130));
+    to->unk_180 = from->unk_180;
+    to->unk_184 = from->unk_184;
+
+    memcpy(to->body_flags, from->body_flags, bodies);
+    memcpy(to->bone_flags, from->bone_flags, bones);
+    copy_FrpgRagdollIns_pose(to->pose, from->pose);
+
+    //the bodies: the game object reads and writes its own, a local copy holds their motions in index order. Their AABBs are
+    //recomputed by copy_FrpgHavokManImp, which runs after every owner has been restored.
+    if (target == StateTarget::ToGame)
+    {
+        for (uint32_t i = 0; i < bodies; i++)
+        {
+            copy_hkpEntity_motion(instance->m_rigidBodies[i], &from->saved_body_motions[i]);
+        }
+    }
+    else
+    {
+        for (uint32_t i = 0; i < bodies; i++)
+        {
+            to->saved_body_motions[i] = target == StateTarget::ToLocal ? instance->m_rigidBodies[i]->m_motion
+                                                                      : from->saved_body_motions[i];
+        }
+        to->saved_body_count = bodies;
+        to->saved_bone_count = bones;
+    }
+}
+
+FrpgRagdollIns* init_FrpgRagdollIns()
+{
+    FrpgRagdollIns* local_FrpgRagdollIns = (FrpgRagdollIns*)malloc_(sizeof(FrpgRagdollIns));
+
+    local_FrpgRagdollIns->pose = init_ChrCtrl_AnimationQueue_field0x20();
+    local_FrpgRagdollIns->body_flags = (uint8_t*)malloc_(FRPGRAGDOLL_MAX_BODIES);
+    local_FrpgRagdollIns->bone_flags = (uint8_t*)malloc_(FRPGRAGDOLL_MAX_BONES);
+    local_FrpgRagdollIns->saved_body_motions = (hkpMotion*)malloc_(sizeof(hkpMotion) * FRPGRAGDOLL_MAX_BODIES);
+
+    return local_FrpgRagdollIns;
+}
+
+void free_FrpgRagdollIns(FrpgRagdollIns* to)
+{
+    free_ChrCtrl_AnimationQueue_field0x20(to->pose);
+    free(to->body_flags);
+    free(to->bone_flags);
+    free(to->saved_body_motions);
+
+    free(to);
+}
+
 void copy_ChrCtrl(ChrCtrl* to, const ChrCtrl* from, StateTarget target)
 {
     to->unk_8 = from->unk_8;
     copy_ChrCtrl_AnimationQueue(to->animationQueue, from->animationQueue, target);
     copy_AnimationMediator(to->animationMediator, from->animationMediator);
     copy_HavokChara(to->havokChara, from->havokChara, target);
+    if ((target == StateTarget::ToGame ? to->ragdollIns : from->ragdollIns) == NULL)
+    {
+        FATALERROR("copy_ChrCtrl: the character has no ragdoll");
+    }
+    copy_FrpgRagdollIns(to->ragdollIns, from->ragdollIns, target);
     copy_ActionCtrl(to->actionctrl, from->actionctrl, target);
     to->unk_80 = from->unk_80;
     memcpy(&to->unk_90, &from->unk_90, 0x118);
@@ -988,6 +1123,7 @@ ChrCtrl* init_ChrCtrl()
     local_ChrCtrl->animationQueue = init_ChrCtrl_AnimationQueue();
     local_ChrCtrl->animationMediator = init_AnimationMediator();
     local_ChrCtrl->havokChara = init_HavokChara();
+    local_ChrCtrl->ragdollIns = init_FrpgRagdollIns();
     local_ChrCtrl->actionctrl = init_ActionCtrl();
     local_ChrCtrl->walkAnim_Twist = init_WalkAnim_Twist();
 
@@ -999,6 +1135,7 @@ void free_ChrCtrl(ChrCtrl* to, bool freeself)
     free_ChrCtrl_AnimationQueue(to->animationQueue);
     free_AnimationMediator(to->animationMediator);
     free_HavokChara(to->havokChara);
+    free_FrpgRagdollIns(to->ragdollIns);
     free_ActionCtrl(to->actionctrl);
     free_WalkAnim_Twist(to->walkAnim_Twist);
 
@@ -1264,7 +1401,23 @@ void copy_HavokChara(HavokChara* to, const HavokChara* from, StateTarget target)
 {
     memcpy(&to->RotAngleUnkWep, &from->RotAngleUnkWep, 0x38);
     copy_hkpCharacterProxy(to->char_proxy, from->char_proxy, target);
-    //should we copy capsule_shape_1/2 and physShapePhantomIns_1/2?
+    //the two collision phantoms belong to the HavokChara. copy_FrpgHavokManImp moves their broadphase entries afterwards,
+    //once every owner has been restored
+    if (target == StateTarget::ToLocal)
+    {
+        copy_SavedHavokPhantom(&to->saved_phantom_1, from->physShapePhantomIns_1);
+        copy_SavedHavokPhantom(&to->saved_phantom_2, from->physShapePhantomIns_2);
+    }
+    else if (target == StateTarget::ToGame)
+    {
+        copy_SavedHavokPhantom(to->physShapePhantomIns_1, &from->saved_phantom_1);
+        copy_SavedHavokPhantom(to->physShapePhantomIns_2, &from->saved_phantom_2);
+    }
+    else
+    {
+        to->saved_phantom_1 = from->saved_phantom_1;
+        to->saved_phantom_2 = from->saved_phantom_2;
+    }
     memcpy(&to->unk_60, &from->unk_60, 0x98);
     memcpy(&to->unk_100, &from->unk_100, 0xe8);
     memcpy(&to->unk_1f0, &from->unk_1f0, 0x58);
@@ -1295,8 +1448,8 @@ void free_HavokChara(HavokChara* to)
 //hkArray needs Havok's allocator, and handing it storage of ours would mean fighting its ownership
 //flags. In practice this is not a limitation: the manifold holds a handful of contacts and hkArray
 //capacity only ever grows, so the live capacity is >= the saved length except in the first frames
-//after a character spawns. If it ever is not, say so rather than silently restoring a truncated
-//contact set, which would be a desync that looks like a physics bug.
+//after a character spawns. If it ever is not, stop: restoring a truncated contact set would be a desync
+//that looks like a physics bug.
 static void copy_hkpCharacterProxy_manifold(hkpCharacterProxy* to, const hkpCharacterProxy* from, StateTarget target)
 {
     const int32_t n = from->m_manifold_len;
@@ -1306,8 +1459,7 @@ static void copy_hkpCharacterProxy_manifold(hkpCharacterProxy* to, const hkpChar
         const uint32_t live_cap = to->m_manifold_cap & HKARRAY_CAPACITY_MASK;
         if (n > 0 && (to->m_manifold == NULL || live_cap < (uint32_t)n))
         {
-            ConsoleWrite("copy_hkpCharacterProxy: cannot restore %d manifold contacts, live capacity is %u", n, live_cap);
-            return;
+            FATALERROR("copy_hkpCharacterProxy: cannot restore %d manifold contacts, live capacity is %u", n, live_cap);
         }
         if (n > 0)
         {
@@ -1338,8 +1490,11 @@ void copy_hkpCharacterProxy(hkpCharacterProxy* to, const hkpCharacterProxy* from
     copy_hkpCharacterProxy_manifold(to, from, target);
     memcpy(&to->m_velocity, &from->m_velocity, 0x20);
 
-    //since the phantoms are never destroyed due to our graveyard mechanism, it's safe to just use the raw pointer. it should always be valid
-    to->HkpSimpleShapePhantom = from->HkpSimpleShapePhantom;
+    //the phantom lives as long as the character, so a load leaves the live pointer alone
+    if (target != StateTarget::ToGame)
+    {
+        to->HkpSimpleShapePhantom = from->HkpSimpleShapePhantom;
+    }
 
     memcpy(&to->m_dynamicFriction, &from->m_dynamicFriction, 0x40);
     memcpy(&to->m_maxSlopeCosine, &from->m_maxSlopeCosine, 24);
@@ -1930,6 +2085,7 @@ static void serialize_ActionCtrl_0x30Substruct(StateVisitor&, const ActionCtrl_0
 static void serialize_EzState_detail_EzStateMachineImpl(StateVisitor&, const EzState_detail_EzStateMachineImpl*);
 static void serialize_EzStateRegisterSet(StateVisitor&, const EzStateRegisterSet*);
 static void serialize_HavokChara(StateVisitor&, const HavokChara*);
+static void serialize_FrpgRagdollIns(StateVisitor&, const FrpgRagdollIns*);
 static void serialize_hkpCharacterProxy(StateVisitor&, const hkpCharacterProxy*);
 static void serialize_HitIns(StateVisitor&, const HitIns*);
 static void serialize_AnimationMediator(StateVisitor&, const AnimationMediator*);
@@ -2326,8 +2482,63 @@ static void serialize_HavokChara(StateVisitor& v, const HavokChara* h)
     v.blob("unk_100", &h->unk_100, 0xe8);
     v.blob("unk_1f0", &h->unk_1f0, 0x58);
     v.blob("unk_258", &h->unk_258, 0x38);
+    serialize_SavedHavokPhantom(v, "phantom1", &h->saved_phantom_1);
+    serialize_SavedHavokPhantom(v, "phantom2", &h->saved_phantom_2);
     v.end();
 }
+
+//The ragdoll's own update state and its bodies. The bodies are the hurtboxes a damage cast hits, and `mode`, the update accumulator
+//and the blend timers decide whether a frame moves them at all, so all of it is compared.
+static void serialize_FrpgRagdollIns(StateVisitor& v, const FrpgRagdollIns* r)
+{
+    v.begin("FrpgRagdollIns");
+    v.field("type", r->base.type);
+    v.field("unk_68", r->unk_68);
+    v.field("unk_6c", r->unk_6c);
+    v.field("unk_70", r->unk_70);
+    v.field("mode", r->mode);
+    v.field("target_mode", r->target_mode);
+    v.field("unk_88", r->unk_88);
+    v.field("update_interval", r->update_interval);
+    v.field("update_accumulator", r->update_accumulator);
+    v.field("unk_94", r->unk_94);
+    v.blob("unk_98", r->unk_98, sizeof(r->unk_98));
+    v.blob("unk_a0", r->unk_a0, sizeof(r->unk_a0));
+    v.field("blend_time_left", r->blend_time_left);
+    v.field("unk_b4", r->unk_b4);
+    v.field("unk_b8", r->unk_b8);
+    v.field("unk_bc", r->unk_bc);
+    v.field("unk_c0", r->unk_c0);
+    v.field("unk_c4", r->unk_c4);
+    v.field("unk_d8", r->unk_d8);
+    v.field("unk_dc", r->unk_dc);
+    for (int i = 0; i < 4; i++) v.field("target_position", r->target_position[i]);
+    v.blob("unk_120", r->unk_120, sizeof(r->unk_120));
+    v.blob("unk_130", r->unk_130, sizeof(r->unk_130));
+    v.field("unk_180", r->unk_180);
+    v.field("unk_184", r->unk_184);
+    v.blob("body_flags", r->body_flags, r->saved_body_count);
+    v.blob("bone_flags", r->bone_flags, r->saved_bone_count);
+
+    v.begin("pose");
+    v.count("local_transforms", r->pose->field0x8_len);
+    v.blob("local_transforms", r->pose->field0x8, (size_t)r->pose->field0x8_len * 0x30);
+    v.count("model_transforms", r->pose->field0x18_len);
+    v.blob("model_transforms", r->pose->field0x18, (size_t)r->pose->field0x18_len * 0x30);
+    v.blob("pose_bone_flags", r->pose->field0x28, (size_t)r->pose->field0x28_len * sizeof(uint32_t));
+    v.field("unk_38", r->pose->unk_38);
+    v.field("unk_48", r->pose->unk_48);
+    v.field("unk_4c", r->pose->unk_4c);
+    v.end();
+
+    v.count("bodies", r->saved_body_count);
+    for (uint32_t i = 0; i < r->saved_body_count; i++)
+    {
+        serialize_hkpMotion(v, &r->saved_body_motions[i]);
+    }
+    v.end();
+}
+
 
 // ---- EzState / ActionCtrl ---------------------------------------------------
 
@@ -2596,6 +2807,7 @@ static void serialize_ChrCtrl(StateVisitor& v, const ChrCtrl* c)
     serialize_ChrCtrl_AnimationQueue(v, c->animationQueue);
     serialize_AnimationMediator(v, c->animationMediator);
     serialize_HavokChara(v, c->havokChara);
+    serialize_FrpgRagdollIns(v, c->ragdollIns);
     serialize_ActionCtrl(v, c->actionctrl);
     v.field("unk_80", c->unk_80);
     v.blob("unk_90", &c->unk_90, 0x118);
