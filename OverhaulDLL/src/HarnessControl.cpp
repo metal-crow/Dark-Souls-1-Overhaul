@@ -22,7 +22,7 @@
       frame                         {"frame":N,"confirmed_frame":M} from ggpo_get_frame_info
       input                         the last local RollbackInput sent to GGPO, as named fields
       rollback on|off|toggle        Rollback::rollbackEnabled (F6). Set BEFORE the other player joins.
-      network on|off                Rollback::networkTest (F7, the lockstep test path)
+      network on|off                Rollback::networkTest (F7) -- ROLLBACK_INPUT_TESTING only
       record arm|disarm             RollbackReplay::record_armed (F12), applies at next session start
       record file <path>            file the next recording is written to
       replay file <path>            file replayed at next session start ("replay off" disables)
@@ -32,7 +32,6 @@
       script neutral on|off         zero player-driven fields every frame
       script name <text>            label for status/logs
       script status                 just the script part of status
-      hotkey gsave|gload|isave|iload  the F8-F11 state/input save-restore tests
       end_session                   Rollback::rollback_end_session()
       log <text>                    write "HARNESS: <text>" into the mod log (marker for alignment)
       subscribe                     turn this connection into a log stream
@@ -43,6 +42,10 @@
       dump_status                   dump_requested / dump_frame / dump_confirmed / dump_size / dump_file
       dump_get                      the captured text (+ dump_status fields); large (hundreds of KB)
       probe                         per connected player: hp, max_hp, x, y, z, rot -- a cheap "what is happening" view
+      synctest [reset]              GGPO_SYNCTEST builds: replayed-frame mismatch counts per subsystem
+                                    (also in status); reset zeroes them and re-arms the state dumps
+      synctest dump <subsys> [f|+n] only dump mismatches in these subsystems (all|none|player,damage,...),
+                                    from frame f; also re-arms the dump budget
       help                          list commands
 */
 
@@ -61,6 +64,7 @@
 #include "RollbackReplay.h"
 #include "RollbackScript.h"
 #include "StateHash.h"
+#include "VirtualPad.h"
 
 #include <algorithm>
 #include <atomic>
@@ -211,7 +215,9 @@ namespace
         bool loaded = Game::playerchar_is_loaded();
         s += ",\"char_loaded\":" + b2s(loaded);
         s += ",\"rollback_enabled\":" + b2s(Rollback::rollbackEnabled);
+#if ROLLBACK_INPUT_TESTING
         s += ",\"network_test\":" + b2s(Rollback::networkTest);
+#endif
         s += ",\"ggpo_started\":" + b2s(Rollback::ggpoStarted);
         s += ",\"ggpo_ready\":" + q(ready_name(Rollback::ggpoReady));
         int frame, confirmed;
@@ -247,8 +253,23 @@ namespace
         s += ",\"replay_file\":" + q(RollbackReplay::replay_file);
         s += ",\"record_file\":" + q(RollbackReplay::record_file);
         s += ",\"script\":" + RollbackScript::status_json();
+#ifdef GGPO_SYNCTEST
+        s += ",\"synctest\":" + RollbackHash::synctest_json();
+#endif
         return s;
     }
+
+#if ROLLBACK_INPUT_TESTING
+    std::string network_test_fields()
+    {
+        std::string s = "\"network_test\":" + b2s(Rollback::networkTest);
+        s += ",\"role\":" + q(Rollback::networkTestRole == NetworkTestRole::Send ? "send" : "recv");
+        s += ",\"sent\":" + std::to_string(Rollback::networkTestSent);
+        s += ",\"received\":" + std::to_string(Rollback::networkTestRecv);
+        s += ",\"missed\":" + std::to_string(Rollback::networkTestMissed);
+        return s;
+    }
+#endif
 
     std::string execute(const std::string& line)
     {
@@ -279,14 +300,30 @@ namespace
             return ok_json(extra);
         }
 
+#if ROLLBACK_INPUT_TESTING
         if (cmd == "network")
         {
-            bool v;
-            if (!parse_on_off(sub, Rollback::networkTest, &v)) return err_json("usage: network on|off|toggle");
+            //no-GGPO input loopback: "network role send" on the instance holding the controller,
+            //"network role recv" on the other, then "network on" on both.
+            if (sub == "role")
+            {
+                const std::string r = a.size() > 2 ? a[2] : "";
+                if (r == "send") Rollback::networkTestRole = NetworkTestRole::Send;
+                else if (r == "recv") Rollback::networkTestRole = NetworkTestRole::Recv;
+                else return err_json("usage: network role send|recv");
+                Rollback::networkTestSent = Rollback::networkTestRecv = Rollback::networkTestMissed = 0;
+                ConsoleWrite("HARNESS: networkTest role %s", r.c_str());
+                return ok_json(network_test_fields());
+            }
+            if (sub == "status") return ok_json(network_test_fields());
+            bool v = false;
+            if (!parse_on_off(sub, Rollback::networkTest, &v)) return err_json("usage: network on|off|toggle | network role send|recv | network status");
             Rollback::networkTest = v;
-            ConsoleWrite("HARNESS: netcode test %d", (int)v);
-            return ok_json("\"network_test\":" + b2s(v));
+            Rollback::networkTestSent = Rollback::networkTestRecv = Rollback::networkTestMissed = 0;
+            ConsoleWrite("HARNESS: networkTest %d", v);
+            return ok_json(network_test_fields());
         }
+#endif
 
         if (cmd == "record")
         {
@@ -365,16 +402,6 @@ namespace
             return err_json("usage: script load <path> | add <directive> | clear | neutral on|off | name <text> | status");
         }
 
-        if (cmd == "hotkey")
-        {
-            if (sub == "gsave") Rollback::gsave = true;
-            else if (sub == "gload") Rollback::gload = true;
-            else if (sub == "isave") Rollback::isave = true;
-            else if (sub == "iload") Rollback::iload = true;
-            else return err_json("usage: hotkey gsave|gload|isave|iload");
-            return ok_json("\"hotkey\":" + q(sub));
-        }
-
         if (cmd == "end_session")
         {
             bool was = Rollback::ggpoStarted;
@@ -391,6 +418,46 @@ namespace
         }
 
         // ---- determinism oracle (StateHash.h) ----
+#ifdef GGPO_SYNCTEST
+        if (cmd == "synctest")
+        {
+            if (sub == "reset")
+            {
+                RollbackHash::synctest = RollbackHash::SyncTestStats{};
+            }
+            else if (sub == "dump")
+            {
+                uint32_t mask;
+                if (a.size() < 3 || !RollbackHash::synctest_parse_mask(a[2], mask))
+                    return err_json("usage: synctest dump <all|none|player,bullet,damage,havok,throw,dmghit> [frame|+n]");
+                int from_frame = -1;
+                if (a.size() > 3)
+                {
+                    int frame, confirmed;
+                    frame_info(&frame, &confirmed);
+                    from_frame = a[3][0] == '+' ? frame + atoi(a[3].c_str() + 1) : atoi(a[3].c_str());
+                }
+                RollbackHash::synctest_dump.mask = mask;
+                RollbackHash::synctest_dump.from_frame = from_frame;
+                RollbackHash::synctest.dump_files_written = 0;
+            }
+            else if (sub == "unrestored")
+            {
+                if (a.size() > 2 && a[2] == "reset")
+                {
+                    synctest_unrestored_reset();
+                }
+                size_t top = (a.size() > 2 && a[2] != "reset") ? (size_t)atoi(a[2].c_str()) : 40;
+                return ok_json("\"unrestored\":" + synctest_unrestored_json(top));
+            }
+            else if (!sub.empty())
+            {
+                return err_json("usage: synctest [reset | dump <subsystems> [frame|+n] | unrestored [top|reset]]");
+            }
+            return ok_json("\"synctest\":" + RollbackHash::synctest_json());
+        }
+#endif
+
         if (cmd == "hashes")
         {
             int since = -1;
@@ -467,14 +534,132 @@ namespace
             return ok_json(s);
         }
 
+        //Per-player view of what the input path actually delivered. Press the button in
+        //question and read this on BOTH instances: it says whether the button bit arrived,
+        //whether Step_PadManipulator turned it into an action, and whether the item/weapon
+        //state that cannot be derived locally came across.
+#if ROLLBACK_INPUT_TESTING
+        if (cmd == "inputdiag")
+        {
+            if (sub == "reset")
+            {
+                for (uint32_t i = 0; i < GGPO_MAX_PLAYERS; i++) Rollback::inputDiag[i] = InputDiag{};
+                return ok_json("\"reset\":true");
+            }
+            std::string s = "\"players\":[";
+            int n = 0;
+            for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
+            {
+                auto p = Game::get_connected_player(i);
+                if (!p.has_value() || p.value() == 0) continue;
+                PlayerIns* pi = (PlayerIns*)p.value();
+                const RollbackInput& in = Rollback::lastAppliedInput[i];
+                if (n) s += ",";
+                s += "{\"slot\":" + std::to_string(i);
+                s += ",\"local\":" + b2s(i == 0);
+                const InputDiag& d = Rollback::inputDiag[i];
+                //the latched view -- this is the one to read after pressing something
+                s += ",\"seen\":{\"frames\":" + std::to_string(d.frames);
+                s += ",\"use\":" + b2s(d.use_seen != 0);
+                s += ",\"twohand\":" + std::to_string(d.twohand_seen);
+                s += ",\"left_slot\":" + std::to_string(d.left_slot_or);
+                s += ",\"right_slot\":" + std::to_string(d.right_slot_or);
+                s += ",\"item_override\":" + std::to_string(d.item_override_last);
+                s += ",\"l_index_mask\":" + std::to_string(d.l_index_mask);
+                s += ",\"r_index_mask\":" + std::to_string(d.r_index_mask);
+                s += ",\"style_mask\":" + std::to_string(d.style_mask);
+                s += ",\"enable\":" + std::to_string(d.enable_or);
+                s += ",\"gate_skip\":" + std::to_string(d.gate_skip);
+                s += ",\"recv_state\":" + std::to_string(d.recv_state);
+                s += ",\"item_use_override\":" + std::to_string(d.item_use_override);
+                s += ",\"attack\":" + b2s(d.attack_seen != 0);
+                s += ",\"x_read\":" + std::to_string(d.x_read);
+                s += ",\"menu109\":" + std::to_string(d.menu109);
+                s += ",\"bow_precision\":" + std::to_string(d.bow_precision);
+                s += ",\"chr_2a6\":" + std::to_string(d.chr_2a6_or);
+                {
+                    VirtualPadState seen{};
+                    seen.buttons = d.buttons_or;
+                    s += ",\"buttons\":" + VirtualPad::state_json(&seen);
+                }
+                s += "}";
+                s += ",\"item_override\":" + std::to_string(Rollback::item_override_for(i));
+                s += ",\"in_curUsingInventoryItemId\":" + std::to_string((int32_t)in.curUsingInventoryItemId);
+                s += ",\"in_curSelectedQuickbarItemId\":" + std::to_string((int32_t)in.curSelectedQuickbarItemId);
+                    s += ",\"in_pad\":" + VirtualPad::state_json(&in.vpad.pad);
+                if (pi->chrins.padManipulator != NULL)
+                {
+                    ChrManipulator* cm = &pi->chrins.padManipulator->chrManipulator;
+                    s += ",\"use_cur\":" + b2s(cm->CurrentFrame_ActionInputs.use_ButtonPressed != 0);
+                    s += ",\"use_prev\":" + b2s(cm->PrevFrame_ActionInputs.use_ButtonPressed != 0);
+                    s += ",\"change_2handing_state\":" + std::to_string(cm->change_2handing_state);
+                    s += ",\"left_hand_slot_selected\":" + std::to_string(cm->left_hand_slot_selected);
+                    s += ",\"right_hand_slot_selected\":" + std::to_string(cm->right_hand_slot_selected);
+                }
+                if (pi->playergamedata != NULL)
+                {
+                    ChrAsm& ca = pi->playergamedata->equipGameData.chrasm;
+                    s += ",\"equipped_weapon_style\":" + std::to_string(ca.equipped_weapon_style);
+                    s += ",\"l_hand_equipped_index\":" + std::to_string(ca.l_hand_equipped_index);
+                    s += ",\"r_hand_equipped_index\":" + std::to_string(ca.r_hand_equipped_index);
+                    s += ",\"itemBeingUsedFromInventory\":" + std::to_string((int32_t)pi->playergamedata->equipGameData.itemInventoryIdCurrentlyBeingUsedFromInventory);
+                }
+                s += "}";
+                n++;
+            }
+            s += "]";
+            return ok_json(s);
+        }
+#endif
+
+#if ROLLBACK_INPUT_TESTING
+        if (cmd == "pad")
+        {
+            VirtualPad::install();
+            if (sub == "reset")
+            {
+                VirtualPad::reset_diagnostics();
+                return ok_json(VirtualPad::status_json());
+            }
+#if VIRTUALPAD_SELFTEST
+            //Passthrough round-trip: replay the pad back through the stubs for N frames, so
+            //the id set can be proven complete (unknown_button_ids stays empty) and replay
+            //itself is exercised, without needing a second machine.
+            if (sub == "selftest")
+            {
+                long frames = a.size() > 2 ? strtol(a[2].c_str(), NULL, 10) : 300;
+                if (frames <= 0 || frames > 60 * 60 * 5) return err_json("usage: pad selftest [frames 1..18000]");
+                VirtualPad::selftest_begin((uint32_t)frames);
+                return ok_json(VirtualPad::status_json());
+            }
+#endif
+            if (sub.empty() || sub == "status")
+            {
+                return ok_json(VirtualPad::status_json());
+            }
+#if VIRTUALPAD_SELFTEST
+            return err_json("usage: pad [status] | pad reset | pad selftest [frames]");
+#else
+            return err_json("usage: pad [status] | pad reset");
+#endif
+        }
+#endif
+
         if (cmd == "help")
         {
-            return ok_json("\"commands\":[\"ping\",\"status\",\"frame\",\"input\",\"rollback on|off|toggle\",\"network on|off\","
+            return ok_json("\"commands\":[\"ping\",\"status\",\"frame\",\"input\",\"rollback on|off|toggle\","
                            "\"record arm|disarm\",\"record file <path>\",\"replay file <path>\",\"replay off\","
                            "\"script load <path>\",\"script add <directive>\",\"script clear\",\"script neutral on|off\","
-                           "\"script name <text>\",\"script status\",\"hotkey gsave|gload|isave|iload\",\"end_session\","
+                           "\"script name <text>\",\"script status\",\"end_session\","
                            "\"log <text>\",\"subscribe\",\"hashes [since] [max]\",\"dump_at <frame>|+<n>\",\"dump_status\","
-                           "\"dump_get\",\"probe\",\"help\"]");
+                           "\"dump_get\",\"probe\""
+#if ROLLBACK_INPUT_TESTING
+                           ",\"inputdiag\",\"network on|off\",\"network role send|recv\",\"network status\",\"pad [status|reset]\""
+#if VIRTUALPAD_SELFTEST
+                           ",\"pad selftest N\""
+#endif
+#endif
+                           ",\"help\"]");
         }
 
         return err_json("unknown command '" + cmd + "' (try help)");
@@ -670,6 +855,24 @@ void HarnessControl::start()
     if (port <= 0 || port > 65535)
     {
         return;   // disabled: the normal case for players
+    }
+
+    //An early-frame state dump has to be armed before the GGPO session exists, and no
+    //control-plane command can be: the peer joins during launch/pairing, so by the time an
+    //orchestrator gets a turn the session is already hundreds of frames in (measured: frame
+    //426 at the earliest a "dump_at" could land). Arming it from the environment at startup is
+    //the only way to catch frame 0. RollbackHash::reset_session deliberately preserves a
+    //pending request across the session boundary so this survives until the session starts.
+    char dumpbuf[32] = {};
+    DWORD dn = GetEnvironmentVariableA("DSR_HARNESS_DUMP_FRAME", dumpbuf, sizeof(dumpbuf));
+    if (dn > 0 && dn < sizeof(dumpbuf))
+    {
+        int f = atoi(dumpbuf);
+        if (f >= 0)
+        {
+            RollbackHash::dump_request_frame = f;
+            ConsoleWrite("HARNESS: state dump pre-armed for frame %d from DSR_HARNESS_DUMP_FRAME", f);
+        }
     }
 
     ConsoleWrite_tap = &log_tap;

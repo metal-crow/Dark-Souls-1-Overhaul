@@ -98,6 +98,28 @@ public:
         }
     }
 
+    // Real, live state that is deliberately OUT OF SCOPE for the comparison, and so is
+    // expected to differ between the two instances. Distinct from padding(): padding is
+    // bytes the game never writes, this is state the game does write but that we have
+    // chosen not to synchronise (yet). Same treatment -- fold the length so a layout
+    // change is still caught, but not the contents -- with its own tag and print text so a
+    // dump diff says which of the two reasons applies.
+    void excluded(const char* n, size_t len)
+    {
+        tag('x'); fold(&len, sizeof(len));
+        if (mode == Mode::Print)
+        {
+            line_begin(n);
+            _out += "<excluded "; _out += std::to_string(len); _out += "B>\n";
+        }
+    }
+
+    // Print-only annotation. Never folded into the digest, so it can describe state that is deliberately not compared.
+    void note(const char* n, const std::string& text)
+    {
+        if (mode == Mode::Print) { line_begin(n); _out += text; _out += "\n"; }
+    }
+
     // Pointer that indexes a known array -> canonical element index.
     void ptr_index(const char* n, const void* p, const void* base, size_t stride)
     {

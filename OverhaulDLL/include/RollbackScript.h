@@ -12,8 +12,9 @@
 #include <vector>
 #include <type_traits>
 
-#include "Rollback.h"               // RollbackInput / PadManipulatorPacked
-#include "DarkSoulsOverhaulMod.h"   // ConsoleWrite
+#include "Rollback.h"
+#include "VirtualPad.h"
+#include "DarkSoulsOverhaulMod.h"
 
 /*
  * rollback test harness feature: scripted, deterministic local input.
@@ -72,11 +73,10 @@
 // Wire layout, documented for the Python side (harness_client.py decodes
 // rollback_recording.bin with these offsets). If a static_assert fires here the
 // Python FIELD table must be updated to match.
-static_assert(sizeof(PadManipulatorPacked) == 137, "PadManipulatorPacked layout changed; update harness_client.py");
-static_assert(offsetof(RollbackInput, padmanipulator) == 5, "RollbackInput layout changed; update harness_client.py");
-static_assert(offsetof(RollbackInput, curSelectedMagicSlot) == 142, "RollbackInput layout changed; update harness_client.py");
-static_assert(offsetof(RollbackInput, equipment_array) == 151, "RollbackInput layout changed; update harness_client.py");
-static_assert(sizeof(RollbackInput) == 231, "RollbackInput layout changed; update harness_client.py");
+static_assert(offsetof(RollbackInput, vpad) == 4, "RollbackInput layout changed; update harness_client.py");
+static_assert(offsetof(RollbackInput, curSelectedMagicSlot) == 72, "RollbackInput layout changed; update harness_client.py");
+static_assert(offsetof(RollbackInput, equipment_array) == 81, "RollbackInput layout changed; update harness_client.py");
+static_assert(sizeof(RollbackInput) == 161, "RollbackInput layout changed; update harness_client.py");
 
 namespace RollbackScript
 {
@@ -93,7 +93,7 @@ namespace RollbackScript
         const char* name;
         void (*set)(RollbackInput*, double);
         double (*get)(const RollbackInput*);
-        bool button;       // an action-button bit: participates in any_action_inputted
+        bool button;       // an action-button bit
         bool neutral_zero; // zeroed by !neutral (player-driven, not state-derived)
         double neutral_value;
     };
@@ -108,10 +108,16 @@ namespace RollbackScript
         [](RollbackInput* i, double v) { i->EXPR = ((unsigned)(long long)v) & 3u; }, \
         [](const RollbackInput* i) -> double { return (double)(i->EXPR); }, false, NEUT, 0.0 }
 
+
+// VirtualPad arm. Addressed by PadDeviceInputs id rather than by action name, deliberately:
+// which id an action produces is a measured fact (see dev_scripts/rollback_harness/verify_pad.py,
+// "guided" mode prints it per action), not something to guess at in a table here.
+#define RS_PADBTN(SLOT, NAME) { NAME,         [](RollbackInput* i, double v) { if (v != 0.0) i->vpad.pad.buttons |= (1u << (SLOT)); else i->vpad.pad.buttons &= ~(1u << (SLOT)); },         [](const RollbackInput* i) -> double { return (double)((i->vpad.pad.buttons >> (SLOT)) & 1u); }, true, true, 0 }
+#define RS_PADAXIS(SLOT, NAME) { NAME,         [](RollbackInput* i, double v) { i->vpad.pad.axes[SLOT] = (float)v; },         [](const RollbackInput* i) -> double { return (double)(i->vpad.pad.axes[SLOT]); }, false, true, 0 }
+
     // Every settable field, by struct member name. Order here = order in input_json().
     inline const FieldDef FIELDS[] = {
         // ---- RollbackInput top level ----
-        RS_NUM("const1",                     const1,                     false, 0),
         RS_BIT("bTargetLocked",              bTargetLocked,              false, false, 0),
         RS_BIT("bTargetLocked_Alt",          bTargetLocked_Alt,          false, false, 0),
         RS_NUM("curSelectedMagicSlot",       curSelectedMagicSlot,       false, 0),
@@ -127,64 +133,55 @@ namespace RollbackScript
         RS_NUM("equipment_array[14]", equipment_array[14], false, 0), RS_NUM("equipment_array[15]", equipment_array[15], false, 0),
         RS_NUM("equipment_array[16]", equipment_array[16], false, 0), RS_NUM("equipment_array[17]", equipment_array[17], false, 0),
         RS_NUM("equipment_array[18]", equipment_array[18], false, 0), RS_NUM("equipment_array[19]", equipment_array[19], false, 0),
-        // ---- PadManipulatorPacked: action buttons (participate in any_action_inputted) ----
-        RS_BIT("r1_weapon_attack_input",     padmanipulator.r1_weapon_attack_input,     true, true, 0),
-        RS_BIT("l1_input",                   padmanipulator.l1_input,                   true, true, 0),
-        RS_BIT("r1_magic_attack_input",      padmanipulator.r1_magic_attack_input,      true, true, 0),
-        RS_BIT("l1_magic_attack_input",      padmanipulator.l1_magic_attack_input,      true, true, 0),
-        RS_BIT("r2_input",                   padmanipulator.r2_input,                   true, true, 0),
-        RS_BIT("backstep_input",             padmanipulator.backstep_input,             true, true, 0),
-        RS_BIT("use_button_pressed",         padmanipulator.use_button_pressed,         true, true, 0),
-        RS_BIT("roll_forward_input",         padmanipulator.roll_forward_input,         true, true, 0),
-        RS_BIT("lefthand_weapon_attack",     padmanipulator.lefthand_weapon_attack,     true, true, 0),
-        RS_BIT("parry_input",                padmanipulator.parry_input,                true, true, 0),
-        RS_BIT("block_input",                padmanipulator.block_input,                true, true, 0),
-        RS_BIT("jump_input",                 padmanipulator.jump_input,                 true, true, 0),
-        RS_BIT("l1_weapon_attack",           padmanipulator.l1_weapon_attack,           true, true, 0),
-        RS_BIT("l2_weapon_attack",           padmanipulator.l2_weapon_attack,           true, true, 0),
-        // ---- PadManipulatorPacked: other flags ----
-        RS_BIT("isSprintingAnim",            padmanipulator.isSprintingAnim,            false, true, 0),
-        RS_BIT("not_getting_movement_input", padmanipulator.not_getting_movement_input, false, true, 1),
-        RS_BITS2("change_2handing_state",    padmanipulator.change_2handing_state,      true),
-        RS_BIT("left_hand_slot_selected",    padmanipulator.left_hand_slot_selected,    false, true, 0),
-        RS_BIT("right_hand_slot_selected",   padmanipulator.right_hand_slot_selected,   false, true, 0),
-        RS_BIT("any_action_inputted",        padmanipulator.any_action_inputted,        false, true, 0),
-        RS_BIT("EnableBackStep",             padmanipulator.EnableBackStep,             false, false, 0),
-        RS_BIT("EnableBackStep_forward",     padmanipulator.EnableBackStep_forward,     false, false, 0),
-        RS_NUM("movement_related_flags",     padmanipulator.movement_related_flags,     false, 0),
-        // ---- PadManipulatorPacked: movement / camera (see header comment) ----
-        RS_NUM("camera_x_direction_movement_input_amount",     padmanipulator.camera_x_direction_movement_input_amount,     true, 0),
-        RS_NUM("camera_x_direction_movement_input_amount_alt", padmanipulator.camera_x_direction_movement_input_amount_alt, true, 0),
-        RS_NUM("camera_y_direction_movement_input_amount",     padmanipulator.camera_y_direction_movement_input_amount,     true, 0),
-        RS_NUM("camera_y_direction_movement_input_amount_alt", padmanipulator.camera_y_direction_movement_input_amount_alt, true, 0),
-        RS_NUM("continuous_weapon_controlled_angle", padmanipulator.continuous_weapon_controlled_angle, false, 0),
-        RS_NUM("delta_pc_rotation_perframe",         padmanipulator.delta_pc_rotation_perframe,         true, 0),
-        RS_NUM("weapon_controlled_angle",            padmanipulator.weapon_controlled_angle,            false, 0),
-        RS_NUM("pc_rotation",                        padmanipulator.pc_rotation,                        false, 0),
-        RS_NUM("delta_camera_y_rotation_perframe",   padmanipulator.delta_camera_y_rotation_perframe,   true, 0),
-        RS_NUM("delta_camera_x_rotation_perframe",   padmanipulator.delta_camera_x_rotation_perframe,   true, 0),
-        RS_NUM("camera_y_rotation",                  padmanipulator.camera_y_rotation,                  false, 0),
-        RS_NUM("camera_x_rotation",                  padmanipulator.camera_x_rotation,                  false, 0),
-        RS_NUM("movement_velocity[0]", padmanipulator.movement_velocity[0], true, 0),
-        RS_NUM("movement_velocity[1]", padmanipulator.movement_velocity[1], true, 0),
-        RS_NUM("movement_velocity[2]", padmanipulator.movement_velocity[2], true, 0),
-        RS_NUM("movement_velocity[3]", padmanipulator.movement_velocity[3], true, 0),
-        RS_NUM("TimeRollButtonHeld",   padmanipulator.TimeRollButtonHeld,   true, 0),
-        RS_NUM("Backstep_timer",       padmanipulator.Backstep_timer,       true, 0),
-        RS_NUM("LockonTargetHandle",   padmanipulator.LockonTargetHandle,   false, 0),
-        RS_NUM("CurrentFrame_ActionInputs_ButtonId", padmanipulator.CurrentFrame_ActionInputs_ButtonId, true, -1),
-        RS_NUM("y_movement_input[0]", padmanipulator.y_movement_input[0], true, 0), RS_NUM("y_movement_input[1]", padmanipulator.y_movement_input[1], true, 0),
-        RS_NUM("y_movement_input[2]", padmanipulator.y_movement_input[2], true, 0), RS_NUM("y_movement_input[3]", padmanipulator.y_movement_input[3], true, 0),
-        RS_NUM("y_movement_input[4]", padmanipulator.y_movement_input[4], true, 0), RS_NUM("y_movement_input[5]", padmanipulator.y_movement_input[5], true, 0),
-        RS_NUM("x_movement_input[0]", padmanipulator.x_movement_input[0], true, 0), RS_NUM("x_movement_input[1]", padmanipulator.x_movement_input[1], true, 0),
-        RS_NUM("x_movement_input[2]", padmanipulator.x_movement_input[2], true, 0), RS_NUM("x_movement_input[3]", padmanipulator.x_movement_input[3], true, 0),
-        RS_NUM("x_movement_input[4]", padmanipulator.x_movement_input[4], true, 0), RS_NUM("x_movement_input[5]", padmanipulator.x_movement_input[5], true, 0),
-        RS_NUM("cur_movement_input_index_to_use", padmanipulator.cur_movement_input_index_to_use, false, 0),
+        // ---- VirtualPad arm: PadDeviceInputs ids, slot order matches VIRTUALPAD_BUTTON_IDS ----
+        RS_PADBTN( 0, "padbtn_36"),
+        RS_PADBTN( 1, "padbtn_3B"),
+        RS_PADBTN( 2, "padbtn_3C"),
+        RS_PADBTN( 3, "padbtn_3D"),
+        RS_PADBTN( 4, "padbtn_3E"),
+        RS_PADBTN( 5, "padbtn_3F"),
+        RS_PADBTN( 6, "padbtn_41"),
+        RS_PADBTN( 7, "padbtn_42"),
+        RS_PADBTN( 8, "padbtn_43"),
+        RS_PADBTN( 9, "padbtn_44"),
+        RS_PADBTN(10, "padbtn_45"),
+        RS_PADBTN(11, "padbtn_4A"),
+        RS_PADBTN(12, "padbtn_4C"),
+        RS_PADBTN(13, "padbtn_4D"),
+        RS_PADBTN(14, "padbtn_4E"),
+        RS_PADBTN(15, "padbtn_4F"),
+        RS_PADBTN(16, "padbtn_50"),
+        RS_PADBTN(17, "padbtn_51"),
+        RS_PADBTN(18, "padbtn_52"),
+        RS_PADBTN(19, "padbtn_53"),
+        RS_PADBTN(20, "padbtn_54"),
+        RS_PADBTN(21, "padbtn_5A"),
+        RS_PADBTN(22, "padbtn_5B"),
+        RS_PADBTN(23, "padbtn_5C"),
+        RS_PADBTN(24, "padbtn_2E"),
+        RS_PADBTN(25, "padbtn_55"),
+        RS_PADBTN(26, "padbtn_6E"),
+        RS_PADBTN(27, "padbtn_70"),
+        RS_PADBTN(28, "padbtn_57"),
+        // ---- and the analog axes, slot order matches VIRTUALPAD_AXIS_IDS ----
+        RS_PADAXIS( 0, "padaxis_10"),
+        RS_PADAXIS( 1, "padaxis_11"),
+        RS_PADAXIS( 2, "padaxis_12"),
+        RS_PADAXIS( 3, "padaxis_13"),
+        RS_PADAXIS( 4, "padaxis_18"),
+        RS_PADAXIS( 5, "padaxis_19"),
+        RS_PADAXIS( 6, "padaxis_0C"),
+        RS_PADAXIS( 7, "padaxis_0D"),
+        RS_PADAXIS( 8, "padaxis_0E"),
+        RS_PADAXIS( 9, "padaxis_0F"),
+
     };
     inline constexpr int FIELD_COUNT = (int)(sizeof(FIELDS) / sizeof(FIELDS[0]));
 
 #undef RS_NUM
 #undef RS_BIT
+#undef RS_PADBTN
+#undef RS_PADAXIS
 #undef RS_BITS2
 
     // Short names. A group alias expands to several fields (array "all copies").
@@ -460,22 +457,14 @@ namespace RollbackScript
         return false;
     }
 
-    inline unsigned _any_action(const RollbackInput* i)
-    {
-        const PadManipulatorPacked& p = i->padmanipulator;
-        return (p.r1_weapon_attack_input | p.l1_input | p.r1_magic_attack_input | p.l1_magic_attack_input |
-                p.r2_input | p.backstep_input | p.use_button_pressed | p.roll_forward_input |
-                p.lefthand_weapon_attack | p.parry_input | p.block_input | p.jump_input |
-                p.l1_weapon_attack | p.l2_weapon_attack) ? 1u : 0u;
-    }
-
     // Overlay the script onto the frame's live input. Pure function of (frame,
     // script) apart from the counters, so it is rollback-safe.
+
     inline void apply(int frame, RollbackInput* io)
     {
         if (!loaded) return;
-        bool touched = false, touched_button = false, set_any = false;
-        const int any_idx = field_index("any_action_inputted");
+        bool touched = false;
+
 
         if (neutral)
         {
@@ -490,13 +479,7 @@ namespace RollbackScript
             {
                 FIELDS[s.first].set(io, s.second);
                 touched = true;
-                if (FIELDS[s.first].button) touched_button = true;
-                if (s.first == any_idx) set_any = true;
             }
-        }
-        if (touched_button && !set_any)
-        {
-            io->padmanipulator.any_action_inputted = _any_action(io);
         }
         if (touched)
         {

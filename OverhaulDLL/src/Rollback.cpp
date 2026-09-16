@@ -5,8 +5,10 @@
 #include "MainLoop.h"
 #include "InputUtil.h"
 #include "ModNetworking.h"
+#include <algorithm>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "PlayerInsStructFunctions.h"
 #include "BulletManStructFunctions.h"
@@ -20,6 +22,7 @@
 #include "RollbackReplay.h"
 #include "RollbackScript.h"
 #include "VirtualPad.h"
+#include "HavokTrace.h"
 
 FILE* hash_logfile = NULL;
 
@@ -567,6 +570,223 @@ static void networkTest_tick()
 }
 #endif
 
+#ifdef GGPO_SYNCTEST
+//curSp and the ChrAttachSys head slot of player 0 around every live and every re-simulated frame. A value that changes in
+//live frames but never in re-simulated ones is stepped outside Step_GameSimulation, rather than not being restored.
+struct SyncTestProbe
+{
+    bool valid = false;
+    int32_t sp = 0;
+    int32_t attach_head = -1;
+};
+
+static SyncTestProbe synctest_probe()
+{
+    SyncTestProbe p;
+    auto player_o = Game::get_connected_player(0);
+    if (!player_o.has_value() || player_o.value() == 0)
+    {
+        return p;
+    }
+    PlayerIns* player = (PlayerIns*)player_o.value();
+    p.valid = true;
+    p.sp = (int32_t)player->chrins.curSp;
+    p.attach_head = player->chrins.chrattachsys.SysSlots != NULL ? (int32_t)player->chrins.chrattachsys.SysSlots->slotType : -1;
+    return p;
+}
+
+static void synctest_observe(bool resim, const SyncTestProbe& before, const SyncTestProbe& after)
+{
+    if (!before.valid || !after.valid)
+    {
+        return;
+    }
+    RollbackHash::SyncTestStats& t = RollbackHash::synctest;
+    (resim ? t.resim_frames : t.live_frames)++;
+    if (after.sp > before.sp)
+    {
+        (resim ? t.sp_up_resim : t.sp_up_live)++;
+    }
+    if (after.attach_head != before.attach_head)
+    {
+        uint64_t& changes = resim ? t.attach_head_changes_resim : t.attach_head_changes_live;
+        changes++;
+        if (changes <= 10)
+        {
+            int frame = 0, confirmed = 0;
+            ggpo_get_frame_info(Rollback::ggpo, &frame, &confirmed);
+            ConsoleWrite("SYNCTEST %s frame=%d attach head slot %d -> %d", resim ? "resim" : "live", frame, before.attach_head, after.attach_head);
+        }
+    }
+}
+
+static SyncTestProbe synctest_live_before;
+
+//Unrestored-write detector: bytes of player 0's objects that a live frame changed and the following load did not put
+//back, i.e. state the simulation writes that RollbackState does not save. Captured at three points per frame:
+//  PostAdvance  after ggpo_advance_frame returns (after the resim): the state the next live frame starts from
+//  LiveEnd      at the end of that live frame, before ggpo_advance_frame saves it
+//  AfterLoad    once the load of the previous frame is done
+//A byte with PostAdvance != LiveEnd (the live frame wrote it) and AfterLoad == LiveEnd (the load did not revert it) is counted.
+enum class UnrestoredStage { PostAdvance, LiveEnd, AfterLoad };
+
+struct UnrestoredRegion
+{
+    const char* name;
+    size_t size;                       //ghidra struct sizes
+    std::vector<uint8_t> post_advance;
+    std::vector<uint8_t> live_end;
+    std::vector<uint32_t> hits;
+    bool have_post = false;
+    bool have_live = false;
+};
+
+static UnrestoredRegion unrestored_regions[] = {
+    { "PlayerIns", 0x9d0 },
+    { "PlayerGameData", 0x660 },
+    { "PlayerCtrl", 0x370 },
+    { "ChrIns_field0x18", sizeof(ChrIns_field0x18) },
+    { "ChrIns_1c0", 0x68 },
+    { "PadManipulator", sizeof(PadManipulator) },
+    { "SpecialEffect", sizeof(SpecialEffect) },
+    { "QwcSpEffectEquipCtrl", sizeof(QwcSpEffectEquipCtrl) },
+    { "ChrIns_field0x2c8", sizeof(ChrIns_field0x2c8) },
+};
+static uint64_t unrestored_loads = 0;
+
+static const uint8_t* unrestored_base(size_t region, PlayerIns* player)
+{
+    switch (region)
+    {
+    case 0: return (const uint8_t*)player;
+    case 1: return (const uint8_t*)player->playergamedata;
+    case 2: return (const uint8_t*)player->chrins.playerCtrl;
+    case 3: return (const uint8_t*)player->chrins.field0x18;
+    case 4: return *(const uint8_t**)((const uint8_t*)player + 0x1c8); //ChrIns_1c0* (ghidra), inside padding_4b
+    case 5: return (const uint8_t*)player->chrins.padManipulator;
+    case 6: return (const uint8_t*)player->chrins.specialEffects;
+    case 7: return (const uint8_t*)player->chrins.qwcSpEffectEquipCtrl;
+    case 8: return (const uint8_t*)player->chrins.field0x2c8;
+    }
+    return NULL;
+}
+
+static void synctest_unrestored_capture(UnrestoredStage stage)
+{
+    auto player_o = Game::get_connected_player(0);
+    if (!player_o.has_value() || player_o.value() == 0)
+    {
+        return;
+    }
+    PlayerIns* player = (PlayerIns*)player_o.value();
+    for (size_t i = 0; i < sizeof(unrestored_regions) / sizeof(unrestored_regions[0]); i++)
+    {
+        UnrestoredRegion& r = unrestored_regions[i];
+        const uint8_t* base = unrestored_base(i, player);
+        if (base == NULL)
+        {
+            continue;
+        }
+        switch (stage)
+        {
+        case UnrestoredStage::PostAdvance:
+            r.post_advance.assign(base, base + r.size);
+            r.have_post = true;
+            break;
+        case UnrestoredStage::LiveEnd:
+            r.live_end.assign(base, base + r.size);
+            r.have_live = true;
+            break;
+        case UnrestoredStage::AfterLoad:
+            if (!r.have_post || !r.have_live)
+            {
+                break;
+            }
+            if (r.hits.size() != r.size)
+            {
+                r.hits.assign(r.size, 0);
+            }
+            for (size_t b = 0; b < r.size; b++)
+            {
+                if (r.post_advance[b] != r.live_end[b] && base[b] == r.live_end[b])
+                {
+                    r.hits[b]++;
+                }
+            }
+            r.have_live = false; //one comparison per live frame
+            break;
+        }
+    }
+    if (stage == UnrestoredStage::AfterLoad)
+    {
+        unrestored_loads++;
+    }
+}
+
+void synctest_unrestored_reset()
+{
+    for (UnrestoredRegion& r : unrestored_regions)
+    {
+        r.hits.assign(r.hits.size(), 0);
+    }
+    unrestored_loads = 0;
+}
+
+//The most-hit runs of adjacent unrestored bytes, with their bytes as of the last live frame
+std::string synctest_unrestored_json(size_t top)
+{
+    struct Run
+    {
+        const char* region;
+        size_t offset;
+        size_t len;
+        uint32_t max_hits;
+        std::string bytes;
+    };
+    std::vector<Run> runs;
+    for (const UnrestoredRegion& r : unrestored_regions)
+    {
+        size_t b = 0;
+        while (b < r.hits.size())
+        {
+            if (r.hits[b] == 0)
+            {
+                b++;
+                continue;
+            }
+            Run run{ r.name, b, 0, 0, "" };
+            while (b < r.hits.size() && r.hits[b] != 0)
+            {
+                if (r.hits[b] > run.max_hits)
+                {
+                    run.max_hits = r.hits[b];
+                }
+                if (b < r.live_end.size() && run.bytes.size() < 64)
+                {
+                    char hex[3];
+                    snprintf(hex, sizeof(hex), "%02x", r.live_end[b]);
+                    run.bytes += hex;
+                }
+                b++;
+            }
+            run.len = b - run.offset;
+            runs.push_back(run);
+        }
+    }
+    std::sort(runs.begin(), runs.end(), [](const Run& x, const Run& y) { return x.max_hits > y.max_hits; });
+
+    std::string s = "{\"loads\":" + std::to_string(unrestored_loads) + ",\"run_count\":" + std::to_string(runs.size()) + ",\"runs\":[";
+    for (size_t i = 0; i < runs.size() && i < top; i++)
+    {
+        char buf[256];
+        snprintf(buf, sizeof(buf), "%s{\"region\":\"%s\",\"offset\":\"0x%zx\",\"len\":%zu,\"max_hits\":%u,\"bytes\":\"%s\"}",
+            i ? "," : "", runs[i].region, runs[i].offset, runs[i].len, runs[i].max_hits, runs[i].bytes.c_str());
+        s += buf;
+    }
+    return s + "]}";
+}
+#endif
+
 bool rollback_game_frame_start_helper(void* unused)
 {
     if (Rollback::rollbackEnabled && Rollback::ggpoStarted)
@@ -633,6 +853,10 @@ bool rollback_game_frame_start_helper(void* unused)
             }
 
             rollback_sync_inputs();
+            HavokTrace::sample(HavokTrace::Stage::LiveBegin);
+#ifdef GGPO_SYNCTEST
+            synctest_live_before = synctest_probe();
+#endif
         }
     }
 
@@ -666,8 +890,16 @@ void dsr_frame_finished_helper()
         //only start telling ggpo we're running once the players are synced
         if (Rollback::ggpoReady == GGPOREADY::Ready)
         {
+#ifdef GGPO_SYNCTEST
+            synctest_observe(false, synctest_live_before, synctest_probe());
+            synctest_unrestored_capture(UnrestoredStage::LiveEnd);
+#endif
+            HavokTrace::sample(HavokTrace::Stage::LiveEnd);
             //this is where the game state is actually saved (and also loaded if we are in SyncTest)
             ggpo_advance_frame(Rollback::ggpo);
+#ifdef GGPO_SYNCTEST
+            synctest_unrestored_capture(UnrestoredStage::PostAdvance);
+#endif
 
             //Emit STATEHASH log lines for any frames that are now confirmed
             int framecount_unused = 0;
@@ -721,11 +953,14 @@ bool rollback_await_init(void* steamMsgs);
 
 void* hkThreadMemory_BlockAlloc(void* hkThreadMemory, uint32_t size)
 {
-    return malloc_(size);
+    void* p = malloc_(size);
+    HavokTrace::on_alloc(p, size, _ReturnAddress());
+    return p;
 }
 
 void hkThreadMemory_BlockFree(void* hkThreadMemory, void* ptr, uint32_t size)
 {
+    HavokTrace::on_free(ptr, size, _ReturnAddress());
     return free(ptr);
 }
 
@@ -757,12 +992,14 @@ void hkThreadMemory_blockAllocBatch(void* param_1, void** ptrsOut, int numPtrs, 
     for (size_t i = 0; i < numPtrs; i++)
     {
         ptrsOut[i] = malloc_(blockSize);
+        HavokTrace::on_alloc(ptrsOut[i], blockSize, _ReturnAddress());
     }
 }
 void hkThreadMemory_blockFreeBatch(void* param_1, void** ptrsIn, int numPtrs, int blockSize)
 {
     for (size_t i = 0; i < numPtrs; i++)
     {
+        HavokTrace::on_free(ptrsIn[i], blockSize, _ReturnAddress());
         free(ptrsIn[i]);
     }
 }
@@ -784,6 +1021,11 @@ void Rollback::start()
     uint8_t* write_address;
 
     SetEnvironmentVariable("ggpo.log", "1");
+#ifdef GGPO_SYNCTEST
+    //Log a checksum mismatch and keep running, so one session reports every desyncing frame.
+    //Otherwise synctest raises 0xC0000000, which the crash handler turns into a crash-report dialog.
+    SetEnvironmentVariable("ggpo.synctest.nonfatal", "1");
+#endif
 
     Rollback::NetcodeFix();
 
@@ -868,7 +1110,15 @@ bool rollback_advance_frame_callback(int)
     rollback_sync_inputs();
 
     //step next frame
+#ifdef GGPO_SYNCTEST
+    const SyncTestProbe synctest_before = synctest_probe();
+#endif
+    HavokTrace::sample(HavokTrace::Stage::ResimBegin);
     Game::Step_GameSimulation();
+    HavokTrace::sample(HavokTrace::Stage::ResimEnd);
+#ifdef GGPO_SYNCTEST
+    synctest_observe(true, synctest_before, synctest_probe());
+#endif
     Rollback::inRollbackResim = false;
     ggpo_advance_frame(Rollback::ggpo);
 
@@ -882,6 +1132,7 @@ bool rollback_advance_frame_callback(int)
 bool rollback_load_game_state_callback(unsigned char* buffer, int)
 {
     RollbackState* state = (RollbackState*)buffer;
+    HavokTrace::sample(HavokTrace::Stage::LoadBegin);
 
     //sfx must be restored before playerins/bulletman so that linked_followupBullet chain heads
     //are cleared before any FollowupBullet data is modified or freed
@@ -909,6 +1160,10 @@ bool rollback_load_game_state_callback(unsigned char* buffer, int)
     {
         *(float*)((uint64_t)Game::get_PlayerIns().value() + 0x328) = 0.4f;
     }
+    HavokTrace::sample(HavokTrace::Stage::LoadEnd);
+#ifdef GGPO_SYNCTEST
+    synctest_unrestored_capture(UnrestoredStage::AfterLoad);
+#endif
     //ConsoleWrite("rollback_load_game_state_callback finish");
 
     return true;
@@ -920,15 +1175,13 @@ bool rollback_load_game_state_callback(unsigned char* buffer, int)
  */
 bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int frame)
 {
+    HavokTrace::sample(HavokTrace::Stage::Save);
     RollbackState* state = (RollbackState*)malloc(sizeof(RollbackState));
     if (state == NULL)
     {
         FATALERROR("Unable to get allocate state for rollback_save_game_state_callback");
     }
 
-    //havok has to be copied first
-    state->havokman = init_FrpgHavokManImp();
-    copy_FrpgHavokManImp(state->havokman, *(FrpgHavokManImp**)Game::frpg_havok_man_imp, StateTarget::ToLocal);
     for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
     {
         auto player_o = Game::get_connected_player(i);
@@ -1059,8 +1312,22 @@ bool rollback_on_event_callback(GGPOEvent* info)
     return true;
 }
 
+//Only the synctest backend calls this: once for the original and once for the replayed state of a mismatching frame.
 bool rollback_log_game_state(char* filename, unsigned char* buffer, int)
 {
+#ifdef GGPO_SYNCTEST
+    //"synctest dump" picks which subsystems' mismatches are worth a dump
+    if (!RollbackHash::synctest_dump_this_mismatch)
+    {
+        return true;
+    }
+    //A mismatch that repeats every frame would otherwise write two full dumps per frame. "synctest reset" re-arms this.
+    if (RollbackHash::synctest.dump_files_written >= RollbackHash::SYNCTEST_MAX_DUMP_FILES)
+    {
+        return true;
+    }
+    RollbackHash::synctest.dump_files_written++;
+#endif
     FILE* fp = nullptr;
     fopen_s(&fp, filename, "w");
     if (!fp)
@@ -1068,23 +1335,11 @@ bool rollback_log_game_state(char* filename, unsigned char* buffer, int)
         return true;
     }
 
-    RollbackState* state = (RollbackState*)buffer;
-
-    for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
-    {
-        std::string player = print_PlayerIns(state->playerins[i]);
-        fprintf(fp, "Player %d\n%s", i, player.c_str());
-    }
-    //std::string bulletman = print_BulletMan(state->bulletman);
-    //fprintf(fp, "%s", bulletman.c_str());
-    //std::string sfxman = print_SfxMan(state->sfxman);
-    //fprintf(fp, "%s", sfxman.c_str());
-    //std::string damage = print_DamageMan(state->damageman);
-    //fprintf(fp, "%s", damage.c_str());
-    //std::string throwman = print_ThrowMan(state->throwman);
-    //fprintf(fp, "%s", throwman.c_str());
-
+    //The oracle's canonical text for every hashed subsystem, so the original/replay pair diffs down to the field
+    std::string text = RollbackHash::dump_text_of((RollbackState*)buffer);
+    fwrite(text.data(), 1, text.size(), fp);
     fclose(fp);
+    ConsoleWrite("SYNCTEST wrote %s", filename);
     return true;
 }
 
@@ -1152,7 +1407,18 @@ bool rollback_await_init(void* steamMsgs)
     }
 
 #ifdef GGPO_SYNCTEST
-    GGPOErrorCode result = ggpo_start_synctest(&Rollback::ggpo, &Rollback::ggpoCallbacks, (char*)"DSR_GGPO", Rollback::ggpoCurrentPlayerCount, sizeof(RollbackInput), 1);
+    //How many frames synctest runs ahead before loading the last verified frame and re-simulating them.
+    //At most GGPO_MAX_PREDICTION_FRAMES: the sync layer only keeps that many saved frames (+2).
+    int check_distance = 1;
+    char check_distance_env[16];
+    if (GetEnvironmentVariableA("DSR_SYNCTEST_DISTANCE", check_distance_env, sizeof(check_distance_env)) > 0)
+    {
+        check_distance = atoi(check_distance_env);
+        if (check_distance < 1) check_distance = 1;
+        if (check_distance > GGPO_MAX_PREDICTION_FRAMES) check_distance = GGPO_MAX_PREDICTION_FRAMES;
+    }
+    ConsoleWrite("GGPO synctest, check distance %d", check_distance);
+    GGPOErrorCode result = ggpo_start_synctest(&Rollback::ggpo, &Rollback::ggpoCallbacks, (char*)"DSR_GGPO", Rollback::ggpoCurrentPlayerCount, sizeof(RollbackInput), check_distance);
 #else
     //Start ggpo
     GGPOErrorCode result = ggpo_start_session(&Rollback::ggpo, &Rollback::ggpoCallbacks, (ISteamNetworkingMessages*)steamMsgs, "DSR_GGPO", Rollback::ggpoCurrentPlayerCount, sizeof(RollbackInput));
@@ -1201,6 +1467,18 @@ bool rollback_await_init(void* steamMsgs)
     RollbackReplay::init_session();
     RollbackScript::init_session();
     RollbackHash::reset_session();
+
+#ifdef GGPO_SYNCTEST
+    //DSR_SYNCTEST_RESERVE_DAMAGE_POOL=1 empties DamageMan's free list for the session, so DamageMan_PopHead_DamageEntry heap-allocates
+    //every new entry and synctest exercises saving and loading heap entries. The detached pool slots stay out of both lists.
+    char reserve_pool_env[8];
+    if (GetEnvironmentVariableA("DSR_SYNCTEST_RESERVE_DAMAGE_POOL", reserve_pool_env, sizeof(reserve_pool_env)) > 0 && reserve_pool_env[0] == '1')
+    {
+        DamageMan* damageman = *(DamageMan**)Game::damage_man;
+        damageman->all_damage_entries_list_cur = NULL;
+        ConsoleWrite("GGPO synctest: DamageMan pool reserved, new damage entries are heap-allocated");
+    }
+#endif
 
     return false;
 }

@@ -45,21 +45,21 @@ static void serialize_ChrManipulator_ActionInputted(StateVisitor& v, const char*
     v.field("lefthand_weapon_attack", e->lefthand_weapon_attack);
     v.field("parry_input", e->parry_input);
     v.field("block_input", e->block_input);
-    v.field("beckon_emote_input", e->beckon_emote_input);
-    v.field("point_forward_emote_input", e->point_forward_emote_input);
-    v.field("hurrah_emote_input", e->hurrah_emote_input);
-    v.field("bow_emote_input", e->bow_emote_input);
-    v.field("joy_emote_input", e->joy_emote_input);
-    v.field("shrug_emote_input", e->shrug_emote_input);
-    v.field("wave_emote_input", e->wave_emote_input);
-    v.field("praise_the_sun_emote_input", e->praise_the_sun_emote_input);
-    v.field("point_up_emote_input", e->point_up_emote_input);
-    v.field("point_down_emote_input", e->point_down_emote_input);
-    v.field("look_skyward_emote_input", e->look_skyward_emote_input);
-    v.field("well_what_is_it_emote_input", e->well_what_is_it_emote_input);
-    v.field("prostration_emote_input", e->prostration_emote_input);
-    v.field("proper_bow_emote_input", e->proper_bow_emote_input);
-    v.field("prayer_emote_input", e->prayer_emote_input);
+    v.excluded("beckon_emote_input", sizeof(e->beckon_emote_input));
+    v.excluded("point_forward_emote_input", sizeof(e->point_forward_emote_input));
+    v.excluded("hurrah_emote_input", sizeof(e->hurrah_emote_input));
+    v.excluded("bow_emote_input", sizeof(e->bow_emote_input));
+    v.excluded("joy_emote_input", sizeof(e->joy_emote_input));
+    v.excluded("shrug_emote_input", sizeof(e->shrug_emote_input));
+    v.excluded("wave_emote_input", sizeof(e->wave_emote_input));
+    v.excluded("praise_the_sun_emote_input", sizeof(e->praise_the_sun_emote_input));
+    v.excluded("point_up_emote_input", sizeof(e->point_up_emote_input));
+    v.excluded("point_down_emote_input", sizeof(e->point_down_emote_input));
+    v.excluded("look_skyward_emote_input", sizeof(e->look_skyward_emote_input));
+    v.excluded("well_what_is_it_emote_input", sizeof(e->well_what_is_it_emote_input));
+    v.excluded("prostration_emote_input", sizeof(e->prostration_emote_input));
+    v.excluded("proper_bow_emote_input", sizeof(e->proper_bow_emote_input));
+    v.excluded("prayer_emote_input", sizeof(e->prayer_emote_input));
     v.field("field37_0x25", e->field37_0x25);
     v.field("field38_0x26", e->field38_0x26);
     v.field("field39_0x27", e->field39_0x27);
@@ -125,7 +125,19 @@ void serialize_PadManipulator(StateVisitor& v, const PadManipulator* p)
     serialize_ChrManipulator_ActionInputted(v, "PrevFrame_ActionInputs", &c->PrevFrame_ActionInputs);
     v.field("field37_0xee", c->field37_0xee);
     v.field("field38_0xef", c->field38_0xef);
-    v.blob("ActionInputtedTimeHeld", &c->ActionInputtedTimeHeld, sizeof(c->ActionInputtedTimeHeld));
+    //ActionInputtedTimeHeld is one float per CurrentFrame_ActionInputs byte, same index. The 15
+    //emote timers are excluded for the same reason the emote button flags above are: emotes are
+    //not carried in RollbackInput, so the two instances can never agree on them.
+    {
+        const uint8_t* th = (const uint8_t*)&c->ActionInputtedTimeHeld;
+        const size_t emote_begin = offsetof(ChrManipulator_ActionInputtedTimeHeld, time_beckon_emote_held);
+        const size_t emote_end = offsetof(ChrManipulator_ActionInputtedTimeHeld, field37_0x94);
+        static_assert(offsetof(ChrManipulator_ActionInputtedTimeHeld, time_beckon_emote_held) == 0x58);
+        static_assert(offsetof(ChrManipulator_ActionInputtedTimeHeld, field37_0x94) == 0x94);
+        v.blob("ActionInputtedTimeHeld_pre_emotes", th, emote_begin);
+        v.excluded("ActionInputtedTimeHeld_emotes", emote_end - emote_begin);
+        v.blob("ActionInputtedTimeHeld_post_emotes", th + emote_end, sizeof(c->ActionInputtedTimeHeld) - emote_end);
+    }
     v.field("AnyActionInputted", c->AnyActionInputted);
     v.field("buttonInteract_pressed", c->buttonInteract_pressed);
     v.field("field46_0x1c6", c->field46_0x1c6);

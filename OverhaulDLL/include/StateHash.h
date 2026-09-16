@@ -101,7 +101,7 @@ namespace RollbackHash
         d.player   = pl;
         d.bullet   = hash_BulletMan(s->bulletman);
         d.damage   = hash_DamageMan(s->damageman);
-        d.havok    = hash_FrpgHavokManImp(s->havokman, ordered, n);
+        d.havok    = hash_FrpgHavokManImp(s->havokman, order, n);
         d.throwman = hash_ThrowMan(s->throwman);
         d.dmghit   = hash_DmgHitRecordManImp(s->dmghitrecordman);
         // d.sfx   = hash_SfxMan(s->sfxman);
@@ -220,7 +220,7 @@ namespace RollbackHash
         }
         t += "=== BulletMan ===\n";        t += print_BulletMan(s->bulletman);
         t += "=== DamageMan ===\n";        t += print_DamageMan(s->damageman);
-        t += "=== FrpgHavokManImp ===\n";  t += print_FrpgHavokManImp(s->havokman, ordered, n);
+        t += "=== Havok ===\n";            t += print_FrpgHavokManImp(s->havokman, order, n);
         t += "=== ThrowMan ===\n";         t += print_ThrowMan(s->throwman);
         t += "=== DmgHitRecordManImp ===\n"; t += print_DmgHitRecordManImp(s->dmghitrecordman);
         return t;
@@ -253,12 +253,176 @@ namespace RollbackHash
         return s;
     }
 
+#ifdef GGPO_SYNCTEST
+    // ---- GGPO synctest: which subsystems a re-simulated frame disagrees in ----
+    // Synctest saves every frame twice: once as it first runs, then again after loading an
+    // earlier frame and re-simulating up to it. The second save reaches record() while the
+    // first one's digest is still in _store(), so comparing them names the subsystems that
+    // did not survive save -> load -> resim. GGPO's own int checksum only says *something* did.
+    // The "original" state GGPO logs on a mismatch is its copy_buffer deep copy (StateTarget::Copy), not the save
+    // itself, so a lossy Copy path shows up as dump differences no real session has. synctest_check_copy tests it.
+    inline const char* const SYNCTEST_SUBSYSTEMS[] = { "player", "bullet", "damage", "havok", "throw", "dmghit" };
+    inline const int SYNCTEST_SUBSYSTEM_COUNT = 6;
+    inline const uint32_t SYNCTEST_ALL = (1u << SYNCTEST_SUBSYSTEM_COUNT) - 1;
+
+    struct SyncTestStats
+    {
+        uint64_t checked = 0;               // re-simulated saves compared against the original
+        uint64_t mismatched = 0;            // ...of which differed
+        int first_mismatch_frame = -1;
+        int last_mismatch_frame = -1;
+        uint64_t by_subsystem[SYNCTEST_SUBSYSTEM_COUNT] = {};
+        uint64_t copies = 0;                // copy_buffer calls checked
+        uint64_t copy_mismatched = 0;       // ...whose copy hashed differently from its source
+        uint64_t copy_by_subsystem[SYNCTEST_SUBSYSTEM_COUNT] = {};
+        int dump_files_written = 0;         // full-state dumps written by rollback_log_game_state
+        // player 0 around each live and each re-simulated frame (Rollback.cpp synctest_observe): state that moves in live
+        // frames but never in re-simulated ones is stepped outside Step_GameSimulation, not merely left unrestored
+        uint64_t live_frames = 0, resim_frames = 0;
+        uint64_t sp_up_live = 0, sp_up_resim = 0;                             // frames curSp rose
+        uint64_t attach_head_changes_live = 0, attach_head_changes_resim = 0; // frames the ChrAttachSys head slot changed type
+    };
+    inline SyncTestStats synctest;
+
+    // Which mismatches get full-state dumps ("synctest dump"): one subsystem can mismatch every frame and use up the budget
+    struct SyncTestDumpConfig
+    {
+        uint32_t mask = SYNCTEST_ALL;       // bit i = SYNCTEST_SUBSYSTEMS[i]
+        int from_frame = -1;
+    };
+    inline SyncTestDumpConfig synctest_dump;
+    inline bool synctest_dump_this_mismatch = false;   // set by the latest compare, read by rollback_log_game_state
+
+    inline const uint64_t SYNCTEST_LOG_FIRST = 20;   // mismatches logged one by one...
+    inline const uint64_t SYNCTEST_LOG_EVERY = 600;  // ...then one line per this many
+    inline const int SYNCTEST_MAX_DUMP_FILES = 16;   // 8 mismatching frames, original + replay each
+
+    // Comma-separated names of the subsystems whose digests differ; mask gets bit i for SYNCTEST_SUBSYSTEMS[i]
+    inline std::string synctest_diff(const StateDigest& a, const StateDigest& b, uint32_t& mask)
+    {
+        const uint64_t av[] = { a.player, a.bullet, a.damage, a.havok, a.throwman, a.dmghit };
+        const uint64_t bv[] = { b.player, b.bullet, b.damage, b.havok, b.throwman, b.dmghit };
+        std::string names;
+        mask = 0;
+        for (int i = 0; i < SYNCTEST_SUBSYSTEM_COUNT; i++)
+        {
+            if (av[i] == bv[i]) continue;
+            mask |= 1u << i;
+            if (!names.empty()) names += ",";
+            names += SYNCTEST_SUBSYSTEMS[i];
+        }
+        return names;
+    }
+
+    inline void synctest_compare(int frame, const StateDigest& orig, const StateDigest& replay)
+    {
+        synctest.checked++;
+        uint32_t mask;
+        std::string diff = synctest_diff(orig, replay, mask);
+        synctest_dump_this_mismatch = false;
+        if (mask == 0) return;
+
+        for (int i = 0; i < SYNCTEST_SUBSYSTEM_COUNT; i++)
+        {
+            if (mask & (1u << i)) synctest.by_subsystem[i]++;
+        }
+        synctest.mismatched++;
+        if (synctest.first_mismatch_frame < 0) synctest.first_mismatch_frame = frame;
+        synctest.last_mismatch_frame = frame;
+        synctest_dump_this_mismatch = (mask & synctest_dump.mask) != 0 && frame >= synctest_dump.from_frame;
+        if (synctest.mismatched <= SYNCTEST_LOG_FIRST || synctest.mismatched % SYNCTEST_LOG_EVERY == 0)
+        {
+            ConsoleWrite("SYNCTEST mismatch #%llu frame=%d subsystems=%s", (unsigned long long)synctest.mismatched, frame, diff.c_str());
+        }
+    }
+
+    inline void synctest_check_copy(RollbackState* src, RollbackState* dst)
+    {
+        synctest.copies++;
+        uint32_t mask;
+        std::string diff = synctest_diff(digest_of(src), digest_of(dst), mask);
+        if (mask == 0) return;
+
+        for (int i = 0; i < SYNCTEST_SUBSYSTEM_COUNT; i++)
+        {
+            if (mask & (1u << i)) synctest.copy_by_subsystem[i]++;
+        }
+        synctest.copy_mismatched++;
+        if (synctest.copy_mismatched <= SYNCTEST_LOG_FIRST || synctest.copy_mismatched % SYNCTEST_LOG_EVERY == 0)
+        {
+            ConsoleWrite("SYNCTEST copy_buffer mismatch #%llu subsystems=%s", (unsigned long long)synctest.copy_mismatched, diff.c_str());
+        }
+    }
+
+    // "player,damage" / "all" / "none" -> mask; false on an unknown name
+    inline bool synctest_parse_mask(const std::string& names, uint32_t& mask)
+    {
+        if (names == "all") { mask = SYNCTEST_ALL; return true; }
+        if (names == "none") { mask = 0; return true; }
+        mask = 0;
+        size_t start = 0;
+        while (start <= names.size())
+        {
+            size_t end = names.find(',', start);
+            if (end == std::string::npos) end = names.size();
+            std::string name = names.substr(start, end - start);
+            int i = 0;
+            while (i < SYNCTEST_SUBSYSTEM_COUNT && name != SYNCTEST_SUBSYSTEMS[i]) i++;
+            if (i == SYNCTEST_SUBSYSTEM_COUNT) return false;
+            mask |= 1u << i;
+            start = end + 1;
+        }
+        return true;
+    }
+
+    inline std::string _synctest_counts_json(const uint64_t* counts)
+    {
+        std::string s = "{";
+        for (int i = 0; i < SYNCTEST_SUBSYSTEM_COUNT; i++)
+        {
+            if (i) s += ",";
+            s += "\"" + std::string(SYNCTEST_SUBSYSTEMS[i]) + "\":" + std::to_string(counts[i]);
+        }
+        return s + "}";
+    }
+
+    inline std::string synctest_json()
+    {
+        const SyncTestStats& t = synctest;
+        std::string s = "{\"checked\":" + std::to_string(t.checked);
+        s += ",\"mismatched\":" + std::to_string(t.mismatched);
+        s += ",\"first_mismatch_frame\":" + std::to_string(t.first_mismatch_frame);
+        s += ",\"last_mismatch_frame\":" + std::to_string(t.last_mismatch_frame);
+        s += ",\"by_subsystem\":" + _synctest_counts_json(t.by_subsystem);
+        s += ",\"copies\":" + std::to_string(t.copies);
+        s += ",\"copy_mismatched\":" + std::to_string(t.copy_mismatched);
+        s += ",\"copy_by_subsystem\":" + _synctest_counts_json(t.copy_by_subsystem);
+        s += ",\"dump_mask\":" + std::to_string(synctest_dump.mask);
+        s += ",\"dump_from_frame\":" + std::to_string(synctest_dump.from_frame);
+        s += ",\"live_frames\":" + std::to_string(t.live_frames);
+        s += ",\"resim_frames\":" + std::to_string(t.resim_frames);
+        s += ",\"sp_up_live\":" + std::to_string(t.sp_up_live);
+        s += ",\"sp_up_resim\":" + std::to_string(t.sp_up_resim);
+        s += ",\"attach_head_changes_live\":" + std::to_string(t.attach_head_changes_live);
+        s += ",\"attach_head_changes_resim\":" + std::to_string(t.attach_head_changes_resim);
+        s += ",\"dump_files_written\":" + std::to_string(t.dump_files_written) + "}";
+        return s;
+    }
+#endif
+
     // Called from rollback_save_game_state_callback with the frame GGPO is
     // saving. Returns the digest so the caller can reuse it (e.g. as the synctest
     // checksum) without hashing the whole state twice.
     inline StateDigest record(int frame, RollbackState* s)
     {
         StateDigest d = digest_of(s);
+#ifdef GGPO_SYNCTEST
+        auto prev = _store().find(frame);
+        if (prev != _store().end())
+        {
+            synctest_compare(frame, prev->second, d);
+        }
+#endif
         _store()[frame] = d;
 
         if (frame == dump_request_frame)
@@ -330,11 +494,17 @@ namespace RollbackHash
         _store().clear();
         _history().clear();
         last_confirmed_emitted = -1;
-        dump_request_frame = -1;
+        //dump_request_frame is deliberately NOT cleared. A request armed before the session
+        //starts means "capture frame N of the next session" -- which is the only way to dump
+        //an early frame at all, since the control plane cannot arm one mid-handshake before
+        //frame 0 has already been saved. Everything else here is per-session and must go.
         dump_frame = -1;
         dump_confirmed = false;
         dump_text_store.clear();
         dump_file.clear();
+#ifdef GGPO_SYNCTEST
+        synctest = SyncTestStats{};
+#endif
     }
 }
 
