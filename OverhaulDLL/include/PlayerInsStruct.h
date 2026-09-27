@@ -1425,6 +1425,13 @@ struct ChrIns_field0x18
 static_assert(offsetof(ChrIns_field0x18, animId) == 0x4);
 static_assert(sizeof(ChrIns_field0x18) == 0x80);
 
+struct EquippedWeaponData
+{
+    uint32_t WeaponStyle;              // 0x0 (compared with ChrManipulator::new_equipped_weapon_style by Get_EquippedWeaponStyle_Switch_Request)
+    int32_t WepmotionCategories[3];    // 0x4: left hand, right hand, and the one/both-hand motion id of the current style
+};
+static_assert(sizeof(EquippedWeaponData) == 0x10);
+
 struct ChrIns
 {
     uint8_t padding_0[8];
@@ -1447,7 +1454,7 @@ struct ChrIns
     ChrIns_AnimationMediatorStateInfo lowerThrowAnim;
     ChrIns_AnimationMediatorStateInfo upperThrowAnim;
     uint8_t padding_4a[12];
-    uint32_t* player_handing_state;
+    EquippedWeaponData* equippedWeaponData; // 0x198
     uint8_t padding_4b[0x28];
     void* chrIns_1c0;          // 0x1c8 (ghidra: ChrIns_1c0*)
     uint8_t padding_4c[0x10];
@@ -1584,7 +1591,7 @@ static_assert(offsetof(ChrIns, CharaInitParamID) == 0xc4+8);
 static_assert(offsetof(ChrIns, unk_16c) == 0x164 + 8);
 static_assert(offsetof(ChrIns, lowerThrowAnim) == 0x174+8);
 static_assert(offsetof(ChrIns, upperThrowAnim) == 0x17c+8);
-static_assert(offsetof(ChrIns, player_handing_state) == 0x190+8);
+static_assert(offsetof(ChrIns, equippedWeaponData) == 0x190+8);
 static_assert(offsetof(ChrIns, chrIns_1c0) == 0x1c0+8);
 static_assert(offsetof(ChrIns, unk_1e0) == 0x1d8+8);
 static_assert(offsetof(ChrIns, curToughness) == 0x248 + 8);

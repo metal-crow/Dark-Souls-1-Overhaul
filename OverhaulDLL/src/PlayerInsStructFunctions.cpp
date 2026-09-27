@@ -415,7 +415,7 @@ void copy_ChrIns(ChrIns* to, const ChrIns* from, StateTarget target)
     memcpy(&to->unk_16c, &from->unk_16c, 0x10);
     to->lowerThrowAnim = from->lowerThrowAnim;
     to->upperThrowAnim = from->upperThrowAnim;
-    memcpy(to->player_handing_state, from->player_handing_state, sizeof(uint32_t)*3);
+    *to->equippedWeaponData = *from->equippedWeaponData;
     to->curToughness = from->curToughness;
     to->maxToughness = from->maxToughness;
     to->toughnessUnk1 = from->toughnessUnk1;
@@ -463,7 +463,7 @@ ChrIns* init_ChrIns()
     //local_ChrIns->field0x18 = init_ChrIns_field0x18();
     local_ChrIns->playerCtrl = init_PlayerCtrl();
     local_ChrIns->padManipulator = init_PadManipulator();
-    local_ChrIns->player_handing_state = (uint32_t*)malloc_(sizeof(uint32_t)*3);
+    local_ChrIns->equippedWeaponData = (EquippedWeaponData*)malloc_(sizeof(EquippedWeaponData));
     local_ChrIns->specialEffects = init_SpecialEffect();
     local_ChrIns->qwcSpEffectEquipCtrl = init_QwcSpEffectEquipCtrl();
     local_ChrIns->field0x2c8 = init_ChrIns_field0x2c8();
@@ -482,7 +482,7 @@ void free_ChrIns(ChrIns* to, bool freeself)
     //free_ChrIns_field0x18(to->field0x18);
     free_PlayerCtrl(to->playerCtrl);
     free_PadManipulator(to->padManipulator);
-    free(to->player_handing_state);
+    free(to->equippedWeaponData);
     free_SpecialEffect(to->specialEffects);
     free_QwcSpEffectEquipCtrl(to->qwcSpEffectEquipCtrl);
     free_ChrIns_field0x2c8(to->field0x2c8);
