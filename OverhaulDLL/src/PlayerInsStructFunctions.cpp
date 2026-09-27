@@ -284,7 +284,13 @@ void free_RingEquipCtrl(RingEquipCtrl* to)
 
 void copy_PlayerGameData(PlayerGameData* to, const PlayerGameData* from, StateTarget target)
 {
+    //player_number_1indexed is session bookkeeping a live-only step sets (once, at the first item use), so a load keeps the live value
+    const int32_t live_player_number = to->attribs.player_number_1indexed;
     copy_PlayerGameData_AttributeInfo(&to->attribs, &from->attribs);
+    if (target == StateTarget::ToGame)
+    {
+        to->attribs.player_number_1indexed = live_player_number;
+    }
     copy_EquipGameData(&to->equipGameData, &from->equipGameData, target);
     copy_PlayerGameData_ChrProperties(&to->ChrProperties, &from->ChrProperties);
 }
