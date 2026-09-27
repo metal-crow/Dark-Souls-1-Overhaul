@@ -238,6 +238,9 @@ void copy_DamageMan(DamageMan* to, DamageMan* from, StateTarget target)
             e.heap_index = -1;
             memset(e.shapes, 0, sizeof(e.shapes));
             e.player_owned = DamageEntry_is_player_owned(head);
+            e.active_shape = head->PhysShapePhantomIns1 == NULL ? -1
+                : head->PhysShapePhantomIns1 == head->FrpgPhysShapePhantomIns_Sphere ? 0
+                : head->PhysShapePhantomIns1 == head->FrpgPhysShapePhantomIns_Capsule ? 1 : -1;
             const ptrdiff_t idx = head - from->all_damage_entries_list_start;
             if (DamageEntry_isDynamicAlloc(head))
             {

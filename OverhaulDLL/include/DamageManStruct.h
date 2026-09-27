@@ -178,6 +178,9 @@ struct SavedDamageEntry
     int32_t heap_index;
     //its attacker is one of the connected players. Only these are compared: rollback covers the players, not the world
     bool player_owned;
+    //which of the entry's shapes PhysShapePhantomIns1 uses: 0 sphere, 1 capsule, -1 none. The other one holds whatever the slot's
+    //previous user left in it
+    int8_t active_shape;
     //the entry's sphere and capsule contents. The phantoms and shapes belong to the entry, so they are saved with it
     SavedHavokShape shapes[2];   //0 sphere, 1 capsule
 };
@@ -206,6 +209,7 @@ struct DamageMan
     uint8_t damage_to_occur;    // 0x33
     uint8_t unk_34[4];          // 0x34 (gap)
     // Local-only fields (not part of the game struct, only used in our local copies)
+    // these are saved as part of Havok code, so we use this info to point back at the right object
     std::vector<SavedDamageEntry> saved_active_damage_entries;   //the active list, in order
     std::vector<SavedHeapDamageEntry> saved_heap_entries;
 };
