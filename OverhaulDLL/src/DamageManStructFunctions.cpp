@@ -417,7 +417,7 @@ void copy_DamageMan(DamageMan* to, DamageMan* from, StateTarget target)
             if (e.pool_index < 0)
             {
                 continue;
-    }
+            }
             restored_active[e.pool_index] = true;
             //a world entry that retired in the discarded frames: its owner has moved on and will never retire it, so retire it now
             //the way the game does. Players are rolled back, so theirs stay.
@@ -444,7 +444,7 @@ void copy_DamageMan(DamageMan* to, DamageMan* from, StateTarget target)
     //the heap id counter only moves forward, like the pool generations
     if (target != StateTarget::ToGame)
     {
-    to->unk_18 = from->unk_18;
+        to->unk_18 = from->unk_18;
     }
     to->put_out_sparks = from->put_out_sparks;
     to->damage_from_weapon = from->damage_from_weapon;
@@ -746,11 +746,17 @@ static void serialize_DamageEntryField0x118(StateVisitor& v, const DamageEntryFi
     v.end();
 }
 
+// Which gaps are padding: Init_DamageEntry, Clear_DamageEntry, Build_DamageEntry, Step_DamageEntry, the damage cast (FUN_1403c6850)
+// and the link/alt-phantom setters never touch +0x4, +0x114, +0x128, +0x197, +0x19c, +0x1b6, +0x1d4, +0x214..+0x21f, +0x228..+0x22f;
+// they are alignment gaps, and a pool slot keeps whatever it held before (Ghidra, 2026-09-25). Of +0x196 only the low byte is written.
 static void serialize_DamageEntry(StateVisitor& v, const DamageEntry* e)
 {
     v.begin("DamageEntry");
-    v.field("id", e->id);
-    v.field("unk_4", e->unk_4);
+    // the id is the pool slot and its reuse count, which world-owned entries shift; which entry this is shows in the list order
+    char idbuf[16];
+    snprintf(idbuf, sizeof(idbuf), "%x", e->id);
+    v.note("id", idbuf);
+    v.padding("unk_4", &e->unk_4, sizeof(e->unk_4));
     serialize_FrpgPhysShapePhantomIns(v, e->FrpgPhysShapePhantomIns_Sphere);
     serialize_FrpgPhysShapePhantomIns(v, e->FrpgPhysShapePhantomIns_Capsule);
     v.ptr_flag("PhysShapePhantomIns1", e->PhysShapePhantomIns1);
@@ -760,7 +766,7 @@ static void serialize_DamageEntry(StateVisitor& v, const DamageEntry* e)
     v.ptr_flag("PhysShapePhantomIns1_altPtr_B", e->PhysShapePhantomIns1_altPtr_B);
     v.field("attackerHandle", e->attackerHandle);
     v.blob("attackInfo", e->attackInfo, sizeof(e->attackInfo));
-    v.field("unk_114", e->unk_114);
+    v.padding("unk_114", &e->unk_114, sizeof(e->unk_114));
     if (e->field0x118)
     {
         v.field("field0x118_present", true);
@@ -772,7 +778,7 @@ static void serialize_DamageEntry(StateVisitor& v, const DamageEntry* e)
     }
     v.field("life", e->life);
     v.field("unk_124", e->unk_124);
-    v.blob("unk_128", e->unk_128, sizeof(e->unk_128));
+    v.padding("unk_128", e->unk_128, sizeof(e->unk_128));
     v.blob("field0x130", e->field0x130, sizeof(e->field0x130));
     v.field("unk_170", e->unk_170);
     v.field("unk_174", e->unk_174);
@@ -782,11 +788,13 @@ static void serialize_DamageEntry(StateVisitor& v, const DamageEntry* e)
     v.field("unk_184", e->unk_184);
     v.field("unk_188", e->unk_188);
     v.field("unk_18c", e->unk_18c);
-    v.field("unk_190", e->unk_190);
+    // the entry this one continues (Step_DamageEntry takes its position once, then sets it to -1)
+    serialize_DamageEntry_ref(v, "unk_190", e->unk_190);
     v.field("unk_194", e->unk_194);
-    v.field("unk_196", e->unk_196);
+    v.field("unk_196", (uint8_t)(e->unk_196 & 0xff));
+    v.padding("unk_197", (const uint8_t*)&e->unk_196 + 1, 1);
     v.field("unk_198", e->unk_198);
-    v.field("unk_19c", e->unk_19c);
+    v.padding("unk_19c", &e->unk_19c, sizeof(e->unk_19c));
     v.field("unk_1a0", e->unk_1a0);
     v.field("unk_1a4", e->unk_1a4);
     v.field("unk_1a8", e->unk_1a8);
@@ -794,7 +802,7 @@ static void serialize_DamageEntry(StateVisitor& v, const DamageEntry* e)
     v.field("unk_1b0", e->unk_1b0);
     v.field("isSweetSpot", e->isSweetSpot);
     v.field("isWeakSpot", e->isWeakSpot);
-    v.field("unk_1b6", e->unk_1b6);
+    v.padding("unk_1b6", &e->unk_1b6, sizeof(e->unk_1b6));
     v.field("unk_1b8", e->unk_1b8);
     v.field("physical_magnification", e->physical_magnification);
     v.field("magic_magnification", e->magic_magnification);
@@ -802,7 +810,7 @@ static void serialize_DamageEntry(StateVisitor& v, const DamageEntry* e)
     v.field("lightning_magnification", e->lightning_magnification);
     v.field("stamina_dmg_magnification", e->stamina_dmg_magnification);
     v.field("knockback_percent", e->knockback_percent);
-    v.field("unk_1d4", e->unk_1d4);
+    v.padding("unk_1d4", &e->unk_1d4, sizeof(e->unk_1d4));
     v.ptr_flag("DmgHitRecordManImp_field0x10Elem", e->DmgHitRecordManImp_field0x10Elem);
     v.ptr_flag("DmgHitRecordManImp_field0x10Elem_b", e->DmgHitRecordManImp_field0x10Elem_b);
     v.ptr_flag("DmgHitRecordManImp_field0x10Elem_c", e->DmgHitRecordManImp_field0x10Elem_c);
@@ -810,13 +818,13 @@ static void serialize_DamageEntry(StateVisitor& v, const DamageEntry* e)
     v.ptr_flag("followup_b", e->followup_b);
     v.ptr_flag("followup_c", e->followup_c);
     v.field("num_hits", e->num_hits);
-    v.field("unk_214", e->unk_214);
-    v.blob("unk_218", e->unk_218, sizeof(e->unk_218));
+    v.padding("unk_214", &e->unk_214, sizeof(e->unk_214));
+    v.padding("unk_218", e->unk_218, sizeof(e->unk_218));
     // the active list's link. Its order is already the order of saved_active_damage_entries, and whether it is set
     // also depends on world-owned entries after this one, which are not compared
     v.excluded("next", sizeof(e->next));
-    v.field("unk_228", e->unk_228);
-    v.field("unk_22c", e->unk_22c);
+    v.padding("unk_228", &e->unk_228, sizeof(e->unk_228));
+    v.padding("unk_22c", &e->unk_22c, sizeof(e->unk_22c));
     v.end();
 }
 
@@ -825,7 +833,8 @@ static void serialize_DamageEntry(StateVisitor& v, const DamageEntry* e)
 static void serialize_SavedDamageEntry(StateVisitor& v, const SavedDamageEntry* e, const DamageMan* d)
 {
     v.begin("SavedDamageEntry");
-    v.field("pool_index", e->pool_index);
+    // printed, not compared: world-owned entries decide which slot a player's entry gets (see serialize_DamageEntry_ref)
+    v.note("pool_index", std::to_string(e->pool_index));
     const SavedHavokShape* shapes = e->shapes;
     if (e->pool_index >= 0 && e->pool_index < (int32_t)max_preallocated_DamageEntry && d->all_damage_entries_list_start != NULL)
     {
@@ -836,13 +845,61 @@ static void serialize_SavedDamageEntry(StateVisitor& v, const SavedDamageEntry* 
         serialize_DamageEntry(v, d->saved_heap_entries[e->heap_index].entry);
         shapes = d->saved_heap_entries[e->heap_index].shapes;
     }
-    serialize_SavedHavokShape(v, "sphere_shape", &shapes[0]);
-    serialize_SavedHavokShape(v, "capsule_shape", &shapes[1]);
+    // only the shape the entry uses; the other still holds what the slot's previous user left in it
+    v.field("active_shape", e->active_shape);
+    if (e->active_shape == 0)
+    {
+        serialize_SavedHavokShape(v, "sphere_shape", &shapes[0]);
+    }
+    else if (e->active_shape == 1)
+    {
+        serialize_SavedHavokShape(v, "capsule_shape", &shapes[1]);
+    }
     v.end();
+}
+
+const DamageMan* serialize_damage_context = NULL;
+
+void serialize_DamageEntry_ref(StateVisitor& v, const char* name, uint32_t id)
+{
+    int32_t ref = -1;
+    if (id != 0xffffffff)
+    {
+        ref = -2;
+        const DamageMan* d = serialize_damage_context;
+        int32_t player_index = 0;
+        for (size_t i = 0; d != NULL && i < d->saved_active_damage_entries.size(); i++)
+        {
+            const SavedDamageEntry& e = d->saved_active_damage_entries[i];
+            const DamageEntry* de = NULL;
+            if (e.pool_index >= 0 && e.pool_index < (int32_t)max_preallocated_DamageEntry && d->all_damage_entries_list_start != NULL)
+                de = &d->all_damage_entries_list_start[e.pool_index];
+            else if (e.heap_index >= 0 && (size_t)e.heap_index < d->saved_heap_entries.size())
+                de = d->saved_heap_entries[e.heap_index].entry;
+            if (de != NULL && de->id == id)
+            {
+                ref = e.player_owned ? player_index : -3;
+                break;
+            }
+            if (e.player_owned)
+            {
+                player_index++;
+            }
+        }
+    }
+    v.field(name, ref);
+    if (v.mode == StateVisitor::Mode::Print && id != 0xffffffff)
+    {
+        char idbuf[16];
+        snprintf(idbuf, sizeof(idbuf), "%x", id);
+        std::string n = std::string(name) + "_id";
+        v.note(n.c_str(), idbuf);
+    }
 }
 
 void serialize_DamageMan(StateVisitor& v, DamageMan* d)
 {
+    DamageEntryRefContext ctx(d);
     v.begin("DamageMan");
 
     // only the ACTIVE, player-owned damage entries are hashed
@@ -860,6 +917,25 @@ void serialize_DamageMan(StateVisitor& v, DamageMan* d)
         }
     }
     v.note("world_owned_entries_not_compared", std::to_string(d->saved_active_damage_entries.size() - player_owned));
+    // every active entry in list order (print only): slot/id/owner/life, to follow allocation order in a dump diff
+    if (v.mode == StateVisitor::Mode::Print)
+    {
+        std::string all;
+        char buf[160];
+        for (const SavedDamageEntry& e : d->saved_active_damage_entries)
+        {
+            const DamageEntry* de = NULL;
+            if (e.pool_index >= 0 && e.pool_index < (int32_t)max_preallocated_DamageEntry && d->all_damage_entries_list_start != NULL)
+                de = &d->all_damage_entries_list_start[e.pool_index];
+            else if (e.heap_index >= 0 && (size_t)e.heap_index < d->saved_heap_entries.size())
+                de = d->saved_heap_entries[e.heap_index].entry;
+            if (de == NULL) continue;
+            snprintf(buf, sizeof(buf), " [%d id=%x atk=%x life=%.4f at %.2f,%.2f,%.2f%s]", e.pool_index, de->id, de->attackerHandle, de->life,
+                de->unk_170, de->unk_174, de->unk_178, e.player_owned ? " P" : "");
+            all += buf;
+        }
+        v.note("active_list", all);
+    }
 
     // all_damage_entries_list_cur is a GAME pool address in the snapshot; can't be
     // indexed against the snapshot's own pool -> null/non-null only. A real cursor
@@ -869,7 +945,8 @@ void serialize_DamageMan(StateVisitor& v, DamageMan* d)
     // The pool itself is NOT walked: an entry that is not in the active list is a
     // free slot holding uninitialised memory.
 
-    v.field("unk_18", d->unk_18);
+    // the heap id counter: not rolled back (see "Entry ids across timelines"), so not compared
+    v.note("unk_18", std::to_string(d->unk_18));
     v.field("put_out_sparks", d->put_out_sparks);
     v.field("damage_from_weapon", d->damage_from_weapon);
     v.field("damage_to_occur", d->damage_to_occur);

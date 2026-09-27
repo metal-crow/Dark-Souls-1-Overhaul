@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <cstring>
 #include <string>
+#include <initializer_list>
 
 /*
  * Single-traversal state serializer shared by the rollback determinism oracle.
@@ -96,6 +97,54 @@ public:
             line_begin(n);
             _out += "<pad "; _out += std::to_string(len); _out += "B>\n";
         }
+    }
+
+    // A blob with holes: `holes` lists byte ranges (offset, length, kind) inside it that are either
+    // padding (Pad: never written by the game, per the Ghidra layout -- only the length is folded) or
+    // a heap pointer (Ptr: 8 bytes, folded as null/non-null like ptr_flag). Everything else is hashed
+    // byte for byte like blob(). The ranges must be sorted and inside the blob. Printed as hex with
+    // "__" for padding bytes and "pp" for pointer bytes, so the dump diff stays quiet about them too.
+    enum class Hole { Pad, Ptr };
+    struct HoleRange { size_t off; size_t len; Hole kind; };
+    void blob_holes(const char* n, const void* p, size_t len, std::initializer_list<HoleRange> holes)
+    {
+        const uint8_t* b = (const uint8_t*)p;
+        tag('H'); fold(&len, sizeof(len));
+        size_t at = 0;
+        std::string hex;
+        char tmp[4];
+        auto plain = [&](size_t upto)
+        {
+            if (upto > len) upto = len;
+            if (upto > at) fold(b + at, upto - at);
+            if (mode == Mode::Print) for (size_t i = at; i < upto; i++) { snprintf(tmp, sizeof(tmp), "%02x", b[i]); hex += tmp; }
+            if (upto > at) at = upto;
+        };
+        for (const HoleRange& h : holes)
+        {
+            plain(h.off);
+            size_t hl = h.len;
+            if (h.off + hl > len) hl = h.off < len ? len - h.off : 0;
+            if (h.kind == Hole::Ptr)
+            {
+                uint64_t v = 0;
+                memcpy(&v, b + h.off, hl < 8 ? hl : 8);
+                uint8_t f = v ? 1 : 0;
+                tag('p'); fold(&f, 1);
+                if (mode == Mode::Print) for (size_t i = 0; i < hl; i++) hex += "pp";
+            }
+            else
+            {
+                tag('_'); fold(&hl, sizeof(hl));
+#if STATEHASH_HASH_PADDING
+                fold(b + h.off, hl);
+#endif
+                if (mode == Mode::Print) for (size_t i = 0; i < hl; i++) hex += "__";
+            }
+            at = h.off + hl;
+        }
+        plain(len);
+        if (mode == Mode::Print) { line_begin(n); _out += hex; _out += "\n"; }
     }
 
     // Real, live state that is deliberately OUT OF SCOPE for the comparison, and so is

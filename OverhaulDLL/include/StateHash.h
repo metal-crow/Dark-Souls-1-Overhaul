@@ -92,10 +92,13 @@ namespace RollbackHash
         // Hash the players in canonical (steam-id) order
         PlayerIns* ordered[GGPO_MAX_PLAYERS] = {};
         uint64_t pl = 1469598103934665603ULL;
+        DamageEntryRefContext damage_refs(s->damageman);
         for (uint32_t i = 0; i < n; i++)
         {
             ordered[i] = s->playerins[order[i]];
-            pl = _fold(pl, s->player_steam_ids[order[i]]);
+            // The steam id orders the players but is not folded in: it is read from the live player at save time, and the local
+            // player's reads 0 until a live-only step sets up its session data (the first item use), so live and re-simulated
+            // saves of that frame disagree. A misordered pair still shows as a whole-player diff, and the dump header names it.
             pl = _fold(pl, hash_PlayerIns(ordered[i]));
         }
         d.player   = pl;
@@ -202,6 +205,7 @@ namespace RollbackHash
         uint32_t order[GGPO_MAX_PLAYERS];
         canonical_player_order(s, n, order);
         PlayerIns* ordered[GGPO_MAX_PLAYERS] = {};
+        DamageEntryRefContext damage_refs(s->damageman);
         for (uint32_t i = 0; i < n; i++)
         {
             ordered[i] = s->playerins[order[i]];

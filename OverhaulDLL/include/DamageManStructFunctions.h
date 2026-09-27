@@ -18,6 +18,20 @@ void serialize_DamageMan(StateVisitor& v, DamageMan* d);
 std::string print_DamageMan(DamageMan* d);
 uint64_t hash_DamageMan(DamageMan* d);
 
+//The saved DamageMan that damage entry ids held elsewhere (ChrIns' current entries) are resolved against while serializing. An id
+//names a pool slot and that slot's reuse count, both of which depend on world-owned entries rollback does not cover, so a reference
+//is compared as WHICH player-owned entry it names. Set by DamageEntryRefContext for the duration of one state's serialization.
+extern const DamageMan* serialize_damage_context;
+struct DamageEntryRefContext
+{
+    const DamageMan* prev;
+    explicit DamageEntryRefContext(const DamageMan* d) : prev(serialize_damage_context) { serialize_damage_context = d; }
+    ~DamageEntryRefContext() { serialize_damage_context = prev; }
+};
+//A damage entry id: -1 for none, else the index among the player-owned active entries of serialize_damage_context, -2 if it names
+//no active entry, -3 if it names a world-owned one. The raw id is printed alongside.
+void serialize_DamageEntry_ref(StateVisitor& v, const char* name, uint32_t id);
+
 void copy_DamageEntry(DamageEntry* to, DamageEntry* from, StateTarget target);
 DamageEntry* init_DamageEntry();
 void free_DamageEntry(DamageEntry* to, bool freeself);

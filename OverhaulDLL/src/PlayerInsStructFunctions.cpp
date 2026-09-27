@@ -2124,13 +2124,17 @@ static void serialize_ChrAsm(StateVisitor& v, const ChrAsm* a)
 static void serialize_ChrAsmModel(StateVisitor& v, const ChrAsmModel* m)
 {
     v.begin("ChrAsmModel");
-    v.blob("unk_8", &m->unk_8, 0x10);
+    v.blob_holes("unk_8", &m->unk_8, 0x10, { { 0xc, 4, StateVisitor::Hole::Pad } });
     v.blob("fieldE0", m->fieldE0, sizeof(m->fieldE0));
     v.blob("unk_68", &m->unk_68, 0x18);
     v.field("data_3a", m->data_3a);
     v.blob("unk_a0", &m->unk_a0, 0x28);
     v.blob("hairColor", &m->hairColor, 0x80);
-    v.blob("filecap_array", m->filecap_array, sizeof(m->filecap_array));
+    // FileCap* x13: loaded resources at per-process addresses
+    for (size_t i = 0; i < sizeof(m->filecap_array) / sizeof(m->filecap_array[0]); i++)
+    {
+        v.ptr_flag("filecap_array", (void*)m->filecap_array[i]);
+    }
     v.field("unk_1c8", m->unk_1c8);
     v.blob("unk_1c9", m->unk_1c9, sizeof(m->unk_1c9));
     v.end();
@@ -2197,7 +2201,9 @@ static void serialize_EquipGameData(StateVisitor& v, const EquipGameData* e)
 static void serialize_PlayerGameData_AttributeInfo(StateVisitor& v, const PlayerGameData_AttributeInfo* a)
 {
     v.begin("PlayerGameData_AttributeInfo");
-    v.blob("AttributeInfo", a, sizeof(*a));
+    // not rolled back (copy_PlayerGameData), and a player's number differs per instance
+    v.excluded("player_number_1indexed", sizeof(a->player_number_1indexed));
+    v.blob("AttributeInfo", &a->Hp, sizeof(*a) - offsetof(PlayerGameData_AttributeInfo, Hp));
     v.end();
 }
 
@@ -2267,7 +2273,7 @@ static void serialize_EntityThrowAnimationStatus(StateVisitor& v, const EntityTh
     {
         v.field("throwSelfEsc_present", false);
     }
-    v.blob("unk_60", &e->unk_60, 0x50);
+    v.blob_holes("unk_60", &e->unk_60, 0x50, { { 0xc, 4, StateVisitor::Hole::Pad }, { 0x41, 3, StateVisitor::Hole::Pad }, { 0x49, 3, StateVisitor::Hole::Pad } });
     v.end();
 }
 
@@ -2290,7 +2296,13 @@ static void serialize_SpecialEffect_Info(StateVisitor& v, const SpecialEffect_In
     const SpecialEffect_Info* cur = s;
     while (cur && n < max_preallocated_SpecialEffect_Info)
     {
-        v.blob("data_0", cur->data_0, sizeof(cur->data_0));
+        // Padding (Ghidra, 2026-09-25): +0x2b..+0x2f, which Construct_SpecialEffect_Info, Init_via_Copy_SpecialEffect_Info and
+        // Step_SpecialEffect_Info never write, and param_info+0x4, the gap before its pointer that SpEffectParam::Build_ParamInfo
+        // (140532410) never writes. A live node carries heap leftovers there ("_End" seen)
+        v.blob("data_0", cur->data_0, 0x2b);
+        v.padding("data_0_pad_2b", cur->data_0 + 0x2b, 5);
+        v.blob("param_info_rowId", cur->data_0 + 0x30, 4);
+        v.padding("param_info_pad_4", cur->data_0 + 0x34, 4);
         v.ptr_flag("paramRowBytes", (void*)cur->paramRowBytes);   // loaded-param ptr
         cur = cur->next;
         n++;
@@ -2380,10 +2392,10 @@ static void serialize_ChrAttachSys(StateVisitor& v, const ChrAttachSys* c)
 static void serialize_ChrIns_field0x2c8(StateVisitor& v, const ChrIns_field0x2c8* f)
 {
     v.begin("ChrIns_field0x2c8");
-    v.blob("unk_8", &f->unk_8, 0x18);
+    v.blob_holes("unk_8", &f->unk_8, 0x18, { { 0x14, 4, StateVisitor::Hole::Pad } });
     v.field("unk_28", f->unk_28);
     v.field("unk_2c", f->unk_2c);
-    v.blob("unk_38", &f->unk_38, 0x10);
+    v.blob_holes("unk_38", &f->unk_38, 0x10, { { 0x4, 4, StateVisitor::Hole::Pad } });
     v.field("unk_50", f->unk_50);
     v.end();
 }
@@ -2413,16 +2425,17 @@ static void serialize_HitIns(StateVisitor& v, const HitIns* h)
 static void serialize_SpinJoint(StateVisitor& v, const SpinJoint* s)
 {
     v.begin("SpinJoint");
-    v.field("unk_8", s->unk_8);
+    // +0x8: nothing in the Ghidra layout between the vtable and the parent pointer; held a heap address on one instance and 0 on the other
+    v.ptr_flag("unk_8", (const void*)s->unk_8);
     v.blob("spin_bone_index", &s->spin_bone_index, 96);
-    v.blob("disableUpdate", &s->disableUpdate, 8);
+    v.blob_holes("disableUpdate", &s->disableUpdate, 8, { { 0x1, 7, StateVisitor::Hole::Pad } });
     v.end();
 }
 
 static void serialize_TurnAnim(StateVisitor& v, const TurnAnim* t)
 {
     v.begin("TurnAnim");
-    v.field("unk_8", t->unk_8);
+    v.ptr_flag("unk_8", (const void*)t->unk_8);   // as SpinJoint
     v.blob("turnL", &t->turnL, 0x28);
     serialize_SpinJoint(v, t->joint_UpperRoot);
     serialize_SpinJoint(v, t->joint_LowerRoot);
@@ -2440,7 +2453,7 @@ static void serialize_ArrowTurnAnim(StateVisitor& v, const ArrowTurnAnim* a)
     serialize_TurnAnim(v, &a->turnAnim);
     serialize_SpinJoint(v, a->joint_spine_2);
     serialize_SpinJoint(v, a->joint_spine1_2);
-    v.blob("unk_1b8", &a->unk_1b8, 8);
+    v.blob_holes("unk_1b8", &a->unk_1b8, 8, { { 0x4, 4, StateVisitor::Hole::Pad } });
     v.end();
 }
 
@@ -2478,10 +2491,10 @@ static void serialize_HavokChara(StateVisitor& v, const HavokChara* h)
     v.begin("HavokChara");
     v.blob("RotAngleUnkWep", &h->RotAngleUnkWep, 0x38);
     serialize_hkpCharacterProxy(v, h->char_proxy);
-    v.blob("unk_60", &h->unk_60, 0x98);
-    v.blob("unk_100", &h->unk_100, 0xe8);
-    v.blob("unk_1f0", &h->unk_1f0, 0x58);
-    v.blob("unk_258", &h->unk_258, 0x38);
+    v.blob_holes("unk_60", &h->unk_60, 0x98, { { 0xe, 2, StateVisitor::Hole::Pad }, { 0x8d, 1, StateVisitor::Hole::Pad }, { 0x94, 4, StateVisitor::Hole::Pad } });
+    v.blob_holes("unk_100", &h->unk_100, 0xe8, { { 0x4, 12, StateVisitor::Hole::Pad } });
+    v.blob_holes("unk_1f0", &h->unk_1f0, 0x58, { { 0x5, 1, StateVisitor::Hole::Pad }, { 0xb, 5, StateVisitor::Hole::Pad }, { 0x52, 6, StateVisitor::Hole::Pad } });
+    v.blob_holes("unk_258", &h->unk_258, 0x38, { { 0x2d, 3, StateVisitor::Hole::Pad } });
     serialize_SavedHavokPhantom(v, "phantom1", &h->saved_phantom_1);
     serialize_SavedHavokPhantom(v, "phantom2", &h->saved_phantom_2);
     v.end();
@@ -2555,7 +2568,9 @@ static void serialize_EzStateRegisterSet(StateVisitor& v, const EzStateRegisterS
 static void serialize_EzState_detail_EzStateMachineImpl(StateVisitor& v, const EzState_detail_EzStateMachineImpl* e)
 {
     v.begin("EzStateMachineImpl");
-    v.blob("data_0", e->data_0, sizeof(e->data_0));
+    // data_0+8 is the current state, a pointer into the loaded ESD file (per-process address). TODO: hash it relative to the
+    // ESD's base; for now null/non-null, and the state ids in ActionCtrl cover which state it is
+    v.blob_holes("data_0", e->data_0, sizeof(e->data_0), { { 8, 8, StateVisitor::Hole::Ptr } });
     serialize_EzStateRegisterSet(v, &e->EzStateRegisterSet1);
     serialize_EzStateRegisterSet(v, &e->EzStateRegisterSet2);
     v.blob("data_1", e->data_1, sizeof(e->data_1));
@@ -2577,8 +2592,8 @@ static void serialize_ActionCtrl(StateVisitor& v, const ActionCtrl* a)
     v.field("unk_8", a->unk_8);
     serialize_ActionCtrl_0x30Substruct(v, &a->passive_state);
     serialize_ActionCtrl_0x30Substruct(v, &a->active_state);
-    v.blob("ezStatePassiveState_region", &a->ezStatePassiveState, 0x4d0);
-    v.blob("unk_548", &a->unk_548, 0x18);
+    v.blob_holes("ezStatePassiveState_region", &a->ezStatePassiveState, 0x4d0, { { 0x31, 1, StateVisitor::Hole::Pad }, { 0x33, 1, StateVisitor::Hole::Pad }, { 0x36, 2, StateVisitor::Hole::Pad }, { 0x47, 1, StateVisitor::Hole::Pad }, { 0xb9, 3, StateVisitor::Hole::Pad }, { 0x125, 3, StateVisitor::Hole::Pad }, { 0x12d, 3, StateVisitor::Hole::Pad }, { 0x134, 5, StateVisitor::Hole::Pad }, { 0x13d, 1, StateVisitor::Hole::Pad }, { 0x165, 3, StateVisitor::Hole::Pad }, { 0x169, 3, StateVisitor::Hole::Pad }, { 0x16f, 1, StateVisitor::Hole::Pad }, { 0x171, 3, StateVisitor::Hole::Pad }, { 0x2a6, 2, StateVisitor::Hole::Pad }, { 0x2ad, 3, StateVisitor::Hole::Pad }, { 0x3ed, 3, StateVisitor::Hole::Pad }, { 0x3f5, 3, StateVisitor::Hole::Pad }, { 0x444, 8, StateVisitor::Hole::Pad }, { 0x45e, 2, StateVisitor::Hole::Pad }, { 0x462, 14, StateVisitor::Hole::Pad }, { 0x4ad, 3, StateVisitor::Hole::Pad }, { 0x4b1, 3, StateVisitor::Hole::Pad }, { 0x4c1, 3, StateVisitor::Hole::Pad } });
+    v.blob_holes("unk_548", &a->unk_548, 0x18, { { 0x2, 2, StateVisitor::Hole::Pad }, { 0xc, 12, StateVisitor::Hole::Pad } });
     v.end();
 }
 
@@ -2646,7 +2661,11 @@ static void serialize_ChrCtrl_AnimationQueue_field0x10(StateVisitor& v, const Ch
     v.begin("ChrCtrl_AnimationQueue_field0x10");
     v.field("array1_len", f->array1_len);
     v.field("array2_len", f->array2_len);
-    v.blob("arry2", f->arry2, sizeof(ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem) * f->array2_len);
+    // each element starts with its AnibndResCap*, a loaded resource at a per-process address
+    for (size_t i = 0; i < f->array2_len; i++)
+    {
+        v.blob_holes("arry2", &f->arry2[i], sizeof(ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem), { { 0, 8, StateVisitor::Hole::Ptr } });
+    }
     for (size_t i = 0; i < f->array1_len; i++)
     {
         v.ptr_index("arry1", f->arry1[i], f->arry2, sizeof(ChrCtrl_AnimationQueue_field0x10_field0x10arrayelem));
@@ -2660,7 +2679,7 @@ static void serialize_ChrCtrl_AnimationQueueEntry(StateVisitor& v, const ChrCtrl
     v.blob("unk_0", &e->unk_0, 8);
     serialize_hkaDefaultAnimationControl(v, e->defaultAnimationControl);
     v.ptr_flag("HvkAnim_AnimInfoArrayElem", (void*)e->HvkAnim_AnimInfoArrayElem);   // loaded animbnd
-    v.blob("unk_28", &e->unk_28, 0x50);
+    v.blob_holes("unk_28", &e->unk_28, 0x50, { { 0x13, 1, StateVisitor::Hole::Pad }, { 0x21, 3, StateVisitor::Hole::Pad }, { 0x29, 3, StateVisitor::Hole::Pad }, { 0x4d, 3, StateVisitor::Hole::Pad } });
     v.end();
 }
 
@@ -2783,7 +2802,7 @@ static void serialize_WalkAnim_Twist_Field0x228Elem(StateVisitor& v, const WalkA
 static void serialize_WalkAnim_Twist(StateVisitor& v, const WalkAnim_Twist* w)
 {
     v.begin("WalkAnim_Twist");
-    v.field("unk_8", w->unk_8);
+    v.ptr_flag("unk_8", (const void*)w->unk_8);   // as SpinJoint
     v.blob("walkF_region", &w->walkF, 0x1b8);
     v.blob("unk_1d8", &w->unk_1d8, 16);
     serialize_SpinJoint(v, w->Upper_Root_Joint);
@@ -2791,7 +2810,7 @@ static void serialize_WalkAnim_Twist(StateVisitor& v, const WalkAnim_Twist* w)
     serialize_SpinJoint(v, w->neck_joint);
     v.blob("turn_lower_body_region", &w->turn_lower_body, 0x28);
     serialize_WalkAnim_Twist_Field0x228Elem(v, &w->walkAnim_Twist_Field0x228Elem);
-    v.blob("unk_258", &w->unk_258, 0x48);
+    v.blob_holes("unk_258", &w->unk_258, 0x48, { { 0x2c, 4, StateVisitor::Hole::Pad } });
     v.end();
 }
 
@@ -2809,11 +2828,12 @@ static void serialize_ChrCtrl(StateVisitor& v, const ChrCtrl* c)
     serialize_HavokChara(v, c->havokChara);
     serialize_FrpgRagdollIns(v, c->ragdollIns);
     serialize_ActionCtrl(v, c->actionctrl);
-    v.field("unk_80", c->unk_80);
-    v.blob("unk_90", &c->unk_90, 0x118);
+    // +0x80: one byte; +0x81..+0x87 are a gap in the Ghidra layout that holds the heap's fill
+    v.blob_holes("unk_80", &c->unk_80, 8, { { 1, 7, StateVisitor::Hole::Pad } });
+    v.blob_holes("unk_90", &c->unk_90, 0x118, { { 0x8, 8, StateVisitor::Hole::Pad }, { 0x10, 8, StateVisitor::Hole::Ptr }, { 0x18, 8, StateVisitor::Hole::Ptr }, { 0x20, 8, StateVisitor::Hole::Ptr }, { 0x28, 8, StateVisitor::Hole::Ptr }, { 0x30, 8, StateVisitor::Hole::Ptr }, { 0x38, 8, StateVisitor::Hole::Ptr }, { 0x79, 7, StateVisitor::Hole::Pad }, { 0xa8, 4, StateVisitor::Hole::Pad }, { 0xe0, 4, StateVisitor::Hole::Pad }, { 0xf0, 32, StateVisitor::Hole::Pad }, { 0x113, 5, StateVisitor::Hole::Pad } });
     serialize_WalkAnim_Twist(v, c->walkAnim_Twist);
-    v.blob("movement_enabled_region", &c->movement_enabled, 0xe0);
-    v.blob("MapHitDisableDebugging_region", &c->MapHitDisableDebugging, 0x60);
+    v.blob_holes("movement_enabled_region", &c->movement_enabled, 0xe0, { { 0x2, 2, StateVisitor::Hole::Pad }, { 0x6e, 2, StateVisitor::Hole::Pad }, { 0xa2, 6, StateVisitor::Hole::Pad }, { 0xa8, 8, StateVisitor::Hole::Ptr }, { 0xc1, 15, StateVisitor::Hole::Pad } });
+    v.blob_holes("MapHitDisableDebugging_region", &c->MapHitDisableDebugging, 0x60, { { 0x3, 1, StateVisitor::Hole::Pad }, { 0x21, 3, StateVisitor::Hole::Pad }, { 0x4d, 1, StateVisitor::Hole::Pad }, { 0x4f, 1, StateVisitor::Hole::Pad }, { 0x55, 3, StateVisitor::Hole::Pad }, { 0x5c, 4, StateVisitor::Hole::Pad } });
     v.end();
 }
 
@@ -2826,7 +2846,7 @@ static void serialize_FootIK(StateVisitor& v, const char* name, const FootIK* f)
         // skips the pointers: owner/solver/animation queue/raycast (0x0-0x28), the Setup's skeleton (0x50) and the raycast interface (0x148)
         const uint8_t* b = (const uint8_t*)f;
         v.blob("state_28", b + 0x28, 0x50 - 0x28);
-        v.blob("state_58", b + 0x58, 0x148 - 0x58);
+        v.blob_holes("state_58", b + 0x58, 0x148 - 0x58, { { 0x88, 8, StateVisitor::Hole::Ptr }, { 0xa8, 8, StateVisitor::Hole::Ptr }, { 0xc8, 8, StateVisitor::Hole::Ptr }, { 0xd0, 8, StateVisitor::Hole::Ptr } });
         v.blob("state_150", b + 0x150, FootIK_size - 0x150);
         // the solver after its header and its Setup's skeleton pointer
         v.blob("solver_state", f->saved_solver + 0x18, FootPlacementIkSolver_size - 0x18);
@@ -2844,7 +2864,7 @@ static void serialize_PlayerCtrl(StateVisitor& v, const PlayerCtrl* p)
     serialize_FootIK(v, "footIK_right", p->footIK_right);
     serialize_FootIK(v, "footIK_left", p->footIK_left);
     v.blob("unk_330", &p->unk_330, 8);
-    v.blob("movement_related_flags_region", &p->movement_related_flags, 24);
+    v.blob_holes("movement_related_flags_region", &p->movement_related_flags, 24, { { 0x1, 3, StateVisitor::Hole::Pad }, { 0x9, 3, StateVisitor::Hole::Pad }, { 0x14, 4, StateVisitor::Hole::Pad } });
     v.end();
 }
 
@@ -2859,7 +2879,10 @@ static void serialize_ChrIns(StateVisitor& v, const ChrIns* c)
     v.blob("unk_16c", &c->unk_16c, 0x10);
     v.blob("lowerThrowAnim", &c->lowerThrowAnim, sizeof(c->lowerThrowAnim));
     v.blob("upperThrowAnim", &c->upperThrowAnim, sizeof(c->upperThrowAnim));
-    v.blob("player_handing_state", c->player_handing_state, sizeof(uint32_t) * 3);
+    v.begin("EquippedWeaponData");
+    v.field("WeaponStyle", c->equippedWeaponData->WeaponStyle);
+    for (int i = 0; i < 3; i++) v.field("WepmotionCategories", c->equippedWeaponData->WepmotionCategories[i]);
+    v.end();
     v.field("curToughness", c->curToughness);
     v.field("maxToughness", c->maxToughness);
     v.field("toughnessUnk1", c->toughnessUnk1);
@@ -2871,9 +2894,20 @@ static void serialize_ChrIns(StateVisitor& v, const ChrIns* c)
     v.field("unk_1e0", c->unk_1e0);
     serialize_SpecialEffect(v, c->specialEffects);
     serialize_QwcSpEffectEquipCtrl(v, c->qwcSpEffectEquipCtrl);
-    v.blob("unk_288", &c->unk_288, 0x48);
+    v.blob_holes("unk_288", &c->unk_288, 0x48, { { 0x9, 7, StateVisitor::Hole::Pad }, { 0x23, 1, StateVisitor::Hole::Pad }, { 0x2c, 12, StateVisitor::Hole::Pad } });
     serialize_ChrIns_field0x2c8(v, c->field0x2c8);
-    v.blob("unk_2d8", &c->unk_2d8, 0x98);
+    v.blob("unk_2d8", &c->unk_2d8, 8);
+    // 0x2e0: the character's current damage entries, 8 x { int32 entry id, uint8 (always 0 so far), 3 bytes never written }
+    for (int i = 0; i < 8; i++)
+    {
+        const uint8_t* rec = c->unk_2e0 + i * 8;
+        uint32_t id;
+        memcpy(&id, rec, 4);
+        serialize_DamageEntry_ref(v, "damage_entry", id);
+        v.field("damage_entry_flag", rec[4]);
+        v.padding("damage_entry_pad", rec + 5, 3);
+    }
+    v.blob_holes("unk_320", &c->unk_320, 0x50, { { 0x42, 2, StateVisitor::Hole::Pad }, { 0x45, 3, StateVisitor::Hole::Pad } });
     serialize_HitIns(v, c->hitins_1);
     serialize_HitIns(v, c->hitins_2);
     v.blob("unk_380", &c->unk_380, 8);
@@ -2894,10 +2928,10 @@ static void serialize_ChrIns(StateVisitor& v, const ChrIns* c)
     v.field("resistCurseTotal", c->resistCurseTotal);
     v.blob("unk_438", c->unk_438, sizeof(c->unk_438));
     serialize_EntityThrowAnimationStatus(v, c->throw_animation_info);
-    v.blob("unk_450", &c->unk_450, 0x18);
-    v.blob("unk_470", &c->unk_470, 0x50);
-    v.blob("unk_4d8", &c->unk_4d8, 0x18);
-    v.blob("unk_518", &c->unk_518, 0x58);
+    v.blob_holes("unk_450", &c->unk_450, 0x18, { { 0x4, 4, StateVisitor::Hole::Pad }, { 0x11, 3, StateVisitor::Hole::Pad } });
+    v.blob_holes("unk_470", &c->unk_470, 0x50, { { 0xd, 3, StateVisitor::Hole::Pad }, { 0x45, 3, StateVisitor::Hole::Pad } });
+    v.blob_holes("unk_4d8", &c->unk_4d8, 0x18, { { 0x8, 8, StateVisitor::Hole::Ptr } });
+    v.blob_holes("unk_518", &c->unk_518, 0x58, { { 0x34, 4, StateVisitor::Hole::Pad }, { 0x40, 4, StateVisitor::Hole::Pad } });
     v.end();
 }
 
@@ -2908,9 +2942,13 @@ void serialize_PlayerIns(StateVisitor& v, const PlayerIns* p)
     v.begin("PlayerIns");
     serialize_ChrIns(v, &p->chrins);
     serialize_PlayerGameData(v, p->playergamedata);
-    v.blob("data_0", p->data_0, sizeof(p->data_0));
-    v.blob("unk_7a8", &p->unk_7a8, 16);
-    v.blob("unk_7d0", &p->unk_7d0, 8);
+    v.blob_holes("data_0", p->data_0, sizeof(p->data_0), { { 0x5, 11, StateVisitor::Hole::Pad }, { 0x115, 3, StateVisitor::Hole::Pad }, { 0x13c, 4, StateVisitor::Hole::Pad }, { 0x154, 12, StateVisitor::Hole::Pad }, { 0x17d, 3, StateVisitor::Hole::Pad }, { 0x199, 3, StateVisitor::Hole::Pad }, { 0x1a0, 4, StateVisitor::Hole::Pad }, { 0x1a9, 7, StateVisitor::Hole::Pad }, { 0x1c1, 15, StateVisitor::Hole::Pad } });
+    v.blob_holes("unk_7a8", &p->unk_7a8, 8, { { 0x1, 3, StateVisitor::Hole::Pad } });
+    v.field("TimeDelayForRollRecalc", p->TimeDelayForRollRecalc);
+    // the host's timer for the type 17 net message (PlayerIns_ComputeChanges), which rollback does not send; it only starts once a
+    // live-only step has set up the player's session data
+    v.excluded("unk_7b4", sizeof(p->unk_7b4));
+    v.blob_holes("unk_7d0", &p->unk_7d0, 8, { { 0x1, 3, StateVisitor::Hole::Pad } });
     serialize_RingEquipCtrl(v, p->ringequipctrl);
     serialize_WeaponEquipCtrl(v, p->weaponequipctrl);
     serialize_ProEquipCtrl(v, p->proequipctrl);
@@ -2923,11 +2961,11 @@ void serialize_PlayerIns(StateVisitor& v, const PlayerIns* p)
     serialize_ChrAsm(v, p->chrasm);
     // chrAsmModelRes intentionally skipped (copy_PlayerIns skips it; redrawn each frame)
     serialize_ChrAsmModel(v, p->chrAsmModel);
-    v.blob("headSize_region", &p->headSize, 24);
-    v.blob("unk_880", &p->unk_880, 0x50);
-    v.blob("data_5", p->data_5, sizeof(p->data_5));
-    v.blob("data_5a", p->data_5a, sizeof(p->data_5a));
-    v.blob("data_6", p->data_6, sizeof(p->data_6));
+    v.blob_holes("headSize_region", &p->headSize, 24, { { 0x14, 4, StateVisitor::Hole::Pad } });
+    v.blob_holes("unk_880", &p->unk_880, 0x50, { { 0x1, 39, StateVisitor::Hole::Pad }, { 0x41, 3, StateVisitor::Hole::Pad }, { 0x4c, 4, StateVisitor::Hole::Pad } });
+    v.blob_holes("data_5", p->data_5, sizeof(p->data_5), { { 0x0, 64, StateVisitor::Hole::Pad }, { 0x41, 3, StateVisitor::Hole::Pad } });
+    v.blob_holes("data_5a", p->data_5a, sizeof(p->data_5a), { { 0x0, 2, StateVisitor::Hole::Pad }, { 0x16, 4, StateVisitor::Hole::Pad }, { 0x21, 5, StateVisitor::Hole::Pad }, { 0x2e, 24, StateVisitor::Hole::Pad } });
+    v.blob_holes("data_6", p->data_6, sizeof(p->data_6), { { 0x0, 8, StateVisitor::Hole::Pad }, { 0x9, 15, StateVisitor::Hole::Pad } });
     v.end();
 }
 

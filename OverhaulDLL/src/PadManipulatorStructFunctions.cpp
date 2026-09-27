@@ -229,8 +229,8 @@ void serialize_PadManipulator(StateVisitor& v, const PadManipulator* p)
     v.field("field145_0x344", p->field145_0x344);
     v.ptr_flag("dbgNode", p->dbgNode);
     // trailing opaque bytes
-    v.blob("seg_tail", b + offsetof(PadManipulator, field147_0x350),
-           sizeof(PadManipulator) - offsetof(PadManipulator, field147_0x350));
+    v.blob_holes("seg_tail", b + offsetof(PadManipulator, field147_0x350),
+           sizeof(PadManipulator) - offsetof(PadManipulator, field147_0x350), { { 0x1, 15, StateVisitor::Hole::Pad } });
     v.end();
 }
 
