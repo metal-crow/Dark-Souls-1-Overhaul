@@ -578,7 +578,37 @@ struct SyncTestProbe
     bool valid = false;
     int32_t sp = 0;
     int32_t attach_head = -1;
+    std::string dmg;      //active DamageMan entries (sorted: Step_DamageMan reverses the list every frame), the free-list head slot and player 0's current entry id
+    //named values whose changes are logged per live and re-simulated frame ("SYNCTEST watch"): a value that changes on a
+    //different frame in one than the other points at state the rollback does not save. Add to it while chasing a mismatch
+    std::vector<std::pair<const char*, int64_t>> watch;
 };
+
+static std::string synctest_damage_summary(PlayerIns* player)
+{
+    DamageMan* dm = *(DamageMan**)Game::damage_man;
+    if (dm == NULL)
+    {
+        return "";
+    }
+    std::vector<std::string> entries;
+    char buf[64];
+    for (DamageEntry* e = dm->active_damage_entries_list; e != NULL; e = e->next)
+    {
+        snprintf(buf, sizeof(buf), "%x%s ", e->id, e->attackerHandle == (uint32_t)player->chrins.handle ? "P" : "");
+        entries.push_back(buf);
+    }
+    std::sort(entries.begin(), entries.end());
+    std::string s;
+    for (const std::string& e : entries)
+    {
+        s += e;
+    }
+    int64_t head = dm->all_damage_entries_list_cur == NULL ? -1 : dm->all_damage_entries_list_cur - dm->all_damage_entries_list_start;
+    snprintf(buf, sizeof(buf), "| free_head=%lld cur=%x", head, *(uint32_t*)((uint8_t*)&player->chrins.unk_2d8 + 8));
+    s += buf;
+    return s;
+}
 
 static SyncTestProbe synctest_probe()
 {
@@ -592,6 +622,19 @@ static SyncTestProbe synctest_probe()
     p.valid = true;
     p.sp = (int32_t)player->chrins.curSp;
     p.attach_head = player->chrins.chrattachsys.SysSlots != NULL ? (int32_t)player->chrins.chrattachsys.SysSlots->slotType : -1;
+    p.dmg = synctest_damage_summary(player);
+    if (player->playergamedata != NULL)
+    {
+        p.watch.push_back({ "attr_10b", ((uint8_t*)&player->playergamedata->attribs)[0x10b] });
+        p.watch.push_back({ "gd_wstyle", player->playergamedata->equipGameData.chrasm.equipped_weapon_style });
+    }
+    if (player->chrasm != NULL)
+    {
+        p.watch.push_back({ "pi_wstyle", player->chrasm->equipped_weapon_style });
+    }
+    p.watch.push_back({ "c2h", player->chrins.padManipulator->chrManipulator.change_2handing_state });
+    //ChrIns+0x160 (ghidra: frame_delta_update_amount_ms): the dt the character update (and the ragdoll keyframe) used, in microseconds
+    p.watch.push_back({ "chr_dt_us", (int64_t)(*(float*)((uint8_t*)player + 0x160) * 1e6f) });
     return p;
 }
 
@@ -606,6 +649,26 @@ static void synctest_observe(bool resim, const SyncTestProbe& before, const Sync
     if (after.sp > before.sp)
     {
         (resim ? t.sp_up_resim : t.sp_up_live)++;
+    }
+    if (after.watch != before.watch)
+    {
+        int frame = 0, confirmed = 0;
+        ggpo_get_frame_info(Rollback::ggpo, &frame, &confirmed);
+        std::string s;
+        for (size_t i = 0; i < after.watch.size() && i < before.watch.size(); i++)
+        {
+            if (after.watch[i].second != before.watch[i].second)
+            {
+                s += " " + std::string(after.watch[i].first) + " " + std::to_string(before.watch[i].second) + "->" + std::to_string(after.watch[i].second);
+            }
+        }
+        ConsoleWrite("SYNCTEST watch %s frame=%d%s", resim ? "resim" : "live", frame, s.c_str());
+    }
+    if (after.dmg != before.dmg)
+    {
+        int frame = 0, confirmed = 0;
+        ggpo_get_frame_info(Rollback::ggpo, &frame, &confirmed);
+        ConsoleWrite("SYNCTEST dmg %s frame=%d  %s  ->  %s", resim ? "resim" : "live", frame, before.dmg.c_str(), after.dmg.c_str());
     }
     if (after.attach_head != before.attach_head)
     {
