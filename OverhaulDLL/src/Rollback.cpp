@@ -853,6 +853,7 @@ bool rollback_game_frame_start_helper(void* unused)
             }
 
             rollback_sync_inputs();
+            clean_free_DamageEntry_slots(*(DamageMan**)Game::damage_man);
             HavokTrace::sample(HavokTrace::Stage::LiveBegin);
 #ifdef GGPO_SYNCTEST
             synctest_live_before = synctest_probe();
@@ -1115,6 +1116,7 @@ bool rollback_advance_frame_callback(int)
     //input path can skip side effects that must only happen once per real frame.
     Rollback::inRollbackResim = true;
     rollback_sync_inputs();
+    clean_free_DamageEntry_slots(*(DamageMan**)Game::damage_man);
 
     //step next frame
 #ifdef GGPO_SYNCTEST

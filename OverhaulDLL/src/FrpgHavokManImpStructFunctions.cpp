@@ -336,6 +336,51 @@ void free_DamageEntry_phantoms(DamageEntry* entry)
     }
 }
 
+// Clear_DamageEntry only queues its phantom's removal (PhysShapePhantomIns1_altPtr_B) and leaves the phantom in the world, and
+// nothing runs that removal until the slot is handed out again: the new entry's first Step_DamageEntry sees its phantom already "in
+// the world", queues no add, then removes it before the damage cast. So a hitbox in a recycled slot misses its first frame of hit
+// detection and one in a fresh slot does not, and which slot a player's hitbox gets depends on world-owned entries, which neither
+// re-simulated frames nor the other instance reproduce. Run at the start of every simulated frame, this
+// finishes those removals so every slot is handed out clean.
+void clean_free_DamageEntry_slots(DamageMan* damageman)
+{
+    if (damageman == NULL)
+    {
+        return;
+    }
+    std::vector<hkpSimpleShapePhantom*> in_world;
+    size_t guard = 0;
+    for (DamageEntry* e = damageman->all_damage_entries_list_cur; e != NULL && guard < HAVOK_ROLLBACK_DAMAGE_POOL_SIZE; e = e->next, guard++)
+    {
+        for (FrpgPhysShapePhantomIns* wrapper : { e->FrpgPhysShapePhantomIns_Sphere, e->FrpgPhysShapePhantomIns_Capsule })
+        {
+            hkpSimpleShapePhantom* phantom = phantom_of(wrapper);
+            if (phantom != NULL && phantom->base.hkpWorldPtr != NULL)
+            {
+                in_world.push_back(phantom);
+            }
+            if (wrapper != NULL)
+            {
+                wrapper->base.base.physWorld = NULL;
+            }
+        }
+        e->PhysShapePhantomIns1_altPtr_A = NULL;
+        e->PhysShapePhantomIns1_altPtr_B = NULL;
+        //+0x1a0..+0x1ac: Init_DamageEntry zeroes them, but neither Clear_DamageEntry nor creating an entry does, so a recycled slot
+        //hands its new entry the previous entry's values
+        e->unk_1a0 = 0.0f;
+        e->unk_1a4 = 0.0f;
+        e->unk_1a8 = 0.0f;
+        e->unk_1ac = 0.0f;
+    }
+    if (!in_world.empty())
+    {
+        hkpWorld* world = get_hkpWorld();
+        check_hkpWorld_unlocked(world, "clean_free_DamageEntry_slots");
+        hk_removePhantomBatch(world, in_world.data(), (uint32_t)in_world.size());
+    }
+}
+
 /* ============================================================
  * FrpgHavokManImp
  * ============================================================ */

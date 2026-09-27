@@ -47,6 +47,8 @@ void copy_hkpEntity_motion(hkpEntity* to, const hkpMotion* from);
 
 // Take a DamageEntry's two phantoms out of the world, ahead of destroying the entry
 void free_DamageEntry_phantoms(DamageEntry* entry);
+//Take the phantoms of every free DamageMan pool slot out of the world and drop the slot's queued add/remove (see the definition)
+void clean_free_DamageEntry_slots(DamageMan* damageman);
 
 void serialize_hkMotionState(StateVisitor& v, const hkMotionState* m);
 void serialize_hkpMotion(StateVisitor& v, const hkpMotion* m);
