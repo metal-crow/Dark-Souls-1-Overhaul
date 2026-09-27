@@ -33,6 +33,9 @@
       script name <text>            label for status/logs
       script status                 just the script part of status
       end_session                   Rollback::rollback_end_session()
+      start_session                 re-arm the session start (rollback_await_init) after end_session
+      warp <x> <y> <z> <yaw>        move the local character within its map with the game's own warp and refill its HP.
+                                    Only without a GGPO session: a live-only change would be undone by the next load
       log <text>                    write "HARNESS: <text>" into the mod log (marker for alignment)
       subscribe                     turn this connection into a log stream
       hashes [since] [max]          confirmed per-frame state digests (StateHash.h ring) with frame > since,
@@ -410,6 +413,44 @@ namespace
             return ok_json("\"was_started\":" + b2s(was));
         }
 
+        if (cmd == "start_session")
+        {
+            if (Rollback::ggpoStarted) return err_json("a GGPO session is already running");
+            Rollback::rollback_start_session(NULL);
+            ConsoleWrite("HARNESS: start_session");
+            return ok_json("\"rollback_enabled\":" + b2s(Rollback::rollbackEnabled));
+        }
+
+        if (cmd == "warp")
+        {
+            if (Rollback::ggpoStarted) return err_json("end the GGPO session first (end_session): the next load would undo the warp");
+            if (a.size() < 5) return err_json("usage: warp <x> <y> <z> <yaw>");
+            if (!Game::playerchar_is_loaded()) return err_json("character not loaded");
+            auto p = Game::get_connected_player(0);
+            if (!p.has_value() || p.value() == 0) return err_json("no local player");
+            PlayerIns* pi = (PlayerIns*)p.value();
+            HavokChara* hc = (pi->chrins.playerCtrl != NULL) ? pi->chrins.playerCtrl->chrCtrl.havokChara : NULL;
+            if (hc == NULL) return err_json("no HavokChara");
+            //FieldArea_RemoteWarpPlayer (the debug menu's warp) ends in FieldArea_WarpHostPlayer(FieldArea, &hit map id, &position,
+            //&rotation); passing the player's own map id takes the same-map path
+            typedef int32_t* PlayerIns_Get_MapId_FUNC(PlayerIns*, int32_t*);
+            typedef void FieldArea_WarpHostPlayer_FUNC(void* field_area, int32_t* map_id, float* position, float* rotation);
+            PlayerIns_Get_MapId_FUNC* PlayerIns_Get_MapId = (PlayerIns_Get_MapId_FUNC*)0x140359d80;
+            FieldArea_WarpHostPlayer_FUNC* FieldArea_WarpHostPlayer = (FieldArea_WarpHostPlayer_FUNC*)0x1403ce050;
+            void* field_area = *(void**)((uint8_t*)Game::get_MoveMapStep() + 0x60);
+            if (field_area == NULL) return err_json("no FieldArea");
+            int32_t map_id = 0;
+            PlayerIns_Get_MapId(pi, &map_id);
+            alignas(16) float position[4] = { std::stof(a[1]), std::stof(a[2]), std::stof(a[3]), 0.0f };
+            alignas(16) float rotation[4] = {};
+            memcpy(rotation, hc->RotAngleUnkWep, sizeof(rotation));
+            rotation[1] = std::stof(a[4]);
+            FieldArea_WarpHostPlayer(field_area, &map_id, position, rotation);
+            pi->chrins.curHp = pi->chrins.maxHp;
+            ConsoleWrite("HARNESS: warp %s %s %s %s", a[1].c_str(), a[2].c_str(), a[3].c_str(), a[4].c_str());
+            return ok_json("\"map_id\":" + std::to_string(map_id));
+        }
+
         if (cmd == "log")
         {
             std::string text = rest_after(line, 1);
@@ -650,7 +691,7 @@ namespace
             return ok_json("\"commands\":[\"ping\",\"status\",\"frame\",\"input\",\"rollback on|off|toggle\","
                            "\"record arm|disarm\",\"record file <path>\",\"replay file <path>\",\"replay off\","
                            "\"script load <path>\",\"script add <directive>\",\"script clear\",\"script neutral on|off\","
-                           "\"script name <text>\",\"script status\",\"end_session\","
+                           "\"script name <text>\",\"script status\",\"end_session\",\"start_session\",\"warp <x> <y> <z> <yaw>\","
                            "\"log <text>\",\"subscribe\",\"hashes [since] [max]\",\"dump_at <frame>|+<n>\",\"dump_status\","
                            "\"dump_get\",\"probe\""
 #if ROLLBACK_INPUT_TESTING
