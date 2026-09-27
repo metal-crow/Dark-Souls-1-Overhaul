@@ -34,6 +34,8 @@
       script status                 just the script part of status
       end_session                   Rollback::rollback_end_session()
       start_session                 re-arm the session start (rollback_await_init) after end_session
+      freeze on|off|status          WorldFreeze (WorldFreeze.h) without a GGPO session: disable enemies, freeze objects/bodies,
+                                    block world damage. A session started while frozen keeps the freeze and ends it with the session
       warp <x> <y> <z> <yaw>        move the local character within its map with the game's own warp and refill its HP.
                                     Only without a GGPO session: a live-only change would be undone by the next load
       log <text>                    write "HARNESS: <text>" into the mod log (marker for alignment)
@@ -68,6 +70,7 @@
 #include "RollbackScript.h"
 #include "StateHash.h"
 #include "VirtualPad.h"
+#include "WorldFreeze.h"
 
 #include <algorithm>
 #include <atomic>
@@ -207,6 +210,15 @@ namespace
         }
     }
 
+    std::string world_freeze_json()
+    {
+        WorldFreeze::Status st = WorldFreeze::status();
+        return "{\"frozen\":" + b2s(st.frozen) + ",\"chrs_disabled\":" + std::to_string(st.chrs)
+            + ",\"objs_unbreakable\":" + std::to_string(st.objs) + ",\"bodies_fixed\":" + std::to_string(st.bodies)
+            + ",\"player_bodies_awake\":" + std::to_string(st.awake) + ",\"damage_blocked\":" + std::to_string(st.blocked_damage)
+            + ",\"world_bodies_fixed\":" + std::to_string(st.world_fixed) + ",\"world_bodies_movable\":" + std::to_string(st.world_movable) + "}";
+    }
+
     std::string status_fields()
     {
         std::string s;
@@ -256,6 +268,7 @@ namespace
         s += ",\"replay_file\":" + q(RollbackReplay::replay_file);
         s += ",\"record_file\":" + q(RollbackReplay::record_file);
         s += ",\"script\":" + RollbackScript::status_json();
+        s += ",\"world_freeze\":" + world_freeze_json();
 #ifdef GGPO_SYNCTEST
         s += ",\"synctest\":" + RollbackHash::synctest_json();
 #endif
@@ -419,6 +432,24 @@ namespace
             Rollback::rollback_start_session(NULL);
             ConsoleWrite("HARNESS: start_session");
             return ok_json("\"rollback_enabled\":" + b2s(Rollback::rollbackEnabled));
+        }
+
+        if (cmd == "freeze")
+        {
+            if (sub == "" || sub == "status") return ok_json("\"world_freeze\":" + world_freeze_json());
+            if (sub != "on" && sub != "off") return err_json("usage: freeze on|off|status");
+            if (Rollback::ggpoStarted) return err_json("a GGPO session is running: it froze the world itself and unfreezes it when it ends");
+            if (sub == "on")
+            {
+                if (!Game::playerchar_is_loaded()) return err_json("character not loaded");
+                WorldFreeze::freeze();
+            }
+            else
+            {
+                WorldFreeze::unfreeze();
+            }
+            ConsoleWrite("HARNESS: freeze %s", sub.c_str());
+            return ok_json("\"world_freeze\":" + world_freeze_json());
         }
 
         if (cmd == "warp")
@@ -691,7 +722,7 @@ namespace
             return ok_json("\"commands\":[\"ping\",\"status\",\"frame\",\"input\",\"rollback on|off|toggle\","
                            "\"record arm|disarm\",\"record file <path>\",\"replay file <path>\",\"replay off\","
                            "\"script load <path>\",\"script add <directive>\",\"script clear\",\"script neutral on|off\","
-                           "\"script name <text>\",\"script status\",\"end_session\",\"start_session\",\"warp <x> <y> <z> <yaw>\","
+                           "\"script name <text>\",\"script status\",\"end_session\",\"start_session\",\"freeze on|off|status\",\"warp <x> <y> <z> <yaw>\","
                            "\"log <text>\",\"subscribe\",\"hashes [since] [max]\",\"dump_at <frame>|+<n>\",\"dump_status\","
                            "\"dump_get\",\"probe\""
 #if ROLLBACK_INPUT_TESTING
@@ -709,6 +740,12 @@ namespace
     // MainLoop callback: run queued commands on the game thread. Never unregisters.
     bool pump(void* unused)
     {
+        //a harness freeze has no session frames to tick it: freeze whatever loaded since
+        if (!Rollback::ggpoStarted)
+        {
+            WorldFreeze::tick();
+        }
+
         std::deque<std::shared_ptr<Request>> batch;
         {
             std::lock_guard<std::mutex> g(g_req_mtx);

@@ -12,6 +12,8 @@ class StateVisitor;
 void copy_DamageMan(DamageMan* to, DamageMan* from, StateTarget target);
 // if DamageMan_PopHead_DamageEntry heap-allocated the entry because the pool was empty
 bool DamageEntry_isDynamicAlloc(const DamageEntry* entry);
+// retire every active entry whose attacker is not a session player, the way the game retires one by id. Returns how many
+uint32_t DamageMan_retire_world_entries(DamageMan* damageman);
 DamageMan* init_DamageMan();
 void free_DamageMan(DamageMan* to);
 void serialize_DamageMan(StateVisitor& v, DamageMan* d);

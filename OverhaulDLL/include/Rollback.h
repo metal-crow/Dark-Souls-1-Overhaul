@@ -107,6 +107,13 @@ private:
     static const uint64_t call_EquipGameData_Reset_ItemBeingUsedFromInventory_offset = 0x3577c9;
     static const uint64_t simpleshapephantom_collisionDetails_iterate_offset = 0x9c763f;
     static const uint64_t Clear_DamageEntry_id_offset = 0x3c5e00;
+    //the object steps, each "movaps xmm1, <frame time>; mov rcx, [manager]; call <step>" (WorldFreeze.h)
+    static const uint64_t WorldObjMan_step_live_offset = 0x24f9b8;       //MoveMapStep_Step_13, live frames only
+    static const uint64_t WorldObjMan_step_objs_offset = 0x3cbd22;       //Step_MapArea_MapAreaObjects_and_NearbyMapAreas, live and re-simulated
+    static const uint64_t WorldObjMan_step_objs_post_offset = 0x3cbdda;  //same
+    static const uint64_t WorldObjActMan_step_offset = 0x3cbde9;         //same
+    //FUN_1403ca770, the number of damage entries to create: mov [rsp+8],rbx / push rdi / sub rsp,30h / mov rbx,r8 / mov rdi,rdx
+    static const uint64_t DamageMan_EntryCount_offset = 0x3ca770;
 
     // SFX graveyard: hook the dealloc functions for SFXEntries and FxBehaviorNodes
     static const uint64_t Destruct_SFXEntry_offset = 0xff9490;

@@ -213,6 +213,109 @@ lea     rcx, [rsp+20h]
 jmp     DamageEntry_Clear_id_return
 DamageEntry_Clear_id_injection ENDP
 
+;WorldFreeze.h: while a rollback session runs, the object steps get a frame time of 0, so no object animates, moves or counts down.
+;Each call site is movaps xmm1, <frame time>; mov rcx, [manager]; call <step> (15 bytes)
+EXTERN rollback_world_frozen: byte
+
+EXTERN WorldObjMan_step_live_return: qword
+PUBLIC WorldObjMan_step_live_injection
+WorldObjMan_step_live_injection PROC
+;original code: movaps xmm1, xmm7 (the frame time); mov rcx, [manager]; call step
+movaps  xmm1, xmm7
+cmp     byte ptr [rollback_world_frozen], 0
+je      @F
+xorps   xmm1, xmm1
+@@:
+mov     rax, 141c75dd8h
+mov     rcx, qword ptr [rax]
+mov     rax, 14030c9b0h
+call    rax
+jmp     WorldObjMan_step_live_return
+WorldObjMan_step_live_injection ENDP
+
+EXTERN WorldObjMan_step_objs_return: qword
+PUBLIC WorldObjMan_step_objs_injection
+WorldObjMan_step_objs_injection PROC
+;original code: movaps xmm1, xmm6 (the frame time); mov rcx, [manager]; call step
+movaps  xmm1, xmm6
+cmp     byte ptr [rollback_world_frozen], 0
+je      @F
+xorps   xmm1, xmm1
+@@:
+mov     rax, 141c75dd8h
+mov     rcx, qword ptr [rax]
+mov     rax, 14030b6c0h
+call    rax
+jmp     WorldObjMan_step_objs_return
+WorldObjMan_step_objs_injection ENDP
+
+EXTERN WorldObjMan_step_objs_post_return: qword
+PUBLIC WorldObjMan_step_objs_post_injection
+WorldObjMan_step_objs_post_injection PROC
+;original code: movaps xmm1, xmm6 (the frame time); mov rcx, [manager]; call step
+movaps  xmm1, xmm6
+cmp     byte ptr [rollback_world_frozen], 0
+je      @F
+xorps   xmm1, xmm1
+@@:
+mov     rax, 141c75dd8h
+mov     rcx, qword ptr [rax]
+mov     rax, 14030b820h
+call    rax
+jmp     WorldObjMan_step_objs_post_return
+WorldObjMan_step_objs_post_injection ENDP
+
+EXTERN WorldObjActMan_step_return: qword
+PUBLIC WorldObjActMan_step_injection
+WorldObjActMan_step_injection PROC
+;original code: movaps xmm1, xmm6 (the frame time); mov rcx, [manager]; call step
+movaps  xmm1, xmm6
+cmp     byte ptr [rollback_world_frozen], 0
+je      @F
+xorps   xmm1, xmm1
+@@:
+mov     rax, 141c75e40h
+mov     rcx, qword ptr [rax]
+mov     rax, 140316510h
+call    rax
+jmp     WorldObjActMan_step_return
+WorldObjActMan_step_injection ENDP
+
+EXTERN DamageMan_EntryCount_return: qword
+extern rollback_damage_attacker_allowed: proc
+
+;FUN_1403ca770(DamageMan*, params, attacker), which says how many damage entries to create. While the world is frozen an attacker
+;that is not a session player gets 0, the game's own "no entry" path (its caller then returns id -1)
+PUBLIC DamageMan_EntryCount_injection
+DamageMan_EntryCount_injection PROC
+cmp     byte ptr [rollback_world_frozen], 0
+je      entrycount_original
+push    rcx
+push    rdx
+push    r8
+push    r9
+sub     rsp, 28h
+mov     rcx, r8
+call    rollback_damage_attacker_allowed
+add     rsp, 28h
+pop     r9
+pop     r8
+pop     rdx
+pop     rcx
+test    al, al
+jnz     entrycount_original
+xor     eax, eax
+ret
+entrycount_original:
+;original code
+mov     qword ptr [rsp+8], rbx
+push    rdi
+sub     rsp, 30h
+mov     rbx, r8
+mov     rdi, rdx
+jmp     DamageMan_EntryCount_return
+DamageMan_EntryCount_injection ENDP
+
 
 
 EXTERN init_playerins_with_padmanip_return: qword

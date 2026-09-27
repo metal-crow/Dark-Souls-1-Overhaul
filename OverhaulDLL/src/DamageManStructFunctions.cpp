@@ -5,6 +5,7 @@
 #include <memory>
 #include <new>
 #include <unordered_map>
+#include "GameData.h"
 
 //the game allocates the DamageMan all_damage_entries_list to be 128 elements long, and so does every local copy
 static const size_t max_preallocated_DamageEntry = 128;
@@ -100,8 +101,22 @@ extern "C" uint32_t DamageEntry_Clear_id_helper(DamageEntry* entry, uint32_t id)
     return id;
 }
 
-typedef void DamageMan_Kill_DamageEntry_By_Id_FUNC(DamageMan* damageman, uint32_t id);
-static DamageMan_Kill_DamageEntry_By_Id_FUNC* DamageMan_Kill_DamageEntry_By_Id = (DamageMan_Kill_DamageEntry_By_Id_FUNC*)0x1403c9f90;
+uint32_t DamageMan_retire_world_entries(DamageMan* damageman)
+{
+    std::vector<uint32_t> ids;
+    for (DamageEntry* e = damageman->active_damage_entries_list; e != NULL; e = e->next)
+    {
+        if (!DamageEntry_is_player_owned(e))
+        {
+            ids.push_back(e->id);
+        }
+    }
+    for (uint32_t id : ids)
+    {
+        DamageMan_Kill_DamageEntry_By_Id(damageman, id);
+    }
+    return (uint32_t)ids.size();
+}
 
 /* ============================================================
  * Heap-allocated entries

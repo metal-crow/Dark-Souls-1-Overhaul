@@ -23,6 +23,7 @@
 #include "RollbackScript.h"
 #include "VirtualPad.h"
 #include "HavokTrace.h"
+#include "WorldFreeze.h"
 
 FILE* hash_logfile = NULL;
 
@@ -916,6 +917,7 @@ bool rollback_game_frame_start_helper(void* unused)
             }
 
             rollback_sync_inputs();
+            WorldFreeze::tick();
             clean_free_DamageEntry_slots(*(DamageMan**)Game::damage_man);
             HavokTrace::sample(HavokTrace::Stage::LiveBegin);
 #ifdef GGPO_SYNCTEST
@@ -1080,6 +1082,17 @@ extern "C" {
 
     uint64_t DamageEntry_Clear_id_return;
     void DamageEntry_Clear_id_injection();
+
+    uint64_t WorldObjMan_step_live_return;
+    void WorldObjMan_step_live_injection();
+    uint64_t WorldObjMan_step_objs_return;
+    void WorldObjMan_step_objs_injection();
+    uint64_t WorldObjMan_step_objs_post_return;
+    void WorldObjMan_step_objs_post_injection();
+    uint64_t WorldObjActMan_step_return;
+    void WorldObjActMan_step_injection();
+    uint64_t DamageMan_EntryCount_return;
+    void DamageMan_EntryCount_injection();
 }
 
 void Rollback::start()
@@ -1149,6 +1162,19 @@ void Rollback::start()
     //A retired damage entry's new id must not reuse a generation a discarded timeline handed out (DamageManStructFunctions.cpp)
     write_address = (uint8_t*)(Game::ds1_base + Rollback::Clear_DamageEntry_id_offset);
     sp::mem::code::x64::inject_jmp_14b(write_address, &DamageEntry_Clear_id_return, 3, &DamageEntry_Clear_id_injection);
+
+    //While a session runs the object steps get a frame time of 0 (WorldFreeze.h)
+    write_address = (uint8_t*)(Game::ds1_base + Rollback::WorldObjMan_step_live_offset);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &WorldObjMan_step_live_return, 1, &WorldObjMan_step_live_injection);
+    write_address = (uint8_t*)(Game::ds1_base + Rollback::WorldObjMan_step_objs_offset);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &WorldObjMan_step_objs_return, 1, &WorldObjMan_step_objs_injection);
+    write_address = (uint8_t*)(Game::ds1_base + Rollback::WorldObjMan_step_objs_post_offset);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &WorldObjMan_step_objs_post_return, 1, &WorldObjMan_step_objs_post_injection);
+    write_address = (uint8_t*)(Game::ds1_base + Rollback::WorldObjActMan_step_offset);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &WorldObjActMan_step_return, 1, &WorldObjActMan_step_injection);
+    //...and only the session players can create damage entries
+    write_address = (uint8_t*)(Game::ds1_base + Rollback::DamageMan_EntryCount_offset);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &DamageMan_EntryCount_return, 2, &DamageMan_EntryCount_injection);
 
     MainLoop::setup_mainloop_callback(ggpo_toggle, NULL, "ggpo_toggle");
 #if ROLLBACK_INPUT_TESTING
@@ -1419,6 +1445,7 @@ void Rollback::rollback_end_session()
 {
     if (Rollback::ggpoStarted)
     {
+        WorldFreeze::unfreeze();
         RollbackReplay::end_session();
         RollbackScript::end_session();
         Rollback::ggpoStarted = false;
@@ -1535,6 +1562,7 @@ bool rollback_await_init(void* steamMsgs)
 
     ConsoleWrite("GGPO started");
     Rollback::ggpoStarted = true;
+    WorldFreeze::freeze();
 
     RollbackReplay::init_session();
     RollbackScript::init_session();

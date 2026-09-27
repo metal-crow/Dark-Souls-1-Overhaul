@@ -758,4 +758,7 @@ static const FxBehaviorNode_GetSize_Type2_t FxBehaviorNode_GetSize_Type2 = (FxBe
 typedef void (*Destruct_DamageEntry_t)(void* entry);
 static const Destruct_DamageEntry_t Destruct_DamageEntry = (Destruct_DamageEntry_t)0x1403c5490;
 
+typedef void DamageMan_Kill_DamageEntry_By_Id_FUNC(DamageMan* damageman, uint32_t id);
+static DamageMan_Kill_DamageEntry_By_Id_FUNC* DamageMan_Kill_DamageEntry_By_Id = (DamageMan_Kill_DamageEntry_By_Id_FUNC*)0x1403c9f90;
+
 #endif // _DS1_OVERHAUL_GAME_DATA_H_
