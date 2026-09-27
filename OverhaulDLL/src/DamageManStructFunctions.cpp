@@ -34,6 +34,76 @@ static bool DamageEntry_is_player_owned(const DamageEntry* entry)
 }
 
 /* ============================================================
+ * Entry ids across timelines
+ *
+ * A pool entry's id is (slot << 16) | generation, and Clear_DamageEntry bumps the generation when the entry retires. Owners keep
+ * the id and find their entry again with DamageMan_Get_DamageEntry_By_Id, or retire it with DamageMan_Kill_DamageEntry_By_Id
+ * (FUN_1403c9f90). A load puts the saved generations back, so an id handed out in the discarded frames is handed out a second time.
+ * Players are rolled back and forget such ids, but world objects are not: one that spawned an entry after the save point still
+ * holds its id, and when it later retires or moves "its" entry it hits whoever now has that id.
+ *
+ * So a generation is never reused: damage_slot_generation keeps the newest generation each slot has had in any timeline, a load
+ * gives every slot the discarded frames touched a newer one, and the Clear_DamageEntry hook (DamageEntry_Clear_id_helper) makes
+ * every retire go past it. The heap id counter (+0x18) is not rolled back, for the same reason.
+ * ============================================================ */
+
+struct DamageSlotGeneration
+{
+    uint16_t newest;
+    bool known;
+};
+static DamageSlotGeneration damage_slot_generation[max_preallocated_DamageEntry] = {};
+
+//a is newer than b, with the game's 16-bit wraparound
+static bool generation_newer(uint16_t a, uint16_t b)
+{
+    return (int16_t)(uint16_t)(a - b) > 0;
+}
+
+static void note_generation(size_t slot, uint16_t gen)
+{
+    DamageSlotGeneration& g = damage_slot_generation[slot];
+    if (!g.known || generation_newer(gen, g.newest))
+    {
+        g.newest = gen;
+        g.known = true;
+    }
+}
+
+//a generation for this slot that no timeline has used yet
+static uint16_t fresh_generation(size_t slot)
+{
+    DamageSlotGeneration& g = damage_slot_generation[slot];
+    g.newest = g.known ? (uint16_t)(g.newest + 1) : 1;
+    g.known = true;
+    return g.newest;
+}
+
+//Called from Clear_DamageEntry with the id it is about to write (the old one with the generation incremented)
+extern "C" uint32_t DamageEntry_Clear_id_helper(DamageEntry* entry, uint32_t id)
+{
+    const uint32_t slot = id >> 16;
+    if (slot >= max_preallocated_DamageEntry)
+    {
+        return id;
+    }
+    const uint16_t gen = (uint16_t)id;
+    DamageSlotGeneration& g = damage_slot_generation[slot];
+    if (g.known && !generation_newer(gen, g.newest))
+    {
+        id = (slot << 16) | fresh_generation(slot);
+    }
+    else
+    {
+        note_generation(slot, gen);
+    }
+    return id;
+}
+
+typedef void DamageMan_Kill_DamageEntry_By_Id_FUNC(DamageMan* damageman, uint32_t id);
+static DamageMan_Kill_DamageEntry_By_Id_FUNC* DamageMan_Kill_DamageEntry_By_Id = (DamageMan_Kill_DamageEntry_By_Id_FUNC*)0x1403c9f90;
+
+/* ============================================================
  * Heap-allocated entries
  *
  * A heap entry is saved whole. A load restores it into the live heap entry with the same id, or into a new one built the way
@@ -266,6 +336,28 @@ void copy_DamageMan(DamageMan* to, DamageMan* from, StateTarget target)
     {
         heap_targets = init_heap_DamageEntries(to, from);
     }
+
+    //ToGame: the live pool's ids and active slots before the load overwrites them (see "Entry ids across timelines")
+    std::vector<uint32_t> live_ids;
+    std::vector<bool> live_active;
+    if (target == StateTarget::ToGame)
+    {
+        live_ids.resize(max_preallocated_DamageEntry);
+        live_active.assign(max_preallocated_DamageEntry, false);
+        for (size_t i = 0; i < max_preallocated_DamageEntry; i++)
+        {
+            live_ids[i] = to->all_damage_entries_list_start[i].id;
+            note_generation(i, (uint16_t)live_ids[i]);
+        }
+        for (DamageEntry* e = to->active_damage_entries_list; e != NULL; e = e->next)
+        {
+            const ptrdiff_t idx = e - to->all_damage_entries_list_start;
+            if (idx >= 0 && idx < (ptrdiff_t)max_preallocated_DamageEntry)
+            {
+                live_active[idx] = true;
+            }
+        }
+    }
     else if (target == StateTarget::Copy)
     {
         to->saved_active_damage_entries = from->saved_active_damage_entries;
@@ -317,9 +409,43 @@ void copy_DamageMan(DamageMan* to, DamageMan* from, StateTarget target)
             link = &entry->next;
         }
         *link = NULL;
+
+        std::vector<bool> restored_active(max_preallocated_DamageEntry, false);
+        std::vector<uint32_t> zombies;
+        for (const SavedDamageEntry& e : from->saved_active_damage_entries)
+        {
+            if (e.pool_index < 0)
+            {
+                continue;
+    }
+            restored_active[e.pool_index] = true;
+            //a world entry that retired in the discarded frames: its owner has moved on and will never retire it, so retire it now
+            //the way the game does. Players are rolled back, so theirs stay.
+            if (!e.player_owned && live_ids[e.pool_index] != to->all_damage_entries_list_start[e.pool_index].id)
+            {
+                zombies.push_back(to->all_damage_entries_list_start[e.pool_index].id);
+            }
+        }
+        //a free slot whose id the discarded frames handed out (it was active, or was retired, since the save) gets a new generation
+        for (size_t i = 0; i < max_preallocated_DamageEntry; i++)
+        {
+            DamageEntry* e = &to->all_damage_entries_list_start[i];
+            if (!restored_active[i] && (live_active[i] || live_ids[i] != e->id))
+            {
+                e->id = (uint32_t)(i << 16) | fresh_generation(i);
+            }
+        }
+        for (uint32_t id : zombies)
+        {
+            DamageMan_Kill_DamageEntry_By_Id(to, id);
+        }
     }
 
+    //the heap id counter only moves forward, like the pool generations
+    if (target != StateTarget::ToGame)
+    {
     to->unk_18 = from->unk_18;
+    }
     to->put_out_sparks = from->put_out_sparks;
     to->damage_from_weapon = from->damage_from_weapon;
     to->damage_to_occur = from->damage_to_occur;

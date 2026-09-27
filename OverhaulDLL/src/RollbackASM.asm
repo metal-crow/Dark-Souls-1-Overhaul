@@ -190,6 +190,30 @@ FUNC_EPILOGUE
 jmp     dsr_frame_finished_return
 dsr_frame_finished_injection ENDP
 
+EXTERN DamageEntry_Clear_id_return: qword
+extern DamageEntry_Clear_id_helper: proc
+
+;Clear_DamageEntry, where it writes the entry's next id (the old one with the generation incremented). The helper may pick a
+;newer generation; see "Entry ids across timelines" in DamageManStructFunctions.cpp
+PUBLIC DamageEntry_Clear_id_injection
+DamageEntry_Clear_id_injection PROC
+;original code
+mov     dword ptr [rbx+40h], 0FFFFFFFFh
+movzx   ecx, ax
+or      edx, ecx
+
+FUNC_PROLOGUE
+mov     rcx, rbx
+call    DamageEntry_Clear_id_helper
+mov     [rsp+00000230h], rax ;use FUNC_EPILOGUE to put this result in RDX
+FUNC_EPILOGUE
+
+;original code
+lea     rcx, [rsp+20h]
+jmp     DamageEntry_Clear_id_return
+DamageEntry_Clear_id_injection ENDP
+
+
 
 EXTERN init_playerins_with_padmanip_return: qword
 extern init_playerins_with_padmanip_helper: proc

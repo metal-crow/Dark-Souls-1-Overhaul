@@ -1013,6 +1013,9 @@ extern "C" {
 
     uint64_t Destruct_FxBehaviorNode_return;
     void Destruct_FxBehaviorNode_injection();
+
+    uint64_t DamageEntry_Clear_id_return;
+    void DamageEntry_Clear_id_injection();
 }
 
 void Rollback::start()
@@ -1078,6 +1081,10 @@ void Rollback::start()
     //Check if a m_collisionDetail is null before trying to use it in-game. This makes life simpler for me when copying them
     write_address = (uint8_t*)(Game::ds1_base + Rollback::simpleshapephantom_collisionDetails_iterate_offset);
     sp::mem::code::x64::inject_jmp_14b(write_address, &simpleshapephantom_collisionDetails_iterate_return, 1, &simpleshapephantom_collisionDetails_iterate_injection);
+
+    //A retired damage entry's new id must not reuse a generation a discarded timeline handed out (DamageManStructFunctions.cpp)
+    write_address = (uint8_t*)(Game::ds1_base + Rollback::Clear_DamageEntry_id_offset);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &DamageEntry_Clear_id_return, 3, &DamageEntry_Clear_id_injection);
 
     MainLoop::setup_mainloop_callback(ggpo_toggle, NULL, "ggpo_toggle");
 #if ROLLBACK_INPUT_TESTING

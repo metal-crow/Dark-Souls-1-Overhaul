@@ -106,6 +106,7 @@ private:
     static const uint64_t get_item_currently_being_used_offset = 0x74a0e0;
     static const uint64_t call_EquipGameData_Reset_ItemBeingUsedFromInventory_offset = 0x3577c9;
     static const uint64_t simpleshapephantom_collisionDetails_iterate_offset = 0x9c763f;
+    static const uint64_t Clear_DamageEntry_id_offset = 0x3c5e00;
 
     // SFX graveyard: hook the dealloc functions for SFXEntries and FxBehaviorNodes
     static const uint64_t Destruct_SFXEntry_offset = 0xff9490;
