@@ -155,7 +155,7 @@ const uint64_t Rollback::PlayerIns_IsHostPlayerIns_offsets[] = {
     //0x140358ee3,
     //0x140359193,
     //0x140359b07,
-    //0x140359e9d,
+    0x140359e9d, //the item use step: consuming the used item (FUN_14074a270 -> ConsumeItem) only for the "host" player
     //0x140359fb7,
     //0x14035a032,
     //0x14035a0ec,

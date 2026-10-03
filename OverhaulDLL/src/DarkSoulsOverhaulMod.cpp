@@ -121,6 +121,7 @@ BOOL on_process_attach(HMODULE h_module, LPVOID lp_reserved)
     Game::init();
     AntiAntiCheat::start();
     FixAnkles::start();
+    Rollback::full_size_remote_inventories();
 
 #ifndef ANTIBAN_ONLY
     Game::injections_init(); //only do injections after we disable the built in code checking

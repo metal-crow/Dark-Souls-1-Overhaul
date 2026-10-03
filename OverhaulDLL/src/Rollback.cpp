@@ -24,6 +24,8 @@
 #include "VirtualPad.h"
 #include "HavokTrace.h"
 #include "WorldFreeze.h"
+#include "RollbackStartSync.h"
+#include "PlayerHandles.h"
 
 FILE* hash_logfile = NULL;
 
@@ -154,6 +156,98 @@ static int32_t inventory_item_id_at(const EquipInventoryDataItem* itemlist, uint
     }
     return itemlist[index].item_id;
 }
+
+//The session's players as (steam id, this machine's handle), in steam id order: the order RollbackHash hashes them in
+static uint32_t session_players_by_steam_id(uint64_t* ids, uint32_t* handles)
+{
+    uint32_t n = 0;
+    for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount && n < GGPO_MAX_PLAYERS; i++)
+    {
+        auto p = Game::get_connected_player(i);
+        if (!p.has_value() || p.value() == 0)
+        {
+            continue;
+        }
+        PlayerIns* pi = (PlayerIns*)p.value();
+        uint64_t id = (pi->steamPlayerData != NULL && pi->steamPlayerData->steamOnlineIDData != NULL) ? pi->steamPlayerData->steamOnlineIDData->steam_id : 0;
+        if (id == 0 && i == 0 && ModNetworking::SteamUser != NULL)
+        {
+            id = ModNetworking::SteamUser->GetSteamID().ConvertToUint64();
+        }
+        uint32_t k = n++;
+        while (k > 0 && ids[k - 1] > id)
+        {
+            ids[k] = ids[k - 1];
+            handles[k] = handles[k - 1];
+            k--;
+        }
+        ids[k] = id;
+        handles[k] = (uint32_t)pi->chrins.handle;
+    }
+    return n;
+}
+
+uint32_t PlayerHandles::to_canonical(uint32_t handle)
+{
+    uint64_t ids[GGPO_MAX_PLAYERS];
+    uint32_t handles[GGPO_MAX_PLAYERS];
+    const uint32_t n = session_players_by_steam_id(ids, handles);
+    for (uint32_t k = 0; k < n; k++)
+    {
+        if (handles[k] == handle)
+        {
+            return CANONICAL_TAG | k;
+        }
+    }
+    return handle;
+}
+
+uint32_t PlayerHandles::from_canonical(uint32_t canonical)
+{
+    if ((canonical & 0xFFFF0000) != CANONICAL_TAG)
+    {
+        return canonical;
+    }
+    uint64_t ids[GGPO_MAX_PLAYERS];
+    uint32_t handles[GGPO_MAX_PLAYERS];
+    const uint32_t n = session_players_by_steam_id(ids, handles);
+    const uint32_t k = canonical & 0xFFFF;
+    if (k >= n)
+    {
+        FATALERROR("PlayerHandles::from_canonical: player %u of %u", k, n);
+    }
+    return handles[k];
+}
+
+//An inventory change the session's input cannot carry was refused (the injections in RollbackASM.asm say which)
+extern "C" void rollback_item_change_blocked(uint32_t which)
+{
+    static const char* const names[] = { "map item pickup", "item lot award", "event script item award", "item drop",
+        "Bottomless Box deposit", "Bottomless Box withdrawal" };
+    static uint32_t logged = 0;
+    if (logged < 20)
+    {
+        logged++;
+        ConsoleWrite("Rollback: refused a %s during the session (only the input may change an inventory)",
+            which < sizeof(names) / sizeof(names[0]) ? names[which] : "?");
+    }
+}
+
+extern "C" {
+    uint64_t MapItem_Pickup_return;
+    void MapItem_Pickup_injection();
+    uint64_t AwardItemLot_return;
+    void AwardItemLot_injection();
+    uint64_t LuaAddInventoryItem_return;
+    void LuaAddInventoryItem_injection();
+    uint64_t ItemDrop_return;
+    void ItemDrop_injection();
+    uint64_t BottomlessBoxDeposit_return;
+    void BottomlessBoxDeposit_injection();
+    uint64_t BottomlessBoxWithdraw_return;
+    void BottomlessBoxWithdraw_injection();
+}
+
 
 void PackRollbackInput(RollbackInput* out, PlayerIns* player)
 {
@@ -860,7 +954,12 @@ bool rollback_game_frame_start_helper(void* unused)
 
         if (Rollback::ggpoReady == GGPOREADY::ReadyAwaitingFrameHead)
         {
-            Rollback::ggpoReady = GGPOREADY::Ready;
+            //Frame 0 is saved on the first ggpo_add_local_input, so every machine's characters have to be
+            //made identical before it (see RollbackStartSync.h)
+            if (RollbackStartSync::tick())
+            {
+                Rollback::ggpoReady = GGPOREADY::Ready;
+            }
         }
 
         if (Rollback::ggpoReady == GGPOREADY::Ready)
@@ -1095,6 +1194,32 @@ extern "C" {
     void DamageMan_EntryCount_injection();
 }
 
+//EquipGameData_New (1407463c0) sizes a player's inventory list by its "main player" flag: 0x800 items and 0x40 keys for
+//the local player, 0x20 and 4 for every other player slot, since vanilla only ever keeps the other players' equipment.
+//Under rollback every machine simulates every character from the same state, and UnpackRollbackInput resolves each
+//equipped item id against that character's inventory list, so the other players need their whole inventory too (the
+//start-state handshake sends it). GameDataMan_New builds all the slots once at boot, before rollback can be switched
+//on, so this is unconditional: it only makes the other slots' lists as large as the local one (~0.3 MB in total).
+//The flag's other use, allowTrophyUnlock, is untouched.
+static const uint64_t EquipGameData_New_keys_capacity_offset = 0x74642d;   //41 B8 04 00 00 00   mov r8d, 4
+static const uint64_t EquipGameData_New_items_capacity_offset = 0x74643a;  //BA 20 00 00 00      mov edx, 0x20
+
+void Rollback::full_size_remote_inventories()
+{
+    uint8_t* keys = (uint8_t*)(Game::ds1_base + EquipGameData_New_keys_capacity_offset);
+    uint8_t* items = (uint8_t*)(Game::ds1_base + EquipGameData_New_items_capacity_offset);
+    const uint8_t keys_original[] = { 0x41, 0xB8, 0x04, 0x00, 0x00, 0x00 };
+    const uint8_t items_original[] = { 0xBA, 0x20, 0x00, 0x00, 0x00 };
+    if (memcmp(keys, keys_original, sizeof(keys_original)) != 0 || memcmp(items, items_original, sizeof(items_original)) != 0)
+    {
+        FATALERROR("full_size_remote_inventories: EquipGameData_New is not the code this patch was written for");
+    }
+    uint8_t keys_patch[] = { 0x41, 0xB8, 0x40, 0x00, 0x00, 0x00 };   //mov r8d, 0x40
+    uint8_t items_patch[] = { 0xBA, 0x00, 0x08, 0x00, 0x00 };        //mov edx, 0x800
+    sp::mem::patch_bytes(keys, keys_patch, sizeof(keys_patch));
+    sp::mem::patch_bytes(items, items_patch, sizeof(items_patch));
+}
+
 void Rollback::start()
 {
     ConsoleWrite("Rollback...");
@@ -1175,6 +1300,20 @@ void Rollback::start()
     //...and only the session players can create damage entries
     write_address = (uint8_t*)(Game::ds1_base + Rollback::DamageMan_EntryCount_offset);
     sp::mem::code::x64::inject_jmp_14b(write_address, &DamageMan_EntryCount_return, 2, &DamageMan_EntryCount_injection);
+
+    //only the input may change an inventory during a session: refuse pickups, awards, drops and the Bottomless Box
+    write_address = (uint8_t*)(Game::ds1_base + Rollback::MapItem_Pickup_offset);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &MapItem_Pickup_return, 3, &MapItem_Pickup_injection);
+    write_address = (uint8_t*)(Game::ds1_base + Rollback::AwardItemLot_offset);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &AwardItemLot_return, 0, &AwardItemLot_injection);
+    write_address = (uint8_t*)(Game::ds1_base + Rollback::LuaAddInventoryItem_offset);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &LuaAddInventoryItem_return, 0, &LuaAddInventoryItem_injection);
+    write_address = (uint8_t*)(Game::ds1_base + Rollback::ItemDrop_offset);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &ItemDrop_return, 0, &ItemDrop_injection);
+    write_address = (uint8_t*)(Game::ds1_base + Rollback::BottomlessBoxDeposit_offset);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &BottomlessBoxDeposit_return, 0, &BottomlessBoxDeposit_injection);
+    write_address = (uint8_t*)(Game::ds1_base + Rollback::BottomlessBoxWithdraw_offset);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &BottomlessBoxWithdraw_return, 1, &BottomlessBoxWithdraw_injection);
 
     MainLoop::setup_mainloop_callback(ggpo_toggle, NULL, "ggpo_toggle");
 #if ROLLBACK_INPUT_TESTING
@@ -1271,9 +1410,8 @@ bool rollback_load_game_state_callback(unsigned char* buffer, int)
  * Save the current state to a buffer and return it to GGPO via the
  * buffer and len parameters.
  */
-bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int frame)
+RollbackState* rollback_capture_state()
 {
-    HavokTrace::sample(HavokTrace::Stage::Save);
     RollbackState* state = (RollbackState*)malloc(sizeof(RollbackState));
     if (state == NULL)
     {
@@ -1308,6 +1446,13 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
     copy_DmgHitRecordManImp(state->dmghitrecordman, *(DmgHitRecordManImp**)Game::dmg_hit_record_man, StateTarget::ToLocal);
     state->havokman = init_FrpgHavokManImp();
     copy_FrpgHavokManImp(state->havokman, *(FrpgHavokManImp**)Game::frpg_havok_man_imp, StateTarget::ToLocal);
+    return state;
+}
+
+bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int frame)
+{
+    HavokTrace::sample(HavokTrace::Stage::Save);
+    RollbackState* state = rollback_capture_state();
 
     //Record the per-subsystem state digest for the determinism oracle, keyed by the
     //GGPO frame being saved. It is emitted later as a STATEHASH log line once the
@@ -1446,6 +1591,7 @@ void Rollback::rollback_end_session()
     if (Rollback::ggpoStarted)
     {
         WorldFreeze::unfreeze();
+        RollbackStartSync::end_session();
         RollbackReplay::end_session();
         RollbackScript::end_session();
         Rollback::ggpoStarted = false;
@@ -1459,16 +1605,25 @@ void Rollback::rollback_end_session()
     }
 }
 
+//How many consecutive frames every player has to pass the checks in rollback_await_init before the session starts.
+//A character that has just loaded in is still mid-spawn: it plays its spawn animation, allocates animation buffers and
+//links itself to the floor it stands on over its first frames, and the other machine's copy of it does all of that on
+//different frames. The start-state handshake (RollbackStartSync) can copy values but not that shape, so let it settle.
+static const uint32_t ROLLBACK_SETTLE_FRAMES = 180;
+static uint32_t rollback_settled_frames = 0;
+
 bool rollback_await_init(void* steamMsgs)
 {
     if (!Rollback::rollbackEnabled)
     {
+        rollback_settled_frames = 0;
         return true;
     }
 
     //Wait for all the players to be loaded in before we start ggpo
     if (!Game::playerchar_is_loaded())
     {
+        rollback_settled_frames = 0;
         return true;
     }
 
@@ -1477,6 +1632,7 @@ bool rollback_await_init(void* steamMsgs)
         auto player_o = Game::get_connected_player(i);
         if (!player_o.has_value() || player_o.value() == NULL)
         {
+            rollback_settled_frames = 0;
             return true;
         }
         PlayerIns* player = (PlayerIns*)player_o.value();
@@ -1484,26 +1640,38 @@ bool rollback_await_init(void* steamMsgs)
         //some sanity checks
         if (player->chrins.maxHp <= 1 || player->chrins.curHp < 10)
         {
+            rollback_settled_frames = 0;
             return true;
         }
         if (player->chrins.playerCtrl == NULL)
         {
+            rollback_settled_frames = 0;
             return true;
         }
         if (player->chrins.playerCtrl->chrCtrl.havokChara == NULL)
         {
+            rollback_settled_frames = 0;
             return true;
         }
         float x_pos = *(float*)(((uint64_t)player->chrins.playerCtrl->chrCtrl.havokChara) + 0x10);
         if (x_pos == 0.0f)
         {
+            rollback_settled_frames = 0;
             return true;
         }
         if (player->chrins.playerCtrl->chrCtrl.animationMediator == NULL)
         {
+            rollback_settled_frames = 0;
             return true;
         }
     }
+
+    if (rollback_settled_frames < ROLLBACK_SETTLE_FRAMES)
+    {
+        rollback_settled_frames++;
+        return true;
+    }
+    rollback_settled_frames = 0;
 
 #ifdef GGPO_SYNCTEST
     //How many frames synctest runs ahead before loading the last verified frame and re-simulating them.
@@ -1560,10 +1728,12 @@ bool rollback_await_init(void* steamMsgs)
 
     //ggpo_set_frame_delay(ggpo, Rollback::ggpoHandles[0], 1);
 
+
     ConsoleWrite("GGPO started");
     Rollback::ggpoStarted = true;
     WorldFreeze::freeze();
 
+    RollbackStartSync::begin_session();
     RollbackReplay::init_session();
     RollbackScript::init_session();
     RollbackHash::reset_session();

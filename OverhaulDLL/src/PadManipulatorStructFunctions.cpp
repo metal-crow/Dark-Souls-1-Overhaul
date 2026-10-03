@@ -1,6 +1,7 @@
 #include "PadManipulatorStructFunctions.h"
 #include "Rollback.h"
 #include "StateSerializer.h"
+#include "PlayerHandles.h"
 #include <format>
 #include <cstddef>
 
@@ -173,7 +174,7 @@ void serialize_PadManipulator(StateVisitor& v, const PadManipulator* p)
     v.field("field76_0x208", c->field76_0x208);
     v.field("field77_0x20c", c->field77_0x20c);
     for (int i = 0; i < 4; i++) v.field("field78_0x210", c->field78_0x210[i]);
-    v.field("LockonTargetHandle", c->LockonTargetHandle);
+    serialize_handle(v, "LockonTargetHandle", c->LockonTargetHandle);
     v.field("CurrentFrame_ActionInputs_ButtonId", c->CurrentFrame_ActionInputs_ButtonId);
     v.field("field81_0x228", c->field81_0x228);
     v.field("field82_0x229", c->field82_0x229);

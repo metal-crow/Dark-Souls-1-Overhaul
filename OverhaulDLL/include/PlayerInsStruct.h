@@ -1271,6 +1271,8 @@ struct SpecialEffect_Info
 
 static_assert(offsetof(SpecialEffect_Info, data_0) == 0x0);
 static_assert(offsetof(SpecialEffect_Info, paramRowBytes) == 0x38);
+static_assert(offsetof(SpecialEffect_Info, data_0_struct.target) == 0x20);
+static_assert(offsetof(SpecialEffect_Info, data_0_struct.attacker) == 0x24);
 static_assert(offsetof(SpecialEffect_Info, next) == 0x40);
 static_assert(offsetof(SpecialEffect_Info, prev) == 0x48);
 static_assert(sizeof(SpecialEffect_Info) == 0x50);

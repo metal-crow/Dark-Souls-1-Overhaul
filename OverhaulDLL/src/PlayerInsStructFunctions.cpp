@@ -5,6 +5,9 @@
 #include "AttachSysSlotStructsFunctions.h"
 #include "PadManipulatorStructFunctions.h"
 #include "StateSerializer.h"
+#include "PlayerHandles.h"
+#include "GameData.h"
+#include <unordered_map>
 
 typedef void* falloc(uint64_t, uint64_t, uint32_t);
 
@@ -2102,7 +2105,7 @@ static void serialize_hkaAnimatedSkeleton(StateVisitor&, const hkaAnimatedSkelet
 static void serialize_hkaDefaultAnimationControl(StateVisitor&, const hkaDefaultAnimationControl*);
 static void serialize_hkaAnimationControl(StateVisitor&, const hkaAnimationControl*);
 static void serialize_ChrCtrl_AnimationQueue_field0x10(StateVisitor&, const ChrCtrl_AnimationQueue_field0x10*);
-static void serialize_ChrCtrl_AnimationQueueEntry(StateVisitor&, const ChrCtrl_AnimationQueueEntry*);
+static void serialize_ChrCtrl_AnimationQueueEntry(StateVisitor&, const ChrCtrl_AnimationQueueEntry*, const ChrCtrl_AnimationQueue_field0x10*);
 static void serialize_AnimationQueue(StateVisitor&, const AnimationQueue*);
 static void serialize_AnimationQueue_Entry(StateVisitor&, const AnimationQueue_Entry*);
 static void serialize_AnimationQueue_Entry_sub1(StateVisitor&, const AnimationQueue_Entry_sub1*);
@@ -2127,22 +2130,16 @@ static void serialize_ChrAsm(StateVisitor& v, const ChrAsm* a)
     v.end();
 }
 
+// The equipment model assembly is this machine's rendering state: which part models it has loaded (filecap_array) and the
+// load/assembly state that goes with them, with regions the game never initialises (heap leftovers such as
+// "enableDeprecatedWelding" seen in hairColor). Writing another machine's values over it made the model code reference render
+// resources this machine never created (stale handle in the render thread's command dispatch, right after the start-state
+// handshake). copy_PlayerIns still saves and restores it on each machine; it is neither compared nor sent.
 static void serialize_ChrAsmModel(StateVisitor& v, const ChrAsmModel* m)
 {
+    (void)m;
     v.begin("ChrAsmModel");
-    v.blob_holes("unk_8", &m->unk_8, 0x10, { { 0xc, 4, StateVisitor::Hole::Pad } });
-    v.blob("fieldE0", m->fieldE0, sizeof(m->fieldE0));
-    v.blob("unk_68", &m->unk_68, 0x18);
-    v.field("data_3a", m->data_3a);
-    v.blob("unk_a0", &m->unk_a0, 0x28);
-    v.blob("hairColor", &m->hairColor, 0x80);
-    // FileCap* x13: loaded resources at per-process addresses
-    for (size_t i = 0; i < sizeof(m->filecap_array) / sizeof(m->filecap_array[0]); i++)
-    {
-        v.ptr_flag("filecap_array", (void*)m->filecap_array[i]);
-    }
-    v.field("unk_1c8", m->unk_1c8);
-    v.blob("unk_1c9", m->unk_1c9, sizeof(m->unk_1c9));
+    v.excluded("model_assembly", sizeof(ChrAsmModel));
     v.end();
 }
 
@@ -2150,7 +2147,7 @@ static void serialize_ProEquipCtrl(StateVisitor& v, const ProEquipCtrl* p)
 {
     v.begin("ProEquipCtrl");
     serialize_SpecialEffect(v, p->spEffectList);
-    v.field("array_len", p->array_len);
+    v.length("array_len", p->array_len);
     for (int i = 0; i < 5; i++) v.field("equipped_armors_ids", p->equipped_armors_ids[i]);
     v.end();
 }
@@ -2159,7 +2156,7 @@ static void serialize_WeaponEquipCtrl(StateVisitor& v, const WeaponEquipCtrl* p)
 {
     v.begin("WeaponEquipCtrl");
     serialize_SpecialEffect(v, p->spEffectList);
-    v.field("array_len", p->array_len);
+    v.length("array_len", p->array_len);
     for (int i = 0; i < 2; i++) v.field("equipped_weapons_ids", p->equipped_weapons_ids[i]);
     v.end();
 }
@@ -2168,7 +2165,7 @@ static void serialize_RingEquipCtrl(StateVisitor& v, const RingEquipCtrl* p)
 {
     v.begin("RingEquipCtrl");
     serialize_SpecialEffect(v, p->spEffectList);
-    v.field("array_len", p->array_len);
+    v.length("array_len", p->array_len);
     for (int i = 0; i < 2; i++) v.field("equipped_rings_ids", p->equipped_rings_ids[i]);
     v.end();
 }
@@ -2189,12 +2186,29 @@ static void serialize_EquipMagicData(StateVisitor& v, const EquipMagicData* e)
     v.end();
 }
 
+// Mirrors copy_EquipInventoryData. The start-state handshake needs it too: the other machine's copy of a character starts
+// with an empty list, and UnpackRollbackInput resolves every equipped item id against this list.
+static void serialize_EquipInventoryData(StateVisitor& v, const EquipInventoryData* d)
+{
+    v.begin("EquipInventoryData");
+    const uint32_t len = d->itemlist2 != NULL ? d->itemList2_len : 0;
+    v.length("itemList2_len", len);
+    if (len != 0)
+    {
+        v.blob("itemlist2", d->itemlist2, sizeof(EquipInventoryDataItem) * len);
+    }
+    v.field("itemCount", d->itemCount);
+    v.field("keyCount", d->keyCount);
+    v.end();
+}
+
 static void serialize_EquipGameData(StateVisitor& v, const EquipGameData* e)
 {
     v.begin("EquipGameData");
     v.blob("EquipItemToInventoryIndexMap", e->EquipItemToInventoryIndexMap, sizeof(e->EquipItemToInventoryIndexMap));
     v.blob("EquipItemToInventoryIndexMap_index_updated", e->EquipItemToInventoryIndexMap_index_updated, sizeof(e->EquipItemToInventoryIndexMap_index_updated));
     serialize_ChrAsm(v, &e->chrasm);
+    serialize_EquipInventoryData(v, &e->equippedInventory);
     serialize_EquipMagicData(v, e->equipMagicData);
     serialize_EquipItemData(v, &e->equippedItemsInQuickbar);
     v.field("amountOfItemUsedFromInventory", e->amountOfItemUsedFromInventory);
@@ -2294,26 +2308,73 @@ static void serialize_QwcSpEffectEquipCtrl(StateVisitor& v, const QwcSpEffectEqu
     v.end();
 }
 
+//NS_FRPG::SpEffectParam::Build_ParamInfo @140532410: fills a node's param_info (row id + SpEffectParam row pointer) from a row id
+typedef void (*SpEffectParam_Build_ParamInfo_t)(void* param_info, int32_t row_id);
+static const uint64_t SpEffectParam_Build_ParamInfo_offset = 0x532410;
+
 static void serialize_SpecialEffect_Info(StateVisitor& v, const SpecialEffect_Info* s)
 {
     // linked list; walk via ->next (capped) mirroring copy_SpecialEffect_Info
     v.begin("SpecialEffect_Info");
     size_t n = 0;
+    for (const SpecialEffect_Info* c = s; c != NULL && n < max_preallocated_SpecialEffect_Info; c = c->next)
+    {
+        n++;
+    }
+    // The count goes first so the start-state handshake can give the receiver's saved list the sender's length:
+    // a saved list is one contiguous block of max_preallocated_SpecialEffect_Info nodes (copy_SpecialEffect_Info),
+    // and loading it grows or shrinks the game's list to match.
+    const bool rebuild = v.mode == StateVisitor::Mode::Apply;
+    if (rebuild)
+    {
+        size_t theirs = 0;
+        if (s != NULL && v.apply_count("nodes", &theirs))
+        {
+            if (theirs == 0 || theirs > max_preallocated_SpecialEffect_Info)
+            {
+                v.apply_problem("nodes", "sender has " + std::to_string(theirs) + " nodes");
+                theirs = theirs == 0 ? 1 : max_preallocated_SpecialEffect_Info;
+            }
+            SpecialEffect_Info* nodes = (SpecialEffect_Info*)s;
+            for (size_t i = 0; i < theirs; i++)
+            {
+                nodes[i].next = (i + 1 < theirs) ? &nodes[i + 1] : NULL;
+                nodes[i].prev = (i > 0) ? &nodes[i - 1] : NULL;
+            }
+            n = theirs;
+        }
+    }
+    else
+    {
+        v.count("nodes", n);
+    }
+    n = 0;
     const SpecialEffect_Info* cur = s;
     while (cur && n < max_preallocated_SpecialEffect_Info)
     {
         // Padding (Ghidra, 2026-09-25): +0x2b..+0x2f, which Construct_SpecialEffect_Info, Init_via_Copy_SpecialEffect_Info and
         // Step_SpecialEffect_Info never write, and param_info+0x4, the gap before its pointer that SpEffectParam::Build_ParamInfo
         // (140532410) never writes. A live node carries heap leftovers there ("_End" seen)
-        v.blob("data_0", cur->data_0, 0x2b);
+        // +0x20 target and +0x24 attacker are character handles, which are machine-relative (PlayerHandles.h). Copying the
+        // sender's into this machine's node named the wrong character and crashed the effect's rendering.
+        v.blob("data_0", cur->data_0, 0x20);
+        serialize_handle(v, "target", cur->data_0_struct.target);
+        serialize_handle(v, "attacker", cur->data_0_struct.attacker);
+        v.blob("data_0_28", cur->data_0 + 0x28, 3);
         v.padding("data_0_pad_2b", cur->data_0 + 0x2b, 5);
         v.blob("param_info_rowId", cur->data_0 + 0x30, 4);
         v.padding("param_info_pad_4", cur->data_0 + 0x34, 4);
+        if (rebuild && v.applying())
+        {
+            // the row pointer belongs to this process: look the (just applied) row id up again
+            int32_t row_id;
+            memcpy(&row_id, cur->data_0 + 0x30, 4);
+            ((SpEffectParam_Build_ParamInfo_t)(Game::ds1_base + SpEffectParam_Build_ParamInfo_offset))((void*)(cur->data_0 + 0x30), row_id);
+        }
         v.ptr_flag("paramRowBytes", (void*)cur->paramRowBytes);   // loaded-param ptr
         cur = cur->next;
         n++;
     }
-    v.count("nodes", n);
     v.end();
 }
 
@@ -2357,6 +2418,15 @@ static bool attach_slot_is_cosmetic(uint32_t type)
     }
 }
 
+// Slots the game creates for the LOCAL player only (the callers of their Init functions set up the local player's
+// character), so the other machine's copy of that character never has them: ChrLanternSlot (the Skull Lantern light;
+// idle unless its flag bit 0 is set) and ChrResonanceMagicSlot (rolls a random resonance level when armed and sends it
+// to the other players in a type 34 packet, i.e. owner-authoritative by design). Not compared.
+static bool attach_slot_is_owner_only(uint32_t type)
+{
+    return type == TypeChrLanternSlot || type == TypeChrResonanceMagicSlot;
+}
+
 static void serialize_ChrAttachSys(StateVisitor& v, const ChrAttachSys* c)
 {
     // Still shallow: which slot types are in the chain, not their contents. Sorted, because the game rotates the chain
@@ -2371,6 +2441,10 @@ static void serialize_ChrAttachSys(StateVisitor& v, const ChrAttachSys* c)
         if (attach_slot_is_cosmetic(s->slotType))
         {
             cosmetic++;
+        }
+        else if (attach_slot_is_owner_only(s->slotType))
+        {
+            // left out of the dump too: the owner always has them and the other machine never does
         }
         else if (count < sizeof(types) / sizeof(types[0]))
         {
@@ -2398,7 +2472,10 @@ static void serialize_ChrAttachSys(StateVisitor& v, const ChrAttachSys* c)
 static void serialize_ChrIns_field0x2c8(StateVisitor& v, const ChrIns_field0x2c8* f)
 {
     v.begin("ChrIns_field0x2c8");
-    v.blob_holes("unk_8", &f->unk_8, 0x18, { { 0x14, 4, StateVisitor::Hole::Pad } });
+    //+0x18 is the character's own handle (FUN_14033d1b0 -> FUN_1405e61e0 writes it every frame), which is machine-relative
+    v.blob("unk_8", &f->unk_8, 0x10);
+    serialize_handle(v, "handle", f->unk_18);
+    v.padding("unk_1c", f->unk_1c, sizeof(f->unk_1c));
     v.field("unk_28", f->unk_28);
     v.field("unk_2c", f->unk_2c);
     v.blob_holes("unk_38", &f->unk_38, 0x10, { { 0x4, 4, StateVisitor::Hole::Pad } });
@@ -2406,33 +2483,32 @@ static void serialize_ChrIns_field0x2c8(StateVisitor& v, const ChrIns_field0x2c8
     v.end();
 }
 
+// A HitIns is a map collision part (HavokChara_Link_HitIns takes it from the collidable a character touches), not
+// part of the character: every character on the same floor links the same one. So only WHICH part is linked is
+// player state -- sub1's identity (area id and part data; +0x50 is a pointer) -- and the rest is the part's own
+// runtime state, which is world state and differs between machines. The start-state handshake must never write
+// another machine's values into this machine's map part, so APPLY works on a throwaway copy.
 static void serialize_HitIns(StateVisitor& v, const HitIns* h)
 {
     if (h == NULL) { v.field("HitIns_null", true); return; }
+    HitIns scratch;
+    if (v.mode == StateVisitor::Mode::Apply)
+    {
+        scratch = *h;
+        h = &scratch;
+    }
     v.begin("HitIns");
-    v.field("unk_8", h->unk_8);
-    v.field("unk_c", h->unk_c);
-    v.blob("unk_18", &h->unk_18, 0x48);
-    v.field("unk_70", h->unk_70);
-    v.field("unk_72", h->unk_72);
-    v.field("unk_74", h->unk_74);
-    v.field("unk_98", h->unk_98);
-    v.field("unk_9a", h->unk_9a);
-    v.field("unk_9c", h->unk_9c);
-    v.field("unk_b0", h->unk_b0);
-    v.field("BackReadState", h->BackReadState);
-    v.field("TargetBackreadState", h->TargetBackreadState);
-    v.blob("unk_b3", h->unk_b3, sizeof(h->unk_b3));
-    v.field("IsDispHitRigid", h->IsDispHitRigid);
-    v.blob("unk_c1", h->unk_c1, sizeof(h->unk_c1));
+    v.blob_holes("identity", &h->unk_18, 0x48, { { 0x2, 1, StateVisitor::Hole::Pad }, { 0x38, 8, StateVisitor::Hole::Ptr }, { 0x42, 1, StateVisitor::Hole::Pad }, { 0x44, 4, StateVisitor::Hole::Pad } });
+    v.excluded("part_runtime_state", sizeof(HitIns) - 0x60);
     v.end();
 }
 
 static void serialize_SpinJoint(StateVisitor& v, const SpinJoint* s)
 {
     v.begin("SpinJoint");
-    // +0x8: nothing in the Ghidra layout between the vtable and the parent pointer; held a heap address on one instance and 0 on the other
-    v.ptr_flag("unk_8", (const void*)s->unk_8);
+    // +0x8: padding. Init_NS_FRPG::SpinJoint (140442440) writes +0x0 and +0x10 on, never +0x8, so it keeps whatever the
+    // allocator left there (seen null, a stale heap address, and a pointer into a live but unrelated object)
+    v.padding("unk_8", &s->unk_8, sizeof(s->unk_8));
     v.blob("spin_bone_index", &s->spin_bone_index, 96);
     v.blob_holes("disableUpdate", &s->disableUpdate, 8, { { 0x1, 7, StateVisitor::Hole::Pad } });
     v.end();
@@ -2441,7 +2517,7 @@ static void serialize_SpinJoint(StateVisitor& v, const SpinJoint* s)
 static void serialize_TurnAnim(StateVisitor& v, const TurnAnim* t)
 {
     v.begin("TurnAnim");
-    v.ptr_flag("unk_8", (const void*)t->unk_8);   // as SpinJoint
+    v.padding("unk_8", &t->unk_8, sizeof(t->unk_8));   // as SpinJoint: Init_NS_FRPG::TurnAnim (14039ee90) never writes it
     v.blob("turnL", &t->turnL, 0x28);
     serialize_SpinJoint(v, t->joint_UpperRoot);
     serialize_SpinJoint(v, t->joint_LowerRoot);
@@ -2605,6 +2681,96 @@ static void serialize_ActionCtrl(StateVisitor& v, const ActionCtrl* a)
 
 // ---- animation chain --------------------------------------------------------
 
+//get_HvkAnim_AnimInfoArrayElem_for_animID @14043e940: the anim info for an anim id, searched through the character's loaded anibnds
+typedef uint64_t (*get_HvkAnim_AnimInfoArrayElem_for_animID_t)(const ChrCtrl_AnimationQueue_field0x10* anims, int32_t animation_id);
+static const uint64_t get_HvkAnim_AnimInfoArrayElem_for_animID_offset = 0x43e940;
+
+// True if [addr, addr+len) is committed, readable memory. Not an SEH guard: the mod's vectored exception handler
+// (CrashHandler.cpp) sees every access violation before any __except does, and brings up the crash report.
+static bool mem_readable(uint64_t addr, size_t len)
+{
+    while (len > 0)
+    {
+        MEMORY_BASIC_INFORMATION mbi;
+        if (VirtualQuery((const void*)addr, &mbi, sizeof(mbi)) == 0 || mbi.State != MEM_COMMIT
+            || (mbi.Protect & (PAGE_NOACCESS | PAGE_GUARD)) != 0
+            || (mbi.Protect & (PAGE_READONLY | PAGE_READWRITE | PAGE_WRITECOPY | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY)) == 0)
+        {
+            return false;
+        }
+        const uint64_t region_end = (uint64_t)mbi.BaseAddress + mbi.RegionSize;
+        const uint64_t step = region_end - addr < len ? region_end - addr : len;
+        addr += step;
+        len -= (size_t)step;
+    }
+    return true;
+}
+
+// HvkAnim_AnimInfoArrayElem starts with its animation_id (Ghidra HvkAnim_AnimInfoArrayElem_). -1 for none, -2 if the
+// pointer does not point at readable memory (it always should: the anibnd stays loaded for the character's lifetime)
+static int32_t anim_info_id(uint64_t anim_info)
+{
+    if (anim_info == 0)
+    {
+        return -1;
+    }
+    if (!mem_readable(anim_info, sizeof(int32_t)))
+    {
+        return -2;
+    }
+    return *(const int32_t*)anim_info;
+}
+
+// A control's hkaAnimationBinding is the binding of the anim info it plays, found through the character's loaded anibnds
+// (layout from get_HvkAnim_AnimInfoArrayElem_for_animID / HvkAnim_Find_AnimInfo_By_AnimId: field0x10.arry1[i] -> AnibndResCap,
+// +0x48 HvkAnim, +0x28 info count, +0x30 info pointer array; an info is { int32 animation_id, pad, hkaAnimationBinding* }).
+// Searched in the same order the game searches (last anibnd first), so an id resolves back to the same binding.
+// -1 for no binding, -2 if no anim info of this character's has it.
+static int32_t anim_id_of_binding(const ChrCtrl_AnimationQueue_field0x10* anims, uint64_t binding)
+{
+    if (binding == 0)
+    {
+        return -1;
+    }
+    if (anims == NULL || anims->arry1 == NULL)
+    {
+        return -2;
+    }
+    //Every save hashes every control, re-simulated frames included, so remember what has been found. A binding belongs to
+    //one loaded animation for as long as it exists; the remembered anim info is checked again on every use, in case the
+    //binding was freed and its address reused.
+    static std::unordered_map<uint64_t, uint64_t> found;   //binding -> anim info
+    auto hit = found.find(binding);
+    if (hit != found.end() && *(const uint64_t*)(hit->second + 8) == binding)
+    {
+        return *(const int32_t*)hit->second;
+    }
+    for (int32_t i = (int32_t)anims->array1_len - 1; i >= 0; i--)
+    {
+        const uint64_t elem = (uint64_t)anims->arry1[i];
+        const uint64_t rescap = elem != 0 ? *(const uint64_t*)elem : 0;
+        const uint64_t hvkanim = rescap != 0 ? *(const uint64_t*)(rescap + 0x48) : 0;
+        if (hvkanim == 0)
+        {
+            continue;
+        }
+        const int32_t count = *(const int32_t*)(hvkanim + 0x28);
+        const uint64_t* infos = *(const uint64_t* const*)(hvkanim + 0x30);
+        for (int32_t k = 0; k < count && infos != NULL; k++)
+        {
+            if (infos[k] != 0 && *(const uint64_t*)(infos[k] + 8) == binding)
+            {
+                found[binding] = infos[k];
+                return *(const int32_t*)infos[k];
+            }
+        }
+    }
+    return -2;
+}
+
+// The character whose animation controls are being serialized (serialize_ChrCtrl_AnimationQueue sets it), for the bindings
+static const ChrCtrl_AnimationQueue_field0x10* serialized_anims = NULL;
+
 static void serialize_hkaAnimationControl(StateVisitor& v, const hkaAnimationControl* h)
 {
     v.begin("hkaAnimationControl");
@@ -2612,13 +2778,45 @@ static void serialize_hkaAnimationControl(StateVisitor& v, const hkaAnimationCon
     v.field("unk_c", h->unk_c);
     v.field("curTimeInAnimation", h->curTimeInAnimation);
     v.field("weight", h->weight);
-    v.field("field0x18_len", h->field0x18_len);
-    v.field("field0x18_cap", h->field0x18_cap);
+    v.length("field0x18_len", h->field0x18_len);
+    v.length("field0x18_cap", h->field0x18_cap);
     v.blob("field0x18", h->field0x18, h->field0x18_len);   // copy memcpy's _len bytes
-    v.field("field0x28_len", h->field0x28_len);
-    v.field("field0x28_cap", h->field0x28_cap);
+    v.length("field0x28_len", h->field0x28_len);
+    v.length("field0x28_cap", h->field0x28_cap);
     v.blob("field0x28", h->field0x28, h->field0x28_len);
-    v.ptr_flag("HkaAnimationBinding", (void*)h->HkaAnimationBinding);   // loaded anim resource
+    // A loaded anim resource at a per-process address: compare which animation it binds instead
+    const int32_t binding_anim = anim_id_of_binding(serialized_anims, h->HkaAnimationBinding);
+    if (v.mode == StateVisitor::Mode::Apply)
+    {
+        int32_t theirs;
+        if (v.apply_value("HkaAnimationBinding_animId", &theirs) && theirs != binding_anim)
+        {
+            uint64_t binding = 0;
+            if (theirs >= 0)
+            {
+                const uint64_t info = serialized_anims != NULL
+                    ? ((get_HvkAnim_AnimInfoArrayElem_for_animID_t)(Game::ds1_base + get_HvkAnim_AnimInfoArrayElem_for_animID_offset))(serialized_anims, theirs)
+                    : 0;
+                binding = info != 0 ? *(const uint64_t*)(info + 8) : 0;
+                if (binding == 0)
+                {
+                    v.apply_problem("HkaAnimationBinding_animId", "anim " + std::to_string(theirs) + " has no binding on this machine (not loaded)");
+                }
+            }
+            else if (theirs == -2)
+            {
+                v.apply_problem("HkaAnimationBinding_animId", "the sender's binding is in none of its character's anibnds");
+            }
+            if (theirs == -1 || binding != 0)
+            {
+                ((hkaAnimationControl*)h)->HkaAnimationBinding = binding;
+            }
+        }
+    }
+    else
+    {
+        v.field("HkaAnimationBinding_animId", binding_anim);
+    }
     v.field("unk_48", h->unk_48);
     v.field("unk_4c", h->unk_4c);
     v.field("unk_50", h->unk_50);
@@ -2665,8 +2863,8 @@ static void serialize_ChrCtrl_AnimationQueue_field0x20(StateVisitor& v, const Ch
 static void serialize_ChrCtrl_AnimationQueue_field0x10(StateVisitor& v, const ChrCtrl_AnimationQueue_field0x10* f)
 {
     v.begin("ChrCtrl_AnimationQueue_field0x10");
-    v.field("array1_len", f->array1_len);
-    v.field("array2_len", f->array2_len);
+    v.length("array1_len", f->array1_len);
+    v.length("array2_len", f->array2_len);
     // each element starts with its AnibndResCap*, a loaded resource at a per-process address
     for (size_t i = 0; i < f->array2_len; i++)
     {
@@ -2679,28 +2877,79 @@ static void serialize_ChrCtrl_AnimationQueue_field0x10(StateVisitor& v, const Ch
     v.end();
 }
 
-static void serialize_ChrCtrl_AnimationQueueEntry(StateVisitor& v, const ChrCtrl_AnimationQueueEntry* e)
+static void serialize_ChrCtrl_AnimationQueueEntry(StateVisitor& v, const ChrCtrl_AnimationQueueEntry* e, const ChrCtrl_AnimationQueue_field0x10* anims)
 {
     v.begin("ChrCtrl_AnimationQueueEntry");
     v.blob("unk_0", &e->unk_0, 8);
     serialize_hkaDefaultAnimationControl(v, e->defaultAnimationControl);
-    v.ptr_flag("HvkAnim_AnimInfoArrayElem", (void*)e->HvkAnim_AnimInfoArrayElem);   // loaded animbnd
-    v.blob_holes("unk_28", &e->unk_28, 0x50, { { 0x13, 1, StateVisitor::Hole::Pad }, { 0x21, 3, StateVisitor::Hole::Pad }, { 0x29, 3, StateVisitor::Hole::Pad }, { 0x4d, 3, StateVisitor::Hole::Pad } });
+    // Points into a loaded anibnd, at a per-process address: compare the animation it names instead
+    const int32_t anim_id = anim_info_id(e->HvkAnim_AnimInfoArrayElem);
+    if (v.mode == StateVisitor::Mode::Apply)
+    {
+        int32_t theirs;
+        if (v.apply_value("HvkAnim_AnimInfoArrayElem_animId", &theirs) && theirs != anim_id)
+        {
+            uint64_t info = 0;
+            if (theirs >= 0)
+            {
+                info = ((get_HvkAnim_AnimInfoArrayElem_for_animID_t)(Game::ds1_base + get_HvkAnim_AnimInfoArrayElem_for_animID_offset))(anims, theirs);
+                if (info == 0)
+                {
+                    v.apply_problem("HvkAnim_AnimInfoArrayElem_animId", "anim " + std::to_string(theirs) + " is not in this character's anibnds");
+                }
+            }
+            ((ChrCtrl_AnimationQueueEntry*)e)->HvkAnim_AnimInfoArrayElem = info;
+        }
+    }
+    else
+    {
+        v.field("HvkAnim_AnimInfoArrayElem_animId", anim_id);
+    }
+    v.blob("unk_28", &e->unk_28, 8);
+    {
+        // +0x30 is a heap pointer (seen 0x1bb471860 on one machine against 0x14cb84a40 on the other) whose presence follows the
+        // entry's state: the start-state handshake has to clear it when the sender's entry has none (keeping this machine's
+        // pointer next to the sender's entry state crashed the game), and cannot make one up when the sender has one.
+        uint64_t* p30 = (uint64_t*)&e->unk_30;
+        if (v.mode == StateVisitor::Mode::Apply)
+        {
+            uint8_t theirs;
+            if (v.apply_value("unk_30_set", &theirs))
+            {
+                if (theirs == 0)
+                {
+                    *p30 = 0;
+                }
+                else if (*p30 == 0)
+                {
+                    v.apply_problem("unk_30_set", "the sender's entry has an object here and this machine's has none");
+                }
+            }
+        }
+        else
+        {
+            v.field("unk_30_set", (uint8_t)(*p30 != 0 ? 1 : 0));
+        }
+    }
+    v.blob_holes("unk_38", (const uint8_t*)&e->unk_28 + 0x10, 0x40, { { 0x3, 1, StateVisitor::Hole::Pad }, { 0x11, 3, StateVisitor::Hole::Pad }, { 0x19, 3, StateVisitor::Hole::Pad }, { 0x3d, 3, StateVisitor::Hole::Pad } });
     v.end();
 }
 
 static void serialize_ChrCtrl_AnimationQueue(StateVisitor& v, const ChrCtrl_AnimationQueue* q)
 {
     v.begin("ChrCtrl_AnimationQueue");
-    v.field("array_length", q->array_length);
+    v.length("array_length", q->array_length);
     v.field("unk_4", q->unk_4);
     v.count("arry", q->array_length);
+    serialized_anims = q->field0x10;
     for (size_t i = 0; i < q->array_length; i++)
     {
-        serialize_ChrCtrl_AnimationQueueEntry(v, &q->arry[i]);
+        serialize_ChrCtrl_AnimationQueueEntry(v, &q->arry[i], q->field0x10);
     }
     serialize_ChrCtrl_AnimationQueue_field0x10(v, q->field0x10);
+    //holds its own copies of the same controls (the saved tree does not share them), so it needs the bindings resolved too
     serialize_hkaAnimatedSkeleton(v, q->HkaAnimatedSkeleton);
+    serialized_anims = NULL;
     serialize_ChrCtrl_AnimationQueue_field0x20(v, q->field0x20);
     v.blob("genderSpecificAnimationOffset_region", &q->genderSpecificAnimationOffset, 0x10);
     v.blob("unk_70_region", &q->unk_70, 0x10);
@@ -2729,9 +2978,16 @@ static void serialize_AnimationQueue_Entry_sub1_field0x10(StateVisitor& v, const
 static void serialize_AnimationQueue_Entry_sub1(StateVisitor& v, const AnimationQueue_Entry_sub1* s)
 {
     v.begin("AnimationQueue_Entry_sub1");
+    // appliable: a saved sub1 always has 8 entries allocated, and loading allocates the game's array when it has none
     v.field("field0x10_cap", s->field0x10_cap);
     v.field("unk", s->unk);
     v.field("field0x10_len", s->field0x10_len);
+    if (v.mode == StateVisitor::Mode::Apply && (s->field0x10_len > 8 || s->field0x10_cap > 8))
+    {
+        v.apply_problem("field0x10_len", "sender has " + std::to_string(s->field0x10_len) + " of " + std::to_string(s->field0x10_cap));
+        ((AnimationQueue_Entry_sub1*)s)->field0x10_len = 0;
+        ((AnimationQueue_Entry_sub1*)s)->field0x10_cap = 0;
+    }
     for (size_t i = 0; i < s->field0x10_len; i++)
     {
         if (s->field0x10[i] != NULL)
@@ -2787,10 +3043,34 @@ static void serialize_WalkAnim_Twist_Field0x228Elem_field0x10elem(StateVisitor& 
 static void serialize_WalkAnim_Twist_Field0x228Elem(StateVisitor& v, const WalkAnim_Twist_Field0x228Elem* f)
 {
     v.begin("WalkAnim_Twist_Field0x228Elem");
-    v.field("field0x10_cap", f->field0x10_cap);
+    // The capacity is allocation, not state: the game allocates the 8 entry array the first time it needs it, so two
+    // machines' copies of one character can differ in it. Only the entries in use are compared and applied.
+    v.excluded("field0x10_cap", sizeof(f->field0x10_cap));
     v.field("unk", f->unk);
     v.field("field0x10_len", f->field0x10_len);
-    for (size_t i = 0; i < f->field0x10_cap; i++)
+    if (v.mode == StateVisitor::Mode::Apply)
+    {
+        // a saved copy always has the 8 entry array (init_WalkAnim_Twist_Field0x228Elem); loading allocates the game's
+        WalkAnim_Twist_Field0x228Elem* m = (WalkAnim_Twist_Field0x228Elem*)f;
+        if (m->field0x10_len > 8)
+        {
+            v.apply_problem("field0x10_len", "sender has " + std::to_string(m->field0x10_len));
+            m->field0x10_len = 0;
+        }
+        else if (m->field0x10_len > m->field0x10_cap)
+        {
+            m->field0x10_cap = 8;
+        }
+        for (size_t i = 0; i < m->field0x10_len; i++)
+        {
+            if (m->field0x10[i] == NULL)
+            {
+                m->field0x10[i] = (WalkAnim_Twist_Field0x228Elem_field0x10elem*)malloc_(sizeof(WalkAnim_Twist_Field0x228Elem_field0x10elem));
+                memset(m->field0x10[i], 0, sizeof(WalkAnim_Twist_Field0x228Elem_field0x10elem));
+            }
+        }
+    }
+    for (size_t i = 0; i < f->field0x10_len; i++)
     {
         if (f->field0x10[i] != NULL)
         {
@@ -2808,7 +3088,7 @@ static void serialize_WalkAnim_Twist_Field0x228Elem(StateVisitor& v, const WalkA
 static void serialize_WalkAnim_Twist(StateVisitor& v, const WalkAnim_Twist* w)
 {
     v.begin("WalkAnim_Twist");
-    v.ptr_flag("unk_8", (const void*)w->unk_8);   // as SpinJoint
+    v.padding("unk_8", &w->unk_8, sizeof(w->unk_8));   // as SpinJoint
     v.blob("walkF_region", &w->walkF, 0x1b8);
     v.blob("unk_1d8", &w->unk_1d8, 16);
     serialize_SpinJoint(v, w->Upper_Root_Joint);
@@ -2825,10 +3105,10 @@ static void serialize_WalkAnim_Twist(StateVisitor& v, const WalkAnim_Twist* w)
 static void serialize_ChrCtrl(StateVisitor& v, const ChrCtrl* c)
 {
     v.begin("ChrCtrl");
-    //Measured as a heap address, not a value: 0x1bb541ff0 on one instance against
-    //0x14d1b7d90 on the other in the same frame-0 dump. Comparing it is a guaranteed
-    //difference every run -- exactly the false-desync class the pointer rule exists for.
-    v.ptr_flag("unk_8", (const void*)c->unk_8);
+    //Padding: init_NS_FRPG::ChrCtrl (1403782c0) never writes +0x8 and Ghidra has no field there. It keeps what the
+    //allocator left: null, or on a remote character a pointer to a live NS_FRPG::FgModel (the face model) from an
+    //earlier use of the same memory, which is why it looked like state that only the remote copy has.
+    v.padding("unk_8", &c->unk_8, sizeof(c->unk_8));
     serialize_ChrCtrl_AnimationQueue(v, c->animationQueue);
     serialize_AnimationMediator(v, c->animationMediator);
     serialize_HavokChara(v, c->havokChara);
@@ -2900,7 +3180,43 @@ static void serialize_ChrIns(StateVisitor& v, const ChrIns* c)
     v.field("unk_1e0", c->unk_1e0);
     serialize_SpecialEffect(v, c->specialEffects);
     serialize_QwcSpEffectEquipCtrl(v, c->qwcSpEffectEquipCtrl);
-    v.blob_holes("unk_288", &c->unk_288, 0x48, { { 0x9, 7, StateVisitor::Hole::Pad }, { 0x23, 1, StateVisitor::Hole::Pad }, { 0x2c, 12, StateVisitor::Hole::Pad } });
+    v.blob_holes("unk_288", &c->unk_288, 0x1d, { { 0x9, 7, StateVisitor::Hole::Pad } });
+    {
+        //ChrIns+0x2a5 bit 4: the character's bounding sphere is inside this machine's camera frustum (FUN_14036e8d0, the
+        //update-rate pass), so it is per-machine view state: compared and applied without it
+        uint8_t* view = (uint8_t*)&c->unk_288 + 0x1d;
+        if (v.mode == StateVisitor::Mode::Apply)
+        {
+            uint8_t theirs;
+            if (v.apply_value("flags_2a5", &theirs))
+            {
+                *view = (uint8_t)((*view & 0x10) | (theirs & ~0x10));
+            }
+        }
+        else
+        {
+            v.field("flags_2a5", (uint8_t)(*view & ~0x10));
+        }
+    }
+    v.blob("unk_2a6", (const uint8_t*)&c->unk_288 + 0x1e, 2);
+    {
+        //ChrIns+0x2a8 bit 3 is UI state: Handle_FloatingMultiplayHpBars sets it (through FUN_142a55a30) while this machine's
+        //camera shows the character's floating HP bar, so it is left out of the comparison and never applied
+        uint8_t* flags = (uint8_t*)&c->unk_288 + 0x20;
+        if (v.mode == StateVisitor::Mode::Apply)
+        {
+            uint8_t theirs;
+            if (v.apply_value("flags_2a8", &theirs))
+            {
+                *flags = (uint8_t)((*flags & 0x08) | (theirs & ~0x08));
+            }
+        }
+        else
+        {
+            v.field("flags_2a8", (uint8_t)(*flags & ~0x08));
+        }
+    }
+    v.blob_holes("unk_2a9", (const uint8_t*)&c->unk_288 + 0x21, 0x27, { { 0x2, 1, StateVisitor::Hole::Pad }, { 0xb, 12, StateVisitor::Hole::Pad } });
     serialize_ChrIns_field0x2c8(v, c->field0x2c8);
     v.blob("unk_2d8", &c->unk_2d8, 8);
     // 0x2e0: the character's current damage entries, 8 x { int32 entry id, uint8 (always 0 so far), 3 bytes never written }

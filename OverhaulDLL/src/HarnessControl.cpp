@@ -47,6 +47,8 @@
       dump_status                   dump_requested / dump_frame / dump_confirmed / dump_size / dump_file
       dump_get                      the captured text (+ dump_status fields); large (hundreds of KB)
       probe                         per connected player: hp, max_hp, x, y, z, rot -- a cheap "what is happening" view
+      giveitem <cat> <id> <qty> [select]  before a session: give the local player an item (cat weapon|protector|accessory|goods),
+                                    into a free quickbar slot if it goes there; select makes it the selected quickbar item
       synctest [reset]              GGPO_SYNCTEST builds: replayed-frame mismatch counts per subsystem
                                     (also in status); reset zeroes them and re-arms the state dumps
       synctest dump <subsys> [f|+n] only dump mismatches in these subsystems (all|none|player,damage,...),
@@ -71,6 +73,7 @@
 #include "StateHash.h"
 #include "VirtualPad.h"
 #include "WorldFreeze.h"
+#include "RollbackStartSync.h"
 
 #include <algorithm>
 #include <atomic>
@@ -235,6 +238,7 @@ namespace
 #endif
         s += ",\"ggpo_started\":" + b2s(Rollback::ggpoStarted);
         s += ",\"ggpo_ready\":" + q(ready_name(Rollback::ggpoReady));
+        s += ",\"start_sync\":" + RollbackStartSync::status_json();
         int frame, confirmed;
         frame_info(&frame, &confirmed);
         s += ",\"frame\":" + std::to_string(frame);
@@ -604,6 +608,40 @@ namespace
             }
             s += "]";
             return ok_json(s);
+        }
+
+        //Test setup: give the local player an item with the game's own GiveItemToPlayer, forced into the first free quickbar
+        //slot when it is equippable there, and optionally select it. Refused once a session runs (the start-state handshake
+        //sends the inventory to the other players, and during a session only the input may change it).
+        if (cmd == "giveitem")
+        {
+            if (a.size() < 4) return err_json("usage: giveitem <category: weapon|protector|accessory|goods> <id> <quantity> [select]");
+            if (Rollback::ggpoStarted) return err_json("a session is running");
+            uint32_t category;
+            if (a[1] == "weapon") category = 0x00000000;
+            else if (a[1] == "protector") category = 0x10000000;
+            else if (a[1] == "accessory") category = 0x20000000;
+            else if (a[1] == "goods") category = 0x40000000;
+            else return err_json("unknown category");
+            int32_t id = 0, quantity = 0;
+            try { id = std::stoi(a[2]); quantity = std::stoi(a[3]); } catch (...) { return err_json("bad id or quantity"); }
+            auto local_o = Game::get_connected_player(0);
+            if (!local_o.has_value() || local_o.value() == 0) return err_json("no local player");
+            PlayerIns* local = (PlayerIns*)local_o.value();
+            EquipGameData* egd = &local->playergamedata->equipGameData;
+            //NS_FRPG::EquipParam::GiveItemToPlayer(EquipGameData*, category, id, quantity, unused, allow_trophy, ?, attempt_auto_equip):
+            //attempt_auto_equip false equips goods into the first free quickbar slot regardless of the param's isAutoEquip
+            typedef int32_t (*GiveItemToPlayer_t)(EquipGameData*, uint32_t, int32_t, int32_t, bool, bool, bool, bool);
+            const int32_t index = ((GiveItemToPlayer_t)(Game::ds1_base + 0x7479e0))(egd, category, id, quantity, false, false, false, false);
+            if (index < 0) return err_json("GiveItemToPlayer refused it (" + std::to_string(index) + ")");
+            if (a.size() > 4 && a[4] == "select")
+            {
+                egd->equippedItemsInQuickbar.selectedQuickbarItem = (uint32_t)index;
+            }
+            std::string bar;
+            for (int i = 0; i < 5; i++) bar += (i ? "," : "") + std::to_string((int32_t)egd->equippedItemsInQuickbar.quickbar[i]);
+            return ok_json("\"inventory_index\":" + std::to_string(index) + ",\"quickbar\":[" + bar + "],\"selected\":" +
+                std::to_string((int32_t)egd->equippedItemsInQuickbar.selectedQuickbarItem));
         }
 
         //Per-player view of what the input path actually delivered. Press the button in

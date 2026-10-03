@@ -457,6 +457,165 @@ ret
 Destruct_FxBehaviorNode_injection ENDP
 
 
+
+;---- Inventory changes the session's input cannot carry -------------------------------------------------------------------
+;The input only says which items a character has equipped and is using; every other change to an inventory has to happen on
+;every machine on the same frames. Picking up, being awarded, dropping or boxing an item happens on one machine only (the
+;menus and the world are not simulated on the others), and the inventory is rolled back while the world event that caused
+;it is not, so while a session runs these are refused at their source, before anything is consumed.
+
+extern rollback_item_change_blocked: proc
+
+;rollback_item_change_blocked(which), with the stack aligned for the call. Clobbers the volatile registers.
+ITEM_CHANGE_BLOCKED macro which
+    push    rbp
+    mov     rbp, rsp
+    and     rsp, -10h
+    sub     rsp, 20h
+    mov     ecx, which
+    call    rollback_item_change_blocked
+    mov     rsp, rbp
+    pop     rbp
+endm
+
+EXTERN MapItem_Pickup_return: qword
+
+;FUN_1403fb144's lookup of the map item the player picks up: call FUN_1403f8600 / mov rdx,rax / test rax,rax / jz (to the
+;epilogue). During a session the lookup finds nothing, so neither the local pickup (remove from the map, award) nor the
+;request to the session host happens, and the item stays where it is.
+PUBLIC MapItem_Pickup_injection
+MapItem_Pickup_injection PROC
+mov     rax, qword ptr [ggpoStarted_ptr]
+cmp     byte ptr [rax], 0
+jne     mapitem_pickup_blocked
+;original code
+mov     rax, 1403f8600h
+call    rax
+mov     rdx, rax
+test    rax, rax
+jz      mapitem_pickup_none
+jmp     MapItem_Pickup_return
+mapitem_pickup_blocked:
+ITEM_CHANGE_BLOCKED 0
+mapitem_pickup_none:
+mov     rax, 1403fb1f3h
+jmp     rax
+MapItem_Pickup_injection ENDP
+
+EXTERN AwardItemLot_return: qword
+
+;FUN_1403fc940, the event scripts' AwardItemLot: awards the lot to the local player, then sets the lot's event flag
+PUBLIC AwardItemLot_injection
+AwardItemLot_injection PROC
+mov     rax, qword ptr [ggpoStarted_ptr]
+cmp     byte ptr [rax], 0
+jne     awarditemlot_blocked
+;original code
+mov     rax, rsp
+push    rbp
+push    rsi
+push    rdi
+push    r12
+push    r13
+push    r14
+push    r15
+jmp     AwardItemLot_return
+awarditemlot_blocked:
+ITEM_CHANGE_BLOCKED 1
+ret
+AwardItemLot_injection ENDP
+
+EXTERN LuaAddInventoryItem_return: qword
+
+;FUN_1404d5a00, behind the event scripts' AddInventoryItem: gives an item to the local player
+PUBLIC LuaAddInventoryItem_injection
+LuaAddInventoryItem_injection PROC
+mov     rax, qword ptr [ggpoStarted_ptr]
+cmp     byte ptr [rax], 0
+jne     luaadditem_blocked
+;original code
+mov     rax, rsp
+push    rbp
+push    rsi
+push    rdi
+push    r12
+push    r13
+push    r14
+push    r15
+jmp     LuaAddInventoryItem_return
+luaadditem_blocked:
+ITEM_CHANGE_BLOCKED 2
+ret
+LuaAddInventoryItem_injection ENDP
+
+EXTERN ItemDrop_return: qword
+
+;FUN_1406ae920(FrpgMenuDlgInventory*, inventory index): the inventory menu's drop. Takes the item out of the local player's
+;inventory and puts it on the ground as a map item
+PUBLIC ItemDrop_injection
+ItemDrop_injection PROC
+mov     rax, qword ptr [ggpoStarted_ptr]
+cmp     byte ptr [rax], 0
+jne     itemdrop_blocked
+;original code
+mov     qword ptr [rsp+20h], rbx
+push    rbp
+push    rsi
+push    rdi
+push    r12
+push    r13
+push    r14
+jmp     ItemDrop_return
+itemdrop_blocked:
+ITEM_CHANGE_BLOCKED 3
+ret
+ItemDrop_injection ENDP
+
+EXTERN BottomlessBoxDeposit_return: qword
+
+;FUN_1406e0270(FrpgMenuDlgInventory*, bool): puts an inventory item in the Bottomless Box
+PUBLIC BottomlessBoxDeposit_injection
+BottomlessBoxDeposit_injection PROC
+mov     rax, qword ptr [ggpoStarted_ptr]
+cmp     byte ptr [rax], 0
+jne     boxdeposit_blocked
+;original code
+mov     byte ptr [rsp+10h], dl
+push    rbp
+push    rbx
+push    rsi
+push    rdi
+push    r13
+push    r14
+push    r15
+jmp     BottomlessBoxDeposit_return
+boxdeposit_blocked:
+ITEM_CHANGE_BLOCKED 4
+ret
+BottomlessBoxDeposit_injection ENDP
+
+EXTERN BottomlessBoxWithdraw_return: qword
+
+;FUN_140768220(RepositoryData*, EquipGameData*, index, quantity): takes an item out of the Bottomless Box. Returns whether it did
+PUBLIC BottomlessBoxWithdraw_injection
+BottomlessBoxWithdraw_injection PROC
+mov     rax, qword ptr [ggpoStarted_ptr]
+cmp     byte ptr [rax], 0
+jne     boxwithdraw_blocked
+;original code
+mov     r11, rsp
+push    rbx
+push    rbp
+push    rsi
+push    r13
+sub     rsp, 48h
+movsxd  rbx, r8d
+jmp     BottomlessBoxWithdraw_return
+boxwithdraw_blocked:
+ITEM_CHANGE_BLOCKED 5
+xor     eax, eax
+ret
+BottomlessBoxWithdraw_injection ENDP
 _TEXT    ENDS
 
 END

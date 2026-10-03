@@ -73,6 +73,7 @@
     <ClCompile Include="src\PlayerVisualsValidationFix.cpp" />
     <ClCompile Include="src\Rollback.cpp" />
     <ClCompile Include="src\WorldFreeze.cpp" />
+    <ClCompile Include="src\RollbackStartSync.cpp" />
     <ClCompile Include="src\ServerMonitor.cpp" />
     <ClCompile Include="src\SfxManStructFunctions.cpp" />
     <ClCompile Include="src\SpellDesyncFixes.cpp" />
@@ -116,6 +117,7 @@
     <ClInclude Include="include\PlayerVisualsValidationFix.h" />
     <ClInclude Include="include\Rollback.h" />
     <ClInclude Include="include\WorldFreeze.h" />
+    <ClInclude Include="include\RollbackStartSync.h" />
     <ClInclude Include="include\RollbackReplay.h" />
     <ClInclude Include="include\RollbackScript.h" />
     <ClInclude Include="include\PlayerInsStruct.h" />

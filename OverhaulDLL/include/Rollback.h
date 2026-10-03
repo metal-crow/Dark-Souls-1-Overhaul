@@ -46,6 +46,8 @@ class Rollback
 {
 public:
     static void start();
+    //Must run before the game builds its player slots (GameDataMan_New, at boot): see Rollback.cpp
+    static void full_size_remote_inventories();
 
     static void NetcodeFix();
 
@@ -114,6 +116,13 @@ private:
     static const uint64_t WorldObjActMan_step_offset = 0x3cbde9;         //same
     //FUN_1403ca770, the number of damage entries to create: mov [rsp+8],rbx / push rdi / sub rsp,30h / mov rbx,r8 / mov rdi,rdx
     static const uint64_t DamageMan_EntryCount_offset = 0x3ca770;
+    //Inventory changes the input cannot carry, refused during sessions (see RollbackASM.asm)
+    static const uint64_t MapItem_Pickup_offset = 0x3fb144;          //call FUN_1403f8600 / mov rdx,rax / test rax,rax / jz
+    static const uint64_t AwardItemLot_offset = 0x3fc940;            //mov rax,rsp / push rbp,rsi,rdi,r12,r13,r14,r15
+    static const uint64_t LuaAddInventoryItem_offset = 0x4d5a00;     //mov rax,rsp / push rbp,rsi,rdi,r12,r13,r14,r15
+    static const uint64_t ItemDrop_offset = 0x6ae920;                //mov [rsp+20h],rbx / push rbp,rsi,rdi,r12,r13,r14
+    static const uint64_t BottomlessBoxDeposit_offset = 0x6e0270;    //mov [rsp+10h],dl / push rbp,rbx,rsi,rdi,r13,r14,r15
+    static const uint64_t BottomlessBoxWithdraw_offset = 0x768220;   //mov r11,rsp / push rbx,rbp,rsi,r13 / sub rsp,48h / movsxd rbx,r8d
 
     // SFX graveyard: hook the dealloc functions for SFXEntries and FxBehaviorNodes
     static const uint64_t Destruct_SFXEntry_offset = 0xff9490;
@@ -259,6 +268,8 @@ bool rollback_begin_game_callback(const char*);
 bool rollback_advance_frame_callback(int);
 bool rollback_load_game_state_callback(unsigned char* buffer, int);
 bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int);
+//Save the whole rollback state (what the save callback hands GGPO) without recording its digest. Free with rollback_free_buffer.
+RollbackState* rollback_capture_state();
 void rollback_copy_buffer(void* buffer_dst, void* buffer_src);
 void rollback_free_buffer(void* buffer);
 bool rollback_on_event_callback(GGPOEvent* info);
