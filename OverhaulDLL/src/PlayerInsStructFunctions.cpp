@@ -445,6 +445,8 @@ void copy_ChrIns(ChrIns* to, const ChrIns* from, StateTarget target)
     copy_ChrAttachSys(&to->chrattachsys, &from->chrattachsys, target);
     to->curHp = from->curHp;
     to->maxHp = from->maxHp;
+    to->curMp = from->curMp;
+    to->maxMp = from->maxMp;
     to->curSp = from->curSp;
     to->maxSp = from->maxSp;
     to->damage_taken_scalar = from->damage_taken_scalar;
@@ -2223,7 +2225,18 @@ static void serialize_PlayerGameData_AttributeInfo(StateVisitor& v, const Player
     v.begin("PlayerGameData_AttributeInfo");
     // not rolled back (copy_PlayerGameData), and a player's number differs per instance
     v.excluded("player_number_1indexed", sizeof(a->player_number_1indexed));
-    v.blob("AttributeInfo", &a->Hp, sizeof(*a) - offsetof(PlayerGameData_AttributeInfo, Hp));
+    //Hp (+0x4), Mp (+0x10) and Sp (+0x20) are mirrors Compute_PlayerGameData_value_updates re-derives every frame from
+    //ChrIns curHp/curMp/curSp (which are compared). The local character's refresh runs at a different point in the frame
+    //than the other machine's copy, so the mirror trails by one regen tick on one side. Copied and applied, not compared.
+    const uint8_t* attr = (const uint8_t*)a;
+    v.excluded("Hp_mirror", 4);
+    v.blob("MaxHp_to_BaseMaxMp", attr + 0x8, 0x8);
+    v.excluded("Mp_mirror", 4);
+    v.blob("MaxMp_to_unk_1c", attr + 0x14, 0xc);
+    v.excluded("Sp_mirror", 4);
+    v.blob("AttributeInfo", attr + 0x24, sizeof(*a) - 0x24);
+    static_assert(offsetof(PlayerGameData_AttributeInfo, Hp) == 0x4 && offsetof(PlayerGameData_AttributeInfo, Mp) == 0x10
+        && offsetof(PlayerGameData_AttributeInfo, Sp) == 0x20, "AttributeInfo mirror offsets");
     v.end();
 }
 
@@ -3007,7 +3020,24 @@ static void serialize_AnimationQueue_Entry(StateVisitor& v, const AnimationQueue
     v.blob("unk_140", &e->unk_140, 8);
     size_t len = ((uint64_t)e->chained_animations_array_end - (uint64_t)e->chained_animations_array_start) / 8;
     v.count("chained_animations_array", len);
-    for (size_t i = 0; i < len; i++) v.field("chained", e->chained_animations_array_start[i]);
+    // Pointers into the character's TimeAct data: 12 byte records {event offset, start time, end time}. Every machine has
+    // the same data at its own address (and its own copy per character), so the record is compared, not the pointer. On
+    // APPLY the values go into copies: the receiver keeps its own pointers (a different record shows up in the verify).
+    for (size_t i = 0; i < len; i++)
+    {
+        const void* rec = (const void*)e->chained_animations_array_start[i];
+        uint32_t event_offset = 0xFFFFFFFF;
+        float start = 0.0f, end = 0.0f;
+        if (rec != NULL && mem_readable((uint64_t)rec, 12))
+        {
+            event_offset = *(const uint32_t*)rec;
+            start = *(const float*)((const uint8_t*)rec + 4);
+            end = *(const float*)((const uint8_t*)rec + 8);
+        }
+        v.field("chained_event_offset", event_offset);
+        v.field("chained_start", start);
+        v.field("chained_end", end);
+    }
     v.blob("unk_168", &e->unk_168, 0x18);
     v.end();
 }
@@ -3236,6 +3266,8 @@ static void serialize_ChrIns(StateVisitor& v, const ChrIns* c)
     serialize_ChrAttachSys(v, &c->chrattachsys);
     v.field("curHp", c->curHp);
     v.field("maxHp", c->maxHp);
+    v.field("curMp", c->curMp);
+    v.field("maxMp", c->maxMp);
     v.field("curSp", c->curSp);
     v.field("maxSp", c->maxSp);
     v.field("damage_taken_scalar", c->damage_taken_scalar);

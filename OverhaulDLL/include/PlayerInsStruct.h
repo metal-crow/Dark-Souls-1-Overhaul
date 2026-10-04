@@ -1522,7 +1522,8 @@ struct ChrIns
     uint8_t padding_7[0x48];
     uint32_t curHp;
     uint32_t maxHp;
-    uint8_t padding_8[8];
+    uint32_t curMp;            // 0x3f0
+    uint32_t maxMp;            // 0x3f4
     uint32_t curSp;
     uint32_t maxSp;
     float damage_taken_scalar;
@@ -1614,6 +1615,7 @@ static_assert(offsetof(ChrIns, hitins_1) == 0x368+8);
 static_assert(offsetof(ChrIns, hitins_2) == 0x370+8);
 static_assert(offsetof(ChrIns, unk_380) == 0x378+8);
 static_assert(offsetof(ChrIns, chrattachsys) == 0x380+8);
+static_assert(offsetof(ChrIns, curMp) == 0x3f0);
 static_assert(offsetof(ChrIns, curHp) == 0x3e0+8);
 static_assert(offsetof(ChrIns, maxHp) == 0x3e4+8);
 static_assert(offsetof(ChrIns, curSp) == 0x3f0+8);
