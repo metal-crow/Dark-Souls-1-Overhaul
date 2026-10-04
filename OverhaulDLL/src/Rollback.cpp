@@ -219,6 +219,79 @@ uint32_t PlayerHandles::from_canonical(uint32_t canonical)
     return handles[k];
 }
 
+//Step_Chr_sub2's list of the characters it steps every frame, in world block order
+struct ChrStepNode
+{
+    PlayerIns* chr;
+    float frame_delta;
+    uint32_t pad;
+    ChrStepNode* next;
+};
+static_assert(offsetof(ChrStepNode, frame_delta) == 0x8);
+static_assert(offsetof(ChrStepNode, next) == 0x10);
+
+static uint32_t step_order_logs = 0;
+
+//Each character's proxy integrates (moves and resolves its contacts) inside its own step, against where the others are at
+//that moment. Two players in contact therefore come out differently depending on which steps first, and world block order
+//puts each machine's own character first. Step the session players in steam id order instead: the nodes keep their places
+//in the list and the players are dealt back into them sorted.
+extern "C" void Step_Chr_canonical_order_helper(ChrStepNode* head)
+{
+    if (!Rollback::ggpoStarted)
+    {
+        return;
+    }
+    uint64_t ids[GGPO_MAX_PLAYERS];
+    uint32_t handles[GGPO_MAX_PLAYERS];
+    const uint32_t n = session_players_by_steam_id(ids, handles);
+
+    ChrStepNode* nodes[GGPO_MAX_PLAYERS];
+    uint32_t ranks[GGPO_MAX_PLAYERS];
+    uint32_t found = 0;
+    for (ChrStepNode* e = head; e != NULL && found < GGPO_MAX_PLAYERS; e = e->next)
+    {
+        if (e->chr == NULL)
+        {
+            continue;
+        }
+        for (uint32_t k = 0; k < n; k++)
+        {
+            if ((uint32_t)e->chr->chrins.handle == handles[k])
+            {
+                nodes[found] = e;
+                ranks[found] = k;
+                found++;
+                break;
+            }
+        }
+    }
+    if (found != n)
+    {
+        FATALERROR("Step_Chr_canonical_order: %u of the session's %u players are in the step list", found, n);
+    }
+
+    PlayerIns* chrs[GGPO_MAX_PLAYERS];
+    float deltas[GGPO_MAX_PLAYERS];
+    for (uint32_t i = 0; i < found; i++)
+    {
+        chrs[ranks[i]] = nodes[i]->chr;
+        deltas[ranks[i]] = nodes[i]->frame_delta;
+    }
+    bool reordered = false;
+    for (uint32_t i = 0; i < found; i++)
+    {
+        reordered |= nodes[i]->chr != chrs[i];
+        nodes[i]->chr = chrs[i];
+        nodes[i]->frame_delta = deltas[i];
+    }
+    if (step_order_logs < 2)
+    {
+        step_order_logs++;
+        ConsoleWrite("Step_Chr_canonical_order: %u session players in the step list, %s", found, reordered ? "reordered" : "already in order");
+    }
+}
+
 //An inventory change the session's input cannot carry was refused (the injections in RollbackASM.asm say which)
 extern "C" void rollback_item_change_blocked(uint32_t which)
 {
@@ -248,6 +321,18 @@ extern "C" {
     void BottomlessBoxWithdraw_injection();
 }
 
+extern "C" {
+    uint64_t Step_Chr_canonical_order_return;
+    void Step_Chr_canonical_order_injection();
+    uint64_t ResonanceMagic_Arm_return;
+    void ResonanceMagic_Arm_injection();
+    uint64_t ChrCam_ApplyToPadManipulator_return;
+    void ChrCam_ApplyToPadManipulator_injection();
+    //While a rollback session runs, the live camera angles Apply_ChrCam_To_PlayerInsPadManipulator computes for the local
+    //player land here instead of in its PadManipulator (see ChrCam_ApplyToPadManipulator_injection): [0] camera_y_rotation,
+    //[1] camera_x_rotation, then the two fields it zeroes. The PadManipulator's are input, set from RollbackInput.
+    alignas(16) float rollback_live_camera[4] = {};
+}
 
 void PackRollbackInput(RollbackInput* out, PlayerIns* player)
 {
@@ -257,9 +342,20 @@ void PackRollbackInput(RollbackInput* out, PlayerIns* player)
     //Read the game pad inputs.
     VirtualPad::capture(&out->vpad.pad);
 
+    if (Rollback::ggpoStarted)
+    {
+        out->vpad.camera_x_rotation = rollback_live_camera[1];
+        out->vpad.camera_y_rotation = rollback_live_camera[0];
+    }
+#if ROLLBACK_INPUT_TESTING
+    else
+    {
     out->vpad.camera_x_rotation = player->chrins.padManipulator->chrManipulator.camera_x_rotation;
     out->vpad.camera_y_rotation = player->chrins.padManipulator->chrManipulator.camera_y_rotation;
-    out->vpad.LockonTargetHandle = player->chrins.padManipulator->chrManipulator.LockonTargetHandle;
+    }
+#endif
+    //a player's handle is this machine's; the receiver translates it back into its own (PlayerHandles.h)
+    out->vpad.LockonTargetHandle = PlayerHandles::to_canonical(player->chrins.padManipulator->chrManipulator.LockonTargetHandle);
 
     //Read before our own Step_PadManipulator consumes it. Pack runs at MainUpdate entry, so
     //this is the request the menus left last frame
@@ -344,7 +440,7 @@ static void apply_virtualpad_input(RollbackInput* in, PlayerIns* player, uint32_
         MenuMan_Set_IndexLookup(MENUMAN_INDEX_UNKNOWN99, (int32_t)saved_99);
     }
 
-    cm->LockonTargetHandle = in->vpad.LockonTargetHandle;
+    cm->LockonTargetHandle = PlayerHandles::from_canonical(in->vpad.LockonTargetHandle);
 
     //Weapon-slot selection, for players whose in-game menu step did not run
     if (suppress_globals)
@@ -1300,6 +1396,16 @@ void Rollback::start()
     //...and only the session players can create damage entries
     write_address = (uint8_t*)(Game::ds1_base + Rollback::DamageMan_EntryCount_offset);
     sp::mem::code::x64::inject_jmp_14b(write_address, &DamageMan_EntryCount_return, 2, &DamageMan_EntryCount_injection);
+    write_address = (uint8_t*)(Game::ds1_base + Rollback::ChrCam_ApplyToPadManipulator_store_offset);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &ChrCam_ApplyToPadManipulator_return, 0, &ChrCam_ApplyToPadManipulator_injection);
+
+    //no covenant resonance during sessions: see ResonanceMagic_Arm_injection
+    write_address = (uint8_t*)(Game::ds1_base + Rollback::ResonanceMagic_Arm_offset);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &ResonanceMagic_Arm_return, 1, &ResonanceMagic_Arm_injection);
+
+    //step the session players in the same order on every machine: see Step_Chr_canonical_order_helper
+    write_address = (uint8_t*)(Game::ds1_base + Rollback::Step_Chr_canonical_order_offset);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &Step_Chr_canonical_order_return, 1, &Step_Chr_canonical_order_injection);
 
     //only the input may change an inventory during a session: refuse pickups, awards, drops and the Bottomless Box
     write_address = (uint8_t*)(Game::ds1_base + Rollback::MapItem_Pickup_offset);
@@ -1728,6 +1834,14 @@ bool rollback_await_init(void* steamMsgs)
 
     //ggpo_set_frame_delay(ggpo, Rollback::ggpoHandles[0], 1);
 
+    //the camera stops going into the local PadManipulator now (ChrCam_ApplyToPadManipulator_injection); start from where it is
+    auto local_o = Game::get_connected_player(0);
+    if (local_o.has_value() && local_o.value() != 0)
+    {
+        const ChrManipulator& cm = ((PlayerIns*)local_o.value())->chrins.padManipulator->chrManipulator;
+        rollback_live_camera[0] = cm.camera_y_rotation;
+        rollback_live_camera[1] = cm.camera_x_rotation;
+    }
 
     ConsoleWrite("GGPO started");
     Rollback::ggpoStarted = true;

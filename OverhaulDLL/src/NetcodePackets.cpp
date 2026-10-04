@@ -76,7 +76,7 @@ const uint64_t Rollback::PlayerIns_IsHostPlayerIns_offsets[] = {
     //0x14031f4ce,
     //0x14031f68f,
     //0x14031f95a,
-    //0x140320884,
+    0x140320884, //FUN_140320870 (every character step): the magic/item-in-use latch ChrIns+0x4b3/+0x4b4 only for the "host" player
     //0x140321429,
     //0x140321669,
     //0x1403218c5,
@@ -144,14 +144,14 @@ const uint64_t Rollback::PlayerIns_IsHostPlayerIns_offsets[] = {
     0x140356ec7, //needed to compute roll type
     //0x140357077,
     //0x140357263, //this is already patched inline as part of the FileReloading ASM
-    //0x1403575bd,
+    0x1403575bd, //PlayerIns_ComputeChanges: Compute_PlayerGameData_value_updates (HP/SP/MP into PlayerGameData) only for the "host"
     //0x14035772e,
     //0x1403577e9,
     //0x1403579a1,
     //0x140357dc4,
-    //0x140358219,
+    0x140358219, //PlayerIns_Update_Model: FUN_14014d0c0 recomputes PlayerIns+0x970.. only for the "host" player
     //0x140358bd2,
-    //0x140358c9c,
+    0x140358c9c, //PlayerIns vtable+0x3b8 (weapon hit durability, FUN_14074e760 adds the wear to durability[1]) only for the "host" player
     //0x140358ee3,
     //0x140359193,
     //0x140359b07,
@@ -184,14 +184,14 @@ const uint64_t Rollback::PlayerIns_IsHostPlayerIns_offsets[] = {
     //0x140361da3,
     //0x14036220e,
     //0x1403623d2,
-    //0x14036f056,
+    0x14036f056, //FUN_14036e8d0 (character update rate): only the "host" gets ChrIns+0x164 = 0 (every frame); the others drop to every 2nd/5th frame when off this machine's camera
     //0x140370252,
     //0x14037057d,
     //0x140373dd6,
     //0x140373df2,
     0x140379219, //toggling weapon (path FUN_140378d00)
-    //0x140382584,
-    //0x1403909d4,
+    0x140382584, //PlayerCtrl_Func_27: foot IK and PlayerCtrl+0x330 run only for the "host" player; the other machine's copy skipped them
+    0x1403909d4, //EzStateActionEvent_Execute_By_CommandId: an EzState command sets ActionCtrl bitfield bit 20 only for the "host"
     //0x140392f71,
     //0x140393427,
     //0x1403971b5,

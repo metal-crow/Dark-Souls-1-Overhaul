@@ -457,6 +457,70 @@ ret
 Destruct_FxBehaviorNode_injection ENDP
 
 
+EXTERN ChrCam_ApplyToPadManipulator_return: qword
+EXTERN rollback_live_camera: xmmword
+
+;Apply_ChrCam_To_PlayerInsPadManipulator's store of the camera angles into the viewing player's ChrManipulator (+0x50).
+;While a rollback session runs the PadManipulator's camera angles are input, set from each player's RollbackInput, so the
+;live camera goes to rollback_live_camera instead (PackRollbackInput reads it), and live and re-simulated frames match.
+PUBLIC ChrCam_ApplyToPadManipulator_injection
+ChrCam_ApplyToPadManipulator_injection PROC
+;original code
+mov     rbx, qword ptr [rsp+40h]
+mov     rcx, qword ptr [ggpoStarted_ptr]
+cmp     byte ptr [rcx], 0
+jne     to_side_buffer
+;original code
+movaps  xmmword ptr [rax+50h], xmm6
+jmp     chrcam_done
+to_side_buffer:
+movups  xmmword ptr [rollback_live_camera], xmm6
+chrcam_done:
+;original code
+movaps  xmm6, xmmword ptr [rsp+20h]
+jmp     ChrCam_ApplyToPadManipulator_return
+ChrCam_ApplyToPadManipulator_injection ENDP
+
+
+EXTERN ResonanceMagic_Arm_return: qword
+
+;FUN_14080cbb0: arms the local player's ChrResonanceMagicSlot every frame. Armed, the slot rolls a resonance level with the
+;game's global RNG every 3 s, applies SpEffect 40-44 to its own character only and sends a type 34 packet: local, random
+;and network-timed, so it can never be the same on two machines. Not armed while a rollback session runs.
+PUBLIC ResonanceMagic_Arm_injection
+ResonanceMagic_Arm_injection PROC
+mov     rax, qword ptr [ggpoStarted_ptr]
+cmp     byte ptr [rax], 0
+jne     resonance_disabled
+;original code
+push    rdi
+sub     rsp, 30h
+mov     qword ptr [rsp+20h], -2
+jmp     ResonanceMagic_Arm_return
+resonance_disabled:
+ret
+ResonanceMagic_Arm_injection ENDP
+
+
+EXTERN Step_Chr_canonical_order_return: qword
+extern Step_Chr_canonical_order_helper: proc
+
+;Step_Chr_sub2, after it has linked this frame's always-stepped characters (R12, {ChrIns*, frame delta, next}) and before
+;the loops that step them. The helper puts the session players into the same order on every machine.
+PUBLIC Step_Chr_canonical_order_injection
+Step_Chr_canonical_order_injection PROC
+FUNC_PROLOGUE
+mov     rcx, r12
+call    Step_Chr_canonical_order_helper
+FUNC_EPILOGUE
+
+;original code
+mov     word ptr [r14+1F2Dh], 0
+mov     rax, 140186340h
+call    rax
+jmp     Step_Chr_canonical_order_return
+Step_Chr_canonical_order_injection ENDP
+
 
 ;---- Inventory changes the session's input cannot carry -------------------------------------------------------------------
 ;The input only says which items a character has equipped and is using; every other change to an inventory has to happen on
@@ -616,6 +680,7 @@ ITEM_CHANGE_BLOCKED 5
 xor     eax, eax
 ret
 BottomlessBoxWithdraw_injection ENDP
+
 _TEXT    ENDS
 
 END

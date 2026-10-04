@@ -116,6 +116,12 @@ private:
     static const uint64_t WorldObjActMan_step_offset = 0x3cbde9;         //same
     //FUN_1403ca770, the number of damage entries to create: mov [rsp+8],rbx / push rdi / sub rsp,30h / mov rbx,r8 / mov rdi,rdx
     static const uint64_t DamageMan_EntryCount_offset = 0x3ca770;
+    //Apply_ChrCam_To_PlayerInsPadManipulator (140235400): mov rbx,[rsp+40h] / movaps [rax+50h],xmm6 / movaps xmm6,[rsp+20h]
+    static const uint64_t ChrCam_ApplyToPadManipulator_store_offset = 0x235480;
+    //FUN_14080cbb0: arms the local player's ChrResonanceMagicSlot (push rdi / sub rsp,30h / mov [rsp+20h],-2)
+    static const uint64_t ResonanceMagic_Arm_offset = 0x80cbb0;
+    //Step_Chr_sub2, between building the list of characters to step and stepping them
+    static const uint64_t Step_Chr_canonical_order_offset = 0x36f98e;
     //Inventory changes the input cannot carry, refused during sessions (see RollbackASM.asm)
     static const uint64_t MapItem_Pickup_offset = 0x3fb144;          //call FUN_1403f8600 / mov rdx,rax / test rax,rax / jz
     static const uint64_t AwardItemLot_offset = 0x3fc940;            //mov rax,rsp / push rbp,rsi,rdi,r12,r13,r14,r15
