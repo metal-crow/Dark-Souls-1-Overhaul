@@ -2,6 +2,7 @@
 #include "PlayerInsStructFunctions.h"
 #include "FrpgHavokManImpStructFunctions.h"
 #include "StateSerializer.h"
+#include "PlayerHandles.h"
 #include <memory>
 #include <new>
 #include <unordered_map>
@@ -727,8 +728,21 @@ static void serialize_FrpgPhysIns(StateVisitor& v, const FrpgPhysIns* p)
     v.begin("FrpgPhysIns");
     v.field("vtable", p->vtable);          // fixed code addr (deterministic)
     v.field("type", p->type);
-    v.field("unk_a", p->unk_a);
-    v.field("unk_c", p->unk_c);
+    //init_NS_FRPG::FrpgPhysIns (1402a95e0) only clears the low 5 bits of +0xa (& 0xffe0); the rest is whatever the allocator
+    //left when the pool was built, which differs between machines (0x4300 seen against 0). +0xc..0xf is a gap in Ghidra's layout.
+    if (v.mode == StateVisitor::Mode::Apply)
+    {
+        uint16_t theirs;
+        if (v.apply_value("unk_a_flags", &theirs))
+        {
+            *(uint16_t*)&p->unk_a = (uint16_t)((p->unk_a & ~0x1f) | (theirs & 0x1f));
+        }
+    }
+    else
+    {
+        v.field("unk_a_flags", (uint16_t)(p->unk_a & 0x1f));
+    }
+    v.padding("unk_c", &p->unk_c, sizeof(p->unk_c));
     v.ptr_flag("owner", p->owner);
     v.ptr_flag("physWorld", p->physWorld);
     v.end();
@@ -756,7 +770,7 @@ static void serialize_DamageEntryField0x118(StateVisitor& v, const DamageEntryFi
 {
     v.begin("DamageEntryField0x118");
     for (int i = 0; i < 4; i++) v.field("unk_0", f->unk_0[i]);
-    v.field("PlayerHandle", f->PlayerHandle);
+    serialize_handle(v, "PlayerHandle", *(const uint32_t*)&f->PlayerHandle);
     v.blob("unk_14", f->unk_14, sizeof(f->unk_14));
     v.end();
 }
@@ -779,7 +793,7 @@ static void serialize_DamageEntry(StateVisitor& v, const DamageEntry* e)
     v.ptr_flag("hkpCapsuleShape1", e->hkpCapsuleShape1);
     v.ptr_flag("PhysShapePhantomIns1_altPtr_A", e->PhysShapePhantomIns1_altPtr_A);
     v.ptr_flag("PhysShapePhantomIns1_altPtr_B", e->PhysShapePhantomIns1_altPtr_B);
-    v.field("attackerHandle", e->attackerHandle);
+    serialize_handle(v, "attackerHandle", e->attackerHandle);
     v.blob("attackInfo", e->attackInfo, sizeof(e->attackInfo));
     v.padding("unk_114", &e->unk_114, sizeof(e->unk_114));
     if (e->field0x118)
@@ -965,7 +979,8 @@ void serialize_DamageMan(StateVisitor& v, DamageMan* d)
     v.field("put_out_sparks", d->put_out_sparks);
     v.field("damage_from_weapon", d->damage_from_weapon);
     v.field("damage_to_occur", d->damage_to_occur);
-    v.blob("unk_34", d->unk_34, sizeof(d->unk_34));
+    // trailing padding: Ghidra's DamageMan is 0x38 bytes and ends at damage_to_occur (0x33)
+    v.padding("unk_34", d->unk_34, sizeof(d->unk_34));
 
     v.end();
 }

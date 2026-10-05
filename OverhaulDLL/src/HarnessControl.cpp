@@ -47,8 +47,13 @@
       dump_status                   dump_requested / dump_frame / dump_confirmed / dump_size / dump_file
       dump_get                      the captured text (+ dump_status fields); large (hundreds of KB)
       probe                         per connected player: hp, max_hp, x, y, z, rot -- a cheap "what is happening" view
+      peek <hexaddr> [len]          raw bytes (at most 512), refused unless readable; for reverse engineering live objects
       giveitem <cat> <id> <qty> [select]  before a session: give the local player an item (cat weapon|protector|accessory|goods),
                                     into a free quickbar slot if it goes there; select makes it the selected quickbar item
+      rtti <hexaddr>                MSVC RTTI class name of the object at an address (its vtable's CompleteObjectLocator)
+      watch <hexaddr> [1|2|4|8] [slot 0-3]  hardware write watchpoint (DR0-3) on the game thread; records every instruction that writes there
+      watch exec <hexaddr> [slot] [edx]  hardware execute breakpoint (optionally only calls with this edx): records rcx, rdx, r8 and the return address at [rsp] of each call
+      watch off | watch log         clear them all | the recorded writers (slot, address after the write, module offset, new value, count, callers)
       synctest [reset]              GGPO_SYNCTEST builds: replayed-frame mismatch counts per subsystem
                                     (also in status); reset zeroes them and re-arms the state dumps
       synctest dump <subsys> [f|+n] only dump mismatches in these subsystems (all|none|player,damage,...),
@@ -290,6 +295,231 @@ namespace
         return s;
     }
 #endif
+
+// True if [addr, addr+len) is committed, readable memory. Not an SEH guard: the mod's vectored exception handler
+    // (CrashHandler.cpp) sees every access violation before any __except does, and brings up the crash report.
+    bool mem_readable(uint64_t addr, size_t len)
+    {
+        while (len > 0)
+        {
+            MEMORY_BASIC_INFORMATION mbi;
+            if (VirtualQuery((const void*)addr, &mbi, sizeof(mbi)) == 0 || mbi.State != MEM_COMMIT
+                || (mbi.Protect & (PAGE_NOACCESS | PAGE_GUARD)) != 0
+                || (mbi.Protect & (PAGE_READONLY | PAGE_READWRITE | PAGE_WRITECOPY | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY)) == 0)
+            {
+                return false;
+            }
+            const uint64_t region_end = (uint64_t)mbi.BaseAddress + mbi.RegionSize;
+            const uint64_t step = region_end - addr < len ? region_end - addr : len;
+            addr += step;
+            len -= (size_t)step;
+        }
+        return true;
+    }
+
+    // Checked raw read for the reverse-engineering commands
+    bool safe_read(uint64_t addr, void* out, size_t len)
+    {
+        if (addr == 0 || !mem_readable(addr, len)) return false;
+        memcpy(out, (const void*)addr, len);
+        return true;
+    }
+
+    // MSVC x64 RTTI: vtable[-1] is the CompleteObjectLocator {signature 1, offset, cdOffset, TypeDescriptor RVA @0xc,
+    // ClassHierarchyDescriptor RVA @0x10, own RVA @0x14}; the TypeDescriptor's decorated name starts at +0x10
+    std::string rtti_name(uint64_t obj)
+    {
+        uint64_t vtable = 0, col = 0;
+        if (!safe_read(obj, &vtable, 8) || vtable == 0 || !safe_read(vtable - 8, &col, 8) || col == 0) return "";
+        uint32_t sig = 0, td_rva = 0, self_rva = 0;
+        if (!safe_read(col, &sig, 4) || !safe_read(col + 0xc, &td_rva, 4) || !safe_read(col + 0x14, &self_rva, 4) || sig != 1) return "";
+        char name[160] = {};
+        if (!safe_read(col - self_rva + td_rva + 0x10, name, sizeof(name) - 1)) return "";
+        return std::string(name);
+    }
+
+    // ---- hardware write watchpoint (reverse engineering) ----
+    // DR0 on the game thread, write-only. A data breakpoint raises EXCEPTION_SINGLE_STEP after the writing instruction; it is not
+    // an 0xC... code, so the crash handler's vectored handler ignores it, and ours (added first) records it and continues.
+    //callers: the first stack slots that point into the game's code, a poor man's backtrace (the writer may be reached
+    //through Arxan's jump-return stubs, which leave no static callers)
+    struct WatchHit { uint32_t slot; uint64_t rip; uint64_t value; uint32_t count; uint64_t callers[8]; uint64_t rcx, rdx, r8, ret; int32_t frame; bool resim; };
+
+    //A stack slot is taken as a return address only if the bytes before it are a call: E8 rel32, or FF /2 (call reg,
+    //call [reg], call [reg+disp8], call [reg+disp32], call [rip+disp32], with or without a REX prefix)
+    bool follows_call(uint64_t ret)
+    {
+        const uint8_t* b = (const uint8_t*)ret;
+        if (b[-5] == 0xE8) return true;
+        for (int len = 2; len <= 7; len++)
+        {
+            const uint8_t* c = b - len;
+            if (c[0] == 0xFF && ((c[1] >> 3) & 7) == 2) return true;
+            if ((c[0] & 0xF0) == 0x40 && c[1] == 0xFF && ((c[2] >> 3) & 7) == 2) return true;
+        }
+        return false;
+    }
+    std::mutex watch_mutex;
+    std::vector<WatchHit> watch_hits;
+    uint64_t watch_addr[4] = {};
+    uint32_t watch_len[4] = {};
+    bool watch_exec[4] = {};
+    int64_t watch_rdx_filter[4] = { -1, -1, -1, -1 };   //exec breakpoints: record only calls whose edx is this (-1 = all)
+    PVOID watch_handler = NULL;
+
+    LONG WINAPI watch_exception_handler(EXCEPTION_POINTERS* info)
+    {
+        if (info->ExceptionRecord->ExceptionCode != EXCEPTION_SINGLE_STEP || (info->ContextRecord->Dr6 & 0xF) == 0)
+        {
+            return EXCEPTION_CONTINUE_SEARCH;
+        }
+        uint32_t slot = 0;
+        while (slot < 3 && (info->ContextRecord->Dr6 & (1ULL << slot)) == 0) slot++;
+        info->ContextRecord->Dr6 = 0;
+        if (watch_addr[slot] == 0)
+        {
+            return EXCEPTION_CONTINUE_EXECUTION;
+        }
+        uint64_t value = 0;
+        const uint64_t rip = (uint64_t)info->ExceptionRecord->ExceptionAddress;
+        WatchHit hit = { slot, rip, 0, 1, {} };
+        if (watch_exec[slot])
+        {
+            //an instruction breakpoint fires before the instruction runs: resume flag, or it fires again forever
+            info->ContextRecord->EFlags |= 0x10000;
+            if (watch_rdx_filter[slot] >= 0 && (uint32_t)info->ContextRecord->Rdx != (uint32_t)watch_rdx_filter[slot])
+            {
+                return EXCEPTION_CONTINUE_EXECUTION;
+            }
+            hit.rcx = info->ContextRecord->Rcx;
+            hit.rdx = info->ContextRecord->Rdx;
+            hit.r8 = info->ContextRecord->R8;
+            hit.ret = *(const uint64_t*)info->ContextRecord->Rsp;
+        }
+        else
+        {
+            memcpy(&value, (const void*)watch_addr[slot], watch_len[slot]);
+            hit.value = value;
+        }
+        //the GGPO frame being simulated, and whether it is a re-simulation after a rollback
+        hit.frame = -1;
+        if (Rollback::ggpoStarted && Rollback::ggpo != NULL)
+        {
+            int f = 0, c = 0;
+            ggpo_get_frame_info(Rollback::ggpo, &f, &c);
+            hit.frame = f;
+        }
+        hit.resim = Rollback::inRollbackResim;
+        //writes from outside the game (the mod restoring saved state) are not told apart by frame, or they fill the log
+        if (rip < Game::ds1_base || rip > Game::ds1_base + 0x3200000)
+        {
+            hit.frame = -1;
+        }
+        const uint64_t* stack = (const uint64_t*)info->ContextRecord->Rsp;
+        for (size_t i = 0, n = 0; i < 256 && n < 8; i++)
+        {
+            //the game's .text (0x1000..0x1ae0000) and the Arxan-rewritten code sections (0x2019000..)
+            const uint64_t v = stack[i];
+            if (v > Game::ds1_base + 0x1010 && v < Game::ds1_base + 0x3200000 && (v < Game::ds1_base + 0x1ae0000 || v > Game::ds1_base + 0x2019010)
+                && follows_call(v))
+            {
+                hit.callers[n++] = v;
+            }
+        }
+        {
+            std::lock_guard<std::mutex> lock(watch_mutex);
+            bool found = false;
+            for (WatchHit& h : watch_hits)
+            {
+                if (h.slot == slot && h.rip == rip && h.value == hit.value && h.rcx == hit.rcx && h.rdx == hit.rdx && h.r8 == hit.r8 && h.ret == hit.ret
+                    && h.frame == hit.frame && h.resim == hit.resim
+                    && memcmp(h.callers, hit.callers, sizeof(hit.callers)) == 0) { h.count++; found = true; break; }
+            }
+            if (!found && watch_hits.size() < 256) watch_hits.push_back(hit);
+        }
+        return EXCEPTION_CONTINUE_EXECUTION;
+    }
+
+    // Debug registers can only be changed on a suspended thread, so a helper thread does it
+    struct WatchSet { DWORD thread_id; uint32_t slot; uint64_t addr; uint32_t len; bool exec; bool clear_all; bool ok; };
+    DWORD WINAPI watch_set_thread(LPVOID p)
+    {
+        WatchSet* w = (WatchSet*)p;
+        HANDLE t = OpenThread(THREAD_GET_CONTEXT | THREAD_SET_CONTEXT | THREAD_SUSPEND_RESUME, FALSE, w->thread_id);
+        if (t == NULL) return 0;
+        if (SuspendThread(t) != (DWORD)-1)
+        {
+            CONTEXT c = {};
+            c.ContextFlags = CONTEXT_DEBUG_REGISTERS;
+            if (GetThreadContext(t, &c))
+            {
+                if (w->clear_all)
+                {
+                    c.Dr0 = c.Dr1 = c.Dr2 = c.Dr3 = 0;
+                    c.Dr7 = 0;
+                }
+                else
+                {
+                    (&c.Dr0)[w->slot] = w->addr;
+                    const uint64_t len_bits = w->len == 8 ? 2 : (w->len == 4 ? 3 : (w->len == 2 ? 1 : 0));
+                    c.Dr7 &= ~(((uint64_t)0xF << (16 + 4 * w->slot)) | (3ULL << (2 * w->slot)));
+                    //Ln, RWn = write (or 00 execute, with LEN 00), LENn
+                    if (w->exec)
+                    {
+                        c.Dr7 |= (1ULL << (2 * w->slot));
+                    }
+                    else
+                    {
+                        c.Dr7 |= (1ULL << (2 * w->slot)) | (1ULL << (16 + 4 * w->slot)) | (len_bits << (18 + 4 * w->slot));
+                    }
+                }
+                c.Dr6 = 0;
+                w->ok = SetThreadContext(t, &c) != 0;
+            }
+            ResumeThread(t);
+        }
+        CloseHandle(t);
+        return 0;
+    }
+
+    bool watch_set(uint32_t slot, uint64_t addr, uint32_t len, bool exec = false)
+    {
+        if (watch_handler == NULL)
+        {
+            watch_handler = AddVectoredExceptionHandler(1, watch_exception_handler);
+        }
+        const bool clear_all = addr == 0;
+        WatchSet w = { GetCurrentThreadId(), slot, addr, len, exec, clear_all, false };
+        //called on the game thread (the harness pump), which is the one to watch
+        if (clear_all)
+        {
+            for (int i = 0; i < 4; i++) watch_addr[i] = 0;
+        }
+        else
+        {
+            watch_addr[slot] = 0;
+        }
+        HANDLE h = CreateThread(NULL, 0, watch_set_thread, &w, 0, NULL);
+        if (h == NULL) return false;
+        //the helper suspends this thread, so wait without holding anything
+        WaitForSingleObject(h, 5000);
+        CloseHandle(h);
+        if (w.ok && !clear_all)
+        {
+            std::lock_guard<std::mutex> lock(watch_mutex);
+            watch_len[slot] = len;
+            watch_exec[slot] = exec;
+            watch_addr[slot] = addr;
+        }
+        return w.ok;
+    }
+
+    std::string hex64(uint64_t v)
+    {
+        char b[24];
+        snprintf(b, sizeof(b), "0x%llx", (unsigned long long)v);
+        return b;
+    }
 
     std::string execute(const std::string& line)
     {
@@ -592,6 +822,8 @@ namespace
                     PlayerIns* pi = (PlayerIns*)p.value();
                     if (n) s += ",";
                     s += "{\"slot\":" + std::to_string(i);
+                    s += ",\"playerins\":" + q(hex64((uint64_t)pi));
+                    s += ",\"playerctrl\":" + q(hex64((uint64_t)pi->chrins.playerCtrl));
                     s += ",\"hp\":" + std::to_string(pi->chrins.curHp) + ",\"max_hp\":" + std::to_string(pi->chrins.maxHp);
                     HavokChara* hc = (pi->chrins.playerCtrl != NULL) ? pi->chrins.playerCtrl->chrCtrl.havokChara : NULL;
                     if (hc != NULL)
@@ -608,6 +840,90 @@ namespace
             }
             s += "]";
             return ok_json(s);
+        }
+
+        if (cmd == "watch")
+        {
+            if (sub == "off")
+            {
+                const bool ok = watch_set(0, 0, 0);
+                {
+                    std::lock_guard<std::mutex> lock(watch_mutex);
+                    watch_hits.clear();
+                }
+                return ok_json("\"cleared\":" + b2s(ok));
+            }
+            if (sub == "log")
+            {
+                std::string s = "\"addresses\":[" + q(hex64(watch_addr[0])) + "," + q(hex64(watch_addr[1])) + "," + q(hex64(watch_addr[2])) + "," + q(hex64(watch_addr[3])) + "],\"hits\":[";
+                std::lock_guard<std::mutex> lock(watch_mutex);
+                for (size_t i = 0; i < watch_hits.size(); i++)
+                {
+                    const WatchHit& h = watch_hits[i];
+                    const bool in_game = h.rip >= Game::ds1_base && h.rip < Game::ds1_base + 0x4000000;
+                    if (i) s += ",";
+                    std::string callers;
+                    for (uint64_t c : h.callers)
+                    {
+                        if (c == 0) break;
+                        if (!callers.empty()) callers += ",";
+                        callers += q(hex64(c - Game::ds1_base));
+                    }
+                    s += "{\"slot\":" + std::to_string(h.slot) + ",\"rcx\":" + q(hex64(h.rcx)) + ",\"rdx\":" + q(hex64(h.rdx)) + ",\"r8\":" + q(hex64(h.r8))
+                        + ",\"ret\":" + q(h.ret >= Game::ds1_base && h.ret < Game::ds1_base + 0x4000000 ? hex64(h.ret - Game::ds1_base) : hex64(h.ret))
+                        + ",\"rip\":" + q(hex64(h.rip)) + ",\"game_offset\":" + q(in_game ? hex64(h.rip - Game::ds1_base) : "") + ",\"value\":" + q(hex64(h.value)) + ",\"count\":" + std::to_string(h.count) + ",\"frame\":" + std::to_string(h.frame) + ",\"resim\":" + (h.resim ? "true" : "false") + ",\"callers\":[" + callers + "]}";
+                }
+                return ok_json(s + "]");
+            }
+            if (sub.empty()) return err_json("usage: watch <hexaddr> [1|2|4|8] [slot 0-3] | watch exec <hexaddr> [slot] | watch off | watch log");
+            if (sub == "exec")
+            {
+                if (a.size() < 3) return err_json("usage: watch exec <hexaddr> [slot]");
+                uint64_t addr = 0;
+                try { addr = std::stoull(a[2], nullptr, 16); } catch (...) { return err_json("bad address"); }
+                uint32_t slot = 0;
+                if (a.size() > 3) { try { slot = (uint32_t)std::stoul(a[3]); } catch (...) { return err_json("bad slot"); } }
+                if (slot > 3) return err_json("slot must be 0..3");
+                watch_rdx_filter[slot] = -1;
+                if (a.size() > 4) { try { watch_rdx_filter[slot] = (int64_t)(uint32_t)std::stoul(a[4], nullptr, 0); } catch (...) { return err_json("bad edx filter"); } }
+                if (!mem_readable(addr, 1)) return err_json("unreadable");
+                if (!watch_set(slot, addr, 1, true)) return err_json("could not set the debug registers");
+                return ok_json("\"exec\":" + q(hex64(addr)) + ",\"slot\":" + std::to_string(slot));
+            }
+            uint64_t addr = 0;
+            try { addr = std::stoull(sub, nullptr, 16); } catch (...) { return err_json("bad address"); }
+            uint32_t len = 1;
+            if (a.size() > 2) { try { len = (uint32_t)std::stoul(a[2]); } catch (...) { return err_json("bad length"); } }
+            if (len != 1 && len != 2 && len != 4 && len != 8) return err_json("length must be 1, 2, 4 or 8");
+            uint32_t slot = 0;
+            if (a.size() > 3) { try { slot = (uint32_t)std::stoul(a[3]); } catch (...) { return err_json("bad slot"); } }
+            if (slot > 3) return err_json("slot must be 0..3");
+            if ((addr & (len - 1)) != 0) return err_json("address must be aligned to the length");
+            if (!mem_readable(addr, len)) return err_json("unreadable");
+            if (!watch_set(slot, addr, len)) return err_json("could not set the debug registers");
+            return ok_json("\"address\":" + q(hex64(addr)) + ",\"length\":" + std::to_string(len) + ",\"slot\":" + std::to_string(slot));
+        }
+
+        if (cmd == "peek" || cmd == "rtti")
+        {
+            if (sub.empty()) return err_json("usage: peek <hexaddr> [len] | rtti <hexaddr>");
+            uint64_t addr = 0;
+            try { addr = std::stoull(sub, nullptr, 16); } catch (...) { return err_json("bad address"); }
+            if (cmd == "rtti")
+            {
+                uint64_t vtable = 0;
+                safe_read(addr, &vtable, 8);
+                return ok_json("\"address\":" + q(hex64(addr)) + ",\"vtable\":" + q(hex64(vtable)) + ",\"class\":" + q(rtti_name(addr)));
+            }
+            size_t len = 64;
+            if (a.size() > 2) { try { len = std::stoul(a[2]); } catch (...) { return err_json("bad length"); } }
+            if (len == 0 || len > 512) return err_json("length must be 1..512");
+            std::vector<uint8_t> buf(len);
+            if (!safe_read(addr, buf.data(), len)) return err_json("unreadable");
+            std::string h;
+            char t[4];
+            for (uint8_t c : buf) { snprintf(t, sizeof(t), "%02x", c); h += t; }
+            return ok_json("\"address\":" + q(hex64(addr)) + ",\"hex\":" + q(h));
         }
 
         //Test setup: give the local player an item with the game's own GiveItemToPlayer, forced into the first free quickbar
@@ -760,7 +1076,7 @@ namespace
             return ok_json("\"commands\":[\"ping\",\"status\",\"frame\",\"input\",\"rollback on|off|toggle\","
                            "\"record arm|disarm\",\"record file <path>\",\"replay file <path>\",\"replay off\","
                            "\"script load <path>\",\"script add <directive>\",\"script clear\",\"script neutral on|off\","
-                           "\"script name <text>\",\"script status\",\"end_session\",\"start_session\",\"freeze on|off|status\",\"warp <x> <y> <z> <yaw>\","
+                           "\"script name <text>\",\"script status\",\"peek <hexaddr> [len]\",\"rtti <hexaddr>\",\"end_session\",\"start_session\",\"freeze on|off|status\",\"warp <x> <y> <z> <yaw>\","
                            "\"log <text>\",\"subscribe\",\"hashes [since] [max]\",\"dump_at <frame>|+<n>\",\"dump_status\","
                            "\"dump_get\",\"probe\""
 #if ROLLBACK_INPUT_TESTING
@@ -984,7 +1300,14 @@ void HarnessControl::start()
     if (dn > 0 && dn < sizeof(dumpbuf))
     {
         int f = atoi(dumpbuf);
-        if (f >= 0)
+        const char* dash = strchr(dumpbuf, '-');
+        if (f >= 0 && dash != NULL && dash != dumpbuf && atoi(dash + 1) >= f)
+        {
+            RollbackHash::dump_range_first = f;
+            RollbackHash::dump_range_last = atoi(dash + 1);
+            ConsoleWrite("HARNESS: state dumps pre-armed for frames %d-%d from DSR_HARNESS_DUMP_FRAME", f, RollbackHash::dump_range_last);
+        }
+        else if (f >= 0)
         {
             RollbackHash::dump_request_frame = f;
             ConsoleWrite("HARNESS: state dump pre-armed for frame %d from DSR_HARNESS_DUMP_FRAME", f);

@@ -193,6 +193,11 @@ namespace RollbackHash
     // SAME GGPO frame and diffed field by field. Also written to
     // statedump_harness_<frame>.txt next to the exe.
     inline int         dump_request_frame = -1;
+    //DSR_HARNESS_DUMP_FRAME=<a>-<b>: every save of a frame in [a, b] writes statedump_range_<frame>.txt. A re-save (a
+    //re-simulated frame) overwrites it, so once a frame is confirmed its file holds the final state. For divergences
+    //whose frame changes from run to run.
+    inline int         dump_range_first = -1;
+    inline int         dump_range_last = -1;
     inline int         dump_frame = -1;       // frame the stored dump is for, -1 = none
     inline bool        dump_confirmed = false;
     inline std::string dump_text_store;
@@ -233,8 +238,20 @@ namespace RollbackHash
     inline void _write_text_file(const char* name, const std::string& t)
     {
         FILE* fp = nullptr;
-        fopen_s(&fp, name, "w");
-        if (!fp) return;
+        //a file just written can be held open briefly by something else (e.g. a scanner); a missed rewrite leaves a stale dump
+        for (int attempt = 0; attempt < 20 && fp == nullptr; attempt++)
+        {
+            if (fopen_s(&fp, name, "w") != 0 || fp == nullptr)
+            {
+                fp = nullptr;
+                Sleep(2);
+            }
+        }
+        if (!fp)
+        {
+            ConsoleWrite("StateHash: could not write %s", name);
+            return;
+        }
         fwrite(t.data(), 1, t.size(), fp);
         fclose(fp);
     }
@@ -429,6 +446,13 @@ namespace RollbackHash
 #endif
         _store()[frame] = d;
 
+        if (dump_range_first >= 0 && frame >= dump_range_first && frame <= dump_range_last)
+        {
+            char range_name[128];
+            snprintf(range_name, sizeof(range_name), "statedump_range_%d.txt", frame);
+            //the digest on the first line: compare it with the frame's STATEHASH line to know the file is the final save
+            _write_text_file(range_name, "#comb=" + _hex(combined(d)) + "\n" + dump_text_of(s));
+        }
         if (frame == dump_request_frame)
         {
             dump_text_store = dump_text_of(s);

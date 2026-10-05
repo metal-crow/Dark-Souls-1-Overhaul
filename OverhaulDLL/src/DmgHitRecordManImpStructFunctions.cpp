@@ -1,5 +1,6 @@
 #include "DmgHitRecordManImpStructFunctions.h"
 #include "StateSerializer.h"
+#include "PlayerHandles.h"
 
 static const size_t max_preallocated_DmgHitRecordManImp_field0x10Elem = 96;
 static const size_t max_preallocated_DmgHitRecordManImp_field0x28Elem = 96;
@@ -114,7 +115,7 @@ static void serialize_DmgHitRecordManImp_field0x28Elem(StateVisitor& v, DmgHitRe
                                                        const void* base0x28)
 {
     v.begin("field0x28Elem");
-    v.field("targetHandle", e->targetHandle);
+    serialize_handle(v, "targetHandle", e->targetHandle);
     v.field("unk_4", e->unk_4);
     v.ptr_index("next", e->next, base0x28, sizeof(DmgHitRecordManImp_field0x28Elem));
     v.field("unk_10", e->unk_10);

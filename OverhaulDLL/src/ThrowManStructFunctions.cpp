@@ -1,5 +1,6 @@
 #include "ThrowManStructFunctions.h"
 #include "StateSerializer.h"
+#include "PlayerHandles.h"
 
 static const size_t ThrowRequestQueueCapacity = 5;
 
@@ -157,8 +158,8 @@ void serialize_ThrowMan(StateVisitor& v, ThrowMan* t)
     v.field("throwEscape_NowIncreaseWeighting", t->throwEscape_NowIncreaseWeighting);
     v.field("throwEscape_goalWeightLossVals", t->throwEscape_goalWeightLossVals);
     v.field("throwEscape_curWeightLossVals", t->throwEscape_curWeightLossVals);
-    v.field("attacking_chr", t->attacking_chr);
-    v.field("defending_chr", t->defending_chr);
+    serialize_handle(v, "attacking_chr", t->attacking_chr);
+    serialize_handle(v, "defending_chr", t->defending_chr);
     v.field("allDrawing", t->allDrawing);
     v.padding("unk_c1", t->unk_c1, sizeof(t->unk_c1));   // alignment gap
     v.field("unk_c4", t->unk_c4);
