@@ -350,8 +350,8 @@ void PackRollbackInput(RollbackInput* out, PlayerIns* player)
 #if ROLLBACK_INPUT_TESTING
     else
     {
-    out->vpad.camera_x_rotation = player->chrins.padManipulator->chrManipulator.camera_x_rotation;
-    out->vpad.camera_y_rotation = player->chrins.padManipulator->chrManipulator.camera_y_rotation;
+        out->vpad.camera_x_rotation = player->chrins.padManipulator->chrManipulator.camera_x_rotation;
+        out->vpad.camera_y_rotation = player->chrins.padManipulator->chrManipulator.camera_y_rotation;
     }
 #endif
     //a player's handle is this machine's; the receiver translates it back into its own (PlayerHandles.h)
@@ -1106,6 +1106,21 @@ bool rollback_game_frame_start_helper(void* unused)
 
             //notify ggpo of the local player's inputs
             GGPOErrorCode result = ggpo_add_local_input(Rollback::ggpo, Rollback::ggpoHandles[0], &localInput, sizeof(RollbackInput));
+            //We are as far ahead of the other player as GGPO can predict. Hold this frame until their inputs arrive
+            //(ggpo_idle polls the network, and may roll back as they do) instead of simulating past what can be corrected.
+            const ULONGLONG waiting_since = GetTickCount64();
+            uint32_t waited_polls = 0;
+            while (result == GGPO_ERRORCODE_PREDICTION_THRESHOLD && GetTickCount64() - waiting_since < 10000)
+            {
+                Sleep(1);
+                ggpo_idle(Rollback::ggpo, 0);
+                result = ggpo_add_local_input(Rollback::ggpo, Rollback::ggpoHandles[0], &localInput, sizeof(RollbackInput));
+                waited_polls++;
+            }
+            if (waited_polls != 0 && GGPO_SUCCEEDED(result))
+            {
+                ConsoleWrite("GGPO: held frame %d for %llu ms at the prediction threshold", rr_framecount, GetTickCount64() - waiting_since);
+            }
             if (!GGPO_SUCCEEDED(result))
             {
                 FATALERROR("Unable to ggpo_add_local_input. %d", result);
