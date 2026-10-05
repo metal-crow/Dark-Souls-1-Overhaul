@@ -116,6 +116,7 @@ private:
     static const uint64_t WorldObjActMan_step_offset = 0x3cbde9;         //same
     //FUN_1403ca770, the number of damage entries to create: mov [rsp+8],rbx / push rdi / sub rsp,30h / mov rbx,r8 / mov rdi,rdx
     static const uint64_t DamageMan_EntryCount_offset = 0x3ca770;
+    static const uint64_t DamageEntry_HitChr_offset = 0x3c7520;
     //Apply_ChrCam_To_PlayerInsPadManipulator (140235400): mov rbx,[rsp+40h] / movaps [rax+50h],xmm6 / movaps xmm6,[rsp+20h]
     static const uint64_t ChrCam_ApplyToPadManipulator_store_offset = 0x235480;
     //FUN_14080cbb0: arms the local player's ChrResonanceMagicSlot (push rdi / sub rsp,30h / mov [rsp+20h],-2)

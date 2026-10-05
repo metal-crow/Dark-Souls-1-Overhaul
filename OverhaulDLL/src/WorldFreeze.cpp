@@ -11,6 +11,7 @@
 
 extern "C" uint8_t rollback_world_frozen = 0;
 static uint32_t blocked_damage = 0;
+static uint32_t blocked_hits = 0;
 
 namespace
 {
@@ -267,6 +268,20 @@ extern "C" bool rollback_damage_attacker_allowed(void* attacker)
     return false;
 }
 
+extern "C" bool rollback_damage_defender_allowed(void* entry, void* defender)
+{
+    (void)entry;
+    if (is_session_player(defender))
+    {
+        return true;
+    }
+    if (blocked_hits++ < 5)
+    {
+        ConsoleWrite("WorldFreeze: a damage entry hit character %p (handle %08x), not a session player: refused", defender, rd<uint32_t>(defender, 8));
+    }
+    return false;
+}
+
 bool WorldFreeze::frozen()
 {
     return rollback_world_frozen != 0;
@@ -283,7 +298,7 @@ WorldFreeze::Status WorldFreeze::status()
         world_movable = bodies.size();
         world_fixed = w->m_fixedIsland != NULL ? w->m_fixedIsland->m_entities_size : 0;
     }
-    return { frozen(), disabled_chrs.size(), unbreakable_objs.size(), frozen_bodies.size(), awake_player_bodies.size(), blocked_damage,
+    return { frozen(), disabled_chrs.size(), unbreakable_objs.size(), frozen_bodies.size(), awake_player_bodies.size(), blocked_damage, blocked_hits,
         world_fixed, world_movable };
 }
 
@@ -384,6 +399,8 @@ void WorldFreeze::unfreeze()
     });
     disabled_chrs.clear();
 
-    ConsoleWrite("WorldFreeze: restored %u characters, %u objects, %u bodies; blocked %u damage entries the world tried to create", chrs, objs, bodies, blocked_damage);
+    ConsoleWrite("WorldFreeze: restored %u characters, %u objects, %u bodies; blocked %u damage entries the world tried to create and %u hits on other characters",
+        chrs, objs, bodies, blocked_damage, blocked_hits);
     blocked_damage = 0;
+    blocked_hits = 0;
 }

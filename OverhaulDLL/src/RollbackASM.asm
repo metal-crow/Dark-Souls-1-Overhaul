@@ -316,6 +316,41 @@ mov     rdi, rdx
 jmp     DamageMan_EntryCount_return
 DamageMan_EntryCount_injection ENDP
 
+EXTERN DamageEntry_HitChr_return: qword
+extern rollback_damage_defender_allowed: proc
+
+;FUN_1403c7520(DamageEntry*, defender ChrIns*, ...): a damage entry hitting a character. While the world is frozen a defender that
+;is not a session player is not hit at all (the frozen characters keep their hit records, which rollback does not restore)
+PUBLIC DamageEntry_HitChr_injection
+DamageEntry_HitChr_injection PROC
+;original code
+test    rdx, rdx
+jz      hitchr_skip
+cmp     byte ptr [rollback_world_frozen], 0
+je      hitchr_original
+push    rcx
+push    rdx
+push    r8
+push    r9
+sub     rsp, 28h
+call    rollback_damage_defender_allowed
+add     rsp, 28h
+pop     r9
+pop     r8
+pop     rdx
+pop     rcx
+test    al, al
+jz      hitchr_skip
+hitchr_original:
+;original code
+mov     r11, rsp
+push    rbp
+push    rbx
+jmp     DamageEntry_HitChr_return
+hitchr_skip:
+ret
+DamageEntry_HitChr_injection ENDP
+
 
 
 EXTERN init_playerins_with_padmanip_return: qword

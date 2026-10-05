@@ -18,7 +18,9 @@
  *                 kept from deactivating instead: island sleep is world state, and live and re-simulated frames put them to sleep
  *                 on different frames
  *   damage        damage entries owned by the world are retired when the session starts, and while it runs only the session
- *                 players can create new ones (objects and event scripts kept spawning some in live frames only)
+ *                 players can create new ones (objects and event scripts kept spawning some in live frames only), and they only
+ *                 hit session players: a frozen character still has hit shapes, and its record of what hit it is world state, so a
+ *                 re-simulated frame would not hit it again (and the attacker's side effects, e.g. weapon wear, would differ)
  *
  * freeze() runs when the session starts, tick() at the start of every live frame (things loaded since), unfreeze() when it ends.
  * unfreeze() only undoes what freeze()/tick() changed, and only on characters, objects and bodies still in the world.
@@ -36,6 +38,7 @@ namespace WorldFreeze
         bool frozen;
         size_t chrs, objs, bodies, awake;   // what is currently held disabled / unbreakable / fixed / awake
         uint32_t blocked_damage;            // world damage entries refused since the freeze started
+        uint32_t blocked_hits;              // hits on characters that are not session players, refused since the freeze started
         size_t world_fixed, world_movable;  // every body in the Havok world right now, fixed and not (compare before/after a freeze)
     };
     Status status();
@@ -45,5 +48,7 @@ namespace WorldFreeze
 extern "C" uint8_t rollback_world_frozen;
 //the damage entry count check (FUN_1403ca770) asks this while the world is frozen: false makes the game create no entry
 extern "C" bool rollback_damage_attacker_allowed(void* attacker);
+//a damage entry hitting a character (FUN_1403c7520) asks this while the world is frozen: false and the character is not hit
+extern "C" bool rollback_damage_defender_allowed(void* entry, void* defender);
 
 #endif

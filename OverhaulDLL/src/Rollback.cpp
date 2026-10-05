@@ -1288,6 +1288,8 @@ extern "C" {
     void WorldObjActMan_step_injection();
     uint64_t DamageMan_EntryCount_return;
     void DamageMan_EntryCount_injection();
+    uint64_t DamageEntry_HitChr_return;
+    void DamageEntry_HitChr_injection();
 }
 
 //EquipGameData_New (1407463c0) sizes a player's inventory list by its "main player" flag: 0x800 items and 0x40 keys for
@@ -1396,6 +1398,10 @@ void Rollback::start()
     //...and only the session players can create damage entries
     write_address = (uint8_t*)(Game::ds1_base + Rollback::DamageMan_EntryCount_offset);
     sp::mem::code::x64::inject_jmp_14b(write_address, &DamageMan_EntryCount_return, 2, &DamageMan_EntryCount_injection);
+    //...and they can only hit each other
+    write_address = (uint8_t*)(Game::ds1_base + Rollback::DamageEntry_HitChr_offset);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &DamageEntry_HitChr_return, 0, &DamageEntry_HitChr_injection);
+
     write_address = (uint8_t*)(Game::ds1_base + Rollback::ChrCam_ApplyToPadManipulator_store_offset);
     sp::mem::code::x64::inject_jmp_14b(write_address, &ChrCam_ApplyToPadManipulator_return, 0, &ChrCam_ApplyToPadManipulator_injection);
 
