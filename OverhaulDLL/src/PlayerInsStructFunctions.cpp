@@ -2698,27 +2698,6 @@ static void serialize_ActionCtrl(StateVisitor& v, const ActionCtrl* a)
 typedef uint64_t (*get_HvkAnim_AnimInfoArrayElem_for_animID_t)(const ChrCtrl_AnimationQueue_field0x10* anims, int32_t animation_id);
 static const uint64_t get_HvkAnim_AnimInfoArrayElem_for_animID_offset = 0x43e940;
 
-// True if [addr, addr+len) is committed, readable memory. Not an SEH guard: the mod's vectored exception handler
-// (CrashHandler.cpp) sees every access violation before any __except does, and brings up the crash report.
-static bool mem_readable(uint64_t addr, size_t len)
-{
-    while (len > 0)
-    {
-        MEMORY_BASIC_INFORMATION mbi;
-        if (VirtualQuery((const void*)addr, &mbi, sizeof(mbi)) == 0 || mbi.State != MEM_COMMIT
-            || (mbi.Protect & (PAGE_NOACCESS | PAGE_GUARD)) != 0
-            || (mbi.Protect & (PAGE_READONLY | PAGE_READWRITE | PAGE_WRITECOPY | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY)) == 0)
-        {
-            return false;
-        }
-        const uint64_t region_end = (uint64_t)mbi.BaseAddress + mbi.RegionSize;
-        const uint64_t step = region_end - addr < len ? region_end - addr : len;
-        addr += step;
-        len -= (size_t)step;
-    }
-    return true;
-}
-
 // HvkAnim_AnimInfoArrayElem starts with its animation_id (Ghidra HvkAnim_AnimInfoArrayElem_). -1 for none, -2 if the
 // pointer does not point at readable memory (it always should: the anibnd stays loaded for the character's lifetime)
 static int32_t anim_info_id(uint64_t anim_info)
@@ -2727,11 +2706,12 @@ static int32_t anim_info_id(uint64_t anim_info)
     {
         return -1;
     }
-    if (!mem_readable(anim_info, sizeof(int32_t)))
+    const int32_t* id = sp::mem::pointer<int32_t>((void*)anim_info).resolve();
+    if (id == NULL)
     {
         return -2;
     }
-    return *(const int32_t*)anim_info;
+    return *id;
 }
 
 // A control's hkaAnimationBinding is the binding of the anim info it plays, found through the character's loaded anibnds
@@ -3025,14 +3005,14 @@ static void serialize_AnimationQueue_Entry(StateVisitor& v, const AnimationQueue
     // APPLY the values go into copies: the receiver keeps its own pointers (a different record shows up in the verify).
     for (size_t i = 0; i < len; i++)
     {
-        const void* rec = (const void*)e->chained_animations_array_start[i];
+        const uint8_t* rec = sp::mem::pointer<uint8_t>((void*)e->chained_animations_array_start[i]).resolve();
         uint32_t event_offset = 0xFFFFFFFF;
         float start = 0.0f, end = 0.0f;
-        if (rec != NULL && mem_readable((uint64_t)rec, 12))
+        if (rec != NULL)
         {
             event_offset = *(const uint32_t*)rec;
-            start = *(const float*)((const uint8_t*)rec + 4);
-            end = *(const float*)((const uint8_t*)rec + 8);
+            start = *(const float*)(rec + 4);
+            end = *(const float*)(rec + 8);
         }
         v.field("chained_event_offset", event_offset);
         v.field("chained_start", start);

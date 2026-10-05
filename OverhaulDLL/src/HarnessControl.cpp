@@ -296,8 +296,10 @@ namespace
     }
 #endif
 
-// True if [addr, addr+len) is committed, readable memory. Not an SEH guard: the mod's vectored exception handler
-    // (CrashHandler.cpp) sees every access violation before any __except does, and brings up the crash report.
+    // True if [addr, addr+len) is committed, readable memory. Not an SEH guard: the mod's vectored exception handler
+    // (CrashHandler.cpp) sees every access violation before any __except does, and brings up the crash report. A whole
+    // byte range, unlike sp::mem::pointer::resolve(), which checks the page an address starts on: peek reads up to 512
+    // bytes from wherever it is pointed.
     bool mem_readable(uint64_t addr, size_t len)
     {
         while (len > 0)

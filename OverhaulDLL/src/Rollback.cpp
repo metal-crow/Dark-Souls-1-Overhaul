@@ -1764,29 +1764,27 @@ bool rollback_await_init(void* steamMsgs)
         }
         PlayerIns* player = (PlayerIns*)player_o.value();
 
-        //some sanity checks
-        if (player->chrins.maxHp <= 1 || player->chrins.curHp < 10)
+        //some sanity checks. A player who has just joined is listed while their character is still being built, with
+        //pointers already set that do not point at readable memory yet, so read through them with resolve(), which
+        //checks every step (no SEH guard here: the crash handler sees an access violation before any __except).
+        //Anything unreadable means not ready yet.
+        const uint32_t* maxHp = sp::mem::pointer<uint32_t>(&player->chrins.maxHp).resolve();
+        const uint32_t* curHp = sp::mem::pointer<uint32_t>(&player->chrins.curHp).resolve();
+        if (maxHp == NULL || curHp == NULL || *maxHp <= 1 || *curHp < 10)
         {
             rollback_settled_frames = 0;
             return true;
         }
-        if (player->chrins.playerCtrl == NULL)
+        //PlayerIns (chrins at +0) -> playerCtrl -> chrCtrl (at +0) -> havokChara -> x position
+        const std::ptrdiff_t playerCtrl_off = offsetof(ChrIns, playerCtrl);
+        const float* x_pos = sp::mem::pointer<float>(&player, { playerCtrl_off, (std::ptrdiff_t)offsetof(ChrCtrl, havokChara), 0x10 }).resolve();
+        if (x_pos == NULL || *x_pos == 0.0f)
         {
             rollback_settled_frames = 0;
             return true;
         }
-        if (player->chrins.playerCtrl->chrCtrl.havokChara == NULL)
-        {
-            rollback_settled_frames = 0;
-            return true;
-        }
-        float x_pos = *(float*)(((uint64_t)player->chrins.playerCtrl->chrCtrl.havokChara) + 0x10);
-        if (x_pos == 0.0f)
-        {
-            rollback_settled_frames = 0;
-            return true;
-        }
-        if (player->chrins.playerCtrl->chrCtrl.animationMediator == NULL)
+        //... -> chrCtrl.animationMediator, and the mediator itself
+        if (sp::mem::pointer<AnimationMediator>(&player, { playerCtrl_off, (std::ptrdiff_t)offsetof(ChrCtrl, animationMediator), 0 }).resolve() == NULL)
         {
             rollback_settled_frames = 0;
             return true;
