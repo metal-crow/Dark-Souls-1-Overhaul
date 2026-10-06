@@ -24,7 +24,7 @@ const uint64_t Rollback::PlayerIns_Is_NetworkedPlayer_offsets[] = {
     //0x140327520,
     //0x140327ca9,
     //0x140329ce7,
-    //0x14032b0ca,
+    //0x14032b0c9,
     //0x14032e0e7,
     //0x14032ef69,
     //0x140342e1b,
@@ -37,9 +37,9 @@ const uint64_t Rollback::PlayerIns_Is_NetworkedPlayer_offsets[] = {
     0x14035a7bb, //needed to take damage
     //0x14035a7db,
     //0x14035a7f0,
-    //0x140360476,
+    //0x140360476, //PlayerIns_GetEntityId: keep disabled, see the IsHost site 0x140360456
     //0x14036ede3,
-    //0x140370266,
+    //0x140370266, //FUN_140370130 per-chr loop: keep disabled, it would send the remote player into the NPC branch
     //0x140370591,
     0x14037922a, //toggling weapon (path FUN_140378d00)
     0x1403792d9, //toggling weapon (path FUN_140378d00)
@@ -137,18 +137,18 @@ const uint64_t Rollback::PlayerIns_IsHostPlayerIns_offsets[] = {
     //0x14035613a,
     //0x1403561c3,
     //0x140356bf6,
-    //0x140356c28,
+    //0x140356c28, //PlayerIns_ComputeChanges: writes this machine's LockTgtManImp, host-only by nature
     //0x140356c79,
-    //0x140356d13,
+    //0x140356d13, //PlayerIns_ComputeChanges: the type-17 net message timer PlayerIns+0x7b4
     //0x140356d51,
     0x140356ec7, //needed to compute roll type
-    //0x140357077,
+    //0x140357077, //PlayerIns_ComputeChanges: reads this machine's LockTgtManImp, host-only by nature
     //0x140357263, //this is already patched inline as part of the FileReloading ASM
     0x1403575bd, //PlayerIns_ComputeChanges: Compute_PlayerGameData_value_updates (HP/SP/MP into PlayerGameData) only for the "host"
     //0x14035772e,
     //0x1403577e9,
     //0x1403579a1,
-    //0x140357dc4,
+    //0x140357dc4, //PlayerIns_Update_Model: phantom draw parameters by chr type, render only
     0x140358219, //PlayerIns_Update_Model: FUN_14014d0c0 recomputes PlayerIns+0x970.. only for the "host" player
     //0x140358bd2,
     0x140358c9c, //PlayerIns vtable+0x3b8 (weapon hit durability, FUN_14074e760 adds the wear to durability[1]) only for the "host" player
@@ -171,7 +171,7 @@ const uint64_t Rollback::PlayerIns_IsHostPlayerIns_offsets[] = {
     //0x14035e0be,
     //0x14035e27a,
     //0x14035fa07,
-    //0x140360456,
+    //0x140360456, //PlayerIns_GetEntityId: keep disabled, the remote player would get entity id 10000 too
     //0x14036062b,
     //0x14036066c,
     //0x1403616a4,
@@ -185,7 +185,7 @@ const uint64_t Rollback::PlayerIns_IsHostPlayerIns_offsets[] = {
     //0x14036220e,
     //0x1403623d2,
     0x14036f056, //FUN_14036e8d0 (character update rate): only the "host" gets ChrIns+0x164 = 0 (every frame); the others drop to every 2nd/5th frame when off this machine's camera
-    //0x140370252,
+    //0x140370252, //FUN_140370130 per-chr loop: host and networked both skip the NPC branch already
     //0x14037057d,
     //0x140373dd6,
     //0x140373df2,
@@ -194,7 +194,7 @@ const uint64_t Rollback::PlayerIns_IsHostPlayerIns_offsets[] = {
     0x1403909d4, //EzStateActionEvent_Execute_By_CommandId: an EzState command sets ActionCtrl bitfield bit 20 only for the "host"
     //0x140392f71,
     //0x140393427,
-    //0x1403971b5,
+    //0x1403971b5, //Step_PadManipulator: DetermineActionFromBButton (0x140398920) only for the host; it reads the pad directly
     //0x1403abd0c,
     //0x1403ae1b4,
     //0x1403be220,
@@ -214,7 +214,7 @@ const uint64_t Rollback::PlayerIns_IsHostPlayerIns_offsets[] = {
     //0x140575643,
     //0x1406598e5,
     //0x140660e84,
-    //0x140670179,
+    //0x140670179, //Handle_FloatingMultiplayHpBars, UI
     //0x14074511f,
     //0x140745438,
     //0x140dfa774,
