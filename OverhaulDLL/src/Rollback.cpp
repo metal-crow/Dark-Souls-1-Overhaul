@@ -1626,6 +1626,10 @@ void rollback_copy_buffer(void* buffer_dst, void* buffer_src)
 void rollback_free_buffer(void* buffer)
 {
     RollbackState* state = (RollbackState*)buffer;
+    if (state == NULL)
+    {
+        return;
+    }
 
     for (size_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
     {
