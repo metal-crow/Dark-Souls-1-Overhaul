@@ -78,6 +78,9 @@ public:
     //true only inside rollback_advance_frame_callback: this frame already ran once, so
     //anything that must happen once per REAL frame has to be skipped.
     static bool inRollbackResim;
+    //Test harness: while set, rollback_await_init does not start the GGPO session (players stay as they are, the settle count
+    //stays at 0), so a test can set the players up first. Never set outside the harness.
+    static bool sessionStartHeld;
 #if ROLLBACK_INPUT_TESTING
     static bool networkToggle;
     static bool networkTest;

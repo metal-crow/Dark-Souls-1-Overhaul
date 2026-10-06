@@ -227,6 +227,82 @@ namespace
             + ",\"world_bodies_fixed\":" + std::to_string(st.world_fixed) + ",\"world_bodies_movable\":" + std::to_string(st.world_movable) + "}";
     }
 
+    //A connected player's steam id. The local player's PlayerIns reads 0 until a live-only step sets it (the first item use),
+    //so slot 0 falls back to Steam's own
+    uint64_t player_steam_id(PlayerIns* pi, uint32_t game_slot)
+    {
+        uint64_t id = (pi->steamPlayerData != NULL && pi->steamPlayerData->steamOnlineIDData != NULL) ? pi->steamPlayerData->steamOnlineIDData->steam_id : 0;
+        if (id == 0 && game_slot == 0 && ModNetworking::SteamUser != NULL)
+        {
+            id = ModNetworking::SteamUser->GetSteamID().ConvertToUint64();
+        }
+        return id;
+    }
+
+    std::string hex_id(uint64_t id)
+    {
+        char b[32];
+        snprintf(b, sizeof(b), "%llx", (unsigned long long)id);
+        return b;
+    }
+
+    //The Steam lobby the mod's matchmaking is in (under Seamless Co-op: SC's master lobby), so the harness can see whether
+    //the host created its session and whether the guest joined it
+    std::string lobby_json()
+    {
+        const uint64_t lobby = ModNetworking::currentLobby.load();
+        if (lobby == 0 || ModNetworking::SteamMatchmaking == NULL || ModNetworking::SteamUser == NULL)
+        {
+            return "{\"id\":\"\",\"owner\":\"\",\"is_owner\":false,\"members\":0}";
+        }
+        const uint64_t owner = ModNetworking::SteamMatchmaking->GetLobbyOwner(lobby).ConvertToUint64();
+        const int members = ModNetworking::SteamMatchmaking->GetNumLobbyMembers(lobby);
+        char b[160];
+        snprintf(b, sizeof(b), "{\"id\":\"%llx\",\"owner\":\"%llx\",\"is_owner\":%s,\"members\":%d}", (unsigned long long)lobby,
+            (unsigned long long)owner, owner == ModNetworking::SteamUser->GetSteamID().ConvertToUint64() ? "true" : "false", members);
+        return b;
+    }
+
+    //Whether an inventory entry's category is `category` (0 weapon, 1 protector, 2 accessory, 4 goods), in either of the forms
+    //the game writes categories in (the GiveItemToPlayer form 0x40000000, or the small number)
+    bool item_category_is(uint32_t item_category, uint32_t category)
+    {
+        return item_category == category || item_category == (category << 28);
+    }
+
+    //The local player's quickbar: the item in each of the 5 slots (inventory category and id, null for an empty slot) and
+    //the selected one -- the item the harness's 'r' tap uses (the Seamless Co-op orbs). selectedQuickbarItem is an
+    //inventory index, like the slots.
+    std::string quickbar_json()
+    {
+        auto p = Game::get_connected_player(0);
+        if (!Game::playerchar_is_loaded() || !p.has_value() || p.value() == 0) return "null";
+        PlayerIns* pi = (PlayerIns*)p.value();
+        if (pi->playergamedata == NULL) return "null";
+        EquipGameData* egd = &pi->playergamedata->equipGameData;
+        const EquipInventoryDataItem* itemlist = egd->equippedInventory.itemlist2;
+        const uint32_t itemlistlen = egd->equippedInventory.itemList2_len;
+        std::string s = "{\"items\":[";
+        for (int i = 0; i < 5; i++)
+        {
+            const uint32_t index = egd->equippedItemsInQuickbar.quickbar[i];
+            char b[64];
+            if (itemlist != NULL && index < itemlistlen)
+                snprintf(b, sizeof(b), "%s{\"category\":\"0x%x\",\"id\":%d}", i ? "," : "", itemlist[index].item_category, (int32_t)itemlist[index].item_id);
+            else
+                snprintf(b, sizeof(b), "%snull", i ? "," : "");
+            s += b;
+        }
+        const uint32_t selected = egd->equippedItemsInQuickbar.selectedQuickbarItem;
+        int selected_slot = -1;
+        for (int i = 0; i < 5; i++)
+        {
+            if (egd->equippedItemsInQuickbar.quickbar[i] == selected) selected_slot = i;
+        }
+        const int32_t selected_id = (itemlist != NULL && selected < itemlistlen) ? (int32_t)itemlist[selected].item_id : -1;
+        return s + "],\"selected_slot\":" + std::to_string(selected_slot) + ",\"selected_id\":" + std::to_string(selected_id) + "}";
+    }
+
     std::string status_fields()
     {
         std::string s;
@@ -261,13 +337,7 @@ namespace
             auto pc = Game::get_PlayerIns();
             if (pc.has_value() && pc.value() != NULL)
             {
-                PlayerIns* pi = (PlayerIns*)pc.value();
-                if (pi->steamPlayerData != NULL && pi->steamPlayerData->steamOnlineIDData != NULL)
-                {
-                    char b[32];
-                    snprintf(b, sizeof(b), "%llx", (unsigned long long)pi->steamPlayerData->steamOnlineIDData->steam_id);
-                    steam = b;
-                }
+                steam = hex_id(player_steam_id((PlayerIns*)pc.value(), 0));
             }
         }
         s += ",\"connected_players\":" + std::to_string(players);
@@ -278,6 +348,9 @@ namespace
         s += ",\"record_file\":" + q(RollbackReplay::record_file);
         s += ",\"script\":" + RollbackScript::status_json();
         s += ",\"world_freeze\":" + world_freeze_json();
+        s += ",\"lobby\":" + lobby_json();
+        s += ",\"quickbar\":" + quickbar_json();
+        s += ",\"session_hold\":" + b2s(Rollback::sessionStartHeld);
 #ifdef GGPO_SYNCTEST
         s += ",\"synctest\":" + RollbackHash::synctest_json();
 #endif
@@ -824,9 +897,12 @@ namespace
                     PlayerIns* pi = (PlayerIns*)p.value();
                     if (n) s += ",";
                     s += "{\"slot\":" + std::to_string(i);
+                    s += ",\"steam_id\":" + q(hex_id(player_steam_id(pi, i)));
                     s += ",\"playerins\":" + q(hex64((uint64_t)pi));
                     s += ",\"playerctrl\":" + q(hex64((uint64_t)pi->chrins.playerCtrl));
                     s += ",\"hp\":" + std::to_string(pi->chrins.curHp) + ",\"max_hp\":" + std::to_string(pi->chrins.maxHp);
+                    //ChrIns chr type (+0xd4: 1 white phantom, 2 red phantom) and team type (+0xd8: 1 player, 2 white, 3 red)
+                    s += ",\"chr_type\":" + std::to_string(*(int32_t*)((uint8_t*)pi + 0xd4)) + ",\"team_type\":" + std::to_string(*(int32_t*)((uint8_t*)pi + 0xd8));
                     HavokChara* hc = (pi->chrins.playerCtrl != NULL) ? pi->chrins.playerCtrl->chrCtrl.havokChara : NULL;
                     if (hc != NULL)
                     {
@@ -1073,6 +1149,79 @@ namespace
         }
 #endif
 
+        //Keep a GGPO session from starting (rollback_await_init waits) while a test sets the players up: warps, chr types, ...
+        //The settle count starts once released.
+        if (cmd == "session_hold")
+        {
+            bool v;
+            if (!parse_on_off(sub, Rollback::sessionStartHeld, &v)) return err_json("usage: session_hold on|off");
+            Rollback::sessionStartHeld = v;
+            ConsoleWrite("HARNESS: session_hold %d", (int)v);
+            return ok_json("\"session_hold\":" + b2s(v));
+        }
+
+        //Set a connected player's chr type (ChrIns+0xd4: 1 white phantom, 2 red phantom, 8 hollow, ...) the way the event script
+        //function SetChrType (0x14048aef0) does it: write it, then the chr's vtable+0x138 (ChrIns_Func_39 0x1403223c0, which derives
+        //the team type from it). Also the PlayerGameData copy. Then the team type (ChrIns+0xd8: 1 player, 2 white, 3 red), written
+        //directly as SetTeamType (0x14048da40) does. On this machine only: a test sets it on every machine.
+        if (cmd == "set_chr_type")
+        {
+            if (a.size() < 4) return err_json("usage: set_chr_type <steam id hex> <chr type> <team type>");
+            if (Rollback::ggpoStarted) return err_json("a session is running");
+            uint64_t steam_id = 0;
+            int32_t chr_type = 0, team_type = 0;
+            try { steam_id = std::stoull(a[1], nullptr, 16); chr_type = std::stoi(a[2]); team_type = std::stoi(a[3]); } catch (...) { return err_json("bad arguments"); }
+            if (!Game::playerchar_is_loaded()) return err_json("character not loaded");
+            for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
+            {
+                auto p = Game::get_connected_player(i);
+                if (!p.has_value() || p.value() == 0) continue;
+                PlayerIns* pi = (PlayerIns*)p.value();
+                if (player_steam_id(pi, i) != steam_id) continue;
+                uint8_t* chr = (uint8_t*)pi;
+                *(int32_t*)(chr + 0xd4) = chr_type;
+                typedef void ApplyChrType_FUNC(void*);
+                (*(ApplyChrType_FUNC**)(*(uint64_t*)chr + 0x138))(chr);
+                *(int32_t*)(chr + 0xd8) = team_type;
+                if (pi->playergamedata != NULL) pi->playergamedata->attribs.ChrType = chr_type;
+                ConsoleWrite("HARNESS: set_chr_type %llx (game slot %u) chr %d team %d", (unsigned long long)steam_id, i, chr_type, team_type);
+                return ok_json("\"slot\":" + std::to_string(i));
+            }
+            return err_json("no connected player with that steam id");
+        }
+
+        //Select the quickbar slot holding an item (category goods|weapon|..., id), for the matchmaking items: the harness taps
+        //'r' to use whatever is selected
+        if (cmd == "selectitem")
+        {
+            if (a.size() < 3) return err_json("usage: selectitem <goods|weapon|protector|accessory> <id>");
+            if (Rollback::ggpoStarted) return err_json("a session is running");
+            uint32_t category;
+            if (a[1] == "weapon") category = 0;
+            else if (a[1] == "protector") category = 1;
+            else if (a[1] == "accessory") category = 2;
+            else if (a[1] == "goods") category = 4;
+            else return err_json("unknown category");
+            int32_t id = 0;
+            try { id = std::stoi(a[2]); } catch (...) { return err_json("bad id"); }
+            auto p = Game::get_connected_player(0);
+            if (!Game::playerchar_is_loaded() || !p.has_value() || p.value() == 0) return err_json("no local player");
+            EquipGameData* egd = &((PlayerIns*)p.value())->playergamedata->equipGameData;
+            const EquipInventoryDataItem* itemlist = egd->equippedInventory.itemlist2;
+            const uint32_t itemlistlen = egd->equippedInventory.itemList2_len;
+            for (uint32_t i = 0; i < 5; i++)
+            {
+                const uint32_t index = egd->equippedItemsInQuickbar.quickbar[i];
+                if (itemlist != NULL && index < itemlistlen && item_category_is(itemlist[index].item_category, category) && (int32_t)itemlist[index].item_id == id)
+                {
+                    egd->equippedItemsInQuickbar.selectedQuickbarItem = index;
+                    ConsoleWrite("HARNESS: selected quickbar slot %u (%s %d)", i, a[1].c_str(), id);
+                    return ok_json("\"quickbar\":" + quickbar_json());
+                }
+            }
+            return err_json("not in the quickbar: " + a[1] + " " + a[2]);
+        }
+
         if (cmd == "help")
         {
             return ok_json("\"commands\":[\"ping\",\"status\",\"frame\",\"input\",\"rollback on|off|toggle\","
@@ -1080,7 +1229,7 @@ namespace
                            "\"script load <path>\",\"script add <directive>\",\"script clear\",\"script neutral on|off\","
                            "\"script name <text>\",\"script status\",\"peek <hexaddr> [len]\",\"rtti <hexaddr>\",\"end_session\",\"start_session\",\"freeze on|off|status\",\"warp <x> <y> <z> <yaw>\","
                            "\"log <text>\",\"subscribe\",\"hashes [since] [max]\",\"dump_at <frame>|+<n>\",\"dump_status\","
-                           "\"dump_get\",\"probe\""
+                           "\"dump_get\",\"probe\",\"selectitem <category> <id>\",\"session_hold on|off\",\"set_chr_type <steam id> <chr type> <team type>\""
 #if ROLLBACK_INPUT_TESTING
                            ",\"inputdiag\",\"network on|off\",\"network role send|recv\",\"network status\",\"pad [status|reset]\""
 #if VIRTUALPAD_SELFTEST

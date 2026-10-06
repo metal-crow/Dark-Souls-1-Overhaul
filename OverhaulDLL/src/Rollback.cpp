@@ -46,6 +46,7 @@ GGPOSessionCallbacks Rollback::ggpoCallbacks = {
 };
 
 bool Rollback::inRollbackResim = false;
+bool Rollback::sessionStartHeld = false;
 #if ROLLBACK_INPUT_TESTING
 RollbackInput Rollback::lastAppliedInput[GGPO_MAX_PLAYERS] = {};
 InputDiag Rollback::inputDiag[GGPO_MAX_PLAYERS] = {};
@@ -1793,6 +1794,13 @@ bool rollback_await_init(void* steamMsgs)
             rollback_settled_frames = 0;
             return true;
         }
+    }
+
+    //the test harness holds the start while it sets the players up (harness command session_hold); the settle count starts after
+    if (Rollback::sessionStartHeld)
+    {
+        rollback_settled_frames = 0;
+        return true;
     }
 
     if (rollback_settled_frames < ROLLBACK_SETTLE_FRAMES)
