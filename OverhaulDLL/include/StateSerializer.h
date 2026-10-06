@@ -211,7 +211,8 @@ public:
                 tag('p'); fold(&f, 1);
                 if (mode == Mode::Write) put(&f, 1);
                 else if (mode == Mode::Apply) check_flag(n, f);
-                if (mode == Mode::Print) for (size_t i = 0; i < hl; i++) hex += "pp";
+                //the null flag is what is hashed, so the dump must show it: "pp" set, "nn" null
+                if (mode == Mode::Print) for (size_t i = 0; i < hl; i++) hex += f ? "pp" : "nn";
             }
             else
             {
