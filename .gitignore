@@ -5,7 +5,3 @@ OverhaulDLL_PtDE/
 /OverhaulDLL/testing.h
 /OverhaulDLL/DebugAsan
 /dev_scripts/rollback_harness/
-/dev_scripts/rollback_harness/harness_client.py
-/dev_scripts/rollback_harness/launch_harness.py
-/dev_scripts/rollback_harness/README.md
-/dev_scripts/rollback_harness/run_scenario.py
