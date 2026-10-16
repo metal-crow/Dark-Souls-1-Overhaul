@@ -3126,7 +3126,8 @@ static void serialize_ChrCtrl(StateVisitor& v, const ChrCtrl* c)
     serialize_ActionCtrl(v, c->actionctrl);
     // +0x80: one byte; +0x81..+0x87 are a gap in the Ghidra layout that holds the heap's fill
     v.blob_holes("unk_80", &c->unk_80, 8, { { 1, 7, StateVisitor::Hole::Pad } });
-    v.blob_holes("unk_90", &c->unk_90, 0x118, { { 0x8, 8, StateVisitor::Hole::Pad }, { 0x10, 8, StateVisitor::Hole::Ptr }, { 0x18, 8, StateVisitor::Hole::Ptr }, { 0x20, 8, StateVisitor::Hole::Ptr }, { 0x28, 8, StateVisitor::Hole::Ptr }, { 0x30, 8, StateVisitor::Hole::Ptr }, { 0x38, 8, StateVisitor::Hole::Ptr }, { 0x79, 7, StateVisitor::Hole::Pad }, { 0xa8, 4, StateVisitor::Hole::Pad }, { 0xe0, 4, StateVisitor::Hole::Pad }, { 0xf0, 32, StateVisitor::Hole::Pad }, { 0x113, 5, StateVisitor::Hole::Pad } });
+    // +0xa0 and +0xd0 (0x10 and 0x40 here) are two 3x4 float transforms, compared by value
+    v.blob_holes("unk_90", &c->unk_90, 0x118, { { 0x8, 8, StateVisitor::Hole::Pad }, { 0x79, 7, StateVisitor::Hole::Pad }, { 0xa8, 4, StateVisitor::Hole::Pad }, { 0xe0, 4, StateVisitor::Hole::Pad }, { 0xf0, 32, StateVisitor::Hole::Pad }, { 0x113, 5, StateVisitor::Hole::Pad } });
     serialize_WalkAnim_Twist(v, c->walkAnim_Twist);
     v.blob_holes("movement_enabled_region", &c->movement_enabled, 0xe0, { { 0x2, 2, StateVisitor::Hole::Pad }, { 0x6e, 2, StateVisitor::Hole::Pad }, { 0xa2, 6, StateVisitor::Hole::Pad }, { 0xa8, 8, StateVisitor::Hole::Ptr }, { 0xc1, 15, StateVisitor::Hole::Pad } });
     v.blob_holes("MapHitDisableDebugging_region", &c->MapHitDisableDebugging, 0x60, { { 0x3, 1, StateVisitor::Hole::Pad }, { 0x21, 3, StateVisitor::Hole::Pad }, { 0x4d, 1, StateVisitor::Hole::Pad }, { 0x4f, 1, StateVisitor::Hole::Pad }, { 0x55, 3, StateVisitor::Hole::Pad }, { 0x5c, 4, StateVisitor::Hole::Pad } });

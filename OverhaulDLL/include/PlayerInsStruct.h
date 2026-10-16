@@ -1023,8 +1023,8 @@ struct ChrCtrl
     uint32_t unk_90;           // 0x90
     uint32_t unk_94;           // 0x94
     uint8_t unk_98[8];         // 0x98 (gap)
-    uint8_t FollowupBullet[48];// 0xa0 (ghidra: BulletIns_FollowupBullet)
-    float unk_d0[12];          // 0xd0
+    float unk_a0[12];          // 0xa0 (ghidra: NS_FRPG_BulletIns_Field0x90_Field0xE0, a 3x4 transform; init FUN_1401e1780)
+    float unk_d0[12];          // 0xd0 (ghidra: NS_FRPG_BulletIns_Field0x90_Field0xE0)
     uint8_t enable;            // 0x100 (ghidra: byte)
     uint8_t unk_101[2];        // 0x101 (gap)
     uint8_t CompletelyNoMove;  // 0x103 (ghidra: byte)
@@ -1065,6 +1065,8 @@ static_assert(offsetof(ChrCtrl, ragdollIns) == 0x30);
 static_assert(offsetof(ChrCtrl, actionctrl) == 0x48);
 static_assert(offsetof(ChrCtrl, unk_80) == 0x80);
 static_assert(offsetof(ChrCtrl, unk_90) == 0x90);
+static_assert(offsetof(ChrCtrl, unk_a0) == 0xa0);
+static_assert(offsetof(ChrCtrl, unk_d0) == 0xd0);
 static_assert(offsetof(ChrCtrl, movementActionDeltas) == 0x140);
 static_assert(offsetof(ChrCtrl, walkAnim_Twist) == 0x1a8);
 static_assert(offsetof(ChrCtrl, movement_enabled) == 0x1b0);
