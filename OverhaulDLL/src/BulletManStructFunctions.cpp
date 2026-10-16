@@ -9,25 +9,7 @@ static const size_t ChrAimCam_size = 0x1d0;
 static const size_t FallDieCam_size = 0xb0;
 static const size_t BallistaAimCam_size = 0xe0;
 
-// ---- BulletIns_FollowupBullet ----
-
-void copy_BulletIns_FollowupBullet_Data(BulletIns_FollowupBullet* to, BulletIns_FollowupBullet* from, StateTarget target)
-{
-    to->vtable = from->vtable;
-    to->FXManager = from->FXManager;
-    to->fxentry_a = NULL;// from->fxentry_a;
-    to->fxentry_b = NULL;// from->fxentry_b;
-}
-
-void copy_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, BulletIns_FollowupBullet* from, StateTarget target)
-{
-    copy_BulletIns_FollowupBullet_Data(to, from, target);
-    //next/prev are linked list pointers into the SFX system or other FollowupBullets.
-    //Since the SFX system is saved/restored independently and game objects are at fixed addresses,
-    //copying the raw pointer values is correct for rollback.
-    to->next = from->next;
-    to->prev = from->prev;
-}
+// ---- BulletIns_FollowupBullet lists ----
 
 //Game's layout for BulletIns_FollowupBullet list allocations (verified via ghidra on
 //ChrMultiSfxSlot_Process_, ChrStatueDeadSlot_Process_, and Destruct_ChrConditionSfxSeSlot):
@@ -66,6 +48,10 @@ void free_BulletIns_FollowupBullet_List(BulletIns_FollowupBullet** list, int16_t
     }
     if (target == StateTarget::ToGame)
     {
+        for (int16_t i = 0; i < *len; i++)
+        {
+            release_BulletIns_FollowupBullet(&(*list)[i]);
+        }
         void* raw = *(void**)(((uint8_t*)(*list)) - BULLETIN_FOLLOWUPBULLET_LIST_HEADER_SIZE);
         Game::game_free_alt(raw);
     }
@@ -87,27 +73,8 @@ void copy_BulletIns_FollowupBullet_List(BulletIns_FollowupBullet** to_list, int1
     }
     for (int16_t i = 0; i < *from_len; i++)
     {
-        copy_BulletIns_FollowupBullet_Data(&(*to_list)[i], &(*from_list)[i], target);
-        //translate next/prev pointers within the list
-        if ((*from_list)[i].next != NULL)
-        {
-            size_t from_next_offset = ((uint64_t)(*from_list)[i].next) - ((uint64_t)(*from_list));
-            (*to_list)[i].next = (BulletIns_FollowupBullet*)(((uint64_t)(*to_list)) + from_next_offset);
+        copy_BulletIns_FollowupBullet(&(*to_list)[i], &(*from_list)[i], target);
         }
-        else
-        {
-            (*to_list)[i].next = NULL;
-        }
-        if ((*from_list)[i].prev != NULL)
-        {
-            size_t from_prev_offset = ((uint64_t)(*from_list)[i].prev) - ((uint64_t)(*from_list));
-            (*to_list)[i].prev = (BulletIns_FollowupBullet*)(((uint64_t)(*to_list)) + from_prev_offset);
-        }
-        else
-        {
-            (*to_list)[i].prev = NULL;
-        }
-    }
     *to_len = *from_len;
 }
 
@@ -243,26 +210,7 @@ void copy_BulletMan_Field0x40(BulletMan_Field0x40* to, BulletMan_Field0x40* from
 
     for (size_t i = 0; i < 16; i++)
     {
-        copy_BulletIns_FollowupBullet_Data(&to->arry[i], &from->arry[i], target);
-        //translate next/prev pointers within the arry
-        if (from->arry[i].next != NULL)
-        {
-            size_t from_next_offset = ((uint64_t)from->arry[i].next) - ((uint64_t)(from->arry));
-            to->arry[i].next = (BulletIns_FollowupBullet*)(((uint64_t)(to->arry)) + from_next_offset);
-        }
-        else
-        {
-            to->arry[i].next = NULL;
-        }
-        if (from->arry[i].prev != NULL)
-        {
-            size_t from_prev_offset = ((uint64_t)from->arry[i].prev) - ((uint64_t)(from->arry));
-            to->arry[i].prev = (BulletIns_FollowupBullet*)(((uint64_t)(to->arry)) + from_prev_offset);
-        }
-        else
-        {
-            to->arry[i].prev = NULL;
-        }
+        copy_BulletIns_FollowupBullet(&to->arry[i], &from->arry[i], target);
     }
 
     to->unk_308 = from->unk_308;

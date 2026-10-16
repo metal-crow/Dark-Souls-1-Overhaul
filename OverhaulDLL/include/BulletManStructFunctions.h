@@ -20,8 +20,6 @@ void copy_BulletIns(BulletIns* to, BulletIns* from, StateTarget target);
 BulletIns* init_BulletIns();
 void free_BulletIns(BulletIns* to, bool freeself);
 
-void copy_BulletIns_FollowupBullet(BulletIns_FollowupBullet* to, BulletIns_FollowupBullet* from, StateTarget target);
-void copy_BulletIns_FollowupBullet_Data(BulletIns_FollowupBullet* to, BulletIns_FollowupBullet* from, StateTarget target);
 void copy_BulletIns_FollowupBullet_List(BulletIns_FollowupBullet** to_list, int16_t* to_len, BulletIns_FollowupBullet** from_list, int16_t* from_len, StateTarget target);
 BulletIns_FollowupBullet* alloc_BulletIns_FollowupBullet_List(int16_t count, StateTarget target);
 void free_BulletIns_FollowupBullet_List(BulletIns_FollowupBullet** list, int16_t* len, StateTarget target);
