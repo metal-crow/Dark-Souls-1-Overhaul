@@ -1209,21 +1209,6 @@ extern "C" {
     uint64_t MoveMapStep_SetPlayerLockOn_FromController_offset_return;
     void MoveMapStep_SetPlayerLockOn_FromController_offset_injection();
     bool* ggpoStarted_ptr;
-
-    uint64_t followupBullet_loop_return;
-    void followupBullet_loop_injection();
-    void followupBullet_loop_helper(uint64_t);
-}
-
-//manually set the fxentry_a ptr in the followupbullet
-//I can't figure out why it's sometimes not set (caused by my code somehow),
-//so i'm patching it this way to fix it.
-void followupBullet_loop_helper(uint64_t FxBehaviorNode_body)
-{
-    uint64_t followupBullet = *(uint64_t*)(FxBehaviorNode_body + 0x20);
-    uint64_t FxBehaviorNode = *(uint64_t*)(FxBehaviorNode_body + 0x8);
-    uint64_t* fxentry_a = (uint64_t*)(followupBullet + 0x10);
-    *fxentry_a = FxBehaviorNode;
 }
 
 bool rollback_await_init(void* steamMsgs);
@@ -1284,12 +1269,6 @@ void hkThreadMemory_blockFreeBatch(void* param_1, void** ptrsIn, int numPtrs, in
 extern "C" {
     uint64_t simpleshapephantom_collisionDetails_iterate_return;
     void simpleshapephantom_collisionDetails_iterate_injection();
-
-    uint64_t Destruct_SFXEntry_return;
-    void Destruct_SFXEntry_injection();
-
-    uint64_t Destruct_FxBehaviorNode_return;
-    void Destruct_FxBehaviorNode_injection();
 
     uint64_t DamageEntry_Clear_id_return;
     void DamageEntry_Clear_id_injection();
@@ -1360,10 +1339,6 @@ void Rollback::start()
     ggpoStarted_ptr = &Rollback::ggpoStarted;
     sp::mem::code::x64::inject_jmp_14b(write_address, &MoveMapStep_SetPlayerLockOn_FromController_offset_return, 2, &MoveMapStep_SetPlayerLockOn_FromController_offset_injection);
 
-    //fix an issue where the FollowupBullet doesn't have the right ptr to it's parent sometimes
-    write_address = (uint8_t*)(Rollback::Build_BulletIns_FollowupBullet_loop_fix_offset + Game::ds1_base);
-    sp::mem::code::x64::inject_jmp_14b(write_address, &followupBullet_loop_return, 2, &followupBullet_loop_injection);
-
     //manually specify the item ID being used, instead of the inventory id
     write_address = (uint8_t*)(Rollback::get_item_currently_being_used_offset + Game::ds1_base);
     sp::mem::code::x64::inject_jmp_14b(write_address, &get_item_currently_being_used_return, 6, &get_item_currently_being_used_injection);
@@ -1374,12 +1349,6 @@ void Rollback::start()
     uint8_t nop[5] = { 0x90, 0x90, 0x90, 0x90, 0x90 };
     sp::mem::patch_bytes(write_address, nop, 5);
 
-    //SFX graveyard: hook the raw dealloc paths so any object in the graveyard
-    //is held alive (and the dealloc args remembered) until refcount drops to 0
-    //write_address = (uint8_t*)(Rollback::Destruct_SFXEntry_offset + Game::ds1_base);
-    //sp::mem::code::x64::inject_jmp_14b(write_address, &Destruct_SFXEntry_return, 1, &Destruct_SFXEntry_injection);
-    //write_address = (uint8_t*)(Rollback::Destruct_FxBehaviorNode_offset + Game::ds1_base);
-    //sp::mem::code::x64::inject_jmp_14b(write_address, &Destruct_FxBehaviorNode_return, 1, &Destruct_FxBehaviorNode_injection);
 
     //Disable all thread specific allocations. Replace it with global malloc/free
     //this is needed because otherwise we can't know what hkThreadMemory instance to allocate or free an object under

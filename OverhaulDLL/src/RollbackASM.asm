@@ -2,7 +2,6 @@ _DATA SEGMENT
 
 sub_1401862A0   dq  1401862A0h
 nullsub_78     dq  140185470h
-Build_BulletIns_FollowupBullet  dq  140fdcac0h
 LAB_1409c7675   dq  1409c7675h
 
 _DATA ENDS
@@ -388,25 +387,6 @@ jmp     MoveMapStep_SetPlayerLockOn_FromController_offset_return
 MoveMapStep_SetPlayerLockOn_FromController_offset_injection ENDP
 
 
-EXTERN followupBullet_loop_return: qword
-extern followupBullet_loop_helper: proc
-
-PUBLIC followupBullet_loop_injection
-followupBullet_loop_injection PROC
-floop:
-MOV     RCX,qword ptr [RDI + 20h]
-FUNC_PROLOGUE
-mov     rcx, rdi
-call    followupBullet_loop_helper
-FUNC_EPILOGUE
-CALL    qword ptr [Build_BulletIns_FollowupBullet]
-CMP     qword ptr [RDI + 20h],0
-JNZ     floop
-jmp     followupBullet_loop_return
-followupBullet_loop_injection ENDP
-
-
-
 EXTERN get_item_currently_being_used_return: qword
 extern get_item_currently_being_used_injection_helper: proc
 
@@ -445,51 +425,7 @@ jmp        simpleshapephantom_collisionDetails_iterate_return
 simpleshapephantom_collisionDetails_iterate_injection ENDP
 
 
-EXTERN Destruct_SFXEntry_return: qword
-extern OnSfxEntryDestruct: proc
 
-PUBLIC Destruct_SFXEntry_injection
-Destruct_SFXEntry_injection PROC
-FUNC_PROLOGUE_LITE
-; RCX = SFXEntry* (first param of Destruct_SFXEntry)
-call    OnSfxEntryDestruct
-FUNC_EPILOGUE_LITE_NORAX
-; AL = true if we should skip destruction
-test    al, al
-jnz     skip_destruct
-; Replay displaced instructions and continue into Destruct_SFXEntry body
-push    rdi
-sub     rsp, 30h
-mov     qword ptr [rsp+20h], -2
-jmp     Destruct_SFXEntry_return
-skip_destruct:
-; Destruct_SFXEntry returns param_1 in RAX
-mov     rax, rcx
-ret
-Destruct_SFXEntry_injection ENDP
-
-
-EXTERN Destruct_FxBehaviorNode_return: qword
-extern OnFxBehaviorNodeDealloc: proc
-
-PUBLIC Destruct_FxBehaviorNode_injection
-Destruct_FxBehaviorNode_injection PROC
-FUNC_PROLOGUE_LITE
-; RCX = Unused. Easier to not bother reordering
-; RDX = FxBehaviorNode* (second param of Destruct_SFXEntry)
-call    OnFxBehaviorNodeDealloc
-FUNC_EPILOGUE_LITE_NORAX
-; AL = true if we should skip destruction
-test    al, al
-jnz     skip_destruct
-MOV     qword ptr [RSP + 8], RBX
-MOV     qword ptr [RSP + 10h], RSI
-PUSH    RDI
-SUB     RSP,20h
-jmp     Destruct_FxBehaviorNode_return
-skip_destruct:
-ret
-Destruct_FxBehaviorNode_injection ENDP
 
 
 EXTERN ChrCam_ApplyToPadManipulator_return: qword
