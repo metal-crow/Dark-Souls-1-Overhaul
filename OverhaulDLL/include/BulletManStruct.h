@@ -7,7 +7,7 @@
 
 typedef struct BulletMan BulletMan;
 typedef struct BulletIns BulletIns;
-typedef struct BulletIns_FollowupBullet BulletIns_FollowupBullet;
+typedef struct SfxHandle SfxHandle;
 typedef struct BulletIns_Field0x90_Field0x1a0 BulletIns_Field0x90_Field0x1a0;
 typedef struct BulletTargetingSystemOwner BulletTargetingSystemOwner;
 typedef struct TargetingSystemBase TargetingSystemBase;
@@ -20,16 +20,16 @@ typedef struct ChrCam ChrCam;
 struct FXManager;
 struct FxBehaviorNode;
 
-struct BulletIns_FollowupBullet
+struct SfxHandle
 {
     uint64_t vtable;
-    FXManager* FXManager;
-    FxBehaviorNode* fxentry_a;
-    BulletIns_FollowupBullet* next;
-    BulletIns_FollowupBullet* prev;
-    FxBehaviorNode* fxentry_b;
+    FXManager* fx_manager;
+    FxBehaviorNode* node;
+    SfxHandle* list_next;
+    SfxHandle* list_prev;
+    FxBehaviorNode* follow_node;
 };
-static_assert(sizeof(BulletIns_FollowupBullet) == 0x30);
+static_assert(sizeof(SfxHandle) == 0x30);
 
 struct BulletIns_Field0x90_Field0x1a0
 {
@@ -139,7 +139,7 @@ struct BulletIns
     float unk_4c;               // 0x4c
     uint32_t unk_50;            // 0x50
     uint32_t unk_54;            // 0x54
-    BulletIns_FollowupBullet FollowupBullet;   // 0x58
+    SfxHandle FollowupBullet;   // 0x58
     int32_t bulletClassType;    // 0x88
     int32_t unk_8c;             // 0x8c
     BulletIns_Field0x90_Field0x1a0 owner;      // 0x90
@@ -219,7 +219,7 @@ struct BulletMan_Field0x40
 {
     int32_t bulletOwnerEntityId;            // 0x0
     uint32_t padding_0;                     // 0x4
-    BulletIns_FollowupBullet arry[16];      // 0x8
+    SfxHandle arry[16];      // 0x8
     //former data_0 (0x308)
     uint32_t unk_308;                       // 0x308
     uint32_t unk_30c;                       // 0x30c (gap)

@@ -9,18 +9,18 @@ static const size_t ChrAimCam_size = 0x1d0;
 static const size_t FallDieCam_size = 0xb0;
 static const size_t BallistaAimCam_size = 0xe0;
 
-// ---- BulletIns_FollowupBullet lists ----
+// ---- SfxHandle lists ----
 
-//Game's layout for BulletIns_FollowupBullet list allocations (verified via ghidra on
+//Game's layout for SfxHandle list allocations (verified via ghidra on
 //ChrMultiSfxSlot_Process_, ChrStatueDeadSlot_Process_, and Destruct_ChrConditionSfxSeSlot):
-//    raw = internal_heap_3->malloc(count * sizeof(BulletIns_FollowupBullet) + 0x10, 0x10)
+//    raw = internal_heap_3->malloc(count * sizeof(SfxHandle) + 0x10, 0x10)
 //    raw[0x0] = raw                    //self pointer used on free
 //    raw[0x8] = (uint64_t)count        //element count
-//    list    = (BulletIns_FollowupBullet*)(raw + 0x10)
+//    list    = (SfxHandle*)(raw + 0x10)
 //    free    = Get_HeapAllocator_For_allocation(list)->free( *(void**)(((uint8_t*)list) - 0x10) )
-static const size_t BULLETIN_FOLLOWUPBULLET_LIST_HEADER_SIZE = 0x10;
+static const size_t SFXHANDLE_LIST_HEADER_SIZE = 0x10;
 
-BulletIns_FollowupBullet* alloc_BulletIns_FollowupBullet_List(int16_t count, StateTarget target)
+SfxHandle* alloc_SfxHandle_List(int16_t count, StateTarget target)
 {
     if (count <= 0)
     {
@@ -29,17 +29,17 @@ BulletIns_FollowupBullet* alloc_BulletIns_FollowupBullet_List(int16_t count, Sta
     if (target == StateTarget::ToGame)
     {
         uint8_t* raw = (uint8_t*)Game::game_malloc(
-            sizeof(BulletIns_FollowupBullet) * (size_t)count + BULLETIN_FOLLOWUPBULLET_LIST_HEADER_SIZE,
+            sizeof(SfxHandle) * (size_t)count + SFXHANDLE_LIST_HEADER_SIZE,
             0x10,
             *(uint64_t*)Game::internal_heap_3);
         *(void**)(raw + 0x0) = raw;
         *(uint64_t*)(raw + 0x8) = (uint64_t)count;
-        return (BulletIns_FollowupBullet*)(raw + BULLETIN_FOLLOWUPBULLET_LIST_HEADER_SIZE);
+        return (SfxHandle*)(raw + SFXHANDLE_LIST_HEADER_SIZE);
     }
-    return (BulletIns_FollowupBullet*)malloc_(sizeof(BulletIns_FollowupBullet) * (size_t)count);
+    return (SfxHandle*)malloc_(sizeof(SfxHandle) * (size_t)count);
 }
 
-void free_BulletIns_FollowupBullet_List(BulletIns_FollowupBullet** list, int16_t* len, StateTarget target)
+void free_SfxHandle_List(SfxHandle** list, int16_t* len, StateTarget target)
 {
     if (*list == NULL)
     {
@@ -50,9 +50,9 @@ void free_BulletIns_FollowupBullet_List(BulletIns_FollowupBullet** list, int16_t
     {
         for (int16_t i = 0; i < *len; i++)
         {
-            release_BulletIns_FollowupBullet(&(*list)[i]);
+            release_SfxHandle(&(*list)[i]);
         }
-        void* raw = *(void**)(((uint8_t*)(*list)) - BULLETIN_FOLLOWUPBULLET_LIST_HEADER_SIZE);
+        void* raw = *(void**)(((uint8_t*)(*list)) - SFXHANDLE_LIST_HEADER_SIZE);
         Game::game_free_alt(raw);
     }
     else
@@ -63,17 +63,17 @@ void free_BulletIns_FollowupBullet_List(BulletIns_FollowupBullet** list, int16_t
     *len = 0;
 }
 
-void copy_BulletIns_FollowupBullet_List(BulletIns_FollowupBullet** to_list, int16_t* to_len, BulletIns_FollowupBullet** from_list, int16_t* from_len, StateTarget target)
+void copy_SfxHandle_List(SfxHandle** to_list, int16_t* to_len, SfxHandle** from_list, int16_t* from_len, StateTarget target)
 {
     //must realloc on any size change because the header has a build in count
     if (*to_len != *from_len)
     {
-        free_BulletIns_FollowupBullet_List(to_list, to_len, target);
-        *to_list = alloc_BulletIns_FollowupBullet_List(*from_len, target);
+        free_SfxHandle_List(to_list, to_len, target);
+        *to_list = alloc_SfxHandle_List(*from_len, target);
     }
     for (int16_t i = 0; i < *from_len; i++)
     {
-        copy_BulletIns_FollowupBullet(&(*to_list)[i], &(*from_list)[i], target);
+        copy_SfxHandle(&(*to_list)[i], &(*from_list)[i], target);
         }
     *to_len = *from_len;
 }
@@ -103,7 +103,7 @@ void copy_BulletIns(BulletIns* to, BulletIns* from, StateTarget target)
     to->unk_50 = from->unk_50;
     to->unk_54 = from->unk_54;
 
-    copy_BulletIns_FollowupBullet(&to->FollowupBullet, &from->FollowupBullet, target);
+    copy_SfxHandle(&to->FollowupBullet, &from->FollowupBullet, target);
 
     to->bulletClassType = from->bulletClassType;
     to->unk_8c = from->unk_8c;
@@ -210,7 +210,7 @@ void copy_BulletMan_Field0x40(BulletMan_Field0x40* to, BulletMan_Field0x40* from
 
     for (size_t i = 0; i < 16; i++)
     {
-        copy_BulletIns_FollowupBullet(&to->arry[i], &from->arry[i], target);
+        copy_SfxHandle(&to->arry[i], &from->arry[i], target);
     }
 
     to->unk_308 = from->unk_308;
@@ -314,7 +314,7 @@ void free_ChrCam(ChrCam* to)
 //
 // Pointer handling:
 //  - intra-array links that copy fixes up as offsets (previous_bullet_in_use,
-//    next_in_use, followup next/prev in field0x40.arry) -> ptr_index.
+//    next_in_use, SfxHandle list_next/list_prev in field0x40.arry) -> ptr_index.
 //  - cursor pointers (end_of_bullets_in_use, etc.) hold GAME addresses in the
 //    snapshot -> ptr_flag.
 //  - sub-structs that copy memcpy's wholesale but which embed a pointer
@@ -325,12 +325,12 @@ void free_ChrCam(ChrCam* to)
 //    hashed raw to mirror copy; if the bullet column shows persistent divergence,
 //    the ChrCam sub-camera blobs are the first thing to exclude.
 
-static void serialize_FollowupBullet_Data(StateVisitor& v, const BulletIns_FollowupBullet* fb)
+static void serialize_FollowupBullet_Data(StateVisitor& v, const SfxHandle* fb)
 {
     v.field("vtable", fb->vtable);
-    v.ptr_flag("FXManager", fb->FXManager);
-    v.ptr_flag("fxentry_a", fb->fxentry_a);   // forced NULL by copy
-    v.ptr_flag("fxentry_b", fb->fxentry_b);   // forced NULL by copy
+    v.ptr_flag("fx_manager", fb->fx_manager);
+    v.ptr_flag("node", fb->node);   // forced NULL by copy
+    v.ptr_flag("follow_node", fb->follow_node);   // forced NULL by copy
 }
 
 static void serialize_BulletIns_Field0x90_Field0x1a0(StateVisitor& v, const BulletIns_Field0x90_Field0x1a0* o)
@@ -440,10 +440,10 @@ static void serialize_BulletIns(StateVisitor& v, const BulletIns* b)
     v.field("unk_50", b->unk_50);
     v.field("unk_54", b->unk_54);
 
-    v.begin("FollowupBullet");   // embedded; next/prev hold raw game addresses
+    v.begin("FollowupBullet");   // embedded; list_next/list_prev hold raw game addresses
     serialize_FollowupBullet_Data(v, &b->FollowupBullet);
-    v.ptr_flag("next", b->FollowupBullet.next);
-    v.ptr_flag("prev", b->FollowupBullet.prev);
+    v.ptr_flag("list_next", b->FollowupBullet.list_next);
+    v.ptr_flag("list_prev", b->FollowupBullet.list_prev);
     v.end();
 
     v.field("bulletClassType", b->bulletClassType);
@@ -507,8 +507,8 @@ static void serialize_BulletMan_Field0x40(StateVisitor& v, const BulletMan_Field
     {
         v.begin("FollowupBullet");
         serialize_FollowupBullet_Data(v, &f->arry[i]);
-        v.ptr_index("next", f->arry[i].next, f->arry, sizeof(BulletIns_FollowupBullet));
-        v.ptr_index("prev", f->arry[i].prev, f->arry, sizeof(BulletIns_FollowupBullet));
+        v.ptr_index("list_next", f->arry[i].list_next, f->arry, sizeof(SfxHandle));
+        v.ptr_index("list_prev", f->arry[i].list_prev, f->arry, sizeof(SfxHandle));
         v.end();
     }
     v.field("unk_308", f->unk_308);

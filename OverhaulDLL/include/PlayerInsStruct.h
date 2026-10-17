@@ -2120,7 +2120,7 @@ struct PlayerIns
     uint8_t equipSlotToEquipIndexMap[8]; // 0x8b4 (ghidra: byte[8])
     uint32_t unk_8bc;          // 0x8bc
     uint8_t unk_8c0[16];       // 0x8c0 (gap)
-    uint8_t unk_BulletIns_FollowupBullet[0x30];
+    uint8_t unk_SfxHandle[0x30];
     uint8_t data_5[0x49];
     uint8_t unk_flags;
     uint8_t data_5a[0x66];
@@ -2155,7 +2155,7 @@ static_assert(offsetof(PlayerIns, headSize) == 0x860);
 static_assert(offsetof(PlayerIns, padding_5) == 0x878);
 static_assert(offsetof(PlayerIns, unk_880) == 0x880);
 static_assert(offsetof(PlayerIns, equipSlotToEquipIndexMap) == 0x8b4);
-static_assert(offsetof(PlayerIns, unk_BulletIns_FollowupBullet) == 0x8d0);
+static_assert(offsetof(PlayerIns, unk_SfxHandle) == 0x8d0);
 static_assert(offsetof(PlayerIns, data_5) == 0x900);
 static_assert(offsetof(PlayerIns, unk_flags) == 0x949);
 static_assert(offsetof(PlayerIns, data_5a) == 0x94a);
