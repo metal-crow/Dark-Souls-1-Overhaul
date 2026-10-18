@@ -139,7 +139,7 @@ struct BulletIns
     float unk_4c;               // 0x4c
     uint32_t unk_50;            // 0x50
     uint32_t unk_54;            // 0x54
-    SfxHandle FollowupBullet;   // 0x58
+    SfxHandle sfx;              // 0x58
     int32_t bulletClassType;    // 0x88
     int32_t unk_8c;             // 0x8c
     BulletIns_Field0x90_Field0x1a0 owner;      // 0x90
@@ -172,7 +172,7 @@ struct BulletIns
 };
 static_assert(offsetof(BulletIns, bullet_number) == 0x8);
 static_assert(offsetof(BulletIns, player_position) == 0x10);
-static_assert(offsetof(BulletIns, FollowupBullet) == 0x58);
+static_assert(offsetof(BulletIns, sfx) == 0x58);
 static_assert(offsetof(BulletIns, bulletClassType) == 0x88);
 static_assert(offsetof(BulletIns, owner) == 0x90);
 static_assert(offsetof(BulletIns, bullet_distance) == 0x1f0);

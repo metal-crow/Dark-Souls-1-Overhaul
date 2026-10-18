@@ -266,27 +266,27 @@ void free_AttachSysSlot_Fields(AttachSysSlotBaseImpl* to, StateTarget target)
     case TypeChrMultiSfxSlot:
     {
         ChrMultiSfxSlot* slot = (ChrMultiSfxSlot*)to;
-        free_SfxHandle_List(&slot->bullet_list, &slot->bullet_list_len, target);
+        free_SfxHandle_List(&slot->sfx_list, &slot->sfx_list_len, target);
         break;
     }
     case TypeChrWepEnchantSlot:
     {
         ChrWepEnchantSlot* slot = (ChrWepEnchantSlot*)to;
-        free_SfxHandle_List(&slot->followup_bullet_list, &slot->followup_bullet_list_len, target);
+        free_SfxHandle_List(&slot->sfx_list, &slot->sfx_list_len, target);
         break;
     }
     case TypeChrStatueDeadSlot:
     {
         ChrStatueDeadSlot* slot = (ChrStatueDeadSlot*)to;
-        int16_t len = (int16_t)slot->followup_bullet_list_len;
-        free_SfxHandle_List(&slot->followup_bullet_list, &len, target);
-        slot->followup_bullet_list_len = len;
+        int16_t len = (int16_t)slot->sfx_list_len;
+        free_SfxHandle_List(&slot->sfx_list, &len, target);
+        slot->sfx_list_len = len;
         break;
     }
     case TypeChrConditionSfxSeSlot:
     {
         ChrConditionSfxSeSlot* slot = (ChrConditionSfxSeSlot*)to;
-        free_SfxHandle_List(&slot->followupbullet_list, &slot->followupbullet_list_len, target);
+        free_SfxHandle_List(&slot->sfx_list, &slot->sfx_list_len, target);
         break;
     }
     case TypeChrBurnSlot:
@@ -354,7 +354,7 @@ void copy_ChrShineTreasureSlot(ChrShineTreasureSlot* to, ChrShineTreasureSlot* f
     to->unk_20 = from->unk_20;
     to->unk_22 = from->unk_22;
     to->unk_24 = from->unk_24;
-    copy_SfxHandle(&to->bullet, &from->bullet, target);
+    copy_SfxHandle(&to->sfx, &from->sfx, target);
 }
 
 void copy_ChrSingleSeSlot(ChrSingleSeSlot* to, ChrSingleSeSlot* from, StateTarget target)
@@ -380,7 +380,7 @@ void copy_ChrSingleSfxSlot(ChrSingleSfxSlot* to, ChrSingleSfxSlot* from, StateTa
     to->unk_2e = from->unk_2e;
     to->unk_30 = from->unk_30;
     memcpy(to->unk_32, from->unk_32, sizeof(to->unk_32));
-    copy_SfxHandle(&to->bullet, &from->bullet, target);
+    copy_SfxHandle(&to->sfx, &from->sfx, target);
 }
 
 void copy_ChrMultiSfxSlot(ChrMultiSfxSlot* to, ChrMultiSfxSlot* from, StateTarget target)
@@ -390,7 +390,7 @@ void copy_ChrMultiSfxSlot(ChrMultiSfxSlot* to, ChrMultiSfxSlot* from, StateTarge
     to->dummyPolyID_B = from->dummyPolyID_B;
     to->dummyPolyID_A = from->dummyPolyID_A;
     to->unk_2c = from->unk_2c;
-    copy_SfxHandle_List(&to->bullet_list, &to->bullet_list_len, &from->bullet_list, &from->bullet_list_len, target);
+    copy_SfxHandle_List(&to->sfx_list, &to->sfx_list_len, &from->sfx_list, &from->sfx_list_len, target);
 }
 
 void copy_ChrBurnSlot(ChrBurnSlot* to, ChrBurnSlot* from, StateTarget target)
@@ -506,18 +506,18 @@ void copy_ChrBurnSlot(ChrBurnSlot* to, ChrBurnSlot* from, StateTarget target)
 
             to_elem->unk_0 = from_elem->unk_0;
 
-            copy_SfxHandle_Data(&to_elem->bullet, &from_elem->bullet, target);
+            copy_SfxHandle_Data(&to_elem->sfx, &from_elem->sfx, target);
             //set up the list_next ptr. We can probably ignore list_prev
-            if (from_elem->bullet.list_next != NULL)
+            if (from_elem->sfx.list_next != NULL)
             {
-                size_t from_next_offset = ((uint64_t)from_elem->bullet.list_next) - ((uint64_t)(from->list));
-                to_elem->bullet.list_next = (SfxHandle*)(((uint64_t)(to->list)) + from_next_offset);
+                size_t from_next_offset = ((uint64_t)from_elem->sfx.list_next) - ((uint64_t)(from->list));
+                to_elem->sfx.list_next = (SfxHandle*)(((uint64_t)(to->list)) + from_next_offset);
             }
             else
             {
-                to_elem->bullet.list_next = NULL;
+                to_elem->sfx.list_next = NULL;
             }
-            to_elem->bullet.list_prev = NULL;
+            to_elem->sfx.list_prev = NULL;
         }
     }
     to->list_len = from->list_len;
@@ -589,30 +589,30 @@ void copy_ChrGasmanSlot(ChrGasmanSlot* to, ChrGasmanSlot* from, StateTarget targ
             memcpy(to_elem->vector, from_elem->vector, sizeof(to_elem->vector));
             memcpy(to_elem->unk_1c, from_elem->unk_1c, sizeof(to_elem->unk_1c));
 
-            copy_SfxHandle_Data(&to_elem->bullet_a, &from_elem->bullet_a, target);
+            copy_SfxHandle_Data(&to_elem->sfx_a, &from_elem->sfx_a, target);
             //set up the list_next ptr. We can probably ignore list_prev
-            if (from_elem->bullet_a.list_next != NULL)
+            if (from_elem->sfx_a.list_next != NULL)
             {
-                size_t from_next_offset = ((uint64_t)from_elem->bullet_a.list_next) - ((uint64_t)(from->list));
-                to_elem->bullet_a.list_next = (SfxHandle*)(((uint64_t)(to->list)) + from_next_offset);
+                size_t from_next_offset = ((uint64_t)from_elem->sfx_a.list_next) - ((uint64_t)(from->list));
+                to_elem->sfx_a.list_next = (SfxHandle*)(((uint64_t)(to->list)) + from_next_offset);
             }
             else
             {
-                to_elem->bullet_a.list_next = NULL;
+                to_elem->sfx_a.list_next = NULL;
             }
-            to_elem->bullet_a.list_prev = NULL;
+            to_elem->sfx_a.list_prev = NULL;
 
-            copy_SfxHandle_Data(&to_elem->bullet_b, &from_elem->bullet_b, target);
-            if (from_elem->bullet_b.list_next != NULL)
+            copy_SfxHandle_Data(&to_elem->sfx_b, &from_elem->sfx_b, target);
+            if (from_elem->sfx_b.list_next != NULL)
             {
-                size_t from_next_offset = ((uint64_t)from_elem->bullet_b.list_next) - ((uint64_t)(from->list));
-                to_elem->bullet_b.list_next = (SfxHandle*)(((uint64_t)(to->list)) + from_next_offset);
+                size_t from_next_offset = ((uint64_t)from_elem->sfx_b.list_next) - ((uint64_t)(from->list));
+                to_elem->sfx_b.list_next = (SfxHandle*)(((uint64_t)(to->list)) + from_next_offset);
             }
             else
             {
-                to_elem->bullet_b.list_next = NULL;
+                to_elem->sfx_b.list_next = NULL;
             }
-            to_elem->bullet_b.list_prev = NULL;
+            to_elem->sfx_b.list_prev = NULL;
         }
     }
     to->list_len = from->list_len;
@@ -630,7 +630,7 @@ void copy_ChrFootEffectSlot(ChrFootEffectSlot* to, ChrFootEffectSlot* from, Stat
     to->unk_26 = from->unk_26;
     to->unk_28 = from->unk_28;
     to->unk_2c = from->unk_2c;
-    copy_SfxHandle(&to->bullet, &from->bullet, target);
+    copy_SfxHandle(&to->sfx, &from->sfx, target);
 }
 
 void copy_ChrRigidOffsetSfxSlot(ChrRigidOffsetSfxSlot* to, ChrRigidOffsetSfxSlot* from, StateTarget target)
@@ -640,7 +640,7 @@ void copy_ChrRigidOffsetSfxSlot(ChrRigidOffsetSfxSlot* to, ChrRigidOffsetSfxSlot
     to->unk_26 = from->unk_26;
     memcpy(to->unk_28, from->unk_28, sizeof(to->unk_28));
     memcpy(to->fieldE0, from->fieldE0, sizeof(to->fieldE0));
-    copy_SfxHandle(&to->bullet, &from->bullet, target);
+    copy_SfxHandle(&to->sfx, &from->sfx, target);
 }
 
 void copy_ChrRigidOffsetChrSlot(ChrRigidOffsetChrSlot* to, ChrRigidOffsetChrSlot* from, StateTarget target)
@@ -660,7 +660,7 @@ void copy_ChrSoulEatSlot(ChrSoulEatSlot* to, ChrSoulEatSlot* from, StateTarget t
     to->unk_34 = from->unk_34;
     to->unk_38 = from->unk_38;
     to->unk_3c = from->unk_3c;
-    copy_SfxHandle(&to->bullet, &from->bullet, target);
+    copy_SfxHandle(&to->sfx, &from->sfx, target);
 }
 
 void copy_ChrSorceryWepSlot(ChrSorceryWepSlot* to, ChrSorceryWepSlot* from, StateTarget target)
@@ -670,10 +670,10 @@ void copy_ChrSorceryWepSlot(ChrSorceryWepSlot* to, ChrSorceryWepSlot* from, Stat
     memcpy(to->unk_22, from->unk_22, sizeof(to->unk_22));
     to->unk_28 = from->unk_28;
     to->unk_2c = from->unk_2c;
-    copy_SfxHandle(&to->bullet1, &from->bullet1, target);
+    copy_SfxHandle(&to->sfx1, &from->sfx1, target);
     to->unk_60 = from->unk_60;
     to->unk_64 = from->unk_64;
-    copy_SfxHandle(&to->bullet2, &from->bullet2, target);
+    copy_SfxHandle(&to->sfx2, &from->sfx2, target);
 }
 
 void copy_ChrLanternSlot(ChrLanternSlot* to, ChrLanternSlot* from, StateTarget target)
@@ -681,9 +681,9 @@ void copy_ChrLanternSlot(ChrLanternSlot* to, ChrLanternSlot* from, StateTarget t
     to->unk_20 = from->unk_20;
     to->unk_22 = from->unk_22;
     to->unk_24 = from->unk_24;
-    copy_SfxHandle(&to->bullet1, &from->bullet1, target);
-    copy_SfxHandle(&to->bullet2, &from->bullet2, target);
-    copy_SfxHandle(&to->bullet3, &from->bullet3, target);
+    copy_SfxHandle(&to->sfx1, &from->sfx1, target);
+    copy_SfxHandle(&to->sfx2, &from->sfx2, target);
+    copy_SfxHandle(&to->sfx3, &from->sfx3, target);
 }
 
 void copy_ChrSingleOneshotSfxSlot(ChrSingleOneshotSfxSlot* to, ChrSingleOneshotSfxSlot* from, StateTarget target)
@@ -691,7 +691,7 @@ void copy_ChrSingleOneshotSfxSlot(ChrSingleOneshotSfxSlot* to, ChrSingleOneshotS
     to->unk_20 = from->unk_20;
     to->unk_24 = from->unk_24;
     to->unk_26 = from->unk_26;
-    copy_SfxHandle(&to->bullet, &from->bullet, target);
+    copy_SfxHandle(&to->sfx, &from->sfx, target);
 }
 
 void copy_ChrSingleTraceSfxSlot(ChrSingleTraceSfxSlot* to, ChrSingleTraceSfxSlot* from, StateTarget target)
@@ -703,7 +703,7 @@ void copy_ChrSingleTraceSfxSlot(ChrSingleTraceSfxSlot* to, ChrSingleTraceSfxSlot
     to->unk_29 = from->unk_29;
     to->unk_2a = from->unk_2a;
     memcpy(to->unk_2c, from->unk_2c, sizeof(to->unk_2c));
-    copy_SfxHandle(&to->bullet, &from->bullet, target);
+    copy_SfxHandle(&to->sfx, &from->sfx, target);
 }
 
 void copy_ChrMagicGoodsUseSfxSlot(ChrMagicGoodsUseSfxSlot* to, ChrMagicGoodsUseSfxSlot* from, StateTarget target)
@@ -714,7 +714,7 @@ void copy_ChrMagicGoodsUseSfxSlot(ChrMagicGoodsUseSfxSlot* to, ChrMagicGoodsUseS
     to->unk_27 = from->unk_27;
     to->unk_28 = from->unk_28;
     memcpy(to->unk_2a, from->unk_2a, sizeof(to->unk_2a));
-    copy_SfxHandle(&to->bullet, &from->bullet, target);
+    copy_SfxHandle(&to->sfx, &from->sfx, target);
 }
 
 void copy_ChrActPntSlot_ArrayElem(ChrActPntSlot_ArrayElem* to, ChrActPntSlot_ArrayElem* from, StateTarget target)
@@ -776,7 +776,7 @@ void copy_ChrWepEnchantSlot(ChrWepEnchantSlot* to, ChrWepEnchantSlot* from, Stat
     to->unk_3c = from->unk_3c;
     to->unk_3d = from->unk_3d;
 
-    copy_SfxHandle_List(&to->followup_bullet_list, &to->followup_bullet_list_len, &from->followup_bullet_list, &from->followup_bullet_list_len, target);
+    copy_SfxHandle_List(&to->sfx_list, &to->sfx_list_len, &from->sfx_list, &from->sfx_list_len, target);
 
     to->unk_48 = from->unk_48;
     to->unk_4c = from->unk_4c;
@@ -798,7 +798,7 @@ void copy_ChrConditionSfxSeSlot(ChrConditionSfxSeSlot* to, ChrConditionSfxSeSlot
     to->seId2 = from->seId2;
     to->dummyId2 = from->dummyId2;
 
-    copy_SfxHandle_List(&to->followupbullet_list, &to->followupbullet_list_len, &from->followupbullet_list, &from->followupbullet_list_len, target);
+    copy_SfxHandle_List(&to->sfx_list, &to->sfx_list_len, &from->sfx_list, &from->sfx_list_len, target);
 
     to->unk_40 = from->unk_40;
     to->unk_44 = from->unk_44;
@@ -819,7 +819,7 @@ void copy_ChrShinpanshaHaraSlot(ChrShinpanshaHaraSlot* to, ChrShinpanshaHaraSlot
 {
     to->unk_20 = from->unk_20;
     memcpy(to->unk_21, from->unk_21, sizeof(to->unk_21));
-    copy_SfxHandle(&to->bullet, &from->bullet, target);
+    copy_SfxHandle(&to->sfx, &from->sfx, target);
 }
 
 void copy_ChrLimitInvincibleSlot(ChrLimitInvincibleSlot* to, ChrLimitInvincibleSlot* from, StateTarget target)
@@ -839,11 +839,11 @@ void copy_ChrStatueDeadSlot(ChrStatueDeadSlot* to, ChrStatueDeadSlot* from, Stat
 {
     to->unk_20 = from->unk_20;
     memcpy(to->unk_21, from->unk_21, sizeof(to->unk_21));
-    int16_t to_followup_bullet_list_len = to->followup_bullet_list_len;
-    int16_t from_followup_bullet_list_len = from->followup_bullet_list_len;
-    copy_SfxHandle_List(&to->followup_bullet_list, &to_followup_bullet_list_len, &from->followup_bullet_list, &from_followup_bullet_list_len, target);
-    to->followup_bullet_list_len = to_followup_bullet_list_len;
-    from->followup_bullet_list_len = from_followup_bullet_list_len;
+    int16_t to_sfx_list_len = to->sfx_list_len;
+    int16_t from_sfx_list_len = from->sfx_list_len;
+    copy_SfxHandle_List(&to->sfx_list, &to_sfx_list_len, &from->sfx_list, &from_sfx_list_len, target);
+    to->sfx_list_len = to_sfx_list_len;
+    from->sfx_list_len = from_sfx_list_len;
 }
 
 void copy_ChrResonanceMagicSlot(ChrResonanceMagicSlot* to, ChrResonanceMagicSlot* from, StateTarget target)
@@ -874,7 +874,7 @@ void copy_ChrFollowSfxSlot(ChrFollowSfxSlot* to, ChrFollowSfxSlot* from, StateTa
 {
     to->unk_20 = from->unk_20;
     to->unk_24 = from->unk_24;
-    copy_SfxHandle(&to->bullet, &from->bullet, target);
+    copy_SfxHandle(&to->sfx, &from->sfx, target);
     to->unk_58 = from->unk_58;
     to->unk_5c = from->unk_5c;
     to->unk_60 = from->unk_60;

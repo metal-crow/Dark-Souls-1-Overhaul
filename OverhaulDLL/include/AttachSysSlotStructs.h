@@ -110,10 +110,10 @@ struct ChrSingleSfxSlot
     uint16_t unk_2e;       // 0x2e
     uint16_t unk_30;       // 0x30
     uint8_t unk_32[6];     // 0x32 (gap)
-    SfxHandle bullet; // 0x38
+    SfxHandle sfx; // 0x38
 };
 static_assert(offsetof(ChrSingleSfxSlot, ffxid) == 0x24);
-static_assert(offsetof(ChrSingleSfxSlot, bullet) == 0x38);
+static_assert(offsetof(ChrSingleSfxSlot, sfx) == 0x38);
 static_assert(sizeof(ChrSingleSfxSlot) == 0x68);
 
 struct ChrResonanceMagicSlot
@@ -148,10 +148,10 @@ struct ChrMultiSfxSlot
     uint16_t dummyPolyID_B;// 0x28
     uint16_t dummyPolyID_A;// 0x2a
     uint16_t unk_2c;       // 0x2c
-    int16_t bullet_list_len; // 0x2e
-    SfxHandle* bullet_list; // 0x30
+    int16_t sfx_list_len; // 0x2e
+    SfxHandle* sfx_list; // 0x30
 };
-static_assert(offsetof(ChrMultiSfxSlot, bullet_list_len) == 0x2e);
+static_assert(offsetof(ChrMultiSfxSlot, sfx_list_len) == 0x2e);
 static_assert(sizeof(ChrMultiSfxSlot) == 0x38);
 
 struct ChrFootEffectSlot
@@ -162,9 +162,9 @@ struct ChrFootEffectSlot
     uint16_t unk_26;       // 0x26
     uint32_t unk_28;       // 0x28
     uint32_t unk_2c;       // 0x2c
-    SfxHandle bullet; // 0x30
+    SfxHandle sfx; // 0x30
 };
-static_assert(offsetof(ChrFootEffectSlot, bullet) == 0x30);
+static_assert(offsetof(ChrFootEffectSlot, sfx) == 0x30);
 static_assert(sizeof(ChrFootEffectSlot) == 0x60);
 
 struct ChrActPntSlot_ArrayElem
@@ -203,13 +203,13 @@ struct ChrWepEnchantSlot
     uint8_t invisible;     // 0x3b (ghidra: bool)
     uint8_t unk_3c;        // 0x3c
     uint8_t unk_3d;        // 0x3d (gap)
-    int16_t followup_bullet_list_len; // 0x3e
-    SfxHandle* followup_bullet_list; // 0x40
+    int16_t sfx_list_len; // 0x3e
+    SfxHandle* sfx_list; // 0x40
     uint32_t unk_48;       // 0x48
     uint32_t unk_4c;       // 0x4c
 };
-static_assert(offsetof(ChrWepEnchantSlot, followup_bullet_list_len) == 0x3e);
-static_assert(offsetof(ChrWepEnchantSlot, followup_bullet_list) == 0x40);
+static_assert(offsetof(ChrWepEnchantSlot, sfx_list_len) == 0x3e);
+static_assert(offsetof(ChrWepEnchantSlot, sfx_list) == 0x40);
 static_assert(sizeof(ChrWepEnchantSlot) == 0x50);
 
 struct ChrStatueDeadSlot
@@ -217,11 +217,11 @@ struct ChrStatueDeadSlot
     AttachSysSlotBaseImpl base;
     uint8_t unk_20;        // 0x20 (ghidra: bool)
     uint8_t unk_21[3];     // 0x21 (gap)
-    int32_t followup_bullet_list_len; // 0x24
-    SfxHandle* followup_bullet_list; // 0x28
+    int32_t sfx_list_len; // 0x24
+    SfxHandle* sfx_list; // 0x28
 };
-static_assert(offsetof(ChrStatueDeadSlot, followup_bullet_list_len) == 0x24);
-static_assert(offsetof(ChrStatueDeadSlot, followup_bullet_list) == 0x28);
+static_assert(offsetof(ChrStatueDeadSlot, sfx_list_len) == 0x24);
+static_assert(offsetof(ChrStatueDeadSlot, sfx_list) == 0x28);
 static_assert(sizeof(ChrStatueDeadSlot) == 0x30);
 
 struct ChrSoulEatSlot
@@ -233,9 +233,9 @@ struct ChrSoulEatSlot
     float unk_34;          // 0x34
     float unk_38;          // 0x38
     float unk_3c;          // 0x3c
-    SfxHandle bullet; // 0x40
+    SfxHandle sfx; // 0x40
 };
-static_assert(offsetof(ChrSoulEatSlot, bullet) == 0x40);
+static_assert(offsetof(ChrSoulEatSlot, sfx) == 0x40);
 static_assert(sizeof(ChrSoulEatSlot) == 0x70);
 
 struct ChrSoulDeadSlot
@@ -249,19 +249,19 @@ static_assert(sizeof(ChrSoulDeadSlot) == 0x28);
 struct ChrSorceryWepSlot
 {
     AttachSysSlotBaseImpl base;
-    //ghidra models 0x28..0x98 as ChrSorceryWepSlot_field0x28Elem[2] = { uint; undefined4; FollowupBullet }
+    //ghidra models 0x28..0x98 as ChrSorceryWepSlot_field0x28Elem[2] = { uint; undefined4; SfxHandle }
     uint8_t unk_20;        // 0x20
     uint8_t unk_21;        // 0x21
     uint8_t unk_22[6];     // 0x22 (gap)
     uint32_t unk_28;       // 0x28 (elem[0] header)
     uint32_t unk_2c;       // 0x2c (elem[0] header)
-    SfxHandle bullet1; // 0x30 (elem[0] followupBullet)
+    SfxHandle sfx1; // 0x30 (elem[0] SfxHandle)
     uint32_t unk_60;       // 0x60 (elem[1] header)
     uint32_t unk_64;       // 0x64 (elem[1] header)
-    SfxHandle bullet2; // 0x68 (elem[1] followupBullet)
+    SfxHandle sfx2; // 0x68 (elem[1] SfxHandle)
 };
-static_assert(offsetof(ChrSorceryWepSlot, bullet1) == 0x30);
-static_assert(offsetof(ChrSorceryWepSlot, bullet2) == 0x68);
+static_assert(offsetof(ChrSorceryWepSlot, sfx1) == 0x30);
+static_assert(offsetof(ChrSorceryWepSlot, sfx2) == 0x68);
 static_assert(sizeof(ChrSorceryWepSlot) == 0x98);
 
 struct ChrSingleTraceSfxSlot
@@ -274,9 +274,9 @@ struct ChrSingleTraceSfxSlot
     uint8_t unk_29;        // 0x29 (gap)
     uint16_t unk_2a;       // 0x2a
     uint8_t unk_2c[4];     // 0x2c (gap)
-    SfxHandle bullet; // 0x30
+    SfxHandle sfx; // 0x30
 };
-static_assert(offsetof(ChrSingleTraceSfxSlot, bullet) == 0x30);
+static_assert(offsetof(ChrSingleTraceSfxSlot, sfx) == 0x30);
 static_assert(sizeof(ChrSingleTraceSfxSlot) == 0x60);
 
 struct ChrSingleSeSlot
@@ -300,9 +300,9 @@ struct ChrSingleOneshotSfxSlot
     uint32_t unk_20;       // 0x20
     uint16_t unk_24;       // 0x24
     uint16_t unk_26;       // 0x26
-    SfxHandle bullet; // 0x28
+    SfxHandle sfx; // 0x28
 };
-static_assert(offsetof(ChrSingleOneshotSfxSlot, bullet) == 0x28);
+static_assert(offsetof(ChrSingleOneshotSfxSlot, sfx) == 0x28);
 static_assert(sizeof(ChrSingleOneshotSfxSlot) == 0x58);
 
 struct ChrShinpanshaHaraSlot
@@ -310,9 +310,9 @@ struct ChrShinpanshaHaraSlot
     AttachSysSlotBaseImpl base;
     uint8_t unk_20;        // 0x20
     uint8_t unk_21[7];     // 0x21 (gap)
-    SfxHandle bullet; // 0x28
+    SfxHandle sfx; // 0x28
 };
-static_assert(offsetof(ChrShinpanshaHaraSlot, bullet) == 0x28);
+static_assert(offsetof(ChrShinpanshaHaraSlot, sfx) == 0x28);
 static_assert(sizeof(ChrShinpanshaHaraSlot) == 0x58);
 
 struct ChrShineTreasureSlot
@@ -321,9 +321,9 @@ struct ChrShineTreasureSlot
     uint16_t unk_20;       // 0x20
     uint16_t unk_22;       // 0x22 (gap)
     uint32_t unk_24;       // 0x24
-    SfxHandle bullet; // 0x28
+    SfxHandle sfx; // 0x28
 };
-static_assert(offsetof(ChrShineTreasureSlot, bullet) == 0x28);
+static_assert(offsetof(ChrShineTreasureSlot, sfx) == 0x28);
 static_assert(sizeof(ChrShineTreasureSlot) == 0x58);
 
 struct ChrRigidOffsetSfxSlot
@@ -334,10 +334,10 @@ struct ChrRigidOffsetSfxSlot
     uint16_t unk_26;       // 0x26
     uint8_t unk_28[8];     // 0x28 (gap)
     uint8_t fieldE0[48];   // 0x30 (ghidra: NS_FRPG_BulletIns_Field0x90_Field0xE0)
-    SfxHandle bullet; // 0x60
+    SfxHandle sfx; // 0x60
 };
 static_assert(offsetof(ChrRigidOffsetSfxSlot, fieldE0) == 0x30);
-static_assert(offsetof(ChrRigidOffsetSfxSlot, bullet) == 0x60);
+static_assert(offsetof(ChrRigidOffsetSfxSlot, sfx) == 0x60);
 static_assert(sizeof(ChrRigidOffsetSfxSlot) == 0x90);
 
 struct ChrRigidOffsetChrSlot
@@ -383,9 +383,9 @@ struct ChrMagicGoodsUseSfxSlot
     uint8_t unk_27;        // 0x27 (gap)
     uint16_t unk_28;       // 0x28
     uint8_t unk_2a[6];     // 0x2a (gap)
-    SfxHandle bullet; // 0x30
+    SfxHandle sfx; // 0x30
 };
-static_assert(offsetof(ChrMagicGoodsUseSfxSlot, bullet) == 0x30);
+static_assert(offsetof(ChrMagicGoodsUseSfxSlot, sfx) == 0x30);
 static_assert(sizeof(ChrMagicGoodsUseSfxSlot) == 0x60);
 
 struct ChrLimitInvincibleSlot
@@ -404,13 +404,13 @@ struct ChrLanternSlot
     uint16_t unk_20;       // 0x20
     uint16_t unk_22;       // 0x22 (gap)
     uint32_t unk_24;       // 0x24
-    SfxHandle bullet1; // 0x28
-    SfxHandle bullet2; // 0x58
-    SfxHandle bullet3; // 0x88
+    SfxHandle sfx1; // 0x28
+    SfxHandle sfx2; // 0x58
+    SfxHandle sfx3; // 0x88
 };
-static_assert(offsetof(ChrLanternSlot, bullet1) == 0x28);
-static_assert(offsetof(ChrLanternSlot, bullet2) == 0x58);
-static_assert(offsetof(ChrLanternSlot, bullet3) == 0x88);
+static_assert(offsetof(ChrLanternSlot, sfx1) == 0x28);
+static_assert(offsetof(ChrLanternSlot, sfx2) == 0x58);
+static_assert(offsetof(ChrLanternSlot, sfx3) == 0x88);
 static_assert(sizeof(ChrLanternSlot) == 0xb8);
 
 struct ChrGrassSlot
@@ -426,11 +426,11 @@ struct ChrGasmanSlot_ListElem
     uint8_t unk_1[11];     // 0x1 (gap)
     float vector[4];       // 0xc (ghidra: float[4])
     uint8_t unk_1c[4];     // 0x1c (gap)
-    SfxHandle bullet_a; // 0x20
-    SfxHandle bullet_b; // 0x50
+    SfxHandle sfx_a; // 0x20
+    SfxHandle sfx_b; // 0x50
 };
 static_assert(offsetof(ChrGasmanSlot_ListElem, vector) == 0xc);
-static_assert(offsetof(ChrGasmanSlot_ListElem, bullet_a) == 0x20);
+static_assert(offsetof(ChrGasmanSlot_ListElem, sfx_a) == 0x20);
 static_assert(sizeof(ChrGasmanSlot_ListElem) == 0x80);
 
 struct ChrGasmanSlot
@@ -455,13 +455,13 @@ struct ChrConditionSfxSeSlot
     int32_t sfxId2;        // 0x2c
     int32_t seId2;         // 0x30
     int16_t dummyId2;      // 0x34
-    int16_t followupbullet_list_len; // 0x36
-    SfxHandle* followupbullet_list; // 0x38
+    int16_t sfx_list_len; // 0x36
+    SfxHandle* sfx_list; // 0x38
     uint32_t unk_40;       // 0x40
     uint32_t unk_44;       // 0x44
 };
-static_assert(offsetof(ChrConditionSfxSeSlot, followupbullet_list_len) == 0x36);
-static_assert(offsetof(ChrConditionSfxSeSlot, followupbullet_list) == 0x38);
+static_assert(offsetof(ChrConditionSfxSeSlot, sfx_list_len) == 0x36);
+static_assert(offsetof(ChrConditionSfxSeSlot, sfx_list) == 0x38);
 static_assert(sizeof(ChrConditionSfxSeSlot) == 0x48);
 
 struct ChrCamouflageSlot
@@ -474,9 +474,9 @@ struct ChrCamouflageSlot
 struct ChrBurnSlot_ListElem
 {
     uint64_t unk_0;        // 0x0 (undefined in ghidra)
-    SfxHandle bullet; // 0x8
+    SfxHandle sfx; // 0x8
 };
-static_assert(offsetof(ChrBurnSlot_ListElem, bullet) == 0x8);
+static_assert(offsetof(ChrBurnSlot_ListElem, sfx) == 0x8);
 static_assert(sizeof(ChrBurnSlot_ListElem) == 0x38);
 
 struct ChrBurnSlot
@@ -511,10 +511,10 @@ struct ObjRigidOffsetSfxSlot
     uint16_t unk_26;       // 0x26
     uint8_t unk_28[8];     // 0x28 (gap)
     uint8_t fieldE0[48];   // 0x30 (ghidra: NS_FRPG_BulletIns_Field0x90_Field0xE0)
-    SfxHandle bullet; // 0x60
+    SfxHandle sfx; // 0x60
 };
 static_assert(offsetof(ObjRigidOffsetSfxSlot, fieldE0) == 0x30);
-static_assert(offsetof(ObjRigidOffsetSfxSlot, bullet) == 0x60);
+static_assert(offsetof(ObjRigidOffsetSfxSlot, sfx) == 0x60);
 static_assert(sizeof(ObjRigidOffsetSfxSlot) == 0x90);
 
 struct ChrFollowSfxSlot
@@ -522,13 +522,13 @@ struct ChrFollowSfxSlot
     AttachSysSlotBaseImpl base;
     uint32_t unk_20;       // 0x20
     uint32_t unk_24;       // 0x24 (gap)
-    SfxHandle bullet; // 0x28
+    SfxHandle sfx; // 0x28
     uint32_t unk_58;       // 0x58
     uint32_t unk_5c;       // 0x5c
     uint32_t unk_60;       // 0x60
     uint32_t unk_64;       // 0x64 (gap)
 };
-static_assert(offsetof(ChrFollowSfxSlot, bullet) == 0x28);
+static_assert(offsetof(ChrFollowSfxSlot, sfx) == 0x28);
 static_assert(offsetof(ChrFollowSfxSlot, unk_58) == 0x58);
 static_assert(sizeof(ChrFollowSfxSlot) == 0x68);
 

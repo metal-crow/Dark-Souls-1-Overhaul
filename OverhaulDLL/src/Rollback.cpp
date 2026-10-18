@@ -1468,8 +1468,8 @@ bool rollback_load_game_state_callback(unsigned char* buffer, int)
     RollbackState* state = (RollbackState*)buffer;
     HavokTrace::sample(HavokTrace::Stage::LoadBegin);
 
-    //sfx must be restored before playerins/bulletman so that linked_followupBullet chain heads
-    //are cleared before any FollowupBullet data is modified or freed
+    //sfx must be restored before playerins/bulletman so that linked_sfxHandle list heads
+    //are cleared before any SfxHandle data is modified or freed
     //copy_SfxMan(*(SfxMan**)Game::sfx_man, state->sfxman, StateTarget::ToGame);
     for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
     {

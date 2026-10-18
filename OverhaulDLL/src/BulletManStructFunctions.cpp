@@ -103,7 +103,7 @@ void copy_BulletIns(BulletIns* to, BulletIns* from, StateTarget target)
     to->unk_50 = from->unk_50;
     to->unk_54 = from->unk_54;
 
-    copy_SfxHandle(&to->FollowupBullet, &from->FollowupBullet, target);
+    copy_SfxHandle(&to->sfx, &from->sfx, target);
 
     to->bulletClassType = from->bulletClassType;
     to->unk_8c = from->unk_8c;
@@ -325,12 +325,12 @@ void free_ChrCam(ChrCam* to)
 //    hashed raw to mirror copy; if the bullet column shows persistent divergence,
 //    the ChrCam sub-camera blobs are the first thing to exclude.
 
-static void serialize_FollowupBullet_Data(StateVisitor& v, const SfxHandle* fb)
+static void serialize_SfxHandle_Data(StateVisitor& v, const SfxHandle* h)
 {
-    v.field("vtable", fb->vtable);
-    v.ptr_flag("fx_manager", fb->fx_manager);
-    v.ptr_flag("node", fb->node);   // forced NULL by copy
-    v.ptr_flag("follow_node", fb->follow_node);   // forced NULL by copy
+    v.field("vtable", h->vtable);
+    v.ptr_flag("fx_manager", h->fx_manager);
+    v.ptr_flag("node", h->node);   // forced NULL by copy
+    v.ptr_flag("follow_node", h->follow_node);   // forced NULL by copy
 }
 
 static void serialize_BulletIns_Field0x90_Field0x1a0(StateVisitor& v, const BulletIns_Field0x90_Field0x1a0* o)
@@ -440,10 +440,10 @@ static void serialize_BulletIns(StateVisitor& v, const BulletIns* b)
     v.field("unk_50", b->unk_50);
     v.field("unk_54", b->unk_54);
 
-    v.begin("FollowupBullet");   // embedded; list_next/list_prev hold raw game addresses
-    serialize_FollowupBullet_Data(v, &b->FollowupBullet);
-    v.ptr_flag("list_next", b->FollowupBullet.list_next);
-    v.ptr_flag("list_prev", b->FollowupBullet.list_prev);
+    v.begin("sfx");   // embedded; list_next/list_prev hold raw game addresses
+    serialize_SfxHandle_Data(v, &b->sfx);
+    v.ptr_flag("list_next", b->sfx.list_next);
+    v.ptr_flag("list_prev", b->sfx.list_prev);
     v.end();
 
     v.field("bulletClassType", b->bulletClassType);
@@ -505,8 +505,8 @@ static void serialize_BulletMan_Field0x40(StateVisitor& v, const BulletMan_Field
     v.count("arry", 16);
     for (size_t i = 0; i < 16; i++)
     {
-        v.begin("FollowupBullet");
-        serialize_FollowupBullet_Data(v, &f->arry[i]);
+        v.begin("sfx");
+        serialize_SfxHandle_Data(v, &f->arry[i]);
         v.ptr_index("list_next", f->arry[i].list_next, f->arry, sizeof(SfxHandle));
         v.ptr_index("list_prev", f->arry[i].list_prev, f->arry, sizeof(SfxHandle));
         v.end();
