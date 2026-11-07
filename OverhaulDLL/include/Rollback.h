@@ -236,7 +236,7 @@ struct RollbackState
     // Not part of the simulation.
     uint64_t player_steam_ids[GGPO_MAX_PLAYERS];
     BulletMan* bulletman;
-    SfxMan* sfxman;
+    SfxManState* sfxman;
     DamageMan* damageman;
     ThrowMan* throwman;
     DmgHitRecordManImp* dmghitrecordman;

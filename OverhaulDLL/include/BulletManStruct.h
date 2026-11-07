@@ -4,10 +4,10 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include "SfxManStruct.h"
 
 typedef struct BulletMan BulletMan;
 typedef struct BulletIns BulletIns;
-typedef struct SfxHandle SfxHandle;
 typedef struct BulletIns_Field0x90_Field0x1a0 BulletIns_Field0x90_Field0x1a0;
 typedef struct BulletTargetingSystemOwner BulletTargetingSystemOwner;
 typedef struct TargetingSystemBase TargetingSystemBase;
@@ -16,20 +16,6 @@ typedef struct BulletFlyState BulletFlyState;
 typedef struct BulletMan_Field0x20 BulletMan_Field0x20;
 typedef struct BulletMan_Field0x40 BulletMan_Field0x40;
 typedef struct ChrCam ChrCam;
-
-struct FXManager;
-struct FxBehaviorNode;
-
-struct SfxHandle
-{
-    uint64_t vtable;
-    FXManager* fx_manager;
-    FxBehaviorNode* node;
-    SfxHandle* list_next;
-    SfxHandle* list_prev;
-    FxBehaviorNode* follow_node;
-};
-static_assert(sizeof(SfxHandle) == 0x30);
 
 struct BulletIns_Field0x90_Field0x1a0
 {

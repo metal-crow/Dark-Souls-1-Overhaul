@@ -425,7 +425,120 @@ jmp        simpleshapephantom_collisionDetails_iterate_return
 simpleshapephantom_collisionDetails_iterate_injection ENDP
 
 
+EXTERN sfx_sim_step_depth: dword
 
+;MoveMapStep_Step_13's calls to the steps a re-simulated frame repeats. Effects spawned and stopped inside them belong to the
+;rolled-back simulation (SfxManStructFunctions.cpp).
+EXTERN SfxSimStep_Chr_return: qword
+PUBLIC SfxSimStep_Chr_injection
+SfxSimStep_Chr_injection PROC
+;original code: movzx r8d, r12b; movaps xmm1, xmm7 (the frame time); mov rcx, rsi; call Step_Chr
+movzx   r8d, r12b
+movaps  xmm1, xmm7
+mov     rcx, rsi
+inc     dword ptr [sfx_sim_step_depth]
+mov     rax, 1402510d0h
+call    rax
+dec     dword ptr [sfx_sim_step_depth]
+jmp     SfxSimStep_Chr_return
+SfxSimStep_Chr_injection ENDP
+
+EXTERN SfxSimStep_Bullet_return: qword
+PUBLIC SfxSimStep_Bullet_injection
+SfxSimStep_Bullet_injection PROC
+;original code: movaps xmm1, xmm7 (the frame time); mov rcx, [BulletMan]; call Step_Bullet
+movaps  xmm1, xmm7
+mov     rax, 141c7a488h
+mov     rcx, qword ptr [rax]
+inc     dword ptr [sfx_sim_step_depth]
+mov     rax, 140429940h
+call    rax
+dec     dword ptr [sfx_sim_step_depth]
+jmp     SfxSimStep_Bullet_return
+SfxSimStep_Bullet_injection ENDP
+
+EXTERN SfxSimStep_DamageMan_return: qword
+PUBLIC SfxSimStep_DamageMan_injection
+SfxSimStep_DamageMan_injection PROC
+;original code: movaps xmm1, xmm7 (the frame time); mov rcx, [DamageMan]; call Step_DamageMan
+movaps  xmm1, xmm7
+mov     rax, 141c7a050h
+mov     rcx, qword ptr [rax]
+inc     dword ptr [sfx_sim_step_depth]
+mov     rax, 1403c8dd0h
+call    rax
+dec     dword ptr [sfx_sim_step_depth]
+jmp     SfxSimStep_DamageMan_return
+SfxSimStep_DamageMan_injection ENDP
+
+
+;The FX handle stop functions. A stop issued by a rolled-back step waits until its frame is confirmed: the helper does the
+;handle's part of the stop and returns true, and the function returns without doing anything else.
+EXTERN SfxHandleKill_return: qword
+extern sfx_defer_handle_kill: proc
+
+;FUN_140fdc930(SfxHandle*)
+PUBLIC SfxHandleKill_injection
+SfxHandleKill_injection PROC
+FUNC_PROLOGUE_LITE
+call    sfx_defer_handle_kill
+FUNC_EPILOGUE_LITE_NORAX
+test    al, al
+jz      sfx_kill_original
+ret
+sfx_kill_original:
+;original code
+push    rbx
+sub     rsp, 20h
+mov     rbx, rcx
+mov     rcx, qword ptr [rcx+8]
+test    rcx, rcx
+jmp     SfxHandleKill_return
+SfxHandleKill_injection ENDP
+
+EXTERN SfxHandleReset_return: qword
+extern sfx_defer_handle_reset: proc
+
+;SfxHandle_KillAndClear(SfxHandle*)
+PUBLIC SfxHandleReset_injection
+SfxHandleReset_injection PROC
+FUNC_PROLOGUE_LITE
+call    sfx_defer_handle_reset
+FUNC_EPILOGUE_LITE_NORAX
+test    al, al
+jz      sfx_reset_original
+ret
+sfx_reset_original:
+;original code
+push    rdi
+sub     rsp, 20h
+mov     rdi, rcx
+mov     rcx, qword ptr [rcx+8]
+test    rcx, rcx
+jmp     SfxHandleReset_return
+SfxHandleReset_injection ENDP
+
+EXTERN SfxHandleSoftStop_return: qword
+extern sfx_defer_handle_soft_stop: proc
+
+;FUN_140fdc690(SfxHandle*)
+PUBLIC SfxHandleSoftStop_injection
+SfxHandleSoftStop_injection PROC
+FUNC_PROLOGUE_LITE
+call    sfx_defer_handle_soft_stop
+FUNC_EPILOGUE_LITE_NORAX
+test    al, al
+jz      sfx_soft_stop_original
+ret
+sfx_soft_stop_original:
+;original code
+push    rdi
+sub     rsp, 20h
+mov     rdx, qword ptr [rcx+10h]
+mov     rdi, rcx
+test    rdx, rdx
+jmp     SfxHandleSoftStop_return
+SfxHandleSoftStop_injection ENDP
 
 
 EXTERN ChrCam_ApplyToPadManipulator_return: qword

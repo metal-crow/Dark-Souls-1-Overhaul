@@ -2405,9 +2405,8 @@ static void serialize_SpecialEffect(StateVisitor& v, const SpecialEffect* s)
     v.end();
 }
 
-// Slots that only drive SFX, sound or light. SfxMan is not rolled back, and live frames create these where a
-// re-simulated frame does not (synctest 2026-09-13: FootEffect, SingleSfx, SingleTraceSfx and MagicGoodsUseSfx slots
-// appeared only in live frames), so they are not compared.
+// Slots that only drive SFX, sound or light.
+// Live frames create these where a re-simulated frame does not, so they are not compared.
 static bool attach_slot_is_cosmetic(uint32_t type)
 {
     switch (type)

@@ -20,6 +20,7 @@
 #include "FileReloading.h"
 #include "ModNetworking.h"
 #include "CustomInvasionTypes.h"
+#include "SfxManStructFunctions.h"
 
 
 /*
@@ -1682,11 +1683,21 @@ void Game::Step_GameSimulation(bool renderFrame)
     {
         void* FieldArea = *(void**)(((uint64_t)MoveMapStep) + 0x60);
         Step_MapArea_MapAreaObjects_and_NearbyMapAreas(FieldArea, FRAMETIME, 1, 1, 0);
-        Step_Chr(MoveMapStep, FRAMETIME, 1);
-        Step_Bullet(*(void**)Game::bullet_man, FRAMETIME);
+        //the rolled-back steps: the live frame's calls are scoped the same way (SfxSimStep_*_injection)
+        {
+            SfxSimStepScope sim_step;
+            Step_Chr(MoveMapStep, FRAMETIME, 1);
+        }
+        {
+            SfxSimStepScope sim_step;
+            Step_Bullet(*(void**)Game::bullet_man, FRAMETIME);
+        }
         void* chrCam = *(void**)(((uint64_t)MoveMapStep) + 0x68);
         //Compute_ChrCam(chrCam, uVar30, pNVar26, PhysWorld, bVar17);
-        Step_DamageMan(*(void**)Game::damage_man, FRAMETIME);
+        {
+            SfxSimStepScope sim_step;
+            Step_DamageMan(*(void**)Game::damage_man, FRAMETIME);
+        }
     }
     else
     {

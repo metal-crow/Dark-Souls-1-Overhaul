@@ -1184,6 +1184,8 @@ void dsr_frame_finished_helper()
             if (GGPO_SUCCEEDED(ggpo_get_frame_info(Rollback::ggpo, &framecount_unused, &last_confirmed_frame)))
             {
                 RollbackHash::emit_confirmed(last_confirmed_frame);
+                //Any FX stops that rolled-back steps issued in previous frames can now proceed
+                sfx_rollback_confirmed_frame(last_confirmed_frame);
             }
 
             if (Rollback::rollbackVisual)
@@ -1349,6 +1351,8 @@ void Rollback::start()
     uint8_t nop[5] = { 0x90, 0x90, 0x90, 0x90, 0x90 };
     sp::mem::patch_bytes(write_address, nop, 5);
 
+    //support for SFX save/restore
+    sfx_rollback_install();
 
     //Disable all thread specific allocations. Replace it with global malloc/free
     //this is needed because otherwise we can't know what hkThreadMemory instance to allocate or free an object under
@@ -1468,9 +1472,9 @@ bool rollback_load_game_state_callback(unsigned char* buffer, int)
     RollbackState* state = (RollbackState*)buffer;
     HavokTrace::sample(HavokTrace::Stage::LoadBegin);
 
-    //sfx must be restored before playerins/bulletman so that linked_sfxHandle list heads
-    //are cleared before any SfxHandle data is modified or freed
-    //copy_SfxMan(*(SfxMan**)Game::sfx_man, state->sfxman, StateTarget::ToGame);
+    //sfx first: it kills the effects the discarded frames spawned, so the FX handles the owners below restore can only link
+    //to effects that existed when this state was saved
+    load_SfxMan(state->sfxman);
     for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
     {
         auto player_o = Game::get_connected_player(i);
@@ -1489,6 +1493,7 @@ bool rollback_load_game_state_callback(unsigned char* buffer, int)
     //havok goes last: damage phantoms are put in or taken out of the world to match the DamageMan just restored,
     //and the character proxy's restored contacts are checked against its restored phantom
     copy_FrpgHavokManImp(*(FrpgHavokManImp**)Game::frpg_havok_man_imp, state->havokman, StateTarget::ToGame);
+    load_SfxMan_finish();
 
     if (Rollback::rollbackVisual)
     {
@@ -1515,6 +1520,8 @@ RollbackState* rollback_capture_state()
         FATALERROR("Unable to get allocate state for rollback_save_game_state_callback");
     }
 
+    state->sfxman = init_SfxMan();
+    save_SfxMan(state->sfxman);
     for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
     {
         auto player_o = Game::get_connected_player(i);
@@ -1533,8 +1540,6 @@ RollbackState* rollback_capture_state()
     }
     state->bulletman = init_BulletMan();
     copy_BulletMan(state->bulletman, *(BulletMan**)Game::bullet_man, StateTarget::ToLocal);
-    //state->sfxman = init_SfxMan();
-    //copy_SfxMan(state->sfxman, *(SfxMan**)Game::sfx_man, StateTarget::ToLocal);
     state->damageman = init_DamageMan();
     copy_DamageMan(state->damageman, *(DamageMan**)Game::damage_man, StateTarget::ToLocal);
     state->throwman = init_ThrowMan();
@@ -1550,6 +1555,9 @@ bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* ch
 {
     HavokTrace::sample(HavokTrace::Stage::Save);
     RollbackState* state = rollback_capture_state();
+    //track the frame about to be simulated
+    state->sfxman->frame = frame;
+    sfx_rollback_saved_frame(frame);
 
     //Record the per-subsystem state digest for the determinism oracle, keyed by the
     //GGPO frame being saved. It is emitted later as a STATEHASH log line once the
@@ -1577,8 +1585,8 @@ void rollback_copy_buffer(void* buffer_dst, void* buffer_src)
     }
     state_dst->bulletman = init_BulletMan();
     copy_BulletMan(state_dst->bulletman, state_src->bulletman, StateTarget::Copy);
-    //state_dst->sfxman = init_SfxMan();
-    //copy_SfxMan(state_dst->sfxman, state_src->sfxman, StateTarget::Copy);
+    state_dst->sfxman = init_SfxMan();
+    copy_SfxMan(state_dst->sfxman, state_src->sfxman);
     state_dst->damageman = init_DamageMan();
     copy_DamageMan(state_dst->damageman, state_src->damageman, StateTarget::Copy);
     state_dst->throwman = init_ThrowMan();
@@ -1608,7 +1616,7 @@ void rollback_free_buffer(void* buffer)
     }
     free_BulletMan(state->bulletman);
     state->bulletman = NULL;
-    //free_SfxMan(state->sfxman);
+    free_SfxMan(state->sfxman);
     state->sfxman = NULL;
     free_DamageMan(state->damageman);
     state->damageman = NULL;
@@ -1692,6 +1700,7 @@ void Rollback::rollback_end_session()
     if (Rollback::ggpoStarted)
     {
         WorldFreeze::unfreeze();
+        sfx_rollback_session_end();
         RollbackStartSync::end_session();
         RollbackReplay::end_session();
         RollbackScript::end_session();
@@ -1846,6 +1855,7 @@ bool rollback_await_init(void* steamMsgs)
     ConsoleWrite("GGPO started");
     Rollback::ggpoStarted = true;
     WorldFreeze::freeze();
+    sfx_rollback_session_start();
 
     RollbackStartSync::begin_session();
     RollbackReplay::init_session();

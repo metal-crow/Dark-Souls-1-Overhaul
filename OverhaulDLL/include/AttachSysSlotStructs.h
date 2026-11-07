@@ -5,7 +5,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include "BulletManStruct.h"
+#include "SfxManStruct.h"
 
 enum AttachSysSlotType
 {

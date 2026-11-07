@@ -1,635 +1,763 @@
 #include "GameData.h"
 #include "SfxManStructFunctions.h"
 #include "StateSerializer.h"
+#include "SP/memory/injection/asm/x64.h"
 #include <unordered_map>
+#include <unordered_set>
+#include <vector>
 
-/* ============================================================
- * Graveyard management
- * ============================================================ */
+/*
+ * SfxMan rollback: reconcile the FX system with the restored state instead of saving it.
+ *
+ * Effects (FxBehaviorNode trees) are cosmetic, aged only by Step_SfxMan in live frames, and own render and sound objects, so
+ * they are not saved. What rollback must keep consistent are the FX handles (SfxHandle) inside the structs it
+ * does save -- bullets and attach slots. A handle points at an effect's node (node, or follow_node once its root
+ * is gone), and every node's body keeps a doubly linked list of the handles pointing at it, which the game walks and writes
+ * through when the node dies. A handle restored by plain copy leaves that list naming memory that no longer holds the handle.
+ *
+ *  - Every node is registered when it is created and forgotten when it is freed. This is done by FrpgFxAdapterBase vtable
+ *    slot 10 Init_FxBehaviorNode, and 11 Destruct_FxBehaviorNode. We replace these with wrappers
+ *    (Init_FxBehaviorNode_hook and Destruct_FxBehaviorNode_hook) which register the nodes
+ *    with a serial number, the frame and session it was spawned in, and whether a rolled-back simulation step spawned it.
+ * 
+ *  - Saving a handle records the serials of the nodes it is linked to. To load a handle, we first takes the game's handle out of
+ *    its node's list, then links it to the saved node if that node still exists (same address, same serial, still alive),
+ *    or leaves it empty, as the game leaves a handle whose effect ended.
+ * 
+ *  - When we load a frame, we have to kill the effects the rolled-back simulation (Step_Chr, Step_Bullet, Step_DamageMan, sfx_sim_step_depth)
+ *    spawned in the frame(s) we discard. The re-simulation spawns them again if they still happen. Otherwise we could have effects
+ *    sticking around that aren't attached to anything.
+ * 
+ *  - Stops (deleting an effect) issued by the game (such as SfxHandle_KillAndClear) wait until their frame is confirmed, to
+ *    prevent a rollback that causes the stop to never trigger making the effect to end prematurly.
+ *    Until the confirm we hide the effect (header flags1 bit sfx_hide_bit). Then either a load that discards the frame
+ *    un-hides it and the restored handles link back to it, or the confirm deletes it for good.
+ *
+ * A handle is in exactly one list: node's when that is set
+ */
 
-//these objects are not ref counted, so we must do so manually
-static std::unordered_map<void*, int32_t> g_sfxGraveyard;
-static std::unordered_map<void*, int32_t> g_nodeGraveyard;
+// ---- game functions ----
 
+typedef void FXManager_Node_FUNC(FXManager* mgr, FxBehaviorNode* node);
+//FUN_140f0b320: kill one node. It is unlinked from its tree (its children move up to its parent, or become roots), its body is
+//torn down at once (detaching every handle), and the node is queued for the destruct list
+static FXManager_Node_FUNC* FXManager_KillNode = (FXManager_Node_FUNC*)0x140f0b320;
+//FUN_140f0b760: kill every descendant of a node, leaves first
+static FXManager_Node_FUNC* FXManager_KillDescendants = (FXManager_Node_FUNC*)0x140f0b760;
 
-void SfxEntryRef(SFXEntry* SFXEntry)
+typedef void FXManager_NodeFlag_FUNC(FXManager* mgr, FxBehaviorNode* node, uint32_t bit);
+//clear a flags1 bit on a node and its descendants (hides them)
+static FXManager_NodeFlag_FUNC* FXManager_HideNode = (FXManager_NodeFlag_FUNC*)0x140f0c420;
+//Unclear the above
+static FXManager_NodeFlag_FUNC* FXManager_ShowNode = (FXManager_NodeFlag_FUNC*)0x140f0d7f0;
+
+//FUN_140fdc690: stop the handle's effect emitting (it fades out by itself). Hooked, see sfx_defer_handle_soft_stop
+typedef void SfxHandle_SoftStop_FUNC(SfxHandle* h);
+static SfxHandle_SoftStop_FUNC* SfxHandle_SoftStop = (SfxHandle_SoftStop_FUNC*)0x140fdc690;
+
+//The bit a pending kill clears to hide its effect. The game uses bits 0 and 31 for this; 29 and 30 mean other things.
+static const uint32_t sfx_hide_bit = 28;
+
+// ---- hooks ----
+
+//The adapter vtables whose slot 10 is Init_FxBehaviorNode (140fde7b0) and slot 11 Destruct_FxBehaviorNode (140fdf530):
+//FrpgFxAdapterBase's own, and the derived class SfxMan's FXManager actually uses (the object's vtable at runtime)
+static const uint64_t FxAdapter_vtable_offsets[] = { 0x15193f0, 0x136a9e0 };
+static const uint64_t Init_FxBehaviorNode_offset = 0xfde7b0;
+static const uint64_t Destruct_FxBehaviorNode_offset = 0xfdf530;
+
+//MoveMapStep_Step_13's calls to the steps the re-simulation repeats (Game::Step_GameSimulation)
+//Instrument these so that our hooks know we're inside rollback frames
+static const uint64_t MoveMapStep_Step_Chr_offset = 0x24fb07;        //movzx r8d,r12b / movaps xmm1,xmm7 / mov rcx,rsi / call Step_Chr
+static const uint64_t MoveMapStep_Step_Bullet_offset = 0x24fc48;     //movaps xmm1,xmm7 / mov rcx,[BulletMan] / call Step_Bullet
+static const uint64_t MoveMapStep_Step_DamageMan_offset = 0x2500ce;  //movaps xmm1,xmm7 / mov rcx,[DamageMan] / call Step_DamageMan
+
+//The handle stop functions. Each starts push reg / sub rsp,20h / mov reg,rcx / mov rcx|rdx,[rcx+..] / test
+static const uint64_t SfxHandle_Kill_offset = 0xfdc930;      //FUN_140fdc930: kill node, follow its first child
+static const uint64_t SfxHandle_Reset_offset = 0xfdc760;     //SfxHandle_KillAndClear: kill the node and its next siblings, clear
+static const uint64_t SfxHandle_SoftStop_offset = 0xfdc690;  //FUN_140fdc690
+
+extern "C" {
+    int32_t sfx_sim_step_depth = 0;
+
+    uint64_t SfxSimStep_Chr_return;
+    void SfxSimStep_Chr_injection();
+    uint64_t SfxSimStep_Bullet_return;
+    void SfxSimStep_Bullet_injection();
+    uint64_t SfxSimStep_DamageMan_return;
+    void SfxSimStep_DamageMan_injection();
+
+    uint64_t SfxHandleKill_return;
+    void SfxHandleKill_injection();
+    bool sfx_defer_handle_kill(SfxHandle* h);
+    uint64_t SfxHandleReset_return;
+    void SfxHandleReset_injection();
+    bool sfx_defer_handle_reset(SfxHandle* h);
+    uint64_t SfxHandleSoftStop_return;
+    void SfxHandleSoftStop_injection();
+    bool sfx_defer_handle_soft_stop(SfxHandle* h);
+}
+
+// ---- node registry ----
+
+struct SfxNodeInfo
 {
-    auto search = g_sfxGraveyard.find(SFXEntry);
-    if (search != g_sfxGraveyard.end())
+    uint64_t serial;
+    int32_t spawn_frame;   //sfx_sim_frame when it was created
+    uint32_t session;      //sfx_session when it was created, 0 for one registered on sight
+    bool sim_spawned;      //created inside a rolled-back simulation step
+};
+
+static std::unordered_map<FxBehaviorNode*, SfxNodeInfo> sfx_nodes;
+static SRWLOCK sfx_nodes_lock = SRWLOCK_INIT;
+static uint64_t sfx_next_serial = 1;
+
+static uint32_t sfx_session = 0;
+static bool sfx_session_active = false;
+//sfx_sim_step_depth counts the main thread's steps: an FX call from another thread is never inside one
+static DWORD sfx_main_thread = 0;
+//The GGPO frame being simulated: the last frame saved or loaded. -1 until the session's first save.
+static int32_t sfx_sim_frame = -1;
+
+//What the session did, logged when it ends
+static struct
+{
+    uint64_t handles_relinked;     //a load linked a handle back to its effect
+    uint64_t handles_emptied;      //a load found a handle's effect gone
+    uint64_t spawns_killed;        //effects the discarded frames spawned
+    uint64_t stops_deferred;
+    uint64_t stops_executed;       //after their frame was confirmed
+    uint64_t stops_cancelled;      //a load discarded the frame that issued them
+} sfx_stats;
+
+typedef void Init_FxBehaviorNode_FUNC(void* adapter, FxBehaviorNodeBody* parent_body, uint8_t p3, uint8_t p4, void* descriptor, FxBehaviorNode** node_out, FxBehaviorNodeBody** body_out);
+typedef void Destruct_FxBehaviorNode_FUNC(void* adapter, FxBehaviorNode* node, uint8_t p3, uint8_t p4);
+static Init_FxBehaviorNode_FUNC* Init_FxBehaviorNode_original = NULL;
+static Destruct_FxBehaviorNode_FUNC* Destruct_FxBehaviorNode_original = NULL;
+
+static void Init_FxBehaviorNode_hook(void* adapter, FxBehaviorNodeBody* parent_body, uint8_t p3, uint8_t p4, void* descriptor, FxBehaviorNode** node_out, FxBehaviorNodeBody** body_out)
+{
+    Init_FxBehaviorNode_original(adapter, parent_body, p3, p4, descriptor, node_out, body_out);
+    FxBehaviorNode* node = *node_out;
+    if (node == NULL)
     {
-        g_sfxGraveyard[SFXEntry] += 1;
+        return;
     }
-    else
+    AcquireSRWLockExclusive(&sfx_nodes_lock);
+    //a new node, whatever an entry at this address said before
+    const bool sim_spawned = sfx_sim_step_depth > 0 && GetCurrentThreadId() == sfx_main_thread;
+    sfx_nodes[node] = { sfx_next_serial++, sfx_sim_frame, sfx_session, sim_spawned };
+    ReleaseSRWLockExclusive(&sfx_nodes_lock);
+}
+
+static void Destruct_FxBehaviorNode_hook(void* adapter, FxBehaviorNode* node, uint8_t p3, uint8_t p4)
+{
+    AcquireSRWLockExclusive(&sfx_nodes_lock);
+    sfx_nodes.erase(node);
+    ReleaseSRWLockExclusive(&sfx_nodes_lock);
+    Destruct_FxBehaviorNode_original(adapter, node, p3, p4);
+}
+
+static bool sfx_node_alive(const FxBehaviorNode* n)
+{
+    return (n->flags1 & FxBehaviorNode_flags1_alive) != 0;
+}
+
+//Sanity check function. Check if a registered node still has valid pointers. Defensive check for freed/reused memory
+static void sfx_check_node(const FxBehaviorNode* n)
+{
+    const FxBehaviorNodeBody* body = (const FxBehaviorNodeBody*)((const uint8_t*)n + sizeof(FxBehaviorNode));
+    if (n->body != body || body->self != n)
     {
-        g_sfxGraveyard.insert({ SFXEntry, 1 });
+        FATALERROR("SfxMan rollback: registered FX node %p is no longer a node (body=%p, expected %p, body->self=%p)",
+            n, n->body, body, body->self);
     }
 }
 
-void SfxEntryDeref(SFXEntry* SFXEntry)
+//Return the serial number for the given node, if present in the nodes list. Otherwise return 0.
+static uint64_t sfx_node_serial(FxBehaviorNode* n)
 {
-    auto search = g_sfxGraveyard.find(SFXEntry);
-    if (search != g_sfxGraveyard.end())
+    if (n == NULL)
     {
-        g_sfxGraveyard[SFXEntry] -= 1;
-        if (g_sfxGraveyard[SFXEntry] == 0)
+        return 0;
+    }
+    uint64_t serial = 0;
+    AcquireSRWLockShared(&sfx_nodes_lock);
+    auto it = sfx_nodes.find(n);
+    if (it != sfx_nodes.end())
+    {
+        serial = it->second.serial;
+    }
+    ReleaseSRWLockShared(&sfx_nodes_lock);
+    if (serial != 0)
+    {
+        sfx_check_node(n);
+    }
+    return serial;
+}
+
+//Check if the given node and serial match and the node is alive
+static bool sfx_node_is(FxBehaviorNode* n, uint64_t serial)
+{
+    if (n == NULL || serial == 0)
+    {
+        return false;
+    }
+    AcquireSRWLockShared(&sfx_nodes_lock);
+    auto it = sfx_nodes.find(n);
+    const bool same = it != sfx_nodes.end() && it->second.serial == serial;
+    ReleaseSRWLockShared(&sfx_nodes_lock);
+    if (!same)
+    {
+        return false;
+    }
+    sfx_check_node(n);
+    return sfx_node_alive(n);
+}
+
+// ---- handle lists ----
+
+static const size_t sfx_handle_list_max = 4096;
+
+//Check if the sfx list for the node contains this handle
+static bool sfx_list_contains(FxBehaviorNodeBody* body, SfxHandle* h)
+{
+    size_t n = 0;
+    for (SfxHandle* p = body->linked_sfxHandle; p != NULL; p = p->list_prev)
+    {
+        if (p == h)
         {
-            Destruct_SfxEntry(SFXEntry, 1);
+            return true;
+        }
+        if (++n > sfx_handle_list_max)
+        {
+            FATALERROR("SfxMan rollback: the handle list of FX node %p is longer than %zu (corrupt)", body->self, sfx_handle_list_max);
         }
     }
+    return false;
 }
 
-bool OnSfxEntryDestruct(void* SFXEntry)
+//Replicated code for FxBehaviorNodeBody_Remove_SfxHandle
+static void sfx_list_unlink(FxBehaviorNodeBody* body, SfxHandle* h)
 {
-    auto search = g_sfxGraveyard.find(SFXEntry);
-    if (search == g_sfxGraveyard.end())
+    if (h->list_next != NULL)
     {
-        //nothing keeping this alive, let it be destroyed
-        return false;
+        h->list_next->list_prev = h->list_prev;
     }
-    //count a game-attempted destruction as a deref
-    int32_t refcount = search->second;
-    refcount -= 1;
-    g_sfxGraveyard[SFXEntry] = refcount;
-    if (refcount <= 0)
+    if (h->list_prev != NULL)
     {
-        g_sfxGraveyard.erase(SFXEntry);
-        return false;
+        h->list_prev->list_next = h->list_next;
     }
-    return true;
+    if (body->linked_sfxHandle == h)
+    {
+        body->linked_sfxHandle = h->list_prev;
+    }
+    h->list_next = NULL;
+    h->list_prev = NULL;
 }
 
-void FxBehaviorNodeRef(FxBehaviorNode* FxBehaviorNode)
+//Replicated code for FxBehaviorNodeBody_PushBack_SfxHandle
+static void sfx_list_push(FxBehaviorNodeBody* body, SfxHandle* h)
 {
-    auto search = g_nodeGraveyard.find(FxBehaviorNode);
-    if (search != g_nodeGraveyard.end())
+    h->list_next = NULL;
+    h->list_prev = body->linked_sfxHandle;
+    if (body->linked_sfxHandle != NULL)
     {
-        g_nodeGraveyard[FxBehaviorNode] += 1;
+        body->linked_sfxHandle->list_next = h;
     }
-    else
-    {
-        g_nodeGraveyard.insert({ FxBehaviorNode, 1 });
-    }
+    body->linked_sfxHandle = h;
 }
 
-void FxBehaviorNodeDeref(FxBehaviorNode* FxBehaviorNode)
+//The node a game handle is really linked to, or NULL. A handle the game destructed keeps its pointers, so make sure it's alive.
+static FxBehaviorNode* sfx_handle_linked_node(SfxHandle* h)
 {
-    auto search = g_nodeGraveyard.find(FxBehaviorNode);
-    if (search != g_nodeGraveyard.end())
+    FxBehaviorNode* n = h->node != NULL ? h->node : h->follow_node;
+    if (sfx_node_serial(n) != 0 && sfx_list_contains(n->body, h))
     {
-        g_nodeGraveyard[FxBehaviorNode] -= 1;
-        if (g_nodeGraveyard[FxBehaviorNode] == 0)
+        return n;
+    }
+    return NULL;
+}
+
+void release_SfxHandle(SfxHandle* h)
+{
+    //check both: a stale handle can name a node it is not in, and must not touch that node's list
+    FxBehaviorNode* nodes[2] = { h->node, h->follow_node };
+    for (FxBehaviorNode* n : nodes)
+    {
+        if (sfx_node_serial(n) != 0 && sfx_list_contains(n->body, h))
         {
-            Destruct_FxBehaviorNode(NULL, FxBehaviorNode, FxBehaviorNode_GetSize_Type1(FxBehaviorNode), FxBehaviorNode_GetSize_Type2(FxBehaviorNode));
+            sfx_list_unlink(n->body, h);
         }
     }
+    clear_SfxHandle(h);
 }
 
-bool OnFxBehaviorNodeDealloc(void* unused, void* FxBehaviorNode)
+void clear_SfxHandle(SfxHandle* h)
 {
-    auto search = g_nodeGraveyard.find(FxBehaviorNode);
-    if (search == g_nodeGraveyard.end())
-    {
-        //nothing keeping this alive, let it be destroyed
-        return false;
-    }
-    //count a game-attempted destruction as a deref
-    int32_t refcount = search->second;
-    refcount -= 1;
-    g_nodeGraveyard[FxBehaviorNode] = refcount;
-    if (refcount <= 0)
-    {
-        g_nodeGraveyard.erase(FxBehaviorNode);
-        return false;
-    }
-    return true;
+    h->fx_manager = NULL;
+    h->node = NULL;
+    h->list_next = NULL;
+    h->list_prev = NULL;
+    h->follow_node = NULL;
 }
 
+// ---- saving handles ----
 
-/* ============================================================ */
-
-
-void copy_SfxMan(SfxMan* to, SfxMan* from, StateTarget target)
+static int32_t sfx_node_sfx_id(const FxBehaviorNode* n)
 {
-    copy_frpgFxManagerBase(to->FrpgFxManagerBase, from->FrpgFxManagerBase, target);
+    return (n != NULL && n->parent != NULL) ? (int32_t)n->parent->base.sfxId : -1;
 }
 
-SfxMan* init_SfxMan()
+//A local handle keeps the game's pointer to the node it is linked to (node, or follow_node once node has died; never both).
+//list_next means nothing outside the game, so it holds that node's serial.
+static uint64_t sfx_saved_serial(const SfxHandle* h) { return (uint64_t)h->list_next; }
+
+void copy_SfxHandle(SfxHandle* to, const SfxHandle* from, StateTarget target)
 {
-    SfxMan* local = (SfxMan*)malloc_(sizeof(SfxMan));
-
-    local->FrpgFxManagerBase = init_frpgFxManagerBase();
-
-    return local;
-}
-
-void free_SfxMan(SfxMan* to)
-{
-    free_frpgFxManagerBase(to->FrpgFxManagerBase);
-    free(to);
-}
-
-
-void copy_frpgFxManagerBase(frpgFxManagerBase* to, frpgFxManagerBase* from, StateTarget target)
-{
-    copy_FXManager(to->base.fXManager, from->base.fXManager, target);
-}
-
-frpgFxManagerBase* init_frpgFxManagerBase()
-{
-    frpgFxManagerBase* local = (frpgFxManagerBase*)malloc_(sizeof(frpgFxManagerBase));
-
-    local->base.fXManager = init_FXManager();
-
-    return local;
-}
-
-void free_frpgFxManagerBase(frpgFxManagerBase* to)
-{
-    free_FXManager(to->base.fXManager);
-    free(to);
-}
-
-
-void copy_FXManager(FXManager* to, FXManager* from, StateTarget target)
-{
-    Game::SuspendThreads();
-
-    to->vtable = from->vtable;
-    to->parent = from->parent;
-    to->heap = from->heap;
-    to->FxBehaviorNode_destructlist_head = NULL;
-    to->FxBehaviorNode_destructlist_tail = NULL;
-    to->unk_38 = from->unk_38;
-    to->unk_3c = from->unk_3c;
-    memcpy(to->FXDrawEntityHandler_list, from->FXDrawEntityHandler_list, sizeof(to->FXDrawEntityHandler_list));
-    memcpy(to->FxBehaviorNode_staging_list, from->FxBehaviorNode_staging_list, sizeof(to->FxBehaviorNode_staging_list));
-    to->FxBehaviorNode_destruction_queue = (void*)1;
-    memcpy(to->unk_88, from->unk_88, sizeof(to->unk_88));
-    memcpy(to->unk_98, from->unk_98, sizeof(to->unk_98));
-    memcpy(to->unk_a0, from->unk_a0, sizeof(to->unk_a0));
-    to->unk_b0 = from->unk_b0;
-    memcpy(to->unk_b1, from->unk_b1, sizeof(to->unk_b1));
-    memcpy(to->FXSettingOptions, from->FXSettingOptions, sizeof(to->FXSettingOptions));
-    memcpy(to->unk_17c, from->unk_17c, sizeof(to->unk_17c));
-    memcpy(to->FXSettingScales, from->FXSettingScales, sizeof(to->FXSettingScales));
-    to->FrpgFxAdapterBase = from->FrpgFxAdapterBase;
-
     switch (target)
     {
     case StateTarget::ToLocal:
-        Save_SFXEntryList(&to->saved_entries, from);
+    {
+        SfxHandle* game = (SfxHandle*)from;
+        to->vtable = game->vtable;
+        clear_SfxHandle(to);
+        FxBehaviorNode* linked = sfx_handle_linked_node(game);
+        if (linked == NULL)
+        {
+            break;
+        }
+        to->fx_manager = game->fx_manager;
+        to->node = game->node;
+        to->follow_node = game->node != NULL ? NULL : game->follow_node;
+        to->list_next = (SfxHandle*)sfx_node_serial(linked);
         break;
+    }
     case StateTarget::ToGame:
-        Restore_SFXEntryList(to, &from->saved_entries);
+    {
+        release_SfxHandle(to);
+        to->vtable = from->vtable;
+        FxBehaviorNode* a = sfx_node_is(from->node, sfx_saved_serial(from)) ? from->node : NULL;
+        //the game zeroes a handle whose node dies, rather than moving it on to follow_node
+        FxBehaviorNode* b = (from->node == NULL && sfx_node_is(from->follow_node, sfx_saved_serial(from))) ? from->follow_node : NULL;
+        if (a == NULL && b == NULL)
+        {
+            if (from->node != NULL || from->follow_node != NULL)
+            {
+                sfx_stats.handles_emptied++;
+            }
+            break;
+        }
+        sfx_stats.handles_relinked++;
+        to->fx_manager = from->fx_manager;
+        to->node = a;
+        to->follow_node = b;
+        sfx_list_push((a != NULL ? a : b)->body, to);
         break;
+    }
     case StateTarget::Copy:
-        Copy_SFXEntryList(&to->saved_entries, &from->saved_entries);
+        *to = *from;
         break;
     }
-    Game::ResumeThreads();
 }
 
-FXManager* init_FXManager()
+void serialize_SfxHandle(StateVisitor& v, const char* name, const SfxHandle* h)
 {
-    FXManager* local_FXManager = (FXManager*)malloc_(sizeof(FXManager));
-
-    return local_FXManager;
+    v.begin(name);
+    v.field("vtable", h->vtable);
+    //which effect it points at, and whether that effect is still alive, is FX state, not compared. Effects only age in live
+    //frames, so this differs between a live and a re-simulated frame.
+    v.excluded("fx_link", sizeof(SfxHandle) - sizeof(h->vtable));
+    v.end();
 }
 
-void free_FXManager(FXManager* to)
+// ---- deferred stops ----
+
+enum class SfxStopKind : uint8_t
 {
-    Clear_SFXEntryList(&to->saved_entries);
-    free(to);
+    KillRoot,   //FUN_140fdc930: the node dies, its children carry on as roots
+    KillTree,   //SfxHandle_KillAndClear: the node and all its descendants die
+    SoftStop,   //FUN_140fdc690: the effect stops emitting
+};
+
+struct SfxPendingStop
+{
+    SfxStopKind kind;
+    int32_t frame;
+    FxBehaviorNode* node;
+    uint64_t serial;
+    FXManager* mgr;
+    uint64_t handle_vtable;   //SoftStop: for the handle it is replayed through
+};
+
+//list of sfx that are queued to be stopped, and are currently hidden
+static std::vector<SfxPendingStop> sfx_pending;
+static bool sfx_bypass_defer = false;
+
+static bool sfx_defer_now()
+{
+    return sfx_session_active && sfx_sim_frame >= 0 && sfx_sim_step_depth > 0 && !sfx_bypass_defer && GetCurrentThreadId() == sfx_main_thread;
 }
 
-
-void Save_SFXEntryList(std::vector<SavedSFXEntry>* to, FXManager* from)
+static void sfx_hide_pending_kills()
 {
-    to->clear();
-
-    SFXEntry* head = from->SFXEntryList;
-    while (head != NULL)
+    for (const SfxPendingStop& p : sfx_pending)
     {
-        SavedSFXEntry ss;
-        ss.game_addr = head;
-        SfxEntryRef(head); //ref for the game-side storage
-        SfxEntryRef(head); //ref for the local-side storage
-        copy_SFXEntry(&ss.data, head, StateTarget::ToLocal);
-
-        FxBehaviorNode* node_head = head->base.behaviour_list;
-        if (node_head != NULL)
+        if (p.kind != SfxStopKind::SoftStop && sfx_node_is(p.node, p.serial))
         {
-            ss.behaviour_list_head = new SavedFxBehaviorNode();
-            Save_SavedFxBehaviorNodeGraph(ss.behaviour_list_head, node_head);
+            FXManager_HideNode(p.mgr, p.node, sfx_hide_bit);
         }
-
-        to->push_back(ss);
-        head = head->base.next;
     }
 }
 
-void Restore_SFXEntryList(FXManager* to, std::vector<SavedSFXEntry>* from)
+static void sfx_execute_stop(const SfxPendingStop& p)
 {
-    //clear out everything, then insert.
-    //this may mean we remove and put back the same element but since those are still ref'd by the saved side it's safe
-    SFXEntry* head = to->SFXEntryList;
-    while (head != NULL)
+    if (!sfx_node_is(p.node, p.serial))
     {
-        SFXEntry* next = head->base.next;
+        return;   //ended (or was killed) meanwhile
+    }
+    sfx_stats.stops_executed++;
+    switch (p.kind)
+    {
+    case SfxStopKind::KillRoot:
+        //its children outlive it, so they must not stay hidden
+        FXManager_ShowNode(p.mgr, p.node, sfx_hide_bit);
+        FXManager_KillNode(p.mgr, p.node);
+        break;
+    case SfxStopKind::KillTree:
+        FXManager_KillDescendants(p.mgr, p.node);
+        FXManager_KillNode(p.mgr, p.node);
+        break;
+    case SfxStopKind::SoftStop:
+    {
+        SfxHandle h = {};
+        h.vtable = p.handle_vtable;
+        h.fx_manager = p.mgr;
+        h.node = p.node;
+        sfx_bypass_defer = true;
+        SfxHandle_SoftStop(&h);   //reads the handle only: it is never linked
+        sfx_bypass_defer = false;
+        break;
+    }
+    }
+}
 
-        std::vector<FxBehaviorNode*> graph_elems;
-        if (head->base.behaviour_list != NULL)
+//Run the stops issued in frames <= last (all of them for INT32_MAX), oldest first
+static void sfx_execute_stops_through(int32_t last)
+{
+    if (sfx_pending.empty())
+    {
+        return;
+    }
+    std::vector<SfxPendingStop> due;
+    std::vector<SfxPendingStop> rest;
+    for (const SfxPendingStop& p : sfx_pending)
+    {
+        (p.frame <= last ? due : rest).push_back(p);
+    }
+    if (due.empty())
+    {
+        return;
+    }
+    sfx_pending.swap(rest);
+    for (const SfxPendingStop& p : due)
+    {
+        sfx_execute_stop(p);
+    }
+    //showing a killed root showed its whole subtree, which may include nodes other pending kills hide
+    sfx_hide_pending_kills();
+}
+
+//FUN_140fdc930 (h): if node is alive, kill it and follow its first child with follow_node
+bool sfx_defer_handle_kill(SfxHandle* h)
+{
+    if (!sfx_defer_now())
+    {
+        return false;
+    }
+    FxBehaviorNode* a = h->node;
+    FXManager* mgr = h->fx_manager;
+    if (mgr == NULL || a == NULL || !sfx_node_alive(a) || a->body == NULL)
+    {
+        return false;   //the original only clears the handle, or does nothing
+    }
+    const uint64_t serial = sfx_node_serial(a);
+    if (serial == 0)
+    {
+        return false;
+    }
+    //leave the handle as the original does
+    FxBehaviorNode* child = a->child_node;
+    if (sfx_list_contains(a->body, h))
+    {
+        sfx_list_unlink(a->body, h);
+    }
+    clear_SfxHandle(h);
+    if (child != NULL)
+    {
+        h->fx_manager = mgr;
+        h->follow_node = child;
+        sfx_list_push(child->body, h);
+    }
+    FXManager_HideNode(mgr, a, sfx_hide_bit);
+    sfx_pending.push_back({ SfxStopKind::KillRoot, sfx_sim_frame, a, serial, mgr, 0 });
+    sfx_stats.stops_deferred++;
+    return true;
+}
+
+//SfxHandle_KillAndClear (h): kill the live one of node / follow_node and every node after it in its sibling list, then clear h
+bool sfx_defer_handle_reset(SfxHandle* h)
+{
+    if (!sfx_defer_now())
+    {
+        return false;
+    }
+    FXManager* mgr = h->fx_manager;
+    if (mgr == NULL)
+    {
+        return false;
+    }
+    FxBehaviorNode* first = NULL;
+    if (h->node != NULL && sfx_node_alive(h->node))
+    {
+        first = h->node;
+    }
+    else if (h->follow_node != NULL && sfx_node_alive(h->follow_node))
+    {
+        first = h->follow_node;
+    }
+    if (first == NULL)
+    {
+        return false;   //the original only clears the handle
+    }
+    std::vector<std::pair<FxBehaviorNode*, uint64_t>> nodes;
+    for (FxBehaviorNode* n = first; n != NULL; n = n->next_node)
+    {
+        const uint64_t serial = sfx_node_serial(n);
+        if (serial == 0)
         {
-            graph_elems.push_back(head->base.behaviour_list);
+            return false;
         }
-        while (!graph_elems.empty())
-        {
-            FxBehaviorNode* node = graph_elems.back();
-            graph_elems.pop_back();
+        nodes.push_back({ n, serial });
+    }
+    release_SfxHandle(h);
+    for (const auto& n : nodes)
+    {
+        FXManager_HideNode(mgr, n.first, sfx_hide_bit);
+        sfx_pending.push_back({ SfxStopKind::KillTree, sfx_sim_frame, n.first, n.second, mgr, 0 });
+        sfx_stats.stops_deferred++;
+    }
+    return true;
+}
 
-            if (node->next_node != NULL)
+//FUN_140fdc690 (h): the effect stops emitting. The handle is not changed.
+bool sfx_defer_handle_soft_stop(SfxHandle* h)
+{
+    if (!sfx_defer_now())
+    {
+        return false;
+    }
+    FxBehaviorNode* a = h->node;
+    if (a == NULL || h->fx_manager == NULL || !sfx_node_alive(a) || a->body == NULL)
+    {
+        return false;
+    }
+    const uint64_t serial = sfx_node_serial(a);
+    if (serial == 0)
+    {
+        return false;
+    }
+    sfx_pending.push_back({ SfxStopKind::SoftStop, sfx_sim_frame, a, serial, h->fx_manager, (uint64_t)h->vtable });
+    sfx_stats.stops_deferred++;
+    return true;
+}
+
+// ---- SfxManState ----
+
+SfxManState* init_SfxMan()
+{
+    SfxManState* local = new SfxManState();
+    local->frame = SfxManState_frame_current;
+    return local;
+}
+
+void free_SfxMan(SfxManState* to)
+{
+    delete to;
+}
+
+void copy_SfxMan(SfxManState* to, const SfxManState* from)
+{
+    *to = *from;
+}
+
+void save_SfxMan(SfxManState* to)
+{
+    to->frame = SfxManState_frame_current;
+}
+
+//Kill the effects the rolled-back simulation spawned in frames >= first_discarded of this session
+static void sfx_kill_discarded_spawns(int32_t first_discarded)
+{
+    std::unordered_set<FxBehaviorNode*> discarded;
+    AcquireSRWLockShared(&sfx_nodes_lock);
+    for (const auto& e : sfx_nodes)
+    {
+        const SfxNodeInfo& info = e.second;
+        if (info.sim_spawned && info.session == sfx_session && info.spawn_frame >= first_discarded)
+        {
+            discarded.insert(e.first);
+        }
+    }
+    ReleaseSRWLockShared(&sfx_nodes_lock);
+
+    std::vector<FxBehaviorNode*> tops;
+    for (FxBehaviorNode* n : discarded)
+    {
+        sfx_check_node(n);
+        if (sfx_node_alive(n) && discarded.find(n->parent_node) == discarded.end())
+        {
+            tops.push_back(n);
+        }
+    }
+    for (FxBehaviorNode* n : tops)
+    {
+        if (!sfx_node_alive(n) || n->parent == NULL || n->parent->base.fxParent == NULL)
+        {
+            continue;
+        }
+        FXManager* mgr = n->parent->base.fxParent;
+        FXManager_KillDescendants(mgr, n);
+        FXManager_KillNode(mgr, n);
+        sfx_stats.spawns_killed++;
+    }
+}
+
+void load_SfxMan(const SfxManState* from)
+{
+    if (from->frame == SfxManState_frame_current)
+    {
+        return;   //a capture of the current frame: nothing is discarded
+    }
+    const int32_t first_discarded = from->frame;
+    sfx_sim_frame = first_discarded;
+
+    //Undo any stop requests from the discarded frames, and un-hide those nodes
+    std::vector<SfxPendingStop> kept;
+    for (const SfxPendingStop& p : sfx_pending)
+    {
+        //this stop is still valid since it was before the undone frames
+        if (p.frame < first_discarded)
+        {
+            kept.push_back(p);
+            continue;
+        }
+        sfx_stats.stops_cancelled++;
+        if (p.kind != SfxStopKind::SoftStop && sfx_node_is(p.node, p.serial))
+        {
+            FXManager_ShowNode(p.mgr, p.node, sfx_hide_bit);
+        }
+    }
+    sfx_pending.swap(kept);
+
+    //also kill any effects spawned during the discarded frames. Killing them also detaches any handle owners have to them.
+    sfx_kill_discarded_spawns(first_discarded);
+    sfx_hide_pending_kills();
+}
+
+//Every handle in every node's list points back at that node, and the list is doubly linked. Catches a handle that some
+//copy wrote raw over a linked one, which would otherwise corrupt memory when the node dies.
+static void sfx_check_handle_lists()
+{
+    AcquireSRWLockShared(&sfx_nodes_lock);
+    for (const auto& e : sfx_nodes)
+    {
+        FxBehaviorNode* node = e.first;
+        sfx_check_node(node);
+        size_t n = 0;
+        SfxHandle* expected_next = NULL;
+        for (SfxHandle* h = node->body->linked_sfxHandle; h != NULL; h = h->list_prev)
+        {
+            const bool points_here = h->node == node || (h->node == NULL && h->follow_node == node);
+            if (!points_here || h->list_next != expected_next || ++n > sfx_handle_list_max)
             {
-                graph_elems.push_back(node->next_node);
+                FATALERROR("SfxMan rollback: FX node %p (sfx %d) lists handle %p (a=%p b=%p list_next=%p, expected list_next %p), which is not linked to it",
+                    node, sfx_node_sfx_id(node), h, h->node, h->follow_node, h->list_next, expected_next);
             }
-            if (node->child_node != NULL)
-            {
-                graph_elems.push_back(node->child_node);
-            }
-            FxBehaviorNodeDeref(node);
+            expected_next = h;
         }
-        head->base.behaviour_list = NULL;
-        head->base.behaviour_list_end = NULL;
-
-        SfxEntryDeref(head);
-        head = next;
     }
-    to->SFXEntryList = NULL;
-    to->SFXEntryList_tail = NULL;
+    ReleaseSRWLockShared(&sfx_nodes_lock);
+}
 
-    //insert elements. Do in reverse order so at the end the first element is put in the head
-    for (auto si = from->rbegin(); si != from->rend(); si++)
+//Now that the sfxhandles have been put back by the other load_* functions, validate all our saved nodes are still correct
+void load_SfxMan_finish()
+{
+    sfx_check_handle_lists();
+}
+
+// ---- session / frames ----
+
+void sfx_rollback_session_start()
+{
+    sfx_execute_stops_through(INT32_MAX);
+    sfx_session++;
+    sfx_session_active = true;
+    sfx_stats = {};
+    sfx_main_thread = GetCurrentThreadId();
+    sfx_sim_frame = -1;
+}
+
+void sfx_rollback_session_end()
+{
+    //nothing can be rolled back any more
+    sfx_execute_stops_through(INT32_MAX);
+    sfx_session_active = false;
+    sfx_sim_frame = -1;
+    ConsoleWrite("SfxMan rollback: %llu handles relinked, %llu emptied (effect gone), %llu discarded spawns killed, %llu stops deferred: %llu run, %llu cancelled",
+        sfx_stats.handles_relinked, sfx_stats.handles_emptied, sfx_stats.spawns_killed, sfx_stats.stops_deferred, sfx_stats.stops_executed, sfx_stats.stops_cancelled);
+}
+
+void sfx_rollback_saved_frame(int32_t frame)
+{
+    sfx_sim_frame = frame;
+}
+
+void sfx_rollback_confirmed_frame(int32_t frame)
+{
+    sfx_execute_stops_through(frame);
+}
+
+// ---- install ----
+
+void sfx_rollback_install()
+{
+    //node registry: slots 10 and 11 of the FX adapter vtables. A node created through an unhooked vtable would be invisible to
+    //the registry, and its handles could then never be unlinked.
+    Init_FxBehaviorNode_original = (Init_FxBehaviorNode_FUNC*)(Game::ds1_base + Init_FxBehaviorNode_offset);
+    Destruct_FxBehaviorNode_original = (Destruct_FxBehaviorNode_FUNC*)(Game::ds1_base + Destruct_FxBehaviorNode_offset);
+    for (uint64_t offset : FxAdapter_vtable_offsets)
     {
-        SavedSFXEntry s = *si;
-        SFXEntry* old_head = to->SFXEntryList;
-        //update the next pointer for this element
-        SFXEntry* new_head = s.game_addr;
-        new_head->base.next = old_head;
-        //update the data
-        copy_SFXEntry(new_head, &s.data, StateTarget::ToGame);
-        //insert into list
-        to->SFXEntryList = new_head;
-        //ref count now that it's in the game
-        SfxEntryRef(s.game_addr);
-
-        if (s.behaviour_list_head != NULL)
+        uint64_t* vtable = (uint64_t*)(Game::ds1_base + offset);
+        if (vtable[10] != (uint64_t)Init_FxBehaviorNode_original || vtable[11] != (uint64_t)Destruct_FxBehaviorNode_original)
         {
-            Restore_SavedFxBehaviorNodeGraph(&new_head->base.behaviour_list, s.behaviour_list_head);
+            FATALERROR("sfx_rollback_install: the FX adapter vtable at +%llx is not the one this hook was written for", offset);
         }
-        FxBehaviorNode* last_node = new_head->base.behaviour_list;
-        while (last_node != NULL)
-        {
-            new_head->base.behaviour_list_end = last_node;
-            last_node = last_node->next_node;
-        }
+        DWORD old;
+        VirtualProtect(&vtable[10], 2 * sizeof(uint64_t), PAGE_READWRITE, &old);
+        vtable[10] = (uint64_t)&Init_FxBehaviorNode_hook;
+        vtable[11] = (uint64_t)&Destruct_FxBehaviorNode_hook;
+        VirtualProtect(&vtable[10], 2 * sizeof(uint64_t), old, &old);
     }
-    if (!from->empty())
-    {
-        to->SFXEntryList_tail = from->back().game_addr;
-    }
-}
 
-void Copy_SFXEntryList(std::vector<SavedSFXEntry>* to, std::vector<SavedSFXEntry>* from)
-{
-    // Clean the dst vectors
-    Clear_SFXEntryList(to);
+    //when the game calls these function that we use as part of a frame resim, we inject code to mark the sfx generated
+    //this tells us to pay attention and handle any generated sfx as part of rollback state
+    sp::mem::code::x64::inject_jmp_14b((void*)(Game::ds1_base + MoveMapStep_Step_Chr_offset), &SfxSimStep_Chr_return, 1, &SfxSimStep_Chr_injection);
+    sp::mem::code::x64::inject_jmp_14b((void*)(Game::ds1_base + MoveMapStep_Step_Bullet_offset), &SfxSimStep_Bullet_return, 1, &SfxSimStep_Bullet_injection);
+    sp::mem::code::x64::inject_jmp_14b((void*)(Game::ds1_base + MoveMapStep_Step_DamageMan_offset), &SfxSimStep_DamageMan_return, 1, &SfxSimStep_DamageMan_injection);
 
-    // Deep copy the vectors, and Ref everything in the new copy
-    for (auto& s : *from)
-    {
-        SavedSFXEntry new_s;
-        new_s.game_addr = s.game_addr;
-        copy_SFXEntry(&new_s.data, &s.data, StateTarget::Copy);
-        SfxEntryRef(new_s.game_addr);
-        if (s.behaviour_list_head != NULL)
-        {
-            new_s.behaviour_list_head = new SavedFxBehaviorNode();
-            Copy_SavedFxBehaviorNodeGraph(new_s.behaviour_list_head, s.behaviour_list_head);
-        }
-        else
-        {
-            new_s.behaviour_list_head = NULL;
-        }
-        to->push_back(new_s);
-    }
-}
-
-void Clear_SFXEntryList(std::vector<SavedSFXEntry>* to)
-{
-    for (auto e : *to)
-    {
-        SfxEntryDeref(e.game_addr);
-        Free_SFXEntry(&e.data, false);
-        if (e.behaviour_list_head != NULL)
-        {
-            Clear_SavedFxBehaviorNodeGraph(e.behaviour_list_head);
-            delete e.behaviour_list_head;
-        }
-    }
-    to->clear();
-}
-
-
-void copy_SFXEntry(SFXEntry* to, SFXEntry* from, StateTarget target)
-{
-    to->base.vtable = from->base.vtable;
-    to->base.unk_8 = from->base.unk_8;
-    to->base.unk_10 = from->base.unk_10;
-    to->base.sfxId = from->base.sfxId;
-    to->base.unk_18 = from->base.unk_18;
-    to->base.unk_1c = from->base.unk_1c;
-    to->base.unk_20 = from->base.unk_20;
-    to->base.fxParent = from->base.fxParent;
-    //TODO dunno if i need to save any of these pointers i've commented out
-    //vec
-    //list
-    to->base.next = from->base.next; //safe to copy since we are graveyarding the pointers
-    //ignore behaviour_list in this function
-    memcpy(to->base.data_1, from->base.data_1, sizeof(to->base.data_1));
-    to->unk_60 = from->unk_60;
-    to->unk_68 = from->unk_68;
-    to->unk_6c = from->unk_6c;
-    to->unk_70 = from->unk_70;
-    to->unk_74 = from->unk_74;
-    to->unk_78 = from->unk_78;
-    to->unk_7c = from->unk_7c;
-    memcpy(to->field0x80, from->field0x80, sizeof(to->field0x80));
-    memcpy(to->field0xb0, from->field0xb0, sizeof(to->field0xb0));
-    //field_0xe0
-    //field_0xf0
-    to->unk_f8 = from->unk_f8;
-    to->unk_fc = from->unk_fc;
-    memcpy(to->unk_fd, from->unk_fd, sizeof(to->unk_fd));
-}
-
-void Free_SFXEntry(SFXEntry* to, bool freeself)
-{
-    if (freeself)
-    {
-        free(to);
-    }
-}
-
-
-void Save_SavedFxBehaviorNodeGraph(SavedFxBehaviorNode* to, FxBehaviorNode* from)
-{
-    to->game_addr = from;
-    copy_FxBehaviorNode(&to->data, from, StateTarget::ToLocal);
-    FxBehaviorNodeRef(from); //ref for game-side
-    FxBehaviorNodeRef(from); //ref for local-side
-
-    if (from->next_node != NULL)
-    {
-        to->next_node = new SavedFxBehaviorNode();
-        Save_SavedFxBehaviorNodeGraph(to->next_node, from->next_node);
-    }
-    if (from->child_node != NULL)
-    {
-        to->child_node = new SavedFxBehaviorNode();
-        Save_SavedFxBehaviorNodeGraph(to->child_node, from->child_node);
-    }
-}
-
-void Restore_SavedFxBehaviorNodeGraph(FxBehaviorNode** to, SavedFxBehaviorNode* from)
-{
-    *to = from->game_addr;
-    copy_FxBehaviorNode(*to, &from->data, StateTarget::ToGame);
-    FxBehaviorNodeRef(from->game_addr);
-
-    if (from->next_node != NULL)
-    {
-        Restore_SavedFxBehaviorNodeGraph(&(*to)->next_node, from->next_node);
-    }
-    else
-    {
-        (*to)->next_node = NULL;
-    }
-    if (from->child_node != NULL)
-    {
-        Restore_SavedFxBehaviorNodeGraph(&(*to)->child_node, from->child_node);
-    }
-    else
-    {
-        (*to)->child_node = NULL;
-    }
-}
-
-void Copy_SavedFxBehaviorNodeGraph(SavedFxBehaviorNode* to, SavedFxBehaviorNode* from)
-{
-    to->game_addr = from->game_addr;
-    copy_FxBehaviorNode(&to->data, &from->data, StateTarget::Copy);
-    FxBehaviorNodeRef(to->game_addr);
-
-    if (from->next_node != NULL)
-    {
-        to->next_node = new SavedFxBehaviorNode();
-        Copy_SavedFxBehaviorNodeGraph(to->next_node, from->next_node);
-    }
-    else
-    {
-        to->next_node = NULL;
-    }
-    if (from->child_node != NULL)
-    {
-        to->child_node = new SavedFxBehaviorNode();
-        Copy_SavedFxBehaviorNodeGraph(to->child_node, from->child_node);
-    }
-    else
-    {
-        to->child_node = NULL;
-    }
-}
-
-void Clear_SavedFxBehaviorNodeGraph(SavedFxBehaviorNode* to)
-{
-    FxBehaviorNodeDeref(to->game_addr);
-    Free_FxBehaviorNode(&to->data, false);
-    if (to->next_node != NULL)
-    {
-        Clear_SavedFxBehaviorNodeGraph(to->next_node);
-        delete to->next_node;
-        to->next_node = NULL;
-    }
-    if (to->child_node != NULL)
-    {
-        Clear_SavedFxBehaviorNodeGraph(to->child_node);
-        delete to->child_node;
-        to->child_node = NULL;
-    }
-}
-
-
-void copy_FxBehaviorNode(FxBehaviorNode* to, FxBehaviorNode* from, StateTarget target)
-{
-    memcpy(to->unk_0, from->unk_0, sizeof(to->unk_0));
-    memcpy(to->unk_20, from->unk_20, sizeof(to->unk_20));
-    to->unk_1 = from->unk_1;
-    //body !!!
-    to->body = from->body;
-    to->flags1 = from->flags1;
-    to->flags2 = from->flags2;
-    to->unk_68 = from->unk_68;
-    //TODO dunno if i need to save any of these pointers i've commented out
-    //unk_2
-    to->unk_78 = from->unk_78;
-    to->unk_7c = from->unk_7c;
-    to->parent_node_updated = from->parent_node_updated;
-    memcpy(to->unk_81, from->unk_81, sizeof(to->unk_81));
-    to->unk_84 = from->unk_84;
-    to->unk_85 = from->unk_85;
-    memcpy(to->unk_86, from->unk_86, sizeof(to->unk_86));
-    to->parent_node = from->parent_node;
-    to->next_node = from->next_node;
-    to->child_node = from->child_node;
-    //unk_3;
-    //unk_4;
-    //_0 !!!
-    to->parent = from->parent;
-    to->destruction_queue_next = from->destruction_queue_next;
-}
-
-void Free_FxBehaviorNode(FxBehaviorNode* to, bool freeself)
-{
-    if (freeself)
-    {
-        free(to);
-    }
-}
-
-// ---- serializer (mirrors copy_SfxMan / Save_SFXEntryList) --------------------
-//
-// Currently NOT wired into the rollback digest (SfxMan is disabled in the active
-// state -- state->sfxman is NULL). Provided so it's ready when SfxMan is restored;
-// re-enable the sfx lines in StateHash.h::digest_of and the copy_SfxMan calls in
-// Rollback.cpp together. Mirrors the saved-entry/node-graph snapshot that
-// copy_FXManager builds. Heap/resource pointers -> ptr_flag.
-
-static void serialize_FxBehaviorNode(StateVisitor& v, const FxBehaviorNode* n)
-{
-    v.begin("FxBehaviorNode");
-    v.blob("unk_0", n->unk_0, sizeof(n->unk_0));
-    v.blob("unk_20", n->unk_20, sizeof(n->unk_20));
-    v.ptr_flag("unk_1", n->unk_1);
-    v.ptr_flag("body", n->body);
-    v.field("flags1", n->flags1);
-    v.field("flags2", n->flags2);
-    v.field("unk_68", n->unk_68);
-    v.field("unk_78", n->unk_78);
-    v.field("unk_7c", n->unk_7c);
-    v.field("parent_node_updated", n->parent_node_updated);
-    v.blob("unk_81", n->unk_81, sizeof(n->unk_81));
-    v.field("unk_84", n->unk_84);
-    v.field("unk_85", n->unk_85);
-    v.blob("unk_86", n->unk_86, sizeof(n->unk_86));
-    v.ptr_flag("parent_node", n->parent_node);
-    v.ptr_flag("next_node", n->next_node);
-    v.ptr_flag("child_node", n->child_node);
-    v.ptr_flag("parent", n->parent);
-    v.ptr_flag("destruction_queue_next", n->destruction_queue_next);
-    v.end();
-}
-
-static void serialize_SavedFxBehaviorNodeGraph(StateVisitor& v, const SavedFxBehaviorNode* g)
-{
-    if (g == NULL) { v.field("node_present", false); return; }
-    v.field("node_present", true);
-    v.begin("SavedFxBehaviorNode");
-    v.ptr_flag("game_addr", g->game_addr);
-    serialize_FxBehaviorNode(v, &g->data);
-    serialize_SavedFxBehaviorNodeGraph(v, g->next_node);
-    serialize_SavedFxBehaviorNodeGraph(v, g->child_node);
-    v.end();
-}
-
-static void serialize_SFXEntry(StateVisitor& v, const SFXEntry* e)
-{
-    v.begin("SFXEntry");
-    // FXEntry base (mirrors copy_SFXEntry: vec/list/behaviour_list skipped)
-    v.ptr_flag("base.vtable", e->base.vtable);
-    v.field("base.unk_8", e->base.unk_8);
-    v.field("base.unk_10", e->base.unk_10);
-    v.field("base.sfxId", e->base.sfxId);
-    v.field("base.unk_18", e->base.unk_18);
-    v.field("base.unk_1c", e->base.unk_1c);
-    v.field("base.unk_20", e->base.unk_20);
-    v.ptr_flag("base.fxParent", e->base.fxParent);
-    v.ptr_flag("base.next", e->base.next);
-    v.blob("base.data_1", e->base.data_1, sizeof(e->base.data_1));
-    v.field("unk_60", e->unk_60);
-    v.field("unk_68", e->unk_68);
-    v.field("unk_6c", e->unk_6c);
-    v.field("unk_70", e->unk_70);
-    v.field("unk_74", e->unk_74);
-    v.field("unk_78", e->unk_78);
-    v.field("unk_7c", e->unk_7c);
-    v.blob("field0x80", e->field0x80, sizeof(e->field0x80));
-    v.blob("field0xb0", e->field0xb0, sizeof(e->field0xb0));
-    v.field("unk_f8", e->unk_f8);
-    v.field("unk_fc", e->unk_fc);
-    v.blob("unk_fd", e->unk_fd, sizeof(e->unk_fd));
-    v.end();
-}
-
-static void serialize_FXManager(StateVisitor& v, const FXManager* m)
-{
-    v.begin("FXManager");
-    v.ptr_flag("vtable", m->vtable);
-    v.ptr_flag("parent", m->parent);
-    v.ptr_flag("heap", (void*)m->heap);
-    // destructlist head/tail + destruction_queue are forced to constants by copy
-    v.field("unk_38", m->unk_38);
-    v.field("unk_3c", m->unk_3c);
-    v.blob("FXDrawEntityHandler_list", m->FXDrawEntityHandler_list, sizeof(m->FXDrawEntityHandler_list));
-    // staging_list holds transient pointers (cleared each frame); blob mirrors copy
-    v.blob("FxBehaviorNode_staging_list", m->FxBehaviorNode_staging_list, sizeof(m->FxBehaviorNode_staging_list));
-    v.blob("unk_88", m->unk_88, sizeof(m->unk_88));
-    v.blob("unk_98", m->unk_98, sizeof(m->unk_98));
-    for (int i = 0; i < 4; i++) v.field("unk_a0", m->unk_a0[i]);
-    v.field("unk_b0", m->unk_b0);
-    v.blob("unk_b1", m->unk_b1, sizeof(m->unk_b1));
-    v.blob("FXSettingOptions", m->FXSettingOptions, sizeof(m->FXSettingOptions));
-    v.blob("unk_17c", m->unk_17c, sizeof(m->unk_17c));
-    v.blob("FXSettingScales", m->FXSettingScales, sizeof(m->FXSettingScales));
-    v.ptr_flag("FrpgFxAdapterBase", m->FrpgFxAdapterBase);
-
-    v.count("saved_entries", m->saved_entries.size());
-    for (const SavedSFXEntry& s : m->saved_entries)
-    {
-        v.begin("SavedSFXEntry");
-        v.ptr_flag("game_addr", s.game_addr);
-        serialize_SFXEntry(v, &s.data);
-        serialize_SavedFxBehaviorNodeGraph(v, s.behaviour_list_head);
-        v.end();
-    }
-    v.end();
-}
-
-void serialize_SfxMan(StateVisitor& v, SfxMan* s)
-{
-    v.begin("SfxMan");
-    serialize_FXManager(v, s->FrpgFxManagerBase->base.fXManager);
-    v.end();
-}
-
-std::string print_SfxMan(SfxMan* s)
-{
-    StateVisitor v(StateVisitor::Mode::Print);
-    serialize_SfxMan(v, s);
-    return v.text();
-}
-
-uint64_t hash_SfxMan(SfxMan* s)
-{
-    StateVisitor v(StateVisitor::Mode::Hash);
-    serialize_SfxMan(v, s);
-    return v.digest();
+    //deferred stops, hook the sfx destruct functions to just make them hidden instead
+    sp::mem::code::x64::inject_jmp_14b((void*)(Game::ds1_base + SfxHandle_Kill_offset), &SfxHandleKill_return, 2, &SfxHandleKill_injection);
+    sp::mem::code::x64::inject_jmp_14b((void*)(Game::ds1_base + SfxHandle_Reset_offset), &SfxHandleReset_return, 2, &SfxHandleReset_injection);
+    sp::mem::code::x64::inject_jmp_14b((void*)(Game::ds1_base + SfxHandle_SoftStop_offset), &SfxHandleSoftStop_return, 2, &SfxHandleSoftStop_injection);
 }
