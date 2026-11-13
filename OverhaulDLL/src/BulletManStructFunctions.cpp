@@ -74,7 +74,7 @@ void copy_SfxHandle_List(SfxHandle** to_list, int16_t* to_len, SfxHandle** from_
     for (int16_t i = 0; i < *from_len; i++)
     {
         copy_SfxHandle(&(*to_list)[i], &(*from_list)[i], target);
-        }
+    }
     *to_len = *from_len;
 }
 
@@ -314,7 +314,9 @@ void free_ChrCam(ChrCam* to)
 //
 // Pointer handling:
 //  - intra-array links that copy fixes up as offsets (previous_bullet_in_use,
-//    next_in_use, SfxHandle list_next/list_prev in field0x40.arry) -> ptr_index.
+//    next_in_use) -> ptr_index.
+//  - FX handles (BulletIns::sfx, field0x40.arry) -> serialize_SfxHandle: only the
+//    vtable, which effect they point at is the sfx column's.
 //  - cursor pointers (end_of_bullets_in_use, etc.) hold GAME addresses in the
 //    snapshot -> ptr_flag.
 //  - sub-structs that copy memcpy's wholesale but which embed a pointer
@@ -324,14 +326,6 @@ void free_ChrCam(ChrCam* to)
 //  - large opaque blobs (ChrCam sub-cameras, field0x4Elem, AttackData, etc.) are
 //    hashed raw to mirror copy; if the bullet column shows persistent divergence,
 //    the ChrCam sub-camera blobs are the first thing to exclude.
-
-static void serialize_SfxHandle_Data(StateVisitor& v, const SfxHandle* h)
-{
-    v.field("vtable", h->vtable);
-    v.ptr_flag("fx_manager", h->fx_manager);
-    v.ptr_flag("node", h->node);   // forced NULL by copy
-    v.ptr_flag("follow_node", h->follow_node);   // forced NULL by copy
-}
 
 static void serialize_BulletIns_Field0x90_Field0x1a0(StateVisitor& v, const BulletIns_Field0x90_Field0x1a0* o)
 {
@@ -440,11 +434,7 @@ static void serialize_BulletIns(StateVisitor& v, const BulletIns* b)
     v.field("unk_50", b->unk_50);
     v.field("unk_54", b->unk_54);
 
-    v.begin("sfx");   // embedded; list_next/list_prev hold raw game addresses
-    serialize_SfxHandle_Data(v, &b->sfx);
-    v.ptr_flag("list_next", b->sfx.list_next);
-    v.ptr_flag("list_prev", b->sfx.list_prev);
-    v.end();
+    serialize_SfxHandle(v, "sfx", &b->sfx);
 
     v.field("bulletClassType", b->bulletClassType);
     v.field("unk_8c", b->unk_8c);
@@ -505,11 +495,7 @@ static void serialize_BulletMan_Field0x40(StateVisitor& v, const BulletMan_Field
     v.count("arry", 16);
     for (size_t i = 0; i < 16; i++)
     {
-        v.begin("sfx");
-        serialize_SfxHandle_Data(v, &f->arry[i]);
-        v.ptr_index("list_next", f->arry[i].list_next, f->arry, sizeof(SfxHandle));
-        v.ptr_index("list_prev", f->arry[i].list_prev, f->arry, sizeof(SfxHandle));
-        v.end();
+        serialize_SfxHandle(v, "sfx", &f->arry[i]);
     }
     v.field("unk_308", f->unk_308);
     v.padding("unk_30c", &f->unk_30c, sizeof(f->unk_30c)); // gap

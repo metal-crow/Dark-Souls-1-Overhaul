@@ -20,10 +20,6 @@
 static const char* hash_logfilename = "dsoverhaul_statehash_logging.txt";
 extern FILE* hash_logfile;
 
-// SfxMan is currently disabled in the active rollback state (state->sfxman is
-// NULL -- the copy_SfxMan calls are commented out in Rollback.cpp), so it is not
-// hashed here. Re-enable the two SfxMan lines below once it is restored.
-
 /*
  * Tier-0 / Tier-1 oracle orchestration (header-only).
  *
@@ -52,7 +48,6 @@ namespace RollbackHash
         uint64_t havok  = 0;
         uint64_t throwman = 0;
         uint64_t dmghit = 0;
-        // uint64_t sfx = 0;   // re-enable when SfxMan is restored
     };
 
     inline uint64_t _fold(uint64_t h, uint64_t x)
@@ -107,7 +102,6 @@ namespace RollbackHash
         d.havok    = hash_FrpgHavokManImp(s->havokman, order, n);
         d.throwman = hash_ThrowMan(s->throwman);
         d.dmghit   = hash_DmgHitRecordManImp(s->dmghitrecordman);
-        // d.sfx   = hash_SfxMan(s->sfxman);
         return d;
     }
 
