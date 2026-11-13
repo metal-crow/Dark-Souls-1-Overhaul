@@ -742,6 +742,39 @@ void copy_BulletMan(BulletMan* to, BulletMan* from, StateTarget target)
     to->unk_58 = from->unk_58;
     to->unk_5c = from->unk_5c;
 
+    //Clear the sfx handles for any bullets that are no longer in use, otherwise we save sfx that don't exist anymore
+    // (since the game doesn't clear them, finished bullets just have their memory left sitting around)
+    if (target == StateTarget::ToLocal)
+    {
+        bool in_use[128] = {};
+        for (BulletIns* b = from->end_of_bullets_in_use; b != NULL; b = b->previous_bullet_in_use)
+        {
+            in_use[b - from->bulletins_arry] = true;
+        }
+        for (size_t i = 0; i < 128; i++)
+        {
+            if (!in_use[i])
+            {
+                clear_SfxHandle(&to->bulletins_arry[i].sfx);
+            }
+        }
+        bool field0x40_in_use[4] = {};
+        for (BulletMan_Field0x40* f = from->end_of_bullets_in_use_field0x40; f != NULL; f = f->next_in_use)
+        {
+            field0x40_in_use[f - from->field0x40] = true;
+        }
+        for (size_t i = 0; i < 4; i++)
+        {
+            if (!field0x40_in_use[i])
+            {
+                for (size_t j = 0; j < 16; j++)
+                {
+                    clear_SfxHandle(&to->field0x40[i].arry[j]);
+                }
+            }
+        }
+    }
+
     copy_ChrCam(to->chrCam, from->chrCam, target);
 
     to->attach_system_disabled = from->attach_system_disabled;
