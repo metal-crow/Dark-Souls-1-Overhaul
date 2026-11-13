@@ -1,5 +1,6 @@
 #include "AttachSysSlotStructsFunctions.h"
 #include "BulletManStructFunctions.h"
+#include "SfxManStructFunctions.h"
 #include "Rollback.h"
 
 //Need to to be a ** since ChrActPntSlot may need to resize it
@@ -326,6 +327,57 @@ void free_AttachSysSlot_Fields(AttachSysSlotBaseImpl* to, StateTarget target)
     }
 }
 
+//Every FX handle a game slot holds leaves its effect's handle list before the slot's memory goes: to the FX system, freeing a
+//game slot is destructing it
+static void release_AttachSysSlot_SfxHandles(AttachSysSlotBaseImpl* to)
+{
+    switch (to->slotType)
+    {
+    case TypeChrShineTreasureSlot: release_SfxHandle(&((ChrShineTreasureSlot*)to)->sfx); break;
+    case TypeChrSingleSfxSlot: release_SfxHandle(&((ChrSingleSfxSlot*)to)->sfx); break;
+    case TypeChrFootEffectSlot: release_SfxHandle(&((ChrFootEffectSlot*)to)->sfx); break;
+    case TypeChrRigidOffsetSfxSlot: release_SfxHandle(&((ChrRigidOffsetSfxSlot*)to)->sfx); break;
+    case TypeChrSoulEatSlot: release_SfxHandle(&((ChrSoulEatSlot*)to)->sfx); break;
+    case TypeChrSingleOneshotSfxSlot: release_SfxHandle(&((ChrSingleOneshotSfxSlot*)to)->sfx); break;
+    case TypeChrSingleTraceSfxSlot: release_SfxHandle(&((ChrSingleTraceSfxSlot*)to)->sfx); break;
+    case TypeChrMagicGoodsUseSfxSlot: release_SfxHandle(&((ChrMagicGoodsUseSfxSlot*)to)->sfx); break;
+    case TypeChrShinpanshaHaraSlot: release_SfxHandle(&((ChrShinpanshaHaraSlot*)to)->sfx); break;
+    case TypeChrFollowSfxSlot: release_SfxHandle(&((ChrFollowSfxSlot*)to)->sfx); break;
+    case TypeChrSorceryWepSlot:
+        release_SfxHandle(&((ChrSorceryWepSlot*)to)->sfx1);
+        release_SfxHandle(&((ChrSorceryWepSlot*)to)->sfx2);
+        break;
+    case TypeChrLanternSlot:
+        release_SfxHandle(&((ChrLanternSlot*)to)->sfx1);
+        release_SfxHandle(&((ChrLanternSlot*)to)->sfx2);
+        release_SfxHandle(&((ChrLanternSlot*)to)->sfx3);
+        break;
+    case TypeChrBurnSlot:
+    {
+        ChrBurnSlot* slot = (ChrBurnSlot*)to;
+        for (int32_t i = 0; slot->list != NULL && i < slot->list_len; i++)
+        {
+            release_SfxHandle(&slot->list[i].sfx);
+        }
+        break;
+    }
+    case TypeChrGasmanSlot:
+    {
+        ChrGasmanSlot* slot = (ChrGasmanSlot*)to;
+        for (int16_t i = 0; slot->list != NULL && i < slot->list_len; i++)
+        {
+            release_SfxHandle(&slot->list[i].sfx_a);
+            release_SfxHandle(&slot->list[i].sfx_b);
+        }
+        break;
+    }
+    default:
+        //the handle lists (ChrMultiSfxSlot, ChrWepEnchantSlot, ChrStatueDeadSlot, ChrConditionSfxSeSlot) are released by
+        //free_SfxHandle_List
+        break;
+    }
+}
+
 void free_AttachSysSlot(AttachSysSlotBaseImpl* to, StateTarget target)
 {
     if (to == NULL)
@@ -336,6 +388,10 @@ void free_AttachSysSlot(AttachSysSlotBaseImpl* to, StateTarget target)
     {
         free_AttachSysSlot(to->next, target);
         to->next = NULL;
+    }
+    if (target == StateTarget::ToGame)
+    {
+        release_AttachSysSlot_SfxHandles(to);
     }
     free_AttachSysSlot_Fields(to, target);
     if (target == StateTarget::ToGame)
@@ -429,7 +485,7 @@ void copy_ChrBurnSlot(ChrBurnSlot* to, ChrBurnSlot* from, StateTarget target)
                 auto new_floatlist = (float*)Game::game_malloc(sizeof(float) * from_list_size, 0x10, *(uint64_t*)Game::internal_heap_3);
                 if (to->floatlist != NULL)
                 {
-                    Game::game_free(to->list);
+                    Game::game_free(to->floatlist);
                 }
                 to->floatlist = new_floatlist;
             }
@@ -438,7 +494,7 @@ void copy_ChrBurnSlot(ChrBurnSlot* to, ChrBurnSlot* from, StateTarget target)
                 auto new_floatlist = (float*)malloc_(sizeof(float) * from_list_size);
                 if (to->floatlist != NULL)
                 {
-                    free(to->list);
+                    free(to->floatlist);
                 }
                 to->floatlist = new_floatlist;
             }
@@ -458,6 +514,10 @@ void copy_ChrBurnSlot(ChrBurnSlot* to, ChrBurnSlot* from, StateTarget target)
         {
             if (target == StateTarget::ToGame)
             {
+                for (int32_t i = 0; i < to->list_len; i++)
+                {
+                    release_SfxHandle(&to->list[i].sfx);
+                }
                 Game::game_free(to->list);
             }
             else
@@ -480,6 +540,10 @@ void copy_ChrBurnSlot(ChrBurnSlot* to, ChrBurnSlot* from, StateTarget target)
                 auto new_list = (ChrBurnSlot_ListElem*)Game::game_malloc(sizeof(ChrBurnSlot_ListElem) * from_list_size, 0x10, *(uint64_t*)Game::internal_heap_3);
                 if (to->list != NULL)
                 {
+                    for (int32_t i = 0; i < to->list_len; i++)
+                    {
+                        release_SfxHandle(&to->list[i].sfx);
+                    }
                     Game::game_free(to->list);
                 }
                 to->list = new_list;
@@ -505,19 +569,7 @@ void copy_ChrBurnSlot(ChrBurnSlot* to, ChrBurnSlot* from, StateTarget target)
             ChrBurnSlot_ListElem* from_elem = &from->list[list_i];
 
             to_elem->unk_0 = from_elem->unk_0;
-
-            copy_SfxHandle_Data(&to_elem->sfx, &from_elem->sfx, target);
-            //set up the list_next ptr. We can probably ignore list_prev
-            if (from_elem->sfx.list_next != NULL)
-            {
-                size_t from_next_offset = ((uint64_t)from_elem->sfx.list_next) - ((uint64_t)(from->list));
-                to_elem->sfx.list_next = (SfxHandle*)(((uint64_t)(to->list)) + from_next_offset);
-            }
-            else
-            {
-                to_elem->sfx.list_next = NULL;
-            }
-            to_elem->sfx.list_prev = NULL;
+            copy_SfxHandle(&to_elem->sfx, &from_elem->sfx, target);
         }
     }
     to->list_len = from->list_len;
@@ -541,6 +593,11 @@ void copy_ChrGasmanSlot(ChrGasmanSlot* to, ChrGasmanSlot* from, StateTarget targ
         {
             if (target == StateTarget::ToGame)
             {
+                for (int16_t i = 0; i < to->list_len; i++)
+                {
+                    release_SfxHandle(&to->list[i].sfx_a);
+                    release_SfxHandle(&to->list[i].sfx_b);
+                }
                 Game::game_free(to->list);
             }
             else
@@ -563,6 +620,11 @@ void copy_ChrGasmanSlot(ChrGasmanSlot* to, ChrGasmanSlot* from, StateTarget targ
                 auto new_ChrGasmanSlot_ListElem_list = (ChrGasmanSlot_ListElem*)Game::game_malloc(sizeof(ChrGasmanSlot_ListElem) * from_list_size, 0x10, *(uint64_t*)Game::internal_heap_3);
                 if (to->list != NULL)
                 {
+                    for (int16_t i = 0; i < to->list_len; i++)
+                    {
+                        release_SfxHandle(&to->list[i].sfx_a);
+                        release_SfxHandle(&to->list[i].sfx_b);
+                    }
                     Game::game_free(to->list);
                 }
                 to->list = new_ChrGasmanSlot_ListElem_list;
@@ -589,30 +651,8 @@ void copy_ChrGasmanSlot(ChrGasmanSlot* to, ChrGasmanSlot* from, StateTarget targ
             memcpy(to_elem->vector, from_elem->vector, sizeof(to_elem->vector));
             memcpy(to_elem->unk_1c, from_elem->unk_1c, sizeof(to_elem->unk_1c));
 
-            copy_SfxHandle_Data(&to_elem->sfx_a, &from_elem->sfx_a, target);
-            //set up the list_next ptr. We can probably ignore list_prev
-            if (from_elem->sfx_a.list_next != NULL)
-            {
-                size_t from_next_offset = ((uint64_t)from_elem->sfx_a.list_next) - ((uint64_t)(from->list));
-                to_elem->sfx_a.list_next = (SfxHandle*)(((uint64_t)(to->list)) + from_next_offset);
-            }
-            else
-            {
-                to_elem->sfx_a.list_next = NULL;
-            }
-            to_elem->sfx_a.list_prev = NULL;
-
-            copy_SfxHandle_Data(&to_elem->sfx_b, &from_elem->sfx_b, target);
-            if (from_elem->sfx_b.list_next != NULL)
-            {
-                size_t from_next_offset = ((uint64_t)from_elem->sfx_b.list_next) - ((uint64_t)(from->list));
-                to_elem->sfx_b.list_next = (SfxHandle*)(((uint64_t)(to->list)) + from_next_offset);
-            }
-            else
-            {
-                to_elem->sfx_b.list_next = NULL;
-            }
-            to_elem->sfx_b.list_prev = NULL;
+            copy_SfxHandle(&to_elem->sfx_a, &from_elem->sfx_a, target);
+            copy_SfxHandle(&to_elem->sfx_b, &from_elem->sfx_b, target);
         }
     }
     to->list_len = from->list_len;
