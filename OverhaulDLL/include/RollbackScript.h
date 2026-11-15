@@ -123,6 +123,13 @@ namespace RollbackScript
         RS_NUM("curSelectedMagicSlot",       curSelectedMagicSlot,       false, 0),
         RS_NUM("curUsingInventoryItemId",    curUsingInventoryItemId,    false, 0),
         RS_NUM("curSelectedQuickbarItemId",  curSelectedQuickbarItemId,  false, 0),
+        // ---- what travels beside the pad (state-derived: passes through unless a script names it) ----
+        RS_NUM("camera_x_rotation",          vpad.camera_x_rotation,          false, 0),
+        RS_NUM("camera_y_rotation",          vpad.camera_y_rotation,          false, 0),
+        RS_NUM("LockonTargetHandle",         vpad.LockonTargetHandle,         false, 0),
+        RS_NUM("left_hand_slot_selected",    vpad.left_hand_slot_selected,    false, 0),
+        RS_NUM("right_hand_slot_selected",   vpad.right_hand_slot_selected,   false, 0),
+        RS_NUM("menu_item_use_request",      vpad.menu_item_use_request,      false, 0),
         RS_NUM("equipment_array[0]",  equipment_array[0],  false, 0), RS_NUM("equipment_array[1]",  equipment_array[1],  false, 0),
         RS_NUM("equipment_array[2]",  equipment_array[2],  false, 0), RS_NUM("equipment_array[3]",  equipment_array[3],  false, 0),
         RS_NUM("equipment_array[4]",  equipment_array[4],  false, 0), RS_NUM("equipment_array[5]",  equipment_array[5],  false, 0),
