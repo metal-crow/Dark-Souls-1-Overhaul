@@ -1625,12 +1625,26 @@ void* Game::game_smallObject_malloc(uint64_t heap, size_t size, size_t alignment
     return new_ptr;
 }
 
+typedef void heapObjFreeFunc(void* heapObj, void* p);
+
+//Free a block the game's heaps allocated (game_malloc, or the game itself). InGame_Free (FreeMem 0x1410e3f6c) is the C
+//runtime's free: handed a block from one of the game's own heaps it corrupts the process heap (2026-11-15: a crash in
+//RtlFreeHeap whenever rollback freed a weapon-buff slot's list or a pending damage record). So ask the game which
+//allocator owns the block, and only fall back to the C runtime when none does.
 void Game::game_free(void* p)
 {
-    return InGame_Free(p);
+    if (p == NULL)
+    {
+        return;
+    }
+    uint64_t* heapObj = Get_HeapAllocator_For_allocation(p);
+    if (heapObj == NULL)
+    {
+        return InGame_Free(p);
+    }
+    heapObjFreeFunc* freeFunc = (heapObjFreeFunc*)*(uint64_t*)(*heapObj + 0x68);
+    freeFunc(heapObj, p);
 }
-
-typedef void heapObjFreeFunc(void* heapObj, void* p);
 
 void Game::game_free_alt(void* p, void* heapObjArg)
 {
