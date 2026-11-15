@@ -443,13 +443,11 @@ static void apply_virtualpad_input(RollbackInput* in, PlayerIns* player, uint32_
 
     cm->LockonTargetHandle = PlayerHandles::from_canonical(in->vpad.LockonTargetHandle);
 
-    //Weapon-slot selection, for players whose in-game menu step did not run
-    if (suppress_globals)
-    {
+    //Weapon-slot selection comes from the input for every player. For the local player on a live frame this is the value
+    //PackRollbackInput just read from
         cm->left_hand_slot_selected = in->vpad.left_hand_slot_selected;
         cm->right_hand_slot_selected = in->vpad.right_hand_slot_selected;
     }
-}
 
 void UnpackRollbackInput(RollbackInput* in, PlayerIns* player, uint32_t playerIndex)
 {
