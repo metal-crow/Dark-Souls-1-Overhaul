@@ -445,9 +445,9 @@ static void apply_virtualpad_input(RollbackInput* in, PlayerIns* player, uint32_
 
     //Weapon-slot selection comes from the input for every player. For the local player on a live frame this is the value
     //PackRollbackInput just read from
-        cm->left_hand_slot_selected = in->vpad.left_hand_slot_selected;
-        cm->right_hand_slot_selected = in->vpad.right_hand_slot_selected;
-    }
+    cm->left_hand_slot_selected = in->vpad.left_hand_slot_selected;
+    cm->right_hand_slot_selected = in->vpad.right_hand_slot_selected;
+}
 
 void UnpackRollbackInput(RollbackInput* in, PlayerIns* player, uint32_t playerIndex)
 {
@@ -1725,6 +1725,9 @@ void Rollback::rollback_end_session()
 //different frames. The start-state handshake (RollbackStartSync) can copy values but not that shape, so let it settle.
 static const uint32_t ROLLBACK_SETTLE_FRAMES = 180;
 static uint32_t rollback_settled_frames = 0;
+//rollback_await_init is registered and has not started its session yet. A second registration would start a second
+//session over the first (and the two would share the settle count).
+static bool rollback_await_init_pending = false;
 
 bool rollback_await_init(void* steamMsgs)
 {
@@ -1858,6 +1861,7 @@ bool rollback_await_init(void* steamMsgs)
 
     ConsoleWrite("GGPO started");
     Rollback::ggpoStarted = true;
+    rollback_await_init_pending = false;
     WorldFreeze::freeze();
     sfx_rollback_session_start();
     if (!canonicalize_DmgHitRecordManImp_free_lists(*(DmgHitRecordManImp**)Game::dmg_hit_record_man))
@@ -1887,8 +1891,9 @@ bool rollback_await_init(void* steamMsgs)
 
 void Rollback::rollback_start_session(ISteamNetworkingMessages* steamMsgs)
 {
-    if (Rollback::rollbackEnabled)
+    if (Rollback::rollbackEnabled && !rollback_await_init_pending)
     {
+        rollback_await_init_pending = true;
         MainLoop::setup_mainloop_callback(rollback_await_init, steamMsgs, "rollback_await_init");
     }
 }
