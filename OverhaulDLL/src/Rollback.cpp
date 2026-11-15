@@ -1554,7 +1554,13 @@ RollbackState* rollback_capture_state()
 bool rollback_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int frame)
 {
     HavokTrace::sample(HavokTrace::Stage::Save);
+#ifdef GGPO_SYNCTEST
+    sfx_synctest_capture_begin();
+#endif
     RollbackState* state = rollback_capture_state();
+#ifdef GGPO_SYNCTEST
+    sfx_synctest_capture_end(frame);
+#endif
     //track the frame about to be simulated
     state->sfxman->frame = frame;
     sfx_rollback_saved_frame(frame);

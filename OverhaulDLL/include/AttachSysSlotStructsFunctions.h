@@ -7,6 +7,12 @@
 #include "AttachSysSlotStructs.h"
 #include "Rollback.h"
 
+//Slots that only drive SFX, sound or light: live frames create these where a re-simulated frame does not, so the state
+//hash leaves them out
+bool attach_slot_is_cosmetic(uint32_t type);
+//Slots the game creates for the local player only, so the other machine's copy of that character never has them
+bool attach_slot_is_owner_only(uint32_t type);
+
 void copy_AttachSysSlot(AttachSysSlotBaseImpl** to, AttachSysSlotBaseImpl* from, StateTarget target);
 AttachSysSlotBaseImpl* init_AttachSysSlot(AttachSysSlotType type, StateTarget target);
 void free_AttachSysSlot(AttachSysSlotBaseImpl* to, StateTarget target);

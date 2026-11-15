@@ -16,6 +16,7 @@
 #include "FrpgHavokManImpStructFunctions.h"
 #include "ThrowManStructFunctions.h"
 #include "DmgHitRecordManImpStructFunctions.h"
+#include "SfxManStructFunctions.h"
 
 static const char* hash_logfilename = "dsoverhaul_statehash_logging.txt";
 extern FILE* hash_logfile;
@@ -420,6 +421,7 @@ namespace RollbackHash
         s += ",\"sp_up_resim\":" + std::to_string(t.sp_up_resim);
         s += ",\"attach_head_changes_live\":" + std::to_string(t.attach_head_changes_live);
         s += ",\"attach_head_changes_resim\":" + std::to_string(t.attach_head_changes_resim);
+        s += ",\"sfx\":" + sfx_synctest_json();
         s += ",\"dump_files_written\":" + std::to_string(t.dump_files_written) + "}";
         return s;
     }
@@ -526,6 +528,7 @@ namespace RollbackHash
         dump_file.clear();
 #ifdef GGPO_SYNCTEST
         synctest = SyncTestStats{};
+        sfx_synctest_reset();
 #endif
     }
 }

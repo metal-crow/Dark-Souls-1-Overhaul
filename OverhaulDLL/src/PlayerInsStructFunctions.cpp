@@ -2405,40 +2405,6 @@ static void serialize_SpecialEffect(StateVisitor& v, const SpecialEffect* s)
     v.end();
 }
 
-// Slots that only drive SFX, sound or light.
-// Live frames create these where a re-simulated frame does not, so they are not compared.
-static bool attach_slot_is_cosmetic(uint32_t type)
-{
-    switch (type)
-    {
-    case TypeChrShineTreasureSlot:
-    case TypeChrSingleSeSlot:
-    case TypeChrSingleSfxSlot:
-    case TypeChrMultiSfxSlot:
-    case TypeChrGrassSlot:
-    case TypeChrFootEffectSlot:
-    case TypeChrRigidOffsetSfxSlot:
-    case TypeChrSingleOneshotSfxSlot:
-    case TypeChrSingleTraceSfxSlot:
-    case TypeChrMagicGoodsUseSfxSlot:
-    case TypeChrPointLightSlot:
-    case TypeChrConditionSfxSeSlot:
-    case TypeChrFollowSfxSlot:
-        return true;
-    default:
-        return false;
-    }
-}
-
-// Slots the game creates for the LOCAL player only (the callers of their Init functions set up the local player's
-// character), so the other machine's copy of that character never has them: ChrLanternSlot (the Skull Lantern light;
-// idle unless its flag bit 0 is set) and ChrResonanceMagicSlot (rolls a random resonance level when armed and sends it
-// to the other players in a type 34 packet, i.e. owner-authoritative by design). Not compared.
-static bool attach_slot_is_owner_only(uint32_t type)
-{
-    return type == TypeChrLanternSlot || type == TypeChrResonanceMagicSlot;
-}
-
 static void serialize_ChrAttachSys(StateVisitor& v, const ChrAttachSys* c)
 {
     // Still shallow: which slot types are in the chain, not their contents. Sorted, because the game rotates the chain

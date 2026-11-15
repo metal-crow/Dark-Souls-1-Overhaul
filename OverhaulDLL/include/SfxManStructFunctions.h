@@ -40,6 +40,30 @@ void sfx_rollback_session_end();
 void sfx_rollback_saved_frame(int32_t frame);      //each GGPO save: the frame now being simulated
 void sfx_rollback_confirmed_frame(int32_t frame);  //frames up to this one can no longer be rolled back
 
+#ifdef GGPO_SYNCTEST
+//Synctest restore check: around each GGPO save, record what every saved handle points at; a re-save of a frame is compared
+//with its original (see SfxManStructFunctions.cpp)
+void sfx_synctest_capture_begin();
+void sfx_synctest_capture_end(int32_t frame);
+void sfx_synctest_reset();
+std::string sfx_synctest_json();
+//Handles saved inside one belong to this attach slot. The check matches them by slot type: the call stack would say how deep
+//in the (rotating) slot chain the slot sits. Differences in a cosmetic slot's handles (one the state hash leaves out) are
+//counted apart from the errors.
+struct SfxSynctestOwner
+{
+    int64_t slot_type;   //-1: not inside an attach slot
+    bool cosmetic;
+};
+extern SfxSynctestOwner sfx_synctest_owner;
+struct SfxSynctestOwnerScope
+{
+    SfxSynctestOwner prev;
+    SfxSynctestOwnerScope(uint32_t slot_type, bool cosmetic) : prev(sfx_synctest_owner) { sfx_synctest_owner = { slot_type, cosmetic }; }
+    ~SfxSynctestOwnerScope() { sfx_synctest_owner = prev; }
+};
+#endif
+
 //When we resimulate a frame using Step_GameSimulation, we inject code to mark the sfx generated
 //this tells us to pay attention and handle any generated sfx as part of rollback state
 extern "C" int32_t sfx_sim_step_depth;

@@ -805,6 +805,7 @@ namespace
             if (sub == "reset")
             {
                 RollbackHash::synctest = RollbackHash::SyncTestStats{};
+                sfx_synctest_reset();
             }
             else if (sub == "dump")
             {

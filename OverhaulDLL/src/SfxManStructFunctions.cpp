@@ -2,6 +2,9 @@
 #include "SfxManStructFunctions.h"
 #include "StateSerializer.h"
 #include "SP/memory/injection/asm/x64.h"
+#include <array>
+#include <map>
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -313,6 +316,350 @@ static int32_t sfx_node_sfx_id(const FxBehaviorNode* n)
 //list_next means nothing outside the game, so it holds that node's serial.
 static uint64_t sfx_saved_serial(const SfxHandle* h) { return (uint64_t)h->list_next; }
 
+#ifdef GGPO_SYNCTEST
+// ---- synctest restore check ----
+//Synctest saves every frame twice: as it first runs, and again after loading an earlier frame and re-simulating up to it. Each
+//save records what every saved handle points at and which code saved it, and the re-simulated save is compared with the
+//original, owner by owner. Effects only age in live frames, so some differences are expected, and are counted apart from the
+//errors:
+//  - ended: the original's effect ended by itself (aged out) before the re-simulation reached the frame
+//  - stopped: a stop the game issued was confirmed and killed the original's effect meanwhile
+//  - replayed: the original's handle was empty, the re-simulation's is linked: it spawned an effect again that had already
+//    ended in the original, so that effect plays a second time
+//  - slot_count: an owner saved a different number of handles. Only owners the state hash leaves out can do this without a
+//    synctest mismatch: the cosmetic attach slots (attach_slot_is_cosmetic), e.g. footstep effects, whose slot lives as long
+//    as its effect
+//  - cosmetic: any of the differences below in a handle a cosmetic attach slot holds. The re-simulation does not recreate
+//    those slots exactly, which is why the state hash leaves them out
+//Errors:
+//  - wrong_effect: both linked, to different effects (sfx id)
+//  - link_kind: both linked to the same effect, one through node and the other through follow_node
+//  - hidden_mismatch: one is hidden by a pending stop, the other not
+//  - orphaned: the original's handle held an effect's root node that still exists, and no re-simulated handle holds it: the
+//    effect plays on unowned (and the owner usually spawns another)
+//  - lost_link: the original's handle followed a node (follow_node) that is still alive, but the re-simulated handle is empty
+//  - not_respawned: the original's effect was killed as a discarded spawn, and the re-simulation did not spawn it again
+
+enum class SfxLinkKind : uint8_t { Empty, Node, Follow };
+
+//How many return addresses identify the code that saved a handle (copy_SfxHandle's caller and theirs)
+static const int sfx_st_site_depth = 3;
+
+struct SfxSynctestHandle
+{
+    FxBehaviorNode* node;   //the node it is linked to
+    uint64_t serial;
+    int32_t sfx_id;
+    SfxLinkKind link;
+    bool hidden;            //by a pending stop: sfx_hide_bit clear
+    SfxSynctestOwner owner; //the attach slot that saved it (SfxSynctestOwnerScope)
+    //which code saved it, logged as offsets into this DLL. Inside an attach slot only the first entry is kept: the rest
+    //depends on how deep in the slot chain the slot sits.
+    void* site[sfx_st_site_depth];
+};
+
+SfxSynctestOwner sfx_synctest_owner = { -1, false };
+
+extern "C" IMAGE_DOS_HEADER __ImageBase;
+
+static std::string sfx_synctest_site(const SfxSynctestOwner& owner, void* const* site)
+{
+    std::string s;
+    if (owner.slot_type >= 0)
+    {
+        char b[48];
+        snprintf(b, sizeof(b), "attach slot type %lld%s, ", (long long)owner.slot_type, owner.cosmetic ? " (cosmetic)" : "");
+        s += b;
+    }
+    for (int i = 0; i < sfx_st_site_depth && site[i] != NULL; i++)
+    {
+        char b[32];
+        snprintf(b, sizeof(b), "%s+%llx", i ? "<-" : "", (unsigned long long)((uint8_t*)site[i] - (uint8_t*)&__ImageBase));
+        s += b;
+    }
+    return s;
+}
+
+enum class SfxDeathCause : uint8_t { DiscardedSpawn, ConfirmedStop };
+
+struct SfxDeath
+{
+    SfxDeathCause cause;
+    int32_t frame;
+};
+
+static struct
+{
+    uint64_t frames_checked = 0;
+    uint64_t handles_checked = 0;
+    uint64_t errors = 0;
+    int32_t first_error_frame = -1;
+    uint64_t wrong_effect = 0, link_kind = 0, hidden_mismatch = 0, lost_link = 0, not_respawned = 0, orphaned = 0;
+    uint64_t ended = 0, stopped = 0, replayed = 0, slot_count = 0, cosmetic = 0;
+    uint64_t slot_count_logged = 0;
+} sfx_synctest;
+
+static std::map<int32_t, std::vector<SfxSynctestHandle>> sfx_st_saves;   //frame -> its original save
+static std::vector<SfxSynctestHandle> sfx_st_current;                     //the save being captured
+static bool sfx_st_capturing = false;
+static std::unordered_map<uint64_t, SfxDeath> sfx_st_deaths;              //serial -> what killed it
+static const int32_t sfx_st_keep_frames = 128;   //far more than any synctest check distance
+static const size_t sfx_st_subtree_max = 65536;
+
+//noinline: the stack capture skips exactly this frame and copy_SfxHandle's
+static __declspec(noinline) SfxSynctestHandle sfx_synctest_describe(const SfxHandle* game, FxBehaviorNode* linked)
+{
+    SfxSynctestHandle d = { NULL, 0, -1, SfxLinkKind::Empty, false, sfx_synctest_owner, {} };
+    //frame 0 is this function, 1 copy_SfxHandle
+    RtlCaptureStackBackTrace(2, d.owner.slot_type >= 0 ? 1 : sfx_st_site_depth, d.site, NULL);
+    if (linked != NULL)
+    {
+        d.node = linked;
+        d.serial = sfx_node_serial(linked);
+        d.sfx_id = sfx_node_sfx_id(linked);
+        d.link = game->node != NULL ? SfxLinkKind::Node : SfxLinkKind::Follow;
+        d.hidden = (linked->flags1 & (1u << sfx_hide_bit)) == 0;
+    }
+    return d;
+}
+
+//We are about to kill top (and its descendants if subtree): remember why, for a handle the original save had linked to them
+static void sfx_synctest_note_deaths(FxBehaviorNode* top, bool subtree, SfxDeathCause cause)
+{
+    std::vector<FxBehaviorNode*> stack = { top };
+    size_t visited = 0;
+    while (!stack.empty() && visited++ < sfx_st_subtree_max)
+    {
+        FxBehaviorNode* n = stack.back();
+        stack.pop_back();
+        const uint64_t serial = sfx_node_serial(n);
+        if (serial == 0)
+        {
+            continue;   //not a node we know: never read through it
+        }
+        sfx_st_deaths[serial] = { cause, sfx_sim_frame };
+        if (subtree)
+        {
+            for (FxBehaviorNode* c = n->child_node; c != NULL; c = c->next_node)
+            {
+                stack.push_back(c);
+            }
+        }
+    }
+}
+
+static const char* sfx_link_name(SfxLinkKind k)
+{
+    return k == SfxLinkKind::Node ? "node" : k == SfxLinkKind::Follow ? "follow" : "empty";
+}
+
+static void sfx_synctest_error(uint64_t& counter, const char* kind, int32_t frame, const SfxSynctestHandle& o, const SfxSynctestHandle& r)
+{
+    if (o.owner.cosmetic || r.owner.cosmetic)
+    {
+        sfx_synctest.cosmetic++;
+        return;
+    }
+    counter++;
+    sfx_synctest.errors++;
+    if (sfx_synctest.first_error_frame < 0)
+    {
+        sfx_synctest.first_error_frame = frame;
+    }
+    if (sfx_synctest.errors <= 20 || sfx_synctest.errors % 600 == 0)
+    {
+        ConsoleWrite("SYNCTEST sfx %s #%llu frame=%d: original sfx=%d %s%s, replay sfx=%d %s%s (saved at %s)", kind,
+            sfx_synctest.errors, frame, o.sfx_id, sfx_link_name(o.link), o.hidden ? " hidden" : "",
+            r.sfx_id, sfx_link_name(r.link), r.hidden ? " hidden" : "", sfx_synctest_site(o.owner, o.site).c_str());
+    }
+}
+
+//The original was linked and the re-simulation's handle is empty: why did the original's effect go?
+static void sfx_synctest_classify_loss(int32_t frame, const SfxSynctestHandle& o, const SfxSynctestHandle& r)
+{
+    if (sfx_node_is(o.node, o.serial))
+    {
+        if (o.link == SfxLinkKind::Follow)
+        {
+            sfx_synctest_error(sfx_synctest.lost_link, "lost_link", frame, o, r);
+        }
+        return;   //a root node still alive is counted as orphaned
+    }
+    auto death = sfx_st_deaths.find(o.serial);
+    if (death == sfx_st_deaths.end())
+    {
+        sfx_synctest.ended++;
+    }
+    else if (death->second.cause == SfxDeathCause::ConfirmedStop)
+    {
+        sfx_synctest.stopped++;
+    }
+    else
+    {
+        sfx_synctest_error(sfx_synctest.not_respawned, "not_respawned", frame, o, r);
+    }
+}
+
+static bool sfx_synctest_same(const SfxSynctestHandle& a, const SfxSynctestHandle& b)
+{
+    return a.link == b.link && (a.link == SfxLinkKind::Empty || (a.sfx_id == b.sfx_id && a.hidden == b.hidden));
+}
+
+static bool sfx_synctest_linked(const SfxSynctestHandle& h)
+{
+    return h.link != SfxLinkKind::Empty;
+}
+
+//Handles are matched within each owner (the code that saved them), not by position: the game rotates a character's attach slot
+//chain every frame, so the same slots can be saved in a different order
+static void sfx_synctest_compare(int32_t frame, const std::vector<SfxSynctestHandle>& orig, const std::vector<SfxSynctestHandle>& replay)
+{
+    //the owner: the slot type and the code (see SfxSynctestHandle::site)
+    typedef std::pair<int64_t, std::array<void*, sfx_st_site_depth>> Site;
+    typedef std::vector<const SfxSynctestHandle*> Handles;
+    std::map<Site, std::pair<Handles, Handles>> sites;
+    for (const SfxSynctestHandle& h : orig)
+    {
+        sites[{ h.owner.slot_type, { h.site[0], h.site[1], h.site[2] } }].first.push_back(&h);
+    }
+    for (const SfxSynctestHandle& h : replay)
+    {
+        sites[{ h.owner.slot_type, { h.site[0], h.site[1], h.site[2] } }].second.push_back(&h);
+    }
+    sfx_synctest.frames_checked++;
+    sfx_synctest.handles_checked += orig.size();
+
+    //An effect the original's handle held that still exists must still be held by the re-simulation: the load relinks the
+    //handle to the same node, unless a rolled-back step killed it (and spawned it again). Not for follow_node links: those
+    //move on to whichever child the effect has when the root dies, and children are spawned by live aging.
+    std::unordered_set<uint64_t> replay_serials;
+    for (const SfxSynctestHandle& h : replay)
+    {
+        if (h.link != SfxLinkKind::Empty)
+        {
+            replay_serials.insert(h.serial);
+        }
+    }
+    for (const SfxSynctestHandle& o : orig)
+    {
+        if (o.link == SfxLinkKind::Node && replay_serials.count(o.serial) == 0 && sfx_node_is(o.node, o.serial))
+        {
+            const SfxSynctestHandle none = { NULL, 0, -1, SfxLinkKind::Empty, false, o.owner, {} };
+            sfx_synctest_error(sfx_synctest.orphaned, "orphaned", frame, o, none);
+        }
+    }
+
+    for (auto& site : sites)
+    {
+        Handles& os = site.second.first;
+        Handles& rs = site.second.second;
+        //each pass pairs some of the handles still unpaired, and takes them out of both lists
+        auto pair_up = [&](auto matches, auto on_pair)
+        {
+            for (size_t i = 0; i < os.size(); )
+            {
+                size_t j = 0;
+                while (j < rs.size() && !matches(*os[i], *rs[j]))
+                {
+                    j++;
+                }
+                if (j == rs.size())
+                {
+                    i++;
+                    continue;
+                }
+                on_pair(*os[i], *rs[j]);
+                os.erase(os.begin() + i);
+                rs.erase(rs.begin() + j);
+            }
+        };
+        typedef const SfxSynctestHandle& H;
+
+        pair_up([](H o, H r) { return sfx_synctest_same(o, r); }, [](H, H) {});
+        pair_up([](H o, H r) { return sfx_synctest_linked(o) && sfx_synctest_linked(r) && o.sfx_id == r.sfx_id; },
+            [frame](H o, H r)
+            {
+                if (o.link != r.link)
+                {
+                    sfx_synctest_error(sfx_synctest.link_kind, "link_kind", frame, o, r);
+                }
+                else
+                {
+                    sfx_synctest_error(sfx_synctest.hidden_mismatch, "hidden_mismatch", frame, o, r);
+                }
+            });
+        pair_up([](H o, H r) { return sfx_synctest_linked(o) && !sfx_synctest_linked(r); },
+            [frame](H o, H r) { sfx_synctest_classify_loss(frame, o, r); });
+        pair_up([](H o, H r) { return !sfx_synctest_linked(o) && sfx_synctest_linked(r); },
+            [](H, H) { sfx_synctest.replayed++; });
+        pair_up([](H o, H r) { return sfx_synctest_linked(o) && sfx_synctest_linked(r); },
+            [frame](H o, H r) { sfx_synctest_error(sfx_synctest.wrong_effect, "wrong_effect", frame, o, r); });
+
+        //what is left is on one side only: this owner saved a different number of handles
+        if (!os.empty() || !rs.empty())
+        {
+            sfx_synctest.slot_count += os.size() + rs.size();
+            if (++sfx_synctest.slot_count_logged <= 5)
+            {
+                const SfxSynctestHandle& any = os.empty() ? *rs[0] : *os[0];
+                ConsoleWrite("SYNCTEST sfx slot_count frame=%d: saved at %s, %zu more in the %s", frame,
+                    sfx_synctest_site(any.owner, any.site).c_str(), os.empty() ? rs.size() : os.size(), os.empty() ? "replay" : "original");
+            }
+        }
+    }
+}
+
+void sfx_synctest_capture_begin()
+{
+    sfx_st_current.clear();
+    sfx_st_capturing = true;
+}
+
+void sfx_synctest_capture_end(int32_t frame)
+{
+    sfx_st_capturing = false;
+    auto it = sfx_st_saves.find(frame);
+    if (it == sfx_st_saves.end())
+    {
+        sfx_st_saves.emplace(frame, sfx_st_current);
+    }
+    else
+    {
+        //keep the original: it is the one the live frame produced
+        sfx_synctest_compare(frame, it->second, sfx_st_current);
+    }
+
+    while (!sfx_st_saves.empty() && sfx_st_saves.begin()->first < frame - sfx_st_keep_frames)
+    {
+        sfx_st_saves.erase(sfx_st_saves.begin());
+    }
+    for (auto d = sfx_st_deaths.begin(); d != sfx_st_deaths.end(); )
+    {
+        d = d->second.frame < frame - sfx_st_keep_frames ? sfx_st_deaths.erase(d) : std::next(d);
+    }
+}
+
+void sfx_synctest_reset()
+{
+    sfx_synctest = {};
+}
+
+std::string sfx_synctest_json()
+{
+    const auto& t = sfx_synctest;
+    char b[768];
+    snprintf(b, sizeof(b),
+        "{\"frames_checked\":%llu,\"handles_checked\":%llu,\"errors\":%llu,\"first_error_frame\":%d,"
+        "\"wrong_effect\":%llu,\"link_kind\":%llu,\"hidden_mismatch\":%llu,\"lost_link\":%llu,"
+        "\"not_respawned\":%llu,\"orphaned\":%llu,\"ended\":%llu,\"stopped\":%llu,\"replayed\":%llu,\"slot_count\":%llu,"
+        "\"cosmetic\":%llu}",
+        t.frames_checked, t.handles_checked, t.errors, t.first_error_frame,
+        t.wrong_effect, t.link_kind, t.hidden_mismatch, t.lost_link,
+        t.not_respawned, t.orphaned, t.ended, t.stopped, t.replayed, t.slot_count, t.cosmetic);
+    return b;
+}
+#endif
+
 void copy_SfxHandle(SfxHandle* to, const SfxHandle* from, StateTarget target)
 {
     switch (target)
@@ -323,6 +670,12 @@ void copy_SfxHandle(SfxHandle* to, const SfxHandle* from, StateTarget target)
         to->vtable = game->vtable;
         clear_SfxHandle(to);
         FxBehaviorNode* linked = sfx_handle_linked_node(game);
+#ifdef GGPO_SYNCTEST
+        if (sfx_st_capturing)
+        {
+            sfx_st_current.push_back(sfx_synctest_describe(game, linked));
+        }
+#endif
         if (linked == NULL)
         {
             break;
@@ -417,6 +770,12 @@ static void sfx_execute_stop(const SfxPendingStop& p)
         return;   //ended (or was killed) meanwhile
     }
     sfx_stats.stops_executed++;
+#ifdef GGPO_SYNCTEST
+    if (p.kind != SfxStopKind::SoftStop)
+    {
+        sfx_synctest_note_deaths(p.node, p.kind == SfxStopKind::KillTree, SfxDeathCause::ConfirmedStop);
+    }
+#endif
     switch (p.kind)
     {
     case SfxStopKind::KillRoot:
@@ -627,6 +986,9 @@ static void sfx_kill_discarded_spawns(int32_t first_discarded)
             continue;
         }
         FXManager* mgr = n->parent->base.fxParent;
+#ifdef GGPO_SYNCTEST
+        sfx_synctest_note_deaths(n, true, SfxDeathCause::DiscardedSpawn);
+#endif
         FXManager_KillDescendants(mgr, n);
         FXManager_KillNode(mgr, n);
         sfx_stats.spawns_killed++;
@@ -706,6 +1068,11 @@ void sfx_rollback_session_start()
     sfx_stats = {};
     sfx_main_thread = GetCurrentThreadId();
     sfx_sim_frame = -1;
+#ifdef GGPO_SYNCTEST
+    //frames restart at 0
+    sfx_st_saves.clear();
+    sfx_st_deaths.clear();
+#endif
 }
 
 void sfx_rollback_session_end()
