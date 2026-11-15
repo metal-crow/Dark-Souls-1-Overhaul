@@ -436,7 +436,38 @@ void copy_ChrIns(ChrIns* to, const ChrIns* from, StateTarget target)
     to->unk_1e0 = from->unk_1e0;
     copy_SpecialEffect(to->specialEffects, from->specialEffects, target);
     copy_QwcSpEffectEquipCtrl(to->qwcSpEffectEquipCtrl, from->qwcSpEffectEquipCtrl);
-    memcpy(&to->unk_288, &from->unk_288, 0x48);
+    memcpy(&to->unk_288, &from->unk_288, 0x10);
+    if (to->pendingAttackInfo == NULL && from->pendingAttackInfo != NULL)
+    {
+        switch (target) {
+        case StateTarget::ToGame:
+            to->pendingAttackInfo = (AttackInfo*)Game::game_malloc(sizeof(AttackInfo), 0x10, *(uint64_t*)Game::internal_heap_3);
+            break;
+        case StateTarget::ToLocal:
+        case StateTarget::Copy:
+            to->pendingAttackInfo = init_AttackInfo();
+            break;
+        }
+    }
+    if (to->pendingAttackInfo != NULL && from->pendingAttackInfo == NULL)
+    {
+        switch (target)
+        {
+        case StateTarget::ToGame:
+            Game::game_free(to->pendingAttackInfo);
+            break;
+        case StateTarget::ToLocal:
+        case StateTarget::Copy:
+            free_AttackInfo(to->pendingAttackInfo);
+            break;
+        }
+        to->pendingAttackInfo = NULL;
+    }
+    if (to->pendingAttackInfo != NULL && from->pendingAttackInfo != NULL)
+    {
+        copy_AttackInfo(to->pendingAttackInfo, from->pendingAttackInfo, target);
+    }
+    memcpy(&to->unk_2a0, &from->unk_2a0, 0x30);
     copy_ChrIns_field0x2c8(to->field0x2c8, from->field0x2c8);
     memcpy(&to->unk_2d8, &from->unk_2d8, 0x98);
     copy_HitIns(to->hitins_1, from->hitins_1);
@@ -501,6 +532,7 @@ void free_ChrIns(ChrIns* to, bool freeself)
     free_HitIns(to->hitins_2);
     free_ChrAttachSys(&to->chrattachsys, false);
     free_EntityThrowAnimationStatus(to->throw_animation_info);
+    free_AttackInfo(to->pendingAttackInfo);
 
     if (freeself)
     {
@@ -642,6 +674,26 @@ void free_EntityThrowAnimationStatus(EntityThrowAnimationStatus* to)
     free(to);
 }
 
+
+void copy_AttackInfo(AttackInfo* to, const AttackInfo* from, StateTarget target)
+{
+    memcpy(to->data_0, from->data_0, sizeof(to->data_0));
+    //these point at the two characters, which outlive the session, so just read/write the pointers themselves
+    to->attacker = from->attacker;
+    to->defender = from->defender;
+    memcpy(to->data_1, from->data_1, sizeof(to->data_1));
+}
+
+AttackInfo* init_AttackInfo()
+{
+    AttackInfo* local_AttackInfo = (AttackInfo*)malloc_(sizeof(AttackInfo));
+    return local_AttackInfo;
+}
+
+void free_AttackInfo(AttackInfo* to)
+{
+    free(to);
+}
 
 void copy_ThrowSelfEsc(ThrowSelfEsc* to, const ThrowSelfEsc* from)
 {
@@ -2080,6 +2132,7 @@ static void serialize_ChrAttachSys(StateVisitor&, const ChrAttachSys*);
 static void serialize_ChrIns_field0x2c8(StateVisitor&, const ChrIns_field0x2c8*);
 static void serialize_EntityThrowAnimationStatus(StateVisitor&, const EntityThrowAnimationStatus*);
 static void serialize_ThrowSelfEsc(StateVisitor&, const ThrowSelfEsc*);
+static void serialize_AttackInfo(StateVisitor&, const AttackInfo*);
 static void serialize_QwcSpEffectEquipCtrl(StateVisitor&, const QwcSpEffectEquipCtrl*);
 static void serialize_SpecialEffect(StateVisitor&, const SpecialEffect*);
 static void serialize_SpecialEffect_Info(StateVisitor&, const SpecialEffect_Info*);
@@ -2281,6 +2334,16 @@ static void serialize_PlayerGameData(StateVisitor& v, const PlayerGameData* p)
     serialize_PlayerGameData_AttributeInfo(v, &p->attribs);
     serialize_EquipGameData(v, &p->equipGameData);
     serialize_PlayerGameData_ChrProperties(v, &p->ChrProperties);
+    v.end();
+}
+
+static void serialize_AttackInfo(StateVisitor& v, const AttackInfo* a)
+{
+    v.begin("AttackInfo");
+    v.blob("data_0", a->data_0, sizeof(a->data_0));
+    v.ptr_flag("attacker", (void*)a->attacker);   // ChrIns ptrs
+    v.ptr_flag("defender", (void*)a->defender);
+    v.blob("data_1", a->data_1, sizeof(a->data_1));
     v.end();
 }
 
@@ -3156,7 +3219,16 @@ static void serialize_ChrIns(StateVisitor& v, const ChrIns* c)
     v.field("unk_1e0", c->unk_1e0);
     serialize_SpecialEffect(v, c->specialEffects);
     serialize_QwcSpEffectEquipCtrl(v, c->qwcSpEffectEquipCtrl);
-    v.blob_holes("unk_288", &c->unk_288, 0x1d, { { 0x9, 7, StateVisitor::Hole::Pad } });
+    v.blob_holes("unk_288", &c->unk_288, 0x1d, { { 0x9, 7, StateVisitor::Hole::Pad }, { 0x10, 8, StateVisitor::Hole::Ptr } });
+    if (c->pendingAttackInfo)
+    {
+        v.field("pendingAttackInfo_present", true);
+        serialize_AttackInfo(v, c->pendingAttackInfo);
+    }
+    else
+    {
+        v.field("pendingAttackInfo_present", false);
+    }
     {
         //ChrIns+0x2a5 bit 4: the character's bounding sphere is inside this machine's camera frustum (FUN_14036e8d0, the
         //update-rate pass), so it is per-machine view state: compared and applied without it

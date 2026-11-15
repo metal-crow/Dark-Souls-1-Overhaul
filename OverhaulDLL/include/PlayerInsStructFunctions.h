@@ -86,6 +86,10 @@ void copy_ThrowSelfEsc(ThrowSelfEsc* to, const ThrowSelfEsc* from);
 ThrowSelfEsc* init_ThrowSelfEsc();
 void free_ThrowSelfEsc(ThrowSelfEsc* to);
 
+void copy_AttackInfo(AttackInfo* to, const AttackInfo* from, StateTarget target);
+AttackInfo* init_AttackInfo();
+void free_AttackInfo(AttackInfo* to);
+
 void copy_QwcSpEffectEquipCtrl(QwcSpEffectEquipCtrl* to, const QwcSpEffectEquipCtrl* from);
 QwcSpEffectEquipCtrl* init_QwcSpEffectEquipCtrl();
 void free_QwcSpEffectEquipCtrl(QwcSpEffectEquipCtrl* to);

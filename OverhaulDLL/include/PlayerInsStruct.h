@@ -49,6 +49,7 @@ typedef struct SpecialEffect SpecialEffect;
 typedef struct QwcSpEffectEquipCtrl QwcSpEffectEquipCtrl;
 typedef struct ChrAttachSys ChrAttachSys;
 typedef struct ThrowSelfEsc ThrowSelfEsc;
+typedef struct AttackInfo AttackInfo;
 typedef struct EntityThrowAnimationStatus EntityThrowAnimationStatus;
 typedef struct ChrIns_field0x2c8 ChrIns_field0x2c8;
 typedef struct ChrIns_field0x18 ChrIns_field0x18;
@@ -1436,6 +1437,22 @@ struct EquippedWeaponData
 };
 static_assert(sizeof(EquippedWeaponData) == 0x10);
 
+//The damage a character is about to take. The game allocates one when a hit or a throw lands
+//(InGame_Malloc(0x1c0, 0x10, internal_heap_3) at 0x14025d1c6, then Init_AttackInfo) and frees it once the character step
+//has applied it (FUN_14037c570 -> ... 0x140328588).
+struct AttackInfo
+{
+    uint8_t data_0[0x130];
+    uint64_t attacker;         // 0x130 (ghidra: ChrIns*)
+    uint64_t defender;         // 0x138 (ghidra: ChrIns* defenderChr)
+    uint8_t data_1[0x80];      // 0x140
+};
+
+static_assert(offsetof(AttackInfo, attacker) == 0x130);
+static_assert(offsetof(AttackInfo, defender) == 0x138);
+static_assert(offsetof(AttackInfo, data_1) == 0x140);
+static_assert(sizeof(AttackInfo) == 0x1c0);
+
 struct ChrIns
 {
     uint8_t padding_0[8];
@@ -1479,7 +1496,7 @@ struct ChrIns
     float unk_28c;             // 0x28c
     uint8_t unk_290;           // 0x290
     uint8_t unk_291[7];        // 0x291 (gap)
-    uint64_t unk_298;          // 0x298
+    AttackInfo* pendingAttackInfo; // 0x298 (owned by the character; NULL while no damage is pending)
     uint32_t unk_2a0;          // 0x2a0
     uint8_t unk_2a4;           // 0x2a4
     uint8_t unk_2a5;           // 0x2a5
