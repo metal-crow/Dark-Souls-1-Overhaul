@@ -1862,6 +1862,10 @@ bool rollback_await_init(void* steamMsgs)
     Rollback::ggpoStarted = true;
     WorldFreeze::freeze();
     sfx_rollback_session_start();
+    if (!canonicalize_DmgHitRecordManImp_free_lists(*(DmgHitRecordManImp**)Game::dmg_hit_record_man))
+    {
+        ConsoleWrite("Rollback: hit records are in use at the session start; their pool order is left as it is and may differ between machines");
+    }
 
     RollbackStartSync::begin_session();
     RollbackReplay::init_session();

@@ -11,6 +11,8 @@ class StateVisitor;
 
 void copy_DmgHitRecordManImp(DmgHitRecordManImp* to, DmgHitRecordManImp* from, StateTarget target);
 DmgHitRecordManImp* init_DmgHitRecordManImp();
+//Session start: when no record is in use, relink both free lists in pool order. Returns false (and changes nothing) otherwise.
+bool canonicalize_DmgHitRecordManImp_free_lists(DmgHitRecordManImp* d);
 void free_DmgHitRecordManImp(DmgHitRecordManImp* to);
 void serialize_DmgHitRecordManImp(StateVisitor& v, DmgHitRecordManImp* d);
 std::string print_DmgHitRecordManImp(DmgHitRecordManImp* d);

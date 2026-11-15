@@ -59,6 +59,48 @@ void copy_DmgHitRecordManImp(DmgHitRecordManImp* to, DmgHitRecordManImp* from, S
     to->field0x28_heap_count = from->field0x28_heap_count;
 }
 
+//The order of a pool's free list is history: which records were used and returned, in which order, since the map loaded. Two
+//machines' histories differ (a hit one of them simulated before the session), and since new records are taken from the head, the
+//same hit would then land in different records on each machine for the rest of the session. So a session starts from the order
+//the game itself builds the pools in. Only when every record is free; records in use are state this cannot rearrange.
+template <typename T>
+static bool pool_all_free(T* head, const T* start, size_t count)
+{
+    size_t n = 0;
+    for (T* e = head; e != NULL; e = e->next)
+    {
+        const ptrdiff_t offset = (const char*)e - (const char*)start;
+        if (offset < 0 || offset >= (ptrdiff_t)(count * sizeof(T)) || offset % (ptrdiff_t)sizeof(T) != 0 || ++n > count)
+        {
+            return false;
+        }
+    }
+    return n == count;
+}
+
+bool canonicalize_DmgHitRecordManImp_free_lists(DmgHitRecordManImp* d)
+{
+    const size_t n10 = max_preallocated_DmgHitRecordManImp_field0x10Elem;
+    const size_t n28 = max_preallocated_DmgHitRecordManImp_field0x28Elem;
+    if (d->timed_list != NULL || d->field0x10_heap_count != 0 || d->field0x28_heap_count != 0
+        || !pool_all_free(d->field0x10_array, d->field0x10_array_start, n10)
+        || !pool_all_free(d->field0x28_array, d->field0x28_array_start, n28))
+    {
+        return false;
+    }
+    for (size_t i = 0; i < n10; i++)
+    {
+        d->field0x10_array_start[i].next = (i + 1 < n10) ? &d->field0x10_array_start[i + 1] : NULL;
+    }
+    d->field0x10_array = d->field0x10_array_start;
+    for (size_t i = 0; i < n28; i++)
+    {
+        d->field0x28_array_start[i].next = (i + 1 < n28) ? &d->field0x28_array_start[i + 1] : NULL;
+    }
+    d->field0x28_array = d->field0x28_array_start;
+    return true;
+}
+
 DmgHitRecordManImp* init_DmgHitRecordManImp()
 {
     DmgHitRecordManImp* local = (DmgHitRecordManImp*)malloc_(sizeof(DmgHitRecordManImp));
