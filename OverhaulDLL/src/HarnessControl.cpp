@@ -46,10 +46,18 @@
                                     (absolute, or n frames past the current one); re-saves overwrite until confirmed
       dump_status                   dump_requested / dump_frame / dump_confirmed / dump_size / dump_file
       dump_get                      the captured text (+ dump_status fields); large (hundreds of KB)
-      probe                         per connected player: hp, max_hp, x, y, z, rot -- a cheap "what is happening" view
+      probe                         per connected player: hp, stamina, position, throw state, special effects, status build-up,
+                                    equipment (ids, quantities, durability), magic -- a cheap "what is happening" view
       peek <hexaddr> [len]          raw bytes (at most 512), refused unless readable; for reverse engineering live objects
       giveitem <cat> <id> <qty> [select]  before a session: give the local player an item (cat weapon|protector|accessory|goods),
                                     into a free quickbar slot if it goes there; select makes it the selected quickbar item
+      loadout                       the local player's stats, equipment slots, attuned magic, quickbar and inventory
+      equip <slot> <cat> <id>       before a session: put an inventory item (cat weapon|protector|accessory|goods) into equipment
+                                    slot 0-19 (InventorySlots: hands 0-3, arrows/bolts 4-7, armor 8-11, rings 13-14, quickbar 15-19)
+                                    with the equipment menu's own function
+      attune <slot> <magic id> [select]  before a session: attune a spell into magic slot 0-11 and refill every slot's casts
+      announce                      before a session: send the other players this character's position, HP and equipment
+      set_hp <hp>                   before a session: the local character's current HP (clamped to 1..max)
       rtti <hexaddr>                MSVC RTTI class name of the object at an address (its vtable's CompleteObjectLocator)
       watch <hexaddr> [1|2|4|8] [slot 0-3]  hardware write watchpoint (DR0-3) on the game thread; records every instruction that writes there
       watch exec <hexaddr> [slot] [edx]  hardware execute breakpoint (optionally only calls with this edx): records rcx, rdx, r8 and the return address at [rsp] of each call
@@ -301,6 +309,80 @@ namespace
         }
         const int32_t selected_id = (itemlist != NULL && selected < itemlistlen) ? (int32_t)itemlist[selected].item_id : -1;
         return s + "],\"selected_slot\":" + std::to_string(selected_slot) + ",\"selected_id\":" + std::to_string(selected_id) + "}";
+    }
+
+    //Inventory entry layout (Ghidra EquipInventoryDataItem): category, id, quantity @+8, sorted index @+0xc, durability[2] @+0x14
+    int32_t inventory_item_quantity(const EquipInventoryDataItem* item) { return *(const int32_t*)((const uint8_t*)item + 0x8); }
+    uint32_t inventory_item_durability(const EquipInventoryDataItem* item, int which) { return *(const uint32_t*)((const uint8_t*)item + 0x14 + 4 * which); }
+
+    //What a player has equipped, as the simulation sees it: per equipment slot the item id, and the quantity and durability
+    //of the inventory entry the slot maps to (-1 without one); attuned spells; the special effects on the character
+    std::string player_equipment_json(PlayerIns* pi)
+    {
+        std::string s;
+        if (pi->playergamedata != NULL)
+        {
+            EquipGameData* egd = &pi->playergamedata->equipGameData;
+            const EquipInventoryDataItem* itemlist = egd->equippedInventory.itemlist2;
+            const uint32_t itemlistlen = egd->equippedInventory.itemList2_len;
+            std::string ids, qty, dur;
+            for (uint32_t i = 0; i < InventorySlots::END; i++)
+            {
+                const uint32_t index = egd->EquipItemToInventoryIndexMap[i];
+                const bool have = itemlist != NULL && index < itemlistlen;
+                ids += (i ? "," : "") + std::to_string((int32_t)egd->chrasm.equip_items[i]);
+                qty += (i ? "," : "") + std::to_string(have ? inventory_item_quantity(&itemlist[index]) : -1);
+                dur += (i ? "," : "") + std::to_string(have ? (int64_t)inventory_item_durability(&itemlist[index], 0) : -1);
+            }
+            s += ",\"weapon_style\":" + std::to_string(egd->chrasm.equipped_weapon_style);
+            s += ",\"l_hand_index\":" + std::to_string(egd->chrasm.l_hand_equipped_index) + ",\"r_hand_index\":" + std::to_string(egd->chrasm.r_hand_equipped_index);
+            s += ",\"equip\":[" + ids + "],\"equip_qty\":[" + qty + "],\"equip_dur\":[" + dur + "]";
+            const uint32_t selected = egd->equippedItemsInQuickbar.selectedQuickbarItem;
+            s += ",\"quickbar_selected_id\":" + std::to_string((itemlist != NULL && selected < itemlistlen) ? (int32_t)itemlist[selected].item_id : -1);
+            if (egd->equipMagicData != NULL)
+            {
+                std::string magic;
+                for (int i = 0; i < 12; i++)
+                {
+                    const MagicSlot& m = egd->equipMagicData->equippedMagicList[i];
+                    if (m.magic_id == -1) continue;
+                    magic += std::string(magic.empty() ? "" : ",") + "{\"slot\":" + std::to_string(i) + ",\"id\":" + std::to_string(m.magic_id) + ",\"count\":" + std::to_string((int32_t)m.count) + "}";
+                }
+                s += ",\"magic_slot\":" + std::to_string(egd->equipMagicData->curSelectedMagicSlot) + ",\"magic\":[" + magic + "]";
+            }
+        }
+        std::string effects;
+        if (pi->chrins.specialEffects != NULL)
+        {
+            int n = 0;
+            for (SpecialEffect_Info* e = pi->chrins.specialEffects->specialEffect_Info; e != NULL && n < 64; e = e->next, n++)
+            {
+                effects += (n ? "," : "") + std::to_string((int32_t)e->data_0_struct.speffect_id);
+            }
+        }
+        s += ",\"speffects\":[" + effects + "]";
+        return s;
+    }
+
+    //The local player's EquipGameData (and the player), or NULL
+    EquipGameData* local_equip_game_data(PlayerIns** player_out = NULL)
+    {
+        auto p = Game::get_connected_player(0);
+        if (!Game::playerchar_is_loaded() || !p.has_value() || p.value() == 0) return NULL;
+        PlayerIns* pi = (PlayerIns*)p.value();
+        if (pi->playergamedata == NULL) return NULL;
+        if (player_out != NULL) *player_out = pi;
+        return &pi->playergamedata->equipGameData;
+    }
+
+    bool parse_item_category(const std::string& name, uint32_t* category)
+    {
+        if (name == "weapon") *category = 0;
+        else if (name == "protector") *category = 1;
+        else if (name == "accessory") *category = 2;
+        else if (name == "goods") *category = 4;
+        else return false;
+        return true;
     }
 
     std::string status_fields()
@@ -738,7 +820,12 @@ namespace
         if (cmd == "start_session")
         {
             if (Rollback::ggpoStarted) return err_json("a GGPO session is already running");
+#ifdef GGPO_SYNCTEST
             Rollback::rollback_start_session(NULL);
+#else
+            //what the lobby callbacks pass (ModNetworking.cpp): a two-player session needs the Steam messaging interface
+            Rollback::rollback_start_session(ModNetworking::SteamNetMessages);
+#endif
             ConsoleWrite("HARNESS: start_session");
             return ok_json("\"rollback_enabled\":" + b2s(Rollback::rollbackEnabled));
         }
@@ -902,6 +989,37 @@ namespace
                     s += ",\"playerins\":" + q(hex64((uint64_t)pi));
                     s += ",\"playerctrl\":" + q(hex64((uint64_t)pi->chrins.playerCtrl));
                     s += ",\"hp\":" + std::to_string(pi->chrins.curHp) + ",\"max_hp\":" + std::to_string(pi->chrins.maxHp);
+                    s += ",\"sp\":" + std::to_string((int32_t)pi->chrins.curSp) + ",\"max_sp\":" + std::to_string((int32_t)pi->chrins.maxSp);
+                    //status build-up left before the effect triggers (poison, toxic, bleed, curse) and the totals they refill to
+                    s += ",\"resist\":[" + std::to_string(pi->chrins.PoisonResist) + "," + std::to_string(pi->chrins.ToxicResist) + ","
+                        + std::to_string(pi->chrins.BleedResist) + "," + std::to_string(pi->chrins.CurseResist) + "]";
+                    s += ",\"resist_total\":[" + std::to_string(pi->chrins.resistPoisonTotal) + "," + std::to_string(pi->chrins.resistPlagueTotal) + ","
+                        + std::to_string(pi->chrins.resistBleedingTotal) + "," + std::to_string(pi->chrins.resistCurseTotal) + "]";
+                    //throws (backstab, riposte): non-zero state while the character is in one, and the other character's handle
+                    if (pi->chrins.throw_animation_info != NULL)
+                    {
+                        s += ",\"throw_state\":" + std::to_string(pi->chrins.throw_animation_info->throwState);
+                        s += ",\"throw_pair\":" + std::to_string((int32_t)pi->chrins.throw_animation_info->ThrowPairHandle);
+                    }
+                    //the animations playing: the ids of the animation mediator's states that hold one
+                    if (pi->chrins.playerCtrl != NULL && pi->chrins.playerCtrl->chrCtrl.animationMediator != NULL)
+                    {
+                        std::string anims;
+                        const AnimationMediator* am = pi->chrins.playerCtrl->chrCtrl.animationMediator;
+                        for (int k = 0; k < 31; k++)
+                        {
+                            if (am->states_list[k].animationId != -1) anims += (anims.empty() ? "" : ",") + std::to_string(am->states_list[k].animationId);
+                        }
+                        s += ",\"anim\":[" + anims + "]";
+                    }
+                    s += ",\"magic_id\":" + std::to_string(pi->chrins.curSelectedMagicId);
+                    //the handle this player is locked on to (-1 none); handles are this machine's own
+                    if (pi->chrins.padManipulator != NULL)
+                    {
+                        s += ",\"lockon\":" + std::to_string((int32_t)pi->chrins.padManipulator->chrManipulator.LockonTargetHandle);
+                    }
+                    s += ",\"handle\":" + std::to_string(*(int32_t*)((uint8_t*)pi + 8));
+                    s += player_equipment_json(pi);
                     //ChrIns chr type (+0xd4: 1 white phantom, 2 red phantom) and team type (+0xd8: 1 player, 2 white, 3 red)
                     s += ",\"chr_type\":" + std::to_string(*(int32_t*)((uint8_t*)pi + 0xd4)) + ",\"team_type\":" + std::to_string(*(int32_t*)((uint8_t*)pi + 0xd8));
                     HavokChara* hc = (pi->chrins.playerCtrl != NULL) ? pi->chrins.playerCtrl->chrCtrl.havokChara : NULL;
@@ -1003,6 +1121,130 @@ namespace
             char t[4];
             for (uint8_t c : buf) { snprintf(t, sizeof(t), "%02x", c); h += t; }
             return ok_json("\"address\":" + q(hex64(addr)) + ",\"hex\":" + q(h));
+        }
+
+        //The local player's build: what a test has to know before it changes it, and has to put back afterwards
+        if (cmd == "loadout")
+        {
+            PlayerIns* pi = NULL;
+            EquipGameData* egd = local_equip_game_data(&pi);
+            if (egd == NULL) return err_json("no local player");
+            const PlayerGameData_AttributeInfo& at = pi->playergamedata->attribs;
+            std::string s = "\"stats\":{\"level\":" + std::to_string(at.SoulLevel) + ",\"vit\":" + std::to_string(at.Vitality) + ",\"att\":" + std::to_string(at.Attunement)
+                + ",\"end\":" + std::to_string(at.Endurance) + ",\"str\":" + std::to_string(at.Strength) + ",\"dex\":" + std::to_string(at.Dexterity)
+                + ",\"res\":" + std::to_string(at.Resistance) + ",\"int\":" + std::to_string(at.Intellect) + ",\"fth\":" + std::to_string(at.Force)
+                + ",\"humanity\":" + std::to_string(at.Humanity) + ",\"covenant\":" + std::to_string(at.covenantId) + "}";
+            const EquipInventoryDataItem* itemlist = egd->equippedInventory.itemlist2;
+            const uint32_t itemlistlen = egd->equippedInventory.itemList2_len;
+            s += ",\"slots\":[";
+            for (uint32_t i = 0; i < InventorySlots::END; i++)
+            {
+                s += std::string(i ? "," : "") + "{\"slot\":" + std::to_string(i) + ",\"id\":" + std::to_string((int32_t)egd->chrasm.equip_items[i])
+                    + ",\"inventory_index\":" + std::to_string((int32_t)egd->EquipItemToInventoryIndexMap[i]) + "}";
+            }
+            s += "]" + player_equipment_json(pi);
+            s += ",\"quickbar\":" + quickbar_json();
+            s += ",\"inventory\":[";
+            int n = 0;
+            for (uint32_t i = 0; itemlist != NULL && i < itemlistlen; i++)
+            {
+                const EquipInventoryDataItem& it = itemlist[i];
+                if (it.item_id == 0xFFFFFFFF || it.item_category == 0xFFFFFFFF || inventory_item_quantity(&it) <= 0) continue;
+                char b[160];
+                snprintf(b, sizeof(b), "%s{\"index\":%u,\"category\":\"0x%x\",\"id\":%d,\"quantity\":%d,\"durability\":%u}", n ? "," : "", i,
+                    it.item_category, (int32_t)it.item_id, inventory_item_quantity(&it), inventory_item_durability(&it, 0));
+                s += b;
+                n++;
+            }
+            return ok_json(s + "]");
+        }
+
+        //Test setup: equip an inventory item the way the equipment menu does (Host_Set_Equipped_Items 0x140638000):
+        //ChrAsm_Set_Equipped_Items(EquipGameData, slot, item id, inventory index, force), then the quickbar resync FUN_140631e90.
+        //The menu's network notification is the separate `announce` command (once, after the last change).
+        if (cmd == "equip")
+        {
+            if (a.size() < 4) return err_json("usage: equip <slot 0-19> <weapon|protector|accessory|goods> <id>");
+            if (Rollback::ggpoStarted) return err_json("a session is running");
+            uint32_t category;
+            if (!parse_item_category(a[2], &category)) return err_json("unknown category");
+            int32_t slot = 0, id = 0;
+            try { slot = std::stoi(a[1]); id = std::stoi(a[3]); } catch (...) { return err_json("bad slot or id"); }
+            if (slot < 0 || slot >= InventorySlots::END || slot == 0xc) return err_json("slot must be 0..19 (not 12)");
+            EquipGameData* egd = local_equip_game_data();
+            if (egd == NULL) return err_json("no local player");
+            const EquipInventoryDataItem* itemlist = egd->equippedInventory.itemlist2;
+            const uint32_t itemlistlen = egd->equippedInventory.itemList2_len;
+            int32_t index = -1;
+            for (uint32_t i = 0; itemlist != NULL && i < itemlistlen; i++)
+            {
+                if (item_category_is(itemlist[i].item_category, category) && (int32_t)itemlist[i].item_id == id && inventory_item_quantity(&itemlist[i]) > 0)
+                {
+                    index = (int32_t)i;
+                    break;
+                }
+            }
+            if (index < 0) return err_json("not in the inventory: " + a[2] + " " + a[3]);
+            typedef void ChrAsm_Set_Equipped_Items_FUNC(EquipGameData*, uint32_t slot, uint32_t item_id, int32_t inventory_index, bool force);
+            typedef void EquipGameData_Resync_Quickbar_FUNC(EquipGameData*);
+            ((ChrAsm_Set_Equipped_Items_FUNC*)(Game::ds1_base + 0x746840))(egd, (uint32_t)slot, (uint32_t)id, index, true);
+            ((EquipGameData_Resync_Quickbar_FUNC*)(Game::ds1_base + 0x631e90))(egd);
+            ConsoleWrite("HARNESS: equip slot %d = %s %d (inventory index %d)", slot, a[2].c_str(), id, index);
+            return ok_json("\"slot\":" + std::to_string(slot) + ",\"inventory_index\":" + std::to_string(index) + ",\"quickbar\":" + quickbar_json());
+        }
+
+        //Test setup: tell the other players about this character the way the equipment menu does after a change
+        //(trigger_sendType10NetMessage 0x14035c990). With rollback enabled and no session, the mod sends its own player-init
+        //packet in place of the game's (NetcodePackets.cpp): position, rotation, HP, stamina and equipment, which the other
+        //machines put on their copy. So their copy stands where this character was warped to and has loaded the models of
+        //what it now wears before the session starts.
+        if (cmd == "announce")
+        {
+            if (Rollback::ggpoStarted) return err_json("a session is running");
+            PlayerIns* local_player = NULL;
+            if (local_equip_game_data(&local_player) == NULL) return err_json("no local player");
+            typedef void trigger_sendType10NetMessage_FUNC(PlayerIns*);
+            ((trigger_sendType10NetMessage_FUNC*)(Game::ds1_base + 0x35c990))(local_player);
+            ConsoleWrite("HARNESS: announce");
+            return ok_json();
+        }
+
+        //Test setup: attune a spell. The slots are {magic id, casts left}; EquipMagicData::Set_MagicInListToMaxQuantity
+        //(0x140753190, what resting at a bonfire runs) refills every slot from the MagicParam rows.
+        if (cmd == "attune")
+        {
+            if (a.size() < 3) return err_json("usage: attune <slot 0-11> <magic id | -1> [select]");
+            if (Rollback::ggpoStarted) return err_json("a session is running");
+            int32_t slot = 0, id = 0;
+            try { slot = std::stoi(a[1]); id = std::stoi(a[2]); } catch (...) { return err_json("bad slot or id"); }
+            if (slot < 0 || slot >= 12) return err_json("slot must be 0..11");
+            EquipGameData* egd = local_equip_game_data();
+            if (egd == NULL || egd->equipMagicData == NULL) return err_json("no local player");
+            EquipMagicData* emd = egd->equipMagicData;
+            emd->equippedMagicList[slot].magic_id = id;
+            emd->equippedMagicList[slot].count = 0;
+            typedef void Set_MagicInListToMaxQuantity_FUNC(EquipMagicData*);
+            ((Set_MagicInListToMaxQuantity_FUNC*)(Game::ds1_base + 0x753190))(emd);
+            if (a.size() > 3 && a[3] == "select") emd->curSelectedMagicSlot = slot;
+            ConsoleWrite("HARNESS: attune slot %d = %d (%u casts)", slot, id, emd->equippedMagicList[slot].count);
+            return ok_json("\"slot\":" + std::to_string(slot) + ",\"count\":" + std::to_string((int32_t)emd->equippedMagicList[slot].count)
+                + ",\"selected_slot\":" + std::to_string(emd->curSelectedMagicSlot));
+        }
+
+        //Test setup: the local character's current HP (a kill then needs one hit instead of a dozen)
+        if (cmd == "set_hp")
+        {
+            if (a.size() < 2) return err_json("usage: set_hp <hp>");
+            if (Rollback::ggpoStarted) return err_json("a session is running");
+            int32_t hp = 0;
+            try { hp = std::stoi(a[1]); } catch (...) { return err_json("bad hp"); }
+            PlayerIns* pi = NULL;
+            if (local_equip_game_data(&pi) == NULL) return err_json("no local player");
+            if (hp < 1) hp = 1;
+            if ((uint32_t)hp > pi->chrins.maxHp) hp = (int32_t)pi->chrins.maxHp;
+            pi->chrins.curHp = (uint32_t)hp;
+            ConsoleWrite("HARNESS: set_hp %d", hp);
+            return ok_json("\"hp\":" + std::to_string(hp) + ",\"max_hp\":" + std::to_string(pi->chrins.maxHp));
         }
 
         //Test setup: give the local player an item with the game's own GiveItemToPlayer, forced into the first free quickbar
@@ -1230,7 +1472,8 @@ namespace
                            "\"script load <path>\",\"script add <directive>\",\"script clear\",\"script neutral on|off\","
                            "\"script name <text>\",\"script status\",\"peek <hexaddr> [len]\",\"rtti <hexaddr>\",\"end_session\",\"start_session\",\"freeze on|off|status\",\"warp <x> <y> <z> <yaw>\","
                            "\"log <text>\",\"subscribe\",\"hashes [since] [max]\",\"dump_at <frame>|+<n>\",\"dump_status\","
-                           "\"dump_get\",\"probe\",\"selectitem <category> <id>\",\"session_hold on|off\",\"set_chr_type <steam id> <chr type> <team type>\""
+                           "\"dump_get\",\"probe\",\"loadout\",\"giveitem <category> <id> <quantity> [select]\",\"equip <slot> <category> <id>\","
+                           "\"attune <slot> <magic id> [select]\",\"announce\",\"set_hp <hp>\",\"selectitem <category> <id>\",\"session_hold on|off\",\"set_chr_type <steam id> <chr type> <team type>\""
 #if ROLLBACK_INPUT_TESTING
                            ",\"inputdiag\",\"network on|off\",\"network role send|recv\",\"network status\",\"pad [status|reset]\""
 #if VIRTUALPAD_SELFTEST
