@@ -71,7 +71,7 @@ const uint64_t Rollback::PlayerIns_IsHostPlayerIns_offsets[] = {
     //0x1402fccb0,
     //0x14030f30d,
     //0x14030f3ca,
-    //0x14031d780,
+    0x14031d780, //a damage entry hit a character: the attacker's weapon wear (-> PlayerIns vtable+0x3b8 -> FUN_140749b70) only for the "host" player
     //0x14031f25c,
     //0x14031f4ce,
     //0x14031f68f,
@@ -99,13 +99,13 @@ const uint64_t Rollback::PlayerIns_IsHostPlayerIns_offsets[] = {
     //0x140327425,
     //0x14032748c,
     //0x140327c69,
-    //0x1403280bb,
+    0x1403280bb, //a throw (backstab, riposte) connects: the thrower's weapon wear (-> 0x1403280e2 -> PlayerIns vtable+0x3b8) only for the "host" player
     //0x140328141,
     //0x1403287c1,
     //0x140328c17,
     //0x140328dd2,
     //0x140329cd7,
-    //0x140329e8d,
+    0x140329e8d, //the character took the hit: its armour wear (-> 0x140358dc0 -> FUN_140749c10) only for the "host" player
     //0x14032a839,
     //0x14032a863,
     //0x14032ad56,

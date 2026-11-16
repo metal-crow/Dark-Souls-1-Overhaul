@@ -348,6 +348,8 @@ static void copy_EquipInventoryData(EquipInventoryData* to, const EquipInventory
     memcpy(to->itemlist2, from->itemlist2, sizeof(EquipInventoryDataItem) * from->itemList2_len);
     to->itemCount = from->itemCount;
     to->keyCount = from->keyCount;
+    to->highestItemIndex = from->highestItemIndex;
+    to->index_of_last_pickedup_item = from->index_of_last_pickedup_item;
 }
 
 void copy_EquipGameData(EquipGameData* to, const EquipGameData* from, StateTarget target)
@@ -2254,6 +2256,8 @@ static void serialize_EquipInventoryData(StateVisitor& v, const EquipInventoryDa
     }
     v.field("itemCount", d->itemCount);
     v.field("keyCount", d->keyCount);
+    v.field("highestItemIndex", d->highestItemIndex);
+    v.field("index_of_last_pickedup_item", d->index_of_last_pickedup_item);
     v.end();
 }
 

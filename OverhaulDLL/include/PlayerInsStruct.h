@@ -1796,9 +1796,13 @@ struct EquipInventoryData
     EquipInventoryDataItem* itemlist2;
     uint32_t itemCount;
     uint32_t keyCount;
-    uint8_t padding_4[48];
+    uint8_t padding_4[24];
+    uint32_t highestItemIndex;            // 0x60
+    uint32_t index_of_last_pickedup_item; // 0x64
+    uint8_t padding_5[16];
 };
 
+static_assert(offsetof(EquipInventoryData, highestItemIndex) == 0x60);
 static_assert(sizeof(EquipInventoryData) == 0x78);
 
 struct MagicSlot
