@@ -424,7 +424,7 @@ typedef struct PlayerInitPacketDelayedStruct PlayerInitPacketDelayedStruct;
 struct PlayerInitPacketDelayedStruct
 {
     PlayerInitPacket* pkt;
-    uint64_t ConnectedPlayerData;
+    int32_t session_player_num;
 };
 
 bool RecvPlayerInitPacket_AwaitForPlayerIns(void* data_)
@@ -435,7 +435,15 @@ bool RecvPlayerInitPacket_AwaitForPlayerIns(void* data_)
     {
         return true;
     }
-    PlayerIns* playerins = getPlayerInsForConnectedPlayerData(*(void**)Game::world_chr_man_imp, (void*)data->ConnectedPlayerData);
+    uint64_t connectedPlayerData = Game::get_ConnectedPlayerData_For_SessionPlayerNumber(data->session_player_num);
+    if (connectedPlayerData == 0)
+    {
+        ConsoleWrite("RecvPlayerInitPacket: session player %d left before its character existed, packet dropped", data->session_player_num);
+        free(pkt);
+        free(data_);
+        return false;
+    }
+    PlayerIns* playerins = getPlayerInsForConnectedPlayerData(*(void**)Game::world_chr_man_imp, (void*)connectedPlayerData);
     if (playerins == NULL)
     {
         return true;
@@ -470,7 +478,7 @@ void RecvPlayerInitPacket(uint64_t ConnectedPlayerData)
             //need to set these once the playerins has been created
             PlayerInitPacketDelayedStruct* data = (PlayerInitPacketDelayedStruct*)malloc(sizeof(PlayerInitPacketDelayedStruct));
             data->pkt = pkt;
-            data->ConnectedPlayerData = ConnectedPlayerData;
+            data->session_player_num = session_player_num;
             MainLoop::setup_mainloop_callback(RecvPlayerInitPacket_AwaitForPlayerIns, data, "RecvPlayerInitPacket_AwaitForPlayerIns");
 
             for (uint32_t i = 0; i < 20; i++)
@@ -497,6 +505,11 @@ void RecvPlayerInitPacket(uint64_t ConnectedPlayerData)
             uint8_t* on_pkt_recv = (uint8_t*)((*(uint64_t*)((*(uint64_t*)Game::game_data_man) + 0x28)) + session_player_num);
             *on_pkt_recv |= 0x4;
             *on_pkt_recv |= 0x8;
+        }
+        else
+        {
+            //nothing was waiting (the usual case: this runs on every poll of every message type)
+            free(pkt);
         }
     }
 }

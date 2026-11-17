@@ -1766,6 +1766,31 @@ int32_t Game::get_SessionPlayerNumber_For_ConnectedPlayerData(uint64_t connected
     return -1;
 }
 
+//The ConnectedPlayerData inside the session's own list entry for that player, or 0 if it is not connected (any more)
+uint64_t Game::get_ConnectedPlayerData_For_SessionPlayerNumber(int32_t session_player_num)
+{
+    uint64_t session_man = *(uint64_t*)Game::session_man_imp;
+    if (session_man == 0)
+    {
+        return 0;
+    }
+    uint64_t connected_players = *(uint64_t*)(session_man + 0x248);
+    if (connected_players == 0)
+    {
+        return 0;
+    }
+    uint64_t node = *(uint64_t*)(connected_players + 0);
+    while (node != connected_players)
+    {
+        if (*(int32_t*)(node + 0x50) == session_player_num)
+        {
+            return node + 0x10;
+        }
+        node = *(uint64_t*)(node + 0);
+    }
+    return 0;
+}
+
 void Game::set_StepInGameMenu_allowed(bool allow)
 {
     StepInGameMenu_allowed = allow;

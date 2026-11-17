@@ -415,6 +415,8 @@ public:
 
     static int32_t get_SessionPlayerNumber_For_ConnectedPlayerData(uint64_t connectedplayerdata);
 
+    static uint64_t get_ConnectedPlayerData_For_SessionPlayerNumber(int32_t session_player_num);
+
     static void set_StepInGameMenu_allowed(bool allow);
 
     static void set_ReadInputs_allowed(bool allow);
