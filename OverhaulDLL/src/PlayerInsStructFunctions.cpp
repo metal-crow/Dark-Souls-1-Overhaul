@@ -2529,22 +2529,20 @@ static void serialize_ChrIns_field0x2c8(StateVisitor& v, const ChrIns_field0x2c8
 }
 
 // A HitIns is a map collision part (HavokChara_Link_HitIns takes it from the collidable a character touches), not
-// part of the character: every character on the same floor links the same one. So only WHICH part is linked is
-// player state -- sub1's identity (area id and part data; +0x50 is a pointer) -- and the rest is the part's own
-// runtime state, which is world state and differs between machines. The start-state handshake must never write
-// another machine's values into this machine's map part, so APPLY works on a throwaway copy.
+// part of the character: every character on the same floor links the same one. Its contents are the part's own state,
+// which is world state.
+//
+// WHICH part is linked is not compared either (it was until 2026-11-16). The link is the closest hit of a sphere cast
+// through the whole physics world, every frame (FUN_1402bcb00 -> FUN_1402b0e70), and which map collision bodies are in
+// that world is each machine's own streaming state: measured in trade_hits, at one spot machine A had a second body of
+// map part 0x00 where machine B had part 0x62, so the same character at the same position stood on a different part on
+// each machine, with the same height, material and area ids. Only whether there is a part at all is compared; what the
+// character takes from the part that matters to it (area ids, materials) is compared in ChrIns.
 static void serialize_HitIns(StateVisitor& v, const HitIns* h)
 {
     if (h == NULL) { v.field("HitIns_null", true); return; }
-    HitIns scratch;
-    if (v.mode == StateVisitor::Mode::Apply)
-    {
-        scratch = *h;
-        h = &scratch;
-    }
     v.begin("HitIns");
-    v.blob_holes("identity", &h->unk_18, 0x48, { { 0x2, 1, StateVisitor::Hole::Pad }, { 0x38, 8, StateVisitor::Hole::Ptr }, { 0x42, 1, StateVisitor::Hole::Pad }, { 0x44, 4, StateVisitor::Hole::Pad } });
-    v.excluded("part_runtime_state", sizeof(HitIns) - 0x60);
+    v.excluded("part", sizeof(HitIns));
     v.end();
 }
 
@@ -3281,7 +3279,9 @@ static void serialize_ChrIns(StateVisitor& v, const ChrIns* c)
         v.field("damage_entry_flag", rec[4]);
         v.padding("damage_entry_pad", rec + 5, 3);
     }
-    v.blob_holes("unk_320", &c->unk_320, 0x50, { { 0x42, 2, StateVisitor::Hole::Pad }, { 0x45, 3, StateVisitor::Hole::Pad } });
+    //+0x334..+0x353 and +0x364 are copied from the map part the character stands on (its draw and display groups): which
+    //part that is is not compared, see serialize_HitIns. The area ids and materials after them (+0x354..+0x361) are.
+    v.blob_holes("unk_320", &c->unk_320, 0x50, { { 0x14, 0x20, StateVisitor::Hole::Pad }, { 0x42, 6, StateVisitor::Hole::Pad } });
     serialize_HitIns(v, c->hitins_1);
     serialize_HitIns(v, c->hitins_2);
     v.blob("unk_380", &c->unk_380, 8);
@@ -3307,7 +3307,11 @@ static void serialize_ChrIns(StateVisitor& v, const ChrIns* c)
     v.blob_holes("unk_450", &c->unk_450, 0x18, { { 0x4, 4, StateVisitor::Hole::Pad }, { 0x11, 3, StateVisitor::Hole::Pad } });
     v.blob_holes("unk_470", &c->unk_470, 0x50, { { 0xd, 3, StateVisitor::Hole::Pad }, { 0x45, 3, StateVisitor::Hole::Pad } });
     v.blob_holes("unk_4d8", &c->unk_4d8, 0x18, { { 0x8, 8, StateVisitor::Hole::Ptr } });
-    v.blob_holes("unk_518", &c->unk_518, 0x58, { { 0x34, 4, StateVisitor::Hole::Pad }, { 0x40, 4, StateVisitor::Hole::Pad } });
+    //+0x44 (ChrIns+0x55c) is ActionCtrl::messageID_for_events as the character step copies it (0x140320235): the event
+    //scripts' "who did this" id, which is the attacker's entity id only when the attacker is this machine's own player
+    //(10000) and -1 otherwise. Entity ids are per machine (PlayerIns_GetEntityId) and event state is out of scope, so it
+    //is copied but not compared.
+    v.blob_holes("unk_518", &c->unk_518, 0x58, { { 0x34, 4, StateVisitor::Hole::Pad }, { 0x40, 4, StateVisitor::Hole::Pad }, { 0x44, 4, StateVisitor::Hole::Pad } });
     v.end();
 }
 
