@@ -44,6 +44,7 @@
                                     oldest first; "gap":true if the ring no longer reaches since+1
       dump_at <frame>|+<n>          capture the full canonical state text when GGPO saves that frame
                                     (absolute, or n frames past the current one); re-saves overwrite until confirmed
+      dump_range <first> <last>|off write statedump_range_<frame>.txt next to the exe for every save of those frames
       dump_status                   dump_requested / dump_frame / dump_confirmed / dump_size / dump_file
       dump_get                      the captured text (+ dump_status fields); large (hundreds of KB)
       probe                         per connected player: hp, stamina, position, throw state, special effects, status build-up,
@@ -500,7 +501,7 @@ namespace
     // an 0xC... code, so the crash handler's vectored handler ignores it, and ours (added first) records it and continues.
     //callers: the first stack slots that point into the game's code, a poor man's backtrace (the writer may be reached
     //through Arxan's jump-return stubs, which leave no static callers)
-    struct WatchHit { uint32_t slot; uint64_t rip; uint64_t value; uint32_t count; uint64_t callers[8]; uint64_t rcx, rdx, r8, ret; int32_t frame; bool resim; };
+    struct WatchHit { uint32_t slot; uint64_t rip; uint64_t value; uint32_t count; uint64_t callers[8]; uint64_t rcx, rdx, r8, ret; int32_t frame; bool resim; int32_t last_frame; };
 
     //A stack slot is taken as a return address only if the bytes before it are a call: E8 rel32, or FF /2 (call reg,
     //call [reg], call [reg+disp8], call [reg+disp32], call [rip+disp32], with or without a REX prefix)
@@ -521,6 +522,7 @@ namespace
     uint64_t watch_addr[4] = {};
     uint32_t watch_len[4] = {};
     bool watch_exec[4] = {};
+    bool watch_exec_calls[4] = {};                     //exec breakpoints: one entry per distinct (rcx, rdx, caller) instead of per frame
     int64_t watch_rdx_filter[4] = { -1, -1, -1, -1 };   //exec breakpoints: record only calls whose edx is this (-1 = all)
     PVOID watch_handler = NULL;
 
@@ -566,6 +568,7 @@ namespace
             ggpo_get_frame_info(Rollback::ggpo, &f, &c);
             hit.frame = f;
         }
+        hit.last_frame = hit.frame;
         hit.resim = Rollback::inRollbackResim;
         //writes from outside the game (the mod restoring saved state) are not told apart by frame, or they fill the log
         if (rip < Game::ds1_base || rip > Game::ds1_base + 0x3200000)
@@ -588,9 +591,12 @@ namespace
             bool found = false;
             for (WatchHit& h : watch_hits)
             {
-                if (h.slot == slot && h.rip == rip && h.value == hit.value && h.rcx == hit.rcx && h.rdx == hit.rdx && h.r8 == hit.r8 && h.ret == hit.ret
-                    && h.frame == hit.frame && h.resim == hit.resim
-                    && memcmp(h.callers, hit.callers, sizeof(hit.callers)) == 0) { h.count++; found = true; break; }
+                //an execute breakpoint in "calls" mode is one entry per distinct (rcx, rdx, caller): first and last frame, count
+                const bool same_time = watch_exec[slot] && watch_exec_calls[slot]
+                    ? true : (h.r8 == hit.r8 && h.frame == hit.frame && h.resim == hit.resim);
+                if (h.slot == slot && h.rip == rip && h.value == hit.value && h.rcx == hit.rcx && h.rdx == hit.rdx && h.ret == hit.ret
+                    && same_time
+                    && memcmp(h.callers, hit.callers, sizeof(hit.callers)) == 0) { h.count++; h.last_frame = hit.frame; found = true; break; }
             }
             if (!found && watch_hits.size() < 256) watch_hits.push_back(hit);
         }
@@ -964,6 +970,23 @@ namespace
 
         if (cmd == "dump_status") return ok_json(RollbackHash::dump_status_fields());
 
+        //Every save of a frame in [first, last] writes statedump_range_<frame>.txt next to the exe (what DSR_HARNESS_DUMP_FRAME
+        //arms at launch); for a divergence at a known frame of a session that can be run again
+        if (cmd == "dump_range")
+        {
+            if (sub == "off")
+            {
+                RollbackHash::dump_range_first = RollbackHash::dump_range_last = -1;
+            }
+            else if (a.size() >= 3)
+            {
+                RollbackHash::dump_range_first = atoi(a[1].c_str());
+                RollbackHash::dump_range_last = atoi(a[2].c_str());
+            }
+            else return err_json("usage: dump_range <first> <last> | dump_range off");
+            return ok_json("\"first\":" + std::to_string(RollbackHash::dump_range_first) + ",\"last\":" + std::to_string(RollbackHash::dump_range_last));
+        }
+
         if (cmd == "dump_get")
         {
             if (RollbackHash::dump_frame < 0) return err_json("no state dump captured yet (use dump_at)");
@@ -1068,21 +1091,22 @@ namespace
                     }
                     s += "{\"slot\":" + std::to_string(h.slot) + ",\"rcx\":" + q(hex64(h.rcx)) + ",\"rdx\":" + q(hex64(h.rdx)) + ",\"r8\":" + q(hex64(h.r8))
                         + ",\"ret\":" + q(h.ret >= Game::ds1_base && h.ret < Game::ds1_base + 0x4000000 ? hex64(h.ret - Game::ds1_base) : hex64(h.ret))
-                        + ",\"rip\":" + q(hex64(h.rip)) + ",\"game_offset\":" + q(in_game ? hex64(h.rip - Game::ds1_base) : "") + ",\"value\":" + q(hex64(h.value)) + ",\"count\":" + std::to_string(h.count) + ",\"frame\":" + std::to_string(h.frame) + ",\"resim\":" + (h.resim ? "true" : "false") + ",\"callers\":[" + callers + "]}";
+                        + ",\"rip\":" + q(hex64(h.rip)) + ",\"game_offset\":" + q(in_game ? hex64(h.rip - Game::ds1_base) : "") + ",\"value\":" + q(hex64(h.value)) + ",\"count\":" + std::to_string(h.count) + ",\"frame\":" + std::to_string(h.frame) + ",\"last_frame\":" + std::to_string(h.last_frame) +",\"resim\":" + (h.resim ? "true" : "false") + ",\"callers\":[" + callers + "]}";
                 }
                 return ok_json(s + "]");
             }
             if (sub.empty()) return err_json("usage: watch <hexaddr> [1|2|4|8] [slot 0-3] | watch exec <hexaddr> [slot] | watch off | watch log");
             if (sub == "exec")
             {
-                if (a.size() < 3) return err_json("usage: watch exec <hexaddr> [slot]");
+                if (a.size() < 3) return err_json("usage: watch exec <hexaddr> [slot] [edx filter | calls]");
                 uint64_t addr = 0;
                 try { addr = std::stoull(a[2], nullptr, 16); } catch (...) { return err_json("bad address"); }
                 uint32_t slot = 0;
                 if (a.size() > 3) { try { slot = (uint32_t)std::stoul(a[3]); } catch (...) { return err_json("bad slot"); } }
                 if (slot > 3) return err_json("slot must be 0..3");
                 watch_rdx_filter[slot] = -1;
-                if (a.size() > 4) { try { watch_rdx_filter[slot] = (int64_t)(uint32_t)std::stoul(a[4], nullptr, 0); } catch (...) { return err_json("bad edx filter"); } }
+                watch_exec_calls[slot] = a.size() > 4 && a[4] == "calls";
+                if (a.size() > 4 && !watch_exec_calls[slot]) { try { watch_rdx_filter[slot] = (int64_t)(uint32_t)std::stoul(a[4], nullptr, 0); } catch (...) { return err_json("bad edx filter"); } }
                 if (!mem_readable(addr, 1)) return err_json("unreadable");
                 if (!watch_set(slot, addr, 1, true)) return err_json("could not set the debug registers");
                 return ok_json("\"exec\":" + q(hex64(addr)) + ",\"slot\":" + std::to_string(slot));
