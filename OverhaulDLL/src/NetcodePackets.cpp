@@ -101,8 +101,8 @@ const uint64_t Rollback::PlayerIns_IsHostPlayerIns_offsets[] = {
     //0x140327c69,
     0x1403280bb, //a throw (backstab, riposte) connects: the thrower's weapon wear (-> 0x1403280e2 -> PlayerIns vtable+0x3b8) only for the "host" player
     //0x140328141,
-    //0x1403287c1,
-    //0x140328c17,
+    0x1403287c1, //taking a hit arms the ChrRetributionMagicSlot (Karmic Justice; FUN_14080cc60) only for the "host" player
+    0x140328c17, //the same, on the second damage path
     //0x140328dd2,
     //0x140329cd7,
     0x140329e8d, //the character took the hit: its armour wear (-> 0x140358dc0 -> FUN_140749c10) only for the "host" player
