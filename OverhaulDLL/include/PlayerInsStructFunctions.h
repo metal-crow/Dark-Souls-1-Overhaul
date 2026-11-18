@@ -157,6 +157,7 @@ void free_hkpCharacterProxy(hkpCharacterProxy* to);
 bool map_part_locate(const HitIns* part, int32_t* block, int32_t* index);
 HitIns* map_part_resolve(int32_t block, int32_t index);
 void copy_map_part_link(HitIns** to, HitIns* from, StateTarget target);
+void map_parts_request_all_collision();
 
 void copy_AnimationMediator(AnimationMediator* to, const AnimationMediator* from);
 AnimationMediator* init_AnimationMediator();

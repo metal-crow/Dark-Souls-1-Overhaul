@@ -123,6 +123,9 @@ private:
     static const uint64_t ChrCam_ApplyToPadManipulator_store_offset = 0x235480;
     //FUN_14080cbb0: arms the local player's ChrResonanceMagicSlot (push rdi / sub rsp,30h / mov [rsp+20h],-2)
     static const uint64_t ResonanceMagic_Arm_offset = 0x80cbb0;
+    //the map streaming step (thunk at 1403cbfa0), where it calls FUN_1403ec540 to decide what collision each map part
+    //should have loaded: mov rdx,[rbx+80h] / mov rcx,[WorldHitManImp] / call FUN_1403ec540
+    static const uint64_t MapCollisionTargets_offset = 0x3cc29e;
     //Step_Chr_sub2, between building the list of characters to step and stepping them
     static const uint64_t Step_Chr_canonical_order_offset = 0x36f98e;
     //Inventory changes the input cannot carry, refused during sessions (see RollbackASM.asm)

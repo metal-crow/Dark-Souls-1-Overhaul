@@ -322,7 +322,19 @@ extern "C" {
     void BottomlessBoxWithdraw_injection();
 }
 
+//Runs right after the game has decided what collision every map part should have loaded
+extern "C" void MapCollisionTargets_helper()
+{
+    if (!Rollback::rollbackEnabled)
+    {
+        return;
+    }
+    map_parts_request_all_collision();
+}
+
 extern "C" {
+    uint64_t MapCollisionTargets_return;
+    void MapCollisionTargets_injection();
     uint64_t Step_Chr_canonical_order_return;
     void Step_Chr_canonical_order_injection();
     uint64_t ResonanceMagic_Arm_return;
@@ -1395,6 +1407,10 @@ void Rollback::start()
     //no covenant resonance during sessions: see ResonanceMagic_Arm_injection
     write_address = (uint8_t*)(Game::ds1_base + Rollback::ResonanceMagic_Arm_offset);
     sp::mem::code::x64::inject_jmp_14b(write_address, &ResonanceMagic_Arm_return, 1, &ResonanceMagic_Arm_injection);
+
+    //the same map collision on every machine: see map_parts_request_all_collision
+    write_address = (uint8_t*)(Game::ds1_base + Rollback::MapCollisionTargets_offset);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &MapCollisionTargets_return, 5, &MapCollisionTargets_injection);
 
     //step the session players in the same order on every machine: see Step_Chr_canonical_order_helper
     write_address = (uint8_t*)(Game::ds1_base + Rollback::Step_Chr_canonical_order_offset);

@@ -1615,12 +1615,12 @@ template <typename F> static void for_each_map_part_block(F f)
             if (info == NULL || parts == NULL || part_count <= 0)
             {
                 continue;
-        }
+            }
             if (f(*(const int32_t*)(info + 0x20), parts, part_count))
             {
                 return;
-    }
-}
+            }
+        }
     }
 }
 
@@ -1638,7 +1638,7 @@ bool map_part_locate(const HitIns* part, int32_t* block, int32_t* index)
         if (part < parts || part >= parts + part_count || ((const uint8_t*)part - (const uint8_t*)parts) % sizeof(HitIns) != 0)
         {
             return false;
-}
+        }
         *block = block_number;
         *index = (int32_t)(part - parts);
         found = true;
@@ -1653,7 +1653,7 @@ HitIns* map_part_resolve(int32_t block, int32_t index)
     for_each_map_part_block([&](int32_t block_number, HitIns* parts, int32_t part_count)
     {
         if (block_number != block || index < 0 || index >= part_count)
-{
+        {
             return false;
         }
         part = parts + index;
@@ -1668,9 +1668,20 @@ void copy_map_part_link(HitIns** to, HitIns* from, StateTarget target)
     *to = from;
 }
 
-void free_HitIns(HitIns* to)
+//Every map part has a lo-res collision model and (sometimes) a hi-res one. Each frame the game decides what should be loaded
+//The decision is made around the player, so two machines can hold different collision for the same part.
+//A player that walks onto such a part stands on different geometry on each machine.
+//Ask for both models of every part of every loaded block instead, which is the same request on every machine.
+void map_parts_request_all_collision()
 {
-    free(to);
+    for_each_map_part_block([&](int32_t block_number, HitIns* parts, int32_t part_count)
+    {
+        for (int32_t i = 0; i < part_count; i++)
+        {
+            parts[i].TargetBackreadState = (parts[i].unk_b0 & 8) != 0 ? 2 : 4;
+        }
+        return false;
+    });
 }
 
 
@@ -2590,7 +2601,7 @@ static void serialize_map_part_link(StateVisitor& v, const char* name, HitIns* c
     //name both machines share: only that it is one is compared, and APPLY leaves this machine's link alone.
     int32_t block = -1, index = -1;
     if (!map_part_locate(*link, &block, &index))
-{
+    {
         block = -2;
         index = -2;
     }

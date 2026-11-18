@@ -586,6 +586,26 @@ ret
 ResonanceMagic_Arm_injection ENDP
 
 
+EXTERN MapCollisionTargets_return: qword
+extern MapCollisionTargets_helper: proc
+
+;The map streaming step, at its call of FUN_1403ec540 (WorldHitManImp, the reference map part), which sets every map
+;part's TargetBackreadState. The call is made here and the helper then raises the targets; al (all loaded) is kept.
+PUBLIC MapCollisionTargets_injection
+MapCollisionTargets_injection PROC
+;original code
+mov     rdx, qword ptr [rbx+80h]
+mov     rcx, 141c7a0b0h
+mov     rcx, qword ptr [rcx]
+mov     rax, 1403ec540h
+call    rax
+FUNC_PROLOGUE
+call    MapCollisionTargets_helper
+FUNC_EPILOGUE
+jmp     MapCollisionTargets_return
+MapCollisionTargets_injection ENDP
+
+
 EXTERN Step_Chr_canonical_order_return: qword
 extern Step_Chr_canonical_order_helper: proc
 
