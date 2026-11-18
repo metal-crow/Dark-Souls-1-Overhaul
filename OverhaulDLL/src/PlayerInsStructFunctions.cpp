@@ -472,8 +472,8 @@ void copy_ChrIns(ChrIns* to, const ChrIns* from, StateTarget target)
     memcpy(&to->unk_2a0, &from->unk_2a0, 0x30);
     copy_ChrIns_field0x2c8(to->field0x2c8, from->field0x2c8);
     memcpy(&to->unk_2d8, &from->unk_2d8, 0x98);
-    copy_HitIns(to->hitins_1, from->hitins_1);
-    copy_HitIns(to->hitins_2, from->hitins_2);
+    copy_map_part_link(&to->hitins_1, from->hitins_1, target);
+    copy_map_part_link(&to->hitins_2, from->hitins_2, target);
     memcpy(&to->unk_380, &from->unk_380, 8);
     copy_ChrAttachSys(&to->chrattachsys, &from->chrattachsys, target);
     to->curHp = from->curHp;
@@ -511,8 +511,8 @@ ChrIns* init_ChrIns()
     local_ChrIns->specialEffects = init_SpecialEffect();
     local_ChrIns->qwcSpEffectEquipCtrl = init_QwcSpEffectEquipCtrl();
     local_ChrIns->field0x2c8 = init_ChrIns_field0x2c8();
-    local_ChrIns->hitins_1 = init_HitIns();
-    local_ChrIns->hitins_2 = init_HitIns();
+    local_ChrIns->hitins_1 = NULL;
+    local_ChrIns->hitins_2 = NULL;
     auto local_chrattach_sys = init_ChrAttachSys();
     local_ChrIns->chrattachsys = *local_chrattach_sys;
     free(local_chrattach_sys);
@@ -530,8 +530,6 @@ void free_ChrIns(ChrIns* to, bool freeself)
     free_SpecialEffect(to->specialEffects);
     free_QwcSpEffectEquipCtrl(to->qwcSpEffectEquipCtrl);
     free_ChrIns_field0x2c8(to->field0x2c8);
-    free_HitIns(to->hitins_1);
-    free_HitIns(to->hitins_2);
     free_ChrAttachSys(&to->chrattachsys, false);
     free_EntityThrowAnimationStatus(to->throw_animation_info);
     free_AttackInfo(to->pendingAttackInfo);
@@ -1485,6 +1483,7 @@ void copy_HavokChara(HavokChara* to, const HavokChara* from, StateTarget target)
     }
     memcpy(&to->unk_60, &from->unk_60, 0x98);
     memcpy(&to->unk_100, &from->unk_100, 0xe8);
+    copy_map_part_link(&to->hitIns, from->hitIns, target);
     memcpy(&to->unk_1f0, &from->unk_1f0, 0x58);
     memcpy(&to->unk_258, &from->unk_258, 0x38);
 }
@@ -1492,6 +1491,7 @@ void copy_HavokChara(HavokChara* to, const HavokChara* from, StateTarget target)
 HavokChara* init_HavokChara()
 {
     HavokChara* local_HavokChara = (HavokChara*)malloc_(sizeof(HavokChara));
+    local_HavokChara->hitIns = NULL;
 
     local_HavokChara->char_proxy = init_hkpCharacterProxy(StateTarget::ToLocal);
 
@@ -1501,7 +1501,6 @@ HavokChara* init_HavokChara()
 void free_HavokChara(HavokChara* to)
 {
     free_hkpCharacterProxy(to->char_proxy);
-    free_HitIns(to->padding_hitIns);
 
     free(to);
 }
@@ -1585,34 +1584,88 @@ void free_hkpCharacterProxy(hkpCharacterProxy* to)
 }
 
 
-void copy_HitIns(HitIns* to, const HitIns* from)
+//A HitIns is a map collision part: a world object in WorldHitManImp's per-block arrays, shared by every character that
+//stands on it. It is NOT part of a character. What a character owns is the link, i.e. which part: ChrIns::hitins_1 (the
+//floor part), hitins_2 (the part of its first landing) and HavokChara::hitIns (what the floor cast last hit).
+//
+//WorldHitManImp: +0x1c area count, +0x20 areas (0x20 each: +0x10 block count, +0x18 blocks). WorldBlockHit (0x98):
+//+0x8 -> block info (+0x20 block number), +0x48 part count, +0x50 parts (sizeof(HitIns) each).
+static const uint64_t WorldHitManImp_ptr = 0x141c7a0b0;
+
+template <typename F> static void for_each_map_part_block(F f)
 {
-    if (to == NULL || from == NULL)
+    const uint8_t* man = *(const uint8_t* const*)WorldHitManImp_ptr;
+    if (man == NULL)
     {
         return;
     }
-    to->unk_8 = from->unk_8;
-    to->unk_c = from->unk_c;
-    memcpy(&to->unk_18, &from->unk_18, 0x48);
-    to->unk_70 = from->unk_70;
-    to->unk_72 = from->unk_72;
-    to->unk_74 = from->unk_74;
-    to->unk_98 = from->unk_98;
-    to->unk_9a = from->unk_9a;
-    to->unk_9c = from->unk_9c;
-    to->unk_b0 = from->unk_b0;
-    to->BackReadState = from->BackReadState;
-    to->TargetBackreadState = from->TargetBackreadState;
-    memcpy(to->unk_b3, from->unk_b3, sizeof(to->unk_b3));
-    to->IsDispHitRigid = from->IsDispHitRigid;
-    memcpy(to->unk_c1, from->unk_c1, sizeof(to->unk_c1));
+    const uint8_t* areas = *(const uint8_t* const*)(man + 0x20);
+    const int32_t area_count = *(const int32_t*)(man + 0x1c);
+    for (int32_t a = 0; areas != NULL && a < area_count; a++)
+    {
+        const uint8_t* area = areas + (size_t)a * 0x20;
+        const uint8_t* blocks = *(const uint8_t* const*)(area + 0x18);
+        const int32_t block_count = *(const int32_t*)(area + 0x10);
+        for (int32_t b = 0; blocks != NULL && b < block_count; b++)
+        {
+            const uint8_t* block = blocks + (size_t)b * 0x98;
+            const uint8_t* info = *(const uint8_t* const*)(block + 0x8);
+            HitIns* parts = *(HitIns* const*)(block + 0x50);
+            const int32_t part_count = *(const int32_t*)(block + 0x48);
+            if (info == NULL || parts == NULL || part_count <= 0)
+            {
+                continue;
+        }
+            if (f(*(const int32_t*)(info + 0x20), parts, part_count))
+            {
+                return;
+    }
+}
+    }
 }
 
-HitIns* init_HitIns()
+bool map_part_locate(const HitIns* part, int32_t* block, int32_t* index)
 {
-    HitIns* local_HitIns = (HitIns*)malloc_(sizeof(HitIns));
+    *block = -1;
+    *index = -1;
+    if (part == NULL)
+    {
+        return true;
+    }
+    bool found = false;
+    for_each_map_part_block([&](int32_t block_number, HitIns* parts, int32_t part_count)
+    {
+        if (part < parts || part >= parts + part_count || ((const uint8_t*)part - (const uint8_t*)parts) % sizeof(HitIns) != 0)
+        {
+            return false;
+}
+        *block = block_number;
+        *index = (int32_t)(part - parts);
+        found = true;
+        return true;
+    });
+    return found;
+}
 
-    return local_HitIns;
+HitIns* map_part_resolve(int32_t block, int32_t index)
+{
+    HitIns* part = NULL;
+    for_each_map_part_block([&](int32_t block_number, HitIns* parts, int32_t part_count)
+    {
+        if (block_number != block || index < 0 || index >= part_count)
+{
+            return false;
+        }
+        part = parts + index;
+        return true;
+    });
+    return part;
+}
+
+//Copy the hitIns as a pointer, since it links the collision of a map object not any player owned data
+void copy_map_part_link(HitIns** to, HitIns* from, StateTarget target)
+{
+    *to = from;
 }
 
 void free_HitIns(HitIns* to)
@@ -2153,7 +2206,7 @@ static void serialize_EzStateRegisterSet(StateVisitor&, const EzStateRegisterSet
 static void serialize_HavokChara(StateVisitor&, const HavokChara*);
 static void serialize_FrpgRagdollIns(StateVisitor&, const FrpgRagdollIns*);
 static void serialize_hkpCharacterProxy(StateVisitor&, const hkpCharacterProxy*);
-static void serialize_HitIns(StateVisitor&, const HitIns*);
+static void serialize_map_part_link(StateVisitor&, const char*, HitIns* const*);
 static void serialize_AnimationMediator(StateVisitor&, const AnimationMediator*);
 static void serialize_AnimationMediatorStateEntry(StateVisitor&, const AnimationMediatorStateEntry*);
 static void serialize_ChrCtrl_AnimationQueue(StateVisitor&, const ChrCtrl_AnimationQueue*);
@@ -2528,22 +2581,32 @@ static void serialize_ChrIns_field0x2c8(StateVisitor& v, const ChrIns_field0x2c8
     v.end();
 }
 
-// A HitIns is a map collision part (HavokChara_Link_HitIns takes it from the collidable a character touches), not
-// part of the character: every character on the same floor links the same one. Its contents are the part's own state,
-// which is world state.
-//
-// WHICH part is linked is not compared either (it was until 2026-11-16). The link is the closest hit of a sphere cast
-// through the whole physics world, every frame (FUN_1402bcb00 -> FUN_1402b0e70), and which map collision bodies are in
-// that world is each machine's own streaming state: measured in trade_hits, at one spot machine A had a second body of
-// map part 0x00 where machine B had part 0x62, so the same character at the same position stood on a different part on
-// each machine, with the same height, material and area ids. Only whether there is a part at all is compared; what the
-// character takes from the part that matters to it (area ids, materials) is compared in ChrIns.
-static void serialize_HitIns(StateVisitor& v, const HitIns* h)
+// Which map part a character is linked to, as (block number, index in the block's part array): the same on every machine
+// that has the same map loaded. The part's contents are world state and are not serialized. APPLY (the start-state
+// handshake) links this machine's part of the same block and index.
+static void serialize_map_part_link(StateVisitor& v, const char* name, HitIns* const* link)
 {
-    if (h == NULL) { v.field("HitIns_null", true); return; }
-    v.begin("HitIns");
-    v.excluded("part", sizeof(HitIns));
+    //-1/-1: no link. -2/-2: linked to something that is not a map part (the collision of a map object), which has no
+    //name both machines share: only that it is one is compared, and APPLY leaves this machine's link alone.
+    int32_t block = -1, index = -1;
+    if (!map_part_locate(*link, &block, &index))
+{
+        block = -2;
+        index = -2;
+    }
+    v.begin(name);
+    v.field("block", block);
+    v.field("index", index);
     v.end();
+    if (v.applying() && index != -2)
+    {
+        HitIns* part = index < 0 ? NULL : map_part_resolve(block, index);
+        if (index >= 0 && part == NULL)
+        {
+            FATALERROR("serialize_map_part_link: %s is part %d of block %d on the sender, which this machine has not loaded", name, index, block);
+        }
+        *(HitIns**)link = part;
+    }
 }
 
 static void serialize_SpinJoint(StateVisitor& v, const SpinJoint* s)
@@ -2618,6 +2681,7 @@ static void serialize_HavokChara(StateVisitor& v, const HavokChara* h)
     serialize_hkpCharacterProxy(v, h->char_proxy);
     v.blob_holes("unk_60", &h->unk_60, 0x98, { { 0xe, 2, StateVisitor::Hole::Pad }, { 0x8d, 1, StateVisitor::Hole::Pad }, { 0x94, 4, StateVisitor::Hole::Pad } });
     v.blob_holes("unk_100", &h->unk_100, 0xe8, { { 0x4, 12, StateVisitor::Hole::Pad } });
+    serialize_map_part_link(v, "cast_part", &h->hitIns);
     v.blob_holes("unk_1f0", &h->unk_1f0, 0x58, { { 0x5, 1, StateVisitor::Hole::Pad }, { 0xb, 5, StateVisitor::Hole::Pad }, { 0x52, 6, StateVisitor::Hole::Pad } });
     v.blob_holes("unk_258", &h->unk_258, 0x38, { { 0x2d, 3, StateVisitor::Hole::Pad } });
     serialize_SavedHavokPhantom(v, "phantom1", &h->saved_phantom_1);
@@ -3279,11 +3343,9 @@ static void serialize_ChrIns(StateVisitor& v, const ChrIns* c)
         v.field("damage_entry_flag", rec[4]);
         v.padding("damage_entry_pad", rec + 5, 3);
     }
-    //+0x334..+0x353 and +0x364 are copied from the map part the character stands on (its draw and display groups): which
-    //part that is is not compared, see serialize_HitIns. The area ids and materials after them (+0x354..+0x361) are.
-    v.blob_holes("unk_320", &c->unk_320, 0x50, { { 0x14, 0x20, StateVisitor::Hole::Pad }, { 0x42, 6, StateVisitor::Hole::Pad } });
-    serialize_HitIns(v, c->hitins_1);
-    serialize_HitIns(v, c->hitins_2);
+    v.blob_holes("unk_320", &c->unk_320, 0x50, { { 0x42, 2, StateVisitor::Hole::Pad }, { 0x45, 3, StateVisitor::Hole::Pad } });
+    serialize_map_part_link(v, "floor_part", &c->hitins_1);
+    serialize_map_part_link(v, "first_landing_part", &c->hitins_2);
     v.blob("unk_380", &c->unk_380, 8);
     serialize_ChrAttachSys(v, &c->chrattachsys);
     v.field("curHp", c->curHp);

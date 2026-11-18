@@ -530,7 +530,7 @@ struct HavokChara
     uint32_t unk_1cc[4];              // 0x1cc
     uint32_t hitMtrlType;             // 0x1dc
     float unk_1e0[2];                 // 0x1e0
-    HitIns* padding_hitIns;           // 0x1e8 (not copied)
+    HitIns* hitIns;                   // 0x1e8 (the map part the floor cast last hit: not owned by the player, so we copy the pointer. see copy_map_part_link)
     uint8_t unk_1f0[4];               // 0x1f0
     uint8_t unable_to_fall;           // 0x1f4 (ghidra: bool)
     uint8_t unk_1f5;                  // 0x1f5
@@ -572,7 +572,7 @@ static_assert(offsetof(HavokChara, unk_100) == 0x100);
 static_assert(offsetof(HavokChara, last_ground_coords) == 0x110);
 static_assert(offsetof(HavokChara, slopeInfo) == 0x120);
 static_assert(offsetof(HavokChara, hitMtrlType) == 0x1dc);
-static_assert(offsetof(HavokChara, padding_hitIns) == 0x1e8);
+static_assert(offsetof(HavokChara, hitIns) == 0x1e8);
 static_assert(offsetof(HavokChara, unk_1f0) == 0x1f0);
 static_assert(offsetof(HavokChara, padding_2) == 0x248);
 static_assert(offsetof(HavokChara, unk_258) == 0x258);
