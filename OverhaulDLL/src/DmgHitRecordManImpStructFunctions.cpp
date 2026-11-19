@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <vector>
 #include "DmgHitRecordManImpStructFunctions.h"
 #include "StateSerializer.h"
 #include "PlayerHandles.h"
@@ -59,46 +61,58 @@ void copy_DmgHitRecordManImp(DmgHitRecordManImp* to, DmgHitRecordManImp* from, S
     to->field0x28_heap_count = from->field0x28_heap_count;
 }
 
-//The order of a pool's free list is history: which records were used and returned, in which order, since the map loaded. Two
-//machines' histories differ (a hit one of them simulated before the session), and since new records are taken from the head, the
-//same hit would then land in different records on each machine for the rest of the session. So a session starts from the order
-//the game itself builds the pools in. Only when every record is free; records in use are state this cannot rearrange.
+//Relink the records of a singly linked list in pool order (a record's index in the pool array); records outside the pool
+//(heap-allocated because the pool was empty) keep their relative order after them. Returns how many were outside the pool.
 template <typename T>
-static bool pool_all_free(T* head, const T* start, size_t count)
+static size_t relink_in_pool_order(T** head, const T* start, size_t count)
 {
-    size_t n = 0;
-    for (T* e = head; e != NULL; e = e->next)
+    std::vector<T*> pooled, heap;
+    for (T* e = *head; e != NULL; e = e->next)
     {
         const ptrdiff_t offset = (const char*)e - (const char*)start;
-        if (offset < 0 || offset >= (ptrdiff_t)(count * sizeof(T)) || offset % (ptrdiff_t)sizeof(T) != 0 || ++n > count)
+        if (offset >= 0 && offset < (ptrdiff_t)(count * sizeof(T)) && offset % (ptrdiff_t)sizeof(T) == 0)
         {
-            return false;
+            pooled.push_back(e);
+        }
+        else
+        {
+            heap.push_back(e);
+        }
+        if (pooled.size() + heap.size() > count + 100000)
+        {
+            FATALERROR("relink_in_pool_order: the list does not end");
         }
     }
-    return n == count;
+    std::sort(pooled.begin(), pooled.end());
+    pooled.insert(pooled.end(), heap.begin(), heap.end());
+    T* next = NULL;
+    for (size_t i = pooled.size(); i-- > 0;)
+    {
+        pooled[i]->next = next;
+        next = pooled[i];
+    }
+    *head = next;
+    return heap.size();
 }
 
+//The order of these lists is each machine's history, and the game takes from and walks them in that order, so a session
+//starts with each in pool order:
+// * the free lists: which records were used and returned, in which order, since the map loaded. New records are taken
+//   from the head, so otherwise the same hit lands in different records on each machine for the rest of the session.
+// * the timed list (records whose lifetime is still counting down, typically hits from before the session): FUN_1403c4da0
+//   pops every record each frame and pushes the live ones back on the front, i.e. reverses the list every frame, so two
+//   machines that had run a different number of frames since the hit held the same records in opposite orders
+//Records in use are not moved between lists; only their order changes. Returns false if heap-allocated records were
+//involved, whose relative order this cannot make agree.
 bool canonicalize_DmgHitRecordManImp_free_lists(DmgHitRecordManImp* d)
 {
     const size_t n10 = max_preallocated_DmgHitRecordManImp_field0x10Elem;
     const size_t n28 = max_preallocated_DmgHitRecordManImp_field0x28Elem;
-    if (d->timed_list != NULL || d->field0x10_heap_count != 0 || d->field0x28_heap_count != 0
-        || !pool_all_free(d->field0x10_array, d->field0x10_array_start, n10)
-        || !pool_all_free(d->field0x28_array, d->field0x28_array_start, n28))
-    {
-        return false;
-    }
-    for (size_t i = 0; i < n10; i++)
-    {
-        d->field0x10_array_start[i].next = (i + 1 < n10) ? &d->field0x10_array_start[i + 1] : NULL;
-    }
-    d->field0x10_array = d->field0x10_array_start;
-    for (size_t i = 0; i < n28; i++)
-    {
-        d->field0x28_array_start[i].next = (i + 1 < n28) ? &d->field0x28_array_start[i + 1] : NULL;
-    }
-    d->field0x28_array = d->field0x28_array_start;
-    return true;
+    size_t outside = 0;
+    outside += relink_in_pool_order(&d->field0x10_array, d->field0x10_array_start, n10);
+    outside += relink_in_pool_order(&d->field0x28_array, d->field0x28_array_start, n28);
+    outside += relink_in_pool_order(&d->timed_list, d->field0x10_array_start, n10);
+    return outside == 0 && d->field0x10_heap_count == 0 && d->field0x28_heap_count == 0;
 }
 
 DmgHitRecordManImp* init_DmgHitRecordManImp()
