@@ -21,6 +21,7 @@
 #include "ModNetworking.h"
 #include "CustomInvasionTypes.h"
 #include "SfxManStructFunctions.h"
+#include "Rollback.h"
 
 
 /*
@@ -1107,6 +1108,20 @@ std::optional<uint32_t> Game::get_pc_playernum() {
         pc_playernum_cache = pc_playernum.resolve();
         return *pc_playernum_cache;
     }
+}
+
+bool Game::is_session_player_handle(uint32_t handle)
+{
+    for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
+    {
+        auto player_o = Game::get_connected_player(i);
+        PlayerIns* player = player_o.has_value() ? (PlayerIns*)player_o.value() : NULL;
+        if (player != NULL && (uint32_t)player->chrins.handle == handle)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 // returns PlayerIns. index 0 is always the PC/self

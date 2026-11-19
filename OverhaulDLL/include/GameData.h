@@ -343,6 +343,9 @@ public:
 
     static std::optional<uint64_t> get_connected_player(uint32_t i);
 
+    //true if handle is the handle of one of the rollback session's players, as this machine knows them
+    static bool is_session_player_handle(uint32_t handle);
+
     static std::optional<int32_t> convert_handle_to_playernum(uint32_t handle);
 
     static std::optional<uint32_t> convert_playernum_to_handle(uint32_t playernum);

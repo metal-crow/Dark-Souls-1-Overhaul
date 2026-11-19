@@ -77,6 +77,9 @@ namespace
         return false;
     }
 
+    //NS_FRPG::BulletIns: a projectile is the attacker of its own damage entries
+    const uint64_t BulletIns_vtable = 0x141342a70;
+
     //apply the given callback function to each world chr
     template <typename F> void for_each_world_chr(F f)
     {
@@ -261,6 +264,12 @@ namespace
 extern "C" bool rollback_damage_attacker_allowed(void* attacker)
 {
     if (is_session_player(attacker))
+    {
+        return true;
+    }
+    //Check the bullet owner to determine if it's allowed
+    if (attacker != NULL && ((BulletIns*)attacker)->vtable == BulletIns_vtable
+        && Game::is_session_player_handle(((BulletIns*)attacker)->owner.owner_entityId))
     {
         return true;
     }
