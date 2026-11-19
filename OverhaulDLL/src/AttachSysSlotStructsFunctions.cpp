@@ -3,6 +3,26 @@
 #include "SfxManStructFunctions.h"
 #include "Rollback.h"
 
+//The game allocates the arrays inside ChrBurnSlot (floatlist, list) and ChrGasmanSlot (list) the way MSVC's vector new[]
+//does: a block of 0x10 + count * size, whose first qword holds the block's own address and second the element count,
+//and the slot points 0x10 past it. Its teardown (FUN_1403b0410, FUN_1403b4e00) frees *(p - 0x10).
+//So we have to alloc and free it following this convention
+static void* game_header_array_alloc(size_t elem_size, size_t count)
+{
+    uint8_t* raw = (uint8_t*)Game::game_malloc(0x10 + elem_size * count, 0x10, *(uint64_t*)Game::internal_heap_3);
+    *(void**)(raw + 0x0) = raw;
+    *(uint64_t*)(raw + 0x8) = (uint64_t)count;
+    return raw + 0x10;
+}
+
+static void game_header_array_free(void* p)
+{
+    if (p != NULL)
+    {
+        Game::game_free_alt(*(void**)((uint8_t*)p - 0x10));
+    }
+}
+
 // Slots that only drive SFX, sound or light.
 // Live frames create these where a re-simulated frame does not, so they are not compared.
 bool attach_slot_is_cosmetic(uint32_t type)
@@ -333,14 +353,14 @@ void free_AttachSysSlot_Fields(AttachSysSlotBaseImpl* to, StateTarget target)
         ChrBurnSlot* slot = (ChrBurnSlot*)to;
         if (slot->floatlist != NULL)
         {
-            if (target == StateTarget::ToGame) { Game::game_free(slot->floatlist); }
+            if (target == StateTarget::ToGame) { game_header_array_free(slot->floatlist); }
             else { free(slot->floatlist); }
             slot->floatlist = NULL;
         }
         slot->floatlist_len = 0;
         if (slot->list != NULL)
         {
-            if (target == StateTarget::ToGame) { Game::game_free(slot->list); }
+            if (target == StateTarget::ToGame) { game_header_array_free(slot->list); }
             else { free(slot->list); }
             slot->list = NULL;
         }
@@ -352,7 +372,7 @@ void free_AttachSysSlot_Fields(AttachSysSlotBaseImpl* to, StateTarget target)
         ChrGasmanSlot* slot = (ChrGasmanSlot*)to;
         if (slot->list != NULL)
         {
-            if (target == StateTarget::ToGame) { Game::game_free(slot->list); }
+            if (target == StateTarget::ToGame) { game_header_array_free(slot->list); }
             else { free(slot->list); }
             slot->list = NULL;
         }
@@ -501,7 +521,7 @@ void copy_ChrBurnSlot(ChrBurnSlot* to, ChrBurnSlot* from, StateTarget target)
         {
             if (target == StateTarget::ToGame)
             {
-                Game::game_free(to->floatlist);
+                game_header_array_free(to->floatlist);
             }
             else
             {
@@ -520,10 +540,10 @@ void copy_ChrBurnSlot(ChrBurnSlot* to, ChrBurnSlot* from, StateTarget target)
             //allocate all the entities as a block
             if (target == StateTarget::ToGame)
             {
-                auto new_floatlist = (float*)Game::game_malloc(sizeof(float) * from_list_size, 0x10, *(uint64_t*)Game::internal_heap_3);
+                auto new_floatlist = (float*)game_header_array_alloc(sizeof(float), from_list_size);
                 if (to->floatlist != NULL)
                 {
-                    Game::game_free(to->floatlist);
+                    game_header_array_free(to->floatlist);
                 }
                 to->floatlist = new_floatlist;
             }
@@ -556,7 +576,7 @@ void copy_ChrBurnSlot(ChrBurnSlot* to, ChrBurnSlot* from, StateTarget target)
                 {
                     release_SfxHandle(&to->list[i].sfx);
                 }
-                Game::game_free(to->list);
+                game_header_array_free(to->list);
             }
             else
             {
@@ -575,14 +595,14 @@ void copy_ChrBurnSlot(ChrBurnSlot* to, ChrBurnSlot* from, StateTarget target)
             //allocate all the entities as a block
             if (target == StateTarget::ToGame)
             {
-                auto new_list = (ChrBurnSlot_ListElem*)Game::game_malloc(sizeof(ChrBurnSlot_ListElem) * from_list_size, 0x10, *(uint64_t*)Game::internal_heap_3);
+                auto new_list = (ChrBurnSlot_ListElem*)game_header_array_alloc(sizeof(ChrBurnSlot_ListElem), from_list_size);
                 if (to->list != NULL)
                 {
                     for (int32_t i = 0; i < to->list_len; i++)
                     {
                         release_SfxHandle(&to->list[i].sfx);
                     }
-                    Game::game_free(to->list);
+                    game_header_array_free(to->list);
                 }
                 to->list = new_list;
             }
@@ -636,7 +656,7 @@ void copy_ChrGasmanSlot(ChrGasmanSlot* to, ChrGasmanSlot* from, StateTarget targ
                     release_SfxHandle(&to->list[i].sfx_a);
                     release_SfxHandle(&to->list[i].sfx_b);
                 }
-                Game::game_free(to->list);
+                game_header_array_free(to->list);
             }
             else
             {
@@ -655,7 +675,7 @@ void copy_ChrGasmanSlot(ChrGasmanSlot* to, ChrGasmanSlot* from, StateTarget targ
             //allocate all the entities as a block
             if (target == StateTarget::ToGame)
             {
-                auto new_ChrGasmanSlot_ListElem_list = (ChrGasmanSlot_ListElem*)Game::game_malloc(sizeof(ChrGasmanSlot_ListElem) * from_list_size, 0x10, *(uint64_t*)Game::internal_heap_3);
+                auto new_ChrGasmanSlot_ListElem_list = (ChrGasmanSlot_ListElem*)game_header_array_alloc(sizeof(ChrGasmanSlot_ListElem), from_list_size);
                 if (to->list != NULL)
                 {
                     for (int16_t i = 0; i < to->list_len; i++)
@@ -663,7 +683,7 @@ void copy_ChrGasmanSlot(ChrGasmanSlot* to, ChrGasmanSlot* from, StateTarget targ
                         release_SfxHandle(&to->list[i].sfx_a);
                         release_SfxHandle(&to->list[i].sfx_b);
                     }
-                    Game::game_free(to->list);
+                    game_header_array_free(to->list);
                 }
                 to->list = new_ChrGasmanSlot_ListElem_list;
             }
