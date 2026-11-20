@@ -1486,6 +1486,8 @@ bool rollback_load_game_state_callback(unsigned char* buffer, int)
     RollbackState* state = (RollbackState*)buffer;
     HavokTrace::sample(HavokTrace::Stage::LoadBegin);
 
+    memcpy(GameRng::state(), state->rng_seed, sizeof(state->rng_seed));
+    GameRng::state()[8] = state->rng_fixed;
     //sfx first: it kills the effects the discarded frames spawned, so the FX handles the owners below restore can only link
     //to effects that existed when this state was saved
     load_SfxMan(state->sfxman);
@@ -1534,6 +1536,8 @@ RollbackState* rollback_capture_state()
         FATALERROR("Unable to get allocate state for rollback_save_game_state_callback");
     }
 
+    memcpy(state->rng_seed, GameRng::state(), sizeof(state->rng_seed));
+    state->rng_fixed = GameRng::state()[8];
     state->sfxman = init_SfxMan();
     save_SfxMan(state->sfxman);
     for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
@@ -1596,6 +1600,8 @@ void rollback_copy_buffer(void* buffer_dst, void* buffer_src)
 {
     RollbackState* state_src = (RollbackState*)buffer_src;
     RollbackState* state_dst = (RollbackState*)buffer_dst;
+    memcpy(state_dst->rng_seed, state_src->rng_seed, sizeof(state_dst->rng_seed));
+    state_dst->rng_fixed = state_src->rng_fixed;
 
     for (size_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
     {
@@ -1885,6 +1891,14 @@ bool rollback_await_init(void* steamMsgs)
         ConsoleWrite("Rollback: heap-allocated hit records exist at the session start; their order relative to each other may differ between machines");
     }
     canonicalize_BulletMan_free_slots(*(BulletMan**)Game::bullet_man);
+    //set the rng state to the same value
+    {
+        static const uint32_t session_seed[2] = { 0x5eed0001, 0x5eed0002 };
+        uint8_t* rng = GameRng::state();
+        ConsoleWrite("Rollback: game RNG %08x %08x (fixed %u) set to the session seed", ((uint32_t*)rng)[0], ((uint32_t*)rng)[1], rng[8]);
+        memcpy(rng, session_seed, sizeof(session_seed));
+        rng[8] = 0;
+    }
 
     RollbackStartSync::begin_session();
     RollbackReplay::init_session();

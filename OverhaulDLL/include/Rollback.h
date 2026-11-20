@@ -244,7 +244,25 @@ struct RollbackState
     ThrowMan* throwman;
     DmgHitRecordManImp* dmghitrecordman;
     FrpgHavokManImp* havokman;
+    //GameMan's random number generator state, and a flag that makes every draw return 0x2a.
+    uint32_t rng_seed[2];
+    uint8_t rng_fixed;
 };
+
+//GameMan (global 0x141c74e08): rng_seed at +0x64, its "always 0x2a" flag at +0x6c
+namespace GameRng
+{
+    static const uint64_t GameMan_global = 0x141c74e08;
+    inline uint8_t* state()
+    {
+        uint8_t* gm = *(uint8_t**)GameMan_global;
+        if (gm == NULL)
+        {
+            FATALERROR("GameRng: GameMan is not set up");
+        }
+        return gm + 0x64;
+    }
+}
 
 inline void* malloc_(size_t size)
 {

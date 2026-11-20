@@ -904,7 +904,7 @@ namespace
             {
                 uint32_t mask;
                 if (a.size() < 3 || !RollbackHash::synctest_parse_mask(a[2], mask))
-                    return err_json("usage: synctest dump <all|none|player,bullet,damage,havok,throw,dmghit> [frame|+n]");
+                    return err_json("usage: synctest dump <all|none|player,bullet,damage,havok,throw,dmghit,rng> [frame|+n]");
                 int from_frame = -1;
                 if (a.size() > 3)
                 {
