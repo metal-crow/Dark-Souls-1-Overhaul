@@ -49,6 +49,7 @@ namespace RollbackHash
         uint64_t havok  = 0;
         uint64_t throwman = 0;
         uint64_t dmghit = 0;
+        uint64_t rng = 0;      // GameMan's random number generator
     };
 
     inline uint64_t _fold(uint64_t h, uint64_t x)
@@ -103,6 +104,7 @@ namespace RollbackHash
         d.havok    = hash_FrpgHavokManImp(s->havokman, order, n);
         d.throwman = hash_ThrowMan(s->throwman);
         d.dmghit   = hash_DmgHitRecordManImp(s->dmghitrecordman);
+        d.rng      = _fold(_fold(_fold(1469598103934665603ULL, s->rng_seed[0]), s->rng_seed[1]), s->rng_fixed);
         return d;
     }
 
@@ -111,7 +113,7 @@ namespace RollbackHash
     inline uint64_t combined(const StateDigest& d)
     {
         uint64_t h = 1469598103934665603ULL;
-        const uint64_t parts[] = { d.player, d.bullet, d.damage, d.havok, d.throwman, d.dmghit };
+        const uint64_t parts[] = { d.player, d.bullet, d.damage, d.havok, d.throwman, d.dmghit, d.rng };
         for (size_t i = 0; i < sizeof(parts) / sizeof(parts[0]); i++) h = _fold(h, parts[i]);
         return h;
     }
@@ -151,6 +153,7 @@ namespace RollbackHash
         s += ",\"havok\":\"" + _hex(d.havok) + "\"";
         s += ",\"throw\":\"" + _hex(d.throwman) + "\"";
         s += ",\"dmghit\":\"" + _hex(d.dmghit) + "\"";
+        s += ",\"rng\":\"" + _hex(d.rng) + "\"";
         s += ",\"comb\":\"" + _hex(combined(d)) + "\"}";
         return s;
     }
@@ -227,6 +230,11 @@ namespace RollbackHash
         t += "=== Havok ===\n";            t += print_FrpgHavokManImp(s->havokman, order, n);
         t += "=== ThrowMan ===\n";         t += print_ThrowMan(s->throwman);
         t += "=== DmgHitRecordManImp ===\n"; t += print_DmgHitRecordManImp(s->dmghitrecordman);
+        {
+            char rb[96];
+            snprintf(rb, sizeof(rb), "=== GameRng ===\nrng_seed:%08x %08x\nrng_fixed:%u\n", s->rng_seed[0], s->rng_seed[1], s->rng_fixed);
+            t += rb;
+        }
         return t;
     }
 
@@ -277,8 +285,8 @@ namespace RollbackHash
     // did not survive save -> load -> resim. GGPO's own int checksum only says *something* did.
     // The "original" state GGPO logs on a mismatch is its copy_buffer deep copy (StateTarget::Copy), not the save
     // itself, so a lossy Copy path shows up as dump differences no real session has. synctest_check_copy tests it.
-    inline const char* const SYNCTEST_SUBSYSTEMS[] = { "player", "bullet", "damage", "havok", "throw", "dmghit" };
-    inline const int SYNCTEST_SUBSYSTEM_COUNT = 6;
+    inline const char* const SYNCTEST_SUBSYSTEMS[] = { "player", "bullet", "damage", "havok", "throw", "dmghit", "rng" };
+    inline const int SYNCTEST_SUBSYSTEM_COUNT = 7;
     inline const uint32_t SYNCTEST_ALL = (1u << SYNCTEST_SUBSYSTEM_COUNT) - 1;
 
     struct SyncTestStats
@@ -316,8 +324,8 @@ namespace RollbackHash
     // Comma-separated names of the subsystems whose digests differ; mask gets bit i for SYNCTEST_SUBSYSTEMS[i]
     inline std::string synctest_diff(const StateDigest& a, const StateDigest& b, uint32_t& mask)
     {
-        const uint64_t av[] = { a.player, a.bullet, a.damage, a.havok, a.throwman, a.dmghit };
-        const uint64_t bv[] = { b.player, b.bullet, b.damage, b.havok, b.throwman, b.dmghit };
+        const uint64_t av[] = { a.player, a.bullet, a.damage, a.havok, a.throwman, a.dmghit, a.rng };
+        const uint64_t bv[] = { b.player, b.bullet, b.damage, b.havok, b.throwman, b.dmghit, b.rng };
         std::string names;
         mask = 0;
         for (int i = 0; i < SYNCTEST_SUBSYSTEM_COUNT; i++)
@@ -483,7 +491,7 @@ namespace RollbackHash
             }
             if (hash_logfile != NULL)
             {
-                fprintf(hash_logfile, "STATEHASH frame=%d player=%016llx bullet=%016llx damage=%016llx havok=%016llx throw=%016llx dmghit=%016llx comb=%016llx\n",
+                fprintf(hash_logfile, "STATEHASH frame=%d player=%016llx bullet=%016llx damage=%016llx havok=%016llx throw=%016llx dmghit=%016llx rng=%016llx comb=%016llx\n",
                     it->first,
                     (unsigned long long)d.player,
                     (unsigned long long)d.bullet,
@@ -491,6 +499,7 @@ namespace RollbackHash
                     (unsigned long long)d.havok,
                     (unsigned long long)d.throwman,
                     (unsigned long long)d.dmghit,
+                    (unsigned long long)d.rng,
                     (unsigned long long)combined(d));
                 fflush(hash_logfile);
             }
