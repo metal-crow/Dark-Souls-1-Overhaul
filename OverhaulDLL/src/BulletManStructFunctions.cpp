@@ -327,30 +327,43 @@ void free_ChrCam(ChrCam* to)
 //    hashed raw to mirror copy; if the bullet column shows persistent divergence,
 //    the ChrCam sub-camera blobs are the first thing to exclude.
 
+// NS_FRPG_BulletIns_Field0x90_Field0x90 (FUN_140423680): entity handle, pad, u64, two Vector4s, a flag byte
+static void serialize_BulletTarget(StateVisitor& v, const char* n, const uint8_t* t)
+{
+    v.begin(n);
+    uint32_t handle;
+    memcpy(&handle, t, sizeof(handle));
+    serialize_handle(v, "entity_id", handle);
+    v.padding("unk_4", t + 4, 4);
+    v.blob("rest", t + 8, 49 - 8);
+    v.end();
+}
+
 static void serialize_BulletIns_Field0x90_Field0x1a0(StateVisitor& v, const BulletIns_Field0x90_Field0x1a0* o)
 {
     v.begin("Field0x90_Field0x1a0");
     v.field("unk_0", o->unk_0);
     v.field("bullet_id", o->bullet_id);
     v.field("unk_8", o->unk_8);
-    v.field("owner_entityId", o->owner_entityId);
+    serialize_handle(v, "owner_entityId", o->owner_entityId);
     v.field("unk_10", o->unk_10);
     v.field("unk_14", o->unk_14);
     v.field("goodsId", o->goodsId);
     v.padding("unk_1c", &o->unk_1c, sizeof(o->unk_1c));            // alignment before AttackData @0x20
     v.blob("AttackData", o->AttackData, sizeof(o->AttackData));
     v.blob("unk_88", o->unk_88, sizeof(o->unk_88));
-    v.blob("target0x90", o->target0x90, sizeof(o->target0x90));
-    v.blob("unk_c1", o->unk_c1, sizeof(o->unk_c1));
-    v.field("unk_c8", o->unk_c8);
+    serialize_BulletTarget(v, "target0x90", o->target0x90);
+    // 0xc1-0xcf: the rest of the 0x40-byte target struct at 0x90 (FUN_140423680 initialises it up to 0x30)
+    v.padding("unk_c1", o->unk_c1, sizeof(o->unk_c1));
+    v.padding("unk_c8", &o->unk_c8, sizeof(o->unk_c8));
     v.field("unk_d0", o->unk_d0);
     v.field("bowDist", o->bowDist);
-    v.blob("unk_d8", o->unk_d8, sizeof(o->unk_d8));
+    v.padding("unk_d8", o->unk_d8, sizeof(o->unk_d8));             // alignment before the 16-aligned 0xe0
     v.blob("fieldE0_0", o->fieldE0_0, sizeof(o->fieldE0_0));
     v.blob("fieldE0_1", o->fieldE0_1, sizeof(o->fieldE0_1));
     v.field("unk_140", o->unk_140);
-    v.blob("unk_144", o->unk_144, sizeof(o->unk_144));
-    v.ptr_flag("unk_148", o->unk_148);
+    v.padding("unk_144", o->unk_144, sizeof(o->unk_144));         // alignment before the pointer
+    v.ptr_flag("unk_148", o->unk_148);                             // DmgHitRecordManImp_field0x10Elem* (refcounted hit record)
     v.field("unk_150", o->unk_150);
     v.field("unk_154", o->unk_154);
     v.field("unk_158", o->unk_158);
@@ -363,9 +376,11 @@ static void serialize_BulletTargetingSystemOwner(StateVisitor& v, const BulletTa
     v.begin("BulletTargetingSystemOwner");
     v.field("vtable", o->vtable);
     v.ptr_flag("parent", o->parent);
-    v.field("ownerEntityId", o->ownerEntityId);
+    serialize_handle(v, "ownerEntityId", o->ownerEntityId);
     v.padding("unk_14", &o->unk_14, sizeof(o->unk_14));            // alignment before the 8-aligned param @0x18
-    v.blob("autoSearchNPCThinkParam", o->autoSearchNPCThinkParam, sizeof(o->autoSearchNPCThinkParam));
+    // NpcThinkParamInfo: rowId, pad, NpcThinkParam*, currentBattleGoalId, currentLogicId
+    v.blob_holes("autoSearchNPCThinkParam", o->autoSearchNPCThinkParam, sizeof(o->autoSearchNPCThinkParam),
+        { { 4, 4, StateVisitor::Hole::Pad }, { 8, 8, StateVisitor::Hole::Ptr } });
     v.end();
 }
 
@@ -374,7 +389,9 @@ static void serialize_TargetingSystemBase(StateVisitor& v, const TargetingSystem
     v.begin("TargetingSystemBase");
     v.field("vtable", t->vtable);
     v.ptr_flag("owner_1", t->owner_1);   // forced NULL by copy_BulletIns
-    v.blob("sub0x10", t->sub0x10, sizeof(t->sub0x10));
+    // TargetingSystemBase_sub0x10 (FUN_14061fba0): owner_2 (the slot's own BulletTargetingSystemOwner), target struct pointer, 2x u64
+    v.blob_holes("sub0x10", t->sub0x10, sizeof(t->sub0x10),
+        { { 0, 8, StateVisitor::Hole::Ptr }, { 8, 8, StateVisitor::Hole::Ptr } });
     v.field("unk_30", t->unk_30);
     v.field("unk_34", t->unk_34);
     v.field("unk_35", t->unk_35);
@@ -391,11 +408,9 @@ static void serialize_BulletState(StateVisitor& v, const BulletState* s)
 {
     v.begin("BulletState");
     v.field("vtable", s->vtable);
-    // param_info = bullet_id(u32) + pad(u32) + BulletParam*(ptr); split out the ptr
-    v.blob("param_info_id", s->param_info, 8);
-    void* bulletParam = nullptr;
-    memcpy(&bulletParam, s->param_info + 8, sizeof(bulletParam));
-    v.ptr_flag("param_info_BulletParam", bulletParam);
+    // param_info = bullet_id(u32) + pad(u32) + BulletParam*(ptr)
+    v.blob_holes("param_info", s->param_info, sizeof(s->param_info),
+        { { 4, 4, StateVisitor::Hole::Pad }, { 8, 8, StateVisitor::Hole::Ptr } });
     v.field("frametime", s->frametime);
     v.field("unk_1c", s->unk_1c);
     v.end();
@@ -417,7 +432,7 @@ static void serialize_BulletIns(StateVisitor& v, const BulletIns* b)
     v.field("bullet_number", b->bullet_number);
     v.field("unk_9", b->unk_9);
     v.field("unk_a", b->unk_a);
-    v.blob("unk_c", b->unk_c, sizeof(b->unk_c));
+    v.padding("unk_c", b->unk_c, sizeof(b->unk_c));                // alignment before the 16-aligned position
     for (int i = 0; i < 4; i++) v.field("player_position", b->player_position[i]);
     v.field("orbit_radius_X", b->orbit_radius_X);
     v.field("orbit_radius_Y", b->orbit_radius_Y);
@@ -432,7 +447,7 @@ static void serialize_BulletIns(StateVisitor& v, const BulletIns* b)
     v.field("unk_48", b->unk_48);
     v.field("unk_4c", b->unk_4c);
     v.field("unk_50", b->unk_50);
-    v.field("unk_54", b->unk_54);
+    serialize_DamageEntry_ref(v, "unk_54", b->unk_54);             // the bullet's DamageEntry id (-1 if none; Init sets -1)
 
     serialize_SfxHandle(v, "sfx", &b->sfx);
 
@@ -449,16 +464,17 @@ static void serialize_BulletIns(StateVisitor& v, const BulletIns* b)
     serialize_TargetingSystemBase(v, &b->targetingSystemBase);
     v.field("unk_288", b->unk_288);
     v.field("unk_28c", b->unk_28c);
-    v.blob("target", b->target, sizeof(b->target));
-    v.blob("unk_2c1", b->unk_2c1, sizeof(b->unk_2c1));
-    v.field("unk_2c4", b->unk_2c4);
-    v.field("unk_2c8", b->unk_2c8);
-    v.field("unk_2cc", b->unk_2cc);
+    serialize_BulletTarget(v, "target", b->target);
+    // 0x2c1-0x2cf: the rest of the 0x40-byte target struct at 0x290 (FUN_140423680 initialises it up to 0x30)
+    v.padding("unk_2c1", b->unk_2c1, sizeof(b->unk_2c1));
+    v.padding("unk_2c4", &b->unk_2c4, sizeof(b->unk_2c4));
+    v.padding("unk_2c8", &b->unk_2c8, sizeof(b->unk_2c8));
+    v.padding("unk_2cc", &b->unk_2cc, sizeof(b->unk_2cc));
     v.field("unk_2d0", b->unk_2d0);
-    v.blob("unk_2d1", b->unk_2d1, sizeof(b->unk_2d1));
+    v.padding("unk_2d1", b->unk_2d1, sizeof(b->unk_2d1));          // alignment before bulletState
     serialize_BulletState(v, &b->bulletState);
-    v.field("unk_2f8", b->unk_2f8);
-    v.field("unk_2fc", b->unk_2fc);
+    v.field("unk_2f8", b->unk_2f8);                                // BulletWaitState's float at +0x20 (Init_BulletWaitState)
+    v.padding("unk_2fc", &b->unk_2fc, sizeof(b->unk_2fc));         // the wait state is 0x24 bytes; alignment before bulletFlyState
     serialize_BulletFlyState(v, &b->bulletFlyState);
     serialize_BulletState(v, &b->bulletExplosionState);
     // previous_bullet_in_use handled by parent (ptr_index); padding_1 not copied
@@ -490,7 +506,7 @@ static void serialize_BulletMan_Field0x20(StateVisitor& v, const BulletMan_Field
 static void serialize_BulletMan_Field0x40(StateVisitor& v, const BulletMan_Field0x40* f)
 {
     v.begin("BulletMan_Field0x40");
-    v.field("bulletOwnerEntityId", f->bulletOwnerEntityId);
+    serialize_handle(v, "bulletOwnerEntityId", *(const uint32_t*)&f->bulletOwnerEntityId);
     v.padding("padding_0", &f->padding_0, sizeof(f->padding_0));
     v.count("arry", 16);
     for (size_t i = 0; i < 16; i++)
