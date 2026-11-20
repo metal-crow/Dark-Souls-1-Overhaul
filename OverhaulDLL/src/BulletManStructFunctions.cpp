@@ -2,6 +2,8 @@
 #include "SfxManStructFunctions.h"
 #include "Rollback.h"
 #include "StateSerializer.h"
+#include "PlayerHandles.h"
+#include "DamageManStructFunctions.h"
 #include <cstring>
 
 static const size_t ChrExFollowCam_size = 0x340;
@@ -123,8 +125,22 @@ void copy_BulletIns(BulletIns* to, BulletIns* from, StateTarget target)
 
     //targetingSystemBase contains vtable, owner ptr, targeting data - raw pointers are fine
     memcpy(&to->targetingSystemBase, &from->targetingSystemBase, sizeof(to->targetingSystemBase));
-    //TODO setting the BulletTargetingSystemOwner to null for now, we may have to save/restore it
-    to->targetingSystemBase.owner_1 = NULL;
+    //owner_1 (and sub0x10's first pointer) always point at the same slot's bulletTargetingSystemOwner: TargetingSystemBase_New
+    //(0x14061c580, called once per slot by Init_NS_FRPG::BulletIns) sets them and nothing changes them. A local copy keeps no
+    //pointer; the game's slot gets its own back
+    if (target == StateTarget::ToLocal)
+    {
+        if (from->targetingSystemBase.owner_1 != &from->bulletTargetingSystemOwner)
+        {
+            FATALERROR("copy_BulletIns: bullet %p's TargetingSystemBase owner is %p, not its own BulletTargetingSystemOwner %p",
+                from, from->targetingSystemBase.owner_1, &from->bulletTargetingSystemOwner);
+        }
+        to->targetingSystemBase.owner_1 = NULL;
+    }
+    else
+    {
+        to->targetingSystemBase.owner_1 = &to->bulletTargetingSystemOwner;
+    }
 
     to->unk_288 = from->unk_288;
     to->unk_28c = from->unk_28c;
