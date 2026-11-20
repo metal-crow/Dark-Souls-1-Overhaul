@@ -1884,6 +1884,7 @@ bool rollback_await_init(void* steamMsgs)
     {
         ConsoleWrite("Rollback: heap-allocated hit records exist at the session start; their order relative to each other may differ between machines");
     }
+    canonicalize_BulletMan_free_slots(*(BulletMan**)Game::bullet_man);
 
     RollbackStartSync::begin_session();
     RollbackReplay::init_session();

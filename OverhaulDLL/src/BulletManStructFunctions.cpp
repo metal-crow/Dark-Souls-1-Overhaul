@@ -616,6 +616,109 @@ uint64_t hash_BulletMan(BulletMan* m)
     return v.digest();
 }
 
+// ---- session start: free pool slots ----
+//BulletMan_AddBullet (0x14042a880) hands out a free slot as it is, and whoever spawns the bullet writes only some of its fields, so
+//the rest keeps whatever the slot's earlier bullets (or the uninitialised heap behind Init_BulletMan) left there. That history differs
+//between the machines, so a session start rebuilds every free slot with the game's own constructors, giving the same bytes on every
+//machine from then on. Kept: the slot's id bytes, its effect handle (SfxMan's lists may still name it), the free list link, the debug
+//menu item, and the two references the slot does not own (refcounted hit record, targeting target).
+typedef BulletIns* Init_BulletIns_FUNC(BulletIns* bullet, uint64_t array_index, uint32_t param_3);
+static Init_BulletIns_FUNC* const Game_Init_BulletIns = (Init_BulletIns_FUNC*)0x140423f10;
+typedef BulletIns_Field0x90_Field0x1a0* Init_BulletOwner_FUNC(BulletIns_Field0x90_Field0x1a0* owner);
+static Init_BulletOwner_FUNC* const Game_Init_BulletOwner = (Init_BulletOwner_FUNC*)0x140423070;
+
+template <typename T>
+static void mark_BulletMan_pool_in_use(const T* head, T* T::* link, const T* pool, size_t count, bool* in_use, const char* what)
+{
+    size_t n = 0;
+    for (const T* e = head; e != NULL; e = e->*link)
+    {
+        if (e < pool || e >= pool + count)
+        {
+            FATALERROR("canonicalize_BulletMan_free_slots: %s %p is not in its %zu-element pool", what, e, count);
+        }
+        if (++n > count)
+        {
+            FATALERROR("canonicalize_BulletMan_free_slots: %s list is longer than its %zu-element pool", what, count);
+        }
+        in_use[e - pool] = true;
+    }
+}
+
+void canonicalize_BulletMan_free_slots(BulletMan* m)
+{
+    if (m == NULL || m->bulletins_arry == NULL || m->field0x20 == NULL || m->field0x40 == NULL)
+    {
+        FATALERROR("canonicalize_BulletMan_free_slots: BulletMan %p is not set up", m);
+    }
+    size_t rebuilt[3] = {};
+
+    bool bullet_in_use[128] = {};
+    mark_BulletMan_pool_in_use(m->end_of_bullets_in_use, &BulletIns::previous_bullet_in_use, m->bulletins_arry, 128, bullet_in_use, "BulletIns in use");
+    for (size_t i = 0; i < 128; i++)
+    {
+        if (bullet_in_use[i])
+        {
+            continue;
+        }
+        BulletIns* b = &m->bulletins_arry[i];
+        BulletIns saved;
+        memcpy(&saved, b, sizeof(saved));
+        memset(b, 0, sizeof(*b));
+        Game_Init_BulletIns(b, i, 0);
+        b->bullet_number = saved.bullet_number;
+        b->unk_9 = saved.unk_9;
+        b->unk_a = saved.unk_a;
+        memcpy(&b->sfx, &saved.sfx, sizeof(b->sfx));
+        b->previous_bullet_in_use = saved.previous_bullet_in_use;
+        b->padding_1 = saved.padding_1;
+        b->owner.unk_148 = saved.owner.unk_148;
+        memcpy(b->targetingSystemBase.sub0x10 + 8, saved.targetingSystemBase.sub0x10 + 8, 8);
+        rebuilt[0]++;
+    }
+
+    bool f20_in_use[64] = {};
+    mark_BulletMan_pool_in_use(m->end_of_bullets_in_use_field0x20, &BulletMan_Field0x20::next_in_use, m->field0x20, 64, f20_in_use, "Field0x20 in use");
+    for (size_t i = 0; i < 64; i++)
+    {
+        if (f20_in_use[i])
+        {
+            continue;
+        }
+        //Init_BulletMan_Field0x20 allocates its BulletParamInfo, so only the parts it builds without allocating are rebuilt; the
+        //release (FUN_140420e00) already resets the rest
+        BulletMan_Field0x20* f = &m->field0x20[i];
+        void* hit_record = f->field0x1a0.unk_148;
+        memset(&f->field0x1a0, 0, sizeof(f->field0x1a0));
+        Game_Init_BulletOwner(&f->field0x1a0);
+        f->field0x1a0.unk_148 = hit_record;
+        memset(f->unk_196, 0, sizeof(f->unk_196));
+        f->unk_300 = 0;
+        f->unk_304 = 0;
+        rebuilt[1]++;
+    }
+
+    bool f40_in_use[4] = {};
+    mark_BulletMan_pool_in_use(m->end_of_bullets_in_use_field0x40, &BulletMan_Field0x40::next_in_use, m->field0x40, 4, f40_in_use, "Field0x40 in use");
+    for (size_t i = 0; i < 4; i++)
+    {
+        if (f40_in_use[i])
+        {
+            continue;
+        }
+        //Init_BulletMan_field0x40, without its effect handles
+        BulletMan_Field0x40* f = &m->field0x40[i];
+        f->bulletOwnerEntityId = -1;
+        f->padding_0 = 0;
+        f->unk_308 = 0;
+        f->unk_30c = 0;
+        rebuilt[2]++;
+    }
+
+    ConsoleWrite("BulletMan: rebuilt %zu free bullet slots, %zu free Field0x20 and %zu free Field0x40 entries for the session start",
+        rebuilt[0], rebuilt[1], rebuilt[2]);
+}
+
 // ---- BulletMan ----
 
 //Init_BulletMan allocates each pool (128 BulletIns, 64 Field0x20, 4 Field0x40) as one array whose elements start on its free list.

@@ -16,6 +16,9 @@ void serialize_BulletMan(StateVisitor& v, BulletMan* m);
 std::string print_BulletMan(BulletMan* m);
 uint64_t hash_BulletMan(BulletMan* m);
 
+//session start: make every free pool slot the same on every machine (see the definition)
+void canonicalize_BulletMan_free_slots(BulletMan* m);
+
 void copy_BulletIns(BulletIns* to, BulletIns* from, StateTarget target);
 BulletIns* init_BulletIns();
 void free_BulletIns(BulletIns* to, bool freeself);
