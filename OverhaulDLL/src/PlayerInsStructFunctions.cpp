@@ -2670,6 +2670,7 @@ static void serialize_hkpCharacterProxy(StateVisitor& v, const hkpCharacterProxy
         v.begin("contact");
         v.blob("m_position", p->m_position, sizeof(p->m_position));
         v.blob("m_separatingNormal", p->m_separatingNormal, sizeof(p->m_separatingNormal));
+        v.field("m_distance", p->m_distance);
         v.ptr_flag("m_rootCollidableA", p->m_rootCollidableA);
         v.field("m_shapeKeyA", p->m_shapeKeyA);
         v.padding("m_shapeKeyA_pad", &p->m_shapeKeyA_pad, sizeof(p->m_shapeKeyA_pad));
