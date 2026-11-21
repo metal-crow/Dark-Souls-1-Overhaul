@@ -7,6 +7,7 @@
 #include <new>
 #include <unordered_map>
 #include "GameData.h"
+#include "BulletManStruct.h"
 
 //the game allocates the DamageMan all_damage_entries_list to be 128 elements long, and so does every local copy
 static const size_t max_preallocated_DamageEntry = 128;
@@ -20,8 +21,32 @@ bool DamageEntry_isDynamicAlloc(const DamageEntry* entry)
     return (entry->id >> 16) == (uint32_t)DamageEntry_heap_slot;
 }
 
-//Map objects and hazards put entries in the DamageMan too, which we should ignore
-//TODO need to verify that this works with spells and bullets
+//A projectile is the attacker of its own entries: their attackerHandle is the BulletIns's id (its bytes at +0x8, set by
+//Init_NS_FRPG::BulletIns from the pool index), and the BulletMan pool is rolled back with them
+static bool DamageEntry_attacker_is_bullet(const DamageEntry* entry)
+{
+    const BulletMan* m = *(BulletMan**)Game::bullet_man;
+    if (m == NULL || m->bulletins_arry == NULL)
+    {
+        return false;
+    }
+    for (size_t i = 0; i < 128; i++)
+    {
+        uint32_t id;
+        memcpy(&id, &m->bulletins_arry[i].bullet_number, sizeof(id));
+        if (id == entry->attackerHandle)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+//Whether the entry's owner is rolled back with it: a session player, or a projectile (BulletMan is rolled back whole). Map objects and
+//hazards put entries in the DamageMan too; their owners are not rolled back, so their entries are retired at the session start, not
+//compared, and a load retires one that retired in the discarded frames (see "Entry ids across timelines"). A projectile's entry used
+//to be treated like that, so a load that crossed the frame its bullet hit someone killed the restored entry without its hit record,
+//and the bullet hit the same character again on that machine only.
 static bool DamageEntry_is_player_owned(const DamageEntry* entry)
 {
     for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
@@ -32,7 +57,7 @@ static bool DamageEntry_is_player_owned(const DamageEntry* entry)
             return true;
         }
     }
-    return false;
+    return DamageEntry_attacker_is_bullet(entry);
 }
 
 /* ============================================================
