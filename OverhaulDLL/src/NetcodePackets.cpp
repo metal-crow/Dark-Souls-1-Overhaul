@@ -125,7 +125,7 @@ const uint64_t Rollback::PlayerIns_IsHostPlayerIns_offsets[] = {
     //0x14032ff23,
     //0x14033021b,
     //0x1403358b2,
-    //0x1403418b9,
+    0x1403418b9, //TAE_Type2_BulletBehavior (FUN_140341670): firing a bullet uses up the ammo (thunk_FUN_1424e7ec1) only for the "host" player
     //0x140341ebf,
     //0x140342a00,
     //0x140342e0a,
