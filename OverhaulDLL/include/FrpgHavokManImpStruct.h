@@ -541,6 +541,45 @@ struct hkpSphereShape
 static_assert(sizeof(hkpSphereShape) == 0x38);
 static_assert(offsetof(hkpSphereShape, m_userData) == 0x18);
 static_assert(offsetof(hkpSphereShape, m_radius) == 0x20);
+
+// One hit of a Havok collision query (standard Havok layout): an hkContactPoint plus the two root collidables that produced it and
+// their shape keys. Used by hkpAllCdPointCollector and by hkpCharacterProxy::m_manifold. In a damage entry's phantom cast
+// (FUN_1403c6850) the phantom is one side and the character or map part it touched the other; the game checks which.
+struct hkpRootCdPoint
+{
+    float m_position[4];                 // 0x0 hkContactPoint::m_position (w unused)
+    float m_separatingNormal[3];         // 0x10 hkContactPoint::m_separatingNormal xyz
+    float m_distance;                    // 0x1c m_separatingNormal.w: the distance (a linear cast's hit fraction); what sortHits orders by
+    hkpCollidable* m_rootCollidableA;    // 0x20 (a live game pointer, never hashed)
+    uint32_t m_shapeKeyA;                // 0x28 (hkpShapeKey is 32 bits)
+    uint32_t m_shapeKeyA_pad;            // 0x2c (padding)
+    hkpCollidable* m_rootCollidableB;    // 0x30 (a live game pointer, never hashed)
+    uint32_t m_shapeKeyB;                // 0x38
+    uint32_t m_shapeKeyB_pad;            // 0x3c (padding)
+};
+static_assert(offsetof(hkpRootCdPoint, m_separatingNormal) == 0x10);
+static_assert(offsetof(hkpRootCdPoint, m_distance) == 0x1c);
+static_assert(offsetof(hkpRootCdPoint, m_rootCollidableA) == 0x20);
+static_assert(offsetof(hkpRootCdPoint, m_shapeKeyA) == 0x28);
+static_assert(offsetof(hkpRootCdPoint, m_rootCollidableB) == 0x30);
+static_assert(offsetof(hkpRootCdPoint, m_shapeKeyB) == 0x38);
+static_assert(sizeof(hkpRootCdPoint) == 0x40);
+
+// Collects every hit of a query (FUN_1403c6850 builds two on the stack, 0x220 bytes each). sortHits is FUN_140879890.
+struct hkpAllCdPointCollector
+{
+    void* vtable;                        // 0x0
+    float m_earlyOutDistance;            // 0x8 (hkpCdPointCollector)
+    uint32_t unk_c;                      // 0xc (padding)
+    hkpRootCdPoint* m_hits;              // 0x10 hkInplaceArray<hkpRootCdPoint, 8>: data
+    int32_t m_hitsSize;                  // 0x18 size
+    int32_t m_hitsCapacityAndFlags;      // 0x1c capacity and flags
+    hkpRootCdPoint m_hitsStorage[8];     // 0x20 the in-place storage m_hits points at until it outgrows it
+};
+static_assert(offsetof(hkpAllCdPointCollector, m_hits) == 0x10);
+static_assert(offsetof(hkpAllCdPointCollector, m_hitsSize) == 0x18);
+static_assert(offsetof(hkpAllCdPointCollector, m_hitsStorage) == 0x20);
+static_assert(sizeof(hkpAllCdPointCollector) == 0x220);
 static_assert(offsetof(hkpSphereShape, m_pad) == 0x28);
 
 /* ============================================================

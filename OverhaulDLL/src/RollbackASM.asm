@@ -586,6 +586,15 @@ ret
 ResonanceMagic_Arm_injection ENDP
 
 
+extern rollback_sort_cast_hits: proc
+
+;FUN_140879890(collector), replaced whole: the C++ function takes the collector in rcx and returns to the game's caller
+PUBLIC CastHits_Sort_injection
+CastHits_Sort_injection PROC
+jmp     rollback_sort_cast_hits
+CastHits_Sort_injection ENDP
+
+
 EXTERN MapCollisionTargets_return: qword
 extern MapCollisionTargets_helper: proc
 

@@ -322,6 +322,72 @@ extern "C" {
     void BottomlessBoxWithdraw_injection();
 }
 
+/*
+ * FUN_140879890 (hkpAllCdPointCollector::sortHits) sorts the hits a Havok query gathered by hkpRootCdPoint::m_distance (for a
+ * linear cast, the hit fraction) with an unstable quicksort (FUN_140879980). A damage entry walks its hits in that order and the
+ * first one on a character decides the hit: which hurtbox body it is (FrpgRagdollIns::body_flags can make that body take no
+ * damage) and the hit record that keeps the rest of the entry's contacts off the character. Hits at the same distance (several
+ * bodies a fresh explosion already overlaps are all at 0) keep the order Havok produced them in, which differs between the
+ * machines (each adds its own player's bodies first), so the same fireball damaged B on one machine and not on the other. During
+ * a session the hits at the same distance are put in a machine-independent order instead: contact position, separating normal,
+ * then the shape keys, compared bit for bit (never the collidable pointers). The character controller
+ * (Calculate_Player_Updated_Position) sorts its contacts with the same function.
+ */
+typedef void hkpRootCdPoint_QuickSort_FUNC(hkpRootCdPoint* hits, uint32_t first, int32_t last, uint8_t unused);
+static hkpRootCdPoint_QuickSort_FUNC* const hkpRootCdPoint_QuickSort = (hkpRootCdPoint_QuickSort_FUNC*)0x140879980;
+
+static uint32_t float_bits(float f)
+{
+    uint32_t b;
+    memcpy(&b, &f, sizeof(b));
+    return b;
+}
+
+static bool cd_point_before(const hkpRootCdPoint& a, const hkpRootCdPoint& b)
+{
+    if (a.m_distance < b.m_distance) return true;
+    if (b.m_distance < a.m_distance) return false;
+    const uint32_t ka[] = { float_bits(a.m_position[0]), float_bits(a.m_position[1]), float_bits(a.m_position[2]),
+        float_bits(a.m_separatingNormal[0]), float_bits(a.m_separatingNormal[1]), float_bits(a.m_separatingNormal[2]),
+        a.m_shapeKeyA, a.m_shapeKeyB };
+    const uint32_t kb[] = { float_bits(b.m_position[0]), float_bits(b.m_position[1]), float_bits(b.m_position[2]),
+        float_bits(b.m_separatingNormal[0]), float_bits(b.m_separatingNormal[1]), float_bits(b.m_separatingNormal[2]),
+        b.m_shapeKeyA, b.m_shapeKeyB };
+    for (size_t i = 0; i < sizeof(ka) / sizeof(ka[0]); i++)
+    {
+        if (ka[i] != kb[i]) return ka[i] < kb[i];
+    }
+    return false;
+}
+
+//replaces FUN_140879890 (CastHits_Sort_injection jumps here with the collector in rcx)
+extern "C" void rollback_sort_cast_hits(hkpAllCdPointCollector* collector)
+{
+    hkpRootCdPoint* hits = collector->m_hits;
+    const int32_t n = collector->m_hitsSize;
+    if (n <= 1)
+    {
+        return;
+    }
+    if (!Rollback::ggpoStarted)
+    {
+        hkpRootCdPoint_QuickSort(hits, 0, n - 1, 0);
+        return;
+    }
+    //insertion sort: in place and without allocating (collectors hold a handful of hits; this also runs in worker threads)
+    for (int32_t i = 1; i < n; i++)
+    {
+        const hkpRootCdPoint h = hits[i];
+        int32_t j = i - 1;
+        while (j >= 0 && cd_point_before(h, hits[j]))
+        {
+            hits[j + 1] = hits[j];
+            j--;
+        }
+        hits[j + 1] = h;
+    }
+}
+
 //Runs right after the game has decided what collision every map part should have loaded
 extern "C" void MapCollisionTargets_helper()
 {
@@ -333,6 +399,8 @@ extern "C" void MapCollisionTargets_helper()
 }
 
 extern "C" {
+    uint64_t CastHits_Sort_return;   //unused: the injection replaces the whole function
+    void CastHits_Sort_injection();
     uint64_t MapCollisionTargets_return;
     void MapCollisionTargets_injection();
     uint64_t Step_Chr_canonical_order_return;
@@ -1407,6 +1475,10 @@ void Rollback::start()
     //no covenant resonance during sessions: see ResonanceMagic_Arm_injection
     write_address = (uint8_t*)(Game::ds1_base + Rollback::ResonanceMagic_Arm_offset);
     sp::mem::code::x64::inject_jmp_14b(write_address, &ResonanceMagic_Arm_return, 1, &ResonanceMagic_Arm_injection);
+
+    //hits at the same fraction in the same order on every machine: see rollback_sort_cast_hits
+    write_address = (uint8_t*)(Game::ds1_base + Rollback::CastHits_Sort_offset);
+    sp::mem::code::x64::inject_jmp_14b(write_address, &CastHits_Sort_return, 0, &CastHits_Sort_injection);
 
     //the same map collision on every machine: see map_parts_request_all_collision
     write_address = (uint8_t*)(Game::ds1_base + Rollback::MapCollisionTargets_offset);

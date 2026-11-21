@@ -682,24 +682,6 @@ static_assert(offsetof(FrpgRagdollIns, bone_flags) == 0x178);
 static_assert(offsetof(FrpgRagdollIns, dbgNode) == 0x188);
 static_assert(offsetof(FrpgRagdollIns, saved_body_motions) == 0x1b0);
 
-//One contact in hkpCharacterProxy::m_manifold. Standard Havok hkpRootCdPoint layout:
-//an hkContactPoint (position + separating normal) plus the two collidables that produced it.
-struct hkpRootCdPoint
-{
-    float m_position[4];          // 0x0
-    float m_separatingNormal[4];  // 0x10
-    void* m_rootCollidableA;      // 0x20 (hkpCdBody*; a live game pointer, never hashed)
-    uint32_t m_shapeKeyA;         // 0x28 (hkpShapeKey is 32 bits)
-    uint32_t m_shapeKeyA_pad;     // 0x2c: alignment
-    void* m_rootCollidableB;      // 0x30 (hkpCdBody*)
-    uint32_t m_shapeKeyB;         // 0x38
-    uint32_t m_shapeKeyB_pad;     // 0x3c: alignment
-};
-static_assert(offsetof(hkpRootCdPoint, m_separatingNormal) == 0x10);
-static_assert(offsetof(hkpRootCdPoint, m_rootCollidableA) == 0x20);
-static_assert(offsetof(hkpRootCdPoint, m_rootCollidableB) == 0x30);
-static_assert(sizeof(hkpRootCdPoint) == 0x40);
-
 //low 30 bits of an hkArray capacity word; the top 2 are DONT_DEALLOCATE / LOCKED
 static const uint32_t HKARRAY_CAPACITY_MASK = 0x3FFFFFFF;
 
