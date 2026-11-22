@@ -1516,6 +1516,26 @@ void Rollback::start()
 #endif
 }
 
+/*
+ * Components of the world state that need to be synced/set correctly for all the clients in order to ensure determanism.
+ */
+void rollback_canonicalize_session_start_state()
+{
+    if (!canonicalize_DmgHitRecordManImp_free_lists(*(DmgHitRecordManImp**)Game::dmg_hit_record_man))
+    {
+        ConsoleWrite("Rollback: heap-allocated hit records exist at the session start; their order relative to each other may differ between machines");
+    }
+    canonicalize_BulletMan_free_slots(*(BulletMan**)Game::bullet_man);
+    //set the rng state to the same value
+    {
+        static const uint32_t session_seed[2] = { 0x5eed0001, 0x5eed0002 };
+        uint8_t* rng = GameRng::state();
+        ConsoleWrite("Rollback: game RNG %08x %08x (fixed %u) set to the session seed", ((uint32_t*)rng)[0], ((uint32_t*)rng)[1], rng[8]);
+        memcpy(rng, session_seed, sizeof(session_seed));
+        rng[8] = 0;
+    }
+}
+
 bool rollback_begin_game_callback(const char*)
 {
     return true;
@@ -1958,19 +1978,6 @@ bool rollback_await_init(void* steamMsgs)
     rollback_await_init_pending = false;
     WorldFreeze::freeze();
     sfx_rollback_session_start();
-    if (!canonicalize_DmgHitRecordManImp_free_lists(*(DmgHitRecordManImp**)Game::dmg_hit_record_man))
-    {
-        ConsoleWrite("Rollback: heap-allocated hit records exist at the session start; their order relative to each other may differ between machines");
-    }
-    canonicalize_BulletMan_free_slots(*(BulletMan**)Game::bullet_man);
-    //set the rng state to the same value
-    {
-        static const uint32_t session_seed[2] = { 0x5eed0001, 0x5eed0002 };
-        uint8_t* rng = GameRng::state();
-        ConsoleWrite("Rollback: game RNG %08x %08x (fixed %u) set to the session seed", ((uint32_t*)rng)[0], ((uint32_t*)rng)[1], rng[8]);
-        memcpy(rng, session_seed, sizeof(session_seed));
-        rng[8] = 0;
-    }
 
     RollbackStartSync::begin_session();
     RollbackReplay::init_session();

@@ -236,6 +236,8 @@ namespace
 
         rollback_load_game_state_callback((unsigned char*)state, sizeof(RollbackState));
         rollback_free_buffer(state);
+        //now that ggpo is started, we can set the world state and keep it in lockstep between players
+        rollback_canonicalize_session_start_state();
 
         for (uint32_t i = 0; i < Rollback::ggpoCurrentPlayerCount; i++)
         {

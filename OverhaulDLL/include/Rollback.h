@@ -292,6 +292,7 @@ inline void* realloc_(void* dst, size_t size)
 }
 
 
+void rollback_canonicalize_session_start_state();
 bool rollback_begin_game_callback(const char*);
 bool rollback_advance_frame_callback(int);
 bool rollback_load_game_state_callback(unsigned char* buffer, int);
