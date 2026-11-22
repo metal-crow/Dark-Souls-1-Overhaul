@@ -3158,7 +3158,14 @@ static void serialize_AnimationQueue_Entry(StateVisitor& v, const AnimationQueue
 {
     v.begin("AnimationQueue_Entry");
     v.blob("unk_0", &e->unk_0, 8);
-    v.blob("field0x10", e->field0x10, sizeof(e->field0x10));
+    // FUN_14043cbb0 copies each 0x20 byte record whole from one its caller built on the stack (FUN_14043a900, 0x14043aa09..):
+    // +4 is a byte (loop) and +0x10/+0x11 are bytes, and +5..+7 and +0x12..+0x13 are never written there. They hold whatever was
+    // on the stack, which differs between a live frame and a re-simulated one (seen as 0x3f80 vs 0 in +6..+7 in bows)
+    for (size_t i = 0; i < 8; i++)
+    {
+        v.blob_holes("field0x10", &e->field0x10[i], sizeof(e->field0x10[i]),
+            { { 0x5, 3, StateVisitor::Hole::Pad }, { 0x12, 2, StateVisitor::Hole::Pad } });
+    }
     serialize_AnimationQueue_Entry_sub1(v, &e->sub1);
     v.blob("unk_140", &e->unk_140, 8);
     size_t len = ((uint64_t)e->chained_animations_array_end - (uint64_t)e->chained_animations_array_start) / 8;
