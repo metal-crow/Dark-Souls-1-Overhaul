@@ -63,6 +63,7 @@
       watch <hexaddr> [1|2|4|8] [slot 0-3]  hardware write watchpoint (DR0-3) on the game thread; records every instruction that writes there
       watch exec <hexaddr> [slot] [edx]  hardware execute breakpoint (optionally only calls with this edx): records rcx, rdx, r8 and the return address at [rsp] of each call
       watch off | watch log         clear them all | the recorded writers (slot, address after the write, module offset, new value, count, callers)
+      watch drain                   the same as watch log, and empties the log
       synctest [reset]              GGPO_SYNCTEST builds: replayed-frame mismatch counts per subsystem
                                     (also in status); reset zeroes them and re-arms the state dumps
       synctest dump <subsys> [f|+n] only dump mismatches in these subsystems (all|none|player,damage,...),
@@ -1073,7 +1074,7 @@ namespace
                 }
                 return ok_json("\"cleared\":" + b2s(ok));
             }
-            if (sub == "log")
+            if (sub == "log" || sub == "drain")
             {
                 std::string s = "\"addresses\":[" + q(hex64(watch_addr[0])) + "," + q(hex64(watch_addr[1])) + "," + q(hex64(watch_addr[2])) + "," + q(hex64(watch_addr[3])) + "],\"hits\":[";
                 std::lock_guard<std::mutex> lock(watch_mutex);
@@ -1093,9 +1094,11 @@ namespace
                         + ",\"ret\":" + q(h.ret >= Game::ds1_base && h.ret < Game::ds1_base + 0x4000000 ? hex64(h.ret - Game::ds1_base) : hex64(h.ret))
                         + ",\"rip\":" + q(hex64(h.rip)) + ",\"game_offset\":" + q(in_game ? hex64(h.rip - Game::ds1_base) : "") + ",\"value\":" + q(hex64(h.value)) + ",\"count\":" + std::to_string(h.count) + ",\"frame\":" + std::to_string(h.frame) + ",\"last_frame\":" + std::to_string(h.last_frame) +",\"resim\":" + (h.resim ? "true" : "false") + ",\"callers\":[" + callers + "]}";
                 }
+                //drain: the hits so far, and the log starts over (a poller that drains often is not limited to 256 entries)
+                if (sub == "drain") watch_hits.clear();
                 return ok_json(s + "]");
             }
-            if (sub.empty()) return err_json("usage: watch <hexaddr> [1|2|4|8] [slot 0-3] | watch exec <hexaddr> [slot] | watch off | watch log");
+            if (sub.empty()) return err_json("usage: watch <hexaddr> [1|2|4|8] [slot 0-3] | watch exec <hexaddr> [slot] | watch off | watch log | watch drain");
             if (sub == "exec")
             {
                 if (a.size() < 3) return err_json("usage: watch exec <hexaddr> [slot] [edx filter | calls]");
