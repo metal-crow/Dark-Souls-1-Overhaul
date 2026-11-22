@@ -62,6 +62,10 @@ void free_EquipMagicData(EquipMagicData* to);
 
 void copy_PlayerGameData_AttributeInfo(PlayerGameData_AttributeInfo* to, const PlayerGameData_AttributeInfo* from);
 
+void copy_ChrModel(ChrModel* to, const ChrModel* from, StateTarget target);
+ChrModel* init_ChrModel();
+void free_ChrModel(ChrModel* to);
+
 void copy_ChrIns(ChrIns* to, const ChrIns* from, StateTarget target);
 ChrIns* init_ChrIns();
 void free_ChrIns(ChrIns* to, bool freeself);

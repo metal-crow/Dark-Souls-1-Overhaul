@@ -1435,6 +1435,38 @@ static_assert(offsetof(AttackInfo, defender) == 0x138);
 static_assert(offsetof(AttackInfo, data_1) == 0x140);
 static_assert(sizeof(AttackInfo) == 0x1c0);
 
+// NS_FRPG::MdlMtx: a set of 3x4 bone matrices (ChrModel::GetDmyPolyPositions reads type 0 or 1)
+struct MdlMtx
+{
+    uint64_t vtable;           // 0x0 (ghidra: DLNonCopyable base)
+    uint32_t type;             // 0x8
+    uint32_t bone_count;       // 0xc
+    float* bone_matrices;      // 0x10 - bone_count 3x4 matrices (0x30 bytes each), game-allocated
+};
+
+static_assert(offsetof(MdlMtx, type) == 0x8);
+static_assert(offsetof(MdlMtx, bone_count) == 0xc);
+static_assert(offsetof(MdlMtx, bone_matrices) == 0x10);
+static_assert(sizeof(MdlMtx) == 0x18);
+
+// NS_FRPG::ChrModel (FrpgModel base), only the part rollback restores. Each character's step in Step_Chr rebuilds the world
+// matrix (0x140379fa7) and the bones (0x140435da8) at its end; the next frame reads them through ChrModel::GetDmyPolyPositions
+// (0x14021cc60) for anything spawned at a dummy poly. The rest is render/resource state (vtable, FlverModel*, effect handles).
+struct ChrModel
+{
+    uint8_t padding_0[0x30];   // 0x0 (ghidra: vtable, FlverModel*, flags; not copied)
+    float world_matrix[12];    // 0x30 (3x4; ghidra had it as an SfxHandle "FollowupBullet")
+    MdlMtx mtx;                // 0x60 - the bones, unless mtx_override is set
+    MdlMtx* mtx_override;      // 0x78 - when set, the bones instead (vtable[3], 0x14020bf60)
+
+    MdlMtx* bones() { return mtx_override != NULL ? mtx_override : &mtx; }
+    const MdlMtx* bones() const { return mtx_override != NULL ? mtx_override : &mtx; }
+};
+
+static_assert(offsetof(ChrModel, world_matrix) == 0x30);
+static_assert(offsetof(ChrModel, mtx) == 0x60);
+static_assert(offsetof(ChrModel, mtx_override) == 0x78);
+
 struct ChrIns
 {
     uint8_t padding_0[8];
@@ -1442,7 +1474,7 @@ struct ChrIns
     uint8_t padding_0b[0x14];
     uint64_t field0x18;
     uint8_t padding_0a[0x38];
-    void* chrModel;
+    ChrModel* chrModel;        // 0x60
     PlayerCtrl* playerCtrl;
     union
     {

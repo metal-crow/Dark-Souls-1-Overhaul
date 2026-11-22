@@ -417,9 +417,63 @@ void copy_PlayerGameData_AttributeInfo(PlayerGameData_AttributeInfo* to, const P
 }
 
 
+/*
+ * The character's model: its world matrix and bones (see struct ChrModel).
+ * The model and it's bones are used to determine where hitboxes and bullets spawn, so it's important for rollback
+ * A local copy is a ChrModel holding only the important bits
+ */
+void copy_ChrModel(ChrModel* to, const ChrModel* from, StateTarget target)
+{
+    if (to == NULL || from == NULL)
+    {
+        FATALERROR("copy_ChrModel: the character's model %p or its copy %p is missing", from, to);
+    }
+    const MdlMtx* from_bones = from->bones();
+    MdlMtx* to_bones = to->bones();
+    if (from_bones->bone_count > 1024 || (from_bones->bone_count > 0 && from_bones->bone_matrices == NULL))
+    {
+        FATALERROR("copy_ChrModel: model %p has an unexpected bone set (%u bones at %p)", from, from_bones->bone_count, from_bones->bone_matrices);
+    }
+    if (target == StateTarget::ToGame)
+    {
+        if (to_bones->bone_count != from_bones->bone_count)
+        {
+            FATALERROR("copy_ChrModel: the model has %u bones, the saved state %u", to_bones->bone_count, from_bones->bone_count);
+        }
+    }
+    else if (to_bones->bone_count != from_bones->bone_count)
+    {
+        free(to_bones->bone_matrices);
+        to_bones->bone_matrices = from_bones->bone_count > 0 ? (float*)malloc_((size_t)from_bones->bone_count * 0x30) : NULL;
+        to_bones->bone_count = from_bones->bone_count;
+    }
+    memcpy(to->world_matrix, from->world_matrix, sizeof(to->world_matrix));
+    if (from_bones->bone_count > 0)
+    {
+        memcpy(to_bones->bone_matrices, from_bones->bone_matrices, (size_t)from_bones->bone_count * 0x30);
+    }
+}
+
+ChrModel* init_ChrModel()
+{
+    ChrModel* local = (ChrModel*)malloc_(sizeof(ChrModel));
+    memset(local, 0, sizeof(ChrModel));
+    return local;
+}
+
+void free_ChrModel(ChrModel* to)
+{
+    if (to != NULL)
+    {
+        free(to->mtx.bone_matrices);
+        free(to);
+    }
+}
+
 void copy_ChrIns(ChrIns* to, const ChrIns* from, StateTarget target)
 {
     //copy_ChrIns_field0x18(to->field0x18, from->field0x18);
+    copy_ChrModel(to->chrModel, from->chrModel, target);
     copy_PlayerCtrl(to->playerCtrl, from->playerCtrl, target);
     copy_PadManipulator(to->padManipulator, from->padManipulator);
     to->CharaInitParamID = from->CharaInitParamID;
@@ -505,6 +559,7 @@ ChrIns* init_ChrIns()
     ChrIns* local_ChrIns = (ChrIns*)malloc_(sizeof(ChrIns));
 
     //local_ChrIns->field0x18 = init_ChrIns_field0x18();
+    local_ChrIns->chrModel = init_ChrModel();
     local_ChrIns->playerCtrl = init_PlayerCtrl();
     local_ChrIns->padManipulator = init_PadManipulator();
     local_ChrIns->equippedWeaponData = (EquippedWeaponData*)malloc_(sizeof(EquippedWeaponData));
@@ -524,6 +579,8 @@ ChrIns* init_ChrIns()
 void free_ChrIns(ChrIns* to, bool freeself)
 {
     //free_ChrIns_field0x18(to->field0x18);
+    free_ChrModel(to->chrModel);
+    to->chrModel = NULL;
     free_PlayerCtrl(to->playerCtrl);
     free_PadManipulator(to->padManipulator);
     free(to->equippedWeaponData);
@@ -3276,6 +3333,15 @@ static void serialize_PlayerCtrl(StateVisitor& v, const PlayerCtrl* p)
 static void serialize_ChrIns(StateVisitor& v, const ChrIns* c)
 {
     v.begin("ChrIns");
+    {
+        const ChrModel* m = c->chrModel;
+        v.begin("ChrModel");
+        v.blob("world_matrix", m->world_matrix, sizeof(m->world_matrix));
+        const MdlMtx* b = m->bones();
+        v.count("bones", b->bone_count);
+        if (b->bone_count > 0) v.blob("bone_matrices", b->bone_matrices, (size_t)b->bone_count * 0x30);
+        v.end();
+    }
     serialize_PlayerCtrl(v, c->playerCtrl);
     serialize_PadManipulator(v, c->padManipulator);
     v.field("CharaInitParamID", c->CharaInitParamID);
