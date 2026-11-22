@@ -366,8 +366,13 @@ static void serialize_BulletIns_Field0x90_Field0x1a0(StateVisitor& v, const Bull
     v.field("unk_14", o->unk_14);
     v.field("goodsId", o->goodsId);
     v.padding("unk_1c", &o->unk_1c, sizeof(o->unk_1c));            // alignment before AttackData @0x20
-    v.blob("AttackData", o->AttackData, sizeof(o->AttackData));
-    v.blob("unk_88", o->unk_88, sizeof(o->unk_88));
+    // AttackData (FUN_140423070's initialisation order): +0x10 is a byte followed by 3 bytes of padding, +0x5c/+0x5d two bools
+    // followed by 2; the spawner's template leaves stack bytes there that differ between the machines
+    v.blob_holes("AttackData", o->AttackData, sizeof(o->AttackData),
+        { { 0x11, 3, StateVisitor::Hole::Pad }, { 0x5e, 2, StateVisitor::Hole::Pad } });
+    // FUN_140423070 zeroes it, but the spawner (0x140423265) copies the whole struct from a template whose +0x88 is
+    // uninitialised stack: seen as float bits on one machine and a code address (0x14021d000) on the other
+    v.padding("unk_88", o->unk_88, sizeof(o->unk_88));
     serialize_BulletTarget(v, "target0x90", o->target0x90);
     // 0xc1-0xcf: the rest of the 0x40-byte target struct at 0x90 (FUN_140423680 initialises it up to 0x30)
     v.padding("unk_c1", o->unk_c1, sizeof(o->unk_c1));
