@@ -42,6 +42,7 @@ bool attach_slot_is_cosmetic(uint32_t type)
     case TypeChrPointLightSlot:
     case TypeChrConditionSfxSeSlot:
     case TypeChrFollowSfxSlot:
+    case TypeChrBurnSlot:
         return true;
     default:
         return false;
