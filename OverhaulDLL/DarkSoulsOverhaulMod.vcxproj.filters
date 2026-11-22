@@ -168,6 +168,12 @@
     <ClCompile Include="src\HarnessControl.cpp">
       <Filter>Source Files\Rollback\Testing</Filter>
     </ClCompile>
+    <ClCompile Include="src\RollbackStartSync.cpp">
+      <Filter>Source Files\Rollback</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WorldFreeze.cpp">
+      <Filter>Source Files\Rollback</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3d11-wrapper\include\d3d11\exports.h">
@@ -316,6 +322,12 @@
     </ClInclude>
     <ClInclude Include="include\StateSerializer.h">
       <Filter>Header Files\Rollback\Testing</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RollbackStartSync.h">
+      <Filter>Header Files\Rollback</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WorldFreeze.h">
+      <Filter>Header Files\Rollback</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
