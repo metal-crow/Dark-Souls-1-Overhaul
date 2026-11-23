@@ -26,6 +26,11 @@ static std::atomic<uint64_t> seamlessGameLobby = 0;
 //Set when our Steam_CreateLobby hook passes through under SC; the next lobby the host enters is the game lobby.
 static std::atomic<bool> expecting_sc_game_lobby = false;
 
+uint64_t seamless_game_lobby()
+{
+    return seamlessGameLobby.load();
+}
+
 bool is_seamless_coop_present()
 {
     //ds1sc.dll is either loaded at startup or not at all, and never changes during the session, so cache it.
@@ -36,7 +41,7 @@ bool is_seamless_coop_present()
 //SC runs its matchmaking through its own Steam lobbies. Both players share an SC lobby, so we
 // adopt the master lobby as our persistant lobby.
 //Note that only the master lobby has the lobby_data == seamless
-static bool IsSeamlessCoopLobby(uint64_t lobby)
+bool IsSeamlessCoopLobby(uint64_t lobby)
 {
     const char* lobby_type = ModNetworking::SteamMatchmaking->GetLobbyData(lobby, "lobby_type");
     return lobby_type != nullptr && strstr(lobby_type, "seamless") != nullptr;

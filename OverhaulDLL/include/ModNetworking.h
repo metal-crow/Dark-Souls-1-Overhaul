@@ -81,5 +81,10 @@ private:
 
 //True if Seamless Co-op (ds1sc.dll) is loaded. Used to back off mod features that conflict with SC.
 bool is_seamless_coop_present();
+//the lobby is one of Seamless Co-op's (its lobby_type data says so; the host's is set shortly after the lobby is created)
+bool IsSeamlessCoopLobby(uint64_t lobby);
+//Seamless Co-op's game lobby, the one its hosting item creates (through the game's CreateLobby) and a guest's joining item
+//enters; 0 when there is none
+uint64_t seamless_game_lobby();
 
 #endif
