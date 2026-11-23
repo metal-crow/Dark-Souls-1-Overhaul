@@ -77,6 +77,8 @@ uint64_t Game::ezstate_man = NULL;
 
 uint64_t Game::delay_delete_man = NULL;
 
+uint64_t Game::game_man = NULL;
+
 uint64_t Game::QInputMgrWindowsFantasy = NULL;
 
 uint64_t Game::InputDirectionMovementMan = NULL;
@@ -241,6 +243,8 @@ void Game::init()
     Game::ezstate_man = Game::ds1_base + 0x1cfbe60;
 
     Game::delay_delete_man = Game::ds1_base + 0x1c6a8e8;
+
+    Game::game_man = Game::ds1_base + 0x1c74e08;
 
     Game::QInputMgrWindowsFantasy = Game::ds1_base + 0x1cb5490;
 
@@ -1736,6 +1740,16 @@ void Game::Step_GameSimulation(bool renderFrame)
     Step_Havok(*(void**)Game::frpg_havok_man_imp, FRAMETIME);
     //Update_SfxMan(FRAMETIME);
     FinishStep_Havok(*(void**)Game::frpg_havok_man_imp);
+}
+
+void Game::set_rng_fixed(bool fixed)
+{
+    uint8_t* gm = *(uint8_t**)Game::game_man;
+    if (gm == NULL)
+    {
+        FATALERROR("GameMan is not set up, can't set the fixed-RNG flag");
+    }
+    gm[0x6c] = fixed ? 1 : 0;
 }
 
 void Game::SuspendThreads()

@@ -173,6 +173,8 @@ public:
 
     static uint64_t delay_delete_man;
 
+    static uint64_t game_man;
+
     static uint64_t QInputMgrWindowsFantasy;
 
     static uint64_t InputDirectionMovementMan;
@@ -411,6 +413,9 @@ public:
     static void* get_InGameStep();
 
 	static void Step_GameSimulation(bool renderFrame = true);
+
+    //Set the game's "fixed RNG" flag: while it is set every rng draw returns 0x2a
+    static void set_rng_fixed(bool fixed);
 
     static void SuspendThreads();
 
