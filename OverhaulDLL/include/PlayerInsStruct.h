@@ -847,7 +847,8 @@ struct ActionCtrl
     float throw_position[4];   // 0x4e0 (ghidra: Vector4)
     uint8_t unk_4f0[0x38];     // 0x4f0 (throwrotation etc.)
     int32_t actionType;        // 0x528
-    uint8_t unk_52c[0x14];     // 0x52c
+    uint32_t parried_by_handle; // 0x52c handle of the character whose parry hit this one
+    uint8_t unk_530[0x10];     // 0x530
     uint8_t padding_2[8];      // 0x540 (ghidra: dbgNode ptr; not copied)
     uint8_t unk_548;           // 0x548
     uint8_t map_action_test_is_valid; // 0x549 (ghidra: bool)
@@ -863,6 +864,7 @@ static_assert(offsetof(ActionCtrl, ezStatePassiveState) == 0x70);
 static_assert(offsetof(ActionCtrl, recievedDamageType) == 0x1e4);
 static_assert(offsetof(ActionCtrl, throw_position) == 0x4e0);
 static_assert(offsetof(ActionCtrl, actionType) == 0x528);
+static_assert(offsetof(ActionCtrl, parried_by_handle) == 0x52c);
 static_assert(offsetof(ActionCtrl, padding_2) == 0x540);
 static_assert(offsetof(ActionCtrl, actionNumber) == 0x54c);
 static_assert(sizeof(ActionCtrl) == 0x560);
