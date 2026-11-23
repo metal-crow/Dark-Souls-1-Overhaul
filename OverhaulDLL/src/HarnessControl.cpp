@@ -60,7 +60,7 @@
       announce                      before a session: send the other players this character's position, HP and equipment
       set_hp <hp>                   before a session: the local character's current HP (clamped to 1..max)
       rtti <hexaddr>                MSVC RTTI class name of the object at an address (its vtable's CompleteObjectLocator)
-      watch <hexaddr> [1|2|4|8] [slot 0-3]  hardware write watchpoint (DR0-3) on the game thread; records every instruction that writes there
+      watch <hexaddr> [1|2|4|8] [slot 0-3] [all]  hardware write watchpoint (DR0-3) on the game thread (all: every thread); records every instruction that writes there
       watch exec <hexaddr> [slot] [edx]  hardware execute breakpoint (optionally only calls with this edx): records rcx, rdx, r8 and the return address at [rsp] of each call
       watch off | watch log         clear them all | the recorded writers (slot, address after the write, module offset, new value, count, callers)
       watch drain                   the same as watch log, and empties the log
@@ -75,6 +75,7 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <windows.h>
+#include <tlhelp32.h>
 
 #include "HarnessControl.h"
 #include "DarkSoulsOverhaulMod.h"
@@ -263,13 +264,18 @@ namespace
         const uint64_t lobby = ModNetworking::currentLobby.load();
         if (lobby == 0 || ModNetworking::SteamMatchmaking == NULL || ModNetworking::SteamUser == NULL)
         {
-            return "{\"id\":\"\",\"owner\":\"\",\"is_owner\":false,\"members\":0}";
+            return "{\"id\":\"\",\"owner\":\"\",\"is_owner\":false,\"members\":0,\"seamless_coop\":false,\"sc_present\":" + b2s(is_seamless_coop_present()) + ",\"sc_game_lobby\":\"" + hex_id(seamless_game_lobby()) + "\"}";
         }
         const uint64_t owner = ModNetworking::SteamMatchmaking->GetLobbyOwner(lobby).ConvertToUint64();
         const int members = ModNetworking::SteamMatchmaking->GetNumLobbyMembers(lobby);
-        char b[160];
-        snprintf(b, sizeof(b), "{\"id\":\"%llx\",\"owner\":\"%llx\",\"is_owner\":%s,\"members\":%d}", (unsigned long long)lobby,
-            (unsigned long long)owner, owner == ModNetworking::SteamUser->GetSteamID().ConvertToUint64() ? "true" : "false", members);
+        //seamless_coop: the lobby is Seamless Co-op's master lobby. It can exist without a session (seen right after a launch),
+        //so whether the hosting item was used is sc_game_lobby: SC's game lobby, created by that item (0 = none, and a guest's
+        //joining item then reports "no session found")
+        const bool sc_present = is_seamless_coop_present();
+        char b[288];
+        snprintf(b, sizeof(b), "{\"id\":\"%llx\",\"owner\":\"%llx\",\"is_owner\":%s,\"members\":%d,\"seamless_coop\":%s,\"sc_present\":%s,\"sc_game_lobby\":\"%llx\"}", (unsigned long long)lobby,
+            (unsigned long long)owner, owner == ModNetworking::SteamUser->GetSteamID().ConvertToUint64() ? "true" : "false", members,
+            sc_present && IsSeamlessCoopLobby(lobby) ? "true" : "false", sc_present ? "true" : "false", (unsigned long long)seamless_game_lobby());
         return b;
     }
 
@@ -502,7 +508,7 @@ namespace
     // an 0xC... code, so the crash handler's vectored handler ignores it, and ours (added first) records it and continues.
     //callers: the first stack slots that point into the game's code, a poor man's backtrace (the writer may be reached
     //through Arxan's jump-return stubs, which leave no static callers)
-    struct WatchHit { uint32_t slot; uint64_t rip; uint64_t value; uint32_t count; uint64_t callers[8]; uint64_t rcx, rdx, r8, ret; int32_t frame; bool resim; int32_t last_frame; };
+    struct WatchHit { uint32_t slot; uint64_t rip; uint64_t value; uint32_t count; uint64_t callers[8]; uint64_t rcx, rdx, r8, ret; int32_t frame; bool resim; int32_t last_frame; DWORD thread; };
 
     //A stack slot is taken as a return address only if the bytes before it are a call: E8 rel32, or FF /2 (call reg,
     //call [reg], call [reg+disp8], call [reg+disp32], call [rip+disp32], with or without a REX prefix)
@@ -526,6 +532,8 @@ namespace
     bool watch_exec_calls[4] = {};                     //exec breakpoints: one entry per distinct (rcx, rdx, caller) instead of per frame
     int64_t watch_rdx_filter[4] = { -1, -1, -1, -1 };   //exec breakpoints: record only calls whose edx is this (-1 = all)
     PVOID watch_handler = NULL;
+    DWORD watch_game_thread = 0;                        //the thread watch_set runs on (the harness pump); hits from others say so
+    bool watch_all_threads_used = false;                //an "all" watch was set since the last clear, so the clear has to reach every thread
 
     LONG WINAPI watch_exception_handler(EXCEPTION_POINTERS* info)
     {
@@ -571,6 +579,7 @@ namespace
         }
         hit.last_frame = hit.frame;
         hit.resim = Rollback::inRollbackResim;
+        hit.thread = GetCurrentThreadId();
         //writes from outside the game (the mod restoring saved state) are not told apart by frame, or they fill the log
         if (rip < Game::ds1_base || rip > Game::ds1_base + 0x3200000)
         {
@@ -594,7 +603,7 @@ namespace
             {
                 //an execute breakpoint in "calls" mode is one entry per distinct (rcx, rdx, caller): first and last frame, count
                 const bool same_time = watch_exec[slot] && watch_exec_calls[slot]
-                    ? true : (h.r8 == hit.r8 && h.frame == hit.frame && h.resim == hit.resim);
+                    ? true : (h.r8 == hit.r8 && h.frame == hit.frame && h.resim == hit.resim && h.thread == hit.thread);
                 if (h.slot == slot && h.rip == rip && h.value == hit.value && h.rcx == hit.rcx && h.rdx == hit.rdx && h.ret == hit.ret
                     && same_time
                     && memcmp(h.callers, hit.callers, sizeof(hit.callers)) == 0) { h.count++; h.last_frame = hit.frame; found = true; break; }
@@ -605,55 +614,84 @@ namespace
     }
 
     // Debug registers can only be changed on a suspended thread, so a helper thread does it
-    struct WatchSet { DWORD thread_id; uint32_t slot; uint64_t addr; uint32_t len; bool exec; bool clear_all; bool ok; };
-    DWORD WINAPI watch_set_thread(LPVOID p)
+    //all_threads: every thread of the process except the helper (threads created later do not get it)
+    //dr/dr7: the whole debug register state to write. It is kept here rather than edited in place: a DR7 read back from a
+    //thread did not keep the slots set before (arming a second slot silently disarmed the first)
+    struct WatchSet { DWORD thread_id; uint64_t dr[4]; uint64_t dr7; bool all_threads; bool ok; };
+    uint64_t watch_dr[4] = {};
+    uint64_t watch_dr7 = 0;
+    bool watch_set_one(const WatchSet* w, DWORD thread_id)
     {
-        WatchSet* w = (WatchSet*)p;
-        HANDLE t = OpenThread(THREAD_GET_CONTEXT | THREAD_SET_CONTEXT | THREAD_SUSPEND_RESUME, FALSE, w->thread_id);
-        if (t == NULL) return 0;
+        HANDLE t = OpenThread(THREAD_GET_CONTEXT | THREAD_SET_CONTEXT | THREAD_SUSPEND_RESUME, FALSE, thread_id);
+        if (t == NULL) return false;
+        bool ok = false;
         if (SuspendThread(t) != (DWORD)-1)
         {
             CONTEXT c = {};
             c.ContextFlags = CONTEXT_DEBUG_REGISTERS;
             if (GetThreadContext(t, &c))
             {
-                if (w->clear_all)
-                {
-                    c.Dr0 = c.Dr1 = c.Dr2 = c.Dr3 = 0;
-                    c.Dr7 = 0;
-                }
-                else
-                {
-                    (&c.Dr0)[w->slot] = w->addr;
-                    const uint64_t len_bits = w->len == 8 ? 2 : (w->len == 4 ? 3 : (w->len == 2 ? 1 : 0));
-                    c.Dr7 &= ~(((uint64_t)0xF << (16 + 4 * w->slot)) | (3ULL << (2 * w->slot)));
-                    //Ln, RWn = write (or 00 execute, with LEN 00), LENn
-                    if (w->exec)
-                    {
-                        c.Dr7 |= (1ULL << (2 * w->slot));
-                    }
-                    else
-                    {
-                        c.Dr7 |= (1ULL << (2 * w->slot)) | (1ULL << (16 + 4 * w->slot)) | (len_bits << (18 + 4 * w->slot));
-                    }
-                }
+                c.Dr0 = w->dr[0];
+                c.Dr1 = w->dr[1];
+                c.Dr2 = w->dr[2];
+                c.Dr3 = w->dr[3];
+                c.Dr7 = w->dr7;
                 c.Dr6 = 0;
-                w->ok = SetThreadContext(t, &c) != 0;
+                ok = SetThreadContext(t, &c) != 0;
             }
             ResumeThread(t);
         }
         CloseHandle(t);
+        return ok;
+    }
+    DWORD WINAPI watch_set_thread(LPVOID p)
+    {
+        WatchSet* w = (WatchSet*)p;
+        if (!w->all_threads)
+        {
+            w->ok = watch_set_one(w, w->thread_id);
+            return 0;
+        }
+        //the requesting thread must succeed; the others are best effort (some exit meanwhile, some cannot be opened)
+        bool requester_ok = false;
+        HANDLE snap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+        if (snap != INVALID_HANDLE_VALUE)
+        {
+            THREADENTRY32 te = {};
+            te.dwSize = sizeof(te);
+            const DWORD pid = GetCurrentProcessId(), self = GetCurrentThreadId();
+            for (BOOL more = Thread32First(snap, &te); more; more = Thread32Next(snap, &te))
+            {
+                if (te.th32OwnerProcessID != pid || te.th32ThreadID == self) continue;
+                const bool ok = watch_set_one(w, te.th32ThreadID);
+                if (te.th32ThreadID == w->thread_id) requester_ok = ok;
+            }
+            CloseHandle(snap);
+        }
+        w->ok = requester_ok;
         return 0;
     }
 
-    bool watch_set(uint32_t slot, uint64_t addr, uint32_t len, bool exec = false)
+    bool watch_set(uint32_t slot, uint64_t addr, uint32_t len, bool exec = false, bool all_threads = false)
     {
         if (watch_handler == NULL)
         {
             watch_handler = AddVectoredExceptionHandler(1, watch_exception_handler);
         }
         const bool clear_all = addr == 0;
-        WatchSet w = { GetCurrentThreadId(), slot, addr, len, exec, clear_all, false };
+        WatchSet w = { GetCurrentThreadId(), {}, 0, all_threads || (clear_all && watch_all_threads_used), false };
+        if (!clear_all)
+        {
+            memcpy(w.dr, watch_dr, sizeof(w.dr));
+            w.dr7 = watch_dr7;
+            w.dr[slot] = addr;
+            const uint64_t len_bits = len == 8 ? 2 : (len == 4 ? 3 : (len == 2 ? 1 : 0));
+            w.dr7 &= ~(((uint64_t)0xF << (16 + 4 * slot)) | (3ULL << (2 * slot)));
+            //Ln, RWn = write (or 00 execute, with LEN 00), LENn
+            w.dr7 |= exec ? (1ULL << (2 * slot)) : ((1ULL << (2 * slot)) | (1ULL << (16 + 4 * slot)) | (len_bits << (18 + 4 * slot)));
+        }
+        if (all_threads) watch_all_threads_used = true;
+        watch_game_thread = GetCurrentThreadId();
         //called on the game thread (the harness pump), which is the one to watch
         if (clear_all)
         {
@@ -668,6 +706,15 @@ namespace
         //the helper suspends this thread, so wait without holding anything
         WaitForSingleObject(h, 5000);
         CloseHandle(h);
+        if (w.ok)
+        {
+            memcpy(watch_dr, w.dr, sizeof(watch_dr));
+            watch_dr7 = w.dr7;
+        }
+        if (w.ok && clear_all)
+        {
+            watch_all_threads_used = false;
+        }
         if (w.ok && !clear_all)
         {
             std::lock_guard<std::mutex> lock(watch_mutex);
@@ -905,7 +952,7 @@ namespace
             {
                 uint32_t mask;
                 if (a.size() < 3 || !RollbackHash::synctest_parse_mask(a[2], mask))
-                    return err_json("usage: synctest dump <all|none|player,bullet,damage,havok,throw,dmghit,rng> [frame|+n]");
+                    return err_json("usage: synctest dump <all|none|player,bullet,damage,havok,throw,dmghit> [frame|+n]");
                 int from_frame = -1;
                 if (a.size() > 3)
                 {
@@ -1092,13 +1139,13 @@ namespace
                     }
                     s += "{\"slot\":" + std::to_string(h.slot) + ",\"rcx\":" + q(hex64(h.rcx)) + ",\"rdx\":" + q(hex64(h.rdx)) + ",\"r8\":" + q(hex64(h.r8))
                         + ",\"ret\":" + q(h.ret >= Game::ds1_base && h.ret < Game::ds1_base + 0x4000000 ? hex64(h.ret - Game::ds1_base) : hex64(h.ret))
-                        + ",\"rip\":" + q(hex64(h.rip)) + ",\"game_offset\":" + q(in_game ? hex64(h.rip - Game::ds1_base) : "") + ",\"value\":" + q(hex64(h.value)) + ",\"count\":" + std::to_string(h.count) + ",\"frame\":" + std::to_string(h.frame) + ",\"last_frame\":" + std::to_string(h.last_frame) +",\"resim\":" + (h.resim ? "true" : "false") + ",\"callers\":[" + callers + "]}";
+                        + ",\"rip\":" + q(hex64(h.rip)) + ",\"game_offset\":" + q(in_game ? hex64(h.rip - Game::ds1_base) : "") + ",\"value\":" + q(hex64(h.value)) + ",\"count\":" + std::to_string(h.count) + ",\"frame\":" + std::to_string(h.frame) + ",\"last_frame\":" + std::to_string(h.last_frame) +",\"resim\":" + (h.resim ? "true" : "false") + ",\"thread\":" + (h.thread == watch_game_thread ? q("game") : std::to_string(h.thread)) + ",\"callers\":[" + callers + "]}";
                 }
                 //drain: the hits so far, and the log starts over (a poller that drains often is not limited to 256 entries)
                 if (sub == "drain") watch_hits.clear();
                 return ok_json(s + "]");
             }
-            if (sub.empty()) return err_json("usage: watch <hexaddr> [1|2|4|8] [slot 0-3] | watch exec <hexaddr> [slot] | watch off | watch log | watch drain");
+            if (sub.empty()) return err_json("usage: watch <hexaddr> [1|2|4|8] [slot 0-3] [all] | watch exec <hexaddr> [slot] | watch off | watch log | watch drain");
             if (sub == "exec")
             {
                 if (a.size() < 3) return err_json("usage: watch exec <hexaddr> [slot] [edx filter | calls]");
@@ -1124,8 +1171,10 @@ namespace
             if (slot > 3) return err_json("slot must be 0..3");
             if ((addr & (len - 1)) != 0) return err_json("address must be aligned to the length");
             if (!mem_readable(addr, len)) return err_json("unreadable");
-            if (!watch_set(slot, addr, len)) return err_json("could not set the debug registers");
-            return ok_json("\"address\":" + q(hex64(addr)) + ",\"length\":" + std::to_string(len) + ",\"slot\":" + std::to_string(slot));
+            //"all": every thread of the process, not just the game thread (hits from another thread have its id as "thread")
+            const bool all_threads = a.size() > 4 && a[4] == "all";
+            if (!watch_set(slot, addr, len, false, all_threads)) return err_json("could not set the debug registers");
+            return ok_json("\"address\":" + q(hex64(addr)) + ",\"length\":" + std::to_string(len) + ",\"slot\":" + std::to_string(slot) + ",\"all_threads\":" + b2s(all_threads));
         }
 
         if (cmd == "peek" || cmd == "rtti")
