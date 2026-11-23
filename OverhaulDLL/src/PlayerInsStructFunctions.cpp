@@ -289,10 +289,14 @@ void copy_PlayerGameData(PlayerGameData* to, const PlayerGameData* from, StateTa
 {
     //player_number_1indexed is session bookkeeping a live-only step sets (once, at the first item use), so a load keeps the live value
     const int32_t live_player_number = to->attribs.player_number_1indexed;
+    //save_replenishable_item_count isn't important to rollback, it's just used to save estus amounts to the save file.
+    // so we keep it to the live value and undo the below copy operation
+    const uint8_t live_save_replenishable_item_count = to->attribs.save_replenishable_item_count;
     copy_PlayerGameData_AttributeInfo(&to->attribs, &from->attribs);
     if (target == StateTarget::ToGame)
     {
         to->attribs.player_number_1indexed = live_player_number;
+        to->attribs.save_replenishable_item_count = live_save_replenishable_item_count;
     }
     copy_EquipGameData(&to->equipGameData, &from->equipGameData, target);
     copy_PlayerGameData_ChrProperties(&to->ChrProperties, &from->ChrProperties);
@@ -2412,9 +2416,14 @@ static void serialize_PlayerGameData_AttributeInfo(StateVisitor& v, const Player
     v.excluded("Mp_mirror", 4);
     v.blob("MaxMp_to_unk_1c", attr + 0x14, 0xc);
     v.excluded("Sp_mirror", 4);
-    v.blob("AttributeInfo", attr + 0x24, sizeof(*a) - 0x24);
+    v.blob("AttributeInfo", attr + 0x24, 0x10b - 0x24);
+    //written by the save routine for the local character only (see copy_PlayerGameData): 0xff after a launch, the Estus count
+    //from the first autosave on, which can come mid-session on one machine
+    v.excluded("save_replenishable_item_count", 1);
+    v.blob("AttributeInfo_after_save_count", attr + 0x10c, sizeof(*a) - 0x10c);
     static_assert(offsetof(PlayerGameData_AttributeInfo, Hp) == 0x4 && offsetof(PlayerGameData_AttributeInfo, Mp) == 0x10
-        && offsetof(PlayerGameData_AttributeInfo, Sp) == 0x20, "AttributeInfo mirror offsets");
+        && offsetof(PlayerGameData_AttributeInfo, Sp) == 0x20 && offsetof(PlayerGameData_AttributeInfo, save_replenishable_item_count) == 0x10b,
+        "AttributeInfo mirror offsets");
     v.end();
 }
 

@@ -1751,7 +1751,7 @@ struct PlayerGameData_AttributeInfo
     uint8_t InvadeType;              // 0x108
     uint8_t MaxWeaponLevel;          // 0x109
     uint8_t EstusLevel;              // 0x10a
-    uint8_t unk_10b;                 // 0x10b (gap)
+    uint8_t save_replenishable_item_count; // 0x10b (The quantity of the Estus Flask (the inventory's replenishable goods))
     uint32_t RankingRegistration_Value; // 0x10c
     uint32_t LastClearCovenant;      // 0x110
     uint32_t unk_114;                // 0x114
@@ -1784,6 +1784,7 @@ static_assert(offsetof(PlayerGameData_AttributeInfo, Vitality) == 0x30);
 static_assert(offsetof(PlayerGameData_AttributeInfo, SoulLevel) == 0x80);
 static_assert(offsetof(PlayerGameData_AttributeInfo, characterName1) == 0x98);
 static_assert(offsetof(PlayerGameData_AttributeInfo, PoisonResist) == 0xf0);
+static_assert(offsetof(PlayerGameData_AttributeInfo, save_replenishable_item_count) == 0x10b);
 static_assert(offsetof(PlayerGameData_AttributeInfo, save_version_time) == 0x148);
 static_assert(sizeof(PlayerGameData_AttributeInfo) == 0x1a4);
 
