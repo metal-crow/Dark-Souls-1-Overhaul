@@ -560,6 +560,7 @@ struct HavokChara
     // Local-only fields (not part of the game struct, only used in our local copies)
     SavedHavokPhantom saved_phantom_1;   // physShapePhantomIns_1's phantom: its motion state and capsule
     SavedHavokPhantom saved_phantom_2;
+    SavedHavokPhantom saved_proxy_phantom; //the character proxy's phantom
 };
 
 static_assert(offsetof(HavokChara, current_coords) == 0x10);

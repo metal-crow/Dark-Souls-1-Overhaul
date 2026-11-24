@@ -158,7 +158,16 @@ void copy_hkpEntity_motion(hkpEntity* to, const hkpMotion* from)
 
 void copy_SavedHavokPhantom(SavedHavokPhantom* to, const FrpgPhysShapePhantomIns* from)
 {
-    const hkpSimpleShapePhantom* phantom = phantom_of(from);
+    copy_SavedHavokPhantom(to, phantom_of(from));
+}
+
+void copy_SavedHavokPhantom(FrpgPhysShapePhantomIns* to, const SavedHavokPhantom* from)
+{
+    copy_SavedHavokPhantom(phantom_of(to), from);
+}
+
+void copy_SavedHavokPhantom(SavedHavokPhantom* to, const hkpSimpleShapePhantom* phantom)
+{
     to->valid = phantom != NULL;
     if (phantom == NULL)
     {
@@ -168,9 +177,8 @@ void copy_SavedHavokPhantom(SavedHavokPhantom* to, const FrpgPhysShapePhantomIns
     copy_hkpShape(&to->shape, (const hkpShape*)phantom->base.m_collidable.base.shape);
 }
 
-void copy_SavedHavokPhantom(FrpgPhysShapePhantomIns* to, const SavedHavokPhantom* from)
+void copy_SavedHavokPhantom(hkpSimpleShapePhantom* phantom, const SavedHavokPhantom* from)
 {
-    hkpSimpleShapePhantom* phantom = phantom_of(to);
     if ((phantom != NULL) != from->valid)
     {
         FATALERROR("copy_SavedHavokPhantom: the phantom %s since the save", from->valid ? "no longer exists" : "was created");
@@ -424,6 +432,10 @@ static void copy_hkpWorld(hkpWorld* to, const HavokRollbackState* from)
         {
             refresh_phantom_broadphase(to, phantom_of(chara->physShapePhantomIns_1));
             refresh_phantom_broadphase(to, phantom_of(chara->physShapePhantomIns_2));
+            if (chara->char_proxy != NULL && chara->char_proxy->HkpSimpleShapePhantom != NULL)
+            {
+                refresh_phantom_broadphase(to, (hkpSimpleShapePhantom*)chara->char_proxy->HkpSimpleShapePhantom);
+            }
             if (chara->char_proxy != NULL)
             {
                 const uint32_t dropped = filter_proxy_manifold(chara->char_proxy);

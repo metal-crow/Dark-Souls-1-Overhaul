@@ -39,6 +39,8 @@ void copy_hkpShape(hkpShape* to, const SavedHavokShape* from);
 // A character phantom's motion state and shape. copy_FrpgHavokManImp moves its broadphase entry afterwards.
 void copy_SavedHavokPhantom(SavedHavokPhantom* to, const FrpgPhysShapePhantomIns* from);
 void copy_SavedHavokPhantom(FrpgPhysShapePhantomIns* to, const SavedHavokPhantom* from);
+void copy_SavedHavokPhantom(SavedHavokPhantom* to, const hkpSimpleShapePhantom* from);
+void copy_SavedHavokPhantom(hkpSimpleShapePhantom* to, const SavedHavokPhantom* from);
 
 // Everything in hkpMotion but its object header, the motion type and m_savedMotion, which is an allocation the motion owns
 void copy_hkpMotion(hkpMotion* to, const hkpMotion* from);

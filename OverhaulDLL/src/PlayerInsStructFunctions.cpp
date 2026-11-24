@@ -1531,16 +1531,19 @@ void copy_HavokChara(HavokChara* to, const HavokChara* from, StateTarget target)
     {
         copy_SavedHavokPhantom(&to->saved_phantom_1, from->physShapePhantomIns_1);
         copy_SavedHavokPhantom(&to->saved_phantom_2, from->physShapePhantomIns_2);
+        copy_SavedHavokPhantom(&to->saved_proxy_phantom, (const hkpSimpleShapePhantom*)from->char_proxy->HkpSimpleShapePhantom);
     }
     else if (target == StateTarget::ToGame)
     {
         copy_SavedHavokPhantom(to->physShapePhantomIns_1, &from->saved_phantom_1);
         copy_SavedHavokPhantom(to->physShapePhantomIns_2, &from->saved_phantom_2);
+        copy_SavedHavokPhantom((hkpSimpleShapePhantom*)to->char_proxy->HkpSimpleShapePhantom, &from->saved_proxy_phantom);
     }
     else
     {
         to->saved_phantom_1 = from->saved_phantom_1;
         to->saved_phantom_2 = from->saved_phantom_2;
+        to->saved_proxy_phantom = from->saved_proxy_phantom;
     }
     memcpy(&to->unk_60, &from->unk_60, 0x98);
     memcpy(&to->unk_100, &from->unk_100, 0xe8);
@@ -2764,6 +2767,7 @@ static void serialize_HavokChara(StateVisitor& v, const HavokChara* h)
     v.blob_holes("unk_258", &h->unk_258, 0x38, { { 0x2d, 3, StateVisitor::Hole::Pad } });
     serialize_SavedHavokPhantom(v, "phantom1", &h->saved_phantom_1);
     serialize_SavedHavokPhantom(v, "phantom2", &h->saved_phantom_2);
+    serialize_SavedHavokPhantom(v, "proxy_phantom", &h->saved_proxy_phantom);
     v.end();
 }
 
