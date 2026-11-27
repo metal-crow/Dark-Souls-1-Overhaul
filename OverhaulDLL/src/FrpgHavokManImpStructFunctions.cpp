@@ -2,6 +2,7 @@
 #include "DamageManStructFunctions.h"
 #include "GameData.h"
 #include "StateSerializer.h"
+#include <algorithm>
 #include <cstddef>
 #include <vector>
 
@@ -222,10 +223,56 @@ static bool phantom_overlaps(const hkpSimpleShapePhantom* phantom, const hkpColl
     return false;
 }
 
+// The collidables of the session players' bodies (their proxy and capsule phantoms and ragdoll bodies). They live as long as the
+// characters and are rolled back with them, so a restored contact with one of them is always valid
+static void collect_player_collidables(std::vector<const hkpCollidable*>& out)
+{
+    auto add_phantom = [&](const hkpSimpleShapePhantom* phantom)
+    {
+        if (phantom != NULL)
+        {
+            out.push_back((const hkpCollidable*)&phantom->base.m_collidable);
+        }
+    };
+    for (uint32_t i = 0; i < (uint32_t)Rollback::ggpoCurrentPlayerCount; i++)
+    {
+        ChrCtrl* chrctrl = chr_ctrl(connected_player(i));
+        if (chrctrl == NULL)
+        {
+            continue;
+        }
+        HavokChara* chara = chrctrl->havokChara;
+        if (chara != NULL)
+        {
+            add_phantom(phantom_of(chara->physShapePhantomIns_1));
+            add_phantom(phantom_of(chara->physShapePhantomIns_2));
+            if (chara->char_proxy != NULL)
+            {
+                add_phantom((const hkpSimpleShapePhantom*)chara->char_proxy->HkpSimpleShapePhantom);
+            }
+        }
+        const FrpgRagdollIns* ragdoll = chrctrl->ragdollIns;
+        if (ragdoll != NULL && ragdoll->ragdollInstance != NULL)
+        {
+            for (uint32_t b = 0; b < ragdoll->ragdollInstance->m_rigidBodies_len; b++)
+            {
+                const hkpEntity* body = ragdoll->ragdollInstance->m_rigidBodies[b];
+                if (body != NULL)
+                {
+                    out.push_back((const hkpCollidable*)&body->m_collidable);
+                }
+            }
+        }
+    }
+}
+
 // copy_PlayerIns restored m_manifold from the saved frame, and its contacts hold raw hkpCdBody pointers. The world outside the players
-// is not rolled back, so a contact can name a body that has since left the world or been freed. Keep only contacts with a body that
-// overlaps the restored phantom now; the proxy finds the others again on its next integrate. Returns how many were dropped.
-static uint32_t filter_proxy_manifold(hkpCharacterProxy* proxy)
+// is not rolled back, so a contact can name a body that has since left the world or been freed. Keep the contacts with a session
+// player's body (always valid, see collect_player_collidables) and, for the rest, only those with a body that overlaps the phantom
+// now; the proxy finds the others again on its next integrate. Returns how many were dropped.
+// Contacts with players aren't judged by overlap: they are always valid, and an overlap list that isn't exactly the saved frame's
+// (it is rebuilt here, not restored) would make the machine that rolled back lose a contact the other machine keeps.
+static uint32_t filter_proxy_manifold(hkpCharacterProxy* proxy, const std::vector<const hkpCollidable*>& player_collidables)
 {
     const hkpSimpleShapePhantom* phantom = (const hkpSimpleShapePhantom*)proxy->HkpSimpleShapePhantom;
     if (phantom == NULL || proxy->m_manifold == NULL)
@@ -236,7 +283,9 @@ static uint32_t filter_proxy_manifold(hkpCharacterProxy* proxy)
     for (int32_t i = 0; i < proxy->m_manifold_len; i++)
     {
         const hkpRootCdPoint point = proxy->m_manifold[i];
-        if (point.m_rootCollidableB != NULL && !phantom_overlaps(phantom, (const hkpCollidable*)point.m_rootCollidableB))
+        const hkpCollidable* body = (const hkpCollidable*)point.m_rootCollidableB;
+        const bool players_body = std::find(player_collidables.begin(), player_collidables.end(), body) != player_collidables.end();
+        if (body != NULL && !players_body && !phantom_overlaps(phantom, body))
         {
             continue;
         }
@@ -420,6 +469,11 @@ static void copy_hkpWorld(hkpWorld* to, const HavokRollbackState* from)
 
     restore_damage_phantom_membership(to, *(DamageMan**)Game::damage_man);
 
+    //Every player's bodies go back to their restored places first, and only then are the manifolds filtered: a player's contact with
+    //another player's body is judged by the overlap list, which only knows the other player's restored place once that player's
+    //phantoms and ragdoll have been refreshed too. Filtering inside the same loop judged the first player against the others' old
+    //places, and the connected-player order (local player first) differs per machine, so the machine that rolled back dropped a
+    //contact the other machine kept, until the proxy found it again on its next integrate
     for (uint32_t i = 0; i < (uint32_t)Rollback::ggpoCurrentPlayerCount; i++)
     {
         ChrCtrl* chrctrl = chr_ctrl(connected_player(i));
@@ -436,16 +490,23 @@ static void copy_hkpWorld(hkpWorld* to, const HavokRollbackState* from)
             {
                 refresh_phantom_broadphase(to, (hkpSimpleShapePhantom*)chara->char_proxy->HkpSimpleShapePhantom);
             }
-            if (chara->char_proxy != NULL)
-            {
-                const uint32_t dropped = filter_proxy_manifold(chara->char_proxy);
-                if (dropped > 0 && log_budget(manifold_logs))
-                {
-                    ConsoleWrite("havok rollback: dropped %u character proxy contacts of player %d whose body no longer overlaps", dropped, i);
-                }
-            }
         }
         refresh_ragdoll_broadphase(to, chrctrl->ragdollIns);
+    }
+    std::vector<const hkpCollidable*> player_collidables;
+    collect_player_collidables(player_collidables);
+    for (uint32_t i = 0; i < (uint32_t)Rollback::ggpoCurrentPlayerCount; i++)
+    {
+        ChrCtrl* chrctrl = chr_ctrl(connected_player(i));
+        if (chrctrl == NULL || chrctrl->havokChara == NULL || chrctrl->havokChara->char_proxy == NULL)
+        {
+            continue;
+        }
+        const uint32_t dropped = filter_proxy_manifold(chrctrl->havokChara->char_proxy, player_collidables);
+        if (dropped > 0 && log_budget(manifold_logs))
+        {
+            ConsoleWrite("havok rollback: dropped %u character proxy contacts of player %d whose body no longer overlaps", dropped, i);
+        }
     }
 }
 
