@@ -742,6 +742,7 @@ void copy_AttackInfo(AttackInfo* to, const AttackInfo* from, StateTarget target)
     //these point at the two characters, which outlive the session, so just read/write the pointers themselves
     to->attacker = from->attacker;
     to->defender = from->defender;
+    to->attacker_handle = from->attacker_handle;
     memcpy(to->data_1, from->data_1, sizeof(to->data_1));
 }
 
@@ -2480,7 +2481,12 @@ static void serialize_AttackInfo(StateVisitor& v, const AttackInfo* a)
     v.blob("data_0", a->data_0, sizeof(a->data_0));
     v.ptr_flag("attacker", (void*)a->attacker);   // ChrIns ptrs
     v.ptr_flag("defender", (void*)a->defender);
-    v.blob("data_1", a->data_1, sizeof(a->data_1));
+    serialize_handle(v, "attacker_handle", a->attacker_handle);
+    //The record is filled from a stack struct that leaves some bytes unset, so they hold whatever the stack had: a return
+    //address (0x140388769) at 0x148, and the low half of a heap address (different on each machine) at 0x188 and 0x198.
+    //Ghidra has no access to any of them (AttackInfo: 0x140, then 0x150; 0x184, then 0x18c; 0x194, then 0x1a0).
+    v.blob_holes("data_1", a->data_1, sizeof(a->data_1), { { 0x148 - 0x144, 8, StateVisitor::Hole::Pad },
+        { 0x188 - 0x144, 4, StateVisitor::Hole::Pad }, { 0x198 - 0x144, 8, StateVisitor::Hole::Pad } });
     v.end();
 }
 
@@ -2496,7 +2502,10 @@ static void serialize_EntityThrowAnimationStatus(StateVisitor& v, const EntityTh
     v.begin("EntityThrowAnimationStatus");
     v.ptr_flag("playerins_parent", (void*)e->playerins_parent);   // heap parent ptr
     v.ptr_flag("throw_paramdef", (void*)e->throw_paramdef);       // loaded-param ptr
-    v.blob("unk_18", &e->unk_18, 0x40);
+    v.blob("unk_18", &e->unk_18, offsetof(EntityThrowAnimationStatus, ThrowPairHandle) - offsetof(EntityThrowAnimationStatus, unk_18));
+    //a player's handle, which is different on each machine for the same character
+    serialize_handle(v, "ThrowPairHandle", e->ThrowPairHandle);
+    v.blob("unk_28", &e->unk_28, offsetof(EntityThrowAnimationStatus, throwSelfEsc) - offsetof(EntityThrowAnimationStatus, unk_28));
     if (e->throwSelfEsc)
     {
         v.field("throwSelfEsc_present", true);

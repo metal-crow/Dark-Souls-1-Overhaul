@@ -1373,6 +1373,8 @@ struct EntityThrowAnimationStatus
 
 static_assert(offsetof(EntityThrowAnimationStatus, throw_paramdef) == 0x10);
 static_assert(offsetof(EntityThrowAnimationStatus, unk_18) == 0x18);
+static_assert(offsetof(EntityThrowAnimationStatus, ThrowPairHandle) == 0x24);
+static_assert(offsetof(EntityThrowAnimationStatus, unk_28) == 0x28);
 static_assert(offsetof(EntityThrowAnimationStatus, throwSelfEsc) == 0x58);
 static_assert(offsetof(EntityThrowAnimationStatus, unk_60) == 0x60);
 static_assert(offsetof(EntityThrowAnimationStatus, starting_position_self) == 0x70);
@@ -1430,12 +1432,14 @@ struct AttackInfo
     uint8_t data_0[0x130];
     uint64_t attacker;         // 0x130 (ghidra: ChrIns*)
     uint64_t defender;         // 0x138 (ghidra: ChrIns* defenderChr)
-    uint8_t data_1[0x80];      // 0x140
+    uint32_t attacker_handle;  // 0x140 the attacker's ChrIns handle (each machine has its own for a player)
+    uint8_t data_1[0x7c];      // 0x144 (some gaps hold stale stack, see serialize_AttackInfo)
 };
 
 static_assert(offsetof(AttackInfo, attacker) == 0x130);
 static_assert(offsetof(AttackInfo, defender) == 0x138);
-static_assert(offsetof(AttackInfo, data_1) == 0x140);
+static_assert(offsetof(AttackInfo, attacker_handle) == 0x140);
+static_assert(offsetof(AttackInfo, data_1) == 0x144);
 static_assert(sizeof(AttackInfo) == 0x1c0);
 
 // NS_FRPG::MdlMtx: a set of 3x4 bone matrices (ChrModel::GetDmyPolyPositions reads type 0 or 1)
