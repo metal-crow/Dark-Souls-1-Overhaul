@@ -187,7 +187,7 @@ void serialize_PadManipulator(StateVisitor& v, const PadManipulator* p)
 
     // ---- PadManipulator ----
     v.ptr_flag("SendGeneralPlayerData", p->SendGeneralPlayerData);
-    v.field("ticks_remaining_before_packetsent", p->ticks_remaining_before_packetsent);
+    v.excluded("ticks_remaining_before_packetsent", sizeof(p->ticks_remaining_before_packetsent));
     v.field("movement_related_flags", p->movement_related_flags);
     v.field("not_getting_movement_input", p->not_getting_movement_input);
     v.field("field5_0x23e", p->field5_0x23e);
