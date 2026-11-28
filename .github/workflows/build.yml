@@ -1,0 +1,38 @@
+name: Build DLL
+
+on:
+  workflow_dispatch:
+    inputs:
+      configuration:
+        description: Build configuration
+        type: choice
+        options:
+          - Release
+          - Debug
+        default: Release
+
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout (with submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          lfs: true
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build
+        working-directory: OverhaulDLL
+        run: msbuild DarkSoulsOverhaulMod.sln /m /p:Configuration=${{ inputs.configuration }} /p:Platform=x64
+
+      - name: Upload DLL
+        uses: actions/upload-artifact@v4
+        with:
+          name: d3d11-${{ inputs.configuration }}-${{ github.sha }}
+          path: |
+            OverhaulDLL/${{ inputs.configuration }}/d3d11.dll
+            OverhaulDLL/${{ inputs.configuration }}/d3d11.pdb
+          if-no-files-found: error

@@ -66,6 +66,39 @@ jmp     Send_Type17_GeneralRequestTask_injection_return
 Send_Type17_GeneralRequestTask_injection ENDP
 
 
+EXTERN BreakInPushDispatch_injection_helper: PROC
+EXTERN BreakInPushDispatch_injection_return: qword
+
+PUBLIC BreakInPushDispatch_injection
+BreakInPushDispatch_injection PROC
+
+FUNC_PROLOGUE
+call    BreakInPushDispatch_injection_helper
+mov     [rsp + 58h], rax ;return the result through the saved rax
+FUNC_EPILOGUE
+test    al, al
+jz      BreakInPushDispatch_original
+;the push is being held, return without dispatching it
+ret
+BreakInPushDispatch_injection ENDP
+
+
+;Call the dispatcher without going through the injection
+PUBLIC BreakInPushDispatch_original
+BreakInPushDispatch_original PROC
+
+;original code
+push    rbp
+push    rsi
+push    rdi
+push    r14
+push    r15
+lea     rbp, [rsp-37h]
+sub     rsp, 0A0h
+jmp     BreakInPushDispatch_injection_return
+BreakInPushDispatch_original ENDP
+
+
 _TEXT    ENDS
 
 END
