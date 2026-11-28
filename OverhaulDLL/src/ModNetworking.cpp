@@ -8,7 +8,6 @@
 #include <unordered_map>
 #include <string>
 #include <queue>
-#include <intrin.h>
 #include "Rollback.h"
 #include "ggponet.h"
 #include "PlayerVisualsValidationFix.h"
@@ -309,40 +308,33 @@ void ModNetworking::start()
     sp::mem::code::x64::inject_jmp_14b(write_address, &Start_SessionDisconnect_Task_injection_return, 1, &Start_SessionDisconnect_Task_injection);
 }
 
-//Check that the bytes before this address are a call instruction, so it's a return address
-static bool IsGameReturnAddress(uint64_t addr)
+#include "StackWalker.h"
+
+class MyStackWalker : public StackWalker
 {
-    if (addr < Game::ds1_base + 0x1000 + 6 || addr >= Game::ds1_base + 0x129c400)
+public:
+    MyStackWalker() : StackWalker() {}
+    std::string GetOutput()
     {
-        return false;
+        std::string output(output_text);
+        output_text.clear();
+        return output;
     }
-    uint8_t* code = (uint8_t*)addr;
-    return code[-5] == 0xE8 ||                                          //call rel32
-        (code[-6] == 0xFF && (code[-5] == 0x15 || (code[-5] & 0xF8) == 0x90)) || //call [rip+disp32] / [reg+disp32]
-        (code[-3] == 0xFF && (code[-2] & 0xF8) == 0x50) ||               //call [reg+disp8]
-        (code[-2] == 0xFF && ((code[-1] & 0xF8) == 0xD0 || (code[-1] & 0xF8) == 0x10)); //call reg / [reg]
-}
+protected:
+    std::string output_text;
+    virtual void OnOutput(LPCSTR szText)
+    {
+        output_text.append(szText);
+    }
+};
 
 void Start_SessionDisconnect_Task_injection_helper(uint32_t reason)
 {
-    //Our injections don't have unwind info, so scan the stack for game return addresses instead of walking it
-    ULONG_PTR stack_low, stack_high;
-    GetCurrentThreadStackLimits(&stack_low, &stack_high);
-    uint64_t* stack = (uint64_t*)_AddressOfReturnAddress();
-    std::string callers;
-    int found = 0;
-    for (; (ULONG_PTR)stack < stack_high && found < 24; stack++)
-    {
-        if (IsGameReturnAddress(*stack))
-        {
-            char addr_str[16];
-            snprintf(addr_str, sizeof(addr_str), " %llx", *stack - Game::ds1_base);
-            callers += addr_str;
-            found++;
-        }
-    }
+    MyStackWalker sw;
+    sw.ShowCallstack(); //This interally calls OnOutput, which we overwrite to only save the output
+    std::string stack_info = sw.GetOutput(); // Get the saved output
     ConsoleWrite("Session disconnection. Reason: %llx", reason);
-    ConsoleWrite("Disconnect callers:%s", callers.c_str());
+    ConsoleWrite("DEBUG info: %s", stack_info.c_str());
 }
 
 /*

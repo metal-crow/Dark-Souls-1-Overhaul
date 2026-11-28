@@ -351,17 +351,6 @@ bool BreakInPushDispatch_injection_helper(void* breakin_impl, uint32_t type, uin
     {
         uint32_t len = *(uint32_t*)join_data;
         lobby = FindLobbyIdInJoinData(join_data + 4, len);
-        if (lobby == 0)
-        {
-            std::string hex;
-            char byte_str[4];
-            for (uint32_t i = 0; i < len && i < 64; i++)
-            {
-                snprintf(byte_str, sizeof(byte_str), "%02x ", join_data[4 + i]);
-                hex += byte_str;
-            }
-            ConsoleWrite("Jolly orb: no lobby id in join data (%d bytes): %s", len, hex.c_str());
-        }
     }
     //Never let the game join a host we can't check
     if (lobby == 0)
